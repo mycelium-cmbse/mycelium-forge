@@ -1,0 +1,5 @@
+root = true
+
+[*.cs]
+file_header_template = ------------------------------------------------------------------------------------------------\n<copyright file="{fileName}" company="Starion Group S.A.">\n\n  Copyright 2026 Starion Group S.A.\n  SPDX-License-Identifier: Apache-2.0\n\n</copyright>\n------------------------------------------------------------------------------------------------
+dotnet_diagnostic.IDE0073.severity = warning

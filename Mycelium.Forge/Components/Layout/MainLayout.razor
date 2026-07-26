@@ -1,0 +1,34 @@
+@inherits LayoutComponentBase
+
+@*
+    Static server-side rendered shell. Deliberately free of interactive state: navigation is
+    plain anchors and search is a form GET, so the whole page works without a circuit.
+*@
+
+<div class="min-h-screen flex flex-col bg-background text-foreground">
+    <header class="border-b">
+        <div class="container mx-auto flex items-center gap-6 h-14 px-4">
+            <a href="/" class="font-semibold tracking-tight">Mycelium Forge</a>
+
+            <form method="get" action="/packages" class="flex-1 max-w-xl">
+                <input type="search" name="q" placeholder="Search packages"
+                       class="w-full rounded-md border px-3 py-1.5 text-sm"/>
+            </form>
+
+            <nav class="ml-auto flex items-center gap-4 text-sm">
+                <a href="/packages">Packages</a>
+                <a href="/docs">Documentation</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1 container mx-auto px-4 py-8">
+        @Body
+    </main>
+
+    <footer class="border-t">
+        <div class="container mx-auto px-4 py-6 text-sm text-muted-foreground">
+            Mycelium Forge &mdash; SysML v2 library registry
+        </div>
+    </footer>
+</div>

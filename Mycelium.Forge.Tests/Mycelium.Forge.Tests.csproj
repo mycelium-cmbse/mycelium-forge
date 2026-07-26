@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>14.0</LangVersion>
+        <Company>Starion Group S.A.</Company>
+        <Authors>Sam Gerene</Authors>
+        <Description>NUnit test suite for the Mycelium.Forge project</Description>
+        <Copyright>Copyright © Starion Group S.A.</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <ImplicitUsings>false</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <PreserveCompilationContext>true</PreserveCompilationContext>
+        <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="bunit" Version="2.7.2"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0"/>
+        <PackageReference Include="Moq" Version="4.20.72"/>
+        <PackageReference Include="NUnit" Version="4.6.1"/>
+        <PackageReference Include="NUnit.Analyzers" Version="4.7.0"/>
+        <PackageReference Include="NUnit3TestAdapter" Version="6.2.0"/>
+
+        <PackageReference Include="coverlet.collector" Version="10.0.1">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.msbuild" Version="10.0.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="NUnit.Framework"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mycelium.Forge\Mycelium.Forge.csproj"/>
+    </ItemGroup>
+
+</Project>

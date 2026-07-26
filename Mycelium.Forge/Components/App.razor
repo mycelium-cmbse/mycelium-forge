@@ -1,0 +1,26 @@
+@*
+    The HTML document shell for Mycelium Forge.
+
+    Routes is rendered without a render mode, so every page is static server-side rendered by
+    default (SSS-FG-REG-W9J requires the web interface to be reachable by unauthenticated users
+    and crawlable). Components that need interactivity opt in individually with @@rendermode.
+*@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <base href="/"/>
+    <link href="styles/themes/default.css" rel="stylesheet"/>
+    <link href="_content/BlazorBlueprint.Components/blazorblueprint.css" rel="stylesheet"/>
+    <link href="css/app.css" rel="stylesheet"/>
+    <HeadOutlet/>
+</head>
+<body class="font-sans antialiased">
+    <Routes/>
+
+    @* Required for enhanced navigation and for components that opt in to a render mode. *@
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>

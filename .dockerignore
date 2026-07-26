@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/node_modules/
+.tools/
+**/.vs/
+**/.idea/
+**/.git/
+**/.github/
+**/docs/
+**/*.user
+**/*.suo
+Dockerfile
+.dockerignore

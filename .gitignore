@@ -55,3 +55,22 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+# Visual Studio
+.vs/
+
+# Build tooling fetched on demand (standalone Tailwind CLI)
+.tools/
+
+# Tailwind build output - generated from Mycelium.Forge/Styles/tailwind.css
+Mycelium.Forge/wwwroot/css/app.css
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/

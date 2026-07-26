@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Mycelium.Forge.Client</AssemblyName>
+        <RootNamespace>Mycelium.Forge.Client</RootNamespace>
+        <LangVersion>14.0</LangVersion>
+        <Company>Starion Group S.A.</Company>
+        <Authors>Sam Gerene</Authors>
+        <Description>First-party client library for the Mycelium Forge package registry HTTP API. Consumable by Mycelium Bloom, CI/CD pipelines and third-party tooling. Implements SSS-FG-REG-C3M.</Description>
+        <Copyright>Copyright © Starion Group S.A.</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FluentResults" Version="4.0.0" />
+      <PackageReference Include="MessagePack" Version="3.1.8" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
+    </ItemGroup>
+
+</Project>
