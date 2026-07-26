@@ -7,7 +7,7 @@
         <LangVersion>14.0</LangVersion>
         <Company>Starion Group S.A.</Company>
         <Authors>Sam Gerene</Authors>
-        <Description>Shared data transfer objects for the Mycelium Forge package registry, serialisable as JSON and MessagePack. Consumed by the Forge host and by the Forge client library.</Description>
+        <Description>Shared data transfer objects for the Mycelium Forge package registry, serialisable as JSON. Consumed by the Forge host and by the Forge client library.</Description>
         <Copyright>Copyright © Starion Group S.A.</Copyright>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
@@ -20,7 +20,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MessagePack" Version="3.1.8" />
     </ItemGroup>
 
 </Project>

@@ -73,10 +73,10 @@ namespace Mycelium.Forge
             // The Forge HTTP API (SSS-FG-REG-A5E, D6F, Q7G, M8H) is routed through Carter modules.
             builder.Services.AddCarter();
 
-            // Static server-side rendering is the default. Interactive server components are
-            // registered so that individual components can opt in with an explicit render mode.
-            builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents();
+            // Every component is statically server-rendered. No interactive render mode is
+            // registered: InteractiveServer is ruled out by horizontal scaling, and no screen
+            // requires a component runtime (docs/design.md DD-02, section 7.4).
+            builder.Services.AddRazorComponents();
 
             builder.Services.AddBlazorBlueprintComponents();
 
@@ -102,8 +102,7 @@ namespace Mycelium.Forge
 
             app.MapCarter();
 
-            app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
+            app.MapRazorComponents<App>();
 
             app.Run();
         }
