@@ -13,6 +13,8 @@
         <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+        <!-- Opts this project into the Tailwind build defined in Directory.Build.targets. -->
+        <UseTailwind>true</UseTailwind>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
@@ -38,68 +40,5 @@
     <ItemGroup>
         <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
     </ItemGroup>
-
-    <!-- ==========================================================================================
-         Tailwind CSS build.
-
-         Styles/tailwind.css is compiled to wwwroot/css/app.css using the standalone Tailwind CLI,
-         which is a single self-contained executable. There is deliberately no Node, npm or pnpm
-         dependency: the binary is fetched once per version into .tools/ at the repository root and
-         reused across builds.
-
-         Set -p:TailwindEnabled=false to skip the download and the compilation, for example when
-         building offline or when wwwroot/css/app.css has been produced by an earlier stage.
-         ========================================================================================== -->
-
-    <PropertyGroup>
-        <TailwindVersion>v4.3.3</TailwindVersion>
-        <TailwindEnabled Condition="'$(TailwindEnabled)' == ''">true</TailwindEnabled>
-        <TailwindDirectory>$(MSBuildThisFileDirectory)..\.tools\tailwind\$(TailwindVersion)\</TailwindDirectory>
-        <TailwindInput>$(MSBuildThisFileDirectory)Styles\tailwind.css</TailwindInput>
-        <TailwindOutput>$(MSBuildThisFileDirectory)wwwroot\css\app.css</TailwindOutput>
-    </PropertyGroup>
-
-    <!-- The SDK resolves the portable runtime identifier for the machine running the build, which
-         maps one-to-one onto the release asset names published by tailwindlabs/tailwindcss. The
-         glibc assets are selected; a musl-based build image would need the -musl variants. -->
-    <PropertyGroup Condition="'$(TailwindEnabled)' == 'true'">
-        <TailwindAsset Condition="'$(NETCoreSdkPortableRuntimeIdentifier)' == 'win-x64'">tailwindcss-windows-x64.exe</TailwindAsset>
-        <TailwindAsset Condition="'$(NETCoreSdkPortableRuntimeIdentifier)' == 'linux-x64'">tailwindcss-linux-x64</TailwindAsset>
-        <TailwindAsset Condition="'$(NETCoreSdkPortableRuntimeIdentifier)' == 'linux-arm64'">tailwindcss-linux-arm64</TailwindAsset>
-        <TailwindAsset Condition="'$(NETCoreSdkPortableRuntimeIdentifier)' == 'osx-x64'">tailwindcss-macos-x64</TailwindAsset>
-        <TailwindAsset Condition="'$(NETCoreSdkPortableRuntimeIdentifier)' == 'osx-arm64'">tailwindcss-macos-arm64</TailwindAsset>
-        <TailwindExecutable>$(TailwindDirectory)$(TailwindAsset)</TailwindExecutable>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <!-- Editing a component can introduce a utility class, so the components are build inputs. -->
-        <TailwindSource Include="$(MSBuildThisFileDirectory)Components\**\*.razor"/>
-        <TailwindSource Include="$(MSBuildThisFileDirectory)wwwroot\styles\themes\*.css"/>
-    </ItemGroup>
-
-    <Target Name="ResolveTailwindCli" Condition="'$(TailwindEnabled)' == 'true'">
-        <Error Condition="'$(TailwindAsset)' == ''"
-               Text="No standalone Tailwind CLI asset is published for runtime identifier '$(NETCoreSdkPortableRuntimeIdentifier)'. Add the mapping to Mycelium.Forge.csproj, or build with -p:TailwindEnabled=false."/>
-
-        <DownloadFile SourceUrl="https://github.com/tailwindlabs/tailwindcss/releases/download/$(TailwindVersion)/$(TailwindAsset)"
-                      DestinationFolder="$(TailwindDirectory)"
-                      DestinationFileName="$(TailwindAsset)"
-                      SkipUnchangedFiles="true"
-                      Retries="3"/>
-
-        <Exec Command="chmod +x &quot;$(TailwindExecutable)&quot;"
-              Condition="!$([MSBuild]::IsOSPlatform('Windows'))"/>
-    </Target>
-
-    <Target Name="BuildTailwindCss"
-            DependsOnTargets="ResolveTailwindCli"
-            BeforeTargets="BeforeBuild"
-            Condition="'$(TailwindEnabled)' == 'true'"
-            Inputs="$(TailwindInput);@(TailwindSource)"
-            Outputs="$(TailwindOutput)">
-        <Message Importance="high" Text="Compiling $(TailwindInput) to $(TailwindOutput)"/>
-
-        <Exec Command="&quot;$(TailwindExecutable)&quot; --input &quot;$(TailwindInput)&quot; --output &quot;$(TailwindOutput)&quot; --minify"/>
-    </Target>
 
 </Project>

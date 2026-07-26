@@ -65,7 +65,7 @@ nunit-*.xml
 .vs/
 
 # Build tooling fetched on demand (standalone Tailwind CLI)
-.tools/
+build/tools/
 
 # Tailwind build output - generated from Mycelium.Forge/Styles/tailwind.css
 Mycelium.Forge/wwwroot/css/app.css

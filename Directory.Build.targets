@@ -1,0 +1,91 @@
+<!--
+    Tailwind CSS build.
+
+    Opt in per project with <UseTailwind>true</UseTailwind>. The standalone Tailwind CLI is a single
+    self-contained executable, so the build carries no Node, npm or pnpm dependency.
+
+    The binary is fetched once per version into build/tools/ and its SHA-256 is verified against the
+    digest published in the release's sha256sums.txt. Because the digest is checked, the feed itself
+    is untrusted: TailwindFeedUrl can be repointed at an internal mirror without weakening anything.
+
+        dotnet build -p:TailwindFeedUrl=https://nexus.internal.mycelium/raw/tailwind ^
+                     -p:TailwindReleaseTag=$(TailwindVersion)
+
+    Set -p:UseTailwind=false to skip both the download and the compilation, for example when building
+    offline or when wwwroot/css/app.css was produced by an earlier pipeline stage.
+
+    To bump the version, change TailwindVersion and replace all three digests from
+    https://github.com/tailwindlabs/tailwindcss/releases/download/v<version>/sha256sums.txt
+-->
+<Project>
+
+    <PropertyGroup Condition="'$(UseTailwind)' == 'true'">
+        <TailwindVersion Condition="'$(TailwindVersion)' == ''">4.3.3</TailwindVersion>
+        <TailwindFeedUrl Condition="'$(TailwindFeedUrl)' == ''">https://github.com/tailwindlabs/tailwindcss/releases/download</TailwindFeedUrl>
+        <TailwindReleaseTag Condition="'$(TailwindReleaseTag)' == ''">v$(TailwindVersion)</TailwindReleaseTag>
+        <TailwindToolsDir>$(MSBuildThisFileDirectory)build/tools/tailwind/$(TailwindVersion)/</TailwindToolsDir>
+        <TailwindMinify Condition="'$(Configuration)' == 'Release'">--minify</TailwindMinify>
+    </PropertyGroup>
+
+    <!-- The expected digest differs per asset, so it is set alongside the file name rather than as a
+         single shared property; one digest cannot validate three platform binaries. The glibc assets
+         are selected. A musl-based build image needs the -musl assets and their own digests. -->
+    <PropertyGroup Condition="'$(UseTailwind)' == 'true' AND $([MSBuild]::IsOSPlatform('Windows'))">
+        <TailwindFileName>tailwindcss-windows-x64.exe</TailwindFileName>
+        <TailwindExpectedSha256>e0e260ce048014e9268f6237ff18f8ccf02cef521cbd0ae04e82c2cdf7aa3955</TailwindExpectedSha256>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(UseTailwind)' == 'true' AND $([MSBuild]::IsOSPlatform('Linux'))">
+        <TailwindFileName>tailwindcss-linux-x64</TailwindFileName>
+        <TailwindExpectedSha256>dc61b3ac6b8c9ca874c0cc4c57b2409791a64c5540404ca5f5367360babc313a</TailwindExpectedSha256>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(UseTailwind)' == 'true' AND $([MSBuild]::IsOSPlatform('OSX'))">
+        <TailwindFileName>tailwindcss-macos-arm64</TailwindFileName>
+        <TailwindExpectedSha256>cdf646702987a743464dff4d9c60fd4480d1c1e73dd819a9a67f1078815dce9d</TailwindExpectedSha256>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(UseTailwind)' == 'true'">
+        <TailwindExe>$(TailwindToolsDir)$(TailwindFileName)</TailwindExe>
+    </PropertyGroup>
+
+    <Target Name="RestoreTailwind"
+            Condition="'$(UseTailwind)' == 'true' AND !Exists('$(TailwindExe)')">
+        <Error Condition="'$(TailwindFileName)' == ''"
+               Text="No standalone Tailwind CLI asset is mapped for this platform. Add the mapping to Directory.Build.targets, or build with -p:UseTailwind=false."/>
+
+        <MakeDir Directories="$(TailwindToolsDir)"/>
+
+        <DownloadFile SourceUrl="$(TailwindFeedUrl)/$(TailwindReleaseTag)/$(TailwindFileName)"
+                      DestinationFolder="$(TailwindToolsDir)"
+                      DestinationFileName="$(TailwindFileName)"
+                      Retries="3"/>
+
+        <Exec Command="chmod +x &quot;$(TailwindExe)&quot;"
+              Condition="!$([MSBuild]::IsOSPlatform('Windows'))"/>
+
+        <GetFileHash Files="$(TailwindExe)" Algorithm="SHA256">
+            <Output TaskParameter="Items" ItemName="_TailwindHash"/>
+        </GetFileHash>
+
+        <!-- Delete the artefact before failing, so a corrupted or tampered download is not treated as
+             a valid cache entry by the !Exists() condition on the next build. -->
+        <Delete Files="$(TailwindExe)"
+                Condition="'%(_TailwindHash.FileHash)' != '$(TailwindExpectedSha256)'"/>
+
+        <Error Condition="'%(_TailwindHash.FileHash)' != '$(TailwindExpectedSha256)'"
+               Text="Tailwind CLI checksum mismatch for $(TailwindFileName). Expected $(TailwindExpectedSha256), got %(_TailwindHash.FileHash). The download has been discarded."/>
+    </Target>
+
+    <Target Name="BuildTailwind"
+            BeforeTargets="Build"
+            DependsOnTargets="RestoreTailwind"
+            Condition="'$(UseTailwind)' == 'true'">
+        <!-- Deliberately not incremental. The output differs between Debug and Release because of the
+             minify flag, so Inputs/Outputs would serve a stale file after a configuration switch.
+             A full compile of this project takes well under a second. -->
+        <Exec Command="&quot;$(TailwindExe)&quot; -i Styles/tailwind.css -o wwwroot/css/app.css $(TailwindMinify)"
+              WorkingDirectory="$(MSBuildProjectDirectory)"/>
+    </Target>
+
+</Project>
