@@ -35,7 +35,7 @@ they are still worth understanding once phase 4 has shipped.
 
 ## 2. Decisions still required
 
-Three things are not yet decided, and two of them block work. Each becomes a design decision in
+Two things are not yet decided, and one of them blocks work. Each becomes a design decision in
 `design.md` once settled — this list is where they are visible until then.
 
 **D-1, data access and migration tooling, is settled** and recorded as **DD-18**: DAOs generated
@@ -44,12 +44,17 @@ applied by DbUp.
 
 **D-4, the development OIDC provider, is settled** and recorded as **DD-20** — dissolved rather than
 answered. Forge ships its own Keycloak, so the development provider *is* the production one and there
-is no longer a stand-in to choose. Neither is listed below.
+is no longer a stand-in to choose.
+
+**D-3, the Enterprise Architect model, is settled** in the sense this list tracks: the question was
+who authors it, and F-03 owns that. What the model must cover is recorded on F-03 and in DD-07, DD-18
+and DD-20. That it does not yet exist is schedule risk, which belongs to §9 rather than here.
+
+None of the three is listed below.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
 | **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
-| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, DD-18 now generates the DAOs and the schema from it too, and DD-20 adds `Account`, `Organization` and `Membership` to what it must cover | `Mycelium.Forge.Common` and the persistence layer, therefore every project | **Owner named — F-03 is assigned.** What remains is the model itself, still the head of the critical path |
 | **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.3 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
 **On D-2.** `AWSSDK.S3` against MinIO locally is the conventional answer and needs little discussion.
@@ -105,7 +110,7 @@ Blocks everything else. Small, and worth doing properly.
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| F-01 | **Decide the data-access and migration stack** (D-1); record as a DD — settled as DD-18 | S | — |
+| F-01 | **Decide the data-access and migration stack** (D-1); record as a DD | S | — |
 | F-02 | **Decide the object-storage client and the on-premise storage question** (D-2); record as a DD | S | — |
 | F-03 | **Author the Forge domain model in Enterprise Architect and export XMI.** §8's class diagram is the specification, **including `Account`, `Organization` and `Membership`** — DD-20 makes those Forge's own records rather than an external directory's | L | — |
 | F-04 | **uml4net DTO generation**: templates, MSBuild target, output into `Common/Generated/` (DD-07) | M | F-03 |
@@ -118,8 +123,7 @@ Blocks everything else. Small, and worth doing properly.
 
 F-03 is the critical path and the one with schedule risk — it is upstream of every project in the
 solution and it is not a coding task. If it slips, F-04, F-05 and F-10 slip with it and phase 1 cannot
-start cleanly. **It now has an owner**, which was the first thing this document asked for; what
-remains is the model.
+start cleanly.
 
 **F-10 was missed when DD-18 was written.** That decision generates the data-access layer and the
 schema from the model, but the plan had generation issues only for DTOs (F-04) and serialisers
@@ -327,8 +331,8 @@ which makes it the likeliest to slip quietly.
 **Two decisions have enlarged F-03 since it was written**, and both landed on the one item least able
 to absorb them. DD-18 made the model the source of the schema, so an error in it is now a migration
 rather than an edit. DD-20 added `Account`, `Organization` and `Membership` to what it must cover.
-F-03 is sized L rather than M as a result, and naming its owner is the single most urgent action in
-this document.
+F-03 is sized L rather than M as a result, and a late correction to it is more expensive than one
+made before F-04 and F-10 consume the export.
 
 Three risks worth stating explicitly:
 
