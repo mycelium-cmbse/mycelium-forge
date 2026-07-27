@@ -75,8 +75,8 @@ once someone picks it up).
 ### Issues as created
 
 **78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. **A-07 was added after that pass and has no issue yet** — it came out of DD-18, which did not
-exist when the issues were created, so one needs raising to match.
+other. **A-07 is #85**, raised later: it came out of DD-18, which did not exist when the original
+pass was made.
 
 Two pre-existing issues were left alone:
 
