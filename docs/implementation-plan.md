@@ -47,7 +47,7 @@ applied by DbUp. It is therefore no longer listed here.
 | **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
 | **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, and DD-18 now generates the DAOs and the schema from it too. Does it exist, and who authors it? | `Mycelium.Forge.Common` and the persistence layer, therefore every project | Treated as F-03 below; needs an owner named |
 | **D-4** | **OIDC provider for development.** §13 says "the same external identity provider as Fabric" — correct for production, undefined for a developer laptop | Epic F, and the authenticated pages in Epic G | A Keycloak container in the compose file |
-| **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
+| **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.3 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
 **On D-2.** `AWSSDK.S3` against MinIO locally is the conventional answer and needs little discussion.
 The question worth deciding deliberately is whether an on-premise or air-gapped customer (§5.1) must
@@ -75,8 +75,8 @@ once someone picks it up).
 ### Issues as created
 
 **78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. **A-07 is #85**, raised later: it came out of DD-18, which did not exist when the original
-pass was made.
+other. Three were raised later, all from decisions that did not exist when that pass was made:
+**A-07 is #85** and **F-10 is #88** (from DD-18), and **D-07 is #86** (from DD-19).
 
 Two pre-existing issues were left alone:
 
@@ -106,10 +106,17 @@ Blocks everything else. Small, and worth doing properly.
 | F-07 | **Local environment**: compose with PostgreSQL, MinIO and Keycloak, plus a one-shot migrator service — migrations are an explicit invocation, not a startup step, so without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09, D-4) | M | F-01, F-02 |
 | F-08 | **CI pipeline**: build, test, `docker buildx --sbom=true --provenance=true`, SBOM published as a release file (§15.1). *Already tracked as #2 — no separate issue was created; the SBOM and provenance requirements should be added to it* | M | — |
 | F-09 | **Make the end-to-end suite self-hosting.** It currently requires a host already listening on `:5000` and fails with connection-refused otherwise, so it cannot run in CI as it stands | S | — |
+| F-10 | **uml4net DAO and schema generation** (DD-18): DAO templates emitting raw Npgsql over the §8 entities, a DDL template emitting the schema that becomes migration `0001`, and golden-file coverage of both | L | F-04 |
 
 F-03 is the critical path and the one with schedule risk — it is upstream of every project in the
-solution and it is not a coding task. If it slips, F-04 and F-05 slip with it and phase 1 cannot start
-cleanly. Worth naming an owner before anything else on this list.
+solution and it is not a coding task. If it slips, F-04, F-05 and F-10 slip with it and phase 1 cannot
+start cleanly. Worth naming an owner before anything else on this list.
+
+**F-10 was missed when DD-18 was written.** That decision generates the data-access layer and the
+schema from the model, but the plan had generation issues only for DTOs (F-04) and serialisers
+(F-05), while A-01 spoke of "the generated baseline" as though a generator already existed. Nothing
+produced it. The critical path is therefore **F-03 → F-04 → F-10 → A-01 → everything**, with F-05 and
+F-06 running alongside F-10 rather than ahead of it.
 
 ---
 
@@ -121,7 +128,7 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, and the advisory lock that stops concurrent migrators racing (DD-18) | M | F-01 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), and an explicitly sized connection pool rather than Npgsql's default (§12.2) | M | F-01, F-10 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12) | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |
@@ -163,7 +170,7 @@ built by different routes, so an unsorted diff will report drift that is not the
 |---|---|---|---|
 | C-01 | `GET …/artifact` (latest listed, non-prerelease) and `…/{version}/artifact` (`SSS-FG-REG-D6F`) | M | A-03 |
 | C-02 | Unlist: hidden from search and resolution, still served on direct download (`SSS-FG-REG-U4D`) | M | A-04, A-05 |
-| C-03 | Append-only download and import event recording — never a synchronous counter increment (DD-15) | S | A-01 |
+| C-03 | Append-only download event recording — never a synchronous counter increment (DD-15). Downloads only; the dependents count is D-07 and is not an event | S | A-01 |
 
 ### Epic D — Metadata and the API surface
 
@@ -175,6 +182,7 @@ built by different routes, so an unsorted diff will report drift that is not the
 | D-04 | Content negotiation: media types, `Vary: Accept`, `406` with an RFC 9457 body listing supported types, no silent downgrade (§10.3, DD-12) | M | D-02 |
 | D-05 | RFC 9457 problem details carrying the correlation identifier across the whole API (§10.1) | S | — |
 | D-06 | Maintainer endpoints, with the §8.1 owner invariants and explicit-acceptance transfer (`SSS-FG-AUTH-M3C`, `-T5E`) | M | A-05, A-06 |
+| D-07 | Dependents count derived from the `usage[]` graph and maintained in the publish and unlist transactions — distinct packages, latest listed version, direct dependencies only, and **decrementing** when a new version drops a dependency (DD-19) | M | D-01, B-04, C-02 |
 
 ### Epic E — Search and resolution
 
@@ -213,14 +221,14 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 | G-08 | API keys, including the one-time secret page | M | F1-02 |
 | G-09 | Docs site — Home, Concept, Howto, CLI, HTTP API (§3.3) | L | G-01 |
 | G-10 | Header search: plain `GET` form plus the `Ctrl K` binding; **no live dropdown** (§7.3) | S | E-02, G-01 |
-| G-11 | Both popularity metrics shown distinctly enough that they are not read as one number (§3.3) | S | C-03, H-02 |
+| G-11 | Both popularity metrics shown distinctly enough that they are not read as one number, and labelled **downloads** and **dependents** rather than "imports" (§3.3, DD-19) | S | H-02, D-07 |
 
 ### Epic H — Background jobs (DD-17)
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
 | H-01 | Job table, `FOR UPDATE SKIP LOCKED` claim, lease renewal, expiry reclaim, progress on the row | L | A-01 |
-| H-02 | Counter aggregation advancing a watermark in the same transaction as the aggregate (DD-15, DD-17) | M | H-01, C-03 |
+| H-02 | Download-count aggregation advancing a watermark in the same transaction as the aggregate (DD-15, DD-17). Downloads only — DD-19's dependents count needs no job | M | H-01, C-03 |
 | H-03 | Orphaned blob collection (§12) | M | H-01, A-03 |
 | H-04 | `Forge__Roles` role switch, role-aware startup and probes (DD-03), including the `/ready` schema-version gate and the advisory-locked migrator invocation (DD-18) | M | H-01 |
 
@@ -289,9 +297,11 @@ Additive if and only if the three seams exist. Independent of phases 2 and 3.
 
 ## 9. Critical path and risk
 
-**The critical path is F-03 → F-04 → F-05 → Epic A → everything.** The Enterprise Architect model is
-upstream of the generated DTOs, which are upstream of every project in the solution. It is also the
-only item on that path that is not a coding task, which makes it the likeliest to slip quietly.
+**The critical path is F-03 → F-04 → F-10 → Epic A → everything.** The Enterprise Architect model is
+upstream of the generated DTOs, which are upstream of every project in the solution — and since
+DD-18 it is upstream of the data-access layer and the database schema as well, which is what puts
+F-10 on the path rather than F-05. It is also the only item on that path that is not a coding task,
+which makes it the likeliest to slip quietly.
 
 Three risks worth stating explicitly:
 

@@ -123,13 +123,27 @@ Identified from the Figma prototype and requiring requirements coverage:
   identity only and deferred beyond the first release** (§13.1); it needs a requirement before it is
   built.
 - **Two popularity metrics, not one.** The interface currently shows an "imports" count, while
-  `SSS-FG-REG-X1K` requires "download counts". These measure different things and both are wanted:
-  **downloads** count artefact fetches, and are inflated by CI pipelines, mirrors and tooling;
-  **imports** count packages actually imported into a project, and so reflect adoption by modellers.
-  A package with many downloads and few imports is being pulled by automation rather than used.
-  *Action for the designer: surface both on the search result card and the package detail page, labelled
-  distinctly enough that they are not read as the same number.* Both are covered by DD-15's
-  append-only, asynchronously aggregated counters.
+  `SSS-FG-REG-X1K` requires "download counts". These measure genuinely different things and both are
+  wanted:
+
+  | | Measures | Source |
+  |---|---|---|
+  | **Downloads** | Artefact fetches. Inflated by CI pipelines, mirrors and tooling | Recorded events (DD-15) |
+  | **Dependents** | How many packages in the registry build on this one | Derived from the `usage[]` graph (DD-19) |
+
+  **The metric is renamed from "imports" to "dependents".** It does not count times a package was
+  imported into a project — Forge never observes that — it counts *packages known to Forge whose
+  latest listed version declares a dependency on this one*. "Imports" reads as the former, which is
+  exactly the misreading this bullet warns against, and it is the reading a newcomer will take.
+  nuget.org says "Used By", crates.io "Reverse dependencies", npm "Dependents".
+
+  The naive inference — "many downloads, few dependents means automation rather than real use" —
+  **does not hold and should not be presented**. A leaf library that modellers reference directly and
+  never re-publish has no dependents by construction, however widely used it is. The two numbers
+  distinguish a *building block* from an *end-user library*, not genuine use from automated use.
+
+  *Action for the designer: surface both on the search result card and the package detail page,
+  labelled distinctly enough that they are not read as the same number.*
 
 ### 3.4 Free-text search is scoped to package metadata
 
@@ -514,7 +528,7 @@ that is not on a request path and must run *somewhere*:
 
 | Work | Kind | Source |
 |---|---|---|
-| Download and import counter aggregation | Recurring, short | DD-15 |
+| Download count aggregation | Recurring, short | DD-15 |
 | Orphaned blob collection | Recurring, short | §12, publish ordering |
 | Metadata index replication from upstream | Recurring, incremental | §5.1.6 |
 | Proxied metadata TTL refresh | Recurring, short | §5.1.4 |
@@ -946,7 +960,11 @@ list to maintain.
 **Migrations run as an explicit invocation, not on every replica's startup.** DD-03 makes replicas
 interchangeable, so *N* of them starting together would race. The migrator runs as its own
 invocation — an init container, a `docker compose` one-shot, or an operator command — and takes a
-PostgreSQL advisory lock so that concurrent attempts serialise. Every replica then *verifies* at
+**transaction-scoped** PostgreSQL advisory lock (`pg_advisory_xact_lock`) so that concurrent attempts
+serialise. Transaction-scoped rather than session-scoped because the lock then cannot outlive the
+work it guards — a session lock leaks if the connection is returned to a pool still holding it. That
+it also keeps §12.2's contingency open is a consequence, not the reason. Every replica then
+*verifies* at
 startup that the journal holds every embedded script, and fails `/ready` rather than `/healthz` if
 it does not, so a partially upgraded deployment removes itself from the load balancer instead of
 serving against a schema it does not understand.
@@ -964,23 +982,86 @@ with hand-written data access would not disturb callers; replacing raw SQL with 
 §15.1's SBOM gains `Npgsql` (PostgreSQL licence) and `dbup-postgresql` (MIT). Both are compatible
 with Forge's Apache-2.0 and neither carries a clause to reason about, unlike §9.2's LGPL-3.0 entry.
 
-### DD-15 — Popularity counters are append-only and aggregated asynchronously
+### DD-15 — Download counts are append-only and aggregated asynchronously
 
-**Context.** `SSS-FG-REG-X1K` requires download counts, and the interface additionally shows per-package
-import counts. The naive implementation increments a column on the package row on every download.
+**Context.** `SSS-FG-REG-X1K` requires download counts. The naive implementation increments a column
+on the package row on every download. This decision covers downloads only; the second metric of §3.3
+is not an event at all and is decided separately in DD-19.
 
-**Decision.** Record download and import events append-only, and aggregate them into a materialised
-count on a schedule. Never increment a counter synchronously on the request path. The aggregation runs
-as a claimed job with a transactional watermark (DD-17), which is what keeps it exactly-once across
+**Decision.** Record download events append-only, and aggregate them into a materialised count on a
+schedule. Never increment a counter synchronously on the request path. The aggregation runs as a
+claimed job with a transactional watermark (DD-17), which is what keeps it exactly-once across
 replicas.
 
-**Reasoning.** A synchronous increment puts every request for a package on the same row, so the most
-popular packages — the ones under the heaviest load — suffer the worst write contention. The counts
-are also displayed rounded ("1.2k imports"), so they have no requirement to be transactionally exact.
+**Reasoning.** Three arguments, in ascending order of weight.
+
+*Write shape.* A synchronous increment puts every request for a package on the same row. Concurrent
+updates to one row serialise and each leaves a dead tuple for autovacuum, whereas appends to
+different pages do not contend at all. This is the weakest of the three: at §12.1's stated corpus —
+thousands of packages — single-row update contention is not where PostgreSQL gives out, and this
+argument should not be leaned on as though Forge were operating at nuget.org's volume, which §12.1
+explicitly argues it will not.
+
+*Decoupling.* An artefact download is a redirect to content-addressed storage and need not touch
+PostgreSQL at all. A synchronous increment makes the highest-volume operation in the registry depend
+on a write to the one component that does not scale out with the application (§12.2), so a database
+disturbance becomes failed downloads. This holds at any scale.
+
+*Queryability, which is the real reason.* A running total can answer exactly one question forever. It
+cannot produce downloads over the last thirty days, a per-version breakdown, or a trend line on the
+package page. Events can produce all three, and history not recorded now cannot be reconstructed
+later. The counts are also displayed rounded ("1.2k downloads"), so they carry no requirement to be
+transactionally exact.
 
 **Consequences.** Counts lag by the aggregation interval, which is acceptable for a popularity metric
-and must be stated in the API documentation so consumers do not treat them as exact. Deciding this now
-avoids a data migration later.
+and must be stated in the API documentation so consumers do not treat them as exact. Deciding this
+now avoids a data migration later.
+
+A mirror's download counts are **local**, since they record fetches this installation served. They
+are therefore not comparable with the origin's, and an installation displaying both its own counts
+and a replicated upstream index (§5.1.6) must not present them as one number.
+
+### DD-19 — The dependents count is derived from the dependency graph, not recorded
+
+**Context.** §3.3's second popularity metric counts how many packages in the registry build on a
+given one. It is easily mistaken for an event — "times imported" — and an earlier draft of DD-15
+treated it as one, which would have meant recording something Forge never observes.
+
+**Decision.** The dependents count is **derived from the `usage[]` dependency graph Forge already
+holds**, not recorded from traffic. Package *Q* counts once toward *P* when **Q's latest listed
+version** declares a `usage[]` entry resolving to *P*. The count is maintained in the same
+transaction as the publish or unlist that changes it.
+
+Four rules follow, and each excludes a plausible alternative:
+
+| Rule | Excludes |
+|---|---|
+| Distinct **packages**, not package versions | A dependent that releases often outweighing ten stable ones |
+| **Latest listed version** only | Abandoned old versions inflating the number permanently |
+| **Direct** dependencies only | A transitive closure that credits foundational packages twice over |
+| Unlisted dependents do not count | Contradicting §8.1, where unlisting hides from search and resolution |
+
+**Reasoning.** §9.1 establishes that `.project.json`'s `usage[]` **is** the dependency graph and does
+not need reconstructing, so the count is a query over data the registry already stores. Nothing
+happens at request time, so there is nothing to append.
+
+That in turn means **none of DD-15's machinery applies**: no event table, no aggregation job, no
+watermark, no eventual consistency. The count changes only when a version is published or unlisted,
+and those are rare next to downloads by many orders of magnitude, so maintaining the aggregate inside
+the publish transaction is affordable and makes the number exact rather than lagging.
+
+**Consequences.** The count is exact and needs no reconciliation, which is a stronger guarantee than
+downloads get and should be documented as such rather than left for a consumer to discover.
+
+Publishing a new version of *Q* that drops its dependency on *P* **decrements** *P*. Maintenance is
+therefore a diff between the outgoing and incoming latest-listed versions, not an increment — the
+single most likely implementation error here, because every other counter in the design only ever
+goes up.
+
+Unlike downloads, the count works identically on a mirror and in an air-gapped installation, because
+it is computed from the replicated metadata index (§5.1.6) rather than from traffic this installation
+served. The two metrics therefore behave differently under mirroring, which is a further reason the
+interface must not present them as one number.
 
 ### DD-16 — Mirror routing is scope-level, with no package-level override
 
@@ -1513,7 +1594,8 @@ identical paths everywhere (DD-11).
 | Per-format artefact manifests | PostgreSQL, JSONB with GIN indexing (DD-14) |
 | Artefact blobs | S3 (SSS §4.5), content-addressed |
 | Search index | PostgreSQL, behind an interface (DD-14); see §12.1 |
-| Download and import counts | PostgreSQL, append-only events plus a materialised aggregate (DD-15) |
+| Download counts | PostgreSQL, append-only events plus a materialised aggregate (DD-15) |
+| Dependents counts | PostgreSQL, derived from the `usage[]` graph and maintained in the publish transaction (DD-19) |
 | Background job state and progress | PostgreSQL, claimed rows (DD-17) |
 | Schema version journal | PostgreSQL, written by DbUp (DD-18) |
 
@@ -1524,6 +1606,8 @@ Horizontal scaling requires every instance to be interchangeable:
 - **No instance is special.** Work that is not on a request path — counter aggregation, blob
   collection, index replication, pre-warm — is claimed from a job table rather than scheduled into a
   designated instance (DD-17). Any replica can run any job; none has to.
+- **The database does not scale out with the application.** Every replica connects to the same
+  PostgreSQL, so the connection budget, not CPU, is what actually caps replica count — see §12.2.
 - **Publish must be atomic across two stores.** `SSS-FG-REG-A5E` requires atomic registration, but a
   publish writes a blob to S3 *and* rows to PostgreSQL. The design writes the blob first under a
   content-addressed key, then commits the metadata transaction; an orphaned blob is harmless and
@@ -1649,6 +1733,66 @@ entirely and couples Forge's search choice to the *platform* database that Fabri
 That inverts the apparent benefit: it replaces "run one more isolated container" with "run a
 non-standard PostgreSQL build beneath the whole platform", which is the more invasive ask for a
 customer-operated installation.
+
+### 12.2 The connection budget
+
+Forge scales out; PostgreSQL does not. Every replica talks to the same instance, so the ceiling on
+replica count is reached through connections long before it is reached through CPU. This is recorded
+because it is the one place where DD-02's freedom to add replicas meets a limit that adding replicas
+cannot solve.
+
+PostgreSQL is **process-per-connection** — each backend is an operating-system process with its own
+memory — so throughput degrades once the connection count runs well ahead of the core count. A few
+hundred is the practical territory, and the stock `max_connections` is 100.
+
+Npgsql pools per `NpgsqlDataSource`, and its default `Max Pool Size` is 100 **per replica**. Two
+replicas at defaults therefore exhaust a default-configured PostgreSQL between them. **Pool size is a
+value to set deliberately, not one to inherit**, and the arithmetic to keep true is:
+
+```
+replicas × Max Pool Size  +  migrator  +  operator sessions  ≤  max_connections − superuser_reserved_connections
+```
+
+The two roles of DD-03 have opposite profiles and are sized separately rather than sharing a number:
+a web replica holds many connections briefly, while a job replica holds few for long transactions
+(DD-17's leases and the multi-hour pre-warm of §5.1.5).
+
+#### If the budget stops working: a pooler, as a contingency
+
+This section is structured like §12.1 deliberately. **No pooler is deployed, and none is planned.**
+What follows is the trigger, the candidate it points to, and what adopting it would require — so that
+the eventual choice is evidence-driven rather than reactive.
+
+| Trigger | Candidate | Why that one |
+|---|---|---|
+| The budget above stops closing — replica count needed for load exceeds what `max_connections` will support, or connection establishment shows up in latency | **PgBouncer, transaction pooling mode** | Multiplexes many client connections onto few server ones. A deployment addition, not an application change; no per-instance state, so it does not compromise §12's interchangeability |
+
+**PgBouncer is not required for the §5.1 topologies and must not be read as a component every
+customer operates.** A `docker compose`, on-premise or air-gapped installation is typically one
+replica, where the default pool already fits comfortably. This is a SaaS scaling provision — and the
+objection §12.1 raises against ParadeDB and DD-17 raises against a message broker applies with equal
+force here.
+
+Transaction pooling withholds anything that outlives a single transaction, because the next
+transaction may land on a different server connection. Four such features matter, and they divide
+into two groups that should not be confused:
+
+**Already true, for reasons of their own** — so the door stays open at no cost:
+
+| Feature | Why Forge does not depend on it |
+|---|---|
+| `LISTEN` / `NOTIFY` | DD-17 polls a job table instead, chosen for observability |
+| Temporary tables spanning statements | Not used |
+| Session-level advisory locks | DD-18's migrator takes a **transaction-scoped** lock (`pg_advisory_xact_lock`). Adopted now because it costs nothing — `pg_advisory_xact_lock` is no harder to write than `pg_advisory_lock` and is the better default regardless, since it cannot leak a lock on a connection returned to the pool |
+
+**Would have to change** — and is deliberately *not* changed in advance:
+
+| Feature | What adoption would require |
+|---|---|
+| Server-side prepared statements | Npgsql's automatic preparation would need disabling, or the affected role routing around the pooler. **Left enabled.** Auto-preparation is a real performance feature, and turning it off now would pay a certain cost today against a contingency that may never arrive |
+
+That split is the point of recording this at all. Constraints that are free are honoured immediately;
+constraints that cost something wait until the trigger fires.
 
 ---
 
