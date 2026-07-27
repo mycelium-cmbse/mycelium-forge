@@ -946,7 +946,9 @@ list to maintain.
 **Migrations run as an explicit invocation, not on every replica's startup.** DD-03 makes replicas
 interchangeable, so *N* of them starting together would race. The migrator runs as its own
 invocation — an init container, a `docker compose` one-shot, or an operator command — and takes a
-PostgreSQL advisory lock so that concurrent attempts serialise. Every replica then *verifies* at
+**transaction-scoped** PostgreSQL advisory lock (`pg_advisory_xact_lock`) so that concurrent attempts
+serialise. Transaction-scoped rather than session-scoped, so that the migrator still works through a
+connection pooler (§12.2). Every replica then *verifies* at
 startup that the journal holds every embedded script, and fails `/ready` rather than `/healthz` if
 it does not, so a partially upgraded deployment removes itself from the load balancer instead of
 serving against a schema it does not understand.
@@ -1524,6 +1526,8 @@ Horizontal scaling requires every instance to be interchangeable:
 - **No instance is special.** Work that is not on a request path — counter aggregation, blob
   collection, index replication, pre-warm — is claimed from a job table rather than scheduled into a
   designated instance (DD-17). Any replica can run any job; none has to.
+- **The database does not scale out with the application.** Every replica connects to the same
+  PostgreSQL, so the connection budget, not CPU, is what actually caps replica count — see §12.2.
 - **Publish must be atomic across two stores.** `SSS-FG-REG-A5E` requires atomic registration, but a
   publish writes a blob to S3 *and* rows to PostgreSQL. The design writes the blob first under a
   content-addressed key, then commits the metadata transaction; an orphaned blob is harmless and
@@ -1649,6 +1653,50 @@ entirely and couples Forge's search choice to the *platform* database that Fabri
 That inverts the apparent benefit: it replaces "run one more isolated container" with "run a
 non-standard PostgreSQL build beneath the whole platform", which is the more invasive ask for a
 customer-operated installation.
+
+### 12.2 The connection budget
+
+Forge scales out; PostgreSQL does not. Every replica talks to the same instance, so the ceiling on
+replica count is reached through connections long before it is reached through CPU. This is recorded
+because it is the one place where DD-02's freedom to add replicas meets a limit that adding replicas
+cannot solve.
+
+PostgreSQL is **process-per-connection** — each backend is an operating-system process with its own
+memory — so throughput degrades once the connection count runs well ahead of the core count. A few
+hundred is the practical territory, and the stock `max_connections` is 100.
+
+Npgsql pools per `NpgsqlDataSource`, and its default `Max Pool Size` is 100 **per replica**. Two
+replicas at defaults therefore exhaust a default-configured PostgreSQL between them. **Pool size is a
+value to set deliberately, not one to inherit**, and the arithmetic to keep true is:
+
+```
+replicas × Max Pool Size  +  migrator  +  operator sessions  ≤  max_connections − superuser_reserved_connections
+```
+
+The two roles of DD-03 have opposite profiles and are sized separately rather than sharing a number:
+a web replica holds many connections briefly, while a job replica holds few for long transactions
+(DD-17's leases and the multi-hour pre-warm of §5.1.5).
+
+Past the point where that arithmetic stops working, the answer is **PgBouncer in transaction pooling
+mode**, which multiplexes many client connections onto few server ones. It is a deployment addition
+rather than an application change — but it constrains what the application may use, and those
+constraints are cheaper to respect from the start than to retrofit:
+
+| Unavailable under transaction pooling | Position |
+|---|---|
+| Session-level advisory locks | DD-18's migrator takes a **transaction-scoped** lock (`pg_advisory_xact_lock`), never a session-scoped one |
+| `LISTEN` / `NOTIFY` | Not used — DD-17 polls a job table |
+| Server-side prepared statements | Npgsql's automatic preparation is disabled, or the affected role is routed around the pooler |
+| Temporary tables spanning statements | Not used |
+
+Two of those four are already true because of decisions taken for unrelated reasons, which is the
+useful part: DD-17 chose a polled job table over `LISTEN`/`NOTIFY` on grounds of observability, and
+that choice keeps this door open as a side effect.
+
+**PgBouncer is not required for the §5.1 topologies.** A `docker compose`, on-premise or air-gapped
+installation is typically one replica, where the default pool already fits. It is a SaaS scaling
+provision, and stating that here keeps it from being read as a component every customer must operate
+— the objection §12.1 raises against ParadeDB and DD-17 raises against a message broker.
 
 ---
 

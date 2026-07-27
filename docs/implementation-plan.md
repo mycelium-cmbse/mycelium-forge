@@ -121,7 +121,7 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, and the advisory lock that stops concurrent migrators racing (DD-18) | M | F-01 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), and an explicitly sized connection pool rather than Npgsql's default (§12.2) | M | F-01 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12) | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |
