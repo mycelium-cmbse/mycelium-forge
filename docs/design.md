@@ -57,7 +57,8 @@ Forge's differentiators follow from that, and should drive prioritisation:
   the whole upstream catalogue, not merely what it has cached, which is more than a conventional
   repository proxy manages for any format except Maven.
 - **Fabric and Bloom integration** with enterprise identity (`SSS-FG-AUTH-S1A`) and the ownership model
-  (`SSS-FG-AUTH-M3C`).
+  (`SSS-FG-AUTH-M3C`) — where those products are present. Forge is deployable without them (§3.5,
+  DD-20), so this is a differentiator in the Mycelium context rather than a dependency.
 
 One observation worth carrying into planning rather than treating as a footnote: **sysand already ships
 the client languages §11.3 lists as planned** — Python and Java APIs, plus WASM bindings covering the
@@ -214,6 +215,25 @@ have been by a blended ranked list.
 resolution.** Neither amendment is made here — this section records the divergence and its
 justification for the SSS owner to act on.
 
+### 3.5 Forge does not share an identity provider with Fabric
+
+**This entry is different in kind from the four above.** Those record places where Forge deliberately
+exceeds or narrows the SSS on its own reasoning. This one records a **platform-level architectural
+decision taken outside Forge** that leaves two requirements simply wrong rather than merely exceeded.
+
+`SSS-FG-AUTH-S1A` and `SSS-CC-EXT-ID1` have interactive users authenticating "through the same
+external identity provider as Fabric". The platform architecture no longer permits Fabric and Forge to
+share a Keycloak, and the product intent is now explicit: **deploying Forge without Fabric and Bloom
+must be possible.**
+
+Forge therefore **owns its identity registry** and federates to an external provider only where one is
+configured. See DD-20 for the decision and its consequences.
+
+**`SSS-FG-AUTH-S1A` and `SSS-CC-EXT-ID1` require amendment, and until they are amended the
+requirements baseline contradicts the architecture.** This is not the deferred bookkeeping the other
+entries in this section describe: a reader following those two requirements today would build the
+wrong thing.
+
 ---
 
 ## 4. Reference documents
@@ -251,7 +271,8 @@ flowchart TB
         s3[("S3<br/>content-addressed artefact blobs")]
     end
 
-    kc[Keycloak / external IdP]
+    kc[Forge Keycloak<br/>ships with the deployment]
+    ext[External IdP<br/>optional, see DD-20]
     upstream[Upstream Forge<br/>optional, see 5.1]
 
     browser --> ui
@@ -264,6 +285,7 @@ flowchart TB
     domain --> s3
     ui -.OIDC.-> kc
     api -.OIDC / API key.-> kc
+    kc -.optional federation.-> ext
     domain -.artefact fetch + index sync.-> upstream
 ```
 
@@ -1063,6 +1085,87 @@ it is computed from the replicated metadata index (§5.1.6) rather than from tra
 served. The two metrics therefore behave differently under mirroring, which is a further reason the
 interface must not present them as one number.
 
+### DD-20 — Forge owns its identity registry and ships its own provider
+
+**Context.** §13 previously delegated all of identity to Fabric's Keycloak, and the sentence "no
+Forge-specific registration exists" carried more weight than its length suggested: Accounts,
+Organizations, membership, invitations and deprovisioning were all inherited rather than modelled.
+The platform architecture no longer permits a shared Keycloak, and the product intent is now that
+**Forge must be deployable without Fabric and Bloom** (§3.5).
+
+**Decision.** Three parts.
+
+1. **Forge owns Account, Organization and Membership as first-class domain entities** (§8). They are
+   Forge's records, not projections of an external directory.
+2. **A Keycloak ships with the deployment**, pre-configured with a Forge realm. Interactive
+   authentication is OIDC against it.
+3. **Federation to an external provider is configuration, not a requirement.** Where Fabric's IdP or
+   an enterprise IdP exists, Forge's Keycloak brokers to it. Where none exists, Forge works unchanged.
+
+The first administrator is **seeded from configuration** — an operator-supplied identifier granted
+administrator on first start.
+
+**Reasoning.**
+
+*The shape is one the design already uses twice.* §5.1 says "a mirror is not a separate product, it is
+the same binary with an upstream configured", and DD-03 selects deployment roles by configuration
+rather than by a second build. Standalone Forge is the same binary with no external IdP configured.
+That also satisfies `SSS-CC-ADAPT-G1P`'s requirement that adaptation be declarative, which §5.1
+already cites for the same reason.
+
+*Why own the registry rather than federate for it.* Federation supplies authentication, not
+organization membership. `SSS-FG-AUTH-S2B` resolves a scope to an Account or Organization slug,
+`SSS-FG-AUTH-G6F` lets an Account publish on behalf of an Organization, and `SSS-FG-AUTH-O4D` requires
+at least one individual-Account Owner. Those are authorisation facts Forge must be able to answer
+with or without an upstream directory, so they belong in Forge's database. A pleasant side effect:
+§8.2's "authorised against the credential" becomes a join against a membership table rather than
+claim parsing.
+
+*Why bundle a provider rather than require one.* §12.1 rejects ParadeDB and DD-17 rejects a message
+broker on the same principle — do not make every on-premise customer run more infrastructure. That
+principle is honoured here rather than broken: bundling is what *avoids* the operator having to stand
+one up. It is also the component `F-07` already needs for development, so the development and
+production shapes become the same rather than one standing in for the other.
+
+*Why not Forge-local credentials.* A username-and-password store would be genuinely
+zero-dependency, but Forge would then hold credentials. §13 currently stores only API key hashes, and
+that is a security surface worth keeping closed.
+
+*Why a seeded administrator rather than first-login-wins.* First-login-wins races on any installation
+reachable before the intended administrator arrives, and leaves nothing in the audit trail
+(`SSS-FG-AUTH-R9J`) explaining why that account holds the role. A configured identifier is explicit,
+auditable, and works unattended in the air-gapped installations of §5.1.
+
+**Consequences.**
+
+**Forge needs an account and organization administration surface that the design previously had no
+need for**: account provisioning on first login, organization creation, membership and roles,
+invitations, deprovisioning, and the seeded-administrator bootstrap. None of it existed while identity
+was inherited. It is phase 1 work, because publish is authorised against scope (§8.2) and §8.1's
+owner invariant is enforced in the domain layer.
+
+**§8's model grows, and that lands on the critical path.** Since DD-18 the Enterprise Architect model
+is upstream of the DTOs, the DAOs and the schema, so adding Account, Organization and Membership
+enlarges the one item §19 already identifies as the likeliest to slip quietly because it is not a
+coding task.
+
+**Organization slugs are now Forge's to allocate**, which makes §5.1.2's rule — rejecting creation of
+a local Organization whose slug is in the proxied set — enforceable by Forge directly rather than
+dependent on an external directory.
+
+**Membership can drift from Fabric's** where both exist and federation carries authentication only. An
+account removed from an organization upstream retains its Forge rights until Forge is told. Where that
+matters, group or role claims from the upstream provider can be mapped onto Forge memberships — but
+that is a configuration option, not a guarantee, and it should be documented as such rather than
+assumed.
+
+**§13.1's verified-publisher programme becomes unambiguously Forge's own.** With no upstream identity
+authority, there is nobody else who could vouch that `@esa` is ESA. It remains deferred.
+
+**Unaffected:** API keys (`SSS-FG-REG-Y2L`) were always Forge's own and never touched Keycloak, so the
+CI/CD publish path is unchanged. Anonymous read access (`SSS-FG-REG-W9J`) is unchanged, which is most
+of the registry. §5.1.7's upstream credential is an API key, so mirroring is unchanged.
+
 ### DD-16 — Mirror routing is scope-level, with no package-level override
 
 **Context.** An on-premise Forge can proxy an upstream while hosting local packages (§5.1). Where both
@@ -1215,6 +1318,17 @@ nothing that exists.
 
 ```mermaid
 classDiagram
+    class Account {
+        +string Subject
+        +string Handle
+    }
+    class Organization {
+        +string Slug
+        +string DisplayName
+    }
+    class Membership {
+        +OrganizationRole Role
+    }
     class Scope {
         +string Slug
         +ScopeKind Kind
@@ -1246,6 +1360,11 @@ classDiagram
         <<interface>>
     }
 
+    Account "1" --> "*" Membership
+    Organization "1" --> "*" Membership
+    Account "1" --> "0..1" Scope
+    Organization "1" --> "0..1" Scope
+    Account "1" --> "*" Maintainer
     Scope "1" --> "*" Package
     Package "1" --> "*" PackageVersion
     Package "1" --> "*" Maintainer
@@ -1265,7 +1384,7 @@ classDiagram
 | A new version must be strictly greater than every prior version | `SSS-FG-REG-S2B` |
 | A major-version change requires release notes | `SSS-FG-REG-S2B` |
 | Unlisting hides from search and resolution but still serves direct downloads | `SSS-FG-REG-U4D` |
-| A package always retains at least one individual-Account Owner | `SSS-FG-AUTH-O4D` |
+| A package always retains at least one individual-Account Owner — a Forge Account, per DD-20 | `SSS-FG-AUTH-O4D` |
 | An Organization Owner alone does not satisfy that invariant | `SSS-FG-AUTH-P7G` |
 | Ownership transfer takes effect only on explicit acceptance | `SSS-FG-AUTH-T5E` |
 | Package metadata is frozen at publish time and never edited directly | `SSS-FG-AUTH-M3C` |
@@ -1798,8 +1917,12 @@ constraints that cost something wait until the trigger fires.
 
 ## 13. Authentication and authorisation
 
-- **Interactive users** authenticate by OIDC through the same external identity provider as Fabric
-  (`SSS-FG-AUTH-S1A`, `SSS-CC-EXT-ID1`). No Forge-specific registration exists.
+- **Interactive users** authenticate by OIDC against **Forge's own identity provider**, which ships
+  with the deployment. Where an external provider exists — Fabric's, or an enterprise IdP — Forge
+  federates to it as configuration. Forge never requires one (DD-20, §3.5).
+- **Accounts and Organizations are Forge's own records**, not projections of an external directory.
+  Membership, roles, invitations and deprovisioning are Forge's to administer (DD-20). This replaces
+  the previous position that no Forge-specific registration exists.
 - **Publishing clients** authenticate with revocable API keys, scoped to a publisher and to a permitted
   operation set (`SSS-FG-REG-Y2L`). Keys are stored as hashes; the secret is shown once, which is what
   the `overlay/Forge Key secret` frame exists for.

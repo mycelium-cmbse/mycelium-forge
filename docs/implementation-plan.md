@@ -35,18 +35,21 @@ they are still worth understanding once phase 4 has shipped.
 
 ## 2. Decisions still required
 
-Four things are not yet decided, and two of them block work. Each becomes a design decision in
+Three things are not yet decided, and two of them block work. Each becomes a design decision in
 `design.md` once settled — this list is where they are visible until then.
 
 **D-1, data access and migration tooling, is settled** and recorded as **DD-18**: DAOs generated
 from the Enterprise Architect model over raw Npgsql, with numbered forward-only SQL migrations
-applied by DbUp. It is therefore no longer listed here.
+applied by DbUp.
+
+**D-4, the development OIDC provider, is settled** and recorded as **DD-20** — dissolved rather than
+answered. Forge ships its own Keycloak, so the development provider *is* the production one and there
+is no longer a stand-in to choose. Neither is listed below.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
 | **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
-| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, and DD-18 now generates the DAOs and the schema from it too. Does it exist, and who authors it? | `Mycelium.Forge.Common` and the persistence layer, therefore every project | Treated as F-03 below; needs an owner named |
-| **D-4** | **OIDC provider for development.** §13 says "the same external identity provider as Fabric" — correct for production, undefined for a developer laptop | Epic F, and the authenticated pages in Epic G | A Keycloak container in the compose file |
+| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, DD-18 now generates the DAOs and the schema from it too, and DD-20 adds `Account`, `Organization` and `Membership` to what it must cover. Does it exist, and who authors it? | `Mycelium.Forge.Common` and the persistence layer, therefore every project | Treated as F-03 below; **this is the most urgent item in the document** and needs an owner named |
 | **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.3 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
 **On D-2.** `AWSSDK.S3` against MinIO locally is the conventional answer and needs little discussion.
@@ -99,11 +102,11 @@ Blocks everything else. Small, and worth doing properly.
 |---|---|---|---|
 | F-01 | **Decide the data-access and migration stack** (D-1); record as a DD — settled as DD-18 | S | — |
 | F-02 | **Decide the object-storage client and the on-premise storage question** (D-2); record as a DD | S | — |
-| F-03 | **Author the Forge domain model in Enterprise Architect and export XMI.** §8's class diagram is the specification | M | — |
+| F-03 | **Author the Forge domain model in Enterprise Architect and export XMI.** §8's class diagram is the specification, **including `Account`, `Organization` and `Membership`** — DD-20 makes those Forge's own records rather than an external directory's | L | — |
 | F-04 | **uml4net DTO generation**: templates, MSBuild target, output into `Common/Generated/` (DD-07) | M | F-03 |
 | F-05 | **uml4net JSON serialiser generation** (DD-05), including DD-13's abbreviated projection | M | F-04 |
 | F-06 | **Contract-test harness** for generated serialisers (§17) — a template defect is systematic, so this is the test that matters most | S | F-05 |
-| F-07 | **Local environment**: compose with PostgreSQL, MinIO and Keycloak, plus a one-shot migrator service — migrations are an explicit invocation, not a startup step, so without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09, D-4) | M | F-01, F-02 |
+| F-07 | **Local environment**: compose with PostgreSQL, MinIO and the Forge Keycloak — which since DD-20 is the production component rather than a stand-in — plus a one-shot migrator service, since migrations are an explicit invocation and without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09) | M | F-01, F-02 |
 | F-08 | **CI pipeline**: build, test, `docker buildx --sbom=true --provenance=true`, SBOM published as a release file (§15.1). *Already tracked as #2 — no separate issue was created; the SBOM and provenance requirements should be added to it* | M | — |
 | F-09 | **Make the end-to-end suite self-hosting.** It currently requires a host already listening on `:5000` and fails with connection-refused otherwise, so it cannot run in CI as it stands | S | — |
 | F-10 | **uml4net DAO and schema generation** (DD-18): DAO templates emitting raw Npgsql over the §8 entities, a DDL template emitting the schema that becomes migration `0001`, and golden-file coverage of both | L | F-04 |
@@ -200,10 +203,22 @@ harness that measures it, the trigger cannot fire and the decision becomes unfal
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| F1-01 | OIDC interactive login against the Fabric identity provider (`SSS-FG-AUTH-S1A`, `SSS-CC-EXT-ID1`) | M | F-07 |
+| F1-01 | OIDC interactive login against **Forge's own** identity provider, with federation to an external one as optional configuration (DD-20) | M | F-07 |
 | F1-02 | API keys: issuance, revocation, hashed storage, one-time reveal in the `POST` response with an idempotency token (§7.4, `SSS-FG-REG-Y2L`) | M | A-01, A-06 |
 | F1-03 | Owner and Maintainer authority model wired into every privileged path (`SSS-FG-AUTH-M3C`) | M | A-05 |
 | F1-04 | Anonymous read access to public packages (`SSS-FG-REG-W9J`, `-Y2L`) | S | — |
+| F1-05 | **Account provisioning on first login**, and the seeded-administrator bootstrap from configuration (DD-20) | M | F1-01, A-01 |
+| F1-06 | **Organization creation and slug allocation**, with §5.1.2's rejection of a slug already in the proxied set (DD-16, DD-20) | M | F1-05, A-02 |
+| F1-07 | **Membership and organization roles** — the relation `SSS-FG-AUTH-G6F` needs to authorise publishing on behalf of an Organization (RD-01, DD-20) | M | F1-06 |
+| F1-08 | **Invitations and deprovisioning**, with audit entries on both (`SSS-FG-AUTH-R9J`, DD-20) | M | F1-07, A-06 |
+
+**F1-05 to F1-08 are new, and they are not a small addition.** Until DD-20 the design inherited
+Accounts, Organizations and membership from Fabric's directory, and §13's sentence "no Forge-specific
+registration exists" was carrying all of it. Standalone deployment makes that surface Forge's own.
+
+They are phase 1 rather than deferrable: publish is authorised against scope (§8.2, B-03) and §8.1's
+"at least one individual-Account Owner" invariant is enforced in the domain layer (A-05). Neither can
+be built against an account model that does not exist.
 
 ### Epic G — Web interface
 
@@ -302,6 +317,12 @@ upstream of the generated DTOs, which are upstream of every project in the solut
 DD-18 it is upstream of the data-access layer and the database schema as well, which is what puts
 F-10 on the path rather than F-05. It is also the only item on that path that is not a coding task,
 which makes it the likeliest to slip quietly.
+
+**Two decisions have enlarged F-03 since it was written**, and both landed on the one item least able
+to absorb them. DD-18 made the model the source of the schema, so an error in it is now a migration
+rather than an edit. DD-20 added `Account`, `Organization` and `Membership` to what it must cover.
+F-03 is sized L rather than M as a result, and naming its owner is the single most urgent action in
+this document.
 
 Three risks worth stating explicitly:
 
