@@ -692,6 +692,7 @@ is generated on the same terms. Generation is performed by uml4net at design-tim
 | Serialisation | **System.Text.Json** | The only wire format per DD-04; the serialisers themselves are generated from the model per DD-05 |
 | Data access | **Npgsql, with DAOs generated from the model** | Raw ADO.NET over the PostgreSQL driver. DD-14's JSONB and GIN, DD-17's `FOR UPDATE SKIP LOCKED` and DD-15's watermark are written as the SQL they are; the DAOs come from the same uml4net pass as the DTOs. See DD-18 |
 | Database migrations | **DbUp** | Numbered, forward-only SQL embedded in the assembly and journalled in the database. It needs no network, so it works unchanged in §5.1's air-gapped topology. See DD-18 |
+| Object storage | **`AWSSDK.S3`** | The reference implementation of the protocol; S3-compatible stores are reached by `ServiceURL` and `ForcePathStyle`. Object storage is required in every topology and there is no filesystem backend. See DD-21 |
 | End-to-end testing | **Playwright** | One tool covers both the browser surface and the HTTP API (§17) |
 | Code generation | **uml4net** | See DD-07 |
 
@@ -1003,6 +1004,87 @@ with hand-written data access would not disturb callers; replacing raw SQL with 
 
 §15.1's SBOM gains `Npgsql` (PostgreSQL licence) and `dbup-postgresql` (MIT). Both are compatible
 with Forge's Apache-2.0 and neither carries a clause to reason about, unlike §9.2's LGPL-3.0 entry.
+
+### DD-21 — Object storage is required in every topology, over `AWSSDK.S3`
+
+**Context.** §12 stores artefact blobs in S3, content-addressed, but DD-06 named no client. The
+second and larger question is whether an on-premise or air-gapped operator (§5.1) must run object
+storage at all, or whether `IArtifactStore` — the §19.1 seam — also gets a filesystem-backed
+implementation.
+
+**Decision.** Two parts.
+
+1. **`AWSSDK.S3`** is the client. S3-compatible endpoints are reached by setting `ServiceURL` and
+   `ForcePathStyle`, so MinIO, Ceph and comparable stores work unchanged.
+2. **S3-compatible object storage is required in every deployment topology.** There is no
+   filesystem-backed `IArtifactStore`. **MinIO** is the local development and CI target, so the path
+   exercised in development is the path production runs.
+
+**Reasoning.**
+
+*On the client.* The official SDK is Apache-2.0, is the reference implementation of the protocol, and
+supports the presigning that §12's redirect-based download path depends on. The `Minio` .NET SDK is
+smaller but ties Forge to a vendor that has been narrowing what its community edition offers, which is
+a poor trade for a saving measured in megabytes. `FluentStorage` would supply a filesystem backend for
+free, but it means placing a third-party abstraction *beneath* `IArtifactStore`, which is Forge's own
+abstraction over the same concern — the result is the union of two leaky abstractions rather than less
+work.
+
+*Why no filesystem implementation.* §12's "no local disk state" is a horizontal-scaling requirement,
+and a filesystem store does not extend it — it contradicts it. Admitting one would mean the design has
+two classes of deployment with different correctness properties, and only one of them documented in
+the section that states the property.
+
+The failure mode is the deciding argument. With two replicas over local disks, content-addressed
+writes land on different machines: a publish succeeds, and downloads of that artefact then fail from
+whichever replica did not receive the bytes. Intermittent, invisible in the publish response, and
+indistinguishable from a transient error to the user. Nothing in the system can detect it — a startup
+guard can only ask the operator to promise something no code can verify, and a promise is not a
+constraint.
+
+One implementation also keeps three properties simple that all rest on a single content-addressed
+store: §8.2's automatic deduplication when one artefact is published into several scopes, §5.1.4's
+identity between the mirror cache and the local blob store, and §12's publish ordering — blob first,
+metadata transaction second — which has to hold identically wherever bytes land.
+
+*The cost, stated rather than glossed.* The smallest on-premise installation must now run object
+storage to hold what may be a few hundred megabytes of packages. That is the objection §12.1 raises
+against ParadeDB and DD-17 raises against a message broker, pointed back at this decision, and it
+deserves an answer rather than silence.
+
+The objection does not transfer cleanly, for two reasons. Those rejections were about adding a
+*second* system to do a job PostgreSQL already does adequately; here object storage is doing a job
+PostgreSQL does badly — large binary objects inflate WAL, backup size and restore time, which is
+precisely why SSS §4.5 separates the two. And the ask is smaller than it sounds: MinIO is a single
+container image, so it travels through an air gap by the same `docker save` route §15.1 already
+documents for Forge itself.
+
+**Consequences.**
+
+`IArtifactStore` has exactly one implementation, so `A-03` builds one and §17's persistence suite
+exercises one path. The seam remains, because §19.1 needs it for mirroring's fetch-on-miss — not
+because a second backend is anticipated.
+
+**§12's "no local disk state" stands unqualified.** This is worth stating positively: the bullet was
+close to acquiring an exception, and it has not.
+
+Configuration is endpoint, region, bucket, credentials and path-style addressing. **Path-style is
+required for MinIO and most S3-compatible stores** while AWS itself prefers virtual-host style, so
+this is a setting operators will get wrong if it is not surfaced in the deployment documentation.
+
+Object storage joins PostgreSQL as a documented prerequisite for **every** topology, including
+air-gapped. §5.1's promise that a mirror is "the same binary with an upstream configured" is preserved
+rather than weakened — storage does not become a second axis on which deployments differ.
+
+`AWSSDK.S3` is Apache-2.0, matching Forge's own licence, so §15.1's SBOM gains no clause to reason
+about.
+
+**One question this leaves open for `C-01`.** §12 and DD-15 describe an artefact download as a
+redirect to content-addressed storage, which implies a presigned URL and requires the *client* to
+reach object storage directly. Behind a reverse proxy or in a restricted network that may not hold,
+and the alternative — streaming through Forge — costs bandwidth and connections (§12.2). The download
+endpoint decides this; it is recorded here because the client choice must support both, and
+`AWSSDK.S3` does.
 
 ### DD-15 — Download counts are append-only and aggregated asynchronously
 
@@ -1723,7 +1805,7 @@ identical paths everywhere (DD-11).
 |---|---|
 | Packages, versions, maintainers, keys, audit | PostgreSQL (SSS §4.5, DD-14) |
 | Per-format artefact manifests | PostgreSQL, JSONB with GIN indexing (DD-14) |
-| Artefact blobs | S3 (SSS §4.5), content-addressed |
+| Artefact blobs | S3-compatible object storage (SSS §4.5), content-addressed, over `AWSSDK.S3` (DD-21) |
 | Search index | PostgreSQL, behind an interface (DD-14); see §12.1 |
 | Download counts | PostgreSQL, append-only events plus a materialised aggregate (DD-15) |
 | Dependents counts | PostgreSQL, derived from the `usage[]` graph and maintained in the publish transaction (DD-19) |
@@ -1733,7 +1815,8 @@ identical paths everywhere (DD-11).
 Horizontal scaling requires every instance to be interchangeable:
 
 - **No server-side session affinity.** Guaranteed by DD-02 — no circuits exist to pin.
-- **No local disk state.** Artefacts stream to and from S3; instances hold no durable local data.
+- **No local disk state.** Artefacts stream to and from object storage; instances hold no durable
+  local data. DD-21 declines a filesystem-backed store precisely so that this holds without exception.
 - **No instance is special.** Work that is not on a request path — counter aggregation, blob
   collection, index replication, pre-warm — is claimed from a job table rather than scheduled into a
   designated instance (DD-17). Any replica can run any job; none has to.
