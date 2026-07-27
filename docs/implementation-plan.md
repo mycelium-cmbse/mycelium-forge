@@ -259,7 +259,7 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 | I-01 | Serilog structured JSON with trace, span and correlation identifiers (`SSS-FB-OBS-S1A`) | S | — |
 | I-02 | OpenTelemetry traces over OTLP (`SSS-FB-OBS-D2B`) | S | — |
 | I-03 | Prometheus `/metrics`, including job duration, outcome and queue lag (`SSS-FB-OBS-M3C`, DD-17) | M | H-01 |
-| I-04 | Credential and PII scrubbing, bounded retention (`SSS-FB-OBS-R8H`) | M | I-01 |
+| I-04 | Credential and PII scrubbing, bounded retention (`SSS-FB-OBS-R8H`), redacting on the API key prefix and on `Authorization` headers (§13) | M | I-01, F1-02 |
 
 ---
 
@@ -272,7 +272,7 @@ Depends only on phase 1's `/api/v1`.
 | P2-01 | `Mycelium.Forge.Client` over the seven `SSS-FG-REG-C3M` operations: base-URL configuration, `IHttpClientFactory`, `FluentResults` rather than exceptions | L |
 | P2-02 | Client tests against a running host, over the real transport (§17) | M |
 | P2-03 | CLI: `System.CommandLine` shell over the client — `search`, `info`, `versions`, `download`, `publish`, `unlist`, `key` (§11.2) | L |
-| P2-04 | `forge login` and local credential storage — the one command with no library counterpart | M |
+| P2-04 | `forge login` and local credential storage — the one command with no library counterpart. The OS credential store, not a dotfile, with an announced fallback where none exists (§11.2) | M |
 | P2-05 | NativeAOT self-contained binaries per platform, not a `dotnet tool` (§11.2) | M |
 | P2-06 | CLI SBOM generated from the restore graph (§15.1) | S |
 

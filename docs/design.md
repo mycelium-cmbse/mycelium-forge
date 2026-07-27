@@ -1678,6 +1678,18 @@ the .NET SDK on the target machine, which is a poor assumption for CI runners an
 editor is not Visual Studio. DD-05's model-generated serialisers contain no reflection, which is what
 makes NativeAOT viable, so this costs nothing additional.
 
+**`forge login` writes to the operating system's credential store** — DPAPI on Windows, Keychain on
+macOS, the Secret Service API on Linux — and not to a file in the user's home directory. Where no
+store is available, which is the common case on a CI runner and on a minimal container, it falls back
+to a file with owner-only permissions, and **says so at the point of use** rather than falling back
+silently.
+
+This is stated because the alternative is the default that gets written by accident. npm keeps its
+token in plaintext in `~/.npmrc`, which is read by any process running as that user, is copied into
+container images by an unguarded `COPY . .`, and is collected by any backup or sync tool pointed at
+the home directory. §13's containment rules are worth little if the credential sits in a
+world-readable dotfile at the other end.
+
 ### 11.3 Clients in other languages
 
 Planned, in priority order to be confirmed:
@@ -1971,6 +1983,43 @@ than a scan of every key.
 DD-15's rule rather than exempt from it: throttled, or aggregated, never a synchronous update per
 request.
 
+#### Containing a leaked key
+
+A key cannot be prevented from leaking. It leaks from a committed `.env`, a CI log, a laptop or a
+screenshot in a support ticket — none of which Forge controls. What the design can do is bound the
+damage and keep revocation effective, and three rules follow from that.
+
+**Keys travel in the `Authorization` header, never in a query string.** A credential in a URL is
+copied into access logs, proxy logs, browser history and `Referer` headers, several of them outside
+the operator's control and most of them retained longer than anyone intends. The rule is absolute:
+there is no query-parameter form of any authenticated request.
+
+**A key can never mint another key.** Key management — issuance and revocation — requires interactive
+OIDC authentication, and is not reachable with an API key. Without this rule theft is *permanent*
+rather than contained: a thief presents the stolen key, issues themselves a fresh one, and revoking
+the original achieves nothing. This is the single cheapest thing that separates a contained incident
+from an uncontained one.
+
+**Credential scrubbing keys off the token format.** §14's Serilog destructuring policy redacts on the
+key prefix and on `Authorization` headers, and §10.1's problem details never echo a credential back.
+The fixed prefix is what makes this mechanical rather than a matter of remembering — a value that
+looks like a key is redacted wherever it appears, including in exception messages and request dumps
+nobody anticipated.
+
+**What limits the blast radius is already in the design**, though for unrelated reasons, and it is
+worth stating so that the residual risk is understood rather than assumed:
+
+| Property | Consequence for a stolen key |
+|---|---|
+| `{package, version}` is immutable (§8.1) | An existing version cannot be overwritten |
+| Unlisted versions still serve direct downloads (`SSS-FG-REG-U4D`) | Existing consumers cannot be cut off |
+| No package-level shadowing (DD-16) | A key for one scope cannot shadow another's package |
+| Every privileged operation is audited (`SSS-FG-AUTH-R9J`) | What was done with the key is reconstructable |
+
+The realistic worst case is therefore the publication of a malicious **new** version within a scope
+the key already covered — serious, since a consumer resolving the latest version receives it, but
+bounded, visible, and answerable by publishing a corrected higher version.
+
 ### 13.1 Verified publishers — deferred beyond the first version
 
 The interface shows a verification badge, but no SSS requirement defines it. It is **planned and
@@ -2017,7 +2066,7 @@ programme, not a boolean column, and should be scheduled as such.
 | Prometheus metrics at `/metrics` | OpenTelemetry | `SSS-FB-OBS-M3C`, `SSS-CC-EXT-OB1` |
 | `/healthz` and `/ready` | ASP.NET health checks | `SSS-FB-OBS-H4D` |
 | Schema-version readiness gate | A `/ready` check that the migration journal holds every embedded script (DD-18) | `SSS-FB-OBS-H4D` |
-| Credential and PII scrubbing, bounded retention | Serilog enrichers and destructuring policy | `SSS-FB-OBS-R8H` |
+| Credential and PII scrubbing, bounded retention | Serilog enrichers and destructuring policy, redacting on the API key prefix and on `Authorization` headers (§13) | `SSS-FB-OBS-R8H` |
 
 The schema-version gate is deliberately on `/ready` and not `/healthz`. A replica whose schema is
 behind the code is not unhealthy — restarting it changes nothing — it is *not ready to serve*, and
