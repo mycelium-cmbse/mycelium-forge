@@ -3,3 +3,9 @@ root = true
 [*.cs]
 file_header_template = ------------------------------------------------------------------------------------------------\n<copyright file="{fileName}" company="Starion Group S.A.">\n\n  Copyright 2026 Starion Group S.A.\n  SPDX-License-Identifier: Apache-2.0\n\n</copyright>\n------------------------------------------------------------------------------------------------
 dotnet_diagnostic.IDE0073.severity = warning
+
+# 'using' directives sit inside the namespace, System first, the rest alphabetical,
+# with a blank line between root-namespace groups.
+csharp_using_directive_placement = inside_namespace:warning
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
