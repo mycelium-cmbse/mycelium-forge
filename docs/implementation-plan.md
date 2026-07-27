@@ -117,6 +117,7 @@ Blocks everything else. Small, and worth doing properly.
 | F-08 | **CI pipeline**: build, test, `docker buildx --sbom=true --provenance=true`, SBOM published as a release file (§15.1). *Already tracked as #2 — no separate issue was created; the SBOM and provenance requirements should be added to it* | M | — |
 | F-09 | **Make the end-to-end suite self-hosting.** It currently requires a host already listening on `:5000` and fails with connection-refused otherwise, so it cannot run in CI as it stands | S | — |
 | F-10 | **uml4net DAO and schema generation** (DD-18): DAO templates emitting raw Npgsql over the §8 entities, a DDL template emitting the schema that becomes migration `0001`, and golden-file coverage of both | L | F-04 |
+| F-11 | **Decide how artefacts are delivered** — streamed or redirected; record as a DD and reconcile DD-11, DD-15 and DD-21 with the answer | S | F-02 |
 
 F-03 is the critical path and the one with schedule risk — it is upstream of every project in the
 solution and it is not a coding task. If it slips, F-04, F-05 and F-10 slip with it and phase 1 cannot
@@ -178,9 +179,9 @@ built by different routes, so an unsorted diff will report drift that is not the
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| C-01 | `GET …/artifact` (latest listed, non-prerelease) and `…/{version}/artifact` (`SSS-FG-REG-D6F`) | M | A-03 |
+| C-01 | `GET …/artifact` (latest listed, non-prerelease) and `…/{version}/artifact` (`SSS-FG-REG-D6F`), streamed through Forge with CDN caching, `Range` support and the content hash as `ETag` (DD-22) | M | A-03, F-11 |
 | C-02 | Unlist: hidden from search and resolution, still served on direct download (`SSS-FG-REG-U4D`) | M | A-04, A-05 |
-| C-03 | Append-only download event recording — never a synchronous counter increment (DD-15). Downloads only; the dependents count is D-07 and is not an event | S | A-01 |
+| C-03 | Append-only download event recording — never a synchronous counter increment (DD-15), written on successful completion rather than at request so the count measures delivery (DD-22). Downloads only; the dependents count is D-07 and is not an event | S | A-01, C-01 |
 
 ### Epic D — Metadata and the API surface
 
