@@ -961,8 +961,10 @@ list to maintain.
 interchangeable, so *N* of them starting together would race. The migrator runs as its own
 invocation — an init container, a `docker compose` one-shot, or an operator command — and takes a
 **transaction-scoped** PostgreSQL advisory lock (`pg_advisory_xact_lock`) so that concurrent attempts
-serialise. Transaction-scoped rather than session-scoped, so that the migrator still works through a
-connection pooler (§12.2). Every replica then *verifies* at
+serialise. Transaction-scoped rather than session-scoped because the lock then cannot outlive the
+work it guards — a session lock leaks if the connection is returned to a pool still holding it. That
+it also keeps §12.2's contingency open is a consequence, not the reason. Every replica then
+*verifies* at
 startup that the journal holds every embedded script, and fails `/ready` rather than `/healthz` if
 it does not, so a partially upgraded deployment removes itself from the load balancer instead of
 serving against a schema it does not understand.
@@ -1755,26 +1757,42 @@ The two roles of DD-03 have opposite profiles and are sized separately rather th
 a web replica holds many connections briefly, while a job replica holds few for long transactions
 (DD-17's leases and the multi-hour pre-warm of §5.1.5).
 
-Past the point where that arithmetic stops working, the answer is **PgBouncer in transaction pooling
-mode**, which multiplexes many client connections onto few server ones. It is a deployment addition
-rather than an application change — but it constrains what the application may use, and those
-constraints are cheaper to respect from the start than to retrofit:
+#### If the budget stops working: a pooler, as a contingency
 
-| Unavailable under transaction pooling | Position |
+This section is structured like §12.1 deliberately. **No pooler is deployed, and none is planned.**
+What follows is the trigger, the candidate it points to, and what adopting it would require — so that
+the eventual choice is evidence-driven rather than reactive.
+
+| Trigger | Candidate | Why that one |
+|---|---|---|
+| The budget above stops closing — replica count needed for load exceeds what `max_connections` will support, or connection establishment shows up in latency | **PgBouncer, transaction pooling mode** | Multiplexes many client connections onto few server ones. A deployment addition, not an application change; no per-instance state, so it does not compromise §12's interchangeability |
+
+**PgBouncer is not required for the §5.1 topologies and must not be read as a component every
+customer operates.** A `docker compose`, on-premise or air-gapped installation is typically one
+replica, where the default pool already fits comfortably. This is a SaaS scaling provision — and the
+objection §12.1 raises against ParadeDB and DD-17 raises against a message broker applies with equal
+force here.
+
+Transaction pooling withholds anything that outlives a single transaction, because the next
+transaction may land on a different server connection. Four such features matter, and they divide
+into two groups that should not be confused:
+
+**Already true, for reasons of their own** — so the door stays open at no cost:
+
+| Feature | Why Forge does not depend on it |
 |---|---|
-| Session-level advisory locks | DD-18's migrator takes a **transaction-scoped** lock (`pg_advisory_xact_lock`), never a session-scoped one |
-| `LISTEN` / `NOTIFY` | Not used — DD-17 polls a job table |
-| Server-side prepared statements | Npgsql's automatic preparation is disabled, or the affected role is routed around the pooler |
+| `LISTEN` / `NOTIFY` | DD-17 polls a job table instead, chosen for observability |
 | Temporary tables spanning statements | Not used |
+| Session-level advisory locks | DD-18's migrator takes a **transaction-scoped** lock (`pg_advisory_xact_lock`). Adopted now because it costs nothing — `pg_advisory_xact_lock` is no harder to write than `pg_advisory_lock` and is the better default regardless, since it cannot leak a lock on a connection returned to the pool |
 
-Two of those four are already true because of decisions taken for unrelated reasons, which is the
-useful part: DD-17 chose a polled job table over `LISTEN`/`NOTIFY` on grounds of observability, and
-that choice keeps this door open as a side effect.
+**Would have to change** — and is deliberately *not* changed in advance:
 
-**PgBouncer is not required for the §5.1 topologies.** A `docker compose`, on-premise or air-gapped
-installation is typically one replica, where the default pool already fits. It is a SaaS scaling
-provision, and stating that here keeps it from being read as a component every customer must operate
-— the objection §12.1 raises against ParadeDB and DD-17 raises against a message broker.
+| Feature | What adoption would require |
+|---|---|
+| Server-side prepared statements | Npgsql's automatic preparation would need disabling, or the affected role routing around the pooler. **Left enabled.** Auto-preparation is a real performance feature, and turning it off now would pay a certain cost today against a contingency that may never arrive |
+
+That split is the point of recording this at all. Constraints that are free are honoured immediately;
+constraints that cost something wait until the trigger fires.
 
 ---
 
