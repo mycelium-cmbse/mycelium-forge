@@ -35,24 +35,19 @@ they are still worth understanding once phase 4 has shipped.
 
 ## 2. Decisions still required
 
-Five things are not yet decided, and three of them block work. Each becomes a design decision in
+Four things are not yet decided, and two of them block work. Each becomes a design decision in
 `design.md` once settled — this list is where they are visible until then.
+
+**D-1, data access and migration tooling, is settled** and recorded as **DD-18**: DAOs generated
+from the Enterprise Architect model over raw Npgsql, with numbered forward-only SQL migrations
+applied by DbUp. It is therefore no longer listed here.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
-| **D-1** | **Data access and migration tooling.** §12 names PostgreSQL; DD-06 names no data-access library and no migration tool | Everything in Epic A, therefore phase 1 | See below |
 | **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
-| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it. Does it exist, and who authors it? | `Mycelium.Forge.Common`, therefore every project | Treated as F-03 below; needs an owner named |
+| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, and DD-18 now generates the DAOs and the schema from it too. Does it exist, and who authors it? | `Mycelium.Forge.Common` and the persistence layer, therefore every project | Treated as F-03 below; needs an owner named |
 | **D-4** | **OIDC provider for development.** §13 says "the same external identity provider as Fabric" — correct for production, undefined for a developer laptop | Epic F, and the authenticated pages in Epic G | A Keycloak container in the compose file |
 | **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
-
-**On D-1.** The three data-shaped decisions already taken all point the same way. DD-14 stores
-per-format manifests as JSONB with GIN indexing; DD-17 claims jobs with `SELECT … FOR UPDATE SKIP
-LOCKED`; DD-15 aggregates against a transactional watermark. None of those is expressible naturally
-through an ORM, and all three are load-bearing. That argues for **Dapper with explicit SQL migrations**
-rather than EF Core. The counter-argument is real and is about people, not technology: EF Core is more
-widely known, and hand-written SQL puts the schema's correctness entirely on review. This is a team
-decision, not a technical one I should take unilaterally.
 
 **On D-2.** `AWSSDK.S3` against MinIO locally is the conventional answer and needs little discussion.
 The question worth deciding deliberately is whether an on-premise or air-gapped customer (§5.1) must
@@ -80,7 +75,10 @@ once someone picks it up).
 ### Issues as created
 
 **78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. Two pre-existing issues were left alone:
+other. **A-07 is #85**, raised later: it came out of DD-18, which did not exist when the original
+pass was made.
+
+Two pre-existing issues were left alone:
 
 - **#2 CI/CD pipeline** already covers F-08, so no duplicate was created. It predates §15.1 and should
   gain the `--sbom=true --provenance=true` requirement and the standalone SBOM release file.
@@ -99,13 +97,13 @@ Blocks everything else. Small, and worth doing properly.
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| F-01 | **Decide the data-access and migration stack** (D-1); record as a DD | S | — |
+| F-01 | **Decide the data-access and migration stack** (D-1); record as a DD — settled as DD-18 | S | — |
 | F-02 | **Decide the object-storage client and the on-premise storage question** (D-2); record as a DD | S | — |
 | F-03 | **Author the Forge domain model in Enterprise Architect and export XMI.** §8's class diagram is the specification | M | — |
 | F-04 | **uml4net DTO generation**: templates, MSBuild target, output into `Common/Generated/` (DD-07) | M | F-03 |
 | F-05 | **uml4net JSON serialiser generation** (DD-05), including DD-13's abbreviated projection | M | F-04 |
 | F-06 | **Contract-test harness** for generated serialisers (§17) — a template defect is systematic, so this is the test that matters most | S | F-05 |
-| F-07 | **Local environment**: compose with PostgreSQL, MinIO and Keycloak; devcontainer wiring (DD-09, D-4) | M | F-01, F-02 |
+| F-07 | **Local environment**: compose with PostgreSQL, MinIO and Keycloak, plus a one-shot migrator service — migrations are an explicit invocation, not a startup step, so without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09, D-4) | M | F-01, F-02 |
 | F-08 | **CI pipeline**: build, test, `docker buildx --sbom=true --provenance=true`, SBOM published as a release file (§15.1). *Already tracked as #2 — no separate issue was created; the SBOM and provenance requirements should be added to it* | M | — |
 | F-09 | **Make the end-to-end suite self-hosting.** It currently requires a host already listening on `:5000` and fails with connection-refused otherwise, so it cannot run in CI as it stands | S | — |
 
@@ -123,12 +121,30 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8) | M | F-01 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, and the advisory lock that stops concurrent migrators racing (DD-18) | M | F-01 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12) | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |
 | A-05 | §8.1 invariants enforced in the **domain layer**, not at the API boundary: immutability of `{package, version}`, strictly increasing SemVer, release notes required on a major change, at least one individual-Account Owner | M | A-01 |
 | A-06 | Append-only tamper-evident audit entries on every privileged operation (`SSS-FG-AUTH-R9J`) | M | A-01 |
+| A-07 | **Schema drift check in CI**: build one database by running every migration in order and another from the generated schema, then fail the build if the migrations did not produce every object the model implies (DD-18) | M | A-01 |
+
+A-07 is not optional polish, for the same reason E-04 is not. DD-18 keeps the Enterprise Architect
+model authoritative over the schema by generating the baseline and then checking that the
+hand-written deltas still add up to what the model implies. Without that check the two drift
+silently, the generated schema becomes decoration, and schema correctness falls back onto review —
+which is precisely the objection DD-18 exists to answer.
+
+It is a separate issue rather than a clause on A-01 because a verification harness attached to a
+feature issue is the first thing dropped when the feature runs long.
+
+Two details for whoever picks it up. The comparison is **one-directional**: every object the
+generated schema declares must exist in the migrated database, but the reverse does not hold, because
+the job table (DD-17), the counter events and their watermark (DD-15), and the search projection
+(E-01) are hand-written and have no model counterpart. That asymmetry is what lets the check work
+without an exclusion list to maintain. And the diff must be normalised before comparison — `pg_dump
+--schema-only` does not guarantee a stable ordering of constraints and indexes between two databases
+built by different routes, so an unsorted diff will report drift that is not there.
 
 ### Epic B — Publish
 
@@ -206,7 +222,7 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 | H-01 | Job table, `FOR UPDATE SKIP LOCKED` claim, lease renewal, expiry reclaim, progress on the row | L | A-01 |
 | H-02 | Counter aggregation advancing a watermark in the same transaction as the aggregate (DD-15, DD-17) | M | H-01, C-03 |
 | H-03 | Orphaned blob collection (§12) | M | H-01, A-03 |
-| H-04 | `Forge__Roles` role switch, role-aware startup and probes (DD-03) | M | H-01 |
+| H-04 | `Forge__Roles` role switch, role-aware startup and probes (DD-03), including the `/ready` schema-version gate and the advisory-locked migrator invocation (DD-18) | M | H-01 |
 
 ### Epic I — Observability
 
