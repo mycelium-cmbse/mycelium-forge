@@ -35,24 +35,19 @@ they are still worth understanding once phase 4 has shipped.
 
 ## 2. Decisions still required
 
-Five things are not yet decided, and three of them block work. Each becomes a design decision in
+Four things are not yet decided, and two of them block work. Each becomes a design decision in
 `design.md` once settled — this list is where they are visible until then.
+
+**D-1, data access and migration tooling, is settled** and recorded as **DD-18**: DAOs generated
+from the Enterprise Architect model over raw Npgsql, with numbered forward-only SQL migrations
+applied by DbUp. It is therefore no longer listed here.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
-| **D-1** | **Data access and migration tooling.** §12 names PostgreSQL; DD-06 names no data-access library and no migration tool | Everything in Epic A, therefore phase 1 | See below |
 | **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
-| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it. Does it exist, and who authors it? | `Mycelium.Forge.Common`, therefore every project | Treated as F-03 below; needs an owner named |
+| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, and DD-18 now generates the DAOs and the schema from it too. Does it exist, and who authors it? | `Mycelium.Forge.Common` and `Mycelium.Forge.Orm`, therefore every project | Treated as F-03 below; needs an owner named |
 | **D-4** | **OIDC provider for development.** §13 says "the same external identity provider as Fabric" — correct for production, undefined for a developer laptop | Epic F, and the authenticated pages in Epic G | A Keycloak container in the compose file |
 | **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
-
-**On D-1.** The three data-shaped decisions already taken all point the same way. DD-14 stores
-per-format manifests as JSONB with GIN indexing; DD-17 claims jobs with `SELECT … FOR UPDATE SKIP
-LOCKED`; DD-15 aggregates against a transactional watermark. None of those is expressible naturally
-through an ORM, and all three are load-bearing. That argues for **Dapper with explicit SQL migrations**
-rather than EF Core. The counter-argument is real and is about people, not technology: EF Core is more
-widely known, and hand-written SQL puts the schema's correctness entirely on review. This is a team
-decision, not a technical one I should take unilaterally.
 
 **On D-2.** `AWSSDK.S3` against MinIO locally is the conventional answer and needs little discussion.
 The question worth deciding deliberately is whether an on-premise or air-gapped customer (§5.1) must
@@ -99,7 +94,7 @@ Blocks everything else. Small, and worth doing properly.
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| F-01 | **Decide the data-access and migration stack** (D-1); record as a DD | S | — |
+| F-01 | **Decide the data-access and migration stack** (D-1); record as a DD — settled as DD-18 | S | — |
 | F-02 | **Decide the object-storage client and the on-premise storage question** (D-2); record as a DD | S | — |
 | F-03 | **Author the Forge domain model in Enterprise Architect and export XMI.** §8's class diagram is the specification | M | — |
 | F-04 | **uml4net DTO generation**: templates, MSBuild target, output into `Common/Generated/` (DD-07) | M | F-03 |
@@ -123,7 +118,7 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8) | M | F-01 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8), including the CI check that a migrated database matches the generated schema (DD-18) | M | F-01 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12) | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |

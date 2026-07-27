@@ -654,6 +654,8 @@ is generated on the same terms. Generation is performed by uml4net at design-tim
 | Operation results | **FluentResults** | Publish, resolve and authorise all have expected failure modes. Returning a result object keeps those out of the exception path |
 | Logging | **Serilog** | Structured JSON sink satisfies `SSS-FB-OBS-S1A` directly |
 | Serialisation | **System.Text.Json** | The only wire format per DD-04; the serialisers themselves are generated from the model per DD-05 |
+| Data access | **Npgsql, with DAOs generated from the model** | Raw ADO.NET over the PostgreSQL driver. DD-14's JSONB and GIN, DD-17's `FOR UPDATE SKIP LOCKED` and DD-15's watermark are written as the SQL they are; the DAOs come from the same uml4net pass as the DTOs. See DD-18 |
+| Database migrations | **DbUp** | Numbered, forward-only SQL embedded in the assembly and journalled in the database. It needs no network, so it works unchanged in §5.1's air-gapped topology. See DD-18 |
 | End-to-end testing | **Playwright** | One tool covers both the browser surface and the HTTP API (§17) |
 | Code generation | **uml4net** | See DD-07 |
 
@@ -815,6 +817,137 @@ second datastore carries a real adoption cost for a single-tenant install even w
 engine can be replaced without disturbing the endpoint. `/api/v1/packages` is a permanent contract
 (DD-11), so a change of engine is invisible to every client. §12.1 records the trigger conditions, the
 candidate each points to, and the options already evaluated and rejected.
+
+### DD-18 — Data access is generated from the model over raw Npgsql; migrations are explicit SQL applied by DbUp
+
+**Context.** DD-14 makes PostgreSQL the system of record, but DD-06 names neither a data-access
+library nor a migration tool. Five constructs already decided constrain the answer, and none of them
+is expressible naturally through an ORM's query abstraction:
+
+| Construct | Source |
+|---|---|
+| Per-format manifests held as JSONB with GIN indexing | DD-14 |
+| `SELECT … FOR UPDATE SKIP LOCKED` job claim, lease renewal, progress recorded on the row | DD-17 |
+| Aggregate and watermark advancing in the same transaction | DD-15 |
+| Recursive CTE over `usage[]` for dependency resolution | §12 |
+| Unique constraint serialising concurrent publishes of one `{package, version}` | §12, `SSS-FG-REG-I3C` |
+
+A sixth constraint is structural rather than technical. DD-07 derives the DTOs from an Enterprise
+Architect model and DD-05 derives their serialisers from the same model in the same pass, so a
+hand-written data-access layer would be the only part of the model's surface not derived from the
+model.
+
+**Decision.** Three parts.
+
+1. **Data-access objects are generated from the Enterprise Architect model** by the uml4net pipeline
+   of DD-07, alongside the DTOs and serialisers. They execute **raw Npgsql** — `NpgsqlCommand`,
+   typed `NpgsqlParameter`, `NpgsqlDataReader` — with no ORM, no micro-ORM and no runtime
+   reflection. Every method takes the caller's `NpgsqlTransaction`; a DAO never opens a connection.
+   Generated classes are `partial`, so hand-written SQL sits beside generated SQL rather than
+   replacing it.
+2. **The schema is generated from the same model** as a single DDL script.
+3. **Migrations are numbered, forward-only SQL scripts applied by DbUp**, embedded in the assembly
+   and journalled in the database. The generated schema is the first migration; every later change
+   is a hand-written delta, and **CI fails the build when the two diverge**.
+
+**Reasoning.**
+
+*Why generated rather than an ORM.* Each of the five constructs above is written as the SQL it
+actually is. An ORM would express three of them through an escape hatch and the other two not at
+all, which means adopting an abstraction and then bypassing it at exactly the points that carry the
+design.
+
+*Why generated rather than hand-written.* A model change regenerates the DTO, its serialiser, its
+DAO and the DDL in a single pass, so the four cannot drift. This is DD-05's argument applied one
+layer down, and it answers the usual objection to explicit SQL — that schema correctness rests
+entirely on review — for everything the model describes.
+
+*Why the schema is generated but the migrations are not.* This is the seam in the design, and it is
+better stated than discovered. A generator emits a **state**: the schema the model implies right
+now. A migration is a **delta**. No tool converts one into the other safely, because a diff cannot
+distinguish a rename from a drop-and-add, and getting that wrong destroys data. So the generated
+schema is the baseline at first release and a reference artefact thereafter, while the deltas are
+authored and reviewed.
+
+Both of the in-house systems this pattern is taken from reach the same seam. CDP4-COMET generates
+its DDL and applies it only at schema creation, hand-writing every subsequent change as a versioned
+script. EORSA-DB avoids the seam only by having no upgrade path at all — its schema ships inside a
+container image, and a new version means a new image and an empty volume. That is not available
+here: §5.1 puts customer-operated on-premise and air-gapped installations in scope, and those
+upgrade in place.
+
+*What closes the seam is a drift check, not a tool.* CI builds one database by running every
+migration in order and another by running the generated schema, then compares them. Any object the
+model implies that the migrations did not produce fails the build. Schema correctness therefore does
+not rest on review; it rests on a test the model itself defines.
+
+*Why DbUp rather than a bespoke engine.* CDP4-COMET's migration engine encodes version, scope and
+handler in the script filename, journals applied versions in a table, and applies everything in one
+transaction at startup. It works, and it is a pattern the team already operates. But most of its
+size is partition fan-out serving a schema-per-tenant model that Forge does not have — Forge is one
+schema, and §5.1.2's scopes are rows. What remains once that is removed is ordering plus a journal,
+which is what DbUp is. Two defects are also worth not inheriting: the journal's primary key is the
+version, so two scripts sharing a version silently lose one, and there are no script checksums, so
+an edit to an already-applied script goes undetected. DbUp is MIT, is a single package, and reads
+its scripts from embedded resources, so it needs no network and works unchanged air-gapped.
+
+*Why not FluentMigrator or EF Core Migrations.* EF Core Migrations is coherent only if EF Core is
+the data-access layer, which it is not. FluentMigrator would wrap C# around a schema that is
+generated as SQL, and the GIN indexes, partial indexes and JSONB specifics would drop to raw SQL
+inside the migration classes regardless — a layer added without a layer removed.
+
+*Why typed columns rather than a catch-all attribute column.* Both in-house systems pack every
+scalar property into one schemaless column — EORSA-DB into a `data` JSONB column on its root table,
+CDP4-COMET into an `hstore` value dictionary — so that a model revision costs no DDL. That is a
+sound trade where the model is large and churning and the migration path is uncomfortable. Forge is
+neither: §8 has six entities and a shallow hierarchy, and the migration path is the subject of this
+decision.
+
+The cost would land exactly where Forge is least able to absorb it. §8.1's invariants are unique
+indexes and check constraints — immutable `{package, version}`, strictly increasing SemVer, at least
+one individual-Account Owner — and those want typed columns rather than expression indexes over blob
+members. §12.1's facet counting groups by scalar attributes under a 500 ms p95 budget, and a
+catch-all column makes each of those a cast over an unindexed extraction. And `->>` cannot
+distinguish an absent key from a JSON null, which §9.2.1 depends on: a resolver must be able to tell
+"no dependencies" from "dependencies not expressible".
+
+Most of all it would invert DD-14's own argument. That decision keeps PostgreSQL because it holds
+the relational spine *and* the polymorphic manifests — "a document store gives the flexibility and
+loses the invariants". A catch-all column makes the spine documents too, which is the outcome DD-14
+rejected. **JSONB stays where DD-14 put it: the per-format `IArtifactManifest`, and nothing else.**
+
+**Consequences.**
+
+`Mycelium.Forge.Orm` and `Mycelium.Forge.Orm.Tests` join §16. The generated DAOs, the generated
+schema and the migration scripts live there, and the scripts are embedded resources so they travel
+inside the image.
+
+**The generated layer covers CRUD over the §8 entities and nothing else.** Search (DD-14), qualified-
+name resolution (§3.4), the job table (DD-17) and the append-only counter events with their
+watermark (DD-15) are hand-written repositories over hand-written SQL, because none of them is a
+projection of a model class. Their DDL is hand-written in migrations, and the drift check tolerates
+them because it compares only the objects the generated schema declares — so it needs no exclusion
+list to maintain.
+
+**Migrations run as an explicit invocation, not on every replica's startup.** DD-03 makes replicas
+interchangeable, so *N* of them starting together would race. The migrator runs as its own
+invocation — an init container, a `docker compose` one-shot, or an operator command — and takes a
+PostgreSQL advisory lock so that concurrent attempts serialise. Every replica then *verifies* at
+startup that the journal holds every embedded script, and fails `/ready` rather than `/healthz` if
+it does not, so a partially upgraded deployment removes itself from the load balancer instead of
+serving against a schema it does not understand.
+
+§17's contract tests extend to the generated DAOs, for DD-05's reason: a defect in a template is
+systematic rather than confined to one type. They run against a real PostgreSQL in a container,
+since the SQL is the thing being tested. Generator output is additionally covered by golden-file
+comparison, with a guard that fails when a model class has no golden file — otherwise adding a class
+to the model silently adds untested generated code.
+
+Reversal is bounded but not free. The DAOs sit behind the domain layer, so replacing the generator
+with hand-written data access would not disturb callers; replacing raw SQL with an ORM would.
+
+§15.1's SBOM gains `Npgsql` (PostgreSQL licence) and `dbup-postgresql` (MIT). Both are compatible
+with Forge's Apache-2.0 and neither carries a clause to reason about, unlike §9.2's LGPL-3.0 entry.
 
 ### DD-15 — Popularity counters are append-only and aggregated asynchronously
 
@@ -1367,6 +1500,7 @@ identical paths everywhere (DD-11).
 | Search index | PostgreSQL, behind an interface (DD-14); see §12.1 |
 | Download and import counts | PostgreSQL, append-only events plus a materialised aggregate (DD-15) |
 | Background job state and progress | PostgreSQL, claimed rows (DD-17) |
+| Schema version journal | PostgreSQL, written by DbUp (DD-18) |
 
 Horizontal scaling requires every instance to be interchangeable:
 
@@ -1645,10 +1779,12 @@ Apache tree. The SBOM is where a customer's procurement function encounters thos
 |---|---|---|---|
 | `Mycelium.Forge` | Web | No | Static SSR interface and Carter HTTP API |
 | `Mycelium.Forge.Common` | Library | Yes | Shared DTOs, generated from EA XMI |
+| `Mycelium.Forge.Orm` | Library | No | Generated DAOs, the generated schema, and the DbUp migration scripts (DD-18) |
 | `Mycelium.Forge.Client` | Library | Yes | REST client library (`SSS-FG-REG-C3M`) |
 | `Mycelium.Forge.Cli` | Tool | Native binary | Command-line client (§11.2) |
 | `Mycelium.Forge.Tests` | NUnit | No | Host and API unit/integration tests |
 | `Mycelium.Forge.Common.Tests` | NUnit | No | JSON serialisation contract tests |
+| `Mycelium.Forge.Orm.Tests` | NUnit | No | DAO and migration tests against a containerised PostgreSQL |
 | `Mycelium.Forge.Client.Tests` | NUnit | No | Client library tests |
 | `Mycelium.Forge.EndToEndTests` | Playwright | No | Browser and HTTP API end-to-end suites |
 
