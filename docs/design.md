@@ -740,7 +740,8 @@ Nor does the index earn its place on the arguments usually made for it:
 
 - **Relocation.** Where a resource genuinely must move, HTTP already provides 301 and 302. CDN-fronting
   artefact downloads needs no client-visible URL change at all, since the CDN sits in front of the
-  origin on the same hostname.
+  origin on the same hostname — which DD-22 confirms by streaming artefacts through Forge rather than
+  redirecting to storage.
 - **Replicas.** A load balancer distributes across replicas transparently. DD-14 keeps search on the
   same host regardless.
 - **Version negotiation.** DD-12 carries the representation version in the media type; an index would
@@ -1079,12 +1080,87 @@ rather than weakened — storage does not become a second axis on which deployme
 `AWSSDK.S3` is Apache-2.0, matching Forge's own licence, so §15.1's SBOM gains no clause to reason
 about.
 
-**One question this leaves open for `C-01`.** §12 and DD-15 describe an artefact download as a
-redirect to content-addressed storage, which implies a presigned URL and requires the *client* to
-reach object storage directly. Behind a reverse proxy or in a restricted network that may not hold,
-and the alternative — streaming through Forge — costs bandwidth and connections (§12.2). The download
-endpoint decides this; it is recorded here because the client choice must support both, and
-`AWSSDK.S3` does.
+**This left one question open, and DD-22 answers it.** Whether an artefact download is a presigned
+redirect or streamed through Forge determines whether the *client* must reach object storage
+directly. `AWSSDK.S3` supports both, so the client choice foreclosed nothing.
+
+### DD-22 — Artefacts are streamed through Forge and cached at a CDN
+
+**Context.** Three places described two different systems, and whichever one `C-01` implemented would
+have silently invalidated reasoning resting on the other:
+
+| Where | Model implied |
+|---|---|
+| DD-11 — CDN-fronting "needs no client-visible URL change at all, since the CDN sits in front of the origin on the same hostname" | The CDN fronts **Forge** |
+| DD-15 — "an artefact download is a **redirect** to content-addressed storage and need not touch PostgreSQL at all" | The client fetches from **storage** |
+| `C-01` — "both routes implemented, **streaming** from `IArtifactStore`" | The client fetches from **Forge** |
+
+**Decision.** Three parts.
+
+1. **Artefacts are streamed through Forge.** `GET …/artifact` returns the bytes. There is no redirect
+   to object storage and no presigned URL on the download path.
+2. **Responses are cacheable at a CDN** — `Cache-Control: public, max-age=31536000, immutable`, with
+   the content hash as a strong `ETag`.
+3. **A download event is recorded on successful completion**, not when the request arrives (DD-15).
+
+**Reasoning.**
+
+*The client can only be assumed to reach Forge.* §5.1 puts on-premise, restricted-egress and
+air-gapped installations in scope. In those, object storage sits on an internal network and Forge sits
+behind a reverse proxy, so a presigned URL names a host the client can neither resolve nor reach. A
+redirect would fail precisely in the deployments the product targets, and it would fail at download —
+the one operation every user performs.
+
+*Immutability makes the CDN do the work, which is what removes the cost.* §8.1 fixes
+`{package, version}` permanently, so an artefact response never needs revalidating and can be held
+indefinitely. A CDN then answers nearly every request for a popular package without contacting the
+origin at all. This is the same property §5.1.4 exploits for the mirror cache — "artefacts are
+immutable, so they cache forever" — applied one layer further out. The bandwidth objection to
+streaming is real only where no CDN exists, and that is the small-deployment case where the volume
+is small.
+
+*It is what DD-11 already assumed.* Its statement that the CDN "sits in front of the origin on the
+same hostname" only makes sense if the origin serves the bytes. Choosing the redirect would have
+required amending DD-11 instead.
+
+*Counting becomes honest.* A redirect cannot observe whether the transfer completed, so it counts
+intent. Streaming can count delivery. §3.3 already warns that downloads are inflated by CI pipelines,
+mirrors and tooling; there is no reason to add abandoned transfers to that list when the alternative
+is free.
+
+*Why not make it configurable.* DD-02's argument applies unchanged: a second mode should not be built
+speculatively. Adding a redirect later is additive — a configuration switch and an alternate response
+on a route that does not move — so this is deferred rather than foreclosed, and the trigger would be
+measurement showing origin bandwidth is the constraint.
+
+**Consequences.**
+
+**The database connection is released before the body is streamed.** This is the rule most easily got
+wrong and the most damaging: holding a connection open while a slow client pulls a large kpar would
+tie a PostgreSQL connection to transfer duration, and §12.2's budget is sized for short queries, not
+for minutes. Metadata is resolved, the connection returns to the pool, and only then does the body
+flow.
+
+**`Range` requests are supported and passed through to object storage**, so an interrupted download of
+a large artefact resumes rather than restarting. `AWSSDK.S3` supports byte ranges (DD-21). This is
+free under a redirect and must be implemented here, which is the one place the redirect model was
+genuinely simpler.
+
+**The content hash is the `ETag`.** §12 already stores blobs content-addressed, so a strong validator
+exists without computing anything, and a repeat request revalidates to `304` rather than re-sending.
+
+**DD-15's decoupling argument is narrowed but survives.** The download path does now touch Forge, so
+"need not touch PostgreSQL at all" no longer holds as stated. What remains — and what was always the
+load-bearing half — is that the request performs no synchronous counter update.
+
+**§5.1.4's fetch-on-miss becomes invisible to the client.** A mirror that does not yet hold an
+artefact fetches and streams it on the same request, under the same URL. A redirect would have had to
+expose that as either a wait or a second hop.
+
+**Storage topology is never exposed.** No client learns the endpoint, bucket or key layout, which also
+means those can change without a client-visible migration.
+
+`C-03` records the event on completion, and `C-01` implements the above.
 
 ### DD-15 — Download counts are append-only and aggregated asynchronously
 
@@ -1106,10 +1182,15 @@ thousands of packages — single-row update contention is not where PostgreSQL g
 argument should not be leaned on as though Forge were operating at nuget.org's volume, which §12.1
 explicitly argues it will not.
 
-*Decoupling.* An artefact download is a redirect to content-addressed storage and need not touch
-PostgreSQL at all. A synchronous increment makes the highest-volume operation in the registry depend
-on a write to the one component that does not scale out with the application (§12.2), so a database
+*Decoupling.* A synchronous increment makes the highest-volume operation in the registry depend on a
+write to the one component that does not scale out with the application (§12.2), so a database
 disturbance becomes failed downloads. This holds at any scale.
+
+An earlier version of this argument said the download "need not touch PostgreSQL at all", on the
+assumption that it was a redirect to storage. DD-22 streams instead, so the request does reach a
+metadata lookup — but it still performs no synchronous *write*, which was always the load-bearing
+half. DD-22 additionally requires the database connection to be released before the body streams, so
+a slow client never holds one for the duration of a transfer.
 
 *Queryability, which is the real reason.* A running total can answer exactly one question forever. It
 cannot produce downloads over the last thirty days, a per-version breakdown, or a trend line on the
