@@ -1931,6 +1931,46 @@ constraints that cost something wait until the trigger fires.
   covered.
 - **Every privileged operation** writes an append-only, tamper-evident audit entry (`SSS-FG-AUTH-R9J`).
 
+#### API keys are Forge's own, and are not Keycloak tokens
+
+Worth stating, because the opposite is a reasonable thing for a reviewer to propose and the reasoning
+should not have to be reconstructed. Keycloak issues tokens, not API keys; it has no
+personal-access-token concept, and the OAuth2 equivalent is a client-credentials grant. That is
+deliberately not used:
+
+- **Revocation.** `SSS-FG-REG-Y2L` requires revocable keys. A JWT remains valid until it expires
+  unless every request calls token introspection, which puts an IdP round trip on every publish and
+  every authenticated read. A hashed key in Forge's own database is revoked with one `UPDATE`.
+- **Scoping.** Keys scope to a publisher and an operation set, which are Forge domain objects.
+  Expressing them as IdP client roles would push Forge's authorisation model into the provider,
+  reintroducing the coupling DD-20 removed.
+- **Availability and reach.** Forge's own keys keep publishing working when the provider is down, and
+  a CI runner needs egress to the registry only — not to the registry *and* the IdP, which is a real
+  cost in §5.1's restricted and air-gapped deployments.
+
+nuget.org, npm, PyPI, crates.io and GitHub all issue opaque hashed tokens, for these reasons.
+
+#### The hash is SHA-256, not a password KDF
+
+This is the one place where the obvious answer is wrong, so it is fixed here rather than left to
+implementation.
+
+A key is a credential, which invites hashing it as a password with bcrypt or Argon2. Those are slow
+*by design*, because passwords carry roughly 30 bits of entropy and are brute-forceable. **A key
+generated from a CSPRNG at 256 bits is not brute-forceable at any hash speed**, so slowness buys
+nothing — and it would be paid on every authenticated request, including the download path §12.1
+budgets at 500 ms p95.
+
+SHA-256 is therefore correct and sufficient, unsalted — salts defeat rainbow tables across users who
+chose the same password, and random tokens present no such collisions — with constant-time
+comparison. The token itself carries a fixed prefix so that secret scanners can detect it when leaked,
+and splits into an indexed lookup identifier plus the secret, so that verification is a seek rather
+than a scan of every key.
+
+**Recording last use is a hot-row write** on the highest-volume authenticated path, and is subject to
+DD-15's rule rather than exempt from it: throttled, or aggregated, never a synchronous update per
+request.
+
 ### 13.1 Verified publishers — deferred beyond the first version
 
 The interface shows a verification badge, but no SSS requirement defines it. It is **planned and
