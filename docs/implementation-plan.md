@@ -78,8 +78,13 @@ once someone picks it up).
 ### Issues as created
 
 **78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. Three were raised later, all from decisions that did not exist when that pass was made:
-**A-07 is #85** and **F-10 is #88** (from DD-18), and **D-07 is #86** (from DD-19).
+other. Seven were raised later, all from decisions that did not exist when that pass was made:
+
+| From | Issues |
+|---|---|
+| DD-18 | **A-07** is #85, **F-10** is #88 |
+| DD-19 | **D-07** is #86 |
+| DD-20 | **F1-05** is #89, **F1-06** is #90, **F1-07** is #91, **F1-08** is #92 |
 
 Two pre-existing issues were left alone:
 
