@@ -49,7 +49,7 @@ is no longer a stand-in to choose. Neither is listed below.
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
 | **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
-| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, DD-18 now generates the DAOs and the schema from it too, and DD-20 adds `Account`, `Organization` and `Membership` to what it must cover. Does it exist, and who authors it? | `Mycelium.Forge.Common` and the persistence layer, therefore every project | Treated as F-03 below; **this is the most urgent item in the document** and needs an owner named |
+| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, DD-18 now generates the DAOs and the schema from it too, and DD-20 adds `Account`, `Organization` and `Membership` to what it must cover | `Mycelium.Forge.Common` and the persistence layer, therefore every project | **Owner named — F-03 is assigned.** What remains is the model itself, still the head of the critical path |
 | **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.3 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
 **On D-2.** `AWSSDK.S3` against MinIO locally is the conventional answer and needs little discussion.
@@ -118,7 +118,8 @@ Blocks everything else. Small, and worth doing properly.
 
 F-03 is the critical path and the one with schedule risk — it is upstream of every project in the
 solution and it is not a coding task. If it slips, F-04, F-05 and F-10 slip with it and phase 1 cannot
-start cleanly. Worth naming an owner before anything else on this list.
+start cleanly. **It now has an owner**, which was the first thing this document asked for; what
+remains is the model.
 
 **F-10 was missed when DD-18 was written.** That decision generates the data-access layer and the
 schema from the model, but the plan had generation issues only for DTOs (F-04) and serialisers
