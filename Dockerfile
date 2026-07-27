@@ -3,10 +3,13 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
 
-# Copy project files first so restore is cached independently of source changes
+# Copy project files first so restore is cached independently of source changes.
+# Directory.Build.targets carries the Tailwind build (DD-08) and is imported by every project, so it
+# has to be present for the restore as well as for the publish; without it wwwroot/css/app.css is
+# never generated and the image serves the interface unstyled.
 COPY Mycelium.Forge/Mycelium.Forge.csproj ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/Mycelium.Forge.Common.csproj ./Mycelium.Forge.Common/
-COPY Nuget.Config ./
+COPY Directory.Build.targets Nuget.Config ./
 
 RUN dotnet restore Mycelium.Forge/Mycelium.Forge.csproj
 

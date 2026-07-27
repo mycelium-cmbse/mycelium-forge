@@ -1,0 +1,93 @@
+name: Container image
+
+# Builds the deployable with the invocation §15.1 fixes for every Starion product:
+#
+#     docker buildx build --sbom=true --provenance=true
+#
+# --sbom=true satisfies SSS-CC-SUP-SBM; BuildKit scans the final stage and emits SPDX.
+# --provenance=true is above requirement and deliberately retained.
+#
+# Attestations are stored as separate OCI manifests referring to the image, so they travel with a
+# registry pull but are lost by `docker save`. Air-gapped sites take delivery as a tarball, so on a
+# release the SPDX document is additionally attached as a standalone release file. Without it
+# SSS-CC-SUP-SBM is silently unmet for exactly the customers most likely to require it.
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # attach the SBOM to the release
+  packages: write   # push the image to GHCR
+
+jobs:
+  image:
+    name: Build image, SBOM and provenance
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+
+      # Third-party actions are pinned to a full commit SHA; a mutable tag would let the action's
+      # owner change what runs here after review.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c  # v4.2.0
+
+      # Not a release: prove the image, the SBOM and the provenance all still build. The OCI
+      # exporter is used rather than type=docker because the docker exporter drops attestations.
+      - name: Build image
+        if: github.event_name != 'release'
+        run: |
+          docker buildx build \
+            --sbom=true \
+            --provenance=true \
+            --tag "$IMAGE:ci" \
+            --output type=oci,dest=/tmp/mycelium-forge-oci.tar \
+            .
+
+      - name: Log in to GHCR
+        if: github.event_name == 'release'
+        uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7  # v4.5.1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        if: github.event_name == 'release'
+        run: |
+          docker buildx build \
+            --sbom=true \
+            --provenance=true \
+            --tag "$IMAGE:${{ github.event.release.tag_name }}" \
+            --tag "$IMAGE:latest" \
+            --push \
+            .
+
+      # docker save does not carry the attestation, so the SPDX document is pulled back out of the
+      # registry and published as a file the customer can hand to procurement.
+      - name: Extract the SBOM
+        if: github.event_name == 'release'
+        run: |
+          docker buildx imagetools inspect "$IMAGE:${{ github.event.release.tag_name }}" \
+            --format '{{ json .SBOM.SPDX }}' \
+            > "mycelium-forge-${{ github.event.release.tag_name }}.spdx.json"
+
+      - name: Attach the SBOM to the release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228  # v3.0.2
+        with:
+          files: mycelium-forge-${{ github.event.release.tag_name }}.spdx.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
