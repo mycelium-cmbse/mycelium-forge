@@ -39,8 +39,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6.0.2
 
+      # Third-party actions are pinned to a full commit SHA; a mutable tag would let the action's
+      # owner change what runs here after review.
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c  # v4.2.0
 
       # Not a release: prove the image, the SBOM and the provenance all still build. The OCI
       # exporter is used rather than type=docker because the docker exporter drops attestations.
@@ -56,7 +58,7 @@ jobs:
 
       - name: Log in to GHCR
         if: github.event_name == 'release'
-        uses: docker/login-action@v3
+        uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7  # v4.5.1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -84,7 +86,7 @@ jobs:
 
       - name: Attach the SBOM to the release
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2.5.0
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228  # v3.0.2
         with:
           files: mycelium-forge-${{ github.event.release.tag_name }}.spdx.json
         env:
