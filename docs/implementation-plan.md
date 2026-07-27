@@ -75,7 +75,10 @@ once someone picks it up).
 ### Issues as created
 
 **78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. Two pre-existing issues were left alone:
+other. **A-07 was added after that pass and has no issue yet** — it came out of DD-18, which did not
+exist when the issues were created, so one needs raising to match.
+
+Two pre-existing issues were left alone:
 
 - **#2 CI/CD pipeline** already covers F-08, so no duplicate was created. It predates §15.1 and should
   gain the `--sbom=true --provenance=true` requirement and the standalone SBOM release file.
@@ -118,12 +121,30 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8), including the CI check that a migrated database matches the generated schema (DD-18) | M | F-01 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, and the advisory lock that stops concurrent migrators racing (DD-18) | M | F-01 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12) | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |
 | A-05 | §8.1 invariants enforced in the **domain layer**, not at the API boundary: immutability of `{package, version}`, strictly increasing SemVer, release notes required on a major change, at least one individual-Account Owner | M | A-01 |
 | A-06 | Append-only tamper-evident audit entries on every privileged operation (`SSS-FG-AUTH-R9J`) | M | A-01 |
+| A-07 | **Schema drift check in CI**: build one database by running every migration in order and another from the generated schema, then fail the build if the migrations did not produce every object the model implies (DD-18) | M | A-01 |
+
+A-07 is not optional polish, for the same reason E-04 is not. DD-18 keeps the Enterprise Architect
+model authoritative over the schema by generating the baseline and then checking that the
+hand-written deltas still add up to what the model implies. Without that check the two drift
+silently, the generated schema becomes decoration, and schema correctness falls back onto review —
+which is precisely the objection DD-18 exists to answer.
+
+It is a separate issue rather than a clause on A-01 because a verification harness attached to a
+feature issue is the first thing dropped when the feature runs long.
+
+Two details for whoever picks it up. The comparison is **one-directional**: every object the
+generated schema declares must exist in the migrated database, but the reverse does not hold, because
+the job table (DD-17), the counter events and their watermark (DD-15), and the search projection
+(E-01) are hand-written and have no model counterpart. That asymmetry is what lets the check work
+without an exclusion list to maintain. And the diff must be normalised before comparison — `pg_dump
+--schema-only` does not guarantee a stable ordering of constraints and indexes between two databases
+built by different routes, so an unsorted diff will report drift that is not there.
 
 ### Epic B — Publish
 
