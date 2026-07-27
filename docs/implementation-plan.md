@@ -75,8 +75,8 @@ once someone picks it up).
 ### Issues as created
 
 **78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. **A-07 is #85**, raised later: it came out of DD-18, which did not exist when the original
-pass was made.
+other. Two were raised later, both from decisions that did not exist when that pass was made:
+**A-07 is #85** (from DD-18) and **D-07 is #86** (from DD-19).
 
 Two pre-existing issues were left alone:
 
