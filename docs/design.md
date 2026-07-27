@@ -918,9 +918,23 @@ rejected. **JSONB stays where DD-14 put it: the per-format `IArtifactManifest`, 
 
 **Consequences.**
 
-`Mycelium.Forge.Orm` and `Mycelium.Forge.Orm.Tests` join §16. The generated DAOs, the generated
-schema and the migration scripts live there, and the scripts are embedded resources so they travel
-inside the image.
+**No new project.** The generated DAOs, the generated schema and the migration scripts live in
+`Mycelium.Forge` under `Orm/`, alongside `Api/` and `Components/` — the folder-per-concern pattern
+DD-03 already establishes for the two request surfaces. The migration scripts are embedded
+resources, so they travel inside the image.
+
+A separate assembly would earn its place if something other than the deployable consumed it, and
+nothing does: DD-03 has one image, and the client library and CLI reach the registry over `/api/v1`
+rather than over the database. The in-house systems this pattern is taken from do separate the
+layer, but both have several consumers to separate it *for*; Forge has one. Nor would separation buy
+enforcement — the web project would reference the assembly and any component could still call a DAO
+directly, so the layering that matters is the domain layer's, not the project boundary's. Adding
+`Mycelium.Forge.Common` to the alternatives is worse still: it is packable and flows into every
+consumer of `Mycelium.Forge.Client`, which would put a PostgreSQL driver and a migration engine in
+their dependency graphs.
+
+Extracting an assembly later is moving files and fixing namespaces, so this is recorded as cheap to
+reverse — unlike §19.1's seams, which are not.
 
 **The generated layer covers CRUD over the §8 entities and nothing else.** Search (DD-14), qualified-
 name resolution (§3.4), the job table (DD-17) and the append-only counter events with their
@@ -937,11 +951,12 @@ startup that the journal holds every embedded script, and fails `/ready` rather 
 it does not, so a partially upgraded deployment removes itself from the load balancer instead of
 serving against a schema it does not understand.
 
-§17's contract tests extend to the generated DAOs, for DD-05's reason: a defect in a template is
-systematic rather than confined to one type. They run against a real PostgreSQL in a container,
-since the SQL is the thing being tested. Generator output is additionally covered by golden-file
-comparison, with a guard that fails when a model class has no golden file — otherwise adding a class
-to the model silently adds untested generated code.
+§17 gains a persistence level, and the contract-test argument extends to the generated DAOs for
+DD-05's reason: a defect in a template is systematic rather than confined to one type. These run
+against a real PostgreSQL in a container, since the SQL is the thing being tested, so they are
+tagged for exclusion exactly as the end-to-end suites are. Generator output is additionally covered
+by golden-file comparison, with a guard that fails when a model class has no golden file — otherwise
+adding a class to the model silently adds untested generated code.
 
 Reversal is bounded but not free. The DAOs sit behind the domain layer, so replacing the generator
 with hand-written data access would not disturb callers; replacing raw SQL with an ORM would.
@@ -1777,19 +1792,21 @@ Apache tree. The SBOM is where a customer's procurement function encounters thos
 
 | Project | Kind | Packable | Responsibility |
 |---|---|---|---|
-| `Mycelium.Forge` | Web | No | Static SSR interface and Carter HTTP API |
+| `Mycelium.Forge` | Web | No | Static SSR interface, Carter HTTP API, and persistence under `Orm/` (DD-18) |
 | `Mycelium.Forge.Common` | Library | Yes | Shared DTOs, generated from EA XMI |
-| `Mycelium.Forge.Orm` | Library | No | Generated DAOs, the generated schema, and the DbUp migration scripts (DD-18) |
 | `Mycelium.Forge.Client` | Library | Yes | REST client library (`SSS-FG-REG-C3M`) |
 | `Mycelium.Forge.Cli` | Tool | Native binary | Command-line client (§11.2) |
 | `Mycelium.Forge.Tests` | NUnit | No | Host and API unit/integration tests |
 | `Mycelium.Forge.Common.Tests` | NUnit | No | JSON serialisation contract tests |
-| `Mycelium.Forge.Orm.Tests` | NUnit | No | DAO and migration tests against a containerised PostgreSQL |
 | `Mycelium.Forge.Client.Tests` | NUnit | No | Client library tests |
 | `Mycelium.Forge.EndToEndTests` | Playwright | No | Browser and HTTP API end-to-end suites |
 
 `Mycelium.Forge.Ui`, the Blazor WebAssembly project, is **not** in this list: no screen requires a
 component runtime (§7.4, DD-02). The name is reserved should one ever do so.
+
+There is likewise **no separate persistence project**. The generated data-access layer lives in
+`Mycelium.Forge/Orm/`, because only the deployable consumes it and DD-03 has one deployable — see
+DD-18 for the reasoning and for why extracting it later is cheap.
 
 ---
 
@@ -1800,11 +1817,13 @@ component runtime (§7.4, DD-02). The name is reserved should one ever do so.
 | Unit | NUnit, Moq | Domain invariants, manifest extractors, validators |
 | Contract | NUnit | JSON round-trips over the generated DTOs and their generated serialisers (DD-05), including the DD-13 abbreviated projection. Critical because a defect in a generator template is systematic rather than confined to one type |
 | Integration | `WebApplicationFactory` | Host composition, routing, probes |
+| Persistence | NUnit, Testcontainers | Generated DAOs, hand-written repositories and the whole migration set against a real PostgreSQL, plus the drift check between a migrated database and the generated schema (DD-18) |
 | End-to-end | Playwright | Browser surface and HTTP API against a running host |
 
 End-to-end suites are tagged `EndToEnd` so `--filter TestCategory!=EndToEnd` gives a server-free run.
 They target a real host over the network rather than an in-memory server, so the API is exercised
-through the transport a real client uses.
+through the transport a real client uses. Persistence suites are tagged `Database` on the same
+principle: they need a container, so a developer without Docker can still run everything else.
 
 ---
 

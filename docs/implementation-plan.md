@@ -45,7 +45,7 @@ applied by DbUp. It is therefore no longer listed here.
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
 | **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
-| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, and DD-18 now generates the DAOs and the schema from it too. Does it exist, and who authors it? | `Mycelium.Forge.Common` and `Mycelium.Forge.Orm`, therefore every project | Treated as F-03 below; needs an owner named |
+| **D-3** | **The Enterprise Architect model.** DD-07 generates all DTOs from it, and DD-18 now generates the DAOs and the schema from it too. Does it exist, and who authors it? | `Mycelium.Forge.Common` and the persistence layer, therefore every project | Treated as F-03 below; needs an owner named |
 | **D-4** | **OIDC provider for development.** §13 says "the same external identity provider as Fabric" — correct for production, undefined for a developer laptop | Epic F, and the authenticated pages in Epic G | A Keycloak container in the compose file |
 | **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
