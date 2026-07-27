@@ -100,7 +100,7 @@ Blocks everything else. Small, and worth doing properly.
 | F-04 | **uml4net DTO generation**: templates, MSBuild target, output into `Common/Generated/` (DD-07) | M | F-03 |
 | F-05 | **uml4net JSON serialiser generation** (DD-05), including DD-13's abbreviated projection | M | F-04 |
 | F-06 | **Contract-test harness** for generated serialisers (§17) — a template defect is systematic, so this is the test that matters most | S | F-05 |
-| F-07 | **Local environment**: compose with PostgreSQL, MinIO and Keycloak; devcontainer wiring (DD-09, D-4) | M | F-01, F-02 |
+| F-07 | **Local environment**: compose with PostgreSQL, MinIO and Keycloak, plus a one-shot migrator service — migrations are an explicit invocation, not a startup step, so without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09, D-4) | M | F-01, F-02 |
 | F-08 | **CI pipeline**: build, test, `docker buildx --sbom=true --provenance=true`, SBOM published as a release file (§15.1). *Already tracked as #2 — no separate issue was created; the SBOM and provenance requirements should be added to it* | M | — |
 | F-09 | **Make the end-to-end suite self-hosting.** It currently requires a host already listening on `:5000` and fails with connection-refused otherwise, so it cannot run in CI as it stands | S | — |
 
@@ -201,7 +201,7 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 | H-01 | Job table, `FOR UPDATE SKIP LOCKED` claim, lease renewal, expiry reclaim, progress on the row | L | A-01 |
 | H-02 | Counter aggregation advancing a watermark in the same transaction as the aggregate (DD-15, DD-17) | M | H-01, C-03 |
 | H-03 | Orphaned blob collection (§12) | M | H-01, A-03 |
-| H-04 | `Forge__Roles` role switch, role-aware startup and probes (DD-03) | M | H-01 |
+| H-04 | `Forge__Roles` role switch, role-aware startup and probes (DD-03), including the `/ready` schema-version gate and the advisory-locked migrator invocation (DD-18) | M | H-01 |
 
 ### Epic I — Observability
 

@@ -1709,7 +1709,13 @@ programme, not a boolean column, and should be scheduled as such.
 | Distributed traces | OpenTelemetry, OTLP exporter | `SSS-FB-OBS-D2B` |
 | Prometheus metrics at `/metrics` | OpenTelemetry | `SSS-FB-OBS-M3C`, `SSS-CC-EXT-OB1` |
 | `/healthz` and `/ready` | ASP.NET health checks | `SSS-FB-OBS-H4D` |
+| Schema-version readiness gate | A `/ready` check that the migration journal holds every embedded script (DD-18) | `SSS-FB-OBS-H4D` |
 | Credential and PII scrubbing, bounded retention | Serilog enrichers and destructuring policy | `SSS-FB-OBS-R8H` |
+
+The schema-version gate is deliberately on `/ready` and not `/healthz`. A replica whose schema is
+behind the code is not unhealthy — restarting it changes nothing — it is *not ready to serve*, and
+the correct response is removal from the load balancer until the migrator has run. Putting it on
+`/healthz` would instead have the orchestrator restart it in a loop.
 
 ---
 
