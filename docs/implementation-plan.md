@@ -35,7 +35,7 @@ they are still worth understanding once phase 4 has shipped.
 
 ## 2. Decisions still required
 
-Two things are not yet decided, and one of them blocks work. Each becomes a design decision in
+One thing is not yet decided, and it blocks nothing. Each becomes a design decision in
 `design.md` once settled — this list is where they are visible until then.
 
 **D-1, data access and migration tooling, is settled** and recorded as **DD-18**: DAOs generated
@@ -50,18 +50,15 @@ is no longer a stand-in to choose.
 who authors it, and F-03 owns that. What the model must cover is recorded on F-03 and in DD-07, DD-18
 and DD-20. That it does not yet exist is schedule risk, which belongs to §9 rather than here.
 
-None of the three is listed below.
+**D-2, object storage, is settled** and recorded as **DD-21**: `AWSSDK.S3`, with S3-compatible object
+storage required in every topology and no filesystem-backed `IArtifactStore`. §12's "no local disk
+state" therefore stands without exception.
+
+None of the four is listed below.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
-| **D-2** | **Object storage client, and whether S3 is mandatory on-premise** | Epic A, the `IArtifactStore` seam | See below |
 | **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.3 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
-
-**On D-2.** `AWSSDK.S3` against MinIO locally is the conventional answer and needs little discussion.
-The question worth deciding deliberately is whether an on-premise or air-gapped customer (§5.1) must
-run object storage at all, or whether `IArtifactStore` also gets a filesystem implementation. The seam
-already exists, so this is a matter of scope rather than architecture — but it should be answered
-before the seam is implemented, not after.
 
 ---
 
@@ -143,7 +140,7 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 |---|---|---|---|
 | A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), and an explicitly sized connection pool rather than Npgsql's default (§12.2) | M | F-01, F-10 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
-| A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12) | M | F-02, A-01 |
+| A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12), with a single `AWSSDK.S3` implementation — DD-21 declines a filesystem backend, so the seam exists for mirroring's fetch-on-miss rather than for a second store | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |
 | A-05 | §8.1 invariants enforced in the **domain layer**, not at the API boundary: immutability of `{package, version}`, strictly increasing SemVer, release notes required on a major change, at least one individual-Account Owner | M | A-01 |
 | A-06 | Append-only tamper-evident audit entries on every privileged operation (`SSS-FG-AUTH-R9J`) | M | A-01 |
