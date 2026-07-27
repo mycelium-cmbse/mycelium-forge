@@ -75,8 +75,8 @@ once someone picks it up).
 ### Issues as created
 
 **78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. Two were raised later, both from decisions that did not exist when that pass was made:
-**A-07 is #85** (from DD-18) and **D-07 is #86** (from DD-19).
+other. Three were raised later, all from decisions that did not exist when that pass was made:
+**A-07 is #85** and **F-10 is #88** (from DD-18), and **D-07 is #86** (from DD-19).
 
 Two pre-existing issues were left alone:
 
@@ -106,10 +106,17 @@ Blocks everything else. Small, and worth doing properly.
 | F-07 | **Local environment**: compose with PostgreSQL, MinIO and Keycloak, plus a one-shot migrator service — migrations are an explicit invocation, not a startup step, so without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09, D-4) | M | F-01, F-02 |
 | F-08 | **CI pipeline**: build, test, `docker buildx --sbom=true --provenance=true`, SBOM published as a release file (§15.1). *Already tracked as #2 — no separate issue was created; the SBOM and provenance requirements should be added to it* | M | — |
 | F-09 | **Make the end-to-end suite self-hosting.** It currently requires a host already listening on `:5000` and fails with connection-refused otherwise, so it cannot run in CI as it stands | S | — |
+| F-10 | **uml4net DAO and schema generation** (DD-18): DAO templates emitting raw Npgsql over the §8 entities, a DDL template emitting the schema that becomes migration `0001`, and golden-file coverage of both | L | F-04 |
 
 F-03 is the critical path and the one with schedule risk — it is upstream of every project in the
-solution and it is not a coding task. If it slips, F-04 and F-05 slip with it and phase 1 cannot start
-cleanly. Worth naming an owner before anything else on this list.
+solution and it is not a coding task. If it slips, F-04, F-05 and F-10 slip with it and phase 1 cannot
+start cleanly. Worth naming an owner before anything else on this list.
+
+**F-10 was missed when DD-18 was written.** That decision generates the data-access layer and the
+schema from the model, but the plan had generation issues only for DTOs (F-04) and serialisers
+(F-05), while A-01 spoke of "the generated baseline" as though a generator already existed. Nothing
+produced it. The critical path is therefore **F-03 → F-04 → F-10 → A-01 → everything**, with F-05 and
+F-06 running alongside F-10 rather than ahead of it.
 
 ---
 
@@ -121,7 +128,7 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), and an explicitly sized connection pool rather than Npgsql's default (§12.2) | M | F-01 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), and an explicitly sized connection pool rather than Npgsql's default (§12.2) | M | F-01, F-10 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12) | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |
@@ -290,9 +297,11 @@ Additive if and only if the three seams exist. Independent of phases 2 and 3.
 
 ## 9. Critical path and risk
 
-**The critical path is F-03 → F-04 → F-05 → Epic A → everything.** The Enterprise Architect model is
-upstream of the generated DTOs, which are upstream of every project in the solution. It is also the
-only item on that path that is not a coding task, which makes it the likeliest to slip quietly.
+**The critical path is F-03 → F-04 → F-10 → Epic A → everything.** The Enterprise Architect model is
+upstream of the generated DTOs, which are upstream of every project in the solution — and since
+DD-18 it is upstream of the data-access layer and the database schema as well, which is what puts
+F-10 on the path rather than F-05. It is also the only item on that path that is not a coding task,
+which makes it the likeliest to slip quietly.
 
 Three risks worth stating explicitly:
 
