@@ -7,49 +7,36 @@
 
 ## 1. Purpose
 
-This document records the design of **Mycelium Forge**, the artefact registry of the Mycelium
-ecosystem. It states the decisions taken, the reasoning behind them, and the questions still open.
-
-The SSS is the authority on *what* Forge must do. This document is the authority on *how*. Where the
-design deliberately exceeds or diverges from the SSS, that is called out explicitly in §3 rather than
-left implicit — those points require a corrective update to the SSS.
+This document records the design of **Mycelium Forge**, the artefact registry of the Mycelium ecosystem. It states the decisions taken, the reasoning behind them, and the questions still open. The SSS is the authority on *what* Forge must do. This document is the authority on *how*. Where the design deliberately exceeds or diverges from the SSS, that is called out explicitly in §3 rather than left implicit — those points require a corrective update to the SSS.
 
 ---
 
 ## 2. Scope
 
-Forge is the package registry for the Mycelium ecosystem, taking its design cues from nuget.org,
-Maven Central and PyPI (SSS §5.2.3.1). It exposes **three surfaces over one backing store**:
+Forge is the package registry for the Mycelium ecosystem, taking its design cues from nuget.org, Maven Central and PyPI (SSS §5.2.3.1). It exposes **three surfaces over one backing store**:
 
 | Surface | Consumers | Requirements |
 |---|---|---|
 | Public web interface | Humans, search engine crawlers | `SSS-FG-REG-W9J`, `X1K` |
 | Forge HTTP API | Bloom, CI/CD, third-party tools | `SSS-FG-REG-A5E`, `D6F`, `Q7G`, `M8H`; `SSS-CC-EXT-FG1` |
-| First-party client library | Bloom, CI/CD, third-party tools | `SSS-FG-REG-C3M` |
+| First-party client libraries | Bloom, CI/CD, third-party tools, editors | `SSS-FG-REG-C3M` (.NET), `J4V` (Java), `T8S` (TypeScript) |
 
 ### 2.1 Competitive position
 
-Forge is positioned next to **sysand** (sensmetry/sysand), a package manager for SysML v2 and KerML.
-It is open source and Rust-based, and its README states it is "based on a concept of a model
-interchange project, a slight generalization of a project interchange file (`*.kpar`), defined in KerML
-clause 10.3" — **the same foundation as Forge**. The two therefore differ by architecture and reach
-rather than by underlying format.
+Forge is positioned next to **sysand** (sensmetry/sysand), a package manager for SysML v2 and KerML. It is open source and Rust-based, and its README states it is "based on a concept of a model interchange project, a slight generalization of a project interchange file (`*.kpar`), defined in KerML clause 10.3" — **the same foundation as Forge**. The two therefore differ by architecture and reach rather than by underlying format.
 
 | | sysand | Mycelium Forge |
 |---|---|---|
 | Topology | Official index at sysand.com, plus private indexes via `sysand index` | Central registry |
 | Storage | Decoupled from the index; the project's own examples demonstrate storing kpars in GitHub Releases | The registry owns the blobs (§12) with potential reference to a git repos |
 | Primary interface | CLI, plus Python and Java APIs and WASM bindings | Web discovery interface, plus CLI and .NET client |
-| Formats | SysML v2 and KerML | Multi-format — additionally Capella and ECSS-E-TM-10-25 (§3.1) |
+| Formats | SysML v2 and KerML | Multi-format — additionally Capella and ECSS-E-TM-10-25 (§9) |
 
-The architectural split is real: sysand's model resembles Go modules, where an index points at
-artefacts hosted anywhere; Forge's resembles nuget.org, where the registry owns storage, metadata and
-discovery. Neither is wrong. Federation comes more naturally to the former; ownership enforcement,
-faceted discovery and integration with an identity provider come more naturally to the latter.
+The architectural split is real: sysand's model resembles Go modules, where an index points at artefacts hosted anywhere; Forge's resembles nuget.org, where the registry owns storage, metadata and discovery. Neither is wrong. Federation comes more naturally to the former; ownership enforcement, faceted discovery and integration with an identity provider come more naturally to the latter.
 
 Forge's differentiators follow from that, and should drive prioritisation:
 
-- **Multi-format storage** (§3.1). sysand covers SysML v2 and KerML; next to Kerml and Sysml,  ECSS-E-TM-10-25 and Capella are
+- **Multi-format storage** (§9). sysand covers SysML v2 and KerML; next to Kerml and Sysml,  ECSS-E-TM-10-25 and Capella are
   Forge's ground.
 - **The web discovery surface** (`SSS-FG-REG-W9J`, `X1K`). A decentralised index cannot offer faceted
   browsing over content it does not hold. §5.1.6 extends this to mirrors: an on-premise Forge searches
@@ -58,10 +45,6 @@ Forge's differentiators follow from that, and should drive prioritisation:
 - **Fabric and Bloom integration** with enterprise identity (`SSS-FG-AUTH-S1A`) and the ownership model
   (`SSS-FG-AUTH-M3C`) — where those products are present. Forge is deployable without them (§3.5,
   DD-20), so this is a differentiator in the Mycelium context rather than a dependency.
-
-One observation worth carrying into planning rather than treating as a footnote: **sysand already ships
-the client languages §11.3 lists as planned** — Python and Java APIs, plus WASM bindings covering the
-JavaScript ecosystem. On breadth of language support Forge is catching up, not leading.
 
 ### 2.1 Explicitly out of scope
 
@@ -76,24 +59,9 @@ Forge.
 
 ## 3. Deliberate divergences from the SSS
 
-These are intentional. Each needs a corresponding SSS amendment.
+These are intentional. Each needs a corresponding SSS amendment. Where an amendment has since been made, the entry records that rather than being deleted — the reasoning stays available, and a reader can tell a closed divergence from an outstanding one.
 
-### 3.1 Forge stores more than kpar
-
-`SSS-FG-REG-K1A` states Forge "shall accept and distribute every published SysML v2 library as a
-single **kpar** file". The design instead treats kpar as **the first of several artefact formats**.
-Capella and CDP4-COMET / ECSS-E-TM-10-25 are in scope as stored artefact kinds. SysML v1 is deferred:
-its archive layout depends on the authoring tool, so there is no single format to target (§9.2).
-
-This is a product decision, not an implementation convenience: the intent is for Forge to be the
-registry for MBSE artefacts generally, not for SysML v2 libraries alone. The domain model is therefore
-polymorphic from the first commit (§8), so that adding a format is an additive change rather than a
-schema migration.
-
-Corroborating evidence from the design: the search facet panel already groups results by **metamodel**
-("SysML v2 (2025-02)", "KerML"), which is the natural axis along which further formats extend.
-
-### 3.2 SemVer is mandatory in Forge, optional in KerML
+### 3.1 SemVer is mandatory in Forge, optional in KerML
 
 KerML 1.0 §10.3 *Model Interchange Projects* (pp. 432–435) is permissive:
 
@@ -104,7 +72,7 @@ KerML 1.0 §10.3 *Model Interchange Projects* (pp. 432–435) is permissive:
 have. Forge policy is therefore stricter than the specification it builds on. This is recorded here so
 that a future contributor does not "correct" the validator to match KerML.
 
-### 3.3 Concepts present in the design but absent from the SSS
+### 3.2 Concepts present in the design but absent from the SSS
 
 Identified from the Figma prototype and requiring requirements coverage:
 
@@ -113,7 +81,6 @@ Identified from the Figma prototype and requiring requirements coverage:
 - **A Forge CLI** — implied by the `Docs CLI` page. `SSS-FG-REG-C3M` mandates a client *library*; a
   command-line tool built on it is an additional deliverable. **Confirmed in scope for the current
   contract** (§11.2), so this needs a requirement rather than remaining an inference from the design.
-- **Client libraries in Java and TypeScript** (§11.3), likewise beyond `SSS-FG-REG-C3M`.
 - **Upstream mirroring** (§5.1) — an on-premise instance proxying an upstream Forge while hosting local
   packages, with bulk pre-warm and air-gapped bundle seeding. SSS §4.4 describes on-premise
   single-tenant deployment but says nothing about proxying an upstream. **Confirmed in scope for the
@@ -145,7 +112,7 @@ Identified from the Figma prototype and requiring requirements coverage:
   *Action for the designer: surface both on the search result card and the package detail page,
   labelled distinctly enough that they are not read as the same number.*
 
-### 3.4 Free-text search is scoped to package metadata
+### 3.3 Free-text search is scoped to package metadata
 
 This is the one place the design deliberately delivers **less** than a requirement asks for, so the
 reasoning is set out at length.
@@ -214,7 +181,7 @@ have been by a blended ranked list.
 resolution.** Neither amendment is made here — this section records the divergence and its
 justification for the SSS owner to act on.
 
-### 3.5 Forge does not share an identity provider with Fabric
+### 3.4 Forge does not share an identity provider with Fabric
 
 **This entry is different in kind from the four above.** Those record places where Forge deliberately
 exceeds or narrows the SSS on its own reasoning. This one records a **platform-level architectural
@@ -835,10 +802,10 @@ Owner" (`SSS-FG-AUTH-O4D`), immutable `{package, version}` (`I3C`), strictly inc
 (`S2B`), and an atomic publish (`A5E`). These are unique indexes and constraints inside a transaction;
 a store without real transactions turns every one of them into an application-level race.
 
-*Why it suits the polymorphic model specifically.* §3.1 commits to storing several artefact formats
+*Why it suits the polymorphic model specifically.* §9 commits to storing several artefact formats
 whose manifests have nothing structurally in common. PostgreSQL keeps the relational spine — package,
 version, maintainer, audit — while holding each `IArtifactManifest` as **JSONB with GIN indexing**. A
-new format is then an additive change with no schema migration, which is exactly what §3.1 promises.
+new format is then an additive change with no schema migration, which is exactly what §9 promises.
 That combination is the deciding factor: a document store gives the flexibility and loses the
 invariants; a strict relational schema keeps the invariants and makes every new format a migration.
 
@@ -1798,6 +1765,12 @@ boundary rather than stored unvalidated.
 
 ## 9. Artefact formats
 
+Three formats are required by the SSS: kpar for SysML v2 and KerML (`SSS-FG-REG-K1A`), ECSS-E-TM-10-25 as an Annex C.3 exchange file (`SSS-FG-REG-E5T`), and Capella as a project archive (`SSS-FG-REG-C7P`).
+
+**The design treats them as the first three of several rather than as three special cases**, and that is a decision rather than a restatement of the requirements. Forge is intended as the registry for MBSE artefacts generally, not for SysML v2 libraries alone — the idea previously called Model Hub, or MoHu. The domain model is therefore polymorphic from the first commit (§8), so that adding a fourth format is an additive change rather than a schema migration. DD-14 depends on this: it is why the relational spine and the per-format manifests are stored differently.
+
+**SysML v1 is deferred.** No requirement names it, and its archive layout depends on the authoring tool, so there is no single format to target (§9.2). Taking it up would need a requirement of its own alongside the other three.
+
 ### 9.1 kpar
 
 KerML 1.0 §10.3 (pp. 432–435), normative:
@@ -1973,7 +1946,10 @@ newer schema believing it had received the one it asked for.
 
 ### 11.1 The .NET client library
 
-`Mycelium.Forge.Client` wraps every endpoint (`SSS-FG-REG-C3M`): search, metadata, version list,
+`SSS-FG-REG-C3M` is scoped to the **.NET ecosystem** and distribution as a NuGet package; the Java and
+TypeScript ecosystems are `SSS-FG-REG-J4V` and `SSS-FG-REG-T8S`, covered in §11.3.
+
+`Mycelium.Forge.Client` wraps every endpoint: search, metadata, version list,
 download, publish, unlist, credential management. It returns `FluentResults` values rather than
 throwing, registers through `IHttpClientFactory`, and depends only on `Mycelium.Forge.Common`. Per
 DD-11 it is configured with a base URL, from which every address derives.
@@ -1999,10 +1975,19 @@ It is a thin `System.CommandLine` shell over `Mycelium.Forge.Client`, so its com
 | `forge key` | API key issuance and revocation |
 | `forge login` | Local credential storage — the one element with no library counterpart |
 
-**Distributed as a NativeAOT self-contained binary**, not as a `dotnet tool`. A tool package requires
-the .NET SDK on the target machine, which is a poor assumption for CI runners and for developers whose
-editor is not Visual Studio. DD-05's model-generated serialisers contain no reflection, which is what
-makes NativeAOT viable, so this costs nothing additional.
+**Distributed through two channels**, because neither one covers the audience on its own:
+
+| Channel | Reaches | Why it is needed |
+|---|---|---|
+| **NuGet, as a `dotnet tool`** | .NET developers, and repositories pinning a version in a tool manifest | The idiomatic path for the ecosystem `SSS-FG-REG-C3M` targets. Installation is one command, versioning comes from NuGet on the same feed as the client library, and a tool manifest makes the version reproducible per repository rather than per machine |
+| **NativeAOT self-contained binary**, per platform | CI runners, air-gapped sites (§5.1), developers whose editor is not Visual Studio | A `dotnet tool` requires the **.NET SDK** on the target machine, not merely the runtime. That is a poor assumption precisely where publishing matters most, and it is the reason the tool package cannot be the only channel |
+
+DD-05's model-generated serialisers contain no reflection, which is what makes the NativeAOT half
+viable, so that channel costs nothing additional.
+
+**The two channels ship the same command surface at the same version**, from one project. They are a
+packaging difference, not two products — a command available in one and not the other would make the
+documentation of §3.3's `Docs CLI` page wrong for half its readers.
 
 **`forge login` writes to the operating system's credential store** — DPAPI on Windows, Keychain on
 macOS, the Secret Service API on Linux — and not to a file in the user's home directory. Where no
@@ -2018,11 +2003,17 @@ world-readable dotfile at the other end.
 
 ### 11.3 Clients in other languages
 
-Planned, in priority order to be confirmed:
+Both are required, and each names its integration target rather than the library alone:
 
-- **Java** — enables integration with the OMG SysML v2 reference implementation, which is Java.
-- **TypeScript** — VS Code's extension host is Node.js and its extension API is a JavaScript API, so
-  any VS Code extension is TypeScript or JavaScript.
+- **Java** (`SSS-FG-REG-J4V`) — a Maven artefact, plus the integration by which the open-source Java
+  reference implementation of SysML v2 resolves and retrieves packages from a Forge registry.
+- **TypeScript** (`SSS-FG-REG-T8S`) — an npm package, plus a Visual Studio Code extension through which
+  a user searches, retrieves and publishes without leaving the editor. VS Code's extension host is
+  Node.js and its extension API is a JavaScript API, so any VS Code extension is TypeScript or
+  JavaScript.
+
+**Sequencing between the two is not fixed by the requirements**, and the argument below is why it
+cannot be settled by picking whichever library is cheaper.
 
 **These are two separate pieces of work, not one.** Language extensions often split into a thin
 TypeScript extension plus a language server over LSP, and such a server can be written in any language
@@ -2468,9 +2459,10 @@ being the default.
 
 #### The CLI carries its own SBOM
 
-`SSS-CC-SUP-SBM` names container images, so the NativeAOT CLI binary (§11.2) falls outside it as
-written. It is nonetheless a released, installed artefact with bundled dependencies, and the same
-procurement logic applies, so **it carries an SBOM too**.
+`SSS-CC-SUP-SBM` names container images, so the CLI falls outside it as written on **both** of §11.2's
+distribution channels. Each is nonetheless a released, installed artefact with bundled dependencies, and
+the same procurement logic applies, so **the CLI carries an SBOM too** — one SBOM, since the two
+channels ship the same code at the same version.
 
 Because there is no image to scan, it is generated from the .NET restore graph rather than by image
 scanning — which also gives more reliable licence data for managed dependencies, since NuGet packages
@@ -2489,7 +2481,7 @@ Apache tree. The SBOM is where a customer's procurement function encounters thos
 | `Mycelium.Forge` | Web | No | Static SSR interface, Carter HTTP API, and persistence under `Orm/` (DD-18) |
 | `Mycelium.Forge.Common` | Library | Yes | Shared DTOs, generated from EA XMI |
 | `Mycelium.Forge.Client` | Library | Yes | REST client library (`SSS-FG-REG-C3M`) |
-| `Mycelium.Forge.Cli` | Tool | Native binary | Command-line client (§11.2) |
+| `Mycelium.Forge.Cli` | Tool | `dotnet tool` on NuGet, plus native binaries | Command-line client, two distribution channels (§11.2) |
 | `Mycelium.Forge.Tests` | NUnit | No | Host and API unit/integration tests |
 | `Mycelium.Forge.Common.Tests` | NUnit | No | JSON serialisation contract tests |
 | `Mycelium.Forge.Client.Tests` | NUnit | No | Client library tests |

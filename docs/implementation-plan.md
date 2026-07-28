@@ -270,13 +270,18 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 
 Depends only on phase 1's `/api/v1`.
 
+**Scope is the .NET client and the CLI built on it.** `SSS-FG-REG-J4V` (Java) and `SSS-FG-REG-T8S`
+(TypeScript) are requirements against the product, but they are **deliberately not decomposed here** —
+they are not part of this plan's delivery. The absence is intentional rather than an oversight, so it
+should not be closed by adding rows.
+
 | Id | Issue | Size |
 |---|---|---|
 | P2-01 | `Mycelium.Forge.Client` over the seven `SSS-FG-REG-C3M` operations: base-URL configuration, `IHttpClientFactory`, `FluentResults` rather than exceptions | L |
 | P2-02 | Client tests against a running host, over the real transport (§17) | M |
 | P2-03 | CLI: `System.CommandLine` shell over the client — `search`, `info`, `versions`, `download`, `publish`, `unlist`, `key` (§11.2) | L |
 | P2-04 | `forge login` and local credential storage — the one command with no library counterpart. The OS credential store, not a dotfile, with an announced fallback where none exists (§11.2) | M |
-| P2-05 | NativeAOT self-contained binaries per platform, not a `dotnet tool` (§11.2) | M |
+| P2-05 | Two distribution channels from one project, at the same version: a NuGet `dotnet tool` package, and NativeAOT self-contained binaries per platform (§11.2) | M |
 | P2-06 | CLI SBOM generated from the restore graph (§15.1) | S |
 
 ---
@@ -342,7 +347,7 @@ every write path once there are several.
 **`Auriga` is not fully published.** P3-02 depends on another team's release schedule. Phase 3 should
 be sequenced with that visibility rather than assuming availability.
 
-**Traceability gaps compound.** Six capabilities in §3.3 have no SSS requirement. Each is confirmed in
+**Traceability gaps compound.** Five capabilities in §3.3 have no SSS requirement. Each is confirmed in
 scope, so the risk is not that they are built wrongly but that the requirements baseline drifts from
 the product while the work is in flight — and reconstructing intent afterwards is far more expensive
 than recording it now.
