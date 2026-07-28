@@ -1,6 +1,5 @@
 # Mycelium Forge — Software Design Document
 
-**Status:** Draft, for PDR
 **Applies to:** `mycelium-forge`
 **Traces to:** Mycelium Software System Specification (SSS) §4.4, §5.2.3, §5.3, §5.13
 
@@ -30,7 +29,7 @@ Maven Central and PyPI (SSS §5.2.3.1). It exposes **three surfaces over one bac
 
 ### 2.1 Competitive position
 
-Forge is positioned against **sysand** (sensmetry/sysand), a package manager for SysML v2 and KerML.
+Forge is positioned next to **sysand** (sensmetry/sysand), a package manager for SysML v2 and KerML.
 It is open source and Rust-based, and its README states it is "based on a concept of a model
 interchange project, a slight generalization of a project interchange file (`*.kpar`), defined in KerML
 clause 10.3" — **the same foundation as Forge**. The two therefore differ by architecture and reach
@@ -39,7 +38,7 @@ rather than by underlying format.
 | | sysand | Mycelium Forge |
 |---|---|---|
 | Topology | Official index at sysand.com, plus private indexes via `sysand index` | Central registry |
-| Storage | Decoupled from the index; the project's own examples demonstrate storing kpars in GitHub Releases | The registry owns the blobs (§12) |
+| Storage | Decoupled from the index; the project's own examples demonstrate storing kpars in GitHub Releases | The registry owns the blobs (§12) with potential reference to a git repos |
 | Primary interface | CLI, plus Python and Java APIs and WASM bindings | Web discovery interface, plus CLI and .NET client |
 | Formats | SysML v2 and KerML | Multi-format — additionally Capella and ECSS-E-TM-10-25 (§3.1) |
 
@@ -50,7 +49,7 @@ faceted discovery and integration with an identity provider come more naturally 
 
 Forge's differentiators follow from that, and should drive prioritisation:
 
-- **Multi-format storage** (§3.1). sysand covers SysML v2 and KerML; Capella and ECSS-E-TM-10-25 are
+- **Multi-format storage** (§3.1). sysand covers SysML v2 and KerML; next to Kerml and Sysml,  ECSS-E-TM-10-25 and Capella are
   Forge's ground.
 - **The web discovery surface** (`SSS-FG-REG-W9J`, `X1K`). A decentralised index cannot offer faceted
   browsing over content it does not hold. §5.1.6 extends this to mirrors: an on-premise Forge searches
