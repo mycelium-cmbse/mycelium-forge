@@ -267,6 +267,12 @@ instance, then export.
 The mirror **replicates upstream's package metadata index** and fetches artefacts lazily. Search
 therefore covers everything upstream offers, not merely what has already been downloaded.
 
+**"Everything upstream offers" means everything the mirror's upstream credential is entitled to read**
+(`SSS-FG-REG-M5R`). A mirror configured with an anonymous or public-scope credential replicates public
+packages only; an organisation mirroring its own private packages to an on-premise instance supplies a
+credential that can see them. §5.1.7's upstream credential is therefore what bounds the catalogue, not
+the upstream's total contents.
+
 This is deliberately more capable than a conventional repository proxy, and Forge is in a position to
 do it because **both ends of the relationship are Forge**. Nexus and Artifactory proxy third-party
 registries whose APIs they do not control, so they can only exploit whatever index an upstream happens
@@ -1136,8 +1142,12 @@ have silently invalidated reasoning resting on the other:
 
 1. **Artefacts are streamed through Forge.** `GET …/artifact` returns the bytes. There is no redirect
    to object storage and no presigned URL on the download path.
-2. **Responses are cacheable at a CDN** — `Cache-Control: public, max-age=31536000, immutable`, with
-   the content hash as a strong `ETag`.
+2. **Responses for public packages are cacheable at a CDN** — `Cache-Control: public, max-age=31536000,
+   immutable`, with the content hash as a strong `ETag`. Artefacts of packages that are not public are
+   served from origin under `Cache-Control: private, no-store` and never reach a shared cache
+   (`SSS-FG-REG-N2C`); the artefact URL is `@scope/name/version/artifact` and therefore guessable, so a
+   shared edge would otherwise serve private bytes to anyone who asked. The content hash remains the
+   `ETag` on both paths.
 3. **A download event is recorded on successful completion**, not when the request arrives (DD-15).
 
 **Reasoning.**
@@ -1489,6 +1499,11 @@ it survives a refresh, it can require the package name to be typed, and it makes
 action deliberate instead of one click inside a modal. This is a case where the static answer is the
 stronger design.
 
+The destructive action reachable from package settings is **unlisting**, not deletion. Neither an Owner
+nor an Organization Administrator can delete a package or erase a published version; that is reserved
+to the Installation Administrator and is not part of the package-settings surface at all
+(`SSS-FG-AUTH-E7N`).
+
 **API keys — the one-time secret reveal.** This looks like the strongest candidate and is worth
 stating carefully, because it is where the reasoning is least obvious.
 
@@ -1537,6 +1552,7 @@ classDiagram
         +Scope Scope
         +string Name
         +ArtifactKind Kind
+        +Visibility Visibility
     }
     class PackageVersion {
         +SemanticVersion Version
@@ -1581,6 +1597,16 @@ identifier invented to distinguish a row rather than to describe it, standing al
 rather than replacing it. It is deliberately absent
 from the diagram: it is a persistence concern with no domain meaning, and the identity that matters at
 this level is the natural one — a handle, a slug, `{Scope, Name}`, `{Package, Version}`.
+
+Two enumerations carry the access model:
+
+- **`Visibility`** is `Private`, `OrganizationVisible` or `Public`, set on the Package by an Owner and
+  defaulting to `Private` unless the owning Organization configures otherwise (`SSS-FG-AUTH-V6K`). It
+  is orthogonal to `PackageVersion.IsListed`: unlisting is a deprecation signal that still serves
+  direct downloads (`SSS-FG-REG-U4D`), so a package may be public-and-unlisted or private-and-listed.
+- **`MaintainerRole`** is `Owner`, `Maintainer` or `Reader`. `Reader` grants read access where
+  visibility would otherwise exclude the principal and confers no write authority; it is not
+  assignable on a public package, where it would express nothing (`SSS-FG-AUTH-K9R`).
 
 ### 8.1 Invariants
 
@@ -1644,9 +1670,15 @@ question is what happens when the declared version **cannot be served** — beca
 
 **Fallback is by content hash only, never by name.**
 
-If the declared version is unavailable, Forge may serve a package version from any scope whose content
-hash is identical to the one requested, and reports the substitution to the caller. If no
-byte-identical copy exists, resolution fails.
+If the declared version is unavailable, Forge may serve a package version whose content hash is
+identical to the one requested, and reports the substitution to the caller. If no byte-identical copy
+exists, resolution fails.
+
+**The candidate set is restricted to artefacts the requester is authorised to read** (`SSS-FG-REG-H8F`).
+The filter is on the requester's authorisation rather than on the artefact's visibility: filtering the
+other way would let identical content act as an oracle for the existence of private packages. Where
+the only byte-identical copies are invisible to the requester, resolution fails exactly as if none
+existed, and the substitution report names only a scope the caller can already see.
 
 The distinction is the whole decision:
 
@@ -1819,6 +1851,12 @@ configured with a base URL, from which every address derives.
 Read access to public packages requires no authentication (`SSS-FG-REG-Y2L`). Errors use RFC 9457
 problem details, carrying the correlation identifier so that a user-facing error can quote it
 (`SSS-PA-OBS-E6F` establishes that expectation on the Bloom side).
+
+**Every read endpoint filters to what the requesting principal may see** (`SSS-FG-AUTH-D4M`). Packages
+the principal is not authorised to read are absent from search results and from qualified-name
+resolution, and a direct request for one returns the same response as a package that does not exist —
+`404`, never `403`. The two cases are deliberately indistinguishable, so the endpoints above cannot be
+used to enumerate private package names.
 
 ### 10.2 Client configuration
 
