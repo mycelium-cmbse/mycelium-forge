@@ -200,8 +200,8 @@ built by different routes, so an unsorted diff will report drift that is not the
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
 | E-01 | Search projection in PostgreSQL behind an interface, so §12.1's contingency stays open (DD-14) | M | D-01 |
-| E-02 | `GET /api/v1/packages` — free text over metadata, facets, sort, pagination (§3.3, `SSS-FG-REG-Q7G`) | L | E-01 |
-| E-03 | `GET /api/v1/elements` — qualified-name resolution, exact and prefix, **unranked**, returning all matches without choosing one (§3.3, §8.2) | M | E-01 |
+| E-02 | `GET /api/v1/packages` — free text over metadata, facets, sort, pagination (`SSS-FG-REG-Q7G`) | L | E-01 |
+| E-03 | `GET /api/v1/elements` — qualified-name resolution, exact and prefix, **unranked**, returning all matches without choosing one (`SSS-FG-REG-Z5Q`, §8.2) | M | E-01 |
 | E-04 | Latency benchmark against the p95 500 ms budget at the target corpus, with facets enabled (§12.1) | M | E-02 |
 
 E-04 is not optional polish. §12.1 sets 500 ms as the trigger for leaving PostgreSQL; without a

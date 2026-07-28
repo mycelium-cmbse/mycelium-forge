@@ -43,8 +43,8 @@ Forge's differentiators follow from that, and should drive prioritisation:
   the whole upstream catalogue, not merely what it has cached, which is more than a conventional
   repository proxy manages for any format except Maven.
 - **Fabric and Bloom integration** with enterprise identity (`SSS-FG-AUTH-S1A`) and the ownership model
-  (`SSS-FG-AUTH-M3C`) — where those products are present. Forge is deployable without them (§3.4,
-  DD-20), so this is a differentiator in the Mycelium context rather than a dependency.
+  (`SSS-FG-AUTH-M3C`) — where those products are present. Forge is deployable without them
+  (DD-20), so this is a differentiator in the Mycelium context rather than a dependency.
 
 ### 2.1 Explicitly out of scope
 
@@ -59,7 +59,7 @@ Forge.
 
 ## 3. Deliberate divergences from the SSS
 
-These are intentional. Each needs a corresponding SSS amendment. Where an amendment has since been made, the entry records that rather than being deleted — the reasoning stays available, and a reader can tell a closed divergence from an outstanding one.
+These are intentional, and each needs a corresponding SSS amendment. **When the amendment lands, the entry is removed from this section rather than kept as a closed record.** The behaviour then lives in the SSS, and restating it here would duplicate a functional requirement — which is the one thing this document should never do.
 
 ### 3.1 SemVer is mandatory in Forge, optional in KerML
 
@@ -111,94 +111,6 @@ Identified from the Figma prototype and requiring requirements coverage:
 
   *Action for the designer: surface both on the search result card and the package detail page,
   labelled distinctly enough that they are not read as the same number.*
-
-### 3.3 Free-text search is scoped to package metadata
-
-This is the one place the design deliberately delivers **less** than a requirement asks for, so the
-reasoning is set out at length.
-
-`SSS-FG-REG-Q7G` requires free-text query terms to be matched against "package identifier, display
-name, description, tags, authors, **and the indexed content of the library (element names, qualified
-names, Metadata Definitions, Quantity Kinds)**", with all of it feeding one ranked result set.
-
-The design narrows this. **Free-text relevance search covers package metadata only.** Element content
-is served instead by a separate, non-ranked capability — qualified-name resolution (§10.2) — which
-answers "which package version defines this element?" by exact or prefix match.
-
-#### Why blending content into relevance search defeats itself
-
-A package containing an element named `Temperature` is not a package *about* temperature. Element
-names are a very low-precision signal for package-level relevance, and the error is not random: it is
-systematically biased toward the largest and most general libraries.
-
-The ISQ quantities library contains essentially every physical quantity name in existence. Under
-content matching it would match nearly any physics-adjacent query and surface in almost every result
-set — and it is a package Forge is *required* to host (`SSS-PA-IE-OYJ`). The packages that match most
-are therefore the least useful answer to "find me a package about X", and they crowd out the specific
-ones. The feature degrades the metadata search it is blended into.
-
-Index structure cannot rescue this. Indexing one document per element and rolling up to the package
-makes it strictly worse — more elements means more chances to match, so size becomes an advantage.
-Indexing one document per package with concatenated element names lets BM25's length normalisation
-penalise large libraries, but then a match cannot be attributed to a specific element, which removes
-most of the value that motivated content search in the first place.
-
-#### The valuable capability underneath
-
-Two distinct user needs are conflated in the requirement:
-
-| Need | Query type | Ranking |
-|---|---|---|
-| "Find me a package about thermal analysis" | Free text over metadata | Relevance |
-| "Which package defines `ISQ::ThermodynamicTemperature`?" | Exact or prefix on qualified name | None — there is a right answer |
-
-The second is genuinely valuable, and arguably more so than content search: it is **reference
-resolution**. Bloom encountering an unresolved qualified name needs to find the package that provides
-it, which is precisely what the package picker in `SSS-PA-REG-B4N` requires. It is a lookup, not a
-search, and treating it as one produces a better answer for less effort.
-
-#### Consequence: PostgreSQL suffices
-
-Qualified-name resolution is a table of `(qualified name → package version)` under a B-tree. At the
-commercial target — thousands of packages, each with thousands of elements — that is on the order of
-tens of millions of rows and a few gigabytes. Exact match is an index seek; prefix match is a range
-scan. PostgreSQL is entirely comfortable at that scale.
-
-Metadata search, meanwhile, is one document per package: thousands of documents, which is trivial.
-
-The scenario that would have forced a dedicated search engine was free-text relevance over millions of
-element documents — the capability being declined here on quality grounds, independently of its cost.
-See DD-14 and §12.1.
-
-#### What is not lost
-
-Element content is still indexed, still queryable, and still reaches the user — through resolution
-rather than ranking. A user searching for a concept finds packages by their described purpose; a tool
-resolving a reference finds the defining package exactly. Neither path is served worse than it would
-have been by a blended ranked list.
-
-**This narrowing requires an amendment to `SSS-FG-REG-Q7G`, and a new requirement for qualified-name
-resolution.** Neither amendment is made here — this section records the divergence and its
-justification for the SSS owner to act on.
-
-### 3.4 Forge does not share an identity provider with Fabric
-
-**This entry is different in kind from the four above.** Those record places where Forge deliberately
-exceeds or narrows the SSS on its own reasoning. This one records a **platform-level architectural
-decision taken outside Forge** that leaves two requirements simply wrong rather than merely exceeded.
-
-`SSS-FG-AUTH-S1A` and `SSS-CC-EXT-ID1` have interactive users authenticating "through the same
-external identity provider as Fabric". The platform architecture no longer permits Fabric and Forge to
-share a Keycloak, and the product intent is now explicit: **deploying Forge without Fabric and Bloom
-must be possible.**
-
-Forge therefore **owns its identity registry** and federates to an external provider only where one is
-configured. See DD-20 for the decision and its consequences.
-
-**`SSS-FG-AUTH-S1A` and `SSS-CC-EXT-ID1` require amendment, and until they are amended the
-requirements baseline contradicts the architecture.** This is not the deferred bookkeeping the other
-entries in this section describe: a reader following those two requirements today would build the
-wrong thing.
 
 ---
 
@@ -256,7 +168,7 @@ flowchart TB
 ```
 
 There is **no separate search index**. Free-text search over package metadata and qualified-name
-resolution both run in PostgreSQL (DD-14, §3.3); §12.1 records the conditions under which that would
+resolution both run in PostgreSQL (DD-14); §12.1 records the conditions under which that would
 change and what it would change to. Artefact blobs are content-addressed, which is what makes the
 §8.2 fallback and the §5.1.4 mirror cache the same mechanism rather than two.
 
@@ -364,7 +276,8 @@ without downloading the entire repository". Most other formats publish nothing c
 proxy search is usually limited to cached content. A Forge mirror talks to another Forge, so the index
 exchange is part of Forge's own API rather than something scraped from an upstream.
 
-**§3.3 is what makes this affordable.** Because free-text search covers package metadata only, the
+**Search covering package metadata only is what makes this affordable.** Because free-text search is
+scoped that way (`SSS-FG-REG-Q7G`), the
 replicated index is a few thousand small records — identifiers, descriptions, tags, versions, licences.
 Had content search remained in scope, replication would have meant millions of element documents and
 this design would not be practical. The two decisions compound.
@@ -809,7 +722,7 @@ new format is then an additive change with no schema migration, which is exactly
 That combination is the deciding factor: a document store gives the flexibility and loses the
 invariants; a strict relational schema keeps the invariants and makes every new format a migration.
 
-*Why search stays there.* Once §3.3 narrows free-text search to package metadata, the workload is
+*Why search stays there.* With free-text search scoped to package metadata (`SSS-FG-REG-Q7G`), the workload is
 one document per package — thousands of documents at the commercial target, which is trivial.
 Qualified-name resolution is a B-tree over tens of millions of rows, answered by index seek or range
 scan. Dependency resolution over `usage[]` is a recursive CTE. None of these strains PostgreSQL.
@@ -941,7 +854,7 @@ Extracting an assembly later is moving files and fixing namespaces, so this is r
 reverse — unlike §19.1's seams, which are not.
 
 **The generated layer covers CRUD over the §8 entities and nothing else.** Search (DD-14), qualified-
-name resolution (§3.3), the job table (DD-17) and the append-only counter events with their
+name resolution (`SSS-FG-REG-Z5Q`), the job table (DD-17) and the append-only counter events with their
 watermark (DD-15) are hand-written repositories over hand-written SQL, because none of them is a
 projection of a model class. Their DDL is hand-written in migrations, and the drift check tolerates
 them because it compares only the objects the generated schema declares — so it needs no exclusion
@@ -1378,7 +1291,7 @@ interface must not present them as one number.
 Forge-specific registration exists" carried more weight than its length suggested: Accounts,
 Organizations, membership, invitations and deprovisioning were all inherited rather than modelled.
 The platform architecture no longer permits a shared Keycloak, and the product intent is now that
-**Forge must be deployable without Fabric and Bloom** (§3.4).
+**Forge must be deployable without Fabric and Bloom** (DD-20).
 
 **Decision.** Three parts.
 
@@ -1718,7 +1631,7 @@ Three consequences follow, and none is incidental:
 - **Storage deduplicates automatically.** §12's blob store is content-addressed, so identical bytes are
   stored once and referenced by both package versions. Publishing into a second scope costs metadata
   only.
-- **Qualified-name resolution becomes genuinely ambiguous.** §3.3's resolution endpoint returns the
+- **Qualified-name resolution becomes genuinely ambiguous.** the resolution endpoint (`SSS-FG-REG-Z5Q`) returns the
   package versions defining a name; with multi-scope publishing, several answers is the *normal* case
   rather than an edge case. The service returns all of them, and the caller — Bloom's package picker,
   or a resolver — chooses. It must not pick one arbitrarily and present it as the answer.
@@ -1893,8 +1806,8 @@ configured with a base URL, from which every address derives.
 
 | Method | Route | Purpose | Requirement |
 |---|---|---|---|
-| `GET` | `/api/v1/packages` | Search over package metadata: free text, facets, sort, pagination | `SSS-FG-REG-Q7G`, narrowed per §3.3 |
-| `GET` | `/api/v1/elements` | Resolve a qualified name to the package versions defining it — exact and prefix match, unranked | §3.3 (needs a requirement) |
+| `GET` | `/api/v1/packages` | Search over package metadata: free text, facets, sort, pagination | `SSS-FG-REG-Q7G` |
+| `GET` | `/api/v1/elements` | Resolve a qualified name to the package versions defining it — exact and prefix match, unranked | `SSS-FG-REG-Z5Q` |
 | `GET` | `/api/v1/packages/{scope}/{name}` | Manifest, versions, dependency graph, release notes | `SSS-FG-REG-M8H` |
 | `GET` | `/api/v1/packages/{scope}/{name}/artifact` | Latest listed, non-prerelease artefact | `SSS-FG-REG-D6F` |
 | `GET` | `/api/v1/packages/{scope}/{name}/{version}/artifact` | Explicit version | `SSS-FG-REG-D6F` |
@@ -2073,7 +1986,7 @@ records what would justify moving, and which engine each trigger points to, so t
 choice is evidence-driven rather than reactive — and so that options already evaluated are not
 re-proposed from first principles later.
 
-**§3.3 substantially weakens the case for ever moving.** The scenario that would have forced a
+**Search being scoped to package metadata substantially weakens the case for ever moving.** The scenario that would have forced a
 dedicated engine — free-text relevance over millions of element documents — is the capability declined
 there on quality grounds. What remains is metadata search over thousands of documents and a B-tree
 lookup, neither of which strains PostgreSQL at the commercial target. Moving is now a contingency
@@ -2127,7 +2040,7 @@ is what makes it a useful trigger rather than a target.
 
 | Trigger | Candidate | Why that one |
 |---|---|---|
-| Facet-count queries degrading as facet dimensions or corpus grow; or §3.3 being reversed and content search reinstated | **Apache Solr** | Built for large faceted indexes. Faceting is Solr's historic differentiator over raw Lucene, and the JSON Facet API computes multi-dimensional counts in one request. Apache-2.0 with no scaling cliff |
+| Facet-count queries degrading as facet dimensions or corpus grow; or `SSS-FG-REG-Q7G` being widened and content search reinstated | **Apache Solr** | Built for large faceted indexes. Faceting is Solr's historic differentiator over raw Lucene, and the JSON Facet API computes multi-dimensional counts in one request. Apache-2.0 with no scaling cliff |
 | p95 of the search query exceeding 500 ms against the target corpus, or typo tolerance — users mistyping identifiers such as `@esa/ECSS-MM-AOC` and getting no results | **Meilisearch** | Far lighter to operate; typo tolerance is native rather than bolted on |
 | — | ~~ParadeDB~~ | **Rejected**, see below |
 
@@ -2252,7 +2165,7 @@ constraints that cost something wait until the trigger fires.
 
 - **Interactive users** authenticate by OIDC against **Forge's own identity provider**, which ships
   with the deployment. Where an external provider exists — Fabric's, or an enterprise IdP — Forge
-  federates to it as configuration. Forge never requires one (DD-20, §3.4).
+  federates to it as configuration. Forge never requires one (DD-20).
 - **Accounts and Organizations are Forge's own records**, not projections of an external directory.
   Membership, roles, invitations and deprovisioning are Forge's to administer (DD-20). This replaces
   the previous position that no Forge-specific registration exists.
@@ -2555,7 +2468,7 @@ do not exist in phase 1, so it arrives with the proxy itself and disturbs nothin
 
 | Phase | Contents | Depends on |
 |---|---|---|
-| **1 — Registry core** | kpar publish, download, unlist. Metadata projection. Metadata search (§3.3) and qualified-name resolution. Static SSR web interface. OIDC and API keys, maintainer model with the §8.1 invariants. The `/api/v1` surface (DD-11). Observability (§14). The job runner (DD-17), carrying counter aggregation and blob collection. **Plus the three seams.** | — |
+| **1 — Registry core** | kpar publish, download, unlist. Metadata projection. Metadata search (`SSS-FG-REG-Q7G`) and qualified-name resolution (`SSS-FG-REG-Z5Q`). Static SSR web interface. OIDC and API keys, maintainer model with the §8.1 invariants. The `/api/v1` surface (DD-11). Observability (§14). The job runner (DD-17), carrying counter aggregation and blob collection. **Plus the three seams.** | — |
 | **2 — Client surfaces** | `Mycelium.Forge.Client`, the CLI (§11.2) | Phase 1's `/api/v1` surface |
 | **3 — Multi-format** | Capella via `Auriga`, ECSS-E-TM-10-25 via `CDP4JsonFileDal-CE`, the publisher-supplied metadata path (§9.2.1) | Phase 1's extractor interface (§8.3) |
 | **4 — Mirroring** | Scope routing configuration, connected proxy with artefact cache and metadata TTL, metadata index replication with availability-aware search (§5.1.6), read-only enforcement, bulk pre-warm, air-gapped bundle export and import | Phase 1's three seams |
