@@ -58,7 +58,7 @@ None of the four is listed below.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
-| **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.3 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
+| **D-5** | **Requirements coverage for §3.2 items.** The mirroring capability itself (beyond `SSS-FG-REG-M5R`, which governs only what a mirror replicates), verified publishers, the docs site and the two popularity metrics lack SSS requirements. The CLI and `/api/v1/elements` no longer do — `SSS-FG-REG-C5L` and `SSS-FG-REG-Z5Q` cover them. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.2 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
 ---
 
@@ -139,7 +139,7 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), an explicitly sized connection pool rather than Npgsql's default (§12.2), and UUIDv7 primary keys defaulting to `uuidv7()` on a PostgreSQL 18 baseline (DD-23) | M | F-01, F-10 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), an explicitly sized connection pool rather than Npgsql's default (§12.2), UUIDv7 primary keys defaulting to `uuidv7()` on a PostgreSQL 18 baseline (DD-23), and the `Visibility` and `MaintainerRole` enumerations of §8 with `Package.Visibility` defaulting to `Private` (`SSS-FG-AUTH-V6K`, `K9R`) | M | F-01, F-10 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12), with a single `AWSSDK.S3` implementation — DD-21 declines a filesystem backend, so the seam exists for mirroring's fetch-on-miss rather than for a second store. Includes DD-21's two unverified Garage properties: assert `Range` passthrough against a real instance, and confirm nothing depends on server-side encryption | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |
@@ -170,7 +170,7 @@ built by different routes, so an unsorted diff will report drift that is not the
 |---|---|---|---|
 | B-01 | `IArtifactManifestExtractor` and Autofac registration; an unregistered kind is rejected at the API boundary rather than stored unvalidated (§8.3) | S | A-01 |
 | B-02 | kpar extractor over `SysML2.NET.Kpar`, implementing the ten checks in §9.1 | L | B-01 |
-| B-03 | Scope declared at publish and authorised against the credential; name equality against the manifest; mismatch **rejected**, not warned (§8.2) | M | B-01, F-03 |
+| B-03 | Scope declared at publish and authorised against the credential; name equality against the manifest; mismatch **rejected**, not warned (§8.2); a first publish creates the package with its publisher as Owner and the scope's default visibility, private unless the Organization configures otherwise (`SSS-FG-AUTH-V6K`, `M3C`) | M | B-01, F-03 |
 | B-04 | Atomic publish across two stores: blob first under a content-addressed key, then the metadata transaction; concurrent publishes serialised by a unique constraint (§12, `SSS-FG-REG-A5E`, `-I3C`) | M | A-03, A-05 |
 | B-05 | `PUT /api/v1/packages` | M | B-02, B-04 |
 | B-06 | Publish page — static SSR multipart form, validation failures re-rendered on the form (§7.4) | M | B-05, G-01 |
@@ -179,7 +179,7 @@ built by different routes, so an unsorted diff will report drift that is not the
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| C-01 | `GET …/artifact` (latest listed, non-prerelease) and `…/{version}/artifact` (`SSS-FG-REG-D6F`), streamed through Forge with CDN caching, `Range` support and the content hash as `ETag` (DD-22) | M | A-03, F-11 |
+| C-01 | `GET …/artifact` (latest listed, non-prerelease) and `…/{version}/artifact` (`SSS-FG-REG-D6F`), streamed through Forge, with cache directives split by visibility — `public, max-age=31536000, immutable` for public packages, `private, no-store` from origin for everything else (`SSS-FG-REG-N2C`) — `Range` support and the content hash as `ETag` (DD-22); the requester's visibility is enforced before any bytes are served | M | A-03, F-11 |
 | C-02 | Unlist: hidden from search and resolution, still served on direct download (`SSS-FG-REG-U4D`) | M | A-04, A-05 |
 | C-03 | Append-only download event recording — never a synchronous counter increment (DD-15), written on successful completion rather than at request so the count measures delivery (DD-22). Downloads only; the dependents count is D-07 and is not an event | S | A-01, C-01 |
 
@@ -200,8 +200,8 @@ built by different routes, so an unsorted diff will report drift that is not the
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
 | E-01 | Search projection in PostgreSQL behind an interface, so §12.1's contingency stays open (DD-14) | M | D-01 |
-| E-02 | `GET /api/v1/packages` — free text over metadata, facets, sort, pagination (§3.4, `SSS-FG-REG-Q7G`) | L | E-01 |
-| E-03 | `GET /api/v1/elements` — qualified-name resolution, exact and prefix, **unranked**, returning all matches without choosing one (§3.4, §8.2) | M | E-01 |
+| E-02 | `GET /api/v1/packages` — free text over metadata, facets, sort, pagination (`SSS-FG-REG-Q7G`); results filtered to the requester's visibility **in the query rather than after it**, so that neither pagination totals nor facet counts include packages the caller cannot see; not-visible is indistinguishable from not-found (`SSS-FG-AUTH-D4M`) | L | E-01 |
+| E-03 | `GET /api/v1/elements` — qualified-name resolution, exact and prefix, **unranked**, returning all matches without choosing one (`SSS-FG-REG-Z5Q`, §8.2); matches filtered to the requester's visibility **in the query rather than after it**, so that pagination totals never include packages the caller cannot see; not-visible is indistinguishable from not-found (`SSS-FG-AUTH-D4M`) | M | E-01 |
 | E-04 | Latency benchmark against the p95 500 ms budget at the target corpus, with facets enabled (§12.1) | M | E-02 |
 
 E-04 is not optional polish. §12.1 sets 500 ms as the trigger for leaving PostgreSQL; without a
@@ -213,20 +213,32 @@ harness that measures it, the trigger cannot fire and the decision becomes unfal
 |---|---|---|---|
 | F1-01 | OIDC interactive login against **Forge's own** identity provider, with federation to an external one as optional configuration (DD-20) | M | F-07 |
 | F1-02 | API keys: issuance, revocation, hashed storage, one-time reveal in the `POST` response with an idempotency token (§7.4, `SSS-FG-REG-Y2L`) | M | A-01, A-06 |
-| F1-03 | Owner and Maintainer authority model wired into every privileged path (`SSS-FG-AUTH-M3C`) | M | A-05 |
+| F1-03 | Owner, Maintainer and Reader authority model wired into every privileged path (`SSS-FG-AUTH-M3C`, `K9R`) — enforcement, not administration; the surface that changes roles and visibility is F1-09 | M | A-05 |
 | F1-04 | Anonymous read access to public packages (`SSS-FG-REG-W9J`, `-Y2L`) | S | — |
-| F1-05 | **Account provisioning on first login**, and the seeded-administrator bootstrap from configuration (DD-20) | M | F1-01, A-01 |
-| F1-06 | **Organization creation and slug allocation**, with §5.1.2's rejection of a slug already in the proxied set (DD-16, DD-20) | M | F1-05, A-02 |
-| F1-07 | **Membership and organization roles** — the relation `SSS-FG-AUTH-G6F` needs to authorise publishing on behalf of an Organization (RD-01, DD-20) | M | F1-06 |
-| F1-08 | **Invitations and deprovisioning**, with audit entries on both (`SSS-FG-AUTH-R9J`, DD-20) | M | F1-07, A-06 |
+| F1-05 | **Account provisioning on first login**, and the seeded-administrator bootstrap from configuration (`SSS-FG-AUTH-A2F`, DD-20) | M | F1-01, A-01 |
+| F1-06 | **Organization creation and slug allocation**, with §5.1.2's rejection of a slug already in the proxied set (`SSS-FG-ORG-C1M`, `S2P`, DD-16) | M | F1-05, A-02 |
+| F1-07 | **Membership and organization roles** — the relation `SSS-FG-AUTH-G6F` needs to authorise publishing on behalf of an Organization; the Organization Administrator role is granted only on acceptance and the last-Administrator invariant holds (`SSS-FG-ORG-R5V`, RD-01) | M | F1-06 |
+| F1-08 | **Invitations and deprovisioning**, admitted only on the invitee's acceptance and expiring if unaccepted, with audit entries on both (`SSS-FG-ORG-I4T`, `SSS-FG-AUTH-R9J`) | M | F1-07, A-06 |
+| F1-09 | **Administering the access model**: granting and revoking package roles including `Reader`, which is refused on a public package (`SSS-FG-AUTH-K9R`); changing a package's visibility (`V6K`); and the Organization's publishing policy and default package visibility (`SSS-FG-ORG-B8Y`). Every change is audited, and the individual-Account Owner invariant is re-checked on every team change (`O4D`, `P7G`) | M | F1-03, F1-07, A-06 |
+| F1-10 | **The Account surface**: registration from an installation-unique username and a verified email address, with publishing and package roles withheld until verification (`SSS-FG-ACC-R1B`); profile (`P2D`); self-service username and email change, deactivation and deletion, refused where it would strand a package's last individual Owner (`C3F`); and the holder's own membership list (`V4H`) | L | F1-01, A-01 |
+| F1-11 | **The Installation Administrator console**: account list with verification status and memberships, and create, deactivate, reactivate, delete and role-grant operations with the last-administrator invariant (`SSS-FG-ACC-L5J`, `M6K`); organization list and management, including membership assignment (`SSS-FG-ORG-A9Z`); organization update and delete, refused while the scope holds packages (`U3R`); member list and leaving (`M6W`, `P7X`) | L | F1-05, F1-07, A-06 |
 
-**F1-05 to F1-08 are new, and they are not a small addition.** Until DD-20 the design inherited
-Accounts, Organizations and membership from Fabric's directory, and §13's sentence "no Forge-specific
-registration exists" was carrying all of it. Standalone deployment makes that surface Forge's own.
+**F1-05 to F1-11 are not a small addition, and Epic F is now the largest in phase 1.** Until DD-20 the
+design inherited Accounts, Organizations and membership from Fabric's directory, and §13's sentence
+"no Forge-specific registration exists" was carrying all of it. Standalone deployment makes that
+surface Forge's own, and SSS §5.2.3.4 then specified it in full: sixteen requirements covering
+registration, profile, account lifecycle, organization CRUD, membership, invitations and an
+Installation Administrator console.
 
 They are phase 1 rather than deferrable: publish is authorised against scope (§8.2, B-03) and §8.1's
 "at least one individual-Account Owner" invariant is enforced in the domain layer (A-05). Neither can
 be built against an account model that does not exist.
+
+**F1-10 and F1-11 are the two worth watching.** Both are `L`, both are surface rather than domain
+logic, and neither is on the critical path for publishing or downloading a package — which makes them
+the most likely candidates if phase 1 has to be trimmed. Trimming them is a decision about what a
+standalone installation can do on day one, not a technical one: without F1-11 an operator has no way
+to see or manage the accounts and organizations their installation holds.
 
 ### Epic G — Web interface
 
@@ -242,9 +254,9 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 | G-06 | My packages, and its empty state | M | F1-01, G-01 |
 | G-07 | Package settings, with destructive actions as their own confirmation pages requiring the package name (§7.4) | M | C-02, F1-03 |
 | G-08 | API keys, including the one-time secret page | M | F1-02 |
-| G-09 | Docs site — Home, Concept, Howto, CLI, HTTP API (§3.3) | L | G-01 |
+| G-09 | Docs site — Home, Concept, Howto, CLI, HTTP API (§3.2) | L | G-01 |
 | G-10 | Header search: plain `GET` form plus the `Ctrl K` binding; **no live dropdown** (§7.3) | S | E-02, G-01 |
-| G-11 | Both popularity metrics shown distinctly enough that they are not read as one number, and labelled **downloads** and **dependents** rather than "imports" (§3.3, DD-19) | S | H-02, D-07 |
+| G-11 | Both popularity metrics shown distinctly enough that they are not read as one number, and labelled **downloads** and **dependents** rather than "imports" (§3.2, DD-19) | S | H-02, D-07 |
 
 ### Epic H — Background jobs (DD-17)
 
@@ -314,7 +326,7 @@ Additive if and only if the three seams exist. Independent of phases 2 and 3.
 | P4-02 | Proxied scope origin and read-only enforcement on every write path (§5.1.3) | M | A-02, A-04 |
 | P4-03 | Fetch-on-miss from upstream, then permanent artefact cache — artefacts are immutable so they never need invalidation (§5.1.4) | L | A-03 |
 | P4-04 | Metadata TTL for proxied version lists — the one place immutability does not help (§5.1.4) | M | P4-03 |
-| P4-05 | Metadata index replication: snapshot, incremental deltas, resumable position marker (§5.1.6) | L | E-01 |
+| P4-05 | Metadata index replication: snapshot, incremental deltas, resumable position marker (§5.1.6); replication is bounded by what the upstream credential is authorised to read (`SSS-FG-REG-M5R`), so a private package crosses an installation boundary only where that credential can see it | L | E-01, P4-10 |
 | P4-06 | Availability-aware search — every result carries cached-now versus available-on-demand, and is filterable on it (§5.1.6) | M | P4-05 |
 | P4-07 | Bulk pre-warm as a claimed job with progress on the row (§5.1.5, DD-17) | L | H-01, P4-03 |
 | P4-08 | Air-gapped bundle export | L | P4-07 |
@@ -347,7 +359,7 @@ every write path once there are several.
 **`Auriga` is not fully published.** P3-02 depends on another team's release schedule. Phase 3 should
 be sequenced with that visibility rather than assuming availability.
 
-**Traceability gaps compound.** Five capabilities in §3.3 have no SSS requirement. Each is confirmed in
+**Traceability gaps compound.** Four capabilities in §3.2 have no SSS requirement. Each is confirmed in
 scope, so the risk is not that they are built wrongly but that the requirements baseline drifts from
 the product while the work is in flight — and reconstructing intent afterwards is far more expensive
 than recording it now.
