@@ -118,8 +118,8 @@ Identified from the Figma prototype and requiring requirements coverage:
 
 | ID | Document |
 |---|---|
-| SSS | Mycelium Software System Specification |
-| RD-01 | Roles and Permissions, Mycelium role and permission model |
+| SSS | [Mycelium Software System Specification](https://github.com/mycelium-cmbse/requirements/blob/main/Software-System-Specification.md) |
+| RD-01 | [Roles and Permissions, Mycelium role and permission model](https://github.com/mycelium-cmbse/requirements/blob/main/Roles-and-Permissions.md) — the reasoning behind the access model, including why visibility defaults to private, why non-public artefacts bypass the CDN, and why substitution filters on the requester |
 | AD-02 | OMG SysML v2, version 2.0 (formal/25-09-03) |
 | AD-03 | OMG KerML, version 1.0 (formal/25-09-03) |
 | AD-04 | OMG Systems Modelling API and Services, version 1.0 (formal/25-09-04) |
@@ -2201,19 +2201,42 @@ constraints that cost something wait until the trigger fires.
 
 ## 13. Authentication and authorisation
 
-- **Interactive users** authenticate by OIDC against **Forge's own identity provider**, which ships
-  with the deployment. Where an external provider exists — Fabric's, or an enterprise IdP — Forge
-  federates to it as configuration. Forge never requires one (DD-20).
-- **Accounts and Organizations are Forge's own records**, not projections of an external directory.
-  Membership, roles, invitations and deprovisioning are Forge's to administer (DD-20). This replaces
-  the previous position that no Forge-specific registration exists.
-- **Publishing clients** authenticate with revocable API keys, scoped to a publisher and to a permitted
-  operation set (`SSS-FG-REG-Y2L`). Keys are stored as hashes; the secret is shown once, which is what
-  the `overlay/Forge Key secret` frame exists for.
-- **Package authority** follows the Owner / Maintainer model of `SSS-FG-AUTH-M3C`, with the invariants
-  in §8.1 enforced in the domain layer rather than at the API boundary, so that every entry point is
-  covered.
-- **Every privileged operation** writes an append-only, tamper-evident audit entry (`SSS-FG-AUTH-R9J`).
+**RD-01 is the authority on the role and permission model** — the scopes, the capability tables, and
+the reasoning behind them. This section records how Forge implements that model, and the parts of it
+that are Forge's own rather than the platform's.
+
+**Three principals**, and only the first two are people:
+
+| Principal | Authenticates by | Reaches |
+|---|---|---|
+| **Anonymous** | Nothing | Public packages only (`SSS-FG-REG-W9J`) |
+| **Account** | OIDC against Forge's own provider, provisioned on first sign-in (`SSS-FG-AUTH-S1A`, `A2F`) | Whatever its roles and the packages' visibility permit |
+| **API key** | Bearer credential, hashed at rest (`SSS-FG-REG-Y2L`) | Never more than the Account that issued it, narrowed to an operation set |
+
+**Identity is Forge's own.** The provider ships with the deployment; where an *upstream* provider is
+configured, Forge federates to it, and never requires one (DD-20). Accounts and Organizations are
+Forge's records rather than projections of an external directory, so registration, profile,
+organization creation, membership, invitations and deprovisioning are all Forge's to administer
+(`SSS-FG-ACC-*`, `SSS-FG-ORG-*`). That surface exists because a Forge installation must run with
+neither Bloom nor Fabric present.
+
+**Read access is governed by visibility, not by a role.** A package is private, organization-visible or
+public (`SSS-FG-AUTH-V6K`), and what a principal cannot read is indistinguishable from what does not
+exist (`D4M`). `Reader` exists only to grant read where visibility would otherwise exclude, which is
+why it is not assignable on a public package (`K9R`).
+
+**Write authority is the package role** — `Owner`, `Maintainer`, `Reader` (`SSS-FG-AUTH-M3C`, `K9R`) —
+with §8.1's invariants enforced in the domain layer rather than at the API boundary, so that every
+entry point is covered.
+
+**Publishing is authorised against the declared scope**, never derived from the credential
+(`SSS-FG-AUTH-S2B`, `G6F`): an Account may hold publishing rights in several scopes and has to be able
+to say which one a publication targets.
+
+**Deletion and erasure belong to the Installation Administrator** (`SSS-FG-AUTH-E7N`). Unlisting is the
+only withdrawal an Owner or Maintainer has (`SSS-FG-REG-U4D`).
+
+**Every privileged operation** writes an append-only, tamper-evident audit entry (`SSS-FG-AUTH-R9J`).
 
 #### API keys are Forge's own, and are not Keycloak tokens
 
