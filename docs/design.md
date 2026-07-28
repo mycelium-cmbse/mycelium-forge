@@ -1651,7 +1651,9 @@ classDiagram
     IArtifactManifest <|.. SysMlV1Manifest
 ```
 
-Every entity additionally carries a **UUIDv7 surrogate primary key** (DD-23). It is deliberately absent
+Every entity additionally carries a **UUIDv7 surrogate primary key** (DD-23) — *surrogate* meaning an
+identifier invented to distinguish a row rather than to describe it, standing alongside the natural key
+rather than replacing it. It is deliberately absent
 from the diagram: it is a persistence concern with no domain meaning, and the identity that matters at
 this level is the natural one — a handle, a slug, `{Scope, Name}`, `{Package, Version}`.
 
