@@ -43,7 +43,7 @@ Forge's differentiators follow from that, and should drive prioritisation:
   the whole upstream catalogue, not merely what it has cached, which is more than a conventional
   repository proxy manages for any format except Maven.
 - **Fabric and Bloom integration** with enterprise identity (`SSS-FG-AUTH-S1A`) and the ownership model
-  (`SSS-FG-AUTH-M3C`) — where those products are present. Forge is deployable without them (§3.5,
+  (`SSS-FG-AUTH-M3C`) — where those products are present. Forge is deployable without them (§3.4,
   DD-20), so this is a differentiator in the Mycelium context rather than a dependency.
 
 ### 2.1 Explicitly out of scope
@@ -256,7 +256,7 @@ flowchart TB
 ```
 
 There is **no separate search index**. Free-text search over package metadata and qualified-name
-resolution both run in PostgreSQL (DD-14, §3.4); §12.1 records the conditions under which that would
+resolution both run in PostgreSQL (DD-14, §3.3); §12.1 records the conditions under which that would
 change and what it would change to. Artefact blobs are content-addressed, which is what makes the
 §8.2 fallback and the §5.1.4 mirror cache the same mechanism rather than two.
 
@@ -364,7 +364,7 @@ without downloading the entire repository". Most other formats publish nothing c
 proxy search is usually limited to cached content. A Forge mirror talks to another Forge, so the index
 exchange is part of Forge's own API rather than something scraped from an upstream.
 
-**§3.4 is what makes this affordable.** Because free-text search covers package metadata only, the
+**§3.3 is what makes this affordable.** Because free-text search covers package metadata only, the
 replicated index is a few thousand small records — identifiers, descriptions, tags, versions, licences.
 Had content search remained in scope, replication would have meant millions of element documents and
 this design would not be practical. The two decisions compound.
@@ -809,7 +809,7 @@ new format is then an additive change with no schema migration, which is exactly
 That combination is the deciding factor: a document store gives the flexibility and loses the
 invariants; a strict relational schema keeps the invariants and makes every new format a migration.
 
-*Why search stays there.* Once §3.4 narrows free-text search to package metadata, the workload is
+*Why search stays there.* Once §3.3 narrows free-text search to package metadata, the workload is
 one document per package — thousands of documents at the commercial target, which is trivial.
 Qualified-name resolution is a B-tree over tens of millions of rows, answered by index seek or range
 scan. Dependency resolution over `usage[]` is a recursive CTE. None of these strains PostgreSQL.
@@ -941,7 +941,7 @@ Extracting an assembly later is moving files and fixing namespaces, so this is r
 reverse — unlike §19.1's seams, which are not.
 
 **The generated layer covers CRUD over the §8 entities and nothing else.** Search (DD-14), qualified-
-name resolution (§3.4), the job table (DD-17) and the append-only counter events with their
+name resolution (§3.3), the job table (DD-17) and the append-only counter events with their
 watermark (DD-15) are hand-written repositories over hand-written SQL, because none of them is a
 projection of a model class. Their DDL is hand-written in migrations, and the drift check tolerates
 them because it compares only the objects the generated schema declares — so it needs no exclusion
@@ -1248,7 +1248,7 @@ same hostname" only makes sense if the origin serves the bytes. Choosing the red
 required amending DD-11 instead.
 
 *Counting becomes honest.* A redirect cannot observe whether the transfer completed, so it counts
-intent. Streaming can count delivery. §3.3 already warns that downloads are inflated by CI pipelines,
+intent. Streaming can count delivery. §3.2 already warns that downloads are inflated by CI pipelines,
 mirrors and tooling; there is no reason to add abandoned transfers to that list when the alternative
 is free.
 
@@ -1289,7 +1289,7 @@ means those can change without a client-visible migration.
 ### DD-15 — Download counts are append-only and aggregated asynchronously
 
 **Context.** `SSS-FG-REG-X1K` requires download counts. The naive implementation increments a column
-on the package row on every download. This decision covers downloads only; the second metric of §3.3
+on the package row on every download. This decision covers downloads only; the second metric of §3.2
 is not an event at all and is decided separately in DD-19.
 
 **Decision.** Record download events append-only, and aggregate them into a materialised count on a
@@ -1332,7 +1332,7 @@ and a replicated upstream index (§5.1.6) must not present them as one number.
 
 ### DD-19 — The dependents count is derived from the dependency graph, not recorded
 
-**Context.** §3.3's second popularity metric counts how many packages in the registry build on a
+**Context.** §3.2's second popularity metric counts how many packages in the registry build on a
 given one. It is easily mistaken for an event — "times imported" — and an earlier draft of DD-15
 treated it as one, which would have meant recording something Forge never observes.
 
@@ -1378,7 +1378,7 @@ interface must not present them as one number.
 Forge-specific registration exists" carried more weight than its length suggested: Accounts,
 Organizations, membership, invitations and deprovisioning were all inherited rather than modelled.
 The platform architecture no longer permits a shared Keycloak, and the product intent is now that
-**Forge must be deployable without Fabric and Bloom** (§3.5).
+**Forge must be deployable without Fabric and Bloom** (§3.4).
 
 **Decision.** Three parts.
 
@@ -1718,7 +1718,7 @@ Three consequences follow, and none is incidental:
 - **Storage deduplicates automatically.** §12's blob store is content-addressed, so identical bytes are
   stored once and referenced by both package versions. Publishing into a second scope costs metadata
   only.
-- **Qualified-name resolution becomes genuinely ambiguous.** §3.4's resolution endpoint returns the
+- **Qualified-name resolution becomes genuinely ambiguous.** §3.3's resolution endpoint returns the
   package versions defining a name; with multi-scope publishing, several answers is the *normal* case
   rather than an edge case. The service returns all of them, and the caller — Bloom's package picker,
   or a resolver — chooses. It must not pick one arbitrarily and present it as the answer.
@@ -1795,7 +1795,7 @@ This gives publish-time validation for free — the checks are specified, not in
 | `.meta.json` conforms to the `Meta` schema | §10.3, Table 13 |
 | `name` and `version` present | Table 12, mandatory |
 | `index` and `created` present | Table 13, mandatory |
-| Version is SemVer 2.0.0 and strictly increasing | `SSS-FG-REG-S2B` (stricter than KerML — see §3.2) |
+| Version is SemVer 2.0.0 and strictly increasing | `SSS-FG-REG-S2B` (stricter than KerML — see §3.1) |
 
 **`.project.json` supplies most registry metadata directly:** `name`, `description`, `version`,
 `license`, `maintainer[]`, `website`, `topic[]`, and `usage[]` — where each usage entry carries a
@@ -1893,8 +1893,8 @@ configured with a base URL, from which every address derives.
 
 | Method | Route | Purpose | Requirement |
 |---|---|---|---|
-| `GET` | `/api/v1/packages` | Search over package metadata: free text, facets, sort, pagination | `SSS-FG-REG-Q7G`, narrowed per §3.4 |
-| `GET` | `/api/v1/elements` | Resolve a qualified name to the package versions defining it — exact and prefix match, unranked | §3.4 (needs a requirement) |
+| `GET` | `/api/v1/packages` | Search over package metadata: free text, facets, sort, pagination | `SSS-FG-REG-Q7G`, narrowed per §3.3 |
+| `GET` | `/api/v1/elements` | Resolve a qualified name to the package versions defining it — exact and prefix match, unranked | §3.3 (needs a requirement) |
 | `GET` | `/api/v1/packages/{scope}/{name}` | Manifest, versions, dependency graph, release notes | `SSS-FG-REG-M8H` |
 | `GET` | `/api/v1/packages/{scope}/{name}/artifact` | Latest listed, non-prerelease artefact | `SSS-FG-REG-D6F` |
 | `GET` | `/api/v1/packages/{scope}/{name}/{version}/artifact` | Explicit version | `SSS-FG-REG-D6F` |
@@ -1957,7 +1957,7 @@ DD-11 it is configured with a base URL, from which every address derives.
 ### 11.2 The CLI
 
 **In scope for the current contract, in this repository.** `SSS-FG-REG-C3M` mandates a client library
-and stops there, so the CLI is a scope addition (§3.3) — but a necessary one: CI/CD pipelines publish
+and stops there, so the CLI is a scope addition (§3.2) — but a necessary one: CI/CD pipelines publish
 with a command, not by referencing a NuGet package, and without a first-party tool every customer
 writes their own wrapper, which is the fragmentation a first-party client exists to prevent.
 
@@ -1987,7 +1987,7 @@ viable, so that channel costs nothing additional.
 
 **The two channels ship the same command surface at the same version**, from one project. They are a
 packaging difference, not two products — a command available in one and not the other would make the
-documentation of §3.3's `Docs CLI` page wrong for half its readers.
+documentation of §3.2's `Docs CLI` page wrong for half its readers.
 
 **`forge login` writes to the operating system's credential store** — DPAPI on Windows, Keychain on
 macOS, the Secret Service API on Linux — and not to a file in the user's home directory. Where no
@@ -2073,7 +2073,7 @@ records what would justify moving, and which engine each trigger points to, so t
 choice is evidence-driven rather than reactive — and so that options already evaluated are not
 re-proposed from first principles later.
 
-**§3.4 substantially weakens the case for ever moving.** The scenario that would have forced a
+**§3.3 substantially weakens the case for ever moving.** The scenario that would have forced a
 dedicated engine — free-text relevance over millions of element documents — is the capability declined
 there on quality grounds. What remains is metadata search over thousands of documents and a B-tree
 lookup, neither of which strains PostgreSQL at the commercial target. Moving is now a contingency
@@ -2127,7 +2127,7 @@ is what makes it a useful trigger rather than a target.
 
 | Trigger | Candidate | Why that one |
 |---|---|---|
-| Facet-count queries degrading as facet dimensions or corpus grow; or §3.4 being reversed and content search reinstated | **Apache Solr** | Built for large faceted indexes. Faceting is Solr's historic differentiator over raw Lucene, and the JSON Facet API computes multi-dimensional counts in one request. Apache-2.0 with no scaling cliff |
+| Facet-count queries degrading as facet dimensions or corpus grow; or §3.3 being reversed and content search reinstated | **Apache Solr** | Built for large faceted indexes. Faceting is Solr's historic differentiator over raw Lucene, and the JSON Facet API computes multi-dimensional counts in one request. Apache-2.0 with no scaling cliff |
 | p95 of the search query exceeding 500 ms against the target corpus, or typo tolerance — users mistyping identifiers such as `@esa/ECSS-MM-AOC` and getting no results | **Meilisearch** | Far lighter to operate; typo tolerance is native rather than bolted on |
 | — | ~~ParadeDB~~ | **Rejected**, see below |
 
@@ -2252,7 +2252,7 @@ constraints that cost something wait until the trigger fires.
 
 - **Interactive users** authenticate by OIDC against **Forge's own identity provider**, which ships
   with the deployment. Where an external provider exists — Fabric's, or an enterprise IdP — Forge
-  federates to it as configuration. Forge never requires one (DD-20, §3.5).
+  federates to it as configuration. Forge never requires one (DD-20, §3.4).
 - **Accounts and Organizations are Forge's own records**, not projections of an external directory.
   Membership, roles, invitations and deprovisioning are Forge's to administer (DD-20). This replaces
   the previous position that no Forge-specific registration exists.
@@ -2374,7 +2374,7 @@ approval workflow, an operator-side grant and revocation capability, audit entri
 `SSS-FG-AUTH-R9J` covering both, and the support burden of adjudicating claims. It is a staffed
 programme, not a boolean column, and should be scheduled as such.
 
-**It needs an SSS requirement** before implementation — see §3.3.
+**It needs an SSS requirement** before implementation — see §3.2.
 
 ---
 
@@ -2555,7 +2555,7 @@ do not exist in phase 1, so it arrives with the proxy itself and disturbs nothin
 
 | Phase | Contents | Depends on |
 |---|---|---|
-| **1 — Registry core** | kpar publish, download, unlist. Metadata projection. Metadata search (§3.4) and qualified-name resolution. Static SSR web interface. OIDC and API keys, maintainer model with the §8.1 invariants. The `/api/v1` surface (DD-11). Observability (§14). The job runner (DD-17), carrying counter aggregation and blob collection. **Plus the three seams.** | — |
+| **1 — Registry core** | kpar publish, download, unlist. Metadata projection. Metadata search (§3.3) and qualified-name resolution. Static SSR web interface. OIDC and API keys, maintainer model with the §8.1 invariants. The `/api/v1` surface (DD-11). Observability (§14). The job runner (DD-17), carrying counter aggregation and blob collection. **Plus the three seams.** | — |
 | **2 — Client surfaces** | `Mycelium.Forge.Client`, the CLI (§11.2) | Phase 1's `/api/v1` surface |
 | **3 — Multi-format** | Capella via `Auriga`, ECSS-E-TM-10-25 via `CDP4JsonFileDal-CE`, the publisher-supplied metadata path (§9.2.1) | Phase 1's extractor interface (§8.3) |
 | **4 — Mirroring** | Scope routing configuration, connected proxy with artefact cache and metadata TTL, metadata index replication with availability-aware search (§5.1.6), read-only enforcement, bulk pre-warm, air-gapped bundle export and import | Phase 1's three seams |

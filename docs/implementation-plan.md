@@ -58,7 +58,7 @@ None of the four is listed below.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
-| **D-5** | **Requirements coverage for §3.3 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.3 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
+| **D-5** | **Requirements coverage for §3.2 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.2 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
 ---
 
@@ -200,8 +200,8 @@ built by different routes, so an unsorted diff will report drift that is not the
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
 | E-01 | Search projection in PostgreSQL behind an interface, so §12.1's contingency stays open (DD-14) | M | D-01 |
-| E-02 | `GET /api/v1/packages` — free text over metadata, facets, sort, pagination (§3.4, `SSS-FG-REG-Q7G`) | L | E-01 |
-| E-03 | `GET /api/v1/elements` — qualified-name resolution, exact and prefix, **unranked**, returning all matches without choosing one (§3.4, §8.2) | M | E-01 |
+| E-02 | `GET /api/v1/packages` — free text over metadata, facets, sort, pagination (§3.3, `SSS-FG-REG-Q7G`) | L | E-01 |
+| E-03 | `GET /api/v1/elements` — qualified-name resolution, exact and prefix, **unranked**, returning all matches without choosing one (§3.3, §8.2) | M | E-01 |
 | E-04 | Latency benchmark against the p95 500 ms budget at the target corpus, with facets enabled (§12.1) | M | E-02 |
 
 E-04 is not optional polish. §12.1 sets 500 ms as the trigger for leaving PostgreSQL; without a
@@ -242,9 +242,9 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 | G-06 | My packages, and its empty state | M | F1-01, G-01 |
 | G-07 | Package settings, with destructive actions as their own confirmation pages requiring the package name (§7.4) | M | C-02, F1-03 |
 | G-08 | API keys, including the one-time secret page | M | F1-02 |
-| G-09 | Docs site — Home, Concept, Howto, CLI, HTTP API (§3.3) | L | G-01 |
+| G-09 | Docs site — Home, Concept, Howto, CLI, HTTP API (§3.2) | L | G-01 |
 | G-10 | Header search: plain `GET` form plus the `Ctrl K` binding; **no live dropdown** (§7.3) | S | E-02, G-01 |
-| G-11 | Both popularity metrics shown distinctly enough that they are not read as one number, and labelled **downloads** and **dependents** rather than "imports" (§3.3, DD-19) | S | H-02, D-07 |
+| G-11 | Both popularity metrics shown distinctly enough that they are not read as one number, and labelled **downloads** and **dependents** rather than "imports" (§3.2, DD-19) | S | H-02, D-07 |
 
 ### Epic H — Background jobs (DD-17)
 
@@ -347,7 +347,7 @@ every write path once there are several.
 **`Auriga` is not fully published.** P3-02 depends on another team's release schedule. Phase 3 should
 be sequenced with that visibility rather than assuming availability.
 
-**Traceability gaps compound.** Five capabilities in §3.3 have no SSS requirement. Each is confirmed in
+**Traceability gaps compound.** Five capabilities in §3.2 have no SSS requirement. Each is confirmed in
 scope, so the risk is not that they are built wrongly but that the requirements baseline drifts from
 the product while the work is in flight — and reconstructing intent afterwards is far more expensive
 than recording it now.
