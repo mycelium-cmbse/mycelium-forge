@@ -58,7 +58,7 @@ None of the four is listed below.
 
 | | Decision | Blocks | Recommendation |
 |---|---|---|---|
-| **D-5** | **Requirements coverage for §3.2 items.** The CLI, mirroring, verified publishers, the docs site, `/api/v1/elements` and the two popularity metrics all lack SSS requirements. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.2 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
+| **D-5** | **Requirements coverage for §3.2 items.** The mirroring capability itself (beyond `SSS-FG-REG-M5R`, which governs only what a mirror replicates), verified publishers, the docs site and the two popularity metrics lack SSS requirements. The CLI and `/api/v1/elements` no longer do — `SSS-FG-REG-C5L` and `SSS-FG-REG-Z5Q` cover them. The second metric is now specified in DD-19 as a **dependents** count derived from the dependency graph, not the "imports" event it was previously described as, so the requirement to be written differs materially from what §3.2 originally implied | Nothing technically; it is a traceability gap that grows the longer it is open | One tracking issue against the requirements repository |
 
 ---
 
@@ -347,7 +347,7 @@ every write path once there are several.
 **`Auriga` is not fully published.** P3-02 depends on another team's release schedule. Phase 3 should
 be sequenced with that visibility rather than assuming availability.
 
-**Traceability gaps compound.** Five capabilities in §3.2 have no SSS requirement. Each is confirmed in
+**Traceability gaps compound.** Four capabilities in §3.2 have no SSS requirement. Each is confirmed in
 scope, so the risk is not that they are built wrongly but that the requirements baseline drifts from
 the product while the work is in flight — and reconstructing intent afterwards is far more expensive
 than recording it now.

@@ -78,13 +78,11 @@ Identified from the Figma prototype and requiring requirements coverage:
 
 - **A documentation site** — `Docs Home`, `Docs Concept`, `Docs Howto`, `Docs CLI`, `Docs HTTP API`,
   plus a `Copy-page` overlay. The SSS covers the registry UI, not a docs surface.
-- **A Forge CLI** — implied by the `Docs CLI` page. `SSS-FG-REG-C3M` mandates a client *library*; a
-  command-line tool built on it is an additional deliverable. **Confirmed in scope for the current
-  contract** (§11.2), so this needs a requirement rather than remaining an inference from the design.
 - **Upstream mirroring** (§5.1) — an on-premise instance proxying an upstream Forge while hosting local
-  packages, with bulk pre-warm and air-gapped bundle seeding. SSS §4.4 describes on-premise
-  single-tenant deployment but says nothing about proxying an upstream. **Confirmed in scope for the
-  first release**, so it needs requirements coverage rather than resting on this design alone.
+  packages, with scope routing, fetch-on-miss, bulk pre-warm and air-gapped bundle seeding.
+  `SSS-FG-REG-M5R` governs *what* a mirror replicates, but nothing requires the mirroring capability
+  itself. **Confirmed in scope for the first release**, so it needs requirements coverage rather than
+  resting on this design alone.
 - **Verified-publisher badging** — visible on `@mycelium/ISQ-quantities-units`. No SSS requirement
   defines what verification means or who grants it. Confirmed as intended, **scoped to publisher
   identity only and deferred beyond the first release** (§13.1); it needs a requirement before it is
@@ -1907,10 +1905,11 @@ DD-11 it is configured with a base URL, from which every address derives.
 
 ### 11.2 The CLI
 
-**In scope for the current contract, in this repository.** `SSS-FG-REG-C3M` mandates a client library
-and stops there, so the CLI is a scope addition (§3.2) — but a necessary one: CI/CD pipelines publish
-with a command, not by referencing a NuGet package, and without a first-party tool every customer
-writes their own wrapper, which is the fragmentation a first-party client exists to prevent.
+**Required by `SSS-FG-REG-C5L`**, and built in this repository. The CLI was originally a scope addition
+inferred from the design — `SSS-FG-REG-C3M` mandates a client library and stops there — and the reason
+it earned a requirement is the one that justified it as an addition: CI/CD pipelines publish with a
+command, not by referencing a NuGet package, and without a first-party tool every customer writes their
+own wrapper, which is the fragmentation a first-party client exists to prevent.
 
 It is a thin `System.CommandLine` shell over `Mycelium.Forge.Client`, so its command surface follows
 `SSS-FG-REG-C3M`'s seven operations, plus credential storage:
