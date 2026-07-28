@@ -1118,30 +1118,40 @@ assert, and expensive to discover missing.
 **§12's prerequisites gain a version**, alongside DD-21's object storage. The floor is uniform across
 topologies, so §5.1's "the same binary with an upstream configured" is preserved rather than weakened.
 
-### DD-21 — Object storage is required in every topology, over `AWSSDK.S3`
+### DD-21 — Object storage is required in every topology, over `AWSSDK.S3`; Garage is the implementation
 
 **Context.** §12 stores artefact blobs in S3, content-addressed, but DD-06 named no client. The
 second and larger question is whether an on-premise or air-gapped operator (§5.1) must run object
 storage at all, or whether `IArtifactStore` — the §19.1 seam — also gets a filesystem-backed
 implementation.
 
-**Decision.** Two parts.
+A third element arrived after this decision was first recorded: the Mycelium platform architecture named
+**Garage** as the object store for Fabric and Bloom, and therefore for Forge. This decision is amended
+rather than superseded, because what that settles is the implementation behind a boundary the original
+reasoning had deliberately left open.
+
+**Decision.** Three parts.
 
 1. **`AWSSDK.S3`** is the client. S3-compatible endpoints are reached by setting `ServiceURL` and
-   `ForcePathStyle`, so MinIO, Ceph and comparable stores work unchanged.
+   `ForcePathStyle`, so any conforming store works unchanged.
 2. **S3-compatible object storage is required in every deployment topology.** There is no
-   filesystem-backed `IArtifactStore`. **MinIO** is the local development and CI target, so the path
-   exercised in development is the path production runs.
+   filesystem-backed `IArtifactStore`.
+3. **Garage is the named implementation.** It is what the platform ships and operates, and it is the
+   local development and CI target, so the path exercised in development is the path production runs.
+   **The S3 boundary is retained deliberately**: Garage is named as the implementation, not substituted
+   for the protocol, so a deployment on AWS S3 itself remains possible and Forge continues to test
+   against the contract rather than against one product.
 
 **Reasoning.**
 
-*On the client.* The official SDK is Apache-2.0, is the reference implementation of the protocol, and
-supports the presigning that §12's redirect-based download path depends on. The `Minio` .NET SDK is
-smaller but ties Forge to a vendor that has been narrowing what its community edition offers, which is
-a poor trade for a saving measured in megabytes. `FluentStorage` would supply a filesystem backend for
-free, but it means placing a third-party abstraction *beneath* `IArtifactStore`, which is Forge's own
-abstraction over the same concern — the result is the union of two leaky abstractions rather than less
-work.
+*On the client.* The official SDK is Apache-2.0 and is the reference implementation of the protocol. It
+also supports presigning, which the download path was expected to need when this was written and which
+DD-22 subsequently declined to use — so the capability is retained without being depended on. A
+vendor-specific SDK is the wrong shape regardless of which vendor: it couples the client to one
+implementation at exactly the boundary this decision keeps generic, for a saving measured in megabytes.
+`FluentStorage` would supply a filesystem backend for free, but it means placing a third-party
+abstraction *beneath* `IArtifactStore`, which is Forge's own abstraction over the same concern — the
+result is the union of two leaky abstractions rather than less work.
 
 *Why no filesystem implementation.* §12's "no local disk state" is a horizontal-scaling requirement,
 and a filesystem store does not extend it — it contradicts it. Admitting one would mean the design has
@@ -1168,9 +1178,31 @@ deserves an answer rather than silence.
 The objection does not transfer cleanly, for two reasons. Those rejections were about adding a
 *second* system to do a job PostgreSQL already does adequately; here object storage is doing a job
 PostgreSQL does badly — large binary objects inflate WAL, backup size and restore time, which is
-precisely why SSS §4.5 separates the two. And the ask is smaller than it sounds: MinIO is a single
-container image, so it travels through an air gap by the same `docker save` route §15.1 already
-documents for Forge itself.
+precisely why SSS §4.5 separates the two. And the ask is smaller than it sounds: Garage is a single
+static binary in a single container image, so it travels through an air gap by the same `docker save`
+route §15.1 already documents for Forge itself.
+
+*On Garage specifically.* This is a **platform-level decision taken for Mycelium as a whole**, not one
+Forge reached on its own merits: Fabric and Bloom adopt Garage too, and one storage system across three
+products is worth more than each choosing well in isolation. Forge records it because it changes what
+`F-07` runs and what `§17` exercises, not because Forge is free to differ.
+
+It is nonetheless a good fit, which is worth establishing rather than assuming. **Forge's demands on the
+protocol are unusually small.** §12 stores blobs content-addressed and immutable, so object versioning
+and object locking describe operations Forge never performs, and `H-03` collects orphaned blobs as a
+claimed job in application code rather than through lifecycle rules — the three areas where Garage's
+coverage is absent or partial are precisely the three Forge does not reach for. What it does need is
+`GET` with byte ranges (DD-22), `PUT` with multipart upload for large artefacts, `ListObjectsV2` and
+`DeleteObjects` for `H-03`, all of which Garage implements. DD-22's decision not to redirect removes
+presigned URLs from the dependency list as well, so the surface that must hold is narrower than the one
+this decision originally contemplated.
+
+*The licence, since §15.1 makes licences consequential.* Garage is **AGPL-3.0**. This creates no
+obligation on Forge: it is a separate service reached over HTTP, not a library linked into the image, so
+there is no derivative work and nothing resembling §9.2's LGPL-3.0 entry. It is also not a regression —
+MinIO, the store this replaces, is AGPL-3.0 as well. Because Garage runs as its own deployment rather
+than inside Forge's image, it does not appear in §15.1's SBOM at all; it is a prerequisite, like
+PostgreSQL.
 
 **Consequences.**
 
@@ -1181,9 +1213,23 @@ because a second backend is anticipated.
 **§12's "no local disk state" stands unqualified.** This is worth stating positively: the bullet was
 close to acquiring an exception, and it has not.
 
-Configuration is endpoint, region, bucket, credentials and path-style addressing. **Path-style is
-required for MinIO and most S3-compatible stores** while AWS itself prefers virtual-host style, so
-this is a setting operators will get wrong if it is not surfaced in the deployment documentation.
+Configuration is endpoint, region, bucket, credentials and path-style addressing. Garage implements both
+addressing styles, but virtual-host style requires wildcard DNS for the bucket subdomain, which an
+on-premise or air-gapped operator often cannot arrange — so **path-style stays the default** while AWS
+itself prefers virtual-host style. This is a setting operators will get wrong if it is not surfaced in
+the deployment documentation.
+
+**Two properties of Garage are load-bearing and not yet verified**, and both belong to `A-03`:
+
+- **`Range` passthrough.** DD-22 commits to resumable downloads by passing byte ranges to storage.
+  Garage's compatibility reference documents *operations* rather than per-operation parameters, so it
+  confirms `GetObject` without confirming `Range`. Every indication is that it works — the integrations
+  Garage documents depend on ranged reads — but DD-22's guarantee rests on it, so `A-03` asserts it
+  against a real Garage instance rather than inheriting it.
+- **No server-side encryption.** Garage does not implement it. Encryption at rest for artefact blobs
+  must therefore come from the volume beneath Garage, not from the store, and any requirement written in
+  those terms has to be read against disk-level encryption. Nothing in the design currently depends on
+  SSE; this is recorded so that a later requirement does not assume it silently.
 
 Object storage joins PostgreSQL as a documented prerequisite for **every** topology, including
 air-gapped. §5.1's promise that a mirror is "the same binary with an upstream configured" is preserved
@@ -2362,8 +2408,8 @@ the correct response is removal from the load balancer until the migrator has ru
 
 ## 15. Build, development environment and deployment
 
-- **Runtime prerequisites** — **PostgreSQL 18 or later** (DD-23) and S3-compatible object storage
-  (DD-21), in every topology of §5.1 including air-gapped.
+- **Runtime prerequisites** — **PostgreSQL 18 or later** (DD-23) and S3-compatible object storage,
+  implemented by **Garage** (DD-21), in every topology of §5.1 including air-gapped.
 - **Tailwind** — DD-08. `Directory.Build.targets`, `UseTailwind` opt-in, checksum-verified.
 - **Devcontainer** — one environment for the team; a prerequisite for running agent tooling in-container.
 - **Container image** — multi-stage; SDK image builds and publishes, ASP.NET runtime image serves on 8080.
