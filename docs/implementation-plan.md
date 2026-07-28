@@ -23,7 +23,7 @@ The boundary between the two:
 | | Lives in `design.md` | Lives here |
 |---|---|---|
 | Phases, seams, what parallelises | **§19** — these derive from architecture and remain true afterwards | Referenced, not restated |
-| Why a decision was taken | **§6, DD-01…DD-17** | Referenced by number |
+| Why a decision was taken | **§6, DD-01…DD-23** | Referenced by number |
 | Decomposition into assignable units | — | §4–§8 |
 | Acceptance criteria and dependencies | — | §4–§8 |
 | Sequencing risk and critical path | — | §9 |
@@ -113,10 +113,10 @@ Blocks everything else. Small, and worth doing properly.
 | F-04 | **uml4net DTO generation**: templates, MSBuild target, output into `Common/Generated/` (DD-07) | M | F-03 |
 | F-05 | **uml4net JSON serialiser generation** (DD-05), including DD-13's abbreviated projection | M | F-04 |
 | F-06 | **Contract-test harness** for generated serialisers (§17) — a template defect is systematic, so this is the test that matters most | S | F-05 |
-| F-07 | **Local environment**: compose with PostgreSQL, MinIO and the Forge Keycloak — which since DD-20 is the production component rather than a stand-in — plus a one-shot migrator service, since migrations are an explicit invocation and without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09) | M | F-01, F-02 |
+| F-07 | **Local environment**: compose with **PostgreSQL 18** (DD-23), MinIO and the Forge Keycloak — which since DD-20 is the production component rather than a stand-in — plus a one-shot migrator service, since migrations are an explicit invocation and without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09) | M | F-01, F-02 |
 | F-08 | **CI pipeline**: build, test, `docker buildx --sbom=true --provenance=true`, SBOM published as a release file (§15.1). *Already tracked as #2 — no separate issue was created; the SBOM and provenance requirements should be added to it* | M | — |
 | F-09 | **Make the end-to-end suite self-hosting.** It currently requires a host already listening on `:5000` and fails with connection-refused otherwise, so it cannot run in CI as it stands | S | — |
-| F-10 | **uml4net DAO and schema generation** (DD-18): DAO templates emitting raw Npgsql over the §8 entities, a DDL template emitting the schema that becomes migration `0001`, and golden-file coverage of both | L | F-04 |
+| F-10 | **uml4net DAO and schema generation** (DD-18): DAO templates emitting raw Npgsql over the §8 entities, a DDL template emitting the schema that becomes migration `0001` — with DD-23's UUIDv7 surrogate key on every table and the §8.1 natural keys retained as unique constraints — and golden-file coverage of both | L | F-04 |
 | F-11 | **Decide how artefacts are delivered** — streamed or redirected; record as a DD and reconcile DD-11, DD-15 and DD-21 with the answer | S | F-02 |
 
 F-03 is the critical path and the one with schedule risk — it is upstream of every project in the
@@ -139,7 +139,7 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 
 | Id | Issue | Size | Depends on |
 |---|---|---|---|
-| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), and an explicitly sized connection pool rather than Npgsql's default (§12.2) | M | F-01, F-10 |
+| A-01 | Schema and migrations for `Scope`, `Package`, `PackageVersion`, `Maintainer`, `ApiKey`, `AuditEntry` (§8): the generated baseline, the DbUp runner, the transaction-scoped advisory lock that stops concurrent migrators racing (DD-18), an explicitly sized connection pool rather than Npgsql's default (§12.2), and UUIDv7 primary keys defaulting to `uuidv7()` on a PostgreSQL 18 baseline (DD-23) | M | F-01, F-10 |
 | A-02 | **Seam:** `Scope.Origin`, always `Local` in this phase (§19.1) | S | A-01 |
 | A-03 | **Seam:** `IArtifactStore` resolving by content hash over content-addressed blob storage (§19.1, §12), with a single `AWSSDK.S3` implementation — DD-21 declines a filesystem backend, so the seam exists for mirroring's fetch-on-miss rather than for a second store | M | F-02, A-01 |
 | A-04 | **Seam:** write-authority check on every publish, unlist, maintainer and ownership path; always `true` in this phase (§19.1) | S | A-01 |

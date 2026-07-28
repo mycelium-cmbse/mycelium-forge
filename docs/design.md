@@ -1006,6 +1006,118 @@ with hand-written data access would not disturb callers; replacing raw SQL with 
 §15.1's SBOM gains `Npgsql` (PostgreSQL licence) and `dbup-postgresql` (MIT). Both are compatible
 with Forge's Apache-2.0 and neither carries a clause to reason about, unlike §9.2's LGPL-3.0 entry.
 
+### DD-23 — Surrogate keys are UUIDv7, and PostgreSQL 18 is the floor
+
+**Context.** §8's model names natural keys — `Account.Handle`, `Organization.Slug`, `Scope.Slug`,
+`{Scope, Name}` for a package, `{Package, Version}` for a version — and no surrogate identifier. DD-18
+then generates both the DAOs and the DDL from that model, which makes the key strategy a property of one
+set of templates: whatever it is, it applies uniformly to every entity, and changing it afterwards is a
+migration across every table and every foreign key in the schema. It is cheap to decide before F-10
+writes a template and expensive to revisit once A-01 has run.
+
+Three candidates: a `bigint` identity column, a random UUID (v4), and a time-ordered UUID (v7,
+RFC 9562).
+
+**Decision.** Two parts, recorded as one decision because the second exists to serve the first.
+
+1. **Every entity carries a UUIDv7 surrogate primary key** on a PostgreSQL `uuid` column. Natural keys
+   keep their unique constraints; the surrogate does not replace them. Values are generated in .NET with
+   `Guid.CreateVersion7()`, and the generated DDL additionally declares `DEFAULT uuidv7()` so that
+   migrations, backfills and DD-18's hand-written tables need nothing else.
+2. **PostgreSQL 18 is the minimum supported version**, in every topology of §5.1.
+
+**Reasoning.**
+
+*Why a surrogate key at all.* The natural keys are wide, and not all of them are immutable.
+`{Scope, Name, Version}` propagated as a foreign key into `Maintainer`, `AuditEntry`, DD-15's download
+events and DD-17's job rows is three columns repeated in the highest-volume tables in the schema. And
+while §8.1 freezes `{package identifier, version}` once published, nothing freezes an Organization slug
+or an Account handle — a rename should be one row updated, not a cascade through every table that
+references it.
+
+*Why UUID rather than a `bigint` identity column.* One reason decides it. §5.1.6 replicates a metadata
+index from an upstream installation into a downstream one, so rows are minted in one database and must
+arrive in another without collision or renumbering. Sequences collide across installations by
+construction, and the fixes — offset ranges, per-installation blocks — are exactly the cross-installation
+coordination §5.1 is built to avoid. A 128-bit key makes the problem not arise.
+
+A second reason is smaller but real: §12's publish writes the blob first and then commits the metadata
+transaction. Minting identifiers in the application lets the whole object graph — package, version,
+audit entry, dependents update — be constructed and logged with its final identifiers before anything is
+written, where an identity column yields them only after a round trip.
+
+*What is not a reason.* Opacity. §8.2 and DD-11 address every resource as `@<scope>/<name>` and a
+version, so surrogate keys never appear in a URL and there is nothing for a sequential identifier to
+leak. The usual "UUIDs so that identifiers cannot be enumerated" argument does not apply here, and
+saying so keeps this decision resting on replication rather than on a benefit Forge does not collect.
+
+*Why v7 rather than v4.* Random keys insert at random points in a B-tree: a dirtied page per insert, WAL
+inflated by full-page images, and none of the cache locality that makes an append-ordered index cheap.
+UUIDv7 puts a 48-bit Unix-millisecond timestamp in the leading bits, so inserts land at the right-hand
+edge exactly as a sequence would, and the index behaves like the `bigint` this decision declined. The
+append-only tables — DD-15's download events, DD-17's job rows, A-06's audit trail — are precisely the
+write pattern that punishes v4, and they are the tables that grow without bound.
+
+Two further properties are useful rather than decisive: rows sort by creation time under the primary key
+with no second index, which is what an append-only audit trail wants anyway; and
+`uuid_extract_timestamp()` recovers the creation instant from the key alone when reading a job row or an
+audit entry.
+
+*Why the floor is PostgreSQL 18.* `uuidv7()` is built in from 18; 17 and earlier ship only
+`gen_random_uuid()`, which is v4.
+
+Because the application generates identifiers, a shim would technically serve — a plpgsql `uuidv7()`
+over `gen_random_bytes()` is a dozen lines. It is declined on DD-18's own terms. That decision
+hand-writes every migration and keeps the schema a projection of the model, so a hand-rolled RFC 9562
+implementation would become a piece of the platform Forge maintains, tests, and gets subtly wrong at the
+sub-millisecond monotonicity edge — standing in for a function the database ships.
+
+The floor also buys three things this workload wants independently:
+
+| From PostgreSQL 18 | Why it matters here |
+|---|---|
+| B-tree **skip scan** on multicolumn indexes | §12.1's facet counting groups by scalar attributes with the leading column frequently unconstrained — the shape that otherwise wants an index per permutation |
+| **Asynchronous I/O** | A registry is read-dominated, and this is the release where heap and bitmap reads are issued concurrently rather than one at a time |
+| `RETURNING old.*` / `new.*` | A-06 writes an audit entry for every privileged operation, and capturing the prior row without a second read is exactly that table's job |
+
+*Why the floor is affordable.* This is DD-21's shape — a prerequisite imposed on every topology
+including air-gapped — and it is a smaller ask than object storage was. PostgreSQL 18 was released in
+September 2025, reached general availability on Amazon RDS in November 2025 and on Azure Database for
+PostgreSQL Flexible Server in December 2025, and is supported upstream until November 2030. Meanwhile
+PostgreSQL 13 is already out of support and 14 leaves support in November 2026, so a customer whose
+instance is old enough for this floor to bite has a support problem that predates Forge. The floor stays
+inside PostgreSQL's own support window until November 2030, which outlasts any horizon this document
+plans against.
+
+**Consequences.**
+
+**F-10 owns the mechanism.** Every generated table declares `id uuid PRIMARY KEY DEFAULT uuidv7()`,
+every generated DAO takes the identifier as a parameter rather than reading one back, and §8.1's natural
+keys remain unique constraints alongside it — they are what enforce the invariants, and a surrogate key
+that quietly replaced them would dissolve every one. A-01's baseline migration is where this first
+becomes real, and F-07's compose file pins the PostgreSQL image accordingly.
+
+**A UUIDv7 is never a secret.** It embeds its creation time and carries at most 74 bits of randomness —
+fewer where an implementation spends `rand_a` on sub-millisecond precision, as PostgreSQL's does — and it
+is a surrogate key rather than a capability. F1-02's API keys are random material hashed at rest (§13)
+and are not UUIDs, nor is the key prefix §14 redacts on. This is recorded because "there is already an
+identifier" is the shortest available path to a token guessable from a timestamp.
+
+**Nothing changes in `/api/v1`.** Surrogate keys stay behind the API boundary, so DD-11's permanent paths
+are unaffected and the timestamp a v7 key embeds is never published. For a `PackageVersion` it would have
+disclosed `PublishedAt`, which §8 already makes public; for everything else it discloses nothing, because
+the key is not sent.
+
+**§17 gains one assertion at the persistence level.** .NET's `Guid` and PostgreSQL's `uuid` do not share
+a byte layout across the first three fields, so the ordering property this whole decision rests on
+depends on Npgsql's conversion being the canonical one. The persistence suite inserts a series of
+`Guid.CreateVersion7()` values in creation order, asserts they come back in that order under
+`ORDER BY id`, and asserts `uuid_extract_timestamp()` agrees with the .NET-side timestamp. Cheap to
+assert, and expensive to discover missing.
+
+**§12's prerequisites gain a version**, alongside DD-21's object storage. The floor is uniform across
+topologies, so §5.1's "the same binary with an upstream configured" is preserved rather than weakened.
+
 ### DD-21 — Object storage is required in every topology, over `AWSSDK.S3`
 
 **Context.** §12 stores artefact blobs in S3, content-addressed, but DD-06 named no client. The
@@ -1539,6 +1651,12 @@ classDiagram
     IArtifactManifest <|.. SysMlV1Manifest
 ```
 
+Every entity additionally carries a **UUIDv7 surrogate primary key** (DD-23) — *surrogate* meaning an
+identifier invented to distinguish a row rather than to describe it, standing alongside the natural key
+rather than replacing it. It is deliberately absent
+from the diagram: it is a persistence concern with no domain meaning, and the identity that matters at
+this level is the natural one — a handle, a slug, `{Scope, Name}`, `{Package, Version}`.
+
 ### 8.1 Invariants
 
 | Invariant | Source |
@@ -1893,6 +2011,9 @@ identical paths everywhere (DD-11).
 | Background job state and progress | PostgreSQL, claimed rows (DD-17) |
 | Schema version journal | PostgreSQL, written by DbUp (DD-18) |
 
+Every row in that table depends on **PostgreSQL 18 or later**, which DD-23 makes a prerequisite of every
+topology alongside DD-21's object storage.
+
 Horizontal scaling requires every instance to be interchangeable:
 
 - **No server-side session affinity.** Guaranteed by DD-02 — no circuits exist to pin.
@@ -2241,6 +2362,8 @@ the correct response is removal from the load balancer until the migrator has ru
 
 ## 15. Build, development environment and deployment
 
+- **Runtime prerequisites** — **PostgreSQL 18 or later** (DD-23) and S3-compatible object storage
+  (DD-21), in every topology of §5.1 including air-gapped.
 - **Tailwind** — DD-08. `Directory.Build.targets`, `UseTailwind` opt-in, checksum-verified.
 - **Devcontainer** — one environment for the team; a prerequisite for running agent tooling in-container.
 - **Container image** — multi-stage; SDK image builds and publishes, ASP.NET runtime image serves on 8080.
@@ -2343,7 +2466,7 @@ DD-18 for the reasoning and for why extracting it later is cheap.
 | Unit | NUnit, Moq | Domain invariants, manifest extractors, validators |
 | Contract | NUnit | JSON round-trips over the generated DTOs and their generated serialisers (DD-05), including the DD-13 abbreviated projection. Critical because a defect in a generator template is systematic rather than confined to one type |
 | Integration | `WebApplicationFactory` | Host composition, routing, probes |
-| Persistence | NUnit, Testcontainers | Generated DAOs, hand-written repositories and the whole migration set against a real PostgreSQL, plus the drift check between a migrated database and the generated schema (DD-18) |
+| Persistence | NUnit, Testcontainers | Generated DAOs, hand-written repositories and the whole migration set against a real PostgreSQL, plus the drift check between a migrated database and the generated schema (DD-18) and DD-23's key-ordering assertion |
 | End-to-end | Playwright | Browser surface and HTTP API against a running host |
 
 End-to-end suites are tagged `EndToEnd` so `--filter TestCategory!=EndToEnd` gives a server-free run.
