@@ -1,22 +1,16 @@
 # Mycelium Forge — implementation plan
 
-**Status:** draft for review, 2026-07-27
-**Companion to:** [`design.md`](design.md)
+**Status:** draft for review, 2026-07-27 **Companion to:** [`design.md`](design.md)
 
 ---
 
 ## 1. What this document is, and what it is not
 
-`design.md` answers *why Forge is built this way*. It is durable: every decision in it stays true
-after the work ships, and someone joining in year two reads it to understand the system.
+`design.md` answers *why Forge is built this way*. It is durable: every decision in it stays true after the work ships, and someone joining in year two reads it to understand the system.
 
-This document answers *what we do, in what order, and who can work in parallel*. It is **perishable**.
-The moment the GitHub issues exist, GitHub owns status, and this file becomes a snapshot of how the
-work was decomposed rather than a live tracker.
+This document answers *what we do, in what order, and who can work in parallel*. It is **perishable**. The moment the GitHub issues exist, GitHub owns status, and this file becomes a snapshot of how the work was decomposed rather than a live tracker.
 
-That difference is why the plan is a separate file. A plan section inside `design.md` would start
-rotting the day the first issue is closed — the same failure the decision log had before it was
-removed. Keeping them apart means neither document has to lie.
+That difference is why the plan is a separate file. A plan section inside `design.md` would start rotting the day the first issue is closed — the same failure the decision log had before it was removed. Keeping them apart means neither document has to lie.
 
 The boundary between the two:
 
@@ -28,31 +22,21 @@ The boundary between the two:
 | Acceptance criteria and dependencies | — | §4–§8 |
 | Sequencing risk and critical path | — | §9 |
 
-**§19 stays where it is.** The three seams exist for architectural reasons, not scheduling ones, and
-they are still worth understanding once phase 4 has shipped.
+**§19 stays where it is.** The three seams exist for architectural reasons, not scheduling ones, and they are still worth understanding once phase 4 has shipped.
 
 ---
 
 ## 2. Decisions still required
 
-One thing is not yet decided, and it blocks nothing. Each becomes a design decision in
-`design.md` once settled — this list is where they are visible until then.
+One thing is not yet decided, and it blocks nothing. Each becomes a design decision in `design.md` once settled — this list is where they are visible until then.
 
-**D-1, data access and migration tooling, is settled** and recorded as **DD-18**: DAOs generated
-from the Enterprise Architect model over raw Npgsql, with numbered forward-only SQL migrations
-applied by DbUp.
+**D-1, data access and migration tooling, is settled** and recorded as **DD-18**: DAOs generated from the Enterprise Architect model over raw Npgsql, with numbered forward-only SQL migrations applied by DbUp.
 
-**D-4, the development OIDC provider, is settled** and recorded as **DD-20** — dissolved rather than
-answered. Forge ships its own Keycloak, so the development provider *is* the production one and there
-is no longer a stand-in to choose.
+**D-4, the development OIDC provider, is settled** and recorded as **DD-20** — dissolved rather than answered. Forge ships its own Keycloak, so the development provider *is* the production one and there is no longer a stand-in to choose.
 
-**D-3, the Enterprise Architect model, is settled** in the sense this list tracks: the question was
-who authors it, and F-03 owns that. What the model must cover is recorded on F-03 and in DD-07, DD-18
-and DD-20. That it does not yet exist is schedule risk, which belongs to §9 rather than here.
+**D-3, the Enterprise Architect model, is settled** in the sense this list tracks: the question was who authors it, and F-03 owns that. What the model must cover is recorded on F-03 and in DD-07, DD-18 and DD-20. That it does not yet exist is schedule risk, which belongs to §9 rather than here.
 
-**D-2, object storage, is settled** and recorded as **DD-21**: `AWSSDK.S3`, with S3-compatible object
-storage required in every topology and no filesystem-backed `IArtifactStore`. §12's "no local disk
-state" therefore stands without exception.
+**D-2, object storage, is settled** and recorded as **DD-21**: `AWSSDK.S3`, with S3-compatible object storage required in every topology and no filesystem-backed `IArtifactStore`. §12's "no local disk state" therefore stands without exception.
 
 None of the four is listed below.
 
@@ -65,22 +49,16 @@ None of the four is listed below.
 ## 3. How this maps onto GitHub
 
 - **Milestone per phase** — `Phase 0 — Foundations`, `Phase 1 — Registry core`, and so on.
-- **Label per epic** — `epic:persistence`, `epic:publish`, `epic:web`, … so an epic's issues are one
-  filter away without needing a tracking issue per epic.
+- **Label per epic** — `epic:persistence`, `epic:publish`, `epic:web`, … so an epic's issues are one filter away without needing a tracking issue per epic.
 - **Label per kind** — `decision`, `seam`, `spike`, `chore`.
-- **`seam` is worth its own label.** §19.1 warns the write-authority check is the one most likely to be
-  skipped because in phase 1 it always returns `true`. A reviewer needs to be able to find all three.
-- **Every issue traces.** Title, one-paragraph context, acceptance criteria as checkboxes, and the
-  `design.md` section or `SSS-…` requirement it satisfies. An issue that traces to neither is either
-  scope creep or a missing requirement, and both are worth catching at issue-creation time.
+- **`seam` is worth its own label.** §19.1 warns the write-authority check is the one most likely to be skipped because in phase 1 it always returns `true`. A reviewer needs to be able to find all three.
+- **Every issue traces.** Title, one-paragraph context, acceptance criteria as checkboxes, and the `design.md` section or `SSS-…` requirement it satisfies. An issue that traces to neither is either scope creep or a missing requirement, and both are worth catching at issue-creation time.
 
-Sizes below are **S** (≤1 day), **M** (2–4 days), **L** (a week or more — a candidate for splitting
-once someone picks it up).
+Sizes below are **S** (≤1 day), **M** (2–4 days), **L** (a week or more — a candidate for splitting once someone picks it up).
 
 ### Issues as created
 
-**78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each
-other. Seven were raised later, all from decisions that did not exist when that pass was made:
+**78 issues, #3 to #80**, each titled with its plan reference so the two can be read against each other. Seven were raised later, all from decisions that did not exist when that pass was made:
 
 | From | Issues |
 |---|---|
@@ -90,14 +68,8 @@ other. Seven were raised later, all from decisions that did not exist when that 
 
 Two pre-existing issues were left alone:
 
-- **#2 CI/CD pipeline** already covers F-08, so no duplicate was created. It predates §15.1 and should
-  gain the `--sbom=true --provenance=true` requirement and the standalone SBOM release file.
-- **#1 Solution scaffolding** specified `Mycelium.Forge.Server` and `Mycelium.Forge.Server.Tests`.
-  That issue was stale: **`Mycelium.Forge` and `Mycelium.Forge.Tests` are correct**, and §16 remains
-  the authoritative solution structure. #1 has been corrected in place. Its file-header requirement is
-  satisfied for source files — all seven `.cs` files carry the Starion Apache-2.0 header — but the
-  **Rider Team-scope File Header Template is still outstanding**, so the header is a convention rather
-  than something the IDE applies to new files. No `Mycelium.Forge.sln.DotSettings` is committed.
+- **#2 CI/CD pipeline** already covers F-08, so no duplicate was created. It predates §15.1 and should gain the `--sbom=true --provenance=true` requirement and the standalone SBOM release file.
+- **#1 Solution scaffolding** specified `Mycelium.Forge.Server` and `Mycelium.Forge.Server.Tests`. That issue was stale: **`Mycelium.Forge` and `Mycelium.Forge.Tests` are correct**, and §16 remains the authoritative solution structure. #1 has been corrected in place. Its file-header requirement is satisfied for source files — all seven `.cs` files carry the Starion Apache-2.0 header — but the **Rider Team-scope File Header Template is still outstanding**, so the header is a convention rather than something the IDE applies to new files. No `Mycelium.Forge.sln.DotSettings` is committed.
 
 ---
 
@@ -119,15 +91,9 @@ Blocks everything else. Small, and worth doing properly.
 | F-10 | **uml4net DAO and schema generation** (DD-18): DAO templates emitting raw Npgsql over the §8 entities, a DDL template emitting the schema that becomes migration `0001` — with DD-23's UUIDv7 surrogate key on every table and the §8.1 natural keys retained as unique constraints — and golden-file coverage of both | L | F-04 |
 | F-11 | **Decide how artefacts are delivered** — streamed or redirected; record as a DD and reconcile DD-11, DD-15 and DD-21 with the answer | S | F-02 |
 
-F-03 is the critical path and the one with schedule risk — it is upstream of every project in the
-solution and it is not a coding task. If it slips, F-04, F-05 and F-10 slip with it and phase 1 cannot
-start cleanly.
+F-03 is the critical path and the one with schedule risk — it is upstream of every project in the solution and it is not a coding task. If it slips, F-04, F-05 and F-10 slip with it and phase 1 cannot start cleanly.
 
-**F-10 was missed when DD-18 was written.** That decision generates the data-access layer and the
-schema from the model, but the plan had generation issues only for DTOs (F-04) and serialisers
-(F-05), while A-01 spoke of "the generated baseline" as though a generator already existed. Nothing
-produced it. The critical path is therefore **F-03 → F-04 → F-10 → A-01 → everything**, with F-05 and
-F-06 running alongside F-10 rather than ahead of it.
+**F-10 was missed when DD-18 was written.** That decision generates the data-access layer and the schema from the model, but the plan had generation issues only for DTOs (F-04) and serialisers (F-05), while A-01 spoke of "the generated baseline" as though a generator already existed. Nothing produced it. The critical path is therefore **F-03 → F-04 → F-10 → A-01 → everything**, with F-05 and F-06 running alongside F-10 rather than ahead of it.
 
 ---
 
@@ -147,22 +113,11 @@ The bulk of the work, and the only phase on the critical path (§19.3).
 | A-06 | Append-only tamper-evident audit entries on every privileged operation (`SSS-FG-AUTH-R9J`) | M | A-01 |
 | A-07 | **Schema drift check in CI**: build one database by running every migration in order and another from the generated schema, then fail the build if the migrations did not produce every object the model implies (DD-18) | M | A-01 |
 
-A-07 is not optional polish, for the same reason E-04 is not. DD-18 keeps the Enterprise Architect
-model authoritative over the schema by generating the baseline and then checking that the
-hand-written deltas still add up to what the model implies. Without that check the two drift
-silently, the generated schema becomes decoration, and schema correctness falls back onto review —
-which is precisely the objection DD-18 exists to answer.
+A-07 is not optional polish, for the same reason E-04 is not. DD-18 keeps the Enterprise Architect model authoritative over the schema by generating the baseline and then checking that the hand-written deltas still add up to what the model implies. Without that check the two drift silently, the generated schema becomes decoration, and schema correctness falls back onto review — which is precisely the objection DD-18 exists to answer.
 
-It is a separate issue rather than a clause on A-01 because a verification harness attached to a
-feature issue is the first thing dropped when the feature runs long.
+It is a separate issue rather than a clause on A-01 because a verification harness attached to a feature issue is the first thing dropped when the feature runs long.
 
-Two details for whoever picks it up. The comparison is **one-directional**: every object the
-generated schema declares must exist in the migrated database, but the reverse does not hold, because
-the job table (DD-17), the counter events and their watermark (DD-15), and the search projection
-(E-01) are hand-written and have no model counterpart. That asymmetry is what lets the check work
-without an exclusion list to maintain. And the diff must be normalised before comparison — `pg_dump
---schema-only` does not guarantee a stable ordering of constraints and indexes between two databases
-built by different routes, so an unsorted diff will report drift that is not there.
+Two details for whoever picks it up. The comparison is **one-directional**: every object the generated schema declares must exist in the migrated database, but the reverse does not hold, because the job table (DD-17), the counter events and their watermark (DD-15), and the search projection (E-01) are hand-written and have no model counterpart. That asymmetry is what lets the check work without an exclusion list to maintain. And the diff must be normalised before comparison — `pg_dump --schema-only` does not guarantee a stable ordering of constraints and indexes between two databases built by different routes, so an unsorted diff will report drift that is not there.
 
 ### Epic B — Publish
 
@@ -204,8 +159,7 @@ built by different routes, so an unsorted diff will report drift that is not the
 | E-03 | `GET /api/v1/elements` — qualified-name resolution, exact and prefix, **unranked**, returning all matches without choosing one (`SSS-FG-REG-Z5Q`, §8.2); matches filtered to the requester's visibility **in the query rather than after it**, so that pagination totals never include packages the caller cannot see; not-visible is indistinguishable from not-found (`SSS-FG-AUTH-D4M`) | M | E-01 |
 | E-04 | Latency benchmark against the p95 500 ms budget at the target corpus, with facets enabled (§12.1) | M | E-02 |
 
-E-04 is not optional polish. §12.1 sets 500 ms as the trigger for leaving PostgreSQL; without a
-harness that measures it, the trigger cannot fire and the decision becomes unfalsifiable.
+E-04 is not optional polish. §12.1 sets 500 ms as the trigger for leaving PostgreSQL; without a harness that measures it, the trigger cannot fire and the decision becomes unfalsifiable.
 
 ### Epic F — Authentication and authorisation
 
@@ -223,22 +177,11 @@ harness that measures it, the trigger cannot fire and the decision becomes unfal
 | F1-10 | **The Account surface**: registration from an installation-unique username and a verified email address, with publishing and package roles withheld until verification (`SSS-FG-ACC-R1B`); profile (`P2D`); self-service username and email change, deactivation and deletion, refused where it would strand a package's last individual Owner (`C3F`); and the holder's own membership list (`V4H`) | L | F1-01, A-01 |
 | F1-11 | **The Installation Administrator console**: account list with verification status and memberships, and create, deactivate, reactivate, delete and role-grant operations with the last-administrator invariant (`SSS-FG-ACC-L5J`, `M6K`); organization list and management, including membership assignment (`SSS-FG-ORG-A9Z`); organization update and delete, refused while the scope holds packages (`U3R`); member list and leaving (`M6W`, `P7X`) | L | F1-05, F1-07, A-06 |
 
-**F1-05 to F1-11 are not a small addition, and Epic F is now the largest in phase 1.** Until DD-20 the
-design inherited Accounts, Organizations and membership from Fabric's directory, and §13's sentence
-"no Forge-specific registration exists" was carrying all of it. Standalone deployment makes that
-surface Forge's own, and SSS §5.2.3.4 then specified it in full: sixteen requirements covering
-registration, profile, account lifecycle, organization CRUD, membership, invitations and an
-Installation Administrator console.
+**F1-05 to F1-11 are not a small addition, and Epic F is now the largest in phase 1.** Until DD-20 the design inherited Accounts, Organizations and membership from Fabric's directory, and §13's sentence "no Forge-specific registration exists" was carrying all of it. Standalone deployment makes that surface Forge's own, and SSS §5.2.3.4 then specified it in full: sixteen requirements covering registration, profile, account lifecycle, organization CRUD, membership, invitations and an Installation Administrator console.
 
-They are phase 1 rather than deferrable: publish is authorised against scope (§8.2, B-03) and §8.1's
-"at least one individual-Account Owner" invariant is enforced in the domain layer (A-05). Neither can
-be built against an account model that does not exist.
+They are phase 1 rather than deferrable: publish is authorised against scope (§8.2, B-03) and §8.1's "at least one individual-Account Owner" invariant is enforced in the domain layer (A-05). Neither can be built against an account model that does not exist.
 
-**F1-10 and F1-11 are the two worth watching.** Both are `L`, both are surface rather than domain
-logic, and neither is on the critical path for publishing or downloading a package — which makes them
-the most likely candidates if phase 1 has to be trimmed. Trimming them is a decision about what a
-standalone installation can do on day one, not a technical one: without F1-11 an operator has no way
-to see or manage the accounts and organizations their installation holds.
+**F1-10 and F1-11 are the two worth watching.** Both are `L`, both are surface rather than domain logic, and neither is on the critical path for publishing or downloading a package — which makes them the most likely candidates if phase 1 has to be trimmed. Trimming them is a decision about what a standalone installation can do on day one, not a technical one: without F1-11 an operator has no way to see or manage the accounts and organizations their installation holds.
 
 ### Epic G — Web interface
 
@@ -282,10 +225,7 @@ All static SSR (DD-01, DD-02). No component runtime anywhere in this epic.
 
 Depends only on phase 1's `/api/v1`.
 
-**Scope is the .NET client and the CLI built on it.** `SSS-FG-REG-J4V` (Java) and `SSS-FG-REG-T8S`
-(TypeScript) are requirements against the product, but they are **deliberately not decomposed here** —
-they are not part of this plan's delivery. The absence is intentional rather than an oversight, so it
-should not be closed by adding rows.
+**Scope is the .NET client and the CLI built on it.** `SSS-FG-REG-J4V` (Java) and `SSS-FG-REG-T8S` (TypeScript) are requirements against the product, but they are **deliberately not decomposed here** — they are not part of this plan's delivery. The absence is intentional rather than an oversight, so it should not be closed by adding rows.
 
 | Id | Issue | Size |
 |---|---|---|
@@ -310,9 +250,7 @@ Extends phase 1's extractor interface. Independent of phases 2 and 4.
 | P3-04 | Publish flow for publisher-supplied metadata, with pre-filling where the reader offers a value | M |
 | P3-05 | Record COMET-SDK's LGPL-3.0 as a known SBOM entry rather than a surprise (§9.2) | S |
 
-`Auriga` is only partially published — the object model is at 1.0.0 and the reader layers are in
-progress. P3-02 depends on work outside this repository and should not be scheduled as though it does
-not.
+`Auriga` is only partially published — the object model is at 1.0.0 and the reader layers are in progress. P3-02 depends on work outside this repository and should not be scheduled as though it does not.
 
 ---
 
@@ -337,32 +275,17 @@ Additive if and only if the three seams exist. Independent of phases 2 and 3.
 
 ## 9. Critical path and risk
 
-**The critical path is F-03 → F-04 → F-10 → Epic A → everything.** The Enterprise Architect model is
-upstream of the generated DTOs, which are upstream of every project in the solution — and since
-DD-18 it is upstream of the data-access layer and the database schema as well, which is what puts
-F-10 on the path rather than F-05. It is also the only item on that path that is not a coding task,
-which makes it the likeliest to slip quietly.
+**The critical path is F-03 → F-04 → F-10 → Epic A → everything.** The Enterprise Architect model is upstream of the generated DTOs, which are upstream of every project in the solution — and since DD-18 it is upstream of the data-access layer and the database schema as well, which is what puts F-10 on the path rather than F-05. It is also the only item on that path that is not a coding task, which makes it the likeliest to slip quietly.
 
-**Two decisions have enlarged F-03 since it was written**, and both landed on the one item least able
-to absorb them. DD-18 made the model the source of the schema, so an error in it is now a migration
-rather than an edit. DD-20 added `Account`, `Organization` and `Membership` to what it must cover.
-F-03 is sized L rather than M as a result, and a late correction to it is more expensive than one
-made before F-04 and F-10 consume the export.
+**Two decisions have enlarged F-03 since it was written**, and both landed on the one item least able to absorb them. DD-18 made the model the source of the schema, so an error in it is now a migration rather than an edit. DD-20 added `Account`, `Organization` and `Membership` to what it must cover. F-03 is sized L rather than M as a result, and a late correction to it is more expensive than one made before F-04 and F-10 consume the export.
 
 Three risks worth stating explicitly:
 
-**The seams are cheap now and expensive later.** §19.1 already says this; the scheduling consequence is
-that A-02, A-03 and A-04 must not be deferred out of phase 1 for being small and apparently pointless.
-A-04 in particular is a function returning `true` — trivial to write, and expensive to retrofit across
-every write path once there are several.
+**The seams are cheap now and expensive later.** §19.1 already says this; the scheduling consequence is that A-02, A-03 and A-04 must not be deferred out of phase 1 for being small and apparently pointless. A-04 in particular is a function returning `true` — trivial to write, and expensive to retrofit across every write path once there are several.
 
-**`Auriga` is not fully published.** P3-02 depends on another team's release schedule. Phase 3 should
-be sequenced with that visibility rather than assuming availability.
+**`Auriga` is not fully published.** P3-02 depends on another team's release schedule. Phase 3 should be sequenced with that visibility rather than assuming availability.
 
-**Traceability gaps compound.** Four capabilities in §3.2 have no SSS requirement. Each is confirmed in
-scope, so the risk is not that they are built wrongly but that the requirements baseline drifts from
-the product while the work is in flight — and reconstructing intent afterwards is far more expensive
-than recording it now.
+**Traceability gaps compound.** Four capabilities in §3.2 have no SSS requirement. Each is confirmed in scope, so the risk is not that they are built wrongly but that the requirements baseline drifts from the product while the work is in flight — and reconstructing intent afterwards is far more expensive than recording it now.
 
 ### What parallelises
 
@@ -373,5 +296,4 @@ Once phase 0 and Epic A are complete, the phase 1 epics fan out with limited con
 - **G** depends on the endpoints but not on each other; G-01 unblocks all the rest.
 - **H** and **I** touch almost nothing else and can run alongside from the start.
 
-After phase 1, §19.3 applies: phases 2, 3 and 4 are mutually independent and three teams can run them
-concurrently without contending on the same code.
+After phase 1, §19.3 applies: phases 2, 3 and 4 are mutually independent and three teams can run them concurrently without contending on the same code.

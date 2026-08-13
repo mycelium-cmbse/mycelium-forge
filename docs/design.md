@@ -1,13 +1,12 @@
 # Mycelium Forge — Software Design Document
 
-**Applies to:** `mycelium-forge`
-**Traces to:** Mycelium Software System Specification (SSS) §4.4, §5.2.3, §5.3, §5.13
+**Applies to:** `mycelium-forge` **Traces to:** Mycelium Software System Specification (SSS) §4.4, §5.2.3, §5.3, §5.13
 
 ---
 
 ## 1. Purpose
 
-This document records the design of **Mycelium Forge**, the artefact registry of the Mycelium ecosystem. It states the decisions taken, the reasoning behind them, and the questions still open. The SSS is the authority on *what* Forge must do. This document is the authority on *how*. Where the design deliberately exceeds or diverges from the SSS, that is called out explicitly in §3 rather than left implicit — those points require a corrective update to the SSS.
+This document records the design of **Mycelium Forge**, the artefact registry of the Mycelium ecosystem. It states the decisions taken, the reasoning behind them. The SSS is the authority on *what* Forge must do. This document is the authority on *how*. Where the design deliberately exceeds or diverges from the SSS, that is called out explicitly in §3 rather than left implicit; those points require a corrective update to the SSS.
 
 ---
 
@@ -25,90 +24,56 @@ Forge is the package registry for the Mycelium ecosystem, taking its design cues
 
 Forge is positioned next to **sysand** (sensmetry/sysand), a package manager for SysML v2 and KerML. It is open source and Rust-based, and its README states it is "based on a concept of a model interchange project, a slight generalization of a project interchange file (`*.kpar`), defined in KerML clause 10.3" — **the same foundation as Forge**. The two therefore differ by architecture and reach rather than by underlying format.
 
-| | sysand | Mycelium Forge |
-|---|---|---|
-| Topology | Official index at sysand.com, plus private indexes via `sysand index` | Central registry |
-| Storage | Decoupled from the index; the project's own examples demonstrate storing kpars in GitHub Releases | The registry owns the blobs (§12) with potential reference to a git repos |
-| Primary interface | CLI, plus Python and Java APIs and WASM bindings | Web discovery interface, plus CLI and .NET client |
-| Formats | SysML v2 and KerML | Multi-format — additionally Capella and ECSS-E-TM-10-25 (§9) |
+Forge's differentiators:
 
-The architectural split is real: sysand's model resembles Go modules, where an index points at artefacts hosted anywhere; Forge's resembles nuget.org, where the registry owns storage, metadata and discovery. Neither is wrong. Federation comes more naturally to the former; ownership enforcement, faceted discovery and integration with an identity provider come more naturally to the latter.
+- **Multi-format storage** (§9). sysand covers SysML v2 and KerML; next to Kerml and Sysml, ECSS-E-TM-10-25 and Capella are Forge's ground.
+- **The web discovery surface** (`SSS-FG-REG-W9J`, `X1K`). A decentralised index cannot offer faceted browsing over content it does not hold. §5.1.6 extends this to mirrors: an on-premise Forge searches the whole upstream catalogue, not merely what it has cached, which is more than a conventional repository proxy manages for any format except Maven.
+- **Fabric and Bloom integration** with enterprise identity (`SSS-FG-AUTH-S1A`) and the ownership model (§8.6). Forge is deployable without them (DD-20), so this is a differentiator in the Mycelium context rather than a dependency.
 
-Forge's differentiators follow from that, and should drive prioritisation:
+### 2.2 Explicitly out of scope
 
-- **Multi-format storage** (§9). sysand covers SysML v2 and KerML; next to Kerml and Sysml,  ECSS-E-TM-10-25 and Capella are
-  Forge's ground.
-- **The web discovery surface** (`SSS-FG-REG-W9J`, `X1K`). A decentralised index cannot offer faceted
-  browsing over content it does not hold. §5.1.6 extends this to mirrors: an on-premise Forge searches
-  the whole upstream catalogue, not merely what it has cached, which is more than a conventional
-  repository proxy manages for any format except Maven.
-- **Fabric and Bloom integration** with enterprise identity (`SSS-FG-AUTH-S1A`) and the ownership model
-  (`SSS-FG-AUTH-M3C`) — where those products are present. Forge is deployable without them
-  (DD-20), so this is a differentiator in the Mycelium context rather than a dependency.
-
-### 2.1 Explicitly out of scope
-
-Forge is a registry, not a modelling environment. **No Mycelium Bloom capability belongs in Forge** —
-no project browser, no model tree, no diagram editing, no concurrent-design session handling. Bloom
-and Forge share a *design system* (BlazorBlueprint and the Figma component library), and nothing more.
-The Figma source for both products lives in one file, so this boundary needs active defence during
-implementation: a component being available in the shared library is not a reason for it to appear in
-Forge.
+Forge is a registry, not a modelling environment. **No Mycelium Bloom capability belongs in Forge**; no project browser, no model tree, no diagram editing, no concurrent-design session handling. Bloom and Forge share a *design system* (BlazorBlueprint and the Figma component library), and nothing more. The Figma source for both products lives in one file, so this boundary needs active defence during implementation: a component being available in the shared library is not a reason for it to appear in Forge.
 
 ---
 
-## 3. Deliberate divergences from the SSS
+## 3. Deliberate divergences from the SSS or the KerML specification
 
-These are intentional, and each needs a corresponding SSS amendment. **When the amendment lands, the entry is removed from this section rather than kept as a closed record.** The behaviour then lives in the SSS, and restating it here would duplicate a functional requirement — which is the one thing this document should never do.
+These are intentional, and each needs a corresponding SSS amendment. **When the amendment lands, the entry is removed from this section rather than kept as a closed record.** The behaviour then lives in the SSS, and restating it here would duplicate a functional requirement, which is the one thing this document should never do.
 
 ### 3.1 SemVer is mandatory in Forge, optional in KerML
 
 KerML 1.0 §10.3 *Model Interchange Projects* (pp. 432–435) is permissive:
 
-> "It is recommended, but not required, that *semantic versioning* (see https://semver.org/) be used
-> for the version numbering of interchange projects"
+> "It is recommended, but not required, that *semantic versioning* (see https://semver.org/) be used for the version numbering of interchange projects"
 
-`SSS-FG-REG-S2B` makes SemVer 2.0.0 **mandatory**, and adds a monotonicity constraint KerML does not
-have. Forge policy is therefore stricter than the specification it builds on. This is recorded here so
-that a future contributor does not "correct" the validator to match KerML.
+`SSS-FG-REG-S2B` makes SemVer 2.0.0 **mandatory**, and adds a monotonicity constraint KerML does not have. Forge policy is therefore stricter than the specification it builds on. This is recorded here so that a future contributor does not "correct" the validator to match KerML.
 
 ### 3.2 Concepts present in the design but absent from the SSS
 
 Identified from the Figma prototype and requiring requirements coverage:
 
-- **A documentation site** — `Docs Home`, `Docs Concept`, `Docs Howto`, `Docs CLI`, `Docs HTTP API`,
-  plus a `Copy-page` overlay. The SSS covers the registry UI, not a docs surface.
-- **Upstream mirroring** (§5.1) — an on-premise instance proxying an upstream Forge while hosting local
-  packages, with scope routing, fetch-on-miss, bulk pre-warm and air-gapped bundle seeding.
-  `SSS-FG-REG-M5R` governs *what* a mirror replicates, but nothing requires the mirroring capability
-  itself. **Confirmed in scope for the first release**, so it needs requirements coverage rather than
-  resting on this design alone.
-- **Verified-publisher badging** — visible on `@mycelium/ISQ-quantities-units`. No SSS requirement
-  defines what verification means or who grants it. Confirmed as intended, **scoped to publisher
-  identity only and deferred beyond the first release** (§13.1); it needs a requirement before it is
-  built.
-- **Two popularity metrics, not one.** The interface currently shows an "imports" count, while
-  `SSS-FG-REG-X1K` requires "download counts". These measure genuinely different things and both are
-  wanted:
+- **A documentation site** — `Docs Home`, `Docs Concept`, `Docs Howto`, `Docs CLI`, `Docs HTTP API`, plus a `Copy-page` overlay. The SSS covers the registry UI, not a docs surface.
+- **Upstream mirroring** (§5.1) — an on-premise instance proxying an upstream Forge while hosting local packages, with scope routing, fetch-on-miss, bulk pre-warm and air-gapped bundle seeding. `SSS-FG-REG-M5R` governs *what* a mirror replicates, but nothing requires the mirroring capability itself. **Confirmed in scope for the first release**, so it needs requirements coverage rather than resting on this design alone.
+- **Verified-publisher badging** — visible on `@mycelium/ISQ-quantities-units`. No SSS requirement defines what verification means or who grants it. Confirmed as intended, **scoped to publisher identity only and deferred beyond the first release** (§13.1); it needs a requirement before it is built.
+- **API key lifetimes** (§13) — `SSS-FG-REG-Y2L` requires keys to be revocable but sets no expiry. The design has the issuer choose a lifetime from a fixed set, and expiry is a containment control that works without anyone noticing the leak, so it needs a requirement rather than resting on this document.
+- **Renaming a scope** (§8.5) — `SSS-FG-ACC-C3F` requires an Account holder to be able to change their username, which under `SSS-FG-AUTH-S2B` renames a scope, but no requirement says what becomes of packages already published under it. Nothing permits an Organization to rename its slug at all, and `SSS-FG-ORG-S2P`'s uniqueness check names Accounts, Organizations and proxied upstream scopes but not retired aliases — which is the check that keeps a released namespace from being reclaimed by an attacker. Three amendments, and the last of them is a security property rather than a convenience.
+- **Ownership follows the scope, and there is no per-package role** (§8.6) — this one **reverses** requirements rather than filling gaps in them. `SSS-FG-AUTH-M3C`'s Maintainer set and `SSS-FG-AUTH-K9R`'s `Reader` are removed; `SSS-FG-AUTH-O4D`'s individual-Owner floor and `SSS-FG-AUTH-P7G`, which exists only to qualify it, go with them. `SSS-FG-ACC-C3F` and `SSS-FG-ACC-M6K` cite the old floor in their own text and follow it down. Six requirements, all `H`, so this is by a wide margin the largest amendment the design asks for, and until it lands the design and the SSS disagree on a point neither can be built against. The two entries below are its remaining parts, separated because each is easy to lose inside this one.
+- **Ownership transfer becomes a scope move** (§8.7) — `SSS-FG-AUTH-T5E` requires transfer and sharing of ownership on explicit acceptance. Sharing is gone with the Maintainer set, and transfer has nothing to attach to when the single owner is derived from the scope, so the design replaces it: a package moves to another scope, its old identifier is retired permanently, and the destination's owner must accept. T5E's acceptance rule is the part that survives verbatim. It needs rewriting around the move rather than withdrawing, and the retired-identifier rule needs stating, since it is what stops a moved package's name from becoming a takeover target.
+- **`SSS-FG-ORG-A9Z` must be exempt from `SSS-FG-ORG-R5V`'s acceptance rule** (§8.6) — **to be written into the SSS; not yet raised.** R5V grants the Organization Administrator role "only upon the recipient's explicit acceptance". A9Z lets the Installation Administrator add an Account to any Organization with a specified role, and is silent on whether R5V's acceptance rule binds it. It must not. §8.6 forbids deleting the Account of an Organization's last Administrator, so a sole Administrator who requests erasure is refused until somebody replaces them — and if the replacement can decline, the Installation Administrator has no way to complete a deletion Forge is obliged to perform. **One word in A9Z is the difference between an escape hatch and a deadlock**, and because the requirement reads perfectly sensibly without it, nothing else will bring the omission back to anyone's attention.
+- **A role that carries authority and that nobody may grant** (§8) — `SSS-FG-AUTH-G6F` extends an Organization's publish and unlist authority to "any Organization Member explicitly granted the `Forge Publisher` role by an Organization Administrator", but `SSS-FG-ORG-R5V` — the requirement that fixes what an Organization Administrator may assign — names only Organization Administrator and Organization Member. **`Forge Publisher` is granted by nothing.** The model carries it as the third value of `OrganizationRole`, ranked between the other two, and R5V needs amending to make it assignable. The name should lose its product qualifier at the same time: inside Forge's own model, `Publisher` is what it is.
+- **`OrganizationVisible` in an Account scope** (§8.1) — `SSS-FG-AUTH-V6K` defines three visibility levels without saying that the middle one is resolved against an Organization's membership. A package in an Account scope has no membership to resolve it against, so the level has no meaning there. The design rejects it rather than silently narrowing it to `Private`; V6K should say so.
+- **The composition of an Organization profile** (§8.4) — `SSS-FG-ORG-U3R` requires an Organization Administrator to update its "profile" without saying what one is, where `SSS-FG-ACC-P2D` enumerates the Account's. The design fixes the composition; U3R should enumerate it the same way, so that the two profiles are specified to the same standard.
+- **Funding and billing** (§8.4) — `BillingEmail` and the `Funding` links have no requirement behind them at all. Neither is served by any capability the SSS defines: nothing bills, and nothing renders a sponsorship link. They are stored because the data model is being fixed now and adding a column later is a migration, but each needs a requirement before a surface is built on it.
+- **Two popularity metrics, not one.** The interface currently shows an "imports" count, while `SSS-FG-REG-X1K` requires "download counts". These measure genuinely different things and both are wanted:
 
   | | Measures | Source |
   |---|---|---|
   | **Downloads** | Artefact fetches. Inflated by CI pipelines, mirrors and tooling | Recorded events (DD-15) |
   | **Dependents** | How many packages in the registry build on this one | Derived from the `usage[]` graph (DD-19) |
 
-  **The metric is renamed from "imports" to "dependents".** It does not count times a package was
-  imported into a project — Forge never observes that — it counts *packages known to Forge whose
-  latest listed version declares a dependency on this one*. "Imports" reads as the former, which is
-  exactly the misreading this bullet warns against, and it is the reading a newcomer will take.
-  nuget.org says "Used By", crates.io "Reverse dependencies", npm "Dependents".
+**The metric is renamed from "imports" to "dependents".** It does not count times a package was imported into a project — Forge never observes that — it counts *packages known to Forge whose latest listed version declares a dependency on this one*. "Imports" reads as the former, which is exactly the misreading this bullet warns against, and it is the reading a newcomer will take. nuget.org says "Used By", crates.io "Reverse dependencies", npm "Dependents".
 
-  The naive inference — "many downloads, few dependents means automation rather than real use" —
-  **does not hold and should not be presented**. A leaf library that modellers reference directly and
-  never re-publish has no dependents by construction, however widely used it is. The two numbers
-  distinguish a *building block* from an *end-user library*, not genuine use from automated use.
-
-  *Action for the designer: surface both on the search result card and the package detail page,
-  labelled distinctly enough that they are not read as the same number.*
+*Action for the designer: surface both on the search result card and the package detail page, labelled distinctly enough that they are not read as the same number.*
 
 ---
 
@@ -143,7 +108,7 @@ flowchart TB
     end
 
     subgraph state [Shared state]
-        pg[("PostgreSQL<br/>metadata, search, qualified-name resolution<br/>maintainers, audit")]
+        pg[("PostgreSQL<br/>metadata, search, qualified-name resolution<br/>ownership, audit")]
         s3[("S3<br/>content-addressed artefact blobs")]
     end
 
@@ -165,28 +130,17 @@ flowchart TB
     domain -.artefact fetch + index sync.-> upstream
 ```
 
-There is **no separate search index**. Free-text search over package metadata and qualified-name
-resolution both run in PostgreSQL (DD-14); §12.1 records the conditions under which that would
-change and what it would change to. Artefact blobs are content-addressed, which is what makes the
-§8.2 fallback and the §5.1.4 mirror cache the same mechanism rather than two.
+There is **no separate search index**. Free-text search over package metadata and qualified-name resolution both run in PostgreSQL (DD-14); §12.1 records the conditions under which that would change and what it would change to. Artefact blobs are content-addressed, which is what makes the §8.2 fallback and the §5.1.4 mirror cache the same mechanism rather than two.
 
-The upstream link is present only when this installation is configured as a mirror (§5.1). It carries
-two distinct flows: lazy artefact fetch, and replication of the metadata index (§5.1.6).
+The upstream link is present only when this installation is configured as a mirror (§5.1). It carries two distinct flows: lazy artefact fetch, and replication of the metadata index (§5.1.6).
 
-Both the web interface and the HTTP API are hosted in a **single deployable** (`Mycelium.Forge`). The
-SSS describes three surfaces "on top of the same backing store"; collapsing the two server-side
-surfaces into one process yields one container image, one SBOM (`SSS-CC-SUP-SBM`), and one pair of
-health probes (`SSS-FB-OBS-H4D`), with no loss of separation — the API lives in `Api/` as Carter
-modules, the UI in `Components/`, and both call the same domain services.
+Both the web interface and the HTTP API are hosted in a **single deployable** (`Mycelium.Forge`). The SSS describes three surfaces "on top of the same backing store"; collapsing the two server-side surfaces into one process yields one container image, one SBOM (`SSS-CC-SUP-SBM`), and one pair of health probes (`SSS-FB-OBS-H4D`), with no loss of separation. The API lives in `Api/` as Carter modules, the UI in `Components/`, and both call the same domain services.
 
 ### 5.1 Deployment topologies and upstream mirroring
 
-An on-premise Forge can act as a **caching mirror of an upstream Forge while also hosting the
-organisation's own packages**, in the manner of Nexus proxying nuget.org. This is in scope for the
-first release.
+An on-premise Forge can act as a **caching mirror of an upstream Forge while also hosting the organisation's own packages**, in the manner of Nexus proxying nuget.org. This is in scope for the first release.
 
-A mirror is not a separate product. It is the same binary with an upstream configured, satisfying
-`SSS-CC-ADAPT-G1P`'s requirement that adaptation be declarative.
+A mirror is not a separate product. It is the same binary with an upstream configured, satisfying `SSS-CC-ADAPT-G1P`'s requirement that adaptation be declarative.
 
 #### 5.1.1 Three modes
 
@@ -196,17 +150,14 @@ A mirror is not a separate product. It is the same binary with an upstream confi
 | **Connected proxy** | Reachable | Lazy fetch on cache miss, plus operator-initiated bulk pre-warm |
 | **Air-gapped seeded** | Unreachable | Offline bundle exported from a connected instance and imported |
 
-The third is a distinct capability rather than a degenerate case of the second: an air-gapped site can
-fetch nothing, so content must arrive as a **transportable bundle**. That bundle is itself a new
-artefact type with its own format, and it must preserve original scopes, versions and content hashes,
-or the dependency IRIs inside the mirrored packages will not resolve.
+The third is a distinct capability rather than a degenerate case of the second: an air-gapped site can fetch nothing, so content must arrive as a **transportable bundle**. That bundle is itself a new artefact type with its own format, and it must preserve original scopes, versions and content hashes, or the dependency IRIs inside the mirrored packages will not resolve.
 
 #### 5.1.2 Scope-level routing
 
 Every scope resolves to exactly one origin. There is no package-level routing and no override.
 
 ```
-@esa       -> proxied from https://forge.mycelium.example
+@starion   -> proxied from https://forge.mycelium.example
 @mycelium  -> proxied from https://forge.mycelium.example
 @acme      -> local
 @acme-labs -> local
@@ -217,8 +168,7 @@ Enforcement is at configuration time, not resolution time:
 - Creating a local Organization whose slug is in the proxied set is **rejected at creation**.
 - Configuring a scope as proxied when it already exists locally is **rejected at configuration**.
 - A scope therefore never has two origins, so there is no resolution-time ambiguity to exploit.
-- If upstream later registers a slug this installation uses locally, nothing changes here — the scope
-  is local, visibly, in configuration.
+- If upstream later registers a slug this installation uses locally, nothing changes here. The scope is local, visibly, in configuration.
 
 See DD-16 for why package-level overrides are excluded.
 
@@ -227,94 +177,51 @@ See DD-16 for why package-level overrides are excluded.
 A direct consequence of one scope, one origin:
 
 - No local publishing into a proxied scope
-- No local maintainer, ownership or unlisting operations on proxied packages
+- No local ownership or unlisting operations on proxied packages
 - The local audit log records fetches, not authority changes
 
-A mirrored `@esa/ECSS-MM-THE` remains ESA's package. The mirror serves bytes; it never assumes
-authorship.
+A mirrored `@starion/ECSS-MM-THE` remains Starion's package. The mirror serves bytes; it never assumes authorship.
 
 #### 5.1.4 Artefacts cache permanently, metadata does not
 
-The cache is two things with different rules, and conflating them is the likeliest implementation
-error.
+The cache is two things with different rules, and conflating them is the likeliest implementation error.
 
-**Artefacts are immutable, so they cache forever.** §8.1 fixes `{package, version}` permanently, so a
-cached artefact needs no invalidation, revalidation or staleness window. Proxy caches normally spend
-most of their complexity precisely there; Forge is exempt because of a decision taken for unrelated
-reasons. Content-addressed storage (§12) compounds this: the cache and the local blob store are one
-store, and an artefact mirrored twice is stored once.
+**Artefacts are immutable, so they cache forever.** §8.1 fixes `{package, version}` permanently, so a cached artefact needs no invalidation, revalidation or staleness window. Proxy caches normally spend most of their complexity precisely there; Forge is exempt because of a decision taken for unrelated reasons. Content-addressed storage (§12) compounds this: the cache and the local blob store are one store, and an artefact mirrored twice is stored once.
 
-**Metadata is mutable and needs a TTL.** "Which versions of `@esa/ECSS-MM-THE` exist?" changes whenever
-upstream publishes, as does the replicated search index of §5.1.6. This is the one place immutability
-does not help. Air-gapped installations therefore hold permanently stale metadata, which is correct
-behaviour and must be surfaced to the user rather than hidden.
+**Metadata is mutable and needs a TTL.** "Which versions of `@starion/ECSS-MM-THE` exist?" changes whenever upstream publishes, as does the replicated search index of §5.1.6. This is the one place immutability does not help. Air-gapped installations therefore hold permanently stale metadata, which is correct behaviour and must be surfaced to the user rather than hidden.
 
 #### 5.1.5 Bulk pre-warm
 
-An operator can mirror an entire scope — "mirror all of `@esa`" — rather than waiting for demand. This
-is a long-running operation, so it reports progress in the manner `SSS-FB-OBS-P7G` establishes for
-commits, merges and imports. It runs as a claimed job (DD-17): progress is recorded on the job row, so
-it is readable by whichever replica serves the operator's page, and a replica lost mid-mirror releases
-the job for another to resume rather than restart.
+An operator can mirror an entire scope — "mirror all of `@starion`" — rather than waiting for demand. This is a long-running operation, so it reports progress in the manner `SSS-FB-OBS-P7G` establishes for commits, merges and imports. It runs as a claimed job (DD-17): progress is recorded on the job row, so it is readable by whichever replica serves the operator's page, and a replica lost mid-mirror releases the job for another to resume rather than restart.
 
-Pre-warming is also the mechanism by which an air-gapped bundle is produced: pre-warm a connected
-instance, then export.
+Pre-warming is also the mechanism by which an air-gapped bundle is produced: pre-warm a connected instance, then export.
 
 #### 5.1.6 Search covers the whole upstream catalogue, not only what is cached
 
-The mirror **replicates upstream's package metadata index** and fetches artefacts lazily. Search
-therefore covers everything upstream offers, not merely what has already been downloaded.
+The mirror **replicates upstream's package metadata index** and fetches artefacts lazily. Search therefore covers everything upstream offers, not merely what has already been downloaded.
 
-**"Everything upstream offers" means everything the mirror's upstream credential is entitled to read**
-(`SSS-FG-REG-M5R`). A mirror configured with an anonymous or public-scope credential replicates public
-packages only; an organisation mirroring its own private packages to an on-premise instance supplies a
-credential that can see them. §5.1.7's upstream credential is therefore what bounds the catalogue, not
-the upstream's total contents.
+**"Everything upstream offers" means everything the mirror's upstream credential is entitled to read** (`SSS-FG-REG-M5R`). A mirror configured with an anonymous or public-scope credential replicates public packages only; an organisation mirroring its own private packages to an on-premise instance supplies a credential that can see them. §5.1.7's upstream credential is therefore what bounds the catalogue, not the upstream's total contents.
 
-This is deliberately more capable than a conventional repository proxy, and Forge is in a position to
-do it because **both ends of the relationship are Forge**. Nexus and Artifactory proxy third-party
-registries whose APIs they do not control, so they can only exploit whatever index an upstream happens
-to publish. Maven is the format where that exists — Central publishes a downloadable Lucene index at
-`/.index/`, rebuilt weekly with incremental deltas, expressly so that tools can "search artifacts
-without downloading the entire repository". Most other formats publish nothing comparable, which is why
-proxy search is usually limited to cached content. A Forge mirror talks to another Forge, so the index
-exchange is part of Forge's own API rather than something scraped from an upstream.
+This is deliberately more capable than a conventional repository proxy, and Forge is in a position to do it because **both ends of the relationship are Forge**. Nexus and Artifactory proxy third-party /registries whose APIs they do not control, so they can only exploit whatever index an upstream happens to publish. Maven is the format where that exists — Central publishes a downloadable Lucene index at `/.index/`, rebuilt weekly with incremental deltas, expressly so that tools can "search artifacts without downloading the entire repository". Most other formats publish nothing comparable, which is why proxy search is usually limited to cached content. A Forge mirror talks to another Forge, so the index exchange is part of Forge's own API rather than something scraped from an upstream.
 
-**Search covering package metadata only is what makes this affordable.** Because free-text search is
-scoped that way (`SSS-FG-REG-Q7G`), the
-replicated index is a few thousand small records — identifiers, descriptions, tags, versions, licences.
-Had content search remained in scope, replication would have meant millions of element documents and
-this design would not be practical. The two decisions compound.
+**Search covering package metadata only is what makes this affordable.** Because free-text search is scoped that way (`SSS-FG-REG-Q7G`), the replicated index is a few thousand small records — identifiers, descriptions, tags, versions, licences. Had content search remained in scope, replication would have meant millions of element documents and this design would not be practical. The two decisions compound.
 
-The Maven index also suggests the shape: a full snapshot, incremental deltas, and a position marker so
-a mirror can resume rather than re-download.
+The Maven index also suggests the shape: a full snapshot, incremental deltas, and a position marker so a mirror can resume rather than re-download.
 
-**Availability is part of the result, not a surprise at download.** A search result carries whether the
-artefact is *cached and servable now* or *available on demand from upstream*, and results are
-filterable on that basis. This matters most on an air-gapped installation, whose index is frozen at the
-last bundle import: search will legitimately surface packages the instance cannot fetch, and that must
-be visible in the result rather than discovered when the download fails.
+**Availability is part of the result, not a surprise at download.** A search result carries whether the artefact is *cached and servable now* or *available on demand from upstream*, and results are filterable on that basis. This matters most on an air-gapped installation, whose index is frozen at the last bundle import: search will legitimately surface packages the instance cannot fetch, and that must be visible in the result rather than discovered when the download fails.
 
 Consequences worth stating:
 
 - The metadata index is subject to the TTL and refresh rules of §5.1.4, since it is mutable state.
-- An air-gapped instance holds a deliberately stale index. That is correct behaviour, and the staleness
-  — including the date of the last import — should be surfaced to the operator.
-- A user can therefore discover a package and request it, which gives the operator a demand signal for
-  what to include in the next bundle or pre-warm.
+- An air-gapped instance holds a deliberately stale index. That is correct behaviour, and the staleness, including the date of the last import, should be surfaced to the operator.
+- A user can therefore discover a package and request it, which gives the operator a demand signal for what to include in the next bundle or pre-warm.
 
 #### 5.1.7 Remaining considerations
 
-- **Upstream credential** — a read-only API key per upstream. `SSS-FG-REG-Y2L` already scopes keys to
-  permitted operations.
-- **Redistribution** — mirroring redistributes third-party content, so a package's licence must permit
-  it. Unproblematic for the Apache and MIT licensing typical of model libraries, but it is a stated
-  position rather than an assumption.
-- **Unlisting** — the mirror records upstream's listed state when fetching and refreshes it when
-  connected, but never deletes cached content. This matches `SSS-FG-REG-U4D`, which requires an
-  unlisted version to remain available on direct download to existing consumers.
-- **Client configuration** — a mirror serves the same `/api/v1` paths as any other installation
-  (DD-11), so pointing a client at it is a base-URL change and no client is aware of the topology.
+- **Upstream credential** — a read-only API key per upstream. `SSS-FG-REG-Y2L` already scopes keys to permitted operations.
+- **Redistribution** — mirroring redistributes third-party content, so a package's licence must permit it.
+- **Unlisting** — the mirror records upstream's listed state when fetching and refreshes it when connected, but never deletes cached content. This matches `SSS-FG-REG-U4D`, which requires an unlisted version to remain available on direct download to existing consumers.
+- **Client configuration** — a mirror serves the same `/api/v1` paths as any other installation (DD-11), so pointing a client at it is a base-URL change and no client is aware of the topology.
 
 ---
 
@@ -322,25 +229,15 @@ Consequences worth stating:
 
 ### DD-01 — Static SSR is the default; interactivity is opt-in per component
 
-**Context.** `SSS-FG-REG-W9J` requires the web interface to be reachable by unauthenticated users. A
-registry's value depends on its pages being linkable, crawlable and cacheable.
+**Context.** `SSS-FG-REG-W9J` requires the web interface to be reachable by unauthenticated users. A registry's value depends on its pages being linkable, crawlable and cacheable.
 
-**Decision.** Every page is statically server-rendered unless a specific component opts in. See §7 for
-the criteria and the per-screen assignment.
+**Decision.** Every page is statically server-rendered unless a specific component opts in. See §7 for the criteria and the per-screen assignment.
 
-**Reasoning.** Two separate things are being decided here: *which* mode the public surface uses, and
-*which way the default points*.
+**Reasoning.** Two separate things are being decided here: *which* mode the public surface uses, and *which way the default points*.
 
-On the mode, §7.1 gives the criteria in full; the short form is that static SSR is the only mode that
-delivers unauthenticated reach, crawlability and CDN caching with no runtime download.
+On the mode, §7.1 gives the criteria in full; the short form is that static SSR is the only mode that delivers unauthenticated reach, crawlability and CDN caching with no runtime download.
 
-The direction of the default is the less obvious half, and it is the more important one. Render mode
-is inherited, so a globally interactive default makes the runtime the ambient condition: a new public
-page acquires it by being added, and nobody has to decide anything for it to happen. Defaulting to
-static inverts that. Interactivity becomes an act — a specific component, in a specific place, for a
-stated reason — which is what makes §7.2 a table of justified exceptions rather than a record of what
-the template happened to produce. The cost being controlled is paid by anonymous visitors and
-crawlers, who are exactly the audience least able to absorb it and least visible when they leave.
+The direction of the default is the less obvious half, and it is the more important one. Render mode is inherited, so a globally interactive default makes the runtime the ambient condition: a new public page acquires it by being added, and nobody has to decide anything for it to happen. Defaulting to static inverts that. Interactivity becomes an act — a specific component, in a specific place, for a stated reason — which is what makes §7.2 a table of justified exceptions rather than a record of what the template happened to produce. The cost being controlled is paid by anonymous visitors and crawlers, who are exactly the audience least able to absorb it and least visible when they leave.
 
 **Consequences.** Public pages ship no component runtime and can be cached at a CDN.
 
@@ -352,84 +249,44 @@ JavaScript on the public surface is progressive enhancement, in three tiers:
 | Enhanced navigation | Body swapped without a full reload | Full page load |
 | `Ctrl K` search focus (§7.3) | Focuses the search box | Shortcut absent; the box itself still works |
 
-So `blazor.web.js` is loaded and does useful work, but nothing on the public surface depends on it.
-That distinction matters for the crawlability requirement: the argument is not that the pages avoid
-JavaScript, it is that their content and function do not require it.
+So `blazor.web.js` is loaded and does useful work, but nothing on the public surface depends on it. That distinction matters for the crawlability requirement: the argument is not that the pages avoid JavaScript, it is that their content and function do not require it.
 
 ### DD-02 — InteractiveServer is not used; no interactive project ships in v1
 
-**Context.** Forge must scale horizontally beyond a single instance. Separately, applying DD-01's
-criteria screen by screen (§7.4) leaves no screen that requires a component runtime.
+**Context.** Forge must scale horizontally beyond a single instance. Separately, applying DD-01's criteria screen by screen (§7.4) leaves no screen that requires a component runtime.
 
 **Decision.** Two parts.
 
-1. **InteractiveServer is never used.** Where interactivity is required, it is
-   **InteractiveWebAssembly**.
-2. **No interactive project ships in v1.** Every screen is statically server-rendered. The
-   WebAssembly project is not created until a screen needs it.
+1. **InteractiveServer is never used.** Where interactivity is required, it is **InteractiveWebAssembly**.
+2. **No interactive project ships in v1.** Every screen is statically server-rendered. The WebAssembly project is not created until a screen needs it.
 
-**Reasoning.** On the first part: a Blazor Server circuit is stateful and bound to the instance that
-created it. Scaling out would require sticky sessions at the load balancer, and any instance recycle
-drops live circuits mid-interaction. WebAssembly holds its state in the browser, so any instance can
-serve any request and instances remain interchangeable. This directly serves the horizontal-scaling
-requirement, and it holds whenever interactivity is eventually added.
+**Reasoning.** On the first part: a Blazor Server circuit is stateful and bound to the instance that created it. Scaling out would require sticky sessions at the load balancer, and any instance recycle drops live circuits mid-interaction. WebAssembly holds its state in the browser, so any instance can serve any request and instances remain interchangeable. This directly serves the horizontal-scaling requirement, and it holds whenever interactivity is eventually added.
 
-On the second part: the islands this decision originally provided for were assigned before §7.3
-removed the search dropdown, and each was re-tested individually in §7.4. Every one resolves to a form
-and a round trip. The single remaining candidate — upload progress on publish — is a nicety rather
-than a capability, and the one requirement in this area, `SSS-FB-OBS-P7G`, assigns publication
-progress to **Fabric over SignalR for display in Bloom**, not to the Forge web interface.
+On the second part: the islands this decision originally provided for were assigned before §7.3 removed the search dropdown, and each was re-tested individually in §7.4. Every one resolves to a form and a round trip. The single remaining candidate — upload progress on publish — is a nicety rather than a capability, and the one requirement in this area, `SSS-FB-OBS-P7G`, assigns publication progress to **Fabric over SignalR for display in Bloom**, not to the Forge web interface.
 
-Deferring costs nothing, because DD-01 made interactivity a per-component opt-in. Adding an island
-later is `@rendermode InteractiveWebAssembly` on one component plus the project it lives in. There is
-no seam to preserve and no decision that becomes harder — which is precisely why it should not be
-built speculatively.
+Deferring costs nothing, because DD-01 made interactivity a per-component opt-in. Adding an island later is `@rendermode InteractiveWebAssembly` on one component plus the project it lives in. There is no seam to preserve and no decision that becomes harder — which is precisely why it should not be built speculatively.
 
-**Consequences.** One less project, no WebAssembly publish output, no runtime download anywhere, and
-no second host in which BlazorBlueprint components and dependency injection must be made to work. The
-Playwright suite covers one rendering model rather than two.
+**Consequences.** One less project, no WebAssembly publish output, no runtime download anywhere, and no second host in which BlazorBlueprint components and dependency injection must be made to work. The Playwright suite covers one rendering model rather than two.
 
-> **On the name, for when it is needed.** `Mycelium.Forge.Ui` is reserved. The Blazor Web App template
-> calls its WebAssembly project `<App>.Client`, but that name is taken here by the REST client library
-> (`SSS-FG-REG-C3M`), which is published to NuGet and appears in every consumer's project file.
-> `Mycelium.Forge.Ui` says what the project *is* rather than what it is a client of, and avoids the
-> collision instead of qualifying one name to work around the other. The public package name is the
-> one that is permanent; the project name is internal.
+> **On the name, for when it is needed.** `Mycelium.Forge.Ui` is reserved. The Blazor Web App template calls its WebAssembly project `<App>.Client`, but that name is taken here by the REST client library (`SSS-FG-REG-C3M`), which is published to NuGet and appears in every consumer's project file. `Mycelium.Forge.Ui` says what the project *is* rather than what it is a client of, and avoids the collision instead of qualifying one name to work around the other. The public package name is the one that is permanent; the project name is internal.
 
 ### DD-03 — One deployable, with roles selected by configuration
 
-**Context.** Forge has three kinds of work: serving the web interface, serving the HTTP API, and
-running background jobs (DD-17). Each could be its own deployable.
+**Context.** Forge has three kinds of work: serving the web interface, serving the HTTP API, and running background jobs (DD-17). Each could be its own deployable.
 
-**Decision.** **One image, one codebase.** Carter modules under `Api/`, Razor components under
-`Components/`, the job runner as a hosted service. Which roles a given replica performs is
-**configuration, not a separate build**: `Forge__Roles` defaults to all three, and a large deployment
-may run web-only replicas alongside job-only replicas from the same image.
+**Decision.** **One image, one codebase.** Carter modules under `Api/`, Razor components under `Components/`, the job runner as a hosted service. Which roles a given replica performs is **configuration, not a separate build**: `Forge__Roles` defaults to all three, and a large deployment may run web-only replicas alongside job-only replicas from the same image.
 
-**Reasoning.** The two request surfaces share the domain layer and the operational surface — the same
-authorisation, the same PostgreSQL and S3 access, the same telemetry pipeline. Splitting them
-multiplies SBOM, probe and deployment work for no current benefit.
+**Reasoning.** The two request surfaces share the domain layer and the operational surface — the same authorisation, the same PostgreSQL and S3 access, the same telemetry pipeline. Splitting them multiplies SBOM, probe and deployment work for no current benefit.
 
-Background work is the case where separation has a genuine argument, since a multi-hour pre-warm
-competes with request serving for CPU and memory, and the two scale on unrelated signals. But that
-argument is about **process topology**, not about build artefacts, and conflating the two is what
-produces a second image that must be versioned, scanned, signed and released in lockstep with the
-first. A role switch gets the operational benefit at none of that cost, and the small deployments —
-`docker compose`, on-premise, air-gapped (§5.1) — keep a single container.
+Background work is the case where separation has a genuine argument, since a multi-hour pre-warm competes with request serving for CPU and memory, and the two scale on unrelated signals. But that argument is about **process topology**, not about build artefacts, and conflating the two is what produces a second image that must be versioned, scanned, signed and released in lockstep with the first. A role switch gets the operational benefit at none of that cost, and the small deployments — `docker compose`, on-premise, air-gapped (§5.1) — keep a single container.
 
-Mirroring reinforces this. A mirror is not a different product: it is the same image with an upstream
-configured (§5.1). Having deployment shape already be a configuration concern is what makes that true
-rather than aspirational.
+Mirroring reinforces this. A mirror is not a different product: it is the same image with an upstream configured (§5.1). Having deployment shape already be a configuration concern is what makes that true rather than aspirational.
 
-**Consequences.** One image to build, scan, sign and ship, so §15.1's SBOM and provenance apply once.
-A replica that does not hold the job role must not start the runner's hosted service, which makes the
-role check a startup concern rather than a per-job one. Readiness probes differ by role: a job-only
-replica has no HTTP surface to check beyond `/healthz`.
+**Consequences.** One image to build, scan, sign and ship, so §15.1's SBOM and provenance apply once. A replica that does not hold the job role must not start the runner's hosted service, which makes the role check a startup concern rather than a per-job one. Readiness probes differ by role: a job-only replica has no HTTP surface to check beyond `/healthz`.
 
 ### DD-17 — Background work runs as claimed jobs in PostgreSQL
 
-**Context.** §12 requires every instance to be interchangeable, but the design has accumulated work
-that is not on a request path and must run *somewhere*:
+**Context.** §12 requires every instance to be interchangeable, but the design has accumulated work that is not on a request path and must run *somewhere*:
 
 | Work | Kind | Source |
 |---|---|---|
@@ -440,128 +297,63 @@ that is not on a request path and must run *somewhere*:
 | Bulk pre-warm of a scope | Operator-initiated, hours | §5.1.5 |
 | Air-gapped bundle export | Operator-initiated, long | §5.1.5 |
 
-With *N* interchangeable replicas, "run on a schedule" is under-specified: run it everywhere and
-counters double-count; run it nowhere and the design does not work.
+With *N* interchangeable replicas, "run on a schedule" is under-specified: run it everywhere and counters double-count; run it nowhere and the design does not work.
 
-**Decision.** A **job table in PostgreSQL**, claimed with `SELECT … FOR UPDATE SKIP LOCKED` by an
-in-process hosted service in every replica holding the job role (DD-03). Recurring work is a row with
-a `next_run_at`; operator-initiated work is a row inserted by a request. One mechanism for both.
+**Decision.** A **job table in PostgreSQL**, claimed with `SELECT … FOR UPDATE SKIP LOCKED` by an in-process hosted service in every replica holding the job role (DD-03). Recurring work is a row with a `next_run_at`; operator-initiated work is a row inserted by a request. One mechanism for both.
 
 Three rules follow from it:
 
-1. **Every job is idempotent or resumable.** A replica can die mid-job, so its lease expires and
-   another replica reclaims the row. Jobs that cannot be safely re-entered are not admissible.
-2. **Aggregation advances a watermark transactionally.** DD-15's aggregate is computed over events up
-   to the maximum event id observed at claim time, and the aggregate update and the new watermark
-   commit together. Re-running after a crash resumes from the last committed watermark, so double
-   counting is impossible without distributed transactions.
-3. **Long jobs hold a renewed lease and record progress on the row.** This is what `SSS-FB-OBS-P7G`
-   needs for pre-warm.
+1. **Every job is idempotent or resumable.** A replica can die mid-job, so its lease expires and another replica reclaims the row. Jobs that cannot be safely re-entered are not admissible.
+2. **Aggregation advances a watermark transactionally.** DD-15's aggregate is computed over events up to the maximum event id observed at claim time, and the aggregate update and the new watermark commit together. Re-running after a crash resumes from the last committed watermark, so double counting is impossible without distributed transactions.
+3. **Long jobs hold a renewed lease and record progress on the row.** This is what `SSS-FB-OBS-P7G` needs for pre-warm.
 
 **Reasoning.** The alternatives were leader election, an external scheduler, and a message broker.
 
-*Leader election* — a PostgreSQL advisory lock is cheap, but one leader running everything means a
-multi-hour pre-warm blocks or starves the short recurring jobs, and progress held in the leader's
-memory is unreadable by the replica that happens to serve the operator's page. Per-job locks avoid the
-starvation but are the job table with worse ergonomics.
+*Leader election* — a PostgreSQL advisory lock is cheap, but one leader running everything means a multi-hour pre-warm blocks or starves the short recurring jobs, and progress held in the leader's memory is unreadable by the replica that happens to serve the operator's page. Per-job locks avoid the starvation but are the job table with worse ergonomics.
 
-*An external scheduler* (Kubernetes `CronJob` and equivalents) pushes the problem onto the operator and
-assumes a scheduler exists. §5.1's topologies include `docker compose` and air-gapped installations
-where it does not, and it does not address the operator-initiated jobs at all.
+*An external scheduler* (Kubernetes `CronJob` and equivalents) pushes the problem onto the operator and assumes a scheduler exists. §5.1's topologies include `docker compose` and air-gapped installations where it does not, and it does not address the operator-initiated jobs at all.
 
-*A message broker* would serve, but it is a new piece of infrastructure that every on-premise customer
-must then run, monitor and back up — the same objection §12.1 raises against ParadeDB, and a heavy one
-for a queue whose depth is measured in single digits.
+*A message broker* would serve, but it is a new piece of infrastructure that every on-premise customer must then run, monitor and back up — the same objection §12.1 raises against ParadeDB, and a heavy one for a queue whose depth is measured in single digits.
 
-PostgreSQL is already the system of record (DD-14) and already the thing whose loss is unrecoverable,
-so putting jobs there adds no failure mode, no new operational surface, and nothing to the on-premise
-install. `SKIP LOCKED` gives mutual exclusion without a lease protocol in the common case. And because
-the job row is a row, its progress and history are queryable by any replica and observable with the
-same tools as everything else — which a leader's memory is not.
+PostgreSQL is already the system of record (DD-14) and already the thing whose loss is unrecoverable, so putting jobs there adds no failure mode, no new operational surface, and nothing to the on-premise install. `SKIP LOCKED` gives mutual exclusion without a lease protocol in the common case. And because the job row is a row, its progress and history are queryable by any replica and observable with the same tools as everything else — which a leader's memory is not.
 
-**Consequences.** Job state, progress and outcome are inspectable in the database and can be surfaced
-to operators directly. §14's metrics gain job duration, outcome and queue lag. A job whose lease
-expires is retried, so the idempotence rule above is a correctness requirement rather than a
-recommendation. The runner is phase 1 work (§19.2) because counter aggregation and blob collection
-exist from the first release — which means mirroring's long-running jobs in phase 4 arrive to
-infrastructure that already exists.
+**Consequences.** Job state, progress and outcome are inspectable in the database and can be surfaced to operators directly. §14's metrics gain job duration, outcome and queue lag. A job whose lease expires is retried, so the idempotence rule above is a correctness requirement rather than a recommendation. The runner is phase 1 work (§19.2) because counter aggregation and blob collection exist from the first release — which means mirroring's long-running jobs in phase 4 arrive to infrastructure that already exists.
 
 ### DD-04 — JSON is the only metadata representation
 
-**Context.** MessagePack is a first-class Mycelium wire format, and an earlier version of this decision
-had Forge serve metadata as either JSON or MessagePack by content negotiation.
+**Context.** MessagePack is a first-class Mycelium wire format, and an earlier version of this decision had Forge serve metadata as either JSON or MessagePack by content negotiation.
 
-**Decision.** **Forge metadata documents are JSON only.** Artefact payloads (kpar and the other
-formats) are opaque bytes and were never affected either way.
+**Decision.** **Forge metadata documents are JSON only.** Artefact payloads (kpar and the other formats) are opaque bytes and were never affected either way.
 
-Content negotiation on `Accept` remains, and remains the mechanism DD-12 uses to carry the schema
-version and DD-13 uses to select the abbreviated representation. What is removed is the *format* axis,
-not negotiation itself.
+Content negotiation on `Accept` remains, and remains the mechanism DD-12 uses to carry the schema version and DD-13 uses to select the abbreviated representation. What is removed is the *format* axis, not negotiation itself.
 
-**Reasoning.** The requirement this decision previously cited does not cover it.
-`SSS-CC-EXT-IN3` requires **Fabric** to ingest *SysML v2 abstract-syntax instances* as MessagePack, and
-the surrounding requirements (`SSS-CC-EXT-IN1`, `-EG1`) are about the same Fabric payloads. SSS §4.4
-lists the Bloom ↔ Forge interface as "HTTPS (REST/JSON/KPAR)". No requirement puts MessagePack on
-Forge's metadata surface, and the one statement that addresses that surface directly says JSON.
+**Reasoning.** The requirement this decision previously cited does not cover it. `SSS-CC-EXT-IN3` requires **Fabric** to ingest *SysML v2 abstract-syntax instances* as MessagePack, and the surrounding requirements (`SSS-CC-EXT-IN1`, `-EG1`) are about the same Fabric payloads. SSS §4.4 lists the Bloom ↔ Forge interface as "HTTPS (REST/JSON/KPAR)". No requirement puts MessagePack on Forge's metadata surface, and the one statement that addresses that surface directly says JSON.
 
-The engineering case is also weaker here than it is for Fabric. MessagePack earns its place on large
-abstract-syntax payloads — tens of thousands of elements, where the size and parse difference is
-material. Forge metadata documents are a few kilobytes: a package, its versions, its maintainers. The
-saving is negligible against `Content-Encoding` on the same response, while the cost is not: a second
-generated serialiser per type (DD-05), a doubled round-trip contract matrix (§17), a second
-representation for every future endpoint to support, and an unregistered `+msgpack` media-type suffix
-(DD-12).
+The engineering case is also weaker here than it is for Fabric. MessagePack earns its place on large abstract-syntax payloads — tens of thousands of elements, where the size and parse difference is material. Forge metadata documents are a few kilobytes: a package, its versions, its owner. The saving is negligible against `Content-Encoding` on the same response, while the cost is not: a second generated serialiser per type (DD-05), a doubled round-trip contract matrix (§17), a second representation for every future endpoint to support, and an unregistered `+msgpack` media-type suffix (DD-12).
 
-The remaining argument was ecosystem consistency — Bloom and Fabric speak MessagePack, and
-`SysML2.NET` and the COMET SDK ship MessagePack serialisers. That is a real consideration but it is not
-a requirement, and it argues for *capability that exists*, not for capability Forge must ship. Where
-Forge does hand over model content it does so as artefacts, which are opaque bytes.
+The remaining argument was ecosystem consistency — Bloom and Fabric speak MessagePack, and `SysML2.NET` and the COMET SDK ship MessagePack serialisers. That is a real consideration but it is not a requirement, and it argues for *capability that exists*, not for capability Forge must ship. Where Forge does hand over model content it does so as artefacts, which are opaque bytes.
 
-**Consequences.** One representation to generate, document, test and support. The `MessagePack`
-package reference leaves all three projects, so it leaves the SBOM under `SSS-CC-SUP-SBM`. §10.3's
-media-type table halves, and DD-12's discussion of the unregistered `+msgpack` suffix becomes historical
-rather than a live constraint.
+**Consequences.** One representation to generate, document, test and support. The `MessagePack` package reference leaves all three projects, so it leaves the SBOM under `SSS-CC-SUP-SBM`. §10.3's media-type table halves, and DD-12's discussion of the unregistered `+msgpack` suffix becomes historical rather than a live constraint.
 
-The design now **agrees with SSS §4.4** rather than diverging from it, so no corrective update to that
-line is required and none is listed in §3.
+The design now **agrees with SSS §4.4** rather than diverging from it, so no corrective update to that line is required and none is listed in §3.
 
-Reversing this is additive, not structural. `Accept` already selects a representation, so adding a
-format later means adding a generated serialiser and a media type — not changing how anything is
-routed.
+Reversing this is additive, not structural. `Accept` already selects a representation, so adding a format later means adding a generated serialiser and a media type — not changing how anything is routed.
 
 ### DD-05 — Serialisers are generated from the model, alongside the DTOs
 
-**Context.** The DTOs are generated from the Enterprise Architect model via `uml4net` (DD-07). Their
-serialisers could come from three places: runtime reflection, the Roslyn source generator shipped by
-`System.Text.Json`, or the same `uml4net` pipeline that produces the DTOs.
+**Context.** The DTOs are generated from the Enterprise Architect model via `uml4net` (DD-07). Their serialisers could come from three places: runtime reflection, the Roslyn source generator shipped by `System.Text.Json`, or the same `uml4net` pipeline that produces the DTOs.
 
-**Decision.** Serialisers are **emitted by the `uml4net` pipeline**, from the same model, into the same
-`Generated/` folder. They are not reflection-based, and they do not rely on third-party source
-generators.
+**Decision.** Serialisers are **emitted by the `uml4net` pipeline**, from the same model, into the same `Generated/` folder. They are not reflection-based, and they do not rely on third-party source generators.
 
 **Reasoning.**
 
-*One source of truth.* A model change regenerates the DTO and its serialiser in a single pass, so the
-two cannot drift. With source generators the DTO comes from the model and the serialiser is derived
-from the DTO by a separate tool on a separate release cadence — a seam that only reveals itself when
-something subtly stops round-tripping.
+*One source of truth.* A model change regenerates the DTO and its serialiser in a single pass, so the two cannot drift. With source generators the DTO comes from the model and the serialiser is derived from the DTO by a separate tool on a separate release cadence — a seam that only reveals itself when something subtly stops round-tripping.
 
-*It is the ecosystem's pattern.* `SysML2.NET` ships `SysML2.NET.Serializer.Json`,
-`.Serializer.Xmi`, `.Serializer.MessagePack` and `.Serializer.Dictionary` as separate packages beside
-its model; the COMET SDK ships `CDP4JsonSerializer-CE` and `CDP4MessagePackSerializer-CE` beside
-`CDP4Common-CE`. Forge generating its serialisers from its model is the same shape the team already
-maintains elsewhere. Those examples also show the pattern scaling to several formats, which is what
-makes DD-04's single format a reversible choice rather than a structural one.
+*It is the ecosystem's pattern.* `SysML2.NET` ships `SysML2.NET.Serializer.Json`, `.Serializer.Xmi`, `.Serializer.MessagePack` and `.Serializer.Dictionary` as separate packages beside its model; the COMET SDK ships `CDP4JsonSerializer-CE` and `CDP4MessagePackSerializer-CE` beside `CDP4Common-CE`. Forge generating its serialisers from its model is the same shape the team already maintains elsewhere. Those examples also show the pattern scaling to several formats, which is what makes DD-04's single format a reversible choice rather than a structural one.
 
-*The performance properties are unchanged.* Generated serialisers contain no reflection, so they remain
-AOT-friendly and trim-safe, and the download and search paths stay off the reflection path. If
-anything the position is stronger, because there is no dependency on a third-party generator's
-analyser version or its compatibility with a given SDK.
+*The performance properties are unchanged.* Generated serialisers contain no reflection, so they remain AOT-friendly and trim-safe, and the download and search paths stay off the reflection path. If anything the position is stronger, because there is no dependency on a third-party generator's analyser version or its compatibility with a given SDK.
 
-**Consequences.** Serialisers live under `Generated/` and are never hand-edited, exactly as the DTOs
-are. The JSON round-trip contract tests in §17 become *more* important rather than less: a defect in a
-template is not a single-type bug but a systematic one affecting every generated serialiser. DD-13's abbreviated representation is a projection defined in the model, so its serialiser
-is generated on the same terms. Generation is performed by uml4net at design-time, not at run-time.
+**Consequences.** Serialisers live under `Generated/` and are never hand-edited, exactly as the DTOs are. The JSON round-trip contract tests in §17 become *more* important rather than less: a defect in a template is not a single-type bug but a systematic one affecting every generated serialiser. DD-13's abbreviated representation is a projection defined in the model, so its serialiser is generated on the same terms. Generation is performed by uml4net at design-time, not at run-time.
 
 ### DD-06 — Library selection
 
@@ -581,24 +373,17 @@ is generated on the same terms. Generation is performed by uml4net at design-tim
 
 ### DD-07 — DTOs are generated from an Enterprise Architect model via uml4net
 
-The shared DTOs in `Mycelium.Forge.Common` are generated from an EA model exported as XMI, using the
-`uml4net` toolchain (`uml4net.xmi` to read, `uml4net.HandleBars` and `uml4net.Reporting` to emit).
-Output lands in `Mycelium.Forge.Common/Generated/` and is never hand-edited; extensions are written as
-`partial` declarations outside that folder.
+The shared DTOs in `Mycelium.Forge.Common` are generated from an EA model exported as XMI, using the `uml4net` toolchain (`uml4net.xmi` to read, `uml4net.HandleBars` and `uml4net.Reporting` to emit). Output lands in `Mycelium.Forge.Common/Generated/` and is never hand-edited; extensions are written as `partial` declarations outside that folder.
 
 The same pipeline emits the JSON serialisers for those types — see DD-05.
 
 ### DD-08 — Tailwind is built by MSBuild using the standalone CLI
 
-No Node, npm or pnpm anywhere in the build. `Directory.Build.targets` fetches the pinned standalone
-binary, **verifies its SHA-256**, and compiles `Styles/tailwind.css` to `wwwroot/css/app.css`.
-Minification applies in Release only. Because the digest is verified, the feed is untrusted and
-`TailwindFeedUrl` can be repointed at an internal mirror without weakening the guarantee.
+No Node, npm or pnpm anywhere in the build. `Directory.Build.targets` fetches the pinned standalone binary, **verifies its SHA-256**, and compiles `Styles/tailwind.css` to `wwwroot/css/app.css`. Minification applies in Release only. Because the digest is verified, the feed is untrusted and `TailwindFeedUrl` can be repointed at an internal mirror without weakening the guarantee.
 
 ### DD-09 — Docker, with a devcontainer for development
 
-Deployment is a container (`SSS-CC-WEB-1MV`). Development uses a devcontainer so the whole team shares
-one environment, and so agent tooling can later run inside it.
+Deployment is a container (`SSS-CC-WEB-1MV`). Development uses a devcontainer so the whole team shares one environment, and so agent tooling can later run inside it.
 
 ### DD-10 — Repository layout is flat, with a classic solution file
 
@@ -606,48 +391,27 @@ All projects sit at the repository root as siblings of `Mycelium.Forge.sln`, mat
 
 ### DD-11 — `/api/v1` is the stable contract, and there is no service index
 
-**Context.** A registry may expose its endpoints through a **service index** — a single documented URL
-returning the address of every resource, as nuget.org does — rather than through fixed paths. An
-installation may be the SaaS registry, an on-premise instance, or an on-premise mirror of an upstream
-(§5.1), so clients must be configurable across topologies.
+**Context.** A registry may expose its endpoints through a **service index** — a single documented URL returning the address of every resource, as nuget.org does — rather than through fixed paths. An installation may be the SaaS registry, an on-premise instance, or an on-premise mirror of an upstream (§5.1), so clients must be configurable across topologies.
 
-**Decision.** `/api/v1` is a **stable, permanent contract** with fixed relative paths. Clients are
-configured with a **base URL**. Forge publishes **no service index**.
+**Decision.** `/api/v1` is a **stable, permanent contract** with fixed relative paths. Clients are configured with a **base URL**. Forge publishes **no service index**.
 
-**Reasoning.** Once the paths are stable, a base URL already reduces client configuration to a single
-value, and every address derives from it by concatenation. A service index would supply exactly the
-same property at the cost of a second entry point, a resolver in every client, and a consistency
-obligation between the index and the routes it advertises.
+**Reasoning.** Once the paths are stable, a base URL already reduces client configuration to a single value, and every address derives from it by concatenation. A service index would supply exactly the same property at the cost of a second entry point, a resolver in every client, and a consistency obligation between the index and the routes it advertises.
 
 Nor does the index earn its place on the arguments usually made for it:
 
-- **Relocation.** Where a resource genuinely must move, HTTP already provides 301 and 302. CDN-fronting
-  artefact downloads needs no client-visible URL change at all, since the CDN sits in front of the
-  origin on the same hostname — which DD-22 confirms by streaming artefacts through Forge rather than
-  redirecting to storage.
-- **Replicas.** A load balancer distributes across replicas transparently. DD-14 keeps search on the
-  same host regardless.
-- **Version negotiation.** DD-12 carries the representation version in the media type; an index would
-  add a third axis obliged to track the other two.
+- **Relocation.** Where a resource genuinely must move, HTTP already provides 301 and 302. CDN-fronting artefact downloads needs no client-visible URL change at all, since the CDN sits in front of the origin on the same hostname — which DD-22 confirms by streaming artefacts through Forge rather than redirecting to storage.
+- **Replicas.** A load balancer distributes across replicas transparently. DD-14 keeps search on the same host regardless.
+- **Version negotiation.** DD-12 carries the representation version in the media type; an index would add a third axis obliged to track the other two.
 
 **Consequences.**
 
-- **`/api/v1` will not be relocated or frozen.** Third parties may hardcode it, and that is the
-  supported use. Anything requiring a URL change is a `v2`, announced as such.
-- Pointing a client at a different installation — SaaS, on-premise, or mirror — is a one-value change,
-  because the paths are identical everywhere.
-- **Adding an index later is purely additive and therefore cheap.** Because `/api/v1` is permanent,
-  publishing `/v1/index.json` at any future point would break nothing: existing consumers continue
-  against fixed paths while new clients prefer the index. This is recorded so that the decision is
-  understood as deferred rather than foreclosed — and so it is not reintroduced on grounds of parity
-  with nuget.org, which operates at a scale §12.1 explicitly argues Forge will not.
+- **`/api/v1` will not be relocated or frozen.** Third parties may hardcode it, and that is the supported use. Anything requiring a URL change is a `v2`, announced as such.
+- Pointing a client at a different installation — SaaS, on-premise, or mirror — is a one-value change, because the paths are identical everywhere.
+- **Adding an index later is purely additive and therefore cheap.** Because `/api/v1` is permanent, publishing `/v1/index.json` at any future point would break nothing: existing consumers continue against fixed paths while new clients prefer the index. This is recorded so that the decision is understood as deferred rather than foreclosed — and so it is not reintroduced on grounds of parity with nuget.org, which operates at a scale §12.1 explicitly argues Forge will not.
 
 ### DD-12 — The representation version travels in the media type
 
-**Context.** DD-11 versions the route surface in the path. But Forge's DTOs are generated from an
-Enterprise Architect model (DD-07), so the *document schema* will churn as that model evolves — far
-more often than the set of endpoints changes. Versioning documents by bumping the path forces every
-unrelated endpoint to move in lockstep.
+**Context.** DD-11 versions the route surface in the path. But Forge's DTOs are generated from an Enterprise Architect model (DD-07), so the *document schema* will churn as that model evolves — far more often than the set of endpoints changes. Versioning documents by bumping the path forces every unrelated endpoint to move in lockstep.
 
 **Decision.** Carry the representation version in the media type:
 
@@ -655,9 +419,7 @@ unrelated endpoint to move in lockstep.
 application/vnd.mycelium.forge.v1+json
 ```
 
-`/api/v1` versions the **route surface** — which endpoints exist. The media type versions the
-**document schema**. There are exactly two axes, and DD-11's decision not to publish a service index
-removes any temptation to introduce a third that would be obliged to track them both.
+`/api/v1` versions the **route surface** — which endpoints exist. The media type versions the **document schema**. There are exactly two axes, and DD-11's decision not to publish a service index removes any temptation to introduce a third that would be obliged to track them both.
 
 **Reasoning.** PyPI and npm both do exactly this, and neither versions its document schema in the URL:
 
@@ -668,23 +430,13 @@ GET /left-pad        Accept: application/vnd.npm.install-v1+json
 
 One negotiation mechanism then serves both concerns, rather than bolting a second one alongside it.
 
-**Consequences.** Every negotiated response must set `Vary: Accept`, or a shared cache will serve one
-client the representation another asked for — a silent, hard-to-diagnose failure. Since DD-13 also
-negotiates on `Accept`, this holds even though DD-04 leaves only one wire format. An absent or `*/*`
-`Accept` yields the latest full JSON representation.
+**Consequences.** Every negotiated response must set `Vary: Accept`, or a shared cache will serve one client the representation another asked for — a silent, hard-to-diagnose failure. Since DD-13 also negotiates on `Accept`, this holds even though DD-04 leaves only one wire format. An absent or `*/*` `Accept` yields the latest full JSON representation.
 
-`+json` is a registered structured syntax suffix (RFC 6839), so the media types above are
-standards-conformant as they stand. This was not true of the `+msgpack` suffix DD-04 previously
-required, which is common practice rather than registered — a cost that disappeared with the format
-rather than one that had to be accepted.
+`+json` is a registered structured syntax suffix (RFC 6839), so the media types above are standards-conformant as they stand. This was not true of the `+msgpack` suffix DD-04 previously required, which is common practice rather than registered — a cost that disappeared with the format rather than one that had to be accepted.
 
 ### DD-13 — Package metadata has an abbreviated representation
 
-**Context.** `SSS-FG-REG-M8H` requires metadata retrieval *"without requiring the kpar content itself
-to be downloaded"*, which puts the metadata document on the hot path of every dependency resolution.
-Bloom's package picker (`SSS-PA-REG-B4N`) reads it, and `SSS-PA-REG-N6Q` has Bloom checking for newer
-versions of **every** package imported into a project, during a session. None of those callers read
-the README, the release notes or the per-version descriptions that the human package-detail page needs.
+**Context.** `SSS-FG-REG-M8H` requires metadata retrieval *"without requiring the kpar content itself to be downloaded"*, which puts the metadata document on the hot path of every dependency resolution. Bloom's package picker (`SSS-PA-REG-B4N`) reads it, and `SSS-PA-REG-N6Q` has Bloom checking for newer versions of **every** package imported into a project, during a session. None of those callers read the README, the release notes or the per-version descriptions that the human package-detail page needs.
 
 **Decision.** Two representations of the same resource, selected by media type:
 
@@ -693,57 +445,31 @@ the README, the release notes or the per-version descriptions that the human pac
 | `application/vnd.mycelium.forge.v1+json` | Full: manifest, README, release notes, complete version history, download counts |
 | `application/vnd.mycelium.forge.v1.abbreviated+json` | Resolver view: package identifier, version list, dependency constraints, checksums, listed/unlisted flags |
 
-**Reasoning.** npm's measured saving on this exact split is substantial — the same package returns
-22,573 bytes in full form and 8,488 abbreviated, a 62% reduction. crates.io, which offers no
-abbreviated form, returns 432,645 bytes of metadata for a single popular crate. Forge's per-version
-manifests are richer than npm's, and the update check in `SSS-PA-REG-N6Q` is a repeated,
-whole-project operation, so the full document would be fetched over and over for data the client
-immediately discards.
+**Reasoning.** npm's measured saving on this exact split is substantial — the same package returns 22,573 bytes in full form and 8,488 abbreviated, a 62% reduction. crates.io, which offers no abbreviated form, returns 432,645 bytes of metadata for a single popular crate. Forge's per-version manifests are richer than npm's, and the update check in `SSS-PA-REG-N6Q` is a repeated, whole-project operation, so the full document would be fetched over and over for data the client immediately discards.
 
-**Consequences.** Two DTO shapes to keep aligned. Both are generated from the same EA model (DD-07), so
-the abbreviated form is defined as a projection **in the model** rather than maintained by hand as a
-subset. The contract tests in §17 cover both representations in both wire formats.
+**Consequences.** Two DTO shapes to keep aligned. Both are generated from the same EA model (DD-07), so the abbreviated form is defined as a projection **in the model** rather than maintained by hand as a subset. The contract tests in §17 cover both representations in both wire formats.
 
 ### DD-14 — PostgreSQL is the system of record, and search stays in it until measured need
 
-**Context.** SSS §4.5 assumes PostgreSQL as the platform persistence layer, and Fabric already uses it.
-The question is whether Forge's workload justifies departing from that, particularly for search.
+**Context.** SSS §4.5 assumes PostgreSQL as the platform persistence layer, and Fabric already uses it. The question is whether Forge's workload justifies departing from that, particularly for search.
 
-**Decision.** PostgreSQL is the system of record for all metadata. Search is implemented **in
-PostgreSQL** behind an interface, and moves to a dedicated engine only when measurement shows it must.
+**Decision.** PostgreSQL is the system of record for all metadata. Search is implemented **in PostgreSQL** behind an interface, and moves to a dedicated engine only when measurement shows it must.
 
 **Reasoning.**
 
-*Why it is right for the record.* Forge's invariants are transactional — "at least one individual
-Owner" (`SSS-FG-AUTH-O4D`), immutable `{package, version}` (`I3C`), strictly increasing versions
-(`S2B`), and an atomic publish (`A5E`). These are unique indexes and constraints inside a transaction;
-a store without real transactions turns every one of them into an application-level race.
+*Why it is right for the record.* Forge's invariants are transactional — "at least one Owner" and "an Organization with packages keeps an Administrator" (§8.6), immutable `{package, version}` (`I3C`), strictly increasing versions (`S2B`), and an atomic publish (`A5E`). These are unique indexes and constraints inside a transaction; a store without real transactions turns every one of them into an application-level race.
 
-*Why it suits the polymorphic model specifically.* §9 commits to storing several artefact formats
-whose manifests have nothing structurally in common. PostgreSQL keeps the relational spine — package,
-version, maintainer, audit — while holding each `IArtifactManifest` as **JSONB with GIN indexing**. A
-new format is then an additive change with no schema migration, which is exactly what §9 promises.
-That combination is the deciding factor: a document store gives the flexibility and loses the
-invariants; a strict relational schema keeps the invariants and makes every new format a migration.
+*Why it suits the polymorphic model specifically.* §9 commits to storing several artefact formats whose manifests have nothing structurally in common. PostgreSQL keeps the relational spine — package, version, scope, audit — while holding each `IArtifactManifest` as **JSONB with GIN indexing**. A new format is then an additive change with no schema migration, which is exactly what §9 promises. That combination is the deciding factor: a document store gives the flexibility and loses the invariants; a strict relational schema keeps the invariants and makes every new format a migration.
 
-*Why search stays there.* With free-text search scoped to package metadata (`SSS-FG-REG-Q7G`), the workload is
-one document per package — thousands of documents at the commercial target, which is trivial.
-Qualified-name resolution is a B-tree over tens of millions of rows, answered by index seek or range
-scan. Dependency resolution over `usage[]` is a recursive CTE. None of these strains PostgreSQL.
+*Why search stays there.* With free-text search scoped to package metadata (`SSS-FG-REG-Q7G`), the workload is one document per package — thousands of documents at the commercial target, which is trivial. Qualified-name resolution is a B-tree over tens of millions of rows, answered by index seek or range scan. Dependency resolution over `usage[]` is a recursive CTE. None of these strains PostgreSQL.
 
-Separately, `SSS-CC-WEB-1MV` and SSS §4.4 put customer-operated on-premise deployments in scope, so a
-second datastore carries a real adoption cost for a single-tenant install even where it would perform.
+Separately, `SSS-CC-WEB-1MV` and SSS §4.4 put customer-operated on-premise deployments in scope, so a second datastore carries a real adoption cost for a single-tenant install even where it would perform.
 
-**Consequences.** The search implementation sits behind an interface from the first commit, so the
-engine can be replaced without disturbing the endpoint. `/api/v1/packages` is a permanent contract
-(DD-11), so a change of engine is invisible to every client. §12.1 records the trigger conditions, the
-candidate each points to, and the options already evaluated and rejected.
+**Consequences.** The search implementation sits behind an interface from the first commit, so the engine can be replaced without disturbing the endpoint. `/api/v1/packages` is a permanent contract (DD-11), so a change of engine is invisible to every client. §12.1 records the trigger conditions, the candidate each points to, and the options already evaluated and rejected.
 
 ### DD-18 — Data access is generated from the model over raw Npgsql; migrations are explicit SQL applied by DbUp
 
-**Context.** DD-14 makes PostgreSQL the system of record, but DD-06 names neither a data-access
-library nor a migration tool. Five constructs already decided constrain the answer, and none of them
-is expressible naturally through an ORM's query abstraction:
+**Context.** DD-14 makes PostgreSQL the system of record, but DD-06 names neither a data-access library nor a migration tool. Five constructs already decided constrain the answer, and none of them is expressible naturally through an ORM's query abstraction:
 
 | Construct | Source |
 |---|---|
@@ -753,207 +479,82 @@ is expressible naturally through an ORM's query abstraction:
 | Recursive CTE over `usage[]` for dependency resolution | §12 |
 | Unique constraint serialising concurrent publishes of one `{package, version}` | §12, `SSS-FG-REG-I3C` |
 
-A sixth constraint is structural rather than technical. DD-07 derives the DTOs from an Enterprise
-Architect model and DD-05 derives their serialisers from the same model in the same pass, so a
-hand-written data-access layer would be the only part of the model's surface not derived from the
-model.
+A sixth constraint is structural rather than technical. DD-07 derives the DTOs from an Enterprise Architect model and DD-05 derives their serialisers from the same model in the same pass, so a hand-written data-access layer would be the only part of the model's surface not derived from the model.
 
 **Decision.** Three parts.
 
-1. **Data-access objects are generated from the Enterprise Architect model** by the uml4net pipeline
-   of DD-07, alongside the DTOs and serialisers. They execute **raw Npgsql** — `NpgsqlCommand`,
-   typed `NpgsqlParameter`, `NpgsqlDataReader` — with no ORM, no micro-ORM and no runtime
-   reflection. Every method takes the caller's `NpgsqlTransaction`; a DAO never opens a connection.
-   Generated classes are `partial`, so hand-written SQL sits beside generated SQL rather than
-   replacing it.
+1. **Data-access objects are generated from the Enterprise Architect model** by the uml4net pipeline of DD-07, alongside the DTOs and serialisers. They execute **raw Npgsql** — `NpgsqlCommand`, typed `NpgsqlParameter`, `NpgsqlDataReader` — with no ORM, no micro-ORM and no runtime reflection. Every method takes the caller's `NpgsqlTransaction`; a DAO never opens a connection. Generated classes are `partial`, so hand-written SQL sits beside generated SQL rather than replacing it.
 2. **The schema is generated from the same model** as a single DDL script.
-3. **Migrations are numbered, forward-only SQL scripts applied by DbUp**, embedded in the assembly
-   and journalled in the database. The generated schema is the first migration; every later change
-   is a hand-written delta, and **CI fails the build when the two diverge**.
+3. **Migrations are numbered, forward-only SQL scripts applied by DbUp**, embedded in the assembly and journalled in the database. The generated schema is the first migration; every later change is a hand-written delta, and **CI fails the build when the two diverge**.
 
 **Reasoning.**
 
-*Why generated rather than an ORM.* Each of the five constructs above is written as the SQL it
-actually is. An ORM would express three of them through an escape hatch and the other two not at
-all, which means adopting an abstraction and then bypassing it at exactly the points that carry the
-design.
+*Why generated rather than an ORM.* Each of the five constructs above is written as the SQL it actually is. An ORM would express three of them through an escape hatch and the other two not at all, which means adopting an abstraction and then bypassing it at exactly the points that carry the design.
 
-*Why generated rather than hand-written.* A model change regenerates the DTO, its serialiser, its
-DAO and the DDL in a single pass, so the four cannot drift. This is DD-05's argument applied one
-layer down, and it answers the usual objection to explicit SQL — that schema correctness rests
-entirely on review — for everything the model describes.
+*Why generated rather than hand-written.* A model change regenerates the DTO, its serialiser, its DAO and the DDL in a single pass, so the four cannot drift. This is DD-05's argument applied one layer down, and it answers the usual objection to explicit SQL — that schema correctness rests entirely on review — for everything the model describes.
 
-*Why the schema is generated but the migrations are not.* This is the seam in the design, and it is
-better stated than discovered. A generator emits a **state**: the schema the model implies right
-now. A migration is a **delta**. No tool converts one into the other safely, because a diff cannot
-distinguish a rename from a drop-and-add, and getting that wrong destroys data. So the generated
-schema is the baseline at first release and a reference artefact thereafter, while the deltas are
-authored and reviewed.
+*Why the schema is generated but the migrations are not.* This is the seam in the design, and it is better stated than discovered. A generator emits a **state**: the schema the model implies right now. A migration is a **delta**. No tool converts one into the other safely, because a diff cannot distinguish a rename from a drop-and-add, and getting that wrong destroys data. So the generated schema is the baseline at first release and a reference artefact thereafter, while the deltas are authored and reviewed.
 
-Both of the in-house systems this pattern is taken from reach the same seam. CDP4-COMET generates
-its DDL and applies it only at schema creation, hand-writing every subsequent change as a versioned
-script. EORSA-DB avoids the seam only by having no upgrade path at all — its schema ships inside a
-container image, and a new version means a new image and an empty volume. That is not available
-here: §5.1 puts customer-operated on-premise and air-gapped installations in scope, and those
-upgrade in place.
+Both of the in-house systems this pattern is taken from reach the same seam. CDP4-COMET generates its DDL and applies it only at schema creation, hand-writing every subsequent change as a versioned script. EORSA-DB avoids the seam only by having no upgrade path at all — its schema ships inside a container image, and a new version means a new image and an empty volume. That is not available here: §5.1 puts customer-operated on-premise and air-gapped installations in scope, and those upgrade in place.
 
-*What closes the seam is a drift check, not a tool.* CI builds one database by running every
-migration in order and another by running the generated schema, then compares them. Any object the
-model implies that the migrations did not produce fails the build. Schema correctness therefore does
-not rest on review; it rests on a test the model itself defines.
+*What closes the seam is a drift check, not a tool.* CI builds one database by running every migration in order and another by running the generated schema, then compares them. Any object the model implies that the migrations did not produce fails the build. Schema correctness therefore does not rest on review; it rests on a test the model itself defines.
 
-*Why DbUp rather than a bespoke engine.* CDP4-COMET's migration engine encodes version, scope and
-handler in the script filename, journals applied versions in a table, and applies everything in one
-transaction at startup. It works, and it is a pattern the team already operates. But most of its
-size is partition fan-out serving a schema-per-tenant model that Forge does not have — Forge is one
-schema, and §5.1.2's scopes are rows. What remains once that is removed is ordering plus a journal,
-which is what DbUp is. Two defects are also worth not inheriting: the journal's primary key is the
-version, so two scripts sharing a version silently lose one, and there are no script checksums, so
-an edit to an already-applied script goes undetected. DbUp is MIT, is a single package, and reads
-its scripts from embedded resources, so it needs no network and works unchanged air-gapped.
+*Why DbUp rather than a bespoke engine.* CDP4-COMET's migration engine encodes version, scope and handler in the script filename, journals applied versions in a table, and applies everything in one transaction at startup. It works, and it is a pattern the team already operates. But most of its size is partition fan-out serving a schema-per-tenant model that Forge does not have — Forge is one schema, and §5.1.2's scopes are rows. What remains once that is removed is ordering plus a journal, which is what DbUp is. Two defects are also worth not inheriting: the journal's primary key is the version, so two scripts sharing a version silently lose one, and there are no script checksums, so an edit to an already-applied script goes undetected. DbUp is MIT, is a single package, and reads its scripts from embedded resources, so it needs no network and works unchanged air-gapped.
 
-*Why not FluentMigrator or EF Core Migrations.* EF Core Migrations is coherent only if EF Core is
-the data-access layer, which it is not. FluentMigrator would wrap C# around a schema that is
-generated as SQL, and the GIN indexes, partial indexes and JSONB specifics would drop to raw SQL
-inside the migration classes regardless — a layer added without a layer removed.
+*Why not FluentMigrator or EF Core Migrations.* EF Core Migrations is coherent only if EF Core is the data-access layer, which it is not. FluentMigrator would wrap C# around a schema that is generated as SQL, and the GIN indexes, partial indexes and JSONB specifics would drop to raw SQL inside the migration classes regardless — a layer added without a layer removed.
 
-*Why typed columns rather than a catch-all attribute column.* Both in-house systems pack every
-scalar property into one schemaless column — EORSA-DB into a `data` JSONB column on its root table,
-CDP4-COMET into an `hstore` value dictionary — so that a model revision costs no DDL. That is a
-sound trade where the model is large and churning and the migration path is uncomfortable. Forge is
-neither: §8 has six entities and a shallow hierarchy, and the migration path is the subject of this
-decision.
+*Why typed columns rather than a catch-all attribute column.* Both in-house systems pack every scalar property into one schemaless column — EORSA-DB into a `data` JSONB column on its root table, CDP4-COMET into an `hstore` value dictionary — so that a model revision costs no DDL. That is a sound trade where the model is large and churning and the migration path is uncomfortable. Forge is neither: §8 has six entities and a shallow hierarchy, and the migration path is the subject of this decision.
 
-The cost would land exactly where Forge is least able to absorb it. §8.1's invariants are unique
-indexes and check constraints — immutable `{package, version}`, strictly increasing SemVer, at least
-one individual-Account Owner — and those want typed columns rather than expression indexes over blob
-members. §12.1's facet counting groups by scalar attributes under a 500 ms p95 budget, and a
-catch-all column makes each of those a cast over an unindexed extraction. And `->>` cannot
-distinguish an absent key from a JSON null, which §9.2.1 depends on: a resolver must be able to tell
-"no dependencies" from "dependencies not expressible".
+The cost would land exactly where Forge is least able to absorb it. §8.1's invariants are unique indexes and check constraints — immutable `{package, version}`, strictly increasing SemVer, at least one Owner — and those want typed columns rather than expression indexes over blob members. §12.1's facet counting groups by scalar attributes under a 500 ms p95 budget, and a catch-all column makes each of those a cast over an unindexed extraction. And `->>` cannot distinguish an absent key from a JSON null, which §9.2.1 depends on: a resolver must be able to tell "no dependencies" from "dependencies not expressible".
 
-Most of all it would invert DD-14's own argument. That decision keeps PostgreSQL because it holds
-the relational spine *and* the polymorphic manifests — "a document store gives the flexibility and
-loses the invariants". A catch-all column makes the spine documents too, which is the outcome DD-14
-rejected. **JSONB stays where DD-14 put it: the per-format `IArtifactManifest`, and nothing else.**
+Most of all it would invert DD-14's own argument. That decision keeps PostgreSQL because it holds the relational spine *and* the polymorphic manifests — "a document store gives the flexibility and loses the invariants". A catch-all column makes the spine documents too, which is the outcome DD-14 rejected. **JSONB stays where DD-14 put it: the per-format `IArtifactManifest`, and nothing else.**
 
 **Consequences.**
 
-**No new project.** The generated DAOs, the generated schema and the migration scripts live in
-`Mycelium.Forge` under `Orm/`, alongside `Api/` and `Components/` — the folder-per-concern pattern
-DD-03 already establishes for the two request surfaces. The migration scripts are embedded
-resources, so they travel inside the image.
+**No new project.** The generated DAOs, the generated schema and the migration scripts live in `Mycelium.Forge` under `Orm/`, alongside `Api/` and `Components/` — the folder-per-concern pattern DD-03 already establishes for the two request surfaces. The migration scripts are embedded resources, so they travel inside the image.
 
-A separate assembly would earn its place if something other than the deployable consumed it, and
-nothing does: DD-03 has one image, and the client library and CLI reach the registry over `/api/v1`
-rather than over the database. The in-house systems this pattern is taken from do separate the
-layer, but both have several consumers to separate it *for*; Forge has one. Nor would separation buy
-enforcement — the web project would reference the assembly and any component could still call a DAO
-directly, so the layering that matters is the domain layer's, not the project boundary's. Adding
-`Mycelium.Forge.Common` to the alternatives is worse still: it is packable and flows into every
-consumer of `Mycelium.Forge.Client`, which would put a PostgreSQL driver and a migration engine in
-their dependency graphs.
+A separate assembly would earn its place if something other than the deployable consumed it, and nothing does: DD-03 has one image, and the client library and CLI reach the registry over `/api/v1` rather than over the database. The in-house systems this pattern is taken from do separate the layer, but both have several consumers to separate it *for*; Forge has one. Nor would separation buy enforcement — the web project would reference the assembly and any component could still call a DAO directly, so the layering that matters is the domain layer's, not the project boundary's. Adding `Mycelium.Forge.Common` to the alternatives is worse still: it is packable and flows into every consumer of `Mycelium.Forge.Client`, which would put a PostgreSQL driver and a migration engine in their dependency graphs.
 
-Extracting an assembly later is moving files and fixing namespaces, so this is recorded as cheap to
-reverse — unlike §19.1's seams, which are not.
+Extracting an assembly later is moving files and fixing namespaces, so this is recorded as cheap to reverse — unlike §19.1's seams, which are not.
 
-**The generated layer covers CRUD over the §8 entities and nothing else.** Search (DD-14), qualified-
-name resolution (`SSS-FG-REG-Z5Q`), the job table (DD-17) and the append-only counter events with their
-watermark (DD-15) are hand-written repositories over hand-written SQL, because none of them is a
-projection of a model class. Their DDL is hand-written in migrations, and the drift check tolerates
-them because it compares only the objects the generated schema declares — so it needs no exclusion
-list to maintain.
+**The generated layer covers CRUD over the §8 entities and nothing else.** Search (DD-14), qualified- name resolution (`SSS-FG-REG-Z5Q`), the job table (DD-17) and the append-only counter events with their watermark (DD-15) are hand-written repositories over hand-written SQL, because none of them is a projection of a model class. Their DDL is hand-written in migrations, and the drift check tolerates them because it compares only the objects the generated schema declares — so it needs no exclusion list to maintain.
 
-**Migrations run as an explicit invocation, not on every replica's startup.** DD-03 makes replicas
-interchangeable, so *N* of them starting together would race. The migrator runs as its own
-invocation — an init container, a `docker compose` one-shot, or an operator command — and takes a
-**transaction-scoped** PostgreSQL advisory lock (`pg_advisory_xact_lock`) so that concurrent attempts
-serialise. Transaction-scoped rather than session-scoped because the lock then cannot outlive the
-work it guards — a session lock leaks if the connection is returned to a pool still holding it. That
-it also keeps §12.2's contingency open is a consequence, not the reason. Every replica then
-*verifies* at
-startup that the journal holds every embedded script, and fails `/ready` rather than `/healthz` if
-it does not, so a partially upgraded deployment removes itself from the load balancer instead of
-serving against a schema it does not understand.
+**Migrations run as an explicit invocation, not on every replica's startup.** DD-03 makes replicas interchangeable, so *N* of them starting together would race. The migrator runs as its own invocation — an init container, a `docker compose` one-shot, or an operator command — and takes a **transaction-scoped** PostgreSQL advisory lock (`pg_advisory_xact_lock`) so that concurrent attempts serialise. Transaction-scoped rather than session-scoped because the lock then cannot outlive the work it guards — a session lock leaks if the connection is returned to a pool still holding it. That it also keeps §12.2's contingency open is a consequence, not the reason. Every replica then *verifies* at startup that the journal holds every embedded script, and fails `/ready` rather than `/healthz` if it does not, so a partially upgraded deployment removes itself from the load balancer instead of serving against a schema it does not understand.
 
-§17 gains a persistence level, and the contract-test argument extends to the generated DAOs for
-DD-05's reason: a defect in a template is systematic rather than confined to one type. These run
-against a real PostgreSQL in a container, since the SQL is the thing being tested, so they are
-tagged for exclusion exactly as the end-to-end suites are. Generator output is additionally covered
-by golden-file comparison, with a guard that fails when a model class has no golden file — otherwise
-adding a class to the model silently adds untested generated code.
+§17 gains a persistence level, and the contract-test argument extends to the generated DAOs for DD-05's reason: a defect in a template is systematic rather than confined to one type. These run against a real PostgreSQL in a container, since the SQL is the thing being tested, so they are tagged for exclusion exactly as the end-to-end suites are. Generator output is additionally covered by golden-file comparison, with a guard that fails when a model class has no golden file — otherwise adding a class to the model silently adds untested generated code.
 
-Reversal is bounded but not free. The DAOs sit behind the domain layer, so replacing the generator
-with hand-written data access would not disturb callers; replacing raw SQL with an ORM would.
+Reversal is bounded but not free. The DAOs sit behind the domain layer, so replacing the generator with hand-written data access would not disturb callers; replacing raw SQL with an ORM would.
 
-§15.1's SBOM gains `Npgsql` (PostgreSQL licence) and `dbup-postgresql` (MIT). Both are compatible
-with Forge's Apache-2.0 and neither carries a clause to reason about, unlike §9.2's LGPL-3.0 entry.
+§15.1's SBOM gains `Npgsql` (PostgreSQL licence) and `dbup-postgresql` (MIT). Both are compatible with Forge's Apache-2.0 and neither carries a clause to reason about, unlike §9.2's LGPL-3.0 entry.
 
 ### DD-23 — Surrogate keys are UUIDv7, and PostgreSQL 18 is the floor
 
-**Context.** §8's model names natural keys — `Account.Handle`, `Organization.Slug`, `Scope.Slug`,
-`{Scope, Name}` for a package, `{Package, Version}` for a version — and no surrogate identifier. DD-18
-then generates both the DAOs and the DDL from that model, which makes the key strategy a property of one
-set of templates: whatever it is, it applies uniformly to every entity, and changing it afterwards is a
-migration across every table and every foreign key in the schema. It is cheap to decide before F-10
-writes a template and expensive to revisit once A-01 has run.
+**Context.** §8's model names natural keys — `Account.Handle`, `Scope.Slug`, `{Scope, Name}` for a package, `{Package, Version}` for a version — and no surrogate identifier. DD-18 then generates both the DAOs and the DDL from that model, which makes the key strategy a property of one set of templates: whatever it is, it applies uniformly to every entity, and changing it afterwards is a migration across every table and every foreign key in the schema. It is cheap to decide before F-10 writes a template and expensive to revisit once A-01 has run.
 
-Three candidates: a `bigint` identity column, a random UUID (v4), and a time-ordered UUID (v7,
-RFC 9562).
+Three candidates: a `bigint` identity column, a random UUID (v4), and a time-ordered UUID (v7, RFC 9562).
 
 **Decision.** Two parts, recorded as one decision because the second exists to serve the first.
 
-1. **Every entity carries a UUIDv7 surrogate primary key** on a PostgreSQL `uuid` column. Natural keys
-   keep their unique constraints; the surrogate does not replace them. Values are generated in .NET with
-   `Guid.CreateVersion7()`, and the generated DDL additionally declares `DEFAULT uuidv7()` so that
-   migrations, backfills and DD-18's hand-written tables need nothing else.
+1. **Every entity carries a UUIDv7 surrogate primary key** on a PostgreSQL `uuid` column. Natural keys keep their unique constraints; the surrogate does not replace them. Values are generated in .NET with `Guid.CreateVersion7()`, and the generated DDL additionally declares `DEFAULT uuidv7()` so that migrations, backfills and DD-18's hand-written tables need nothing else.
 2. **PostgreSQL 18 is the minimum supported version**, in every topology of §5.1.
 
 **Reasoning.**
 
-*Why a surrogate key at all.* The natural keys are wide, and not all of them are immutable.
-`{Scope, Name, Version}` propagated as a foreign key into `Maintainer`, `AuditEntry`, DD-15's download
-events and DD-17's job rows is three columns repeated in the highest-volume tables in the schema. And
-while §8.1 freezes `{package identifier, version}` once published, nothing freezes an Organization slug
-or an Account handle — a rename should be one row updated, not a cascade through every table that
-references it.
+*Why a surrogate key at all.* The natural keys are wide, and not all of them are immutable. `{Scope, Name, Version}` propagated as a foreign key into `AuditEntry`, DD-15's download events and DD-17's job rows is three columns repeated in the highest-volume tables in the schema. And while §8.1 freezes the content behind `{package identifier, version}` once published, nothing freezes the scope slug or the Account handle — §8.5 makes both renameable, and a rename should be one row updated, not a cascade through every table that references it.
 
-*Why UUID rather than a `bigint` identity column.* One reason decides it. §5.1.6 replicates a metadata
-index from an upstream installation into a downstream one, so rows are minted in one database and must
-arrive in another without collision or renumbering. Sequences collide across installations by
-construction, and the fixes — offset ranges, per-installation blocks — are exactly the cross-installation
-coordination §5.1 is built to avoid. A 128-bit key makes the problem not arise.
+*Why UUID rather than a `bigint` identity column.* One reason decides it. §5.1.6 replicates a metadata index from an upstream installation into a downstream one, so rows are minted in one database and must arrive in another without collision or renumbering. Sequences collide across installations by construction, and the fixes — offset ranges, per-installation blocks — are exactly the cross-installation coordination §5.1 is built to avoid. A 128-bit key makes the problem not arise.
 
-A second reason is smaller but real: §12's publish writes the blob first and then commits the metadata
-transaction. Minting identifiers in the application lets the whole object graph — package, version,
-audit entry, dependents update — be constructed and logged with its final identifiers before anything is
-written, where an identity column yields them only after a round trip.
+A second reason is smaller but real: §12's publish writes the blob first and then commits the metadata transaction. Minting identifiers in the application lets the whole object graph — package, version, audit entry, dependents update — be constructed and logged with its final identifiers before anything is written, where an identity column yields them only after a round trip.
 
-*What is not a reason.* Opacity. §8.2 and DD-11 address every resource as `@<scope>/<name>` and a
-version, so surrogate keys never appear in a URL and there is nothing for a sequential identifier to
-leak. The usual "UUIDs so that identifiers cannot be enumerated" argument does not apply here, and
-saying so keeps this decision resting on replication rather than on a benefit Forge does not collect.
+*What is not a reason.* Opacity. §8.2 and DD-11 address every resource as `@<scope>/<name>` and a version, so surrogate keys never appear in a URL and there is nothing for a sequential identifier to leak. The usual "UUIDs so that identifiers cannot be enumerated" argument does not apply here, and saying so keeps this decision resting on replication rather than on a benefit Forge does not collect.
 
-*Why v7 rather than v4.* Random keys insert at random points in a B-tree: a dirtied page per insert, WAL
-inflated by full-page images, and none of the cache locality that makes an append-ordered index cheap.
-UUIDv7 puts a 48-bit Unix-millisecond timestamp in the leading bits, so inserts land at the right-hand
-edge exactly as a sequence would, and the index behaves like the `bigint` this decision declined. The
-append-only tables — DD-15's download events, DD-17's job rows, A-06's audit trail — are precisely the
-write pattern that punishes v4, and they are the tables that grow without bound.
+*Why v7 rather than v4.* Random keys insert at random points in a B-tree: a dirtied page per insert, WAL inflated by full-page images, and none of the cache locality that makes an append-ordered index cheap. UUIDv7 puts a 48-bit Unix-millisecond timestamp in the leading bits, so inserts land at the right-hand edge exactly as a sequence would, and the index behaves like the `bigint` this decision declined. The append-only tables — DD-15's download events, DD-17's job rows, A-06's audit trail — are precisely the write pattern that punishes v4, and they are the tables that grow without bound.
 
-Two further properties are useful rather than decisive: rows sort by creation time under the primary key
-with no second index, which is what an append-only audit trail wants anyway; and
-`uuid_extract_timestamp()` recovers the creation instant from the key alone when reading a job row or an
-audit entry.
+Two further properties are useful rather than decisive: rows sort by creation time under the primary key with no second index, which is what an append-only audit trail wants anyway; and `uuid_extract_timestamp()` recovers the creation instant from the key alone when reading a job row or an audit entry.
 
-*Why the floor is PostgreSQL 18.* `uuidv7()` is built in from 18; 17 and earlier ship only
-`gen_random_uuid()`, which is v4.
+*Why the floor is PostgreSQL 18.* `uuidv7()` is built in from 18; 17 and earlier ship only `gen_random_uuid()`, which is v4.
 
-Because the application generates identifiers, a shim would technically serve — a plpgsql `uuidv7()`
-over `gen_random_bytes()` is a dozen lines. It is declined on DD-18's own terms. That decision
-hand-writes every migration and keeps the schema a projection of the model, so a hand-rolled RFC 9562
-implementation would become a piece of the platform Forge maintains, tests, and gets subtly wrong at the
-sub-millisecond monotonicity edge — standing in for a function the database ships.
+Because the application generates identifiers, a shim would technically serve — a plpgsql `uuidv7()` over `gen_random_bytes()` is a dozen lines. It is declined on DD-18's own terms. That decision hand-writes every migration and keeps the schema a projection of the model, so a hand-rolled RFC 9562 implementation would become a piece of the platform Forge maintains, tests, and gets subtly wrong at the sub-millisecond monotonicity edge — standing in for a function the database ships.
 
 The floor also buys three things this workload wants independently:
 
@@ -963,172 +564,74 @@ The floor also buys three things this workload wants independently:
 | **Asynchronous I/O** | A registry is read-dominated, and this is the release where heap and bitmap reads are issued concurrently rather than one at a time |
 | `RETURNING old.*` / `new.*` | A-06 writes an audit entry for every privileged operation, and capturing the prior row without a second read is exactly that table's job |
 
-*Why the floor is affordable.* This is DD-21's shape — a prerequisite imposed on every topology
-including air-gapped — and it is a smaller ask than object storage was. PostgreSQL 18 was released in
-September 2025, reached general availability on Amazon RDS in November 2025 and on Azure Database for
-PostgreSQL Flexible Server in December 2025, and is supported upstream until November 2030. Meanwhile
-PostgreSQL 13 is already out of support and 14 leaves support in November 2026, so a customer whose
-instance is old enough for this floor to bite has a support problem that predates Forge. The floor stays
-inside PostgreSQL's own support window until November 2030, which outlasts any horizon this document
-plans against.
+*Why the floor is affordable.* This is DD-21's shape — a prerequisite imposed on every topology including air-gapped — and it is a smaller ask than object storage was. PostgreSQL 18 was released in September 2025, reached general availability on Amazon RDS in November 2025 and on Azure Database for PostgreSQL Flexible Server in December 2025, and is supported upstream until November 2030. Meanwhile PostgreSQL 13 is already out of support and 14 leaves support in November 2026, so a customer whose instance is old enough for this floor to bite has a support problem that predates Forge. The floor stays inside PostgreSQL's own support window until November 2030, which outlasts any horizon this document plans against.
 
 **Consequences.**
 
-**F-10 owns the mechanism.** Every generated table declares `id uuid PRIMARY KEY DEFAULT uuidv7()`,
-every generated DAO takes the identifier as a parameter rather than reading one back, and §8.1's natural
-keys remain unique constraints alongside it — they are what enforce the invariants, and a surrogate key
-that quietly replaced them would dissolve every one. A-01's baseline migration is where this first
-becomes real, and F-07's compose file pins the PostgreSQL image accordingly.
+**F-10 owns the mechanism.** Every generated table declares `id uuid PRIMARY KEY DEFAULT uuidv7()`, every generated DAO takes the identifier as a parameter rather than reading one back, and §8.1's natural keys remain unique constraints alongside it — they are what enforce the invariants, and a surrogate key that quietly replaced them would dissolve every one. A-01's baseline migration is where this first becomes real, and F-07's compose file pins the PostgreSQL image accordingly.
 
-**A UUIDv7 is never a secret.** It embeds its creation time and carries at most 74 bits of randomness —
-fewer where an implementation spends `rand_a` on sub-millisecond precision, as PostgreSQL's does — and it
-is a surrogate key rather than a capability. F1-02's API keys are random material hashed at rest (§13)
-and are not UUIDs, nor is the key prefix §14 redacts on. This is recorded because "there is already an
-identifier" is the shortest available path to a token guessable from a timestamp.
+**A UUIDv7 is never a secret.** It embeds its creation time and carries at most 74 bits of randomness — fewer where an implementation spends `rand_a` on sub-millisecond precision, as PostgreSQL's does — and it is a surrogate key rather than a capability. F1-02's API keys are random material hashed at rest (§13) and are not UUIDs, nor is the key prefix §14 redacts on. This is recorded because "there is already an identifier" is the shortest available path to a token guessable from a timestamp.
 
-**Nothing changes in `/api/v1`.** Surrogate keys stay behind the API boundary, so DD-11's permanent paths
-are unaffected and the timestamp a v7 key embeds is never published. For a `PackageVersion` it would have
-disclosed `PublishedAt`, which §8 already makes public; for everything else it discloses nothing, because
-the key is not sent.
+**Nothing changes in `/api/v1`.** Surrogate keys stay behind the API boundary, so DD-11's permanent paths are unaffected and the timestamp a v7 key embeds is never published. For a `PackageVersion` it would have disclosed `PublishedAt`, which §8 already makes public; for everything else it discloses nothing, because the key is not sent.
 
-**§17 gains one assertion at the persistence level.** .NET's `Guid` and PostgreSQL's `uuid` do not share
-a byte layout across the first three fields, so the ordering property this whole decision rests on
-depends on Npgsql's conversion being the canonical one. The persistence suite inserts a series of
-`Guid.CreateVersion7()` values in creation order, asserts they come back in that order under
-`ORDER BY id`, and asserts `uuid_extract_timestamp()` agrees with the .NET-side timestamp. Cheap to
-assert, and expensive to discover missing.
+**§17 gains one assertion at the persistence level.** .NET's `Guid` and PostgreSQL's `uuid` do not share a byte layout across the first three fields, so the ordering property this whole decision rests on depends on Npgsql's conversion being the canonical one. The persistence suite inserts a series of `Guid.CreateVersion7()` values in creation order, asserts they come back in that order under `ORDER BY id`, and asserts `uuid_extract_timestamp()` agrees with the .NET-side timestamp. Cheap to assert, and expensive to discover missing.
 
-**§12's prerequisites gain a version**, alongside DD-21's object storage. The floor is uniform across
-topologies, so §5.1's "the same binary with an upstream configured" is preserved rather than weakened.
+**§12's prerequisites gain a version**, alongside DD-21's object storage. The floor is uniform across topologies, so §5.1's "the same binary with an upstream configured" is preserved rather than weakened.
 
 ### DD-21 — Object storage is required in every topology, over `AWSSDK.S3`; Garage is the implementation
 
-**Context.** §12 stores artefact blobs in S3, content-addressed, but DD-06 named no client. The
-second and larger question is whether an on-premise or air-gapped operator (§5.1) must run object
-storage at all, or whether `IArtifactStore` — the §19.1 seam — also gets a filesystem-backed
-implementation.
+**Context.** §12 stores artefact blobs in S3, content-addressed, but DD-06 named no client. The second and larger question is whether an on-premise or air-gapped operator (§5.1) must run object storage at all, or whether `IArtifactStore` — the §19.1 seam — also gets a filesystem-backed implementation.
 
-A third element arrived after this decision was first recorded: the Mycelium platform architecture named
-**Garage** as the object store for Fabric and Bloom, and therefore for Forge. This decision is amended
-rather than superseded, because what that settles is the implementation behind a boundary the original
-reasoning had deliberately left open.
+A third element arrived after this decision was first recorded: the Mycelium platform architecture named **Garage** as the object store for Fabric and Bloom, and therefore for Forge. This decision is amended rather than superseded, because what that settles is the implementation behind a boundary the original reasoning had deliberately left open.
 
 **Decision.** Three parts.
 
-1. **`AWSSDK.S3`** is the client. S3-compatible endpoints are reached by setting `ServiceURL` and
-   `ForcePathStyle`, so any conforming store works unchanged.
-2. **S3-compatible object storage is required in every deployment topology.** There is no
-   filesystem-backed `IArtifactStore`.
-3. **Garage is the named implementation.** It is what the platform ships and operates, and it is the
-   local development and CI target, so the path exercised in development is the path production runs.
-   **The S3 boundary is retained deliberately**: Garage is named as the implementation, not substituted
-   for the protocol, so a deployment on AWS S3 itself remains possible and Forge continues to test
-   against the contract rather than against one product.
+1. **`AWSSDK.S3`** is the client. S3-compatible endpoints are reached by setting `ServiceURL` and `ForcePathStyle`, so any conforming store works unchanged.
+2. **S3-compatible object storage is required in every deployment topology.** There is no filesystem-backed `IArtifactStore`.
+3. **Garage is the named implementation.** It is what the platform ships and operates, and it is the local development and CI target, so the path exercised in development is the path production runs. **The S3 boundary is retained deliberately**: Garage is named as the implementation, not substituted for the protocol, so a deployment on AWS S3 itself remains possible and Forge continues to test against the contract rather than against one product.
 
 **Reasoning.**
 
-*On the client.* The official SDK is Apache-2.0 and is the reference implementation of the protocol. It
-also supports presigning, which the download path was expected to need when this was written and which
-DD-22 subsequently declined to use — so the capability is retained without being depended on. A
-vendor-specific SDK is the wrong shape regardless of which vendor: it couples the client to one
-implementation at exactly the boundary this decision keeps generic, for a saving measured in megabytes.
-`FluentStorage` would supply a filesystem backend for free, but it means placing a third-party
-abstraction *beneath* `IArtifactStore`, which is Forge's own abstraction over the same concern — the
-result is the union of two leaky abstractions rather than less work.
+*On the client.* The official SDK is Apache-2.0 and is the reference implementation of the protocol. It also supports presigning, which the download path was expected to need when this was written and which DD-22 subsequently declined to use — so the capability is retained without being depended on. A vendor-specific SDK is the wrong shape regardless of which vendor: it couples the client to one implementation at exactly the boundary this decision keeps generic, for a saving measured in megabytes. `FluentStorage` would supply a filesystem backend for free, but it means placing a third-party abstraction *beneath* `IArtifactStore`, which is Forge's own abstraction over the same concern — the result is the union of two leaky abstractions rather than less work.
 
-*Why no filesystem implementation.* §12's "no local disk state" is a horizontal-scaling requirement,
-and a filesystem store does not extend it — it contradicts it. Admitting one would mean the design has
-two classes of deployment with different correctness properties, and only one of them documented in
-the section that states the property.
+*Why no filesystem implementation.* §12's "no local disk state" is a horizontal-scaling requirement, and a filesystem store does not extend it — it contradicts it. Admitting one would mean the design has two classes of deployment with different correctness properties, and only one of them documented in the section that states the property.
 
-The failure mode is the deciding argument. With two replicas over local disks, content-addressed
-writes land on different machines: a publish succeeds, and downloads of that artefact then fail from
-whichever replica did not receive the bytes. Intermittent, invisible in the publish response, and
-indistinguishable from a transient error to the user. Nothing in the system can detect it — a startup
-guard can only ask the operator to promise something no code can verify, and a promise is not a
-constraint.
+The failure mode is the deciding argument. With two replicas over local disks, content-addressed writes land on different machines: a publish succeeds, and downloads of that artefact then fail from whichever replica did not receive the bytes. Intermittent, invisible in the publish response, and indistinguishable from a transient error to the user. Nothing in the system can detect it — a startup guard can only ask the operator to promise something no code can verify, and a promise is not a constraint.
 
-One implementation also keeps three properties simple that all rest on a single content-addressed
-store: §8.2's automatic deduplication when one artefact is published into several scopes, §5.1.4's
-identity between the mirror cache and the local blob store, and §12's publish ordering — blob first,
-metadata transaction second — which has to hold identically wherever bytes land.
+One implementation also keeps three properties simple that all rest on a single content-addressed store: §8.2's automatic deduplication when one artefact is published into several scopes, §5.1.4's identity between the mirror cache and the local blob store, and §12's publish ordering — blob first, metadata transaction second — which has to hold identically wherever bytes land.
 
-*The cost, stated rather than glossed.* The smallest on-premise installation must now run object
-storage to hold what may be a few hundred megabytes of packages. That is the objection §12.1 raises
-against ParadeDB and DD-17 raises against a message broker, pointed back at this decision, and it
-deserves an answer rather than silence.
+*The cost, stated rather than glossed.* The smallest on-premise installation must now run object storage to hold what may be a few hundred megabytes of packages. That is the objection §12.1 raises against ParadeDB and DD-17 raises against a message broker, pointed back at this decision, and it deserves an answer rather than silence.
 
-The objection does not transfer cleanly, for two reasons. Those rejections were about adding a
-*second* system to do a job PostgreSQL already does adequately; here object storage is doing a job
-PostgreSQL does badly — large binary objects inflate WAL, backup size and restore time, which is
-precisely why SSS §4.5 separates the two. And the ask is smaller than it sounds: Garage is a single
-static binary in a single container image, so it travels through an air gap by the same `docker save`
-route §15.1 already documents for Forge itself.
+The objection does not transfer cleanly, for two reasons. Those rejections were about adding a *second* system to do a job PostgreSQL already does adequately; here object storage is doing a job PostgreSQL does badly — large binary objects inflate WAL, backup size and restore time, which is precisely why SSS §4.5 separates the two. And the ask is smaller than it sounds: Garage is a single static binary in a single container image, so it travels through an air gap by the same `docker save` route §15.1 already documents for Forge itself.
 
-*On Garage specifically.* This is a **platform-level decision taken for Mycelium as a whole**, not one
-Forge reached on its own merits: Fabric and Bloom adopt Garage too, and one storage system across three
-products is worth more than each choosing well in isolation. Forge records it because it changes what
-`F-07` runs and what `§17` exercises, not because Forge is free to differ.
+*On Garage specifically.* This is a **platform-level decision taken for Mycelium as a whole**, not one Forge reached on its own merits: Fabric and Bloom adopt Garage too, and one storage system across three products is worth more than each choosing well in isolation. Forge records it because it changes what `F-07` runs and what `§17` exercises, not because Forge is free to differ.
 
-It is nonetheless a good fit, which is worth establishing rather than assuming. **Forge's demands on the
-protocol are unusually small.** §12 stores blobs content-addressed and immutable, so object versioning
-and object locking describe operations Forge never performs, and `H-03` collects orphaned blobs as a
-claimed job in application code rather than through lifecycle rules — the three areas where Garage's
-coverage is absent or partial are precisely the three Forge does not reach for. What it does need is
-`GET` with byte ranges (DD-22), `PUT` with multipart upload for large artefacts, `ListObjectsV2` and
-`DeleteObjects` for `H-03`, all of which Garage implements. DD-22's decision not to redirect removes
-presigned URLs from the dependency list as well, so the surface that must hold is narrower than the one
-this decision originally contemplated.
+It is nonetheless a good fit, which is worth establishing rather than assuming. **Forge's demands on the protocol are unusually small.** §12 stores blobs content-addressed and immutable, so object versioning and object locking describe operations Forge never performs, and `H-03` collects orphaned blobs as a claimed job in application code rather than through lifecycle rules — the three areas where Garage's coverage is absent or partial are precisely the three Forge does not reach for. What it does need is `GET` with byte ranges (DD-22), `PUT` with multipart upload for large artefacts, `ListObjectsV2` and `DeleteObjects` for `H-03`, all of which Garage implements. DD-22's decision not to redirect removes presigned URLs from the dependency list as well, so the surface that must hold is narrower than the one this decision originally contemplated.
 
-*The licence, since §15.1 makes licences consequential.* Garage is **AGPL-3.0**. This creates no
-obligation on Forge: it is a separate service reached over HTTP, not a library linked into the image, so
-there is no derivative work and nothing resembling §9.2's LGPL-3.0 entry. It is also not a regression —
-MinIO, the store this replaces, is AGPL-3.0 as well. Because Garage runs as its own deployment rather
-than inside Forge's image, it does not appear in §15.1's SBOM at all; it is a prerequisite, like
-PostgreSQL.
+*The licence, since §15.1 makes licences consequential.* Garage is **AGPL-3.0**. This creates no obligation on Forge: it is a separate service reached over HTTP, not a library linked into the image, so there is no derivative work and nothing resembling §9.2's LGPL-3.0 entry. It is also not a regression — MinIO, the store this replaces, is AGPL-3.0 as well. Because Garage runs as its own deployment rather than inside Forge's image, it does not appear in §15.1's SBOM at all; it is a prerequisite, like PostgreSQL.
 
 **Consequences.**
 
-`IArtifactStore` has exactly one implementation, so `A-03` builds one and §17's persistence suite
-exercises one path. The seam remains, because §19.1 needs it for mirroring's fetch-on-miss — not
-because a second backend is anticipated.
+`IArtifactStore` has exactly one implementation, so `A-03` builds one and §17's persistence suite exercises one path. The seam remains, because §19.1 needs it for mirroring's fetch-on-miss — not because a second backend is anticipated.
 
-**§12's "no local disk state" stands unqualified.** This is worth stating positively: the bullet was
-close to acquiring an exception, and it has not.
+**§12's "no local disk state" stands unqualified.** This is worth stating positively: the bullet was close to acquiring an exception, and it has not.
 
-Configuration is endpoint, region, bucket, credentials and path-style addressing. Garage implements both
-addressing styles, but virtual-host style requires wildcard DNS for the bucket subdomain, which an
-on-premise or air-gapped operator often cannot arrange — so **path-style stays the default** while AWS
-itself prefers virtual-host style. This is a setting operators will get wrong if it is not surfaced in
-the deployment documentation.
+Configuration is endpoint, region, bucket, credentials and path-style addressing. Garage implements both addressing styles, but virtual-host style requires wildcard DNS for the bucket subdomain, which an on-premise or air-gapped operator often cannot arrange — so **path-style stays the default** while AWS itself prefers virtual-host style. This is a setting operators will get wrong if it is not surfaced in the deployment documentation.
 
 **Two properties of Garage are load-bearing and not yet verified**, and both belong to `A-03`:
 
-- **`Range` passthrough.** DD-22 commits to resumable downloads by passing byte ranges to storage.
-  Garage's compatibility reference documents *operations* rather than per-operation parameters, so it
-  confirms `GetObject` without confirming `Range`. Every indication is that it works — the integrations
-  Garage documents depend on ranged reads — but DD-22's guarantee rests on it, so `A-03` asserts it
-  against a real Garage instance rather than inheriting it.
-- **No server-side encryption.** Garage does not implement it. Encryption at rest for artefact blobs
-  must therefore come from the volume beneath Garage, not from the store, and any requirement written in
-  those terms has to be read against disk-level encryption. Nothing in the design currently depends on
-  SSE; this is recorded so that a later requirement does not assume it silently.
+- **`Range` passthrough.** DD-22 commits to resumable downloads by passing byte ranges to storage. Garage's compatibility reference documents *operations* rather than per-operation parameters, so it confirms `GetObject` without confirming `Range`. Every indication is that it works — the integrations Garage documents depend on ranged reads — but DD-22's guarantee rests on it, so `A-03` asserts it against a real Garage instance rather than inheriting it.
+- **No server-side encryption.** Garage does not implement it. Encryption at rest for artefact blobs must therefore come from the volume beneath Garage, not from the store, and any requirement written in those terms has to be read against disk-level encryption. Nothing in the design currently depends on SSE; this is recorded so that a later requirement does not assume it silently.
 
-Object storage joins PostgreSQL as a documented prerequisite for **every** topology, including
-air-gapped. §5.1's promise that a mirror is "the same binary with an upstream configured" is preserved
-rather than weakened — storage does not become a second axis on which deployments differ.
+Object storage joins PostgreSQL as a documented prerequisite for **every** topology, including air-gapped. §5.1's promise that a mirror is "the same binary with an upstream configured" is preserved rather than weakened — storage does not become a second axis on which deployments differ.
 
-`AWSSDK.S3` is Apache-2.0, matching Forge's own licence, so §15.1's SBOM gains no clause to reason
-about.
+`AWSSDK.S3` is Apache-2.0, matching Forge's own licence, so §15.1's SBOM gains no clause to reason about.
 
-**This left one question open, and DD-22 answers it.** Whether an artefact download is a presigned
-redirect or streamed through Forge determines whether the *client* must reach object storage
-directly. `AWSSDK.S3` supports both, so the client choice foreclosed nothing.
+**This left one question open, and DD-22 answers it.** Whether an artefact download is a presigned redirect or streamed through Forge determines whether the *client* must reach object storage directly. `AWSSDK.S3` supports both, so the client choice foreclosed nothing.
 
 ### DD-22 — Artefacts are streamed through Forge and cached at a CDN
 
-**Context.** Three places described two different systems, and whichever one `C-01` implemented would
-have silently invalidated reasoning resting on the other:
+**Context.** Three places described two different systems, and whichever one `C-01` implemented would have silently invalidated reasoning resting on the other:
 
 | Where | Model implied |
 |---|---|
@@ -1138,129 +641,63 @@ have silently invalidated reasoning resting on the other:
 
 **Decision.** Three parts.
 
-1. **Artefacts are streamed through Forge.** `GET …/artifact` returns the bytes. There is no redirect
-   to object storage and no presigned URL on the download path.
-2. **Responses for public packages are cacheable at a CDN** — `Cache-Control: public, max-age=31536000,
-   immutable`, with the content hash as a strong `ETag`. Artefacts of packages that are not public are
-   served from origin under `Cache-Control: private, no-store` and never reach a shared cache
-   (`SSS-FG-REG-N2C`); the artefact URL is `@scope/name/version/artifact` and therefore guessable, so a
-   shared edge would otherwise serve private bytes to anyone who asked. The content hash remains the
-   `ETag` on both paths.
+1. **Artefacts are streamed through Forge.** `GET …/artifact` returns the bytes. There is no redirect to object storage and no presigned URL on the download path.
+2. **Responses for public packages are cacheable at a CDN** — `Cache-Control: public, max-age=31536000, immutable`, with the content hash as a strong `ETag`. Artefacts of packages that are not public are served from origin under `Cache-Control: private, no-store` and never reach a shared cache (`SSS-FG-REG-N2C`); the artefact URL is `@scope/name/version/artifact` and therefore guessable, so a shared edge would otherwise serve private bytes to anyone who asked. The content hash remains the `ETag` on both paths.
 3. **A download event is recorded on successful completion**, not when the request arrives (DD-15).
 
 **Reasoning.**
 
-*The client can only be assumed to reach Forge.* §5.1 puts on-premise, restricted-egress and
-air-gapped installations in scope. In those, object storage sits on an internal network and Forge sits
-behind a reverse proxy, so a presigned URL names a host the client can neither resolve nor reach. A
-redirect would fail precisely in the deployments the product targets, and it would fail at download —
-the one operation every user performs.
+*The client can only be assumed to reach Forge.* §5.1 puts on-premise, restricted-egress and air-gapped installations in scope. In those, object storage sits on an internal network and Forge sits behind a reverse proxy, so a presigned URL names a host the client can neither resolve nor reach. A redirect would fail precisely in the deployments the product targets, and it would fail at download — the one operation every user performs.
 
-*Immutability makes the CDN do the work, which is what removes the cost.* §8.1 fixes
-`{package, version}` permanently, so an artefact response never needs revalidating and can be held
-indefinitely. A CDN then answers nearly every request for a popular package without contacting the
-origin at all. This is the same property §5.1.4 exploits for the mirror cache — "artefacts are
-immutable, so they cache forever" — applied one layer further out. The bandwidth objection to
-streaming is real only where no CDN exists, and that is the small-deployment case where the volume
-is small.
+*Immutability makes the CDN do the work, which is what removes the cost.* §8.1 fixes `{package, version}` permanently, so an artefact response never needs revalidating and can be held indefinitely. A CDN then answers nearly every request for a popular package without contacting the origin at all. This is the same property §5.1.4 exploits for the mirror cache — "artefacts are immutable, so they cache forever" — applied one layer further out. The bandwidth objection to streaming is real only where no CDN exists, and that is the small-deployment case where the volume is small.
 
-*It is what DD-11 already assumed.* Its statement that the CDN "sits in front of the origin on the
-same hostname" only makes sense if the origin serves the bytes. Choosing the redirect would have
-required amending DD-11 instead.
+*It is what DD-11 already assumed.* Its statement that the CDN "sits in front of the origin on the same hostname" only makes sense if the origin serves the bytes. Choosing the redirect would have required amending DD-11 instead.
 
-*Counting becomes honest.* A redirect cannot observe whether the transfer completed, so it counts
-intent. Streaming can count delivery. §3.2 already warns that downloads are inflated by CI pipelines,
-mirrors and tooling; there is no reason to add abandoned transfers to that list when the alternative
-is free.
+*Counting becomes honest.* A redirect cannot observe whether the transfer completed, so it counts intent. Streaming can count delivery. §3.2 already warns that downloads are inflated by CI pipelines, mirrors and tooling; there is no reason to add abandoned transfers to that list when the alternative is free.
 
-*Why not make it configurable.* DD-02's argument applies unchanged: a second mode should not be built
-speculatively. Adding a redirect later is additive — a configuration switch and an alternate response
-on a route that does not move — so this is deferred rather than foreclosed, and the trigger would be
-measurement showing origin bandwidth is the constraint.
+*Why not make it configurable.* DD-02's argument applies unchanged: a second mode should not be built speculatively. Adding a redirect later is additive — a configuration switch and an alternate response on a route that does not move — so this is deferred rather than foreclosed, and the trigger would be measurement showing origin bandwidth is the constraint.
 
 **Consequences.**
 
-**The database connection is released before the body is streamed.** This is the rule most easily got
-wrong and the most damaging: holding a connection open while a slow client pulls a large kpar would
-tie a PostgreSQL connection to transfer duration, and §12.2's budget is sized for short queries, not
-for minutes. Metadata is resolved, the connection returns to the pool, and only then does the body
-flow.
+**The database connection is released before the body is streamed.** This is the rule most easily got wrong and the most damaging: holding a connection open while a slow client pulls a large kpar would tie a PostgreSQL connection to transfer duration, and §12.2's budget is sized for short queries, not for minutes. Metadata is resolved, the connection returns to the pool, and only then does the body flow.
 
-**`Range` requests are supported and passed through to object storage**, so an interrupted download of
-a large artefact resumes rather than restarting. `AWSSDK.S3` supports byte ranges (DD-21). This is
-free under a redirect and must be implemented here, which is the one place the redirect model was
-genuinely simpler.
+**`Range` requests are supported and passed through to object storage**, so an interrupted download of a large artefact resumes rather than restarting. `AWSSDK.S3` supports byte ranges (DD-21). This is free under a redirect and must be implemented here, which is the one place the redirect model was genuinely simpler.
 
-**The content hash is the `ETag`.** §12 already stores blobs content-addressed, so a strong validator
-exists without computing anything, and a repeat request revalidates to `304` rather than re-sending.
+**The content hash is the `ETag`.** §12 already stores blobs content-addressed, so a strong validator exists without computing anything, and a repeat request revalidates to `304` rather than re-sending.
 
-**DD-15's decoupling argument is narrowed but survives.** The download path does now touch Forge, so
-"need not touch PostgreSQL at all" no longer holds as stated. What remains — and what was always the
-load-bearing half — is that the request performs no synchronous counter update.
+**DD-15's decoupling argument is narrowed but survives.** The download path does now touch Forge, so "need not touch PostgreSQL at all" no longer holds as stated. What remains — and what was always the load-bearing half — is that the request performs no synchronous counter update.
 
-**§5.1.4's fetch-on-miss becomes invisible to the client.** A mirror that does not yet hold an
-artefact fetches and streams it on the same request, under the same URL. A redirect would have had to
-expose that as either a wait or a second hop.
+**§5.1.4's fetch-on-miss becomes invisible to the client.** A mirror that does not yet hold an artefact fetches and streams it on the same request, under the same URL. A redirect would have had to expose that as either a wait or a second hop.
 
-**Storage topology is never exposed.** No client learns the endpoint, bucket or key layout, which also
-means those can change without a client-visible migration.
+**Storage topology is never exposed.** No client learns the endpoint, bucket or key layout, which also means those can change without a client-visible migration.
 
 `C-03` records the event on completion, and `C-01` implements the above.
 
 ### DD-15 — Download counts are append-only and aggregated asynchronously
 
-**Context.** `SSS-FG-REG-X1K` requires download counts. The naive implementation increments a column
-on the package row on every download. This decision covers downloads only; the second metric of §3.2
-is not an event at all and is decided separately in DD-19.
+**Context.** `SSS-FG-REG-X1K` requires download counts. The naive implementation increments a column on the package row on every download. This decision covers downloads only; the second metric of §3.2 is not an event at all and is decided separately in DD-19.
 
-**Decision.** Record download events append-only, and aggregate them into a materialised count on a
-schedule. Never increment a counter synchronously on the request path. The aggregation runs as a
-claimed job with a transactional watermark (DD-17), which is what keeps it exactly-once across
-replicas.
+**Decision.** Record download events append-only, and aggregate them into a materialised count on a schedule. Never increment a counter synchronously on the request path. The aggregation runs as a claimed job with a transactional watermark (DD-17), which is what keeps it exactly-once across replicas.
 
 **Reasoning.** Three arguments, in ascending order of weight.
 
-*Write shape.* A synchronous increment puts every request for a package on the same row. Concurrent
-updates to one row serialise and each leaves a dead tuple for autovacuum, whereas appends to
-different pages do not contend at all. This is the weakest of the three: at §12.1's stated corpus —
-thousands of packages — single-row update contention is not where PostgreSQL gives out, and this
-argument should not be leaned on as though Forge were operating at nuget.org's volume, which §12.1
-explicitly argues it will not.
+*Write shape.* A synchronous increment puts every request for a package on the same row. Concurrent updates to one row serialise and each leaves a dead tuple for autovacuum, whereas appends to different pages do not contend at all. This is the weakest of the three: at §12.1's stated corpus — thousands of packages — single-row update contention is not where PostgreSQL gives out, and this argument should not be leaned on as though Forge were operating at nuget.org's volume, which §12.1 explicitly argues it will not.
 
-*Decoupling.* A synchronous increment makes the highest-volume operation in the registry depend on a
-write to the one component that does not scale out with the application (§12.2), so a database
-disturbance becomes failed downloads. This holds at any scale.
+*Decoupling.* A synchronous increment makes the highest-volume operation in the registry depend on a write to the one component that does not scale out with the application (§12.2), so a database disturbance becomes failed downloads. This holds at any scale.
 
-An earlier version of this argument said the download "need not touch PostgreSQL at all", on the
-assumption that it was a redirect to storage. DD-22 streams instead, so the request does reach a
-metadata lookup — but it still performs no synchronous *write*, which was always the load-bearing
-half. DD-22 additionally requires the database connection to be released before the body streams, so
-a slow client never holds one for the duration of a transfer.
+An earlier version of this argument said the download "need not touch PostgreSQL at all", on the assumption that it was a redirect to storage. DD-22 streams instead, so the request does reach a metadata lookup — but it still performs no synchronous *write*, which was always the load-bearing half. DD-22 additionally requires the database connection to be released before the body streams, so a slow client never holds one for the duration of a transfer.
 
-*Queryability, which is the real reason.* A running total can answer exactly one question forever. It
-cannot produce downloads over the last thirty days, a per-version breakdown, or a trend line on the
-package page. Events can produce all three, and history not recorded now cannot be reconstructed
-later. The counts are also displayed rounded ("1.2k downloads"), so they carry no requirement to be
-transactionally exact.
+*Queryability, which is the real reason.* A running total can answer exactly one question forever. It cannot produce downloads over the last thirty days, a per-version breakdown, or a trend line on the package page. Events can produce all three, and history not recorded now cannot be reconstructed later. The counts are also displayed rounded ("1.2k downloads"), so they carry no requirement to be transactionally exact.
 
-**Consequences.** Counts lag by the aggregation interval, which is acceptable for a popularity metric
-and must be stated in the API documentation so consumers do not treat them as exact. Deciding this
-now avoids a data migration later.
+**Consequences.** Counts lag by the aggregation interval, which is acceptable for a popularity metric and must be stated in the API documentation so consumers do not treat them as exact. Deciding this now avoids a data migration later.
 
-A mirror's download counts are **local**, since they record fetches this installation served. They
-are therefore not comparable with the origin's, and an installation displaying both its own counts
-and a replicated upstream index (§5.1.6) must not present them as one number.
+A mirror's download counts are **local**, since they record fetches this installation served. They are therefore not comparable with the origin's, and an installation displaying both its own counts and a replicated upstream index (§5.1.6) must not present them as one number.
 
 ### DD-19 — The dependents count is derived from the dependency graph, not recorded
 
-**Context.** §3.2's second popularity metric counts how many packages in the registry build on a
-given one. It is easily mistaken for an event — "times imported" — and an earlier draft of DD-15
-treated it as one, which would have meant recording something Forge never observes.
+**Context.** §3.2's second popularity metric counts how many packages in the registry build on a given one. It is easily mistaken for an event — "times imported" — and an earlier draft of DD-15 treated it as one, which would have meant recording something Forge never observes.
 
-**Decision.** The dependents count is **derived from the `usage[]` dependency graph Forge already
-holds**, not recorded from traffic. Package *Q* counts once toward *P* when **Q's latest listed
-version** declares a `usage[]` entry resolving to *P*. The count is maintained in the same
-transaction as the publish or unlist that changes it.
+**Decision.** The dependents count is **derived from the `usage[]` dependency graph Forge already holds**, not recorded from traffic. Package *Q* counts once toward *P* when **Q's latest listed version** declares a `usage[]` entry resolving to *P*. The count is maintained in the same transaction as the publish or unlist that changes it.
 
 Four rules follow, and each excludes a plausible alternative:
 
@@ -1271,131 +708,63 @@ Four rules follow, and each excludes a plausible alternative:
 | **Direct** dependencies only | A transitive closure that credits foundational packages twice over |
 | Unlisted dependents do not count | Contradicting §8.1, where unlisting hides from search and resolution |
 
-**Reasoning.** §9.1 establishes that `.project.json`'s `usage[]` **is** the dependency graph and does
-not need reconstructing, so the count is a query over data the registry already stores. Nothing
-happens at request time, so there is nothing to append.
+**Reasoning.** §9.1 establishes that `.project.json`'s `usage[]` **is** the dependency graph and does not need reconstructing, so the count is a query over data the registry already stores. Nothing happens at request time, so there is nothing to append.
 
-That in turn means **none of DD-15's machinery applies**: no event table, no aggregation job, no
-watermark, no eventual consistency. The count changes only when a version is published or unlisted,
-and those are rare next to downloads by many orders of magnitude, so maintaining the aggregate inside
-the publish transaction is affordable and makes the number exact rather than lagging.
+That in turn means **none of DD-15's machinery applies**: no event table, no aggregation job, no watermark, no eventual consistency. The count changes only when a version is published or unlisted, and those are rare next to downloads by many orders of magnitude, so maintaining the aggregate inside the publish transaction is affordable and makes the number exact rather than lagging.
 
-**Consequences.** The count is exact and needs no reconciliation, which is a stronger guarantee than
-downloads get and should be documented as such rather than left for a consumer to discover.
+**Consequences.** The count is exact and needs no reconciliation, which is a stronger guarantee than downloads get and should be documented as such rather than left for a consumer to discover.
 
-Publishing a new version of *Q* that drops its dependency on *P* **decrements** *P*. Maintenance is
-therefore a diff between the outgoing and incoming latest-listed versions, not an increment — the
-single most likely implementation error here, because every other counter in the design only ever
-goes up.
+Publishing a new version of *Q* that drops its dependency on *P* **decrements** *P*. Maintenance is therefore a diff between the outgoing and incoming latest-listed versions, not an increment — the single most likely implementation error here, because every other counter in the design only ever goes up.
 
-Unlike downloads, the count works identically on a mirror and in an air-gapped installation, because
-it is computed from the replicated metadata index (§5.1.6) rather than from traffic this installation
-served. The two metrics therefore behave differently under mirroring, which is a further reason the
-interface must not present them as one number.
+Unlike downloads, the count works identically on a mirror and in an air-gapped installation, because it is computed from the replicated metadata index (§5.1.6) rather than from traffic this installation served. The two metrics therefore behave differently under mirroring, which is a further reason the interface must not present them as one number.
 
 ### DD-20 — Forge owns its identity registry and ships its own provider
 
-**Context.** §13 previously delegated all of identity to Fabric's Keycloak, and the sentence "no
-Forge-specific registration exists" carried more weight than its length suggested: Accounts,
-Organizations, membership, invitations and deprovisioning were all inherited rather than modelled.
-The platform architecture no longer permits a shared Keycloak, and the product intent is now that
-**Forge must be deployable without Fabric and Bloom** (DD-20).
+**Context.** §13 previously delegated all of identity to Fabric's Keycloak, and the sentence "no Forge-specific registration exists" carried more weight than its length suggested: Accounts, Organizations, membership, invitations and deprovisioning were all inherited rather than modelled. The platform architecture no longer permits a shared Keycloak, and the product intent is now that **Forge must be deployable without Fabric and Bloom** (DD-20).
 
 **Decision.** Three parts.
 
-1. **Forge owns Account, Organization and Membership as first-class domain entities** (§8). They are
-   Forge's records, not projections of an external directory.
-2. **A Keycloak ships with the deployment**, pre-configured with a Forge realm. Interactive
-   authentication is OIDC against it.
-3. **Federation to an external provider is configuration, not a requirement.** Where Fabric's IdP or
-   an enterprise IdP exists, Forge's Keycloak brokers to it. Where none exists, Forge works unchanged.
+1. **Forge owns Account, Organization and Membership as first-class domain entities** (§8). They are Forge's records, not projections of an external directory.
+2. **A Keycloak ships with the deployment**, pre-configured with a Forge realm. Interactive authentication is OIDC against it.
+3. **Federation to an external provider is configuration, not a requirement.** Where Fabric's IdP or an enterprise IdP exists, Forge's Keycloak brokers to it. Where none exists, Forge works unchanged.
 
-The first administrator is **seeded from configuration** — an operator-supplied identifier granted
-administrator on first start.
+The first administrator is **seeded from configuration** — an operator-supplied identifier granted administrator on first start.
 
 **Reasoning.**
 
-*The shape is one the design already uses twice.* §5.1 says "a mirror is not a separate product, it is
-the same binary with an upstream configured", and DD-03 selects deployment roles by configuration
-rather than by a second build. Standalone Forge is the same binary with no external IdP configured.
-That also satisfies `SSS-CC-ADAPT-G1P`'s requirement that adaptation be declarative, which §5.1
-already cites for the same reason.
+*The shape is one the design already uses twice.* §5.1 says "a mirror is not a separate product, it is the same binary with an upstream configured", and DD-03 selects deployment roles by configuration rather than by a second build. Standalone Forge is the same binary with no external IdP configured. That also satisfies `SSS-CC-ADAPT-G1P`'s requirement that adaptation be declarative, which §5.1 already cites for the same reason.
 
-*Why own the registry rather than federate for it.* Federation supplies authentication, not
-organization membership. `SSS-FG-AUTH-S2B` resolves a scope to an Account or Organization slug,
-`SSS-FG-AUTH-G6F` lets an Account publish on behalf of an Organization, and `SSS-FG-AUTH-O4D` requires
-at least one individual-Account Owner. Those are authorisation facts Forge must be able to answer
-with or without an upstream directory, so they belong in Forge's database. A pleasant side effect:
-§8.2's "authorised against the credential" becomes a join against a membership table rather than
-claim parsing.
+*Why own the registry rather than federate for it.* Federation supplies authentication, not organization membership. `SSS-FG-AUTH-S2B` resolves a scope to an Account or Organization slug, `SSS-FG-AUTH-G6F` lets an Account publish on behalf of an Organization, and §8.6 makes an Organization's membership the only source of authority over its packages. Those are authorisation facts Forge must be able to answer with or without an upstream directory, so they belong in Forge's database. A pleasant side effect: §8.2's "authorised against the credential" becomes a join against a membership table rather than claim parsing.
 
-*Why bundle a provider rather than require one.* §12.1 rejects ParadeDB and DD-17 rejects a message
-broker on the same principle — do not make every on-premise customer run more infrastructure. That
-principle is honoured here rather than broken: bundling is what *avoids* the operator having to stand
-one up. It is also the component `F-07` already needs for development, so the development and
-production shapes become the same rather than one standing in for the other.
+*Why bundle a provider rather than require one.* §12.1 rejects ParadeDB and DD-17 rejects a message broker on the same principle — do not make every on-premise customer run more infrastructure. That principle is honoured here rather than broken: bundling is what *avoids* the operator having to stand one up. It is also the component `F-07` already needs for development, so the development and production shapes become the same rather than one standing in for the other.
 
-*Why not Forge-local credentials.* A username-and-password store would be genuinely
-zero-dependency, but Forge would then hold credentials. §13 currently stores only API key hashes, and
-that is a security surface worth keeping closed.
+*Why not Forge-local credentials.* A username-and-password store would be genuinely zero-dependency, but Forge would then hold credentials. §13 currently stores only API key hashes, and that is a security surface worth keeping closed.
 
-*Why a seeded administrator rather than first-login-wins.* First-login-wins races on any installation
-reachable before the intended administrator arrives, and leaves nothing in the audit trail
-(`SSS-FG-AUTH-R9J`) explaining why that account holds the role. A configured identifier is explicit,
-auditable, and works unattended in the air-gapped installations of §5.1.
+*Why a seeded administrator rather than first-login-wins.* First-login-wins races on any installation reachable before the intended administrator arrives, and leaves nothing in the audit trail (`SSS-FG-AUTH-R9J`) explaining why that account holds the role. A configured identifier is explicit, auditable, and works unattended in the air-gapped installations of §5.1.
 
 **Consequences.**
 
-**Forge needs an account and organization administration surface that the design previously had no
-need for**: account provisioning on first login, organization creation, membership and roles,
-invitations, deprovisioning, and the seeded-administrator bootstrap. None of it existed while identity
-was inherited. It is phase 1 work, because publish is authorised against scope (§8.2) and §8.1's
-owner invariant is enforced in the domain layer.
+**Forge needs an account and organization administration surface that the design previously had no need for**: account provisioning on first login, organization creation, membership and roles, invitations, deprovisioning, and the seeded-administrator bootstrap. None of it existed while identity was inherited. It is phase 1 work, because publish is authorised against scope (§8.2) and §8.1's owner invariant is enforced in the domain layer.
 
-**§8's model grows, and that lands on the critical path.** Since DD-18 the Enterprise Architect model
-is upstream of the DTOs, the DAOs and the schema, so adding Account, Organization and Membership
-enlarges the one item §19 already identifies as the likeliest to slip quietly because it is not a
-coding task.
+**§8's model grows, and that lands on the critical path.** Since DD-18 the Enterprise Architect model is upstream of the DTOs, the DAOs and the schema, so adding Account, Organization and Membership enlarges the one item §19 already identifies as the likeliest to slip quietly because it is not a coding task.
 
-**Organization slugs are now Forge's to allocate**, which makes §5.1.2's rule — rejecting creation of
-a local Organization whose slug is in the proxied set — enforceable by Forge directly rather than
-dependent on an external directory.
+**Organization slugs are now Forge's to allocate**, which makes §5.1.2's rule — rejecting creation of a local Organization whose slug is in the proxied set — enforceable by Forge directly rather than dependent on an external directory.
 
-**Membership can drift from Fabric's** where both exist and federation carries authentication only. An
-account removed from an organization upstream retains its Forge rights until Forge is told. Where that
-matters, group or role claims from the upstream provider can be mapped onto Forge memberships — but
-that is a configuration option, not a guarantee, and it should be documented as such rather than
-assumed.
+**Membership can drift from Fabric's** where both exist and federation carries authentication only. An account removed from an organization upstream retains its Forge rights until Forge is told. Where that matters, group or role claims from the upstream provider can be mapped onto Forge memberships — but that is a configuration option, not a guarantee, and it should be documented as such rather than assumed.
 
-**§13.1's verified-publisher programme becomes unambiguously Forge's own.** With no upstream identity
-authority, there is nobody else who could vouch that `@esa` is ESA. It remains deferred.
+**§13.1's verified-publisher programme becomes unambiguously Forge's own.** With no upstream identity authority, there is nobody else who could vouch that `@esa` is ESA. It remains deferred.
 
-**Unaffected:** API keys (`SSS-FG-REG-Y2L`) were always Forge's own and never touched Keycloak, so the
-CI/CD publish path is unchanged. Anonymous read access (`SSS-FG-REG-W9J`) is unchanged, which is most
-of the registry. §5.1.7's upstream credential is an API key, so mirroring is unchanged.
+**Unaffected:** API keys (`SSS-FG-REG-Y2L`) were always Forge's own and never touched Keycloak, so the CI/CD publish path is unchanged. Anonymous read access (`SSS-FG-REG-W9J`) is unchanged, which is most of the registry. §5.1.7's upstream credential is an API key, so mirroring is unchanged.
 
 ### DD-16 — Mirror routing is scope-level, with no package-level override
 
-**Context.** An on-premise Forge can proxy an upstream while hosting local packages (§5.1). Where both
-origins could supply the same identifier, something must decide. Nexus and Artifactory resolve this by
-ordering repositories within a group, which allows a locally published package to shadow the upstream
-one of the same name — the standard enterprise mechanism for shipping a patched dependency.
+**Context.** An on-premise Forge can proxy an upstream while hosting local packages (§5.1). Where both origins could supply the same identifier, something must decide. Nexus and Artifactory resolve this by ordering repositories within a group, which allows a locally published package to shadow the upstream one of the same name — the standard enterprise mechanism for shipping a patched dependency.
 
-**Decision.** Routing is **per scope**, and a scope has exactly one origin. Package-level overrides are
-not supported. Conflicts are rejected at configuration and Organization-creation time rather than
-resolved at request time.
+**Decision.** Routing is **per scope**, and a scope has exactly one origin. Package-level overrides are not supported. Conflicts are rejected at configuration and Organization-creation time rather than resolved at request time.
 
-**Reasoning.** Silent shadowing is the mechanism behind dependency-confusion attacks, which have
-repeatedly succeeded against npm and PyPI users. It also breaks the guarantee §8.2 rests on — that a
-scope identifies who vouches for its content. A model referencing `@esa/ECSS-MM-THE` would receive
-something ESA never published, with no signal at the point of use. It contradicts the content-hash
-fallback in §8.2 as well: one rule would say "identical bytes or nothing", while the other quietly
-served different bytes.
+**Reasoning.** Silent shadowing is the mechanism behind dependency-confusion attacks, which have repeatedly succeeded against npm and PyPI users. It also breaks the guarantee §8.2 rests on — that a scope identifies who vouches for its content. A model referencing `@esa/ECSS-MM-THE` would receive something ESA never published, with no signal at the point of use. It contradicts the content-hash fallback in §8.2 as well: one rule would say "identical bytes or nothing", while the other quietly served different bytes.
 
-**Consequences.** The patched-dependency workflow is still available, but explicitly: publish the patch
-into your own scope as `@acme/ECSS-MM-THE` and reference it directly. One deliberate edit in the
-depending model, and provenance remains truthful. Organisations accustomed to transparent shadowing in
-Nexus will find this stricter, and the difference should be documented rather than discovered.
+**Consequences.** The patched-dependency workflow is still available, but explicitly: publish the patch into your own scope as `@acme/ECSS-MM-THE` and reference it directly. One deliberate edit in the depending model, and provenance remains truthful. Organisations accustomed to transparent shadowing in Nexus will find this stricter, and the difference should be documented rather than discovered.
 
 ---
 
@@ -1403,32 +772,18 @@ Nexus will find this stricter, and the difference should be documented rather th
 
 Render mode is an **engineering decision**, derived from the platform requirements below.
 
-It is deliberately **not** derived from the visual design. The Figma prototype is used here only as an
-inventory of which screens exist and what each one is for; how a screen is drawn carries no
-architectural intent, and the designer holds no position on render modes. Any interaction model the
-design calls for — live filtering, typeahead, inline editing — is implementable under any of these
-modes. If the interaction model changes, the assignment below does not automatically change with it.
+It is deliberately **not** derived from the visual design. The Figma prototype is used here only as an inventory of which screens exist and what each one is for; how a screen is drawn carries no architectural intent, and the designer holds no position on render modes. Any interaction model the design calls for — live filtering, typeahead, inline editing — is implementable under any of these modes. If the interaction model changes, the assignment below does not automatically change with it.
 
 ### 7.1 Criteria
 
 Four platform requirements determine the assignment:
 
 1. **Horizontal scaling.** Rules out InteractiveServer everywhere (DD-02).
-2. **Unauthenticated reach and discoverability.** `SSS-FG-REG-W9J` requires the interface to be
-   reachable by unauthenticated users. A registry additionally depends on its pages being crawlable,
-   linkable and cacheable at a CDN. Static SSR is the only mode that delivers this with no runtime
-   download.
-3. **First-load cost.** The WebAssembly runtime is a one-off download per client. Acceptable behind
-   authentication, where the audience is small and returning; not acceptable on a public landing or
-   package page, where it is paid by every anonymous visitor and every crawler.
-4. **Client-held state.** A screen justifies an island only if its behaviour depends on state that
-   genuinely cannot be round-tripped. "Awkward to round-trip" does not qualify: a form and a redirect
-   are cheap, and the bar has to be capability, not convenience, or criterion 3 is defeated by
-   accumulation.
+2. **Unauthenticated reach and discoverability.** `SSS-FG-REG-W9J` requires the interface to be reachable by unauthenticated users. A registry additionally depends on its pages being crawlable, linkable and cacheable at a CDN. Static SSR is the only mode that delivers this with no runtime download.
+3. **First-load cost.** The WebAssembly runtime is a one-off download per client. Acceptable behind authentication, where the audience is small and returning; not acceptable on a public landing or package page, where it is paid by every anonymous visitor and every crawler.
+4. **Client-held state.** A screen justifies an island only if its behaviour depends on state that genuinely cannot be round-tripped. "Awkward to round-trip" does not qualify: a form and a redirect are cheap, and the bar has to be capability, not convenience, or criterion 3 is defeated by accumulation.
 
-The rule that falls out is: **public and anonymous ⇒ static SSR; interactivity only where criterion 4
-is genuinely met.** §7.2 is that rule applied, and §7.4 works through criterion 4 case by case —
-where it lands is that no screen currently meets it.
+The rule that falls out is: **public and anonymous ⇒ static SSR; interactivity only where criterion 4 is genuinely met.** §7.2 is that rule applied, and §7.4 works through criterion 4 case by case — where it lands is that no screen currently meets it.
 
 ### 7.2 Assignment
 
@@ -1451,9 +806,7 @@ where it lands is that no screen currently meets it.
 
 ### 7.3 The header search
 
-The header search appears on every page, including the entirely public ones, so whatever mechanism it
-uses is paid for by every anonymous visitor and every crawler. It is the one component whose
-implementation choice has whole-site consequences.
+The header search appears on every page, including the entirely public ones, so whatever mechanism it uses is paid for by every anonymous visitor and every crawler. It is the one component whose implementation choice has whole-site consequences.
 
 It decomposes into three parts with very different costs:
 
@@ -1463,234 +816,98 @@ It decomposes into three parts with very different costs:
 | The `Ctrl K` shortcut | A few lines of JavaScript binding `keydown` to `.focus()`. Works on a static page |
 | A results dropdown updating as you type | Debounce, a fetch per keystroke, DOM rendering, arrow-key navigation, `Escape`/`Enter` handling, ARIA combobox semantics — this is the only part needing either substantial hand-written JavaScript or a component runtime |
 
-**Decision: there is no live dropdown.** Pressing `Enter` submits the form and navigates to
-`/packages?q=…`, which renders server-side like any other page. The input is HTML, the shortcut is a
-handful of lines, and the public surface stays entirely free of a component runtime.
+**Decision: there is no live dropdown.** Pressing `Enter` submits the form and navigates to `/packages?q=…`, which renders server-side like any other page. The input is HTML, the shortcut is a handful of lines, and the public surface stays entirely free of a component runtime.
 
 Three consequences:
 
-- **No `AutocompleteService`.** That resource type existed solely to feed the dropdown, so it is not
-  built, documented or versioned.
-- **No design-system inconsistency.** A hand-written JavaScript palette could not have used
-  BlazorBlueprint, which would have made the one component present on every page the one component
-  outside the design system. A plain input is styled like any other static markup.
-- **Responsiveness comes from enhanced navigation.** Submitting to `/packages?q=…` is a single round
-  trip that swaps the page body without a full reload, which at this corpus size is fast enough that a
-  dropdown would be polish rather than capability.
+- **No `AutocompleteService`.** That resource type existed solely to feed the dropdown, so it is not built, documented or versioned.
+- **No design-system inconsistency.** A hand-written JavaScript palette could not have used BlazorBlueprint, which would have made the one component present on every page the one component outside the design system. A plain input is styled like any other static markup.
+- **Responsiveness comes from enhanced navigation.** Submitting to `/packages?q=…` is a single round trip that swaps the page body without a full reload, which at this corpus size is fast enough that a dropdown would be polish rather than capability.
 
 ### 7.4 Criterion 4, screen by screen
 
-The four screens that previously carried islands were assigned before §7.3 removed the dropdown. Each
-is re-tested against criterion 4 here. None survives, which is what DD-02 records.
+The four screens that previously carried islands were assigned before §7.3 removed the dropdown. Each is re-tested against criterion 4 here. None survives, which is what DD-02 records.
 
-**Publish — upload progress.** The upload is a multipart `POST`; validation failures re-render the
-form with errors, as on any other form. That leaves only the progress indicator, and progress is not
-Forge's to display: `SSS-FB-OBS-P7G` requires **Fabric** to publish progress events for long-running
-operations — package publication named explicitly — over SignalR, for **Bloom** to display. A progress
-bar in the Forge publish page would be a second implementation of something the platform already
-places elsewhere. What remains is the browser's own upload indication, which is what every other
-file-upload form on the web relies on.
+**Publish — upload progress.** The upload is a multipart `POST`; validation failures re-render the form with errors, as on any other form. That leaves only the progress indicator, and progress is not Forge's to display: `SSS-FB-OBS-P7G` requires **Fabric** to publish progress events for long-running operations — package publication named explicitly — over SignalR, for **Bloom** to display. A progress bar in the Forge publish page would be a second implementation of something the platform already places elsewhere. What remains is the browser's own upload indication, which is what every other file-upload form on the web relies on.
 
-**Package settings — destructive actions.** Confirmation does not need client-held state; it needs a
-confirmation *page*. Doing it as a page is better rather than merely adequate: the URL is addressable,
-it survives a refresh, it can require the package name to be typed, and it makes an irreversible
-action deliberate instead of one click inside a modal. This is a case where the static answer is the
-stronger design.
+**Package settings — destructive actions.** Confirmation does not need client-held state; it needs a confirmation *page*. Doing it as a page is better rather than merely adequate: the URL is addressable, it survives a refresh, it can require the package name to be typed, and it makes an irreversible action deliberate instead of one click inside a modal. This is a case where the static answer is the stronger design.
 
-The destructive action reachable from package settings is **unlisting**, not deletion. Neither an Owner
-nor an Organization Administrator can delete a package or erase a published version; that is reserved
-to the Installation Administrator and is not part of the package-settings surface at all
-(`SSS-FG-AUTH-E7N`).
+The destructive action reachable from package settings is **unlisting**, not deletion. Neither an Owner nor an Organization Administrator can delete a package or erase a published version; that is reserved to the Installation Administrator and is not part of the package-settings surface at all (`SSS-FG-AUTH-E7N`).
 
-**API keys — the one-time secret reveal.** This looks like the strongest candidate and is worth
-stating carefully, because it is where the reasoning is least obvious.
+**API keys — the one-time secret reveal.** This looks like the strongest candidate and is worth stating carefully, because it is where the reasoning is least obvious.
 
-The secret is generated server-side and only its hash is stored, so it can never be re-fetched — that
-is the point of the scheme. Under strict `POST`-redirect-`GET` the plaintext would therefore have to
-survive the redirect, which means either persisting it (defeating the hashing) or holding it in a
-shared one-shot store (server-side state, against §12). The resolution is to render the secret in the
-`200` response to the `POST` itself, where it exists in exactly one response body and is never stored.
-The usual objection to that shape — a refresh re-submits — is handled by an idempotency token on the
-form, so a resubmission returns the same result rather than minting a second key.
+The secret is generated server-side and only its hash is stored, so it can never be re-fetched — that is the point of the scheme. Under strict `POST`-redirect-`GET` the plaintext would therefore have to survive the redirect, which means either persisting it (defeating the hashing) or holding it in a shared one-shot store (server-side state, against §12). The resolution is to render the secret in the `200` response to the `POST` itself, where it exists in exactly one response body and is never stored. The usual objection to that shape — a refresh re-submits — is handled by an idempotency token on the form, so a resubmission returns the same result rather than minting a second key.
 
-An island would not have avoided any of this. The server generates the key either way, so the secret
-crosses the wire either way; interactivity would only have changed where it was painted.
+An island would not have avoided any of this. The server generates the key either way, so the secret crosses the wire either way; interactivity would only have changed where it was painted.
 
-**`Add to project` — selection across a modal.** Selection state in a form is what form controls are.
-That this screen is drawn as an overlay is a presentation choice from the prototype, and per the
-preamble to this section presentation carries no architectural intent; an overlay can be a page.
+**`Add to project` — selection across a modal.** Selection state in a form is what form controls are. That this screen is drawn as an overlay is a presentation choice from the prototype, and per the preamble to this section presentation carries no architectural intent; an overlay can be a page.
 
-**What would reverse this.** A screen whose state genuinely cannot round-trip — live collaborative
-editing, a canvas, a client-side diff, an editor with unsaved buffers. None is in scope. If one
-arrives, DD-01's opt-in default means it is added as one component plus one project, disturbing
-nothing that exists.
+**What would reverse this.** A screen whose state genuinely cannot round-trip — live collaborative editing, a canvas, a client-side diff, an editor with unsaved buffers. None is in scope. If one arrives, DD-01's opt-in default means it is added as one component plus one project, disturbing nothing that exists.
 
 ---
 
 ## 8. Domain model
 
-```mermaid
-classDiagram
-    class Account {
-        +string Subject
-        +string Handle
-    }
-    class Organization {
-        +string Slug
-        +string DisplayName
-    }
-    class Membership {
-        +OrganizationRole Role
-    }
-    class Scope {
-        +string Slug
-        +ScopeKind Kind
-    }
-    class Package {
-        +Scope Scope
-        +string Name
-        +ArtifactKind Kind
-        +Visibility Visibility
-    }
-    class PackageVersion {
-        +SemanticVersion Version
-        +string BlobReference
-        +Checksum Checksum
-        +bool IsListed
-        +DateTimeOffset PublishedAt
-    }
-    class Maintainer {
-        +MaintainerRole Role
-    }
-    class ApiKey {
-        +string[] Scopes
-        +DateTimeOffset? RevokedAt
-    }
-    class AuditEntry {
-        +string Operation
-        +DateTimeOffset OccurredAt
-    }
-    class IArtifactManifest {
-        <<interface>>
-    }
-
-    Account "1" --> "*" Membership
-    Organization "1" --> "*" Membership
-    Account "1" --> "0..1" Scope
-    Organization "1" --> "0..1" Scope
-    Account "1" --> "*" Maintainer
-    Scope "1" --> "*" Package
-    Package "1" --> "*" PackageVersion
-    Package "1" --> "*" Maintainer
-    Package "1" --> "*" AuditEntry
-    PackageVersion --> IArtifactManifest
-    IArtifactManifest <|.. KparManifest
-    IArtifactManifest <|.. CapellaManifest
-    IArtifactManifest <|.. Ecss1025Manifest
-    IArtifactManifest <|.. SysMlV1Manifest
-```
-
-Every entity additionally carries a **UUIDv7 surrogate primary key** (DD-23) — *surrogate* meaning an
-identifier invented to distinguish a row rather than to describe it, standing alongside the natural key
-rather than replacing it. It is deliberately absent
-from the diagram: it is a persistence concern with no domain meaning, and the identity that matters at
-this level is the natural one — a handle, a slug, `{Scope, Name}`, `{Package, Version}`.
-
-Two enumerations carry the access model:
-
-- **`Visibility`** is `Private`, `OrganizationVisible` or `Public`, set on the Package by an Owner and
-  defaulting to `Private` unless the owning Organization configures otherwise (`SSS-FG-AUTH-V6K`). It
-  is orthogonal to `PackageVersion.IsListed`: unlisting is a deprecation signal that still serves
-  direct downloads (`SSS-FG-REG-U4D`), so a package may be public-and-unlisted or private-and-listed.
-- **`MaintainerRole`** is `Owner`, `Maintainer` or `Reader`. `Reader` grants read access where
-  visibility would otherwise exclude the principal and confers no write authority; it is not
-  assignable on a public package, where it would express nothing (`SSS-FG-AUTH-K9R`).
+The domain model is mantained at [mycelium-model](https://github.com/mycelium-cmbse/mycelium-model). 
 
 ### 8.1 Invariants
 
 | Invariant | Source |
 |---|---|
-| `{package identifier, version}` is immutable once published | `SSS-FG-REG-I3C` |
+| The content bound to `{package identifier, version}` never changes once published | `SSS-FG-REG-I3C` |
+| A retired scope slug (scope.shortName) is never reassigned, and resolves to its successor forever | §8.5 |
+| `OrganizationVisible` is rejected on a package in an Account scope | `SSS-FG-AUTH-V6K`; §3.2 |
 | A new version must be strictly greater than every prior version | `SSS-FG-REG-S2B` |
 | A major-version change requires release notes | `SSS-FG-REG-S2B` |
 | Unlisting hides from search and resolution but still serves direct downloads | `SSS-FG-REG-U4D` |
-| A package always retains at least one individual-Account Owner — a Forge Account, per DD-20 | `SSS-FG-AUTH-O4D` |
-| An Organization Owner alone does not satisfy that invariant | `SSS-FG-AUTH-P7G` |
-| Ownership transfer takes effect only on explicit acceptance | `SSS-FG-AUTH-T5E` |
+| An Organization always has at least one member, and at least one of them is an Organization Administrator. The Account holding that role last cannot be deleted while it is an administrator | §8.6; `SSS-FG-ORG-R5V` |
+| A retired package identifier is never reassigned, and resolves to the package's current scope forever | §8.7 |
+| A package moves to another scope only where that scope holds no package of the same name | §8.7 |
+| An Account with an unverified email address may not publish and may not hold a package role | `SSS-FG-ACC-R1B` |
+| The installation always has at least one Installation Administrator | `SSS-FG-ACC-M6K` |
 | Package metadata is frozen at publish time and never edited directly | `SSS-FG-AUTH-M3C` |
 | The scope is declared at publish time and authorised against the credential | `SSS-FG-AUTH-S2B`, `G6F`; §8.2 |
 | `<package-name>` equals the manifest `name` where the format has a manifest | §8.2 |
 
-That last invariant is structural, not merely a rule. Where the format carries a manifest, the
-registry's metadata is a **projection of the uploaded artefact**, so there is no editable metadata
-record to protect. Where it does not — see §9.2.1 — the publisher supplies it once at publish time and
-it is frozen with the version. The source differs; the immutability does not.
+That last invariant is structural, not merely a rule. Where the format carries a manifest, the registry's metadata is a **projection of the uploaded artefact**, so there is no editable metadata record to protect. Where it does not — see §9.2.1 — the publisher supplies it once at publish time and it is frozen with the version. The source differs; the immutability does not.
 
 ### 8.2 Scope assignment and package identity
 
-KerML `.project.json` carries a bare `name` with no namespace, while `SSS-FG-AUTH-S2B` requires
-registry identifiers of the form `@<scope>/<package-name>` where the scope resolves to an Account or
-Organization slug. **Scope is therefore a registry concept with no counterpart in the artefact**, and
-the rules for assigning it must be stated rather than inferred.
+KerML `.project.json` carries a bare `name` with no namespace, while `SSS-FG-AUTH-S2B` requires registry identifiers of the form `@<scope>/<package-name>` where the scope resolves to an Account or Organization slug. **Scope is therefore a registry concept with no counterpart in the artefact**, and the rules for assigning it must be stated rather than inferred.
 
 | Rule | |
 |---|---|
 | **Scope is declared at publish time and authorised** against the credential | Not derived from it. `SSS-FG-AUTH-G6F` permits an Account to publish on behalf of an Organization, so a publisher with rights in several scopes must be able to say which one this publication targets |
 | `<package-name>` **must equal** the manifest `name`, where the format has a manifest | Prevents the registry identifier and the artefact's own identity from diverging |
-| A mismatch is **rejected**, not warned | §8.1 makes the identifier immutable once published; a warning would let the mismatch become permanent with no correction path short of publishing a new version |
+| A mismatch is **rejected**, not warned | The unscoped part of the identifier is fixed at publish and, unlike the scope (§8.5), has no rename path; a warning would let the mismatch become permanent with no correction short of publishing a new version |
 | For formats without a manifest (§9.2.1), the publisher supplies both parts | There is no manifest `name` to disagree with |
 
 #### Publishing the same package into multiple organisations
 
-This is supported and is the reason scope is declared rather than derived. Because scope lives outside
-the manifest, one artefact publishes unchanged to `@esa/ECSS-MM-THE` and `@starion/ECSS-MM-THE` — the
-manifest `name` matches the unscoped part in both cases, so name equality is preserved.
+This is supported and is the reason scope is declared rather than derived. Because scope lives outside the manifest, one artefact publishes unchanged to `@esa/ECSS-MM-THE` and `@starion/ECSS-MM-THE` — the manifest `name` matches the unscoped part in both cases, so name equality is preserved.
 
 Three consequences follow, and none is incidental:
 
-- **They are two independent packages, not a mirror.** Each has its own Maintainer set, its own
-  unlisting state, its own audit trail, and its own version sequence. Nothing links them, and
-  unlisting one has no effect on the other. The registry has no concept of "the same package in two
-  places" — it has two packages that happen to share content.
-- **Storage deduplicates automatically.** §12's blob store is content-addressed, so identical bytes are
-  stored once and referenced by both package versions. Publishing into a second scope costs metadata
-  only.
-- **Qualified-name resolution becomes genuinely ambiguous.** the resolution endpoint (`SSS-FG-REG-Z5Q`) returns the
-  package versions defining a name; with multi-scope publishing, several answers is the *normal* case
-  rather than an edge case. The service returns all of them, and the caller — Bloom's package picker,
-  or a resolver — chooses. It must not pick one arbitrarily and present it as the answer.
+- **They are two independent packages, not a mirror.** Each has its own owner, its own unlisting state, its own audit trail, and its own version sequence. Nothing links them, and unlisting one has no effect on the other. The registry has no concept of "the same package in two places" — it has two packages that happen to share content.
+- **Storage deduplicates automatically.** §12's blob store is content-addressed, so identical bytes are stored once and referenced by both package versions. Publishing into a second scope costs metadata only.
+- **Qualified-name resolution becomes genuinely ambiguous.** the resolution endpoint (`SSS-FG-REG-Z5Q`) returns the package versions defining a name; with multi-scope publishing, several answers is the *normal* case rather than an edge case. The service returns all of them, and the caller — Bloom's package picker, or a resolver — chooses. It must not pick one arbitrarily and present it as the answer.
 
 #### Resolving a dependency when the declared version cannot be served
 
-A `usage[]` entry names a specific scope's copy by IRI. Resolution follows that IRI exactly. The
-question is what happens when the declared version **cannot be served** — because it was unlisted
-(`SSS-FG-REG-U4D`), because the scope was deleted, or because this installation does not hold it.
+A `usage[]` entry names a specific scope's copy by IRI. Resolution follows that IRI exactly. The question is what happens when the declared version **cannot be served** — because it was unlisted (`SSS-FG-REG-U4D`), because the scope was deleted, or because this installation does not hold it.
 
 **Fallback is by content hash only, never by name.**
 
-If the declared version is unavailable, Forge may serve a package version whose content hash is
-identical to the one requested, and reports the substitution to the caller. If no byte-identical copy
-exists, resolution fails.
+If the declared version is unavailable, Forge may serve a package version whose content hash is identical to the one requested, and reports the substitution to the caller. If no byte-identical copy exists, resolution fails.
 
-**The candidate set is restricted to artefacts the requester is authorised to read** (`SSS-FG-REG-H8F`).
-The filter is on the requester's authorisation rather than on the artefact's visibility: filtering the
-other way would let identical content act as an oracle for the existence of private packages. Where
-the only byte-identical copies are invisible to the requester, resolution fails exactly as if none
-existed, and the substitution report names only a scope the caller can already see.
+**The candidate set is restricted to artefacts the requester is authorised to read** (`SSS-FG-REG-H8F`). The filter is on the requester's authorisation rather than on the artefact's visibility: filtering the other way would let identical content act as an oracle for the existence of private packages. Where the only byte-identical copies are invisible to the requester, resolution fails exactly as if none existed, and the substitution report names only a scope the caller can already see.
 
 The distinction is the whole decision:
 
-- **Matching by name** — serving `@starion/ECSS-MM-THE` because `@esa/ECSS-MM-THE` is missing — is
-  unsafe. §8.2 makes those independent packages with different maintainer sets and independent version
-  sequences; identical content today implies nothing about the next version. It also creates an
-  obvious attack: publish a copy of a popular package into a scope you control and wait to be
-  substituted in.
-- **Matching by content hash** transfers no trust at all. §12 content-addresses the blob store, so an
-  identical hash means the same bytes. The caller receives the exact artefact it asked for, reachable
-  under a different name.
+- **Matching by name** — serving `@starion/ECSS-MM-THE` because `@esa/ECSS-MM-THE` is missing — is unsafe. §8.2 makes those independent packages with different owners and independent version sequences; identical content today implies nothing about the next version. It also creates an obvious attack: publish a copy of a popular package into a scope you control and wait to be substituted in.
+- **Matching by content hash** transfers no trust at all. §12 content-addresses the blob store, so an identical hash means the same bytes. The caller receives the exact artefact it asked for, reachable under a different name.
 
-Substitution is therefore an availability fallback, not a resolution rule. It never changes which
-artefact is served, only whether one can be found.
+Substitution is therefore an availability fallback, not a resolution rule. It never changes which artefact is served, only whether one can be found.
 
 ### 8.3 Manifest extraction
 
@@ -1700,9 +917,132 @@ IArtifactManifestExtractor
     Result<IArtifactManifest> Extract(Stream artifact)
 ```
 
-One implementation per format, resolved through Autofac. Publish validates by locating the extractor
-for the declared kind and running it; a format with no registered extractor is rejected at the API
-boundary rather than stored unvalidated.
+One implementation per format, resolved through Autofac. Publish validates by locating the extractor for the declared kind and running it; a format with no registered extractor is rejected at the API boundary rather than stored unvalidated.
+
+### 8.4 The Organization profile
+
+`SSS-FG-ORG-U3R` requires an Organization Administrator to be able to update "display name, description and profile" without saying what a profile contains. `SSS-FG-ACC-P2D` does enumerate the Account's — biography, company, location, website, social media links, avatar — so the composition below follows that requirement's shape wherever the two overlap, and the differences are where the reasoning is.
+
+**The two email addresses are not the same field twice.**
+
+| | Purpose | Rendered publicly |
+|---|---|---|
+| `ContactEmail` | How the outside world reaches the Organization about its packages — a security report, a licensing question | Yes, on the Organization page |
+| `BillingEmail` | Where an operator sends invoices and account notices | **Never** |
+
+They are separated because their exposure rules are opposite, and a single field would resolve that conflict in whichever direction the first implementation happened to pick. `BillingEmail` is excluded from every public projection and from the `/api/v1` surface, and both addresses fall under §14's PII scrubbing rather than being logged.
+
+**Links are one entity rather than a column per platform.** `LinkedIn`, `X` and *"other…"* is an open set, and modelling an open set as columns means a migration every time it grows. `ProfileLink` carries `Ordinal` because the order is the Organization's to choose rather than the insertion order's to dictate, and `Label` because `LinkPlatform.Other` has no name to render.
+
+It is also the second reason not to model links as Organization columns: `SSS-FG-ACC-P2D` requires social media links on an Account too, and columns cannot be shared. The rest of the Account profile that P2D enumerates is not modelled here and is still outstanding.
+
+**Every link is publisher-supplied content on a public, crawled page**, and that has two consequences worth fixing here rather than discovering in a penetration test:
+
+- Outbound links render with `rel="nofollow ugc noopener"`. A registry with per-organization pages is an obvious target for link farming, and the SEO value of an unqualified outbound link is the entire motive.
+- A URL is validated at entry for scheme and, where the platform is not `Other`, for host. `https` and `http` only: a `javascript:` or `data:` URL in an `href` is script execution on the origin that serves the page.
+
+**The logo is a blob, not a column.** It is stored in §12's object store and referenced by key, exactly as an artefact is, because that is the store built to hold bytes and DD-21 already requires it in every topology. `LogoBlobReference` is the key rather than a URL, so the serving origin and cache directives stay Forge's decision rather than being frozen into a stored value.
+
+Three rules apply to it that do not apply to an artefact:
+
+| Rule | Reason |
+|---|---|
+| Raster formats only — PNG, JPEG, WebP — **SVG is rejected** | An SVG is a document that may carry script, and it would be served from an origin that holds a session cookie |
+| Bounded dimensions and byte size, re-encoded on upload rather than stored as received | Re-encoding is what makes the rejection above hold against a file that merely claims to be a PNG, and it bounds the decompression cost of serving one |
+| Served with `Content-Type` from the re-encoded result and never from the upload | The uploader does not get to choose how a browser interprets the bytes |
+
+Its cache directive follows the Organization, not DD-22's artefact rule: a public Organization's logo is cacheable at the edge, and a suspended or private one's is not.
+
+**An Account's avatar is the same thing under a different name** (`SSS-FG-ACC-P2D`), and is governed by the three rules above without exception. It is worth saying because an avatar arrives through a different screen and feels like a smaller object: an SVG accepted there is served from the same origin and carries the same script.
+
+**`Description` is plain text with a bounded length, not Markdown.** Rendering publisher-supplied Markdown on a public page means an HTML sanitiser, and a sanitiser is a dependency with a CVE history that has to be kept current for the life of the product. The description is a line or two under the Organization's name; if a longer, formatted Organization page is wanted later, the answer is a README artefact rendered through the same path as a package README, not a rich-text column here.
+
+### 8.5 Renaming a scope
+
+**A scope is editable, and the design already owed an answer here before anyone asked for one.** `SSS-FG-ACC-C3F` requires at priority `H` that an Account holder can change their username, and `SSS-FG-AUTH-S2B` makes that username the scope in `@<scope>/<package-name>`. A username change is therefore a scope rename, and this section is what has been missing rather than a new capability. Extending it to the Organization slug (`SSS-FG-ORG-U3R`) adds nothing mechanically.
+
+**Immutability is not in the way, and the reason is worth being exact about.** `SSS-FG-REG-I3C` says that once published, a version's "kpar content and its manifest shall not be mutated" — it binds *content* to `{identifier, version}` and says nothing about the identifier being permanent. A rename changes what a package is called; it changes no byte of what a caller receives. §8.1's invariant is restated accordingly, because as written it claimed more than I3C gives.
+
+**A rename rewrites the canonical identifier, and the retired slug resolves forever.** Packages move with the Organization: after `@starion` becomes `@starion-official`, `@starion-official/ECSS-MM-THE` is canonical and `@starion/ECSS-MM-THE` continues to resolve. The alternative — freezing published packages at the old slug and sending only new publishes to the new one — splits an Organization's catalogue across two scopes permanently, with no path back to one.
+
+**A retired slug is never reassigned to anyone.** This is the rule the whole mechanism exists to protect, and it is not a matter of taste:
+
+- Every `usage[]` IRI in every published artefact that depends on the Organization's packages names the old scope, and those artefacts are immutable — they can never be corrected (§8.1). Lockfiles, mirror caches and air-gapped bundles hold the same references.
+- If the old slug could be claimed by someone else, they would publish arbitrary content under an identifier the ecosystem already resolves and already trusts. That is a supply-chain takeover requiring no compromise of anything — only patience and a free namespace.
+- GitHub releases organization names on rename, and repository hijacking through reclaimed names is the documented consequence. Forge retains instead. `ScopeAlias` is therefore an append-only tombstone: `RetiredAt` records when, and nothing ever deletes the row.
+
+**Reads follow an alias; writes require the canonical slug.** Resolution, download and search accept a retired slug and answer under the canonical one, reporting the substitution as §8.2 already requires for a content-hash fallback — a caller is told which identifier actually served it rather than silently redirected. A publish addressed to a retired slug is **rejected**, not redirected: the alias exists to keep old references working, and letting it accept writes would make it a live scope again by another name.
+
+**Uniqueness now spans four sets, not three.** `SSS-FG-ORG-S2P` rejects a slug already held by an Account, by another Organization, or by a scope proxied from upstream (§5.1.2). Retired aliases are the fourth, and the requirement does not mention them — the omission is recorded in §3.2. The same check governs the rename itself: renaming *into* a proxied upstream scope is rejected exactly as creating one there is.
+
+**What a rename actually costs.**
+
+| | |
+|---|---|
+| **Object storage** | Nothing. §12 content-addresses blobs, so no artefact is copied, rewritten or re-uploaded. This is the property that makes the whole operation affordable |
+| **PostgreSQL** | A bounded metadata update — the scope row, one alias insert, and the denormalised identifiers in the search and resolution rows (§12). Bounded by the Organization's package count, so a large catalogue runs it as a DD-17 job rather than in the request |
+| **Mirrors** | Metadata carries a TTL (§5.1.4) and picks the rename up on refresh; artefacts cache permanently and are unaffected because they are content-addressed. An air-gapped installation keeps the old identifier until it is reseeded, which is the same staleness §5.1.4 already accepts rather than a new failure |
+| **Clients** | A base URL and a package identifier (DD-11). Nothing is configured with a scope separately, so nothing has to be reconfigured |
+
+**An Organization Administrator performs the rename**, consistent with holding the rest of the profile (`SSS-FG-ORG-U3R`) and with C3F letting an Account holder change their own username unaided. Two constraints attach to it: it is **rate-limited**, because an unlimited rename is a way to cycle through and retire slugs an Organization does not intend to use, and it writes an **audit entry** like every other privileged operation (`SSS-FG-AUTH-R9J`). The rate limit is a configured interval rather than a fixed one; one rename per 30 days is the intended default.
+
+### 8.6 Ownership follows the scope
+
+**A package is owned by the principal that owns its scope, and there is no other owner and no per-package role.** An Account-scoped package is owned by that Account; an Organization-scoped package is owned by that Organization. Ownership is derived, not stored and not granted: `@Starion/ECSS-MM-THE` is Starion's because it is in Starion's scope, and the identifier a caller already types is the complete statement of who owns it.
+
+**Authority inside an Organization scope comes from the organization role.** An Organization Administrator or a `Publisher` acts on the Organization's packages because of their standing in the Organization; a `Member` does not. Adding somebody to the Organization grants publishing authority over everything in the scope, and removing them withdraws it — with no per-package bookkeeping in between, and no package left behind when someone leaves.
+
+**The whole authorisation question becomes one lookup.** May this principal write to this package? Resolve the package's scope to its principal; if that principal is the caller, yes; if it is an Organization, yes when the caller's `OrganizationRole` is `Administrator` or `Publisher`. There is no set to consult, no role to reconcile against a second role, and no state that can drift from the Organization's actual membership.
+
+**This reverses four requirements**, all at priority `H`, and the reversal is deliberate rather than an oversight:
+
+| | | |
+|---|---|---|
+| `SSS-FG-AUTH-M3C` | Establishes a per-package Maintainer set with `Owner` and `Maintainer` entries | Removed. Its second half — metadata sourced from the manifest and frozen at publish — is untouched and still governs §8.1 |
+| `SSS-FG-AUTH-K9R` | Adds `Reader`, a per-package read grant | Removed. See the cost below |
+| `SSS-FG-AUTH-O4D` | Every package retains an individual-Account Owner | Removed. An Organization-scoped package has an Organization owner and no individual alongside it |
+| `SSS-FG-AUTH-P7G` | An Organization Owner never satisfies `O4D` alone | Removed with `O4D`, which it exists only to qualify |
+
+`SSS-FG-AUTH-T5E` is replaced rather than removed. Ownership cannot be transferred as a grant, because it is not a grant — but a package can be **moved to another scope**, which achieves what a transfer was for and is the only thing that could, given ownership follows the scope. §8.7 specifies it. T5E's acceptance rule survives intact inside it: a move lands in somebody else's scope, so it takes effect only when that side accepts.
+
+**What the simplification costs, stated plainly.** `K9R`'s `Reader` was the only way to give one outside principal read access to a private package. Without it there are two remaining routes, and neither is the same thing: widen the package's visibility, or add the person to the Organization — which grants them everything the Organization owns rather than one package. For a registry whose private packages are commercially sensitive, "share this one library with one partner" is a plausible request with no answer. If it turns out to be needed, the way back is a standalone read grant rather than a revived role: it is read-only, it has no ranking against anything, and folding it into a role enumeration is what made `K9R` need a special rule forbidding it on public packages.
+
+**The guarantee moves rather than disappearing.** What replaces it is that **an Organization always has at least one member, that member is an Organization Administrator, and the Account holding that role last cannot be deleted.** An Organization is created with its creator as its sole member and Administrator (`SSS-FG-ORG-C1M`); further Administrators are promoted and demoted by an existing one, and the last one standing cannot be demoted. `SSS-FG-ORG-R5V` already requires this of membership changes; the rule is that *every* path to the same state is refused, not only the ones inside the Organization:
+
+| Path | |
+|---|---|
+| Revoking the Administrator role | `SSS-FG-ORG-R5V` — already refused |
+| Leaving the Organization | `SSS-FG-ORG-P7X` — already refused, though it currently cites the package floor rather than this one |
+| An Account holder deactivating or deleting themselves | `SSS-FG-ACC-C3F` — currently guards packages, must guard Organizations |
+| The Installation Administrator deleting an Account | `SSS-FG-ACC-M6K` — currently guards nothing here at all |
+
+**It is unqualified: it holds whether or not the Organization has packages.** An Organization that loses its last Administrator can be neither administered nor deleted — `SSS-FG-ORG-U3R` gives deletion to an Administrator — so it would sit on its slug permanently, and §8.5 makes that slug unrecoverable. An empty Organization is exactly as capable of that as a full one.
+
+**The exit is the Installation Administrator, and it has to be**, because this rule can otherwise block a deletion that Forge is obliged to perform: a sole Administrator who demands erasure is refused, and `SSS-FG-ORG-R5V` grants the Administrator role "only upon the recipient's explicit acceptance", so nobody can be conscripted into taking their place. `SSS-FG-ORG-A9Z` supplies both escapes — the Installation Administrator can add an Account to any Organization with a specified role, or delete the Organization outright. **Whether A9Z's grant is subject to R5V's acceptance requirement is not stated, and it has to be `no`**, or the deadlock survives the escape that exists to break it.
+
+The amendments this section asks for are recorded in §3.2: `M3C`, `K9R`, `O4D` and `P7G` are reversed, `T5E` is rewritten around §8.7's move, `C3F` and `M6K` are repointed at the Organization floor, and `A9Z` is made explicitly exempt from R5V's acceptance rule.
+
+### 8.7 Moving a package between scopes
+
+**Because ownership is the scope, changing owner means changing scope**, and that is the operation `SSS-FG-AUTH-T5E` was reaching for. `@esa/ECSS-MM-THE` becomes `@starion/ECSS-MM-THE`, and Starion owns it from that moment because it is in Starion's scope. Nothing is granted and nothing is shared; the package is somewhere else.
+
+**Only the scope changes; the name cannot.** §8.2 requires `<package-name>` to equal the manifest `name` where the format carries one, and §8.1 freezes the content behind every published version — so the manifest cannot be edited and the name is not the mover's to choose. A move is always `@old-scope/name` → `@new-scope/name`, which is a smaller operation than it first appears.
+
+**It requires both sides.** The source scope's owner initiates and the destination scope's owner accepts — `SSS-FG-AUTH-T5E`'s acceptance rule, applied where it now belongs. A package brings maintenance obligations and takes a name inside the receiving scope, and neither should arrive unasked. Where the destination is an Organization, an Administrator accepts for it; where it is the global scope, only the Installation Administrator can, since `SSS-FG-AUTH-S2B` reserves that namespace for the operator.
+
+**The old identifier resolves forever and is never reassigned.** A move retires `@esa/ECSS-MM-THE` exactly as §8.5 retires a slug, for the same reason: every `usage[]` IRI in every dependent artefact names the old identifier, those artefacts are immutable, and a released identifier somebody else can claim is a supply-chain takeover waiting for a volunteer. `PackageAlias` is the append-only tombstone.
+
+**One consequence of that is easy to miss: the source scope loses the name permanently.** After the move, ESA can never publish a new `@esa/ECSS-MM-THE` — not because the package is gone, but because the identifier belongs to the alias. A scope rename retires a whole slug nobody was going to reuse; a package move burns one name inside a scope that stays live and busy.
+
+**`PackageAlias` stores the literal retired identifier rather than a link to the source `Scope`**, which is a decision rather than an implementation detail. If ESA later renames `@esa` to `@esa-official` (§8.5), a link would follow the rename and the alias would begin answering for `@esa-official/ECSS-MM-THE` — an identifier that never existed. The literal string keeps answering for the one that was actually published, which is the only one anything in the wild references.
+
+Where both kinds of alias could apply, **the package alias wins**, being the more specific: after that move and that rename, `@esa/ECSS-MM-THE` resolves through `PackageAlias` to Starion, while `@esa/anything-else` resolves through `ScopeAlias` to `@esa-official`.
+
+**A move is rejected, not merged, where the destination already holds the name.** §8.2 supports publishing one artefact into several scopes as independent packages, so `@starion/ECSS-MM-THE` may already exist with its own version sequence and unlisting state. Merging two version histories is not something the design can do coherently, and silently preferring one would discard the other.
+
+**Visibility does not travel unchecked.** §8.1 rejects `OrganizationVisible` on a package in an Account scope, so moving an organization-visible package into an Account scope is refused until its visibility is changed — refused rather than quietly narrowed to `Private`, for the reason §8 already gives.
+
+**What it costs to run.** Nothing in object storage: §12 content-addresses blobs, so no artefact moves. In PostgreSQL it is the package row's scope, one alias insert, and the denormalised identifiers in the search and resolution rows, bounded by the package's version count. Reads follow the alias and report the substitution as §8.2 already does for a content-hash fallback; **writes require the current identifier**, so a publish addressed to the retired one is rejected rather than redirected. Every move writes an audit entry (`SSS-FG-AUTH-R9J`).
 
 ---
 
@@ -1718,12 +1058,7 @@ Three formats are required by the SSS: kpar for SysML v2 and KerML (`SSS-FG-REG-
 
 KerML 1.0 §10.3 (pp. 432–435), normative:
 
-> "A *project interchange file* is contains a single project serialized as a set of model interchange
-> files, archived using the ZIP format [ZIP]. The archive shall contain a model interchange file for
-> each of the root namespaces in the project, each formatted in one of the formats listed in 10.2. In
-> addition, the archive shall contain, at its top level, exactly one file named `.project.json` and
-> exactly one file named `.meta.json`. A KerML project interchange file shall have the file extension
-> `.kpar` (KerML Project Archive)."
+> "A *project interchange file* is contains a single project serialized as a set of model interchange files, archived using the ZIP format [ZIP]. The archive shall contain a model interchange file for each of the root namespaces in the project, each formatted in one of the formats listed in 10.2. In addition, the archive shall contain, at its top level, exactly one file named `.project.json` and exactly one file named `.meta.json`. A KerML project interchange file shall have the file extension `.kpar` (KerML Project Archive)."
 
 This gives publish-time validation for free — the checks are specified, not invented:
 
@@ -1740,20 +1075,13 @@ This gives publish-time validation for free — the checks are specified, not in
 | `index` and `created` present | Table 13, mandatory |
 | Version is SemVer 2.0.0 and strictly increasing | `SSS-FG-REG-S2B` (stricter than KerML — see §3.1) |
 
-**`.project.json` supplies most registry metadata directly:** `name`, `description`, `version`,
-`license`, `maintainer[]`, `website`, `topic[]`, and `usage[]` — where each usage entry carries a
-`resource` IRI and an optional `versionConstraint`. That `usage` list **is** the dependency graph
-`SSS-FG-REG-M8H` requires Forge to expose; it does not need to be reconstructed.
+**`.project.json` supplies most registry metadata directly:** `name`, `description`, `version`, `license`, `maintainer[]`, `website`, `topic[]`, and `usage[]` — where each usage entry carries a `resource` IRI and an optional `versionConstraint`. That `usage` list **is** the dependency graph `SSS-FG-REG-M8H` requires Forge to expose; it does not need to be reconstructed.
 
-**`.meta.json` supplies integrity and language identification:** an optional `checksum` map with a
-specified algorithm set (SHA-256, SHA3, BLAKE2b, BLAKE3, and legacy options), plus a `metamodel` IRI
-identifying the language. The `metamodel` field is what populates the METAMODEL search facet, and it
-is the natural discriminator for the polymorphic artefact model in §8.
+**`.meta.json` supplies integrity and language identification:** an optional `checksum` map with a specified algorithm set (SHA-256, SHA3, BLAKE2b, BLAKE3, and legacy options), plus a `metamodel` IRI identifying the language. The `metamodel` field is what populates the METAMODEL search facet, and it is the natural discriminator for the polymorphic artefact model in §8.
 
 ### 9.2 Other formats
 
-Each format is read by a first-party library rather than a bespoke parser. Forge owns the *extractor*
-— the mapping from a format's own metadata onto the registry's model — not the format parsing.
+Each format is read by a first-party library rather than a bespoke parser. Forge owns the *extractor* — the mapping from a format's own metadata onto the registry's model — not the format parsing.
 
 | Format | Reader | Licence | Availability |
 |---|---|---|---|
@@ -1762,65 +1090,35 @@ Each format is read by a first-party library rather than a bespoke parser. Forge
 | Capella | `Auriga` | Apache-2.0 | Partially published; object model at 1.0.0, reader layers in progress |
 | SysML v1 | — | — | **Deferred.** The archive layout depends on the authoring tool, so there is no single format to target |
 
-> The unrelated `AurigaLLC.*` packages on NuGet belong to a different organisation. The Starion library
-> is the single package `Auriga`.
+> The unrelated `AurigaLLC.*` packages on NuGet belong to a different organisation. The Starion library is the single package `Auriga`.
 
-**COMET-SDK is LGPL-3.0**, against Forge's Apache-2.0. Unlike GPL or AGPL, the LGPL permits linking
-from non-copyleft code, which NuGet assembly references satisfy; and the library is Starion's own, so
-relicensing is available if it ever became necessary. It will nonetheless appear as LGPL-3.0 in every
-released image's SBOM under `SSS-CC-SUP-SBM`, which should be a known entry rather than a surprise.
+**COMET-SDK is LGPL-3.0**, against Forge's Apache-2.0. Unlike GPL or AGPL, the LGPL permits linking from non-copyleft code, which NuGet assembly references satisfy; and the library is Starion's own, so relicensing is available if it ever became necessary. It will nonetheless appear as LGPL-3.0 in every released image's SBOM under `SSS-CC-SUP-SBM`, which should be a known entry rather than a surprise.
 
 #### 9.2.1 Not every format carries package metadata
 
 This is the structural finding, and it shapes the domain model.
 
-kpar is unusually well-specified: KerML §10.3 mandates `.project.json` carrying name, version, licence,
-maintainers, topics and a `usage[]` dependency list, so the registry's metadata is a faithful
-projection of the artefact.
+kpar is unusually well-specified: KerML §10.3 mandates `.project.json` carrying name, version, licence, maintainers, topics and a `usage[]` dependency list, so the registry's metadata is a faithful projection of the artefact.
 
-**ECSS-E-TM-10-25 Annex C.3 has no equivalent.** The archive does have a root `Header.json`, but it
-carries *provenance* rather than package identity — `mediaType`, `dataModelVersion`,
-`exchangeFileFormatVersion`, `creatorOrganization`, `creatorPerson`, and creation and modification
-timestamps. There is no package name, no SemVer version and no licence. The format also has no
-dependency-declaration mechanism at all; dependencies are implicit in object references from the
-`SiteDirectory` to its reference data libraries.
+**ECSS-E-TM-10-25 Annex C.3 has no equivalent.** The archive does have a root `Header.json`, but it carries *provenance* rather than package identity — `mediaType`, `dataModelVersion`, `exchangeFileFormatVersion`, `creatorOrganization`, `creatorPerson`, and creation and modification timestamps. There is no package name, no SemVer version and no licence. The format also has no dependency-declaration mechanism at all; dependencies are implicit in object references from the `SiteDirectory` to its reference data libraries.
 
-Note that `dataModelVersion` and `exchangeFileFormatVersion` version the *format*, not the artefact.
-Mapping either onto the package version would be a category error.
+Note that `dataModelVersion` and `exchangeFileFormatVersion` version the *format*, not the artefact. Mapping either onto the package version would be a category error.
 
-**Capella sits between the two.** Its metamodel has a first-class library concept —
-`Auriga.Model.Libraries.ModelVersion` carries `MajorVersionNumber`, `MinorVersionNumber` and
-`LastModifiedFileStamp` — so unlike Annex C.3 there is genuine version information in the artefact. But
-it is not sufficient:
+**Capella sits between the two.** Its metamodel has a first-class library concept — `Auriga.Model.Libraries.ModelVersion` carries `MajorVersionNumber`, `MinorVersionNumber` and `LastModifiedFileStamp` — so unlike Annex C.3 there is genuine version information in the artefact. But it is not sufficient:
 
-- **Major and minor only, with no patch component**, so it cannot be mapped onto the SemVer 2.0.0 that
-  `SSS-FG-REG-S2B` requires without inventing the third value. Deriving `major.minor.0` would then
-  collide with the monotonicity invariant as soon as two publications shared a major/minor pair.
+- **Major and minor only, with no patch component**, so it cannot be mapped onto the SemVer 2.0.0 that `SSS-FG-REG-S2B` requires without inventing the third value. Deriving `major.minor.0` would then collide with the monotonicity invariant as soon as two publications shared a major/minor pair.
 - **No licence.**
 - The name comes from the model element rather than from any package manifest.
 
-Capella is therefore treated as **publisher-supplied, pre-filled from the artefact where the reader can
-offer a value**. Pre-filling is a convenience in the publish flow, not a change of provenance:
-`MetadataSource` stays binary, and Capella records as publisher-supplied. Introducing a third,
-partial state would complicate every consumer of that discriminator to describe what is really a
-difference in how helpfully a form can be populated.
+Capella is therefore treated as **publisher-supplied, pre-filled from the artefact where the reader can offer a value**. Pre-filling is a convenience in the publish flow, not a change of provenance: `MetadataSource` stays binary, and Capella records as publisher-supplied. Introducing a third, partial state would complicate every consumer of that discriminator to describe what is really a difference in how helpfully a form can be populated.
 
 **Consequences for the design:**
 
 - Where a format carries a manifest, metadata is extracted from it.
-- Where it does not, metadata is **supplied by the publisher at publish time** and frozen with the
-  version, exactly as manifest-sourced metadata is. `SSS-FG-AUTH-M3C`'s requirement is that metadata
-  cannot be edited outside publishing a new version; that still holds. What varies is the *source*, not
-  the mutability.
-- `PackageVersion` therefore carries a `MetadataSource` discriminator, so provenance is visible to the
-  API and to the interface. "Declared by the artefact" and "asserted by the publisher" are different
-  trust propositions and should not be presented identically.
-- **DD-13's abbreviated representation cannot carry dependency constraints for formats without a
-  dependency declaration.** For those kinds the field is absent rather than empty, so a resolver can
-  distinguish "no dependencies" from "dependencies not expressible".
-- `SSS-FG-REG-S2B`'s SemVer requirement remains a Forge policy applied uniformly. For an Annex C.3
-  archive — a snapshot of a site directory and its engineering models rather than a reusable library —
-  the version is publisher-asserted and carries no meaning intrinsic to the artefact.
+- Where it does not, metadata is **supplied by the publisher at publish time** and frozen with the version, exactly as manifest-sourced metadata is. `SSS-FG-AUTH-M3C`'s requirement is that metadata cannot be edited outside publishing a new version; that still holds. What varies is the *source*, not the mutability.
+- `PackageVersion` therefore carries a `MetadataSource` discriminator, so provenance is visible to the API and to the interface. "Declared by the artefact" and "asserted by the publisher" are different trust propositions and should not be presented identically.
+- **DD-13's abbreviated representation cannot carry dependency constraints for formats without a dependency declaration.** For those kinds the field is absent rather than empty, so a resolver can distinguish "no dependencies" from "dependencies not expressible".
+- `SSS-FG-REG-S2B`'s SemVer requirement remains a Forge policy applied uniformly. For an Annex C.3 archive — a snapshot of a site directory and its engineering models rather than a reusable library — the version is publisher-asserted and carries no meaning intrinsic to the artefact.
 
 ---
 
@@ -1830,36 +1128,25 @@ One entry point: a conventional versioned base path. There is no service index �
 
 ### 10.1 Versioned base path
 
-`/api/v1`, versioned in the path so that a breaking change is additive. This is a **stable, permanent
-contract**: third-party consumers may hardcode these paths, and that is the supported use. Clients are
-configured with a base URL, from which every address derives.
+`/api/v1`, versioned in the path so that a breaking change is additive. This is a **stable, permanent contract**: third-party consumers may hardcode these paths, and that is the supported use. Clients are configured with a base URL, from which every address derives.
 
 | Method | Route | Purpose | Requirement |
 |---|---|---|---|
 | `GET` | `/api/v1/packages` | Search over package metadata: free text, facets, sort, pagination | `SSS-FG-REG-Q7G` |
-| `GET` | `/api/v1/elements` | Resolve a qualified name to the package versions defining it — exact and prefix match, unranked | `SSS-FG-REG-Z5Q` |
 | `GET` | `/api/v1/packages/{scope}/{name}` | Manifest, versions, dependency graph, release notes | `SSS-FG-REG-M8H` |
 | `GET` | `/api/v1/packages/{scope}/{name}/artifact` | Latest listed, non-prerelease artefact | `SSS-FG-REG-D6F` |
 | `GET` | `/api/v1/packages/{scope}/{name}/{version}/artifact` | Explicit version | `SSS-FG-REG-D6F` |
 | `PUT` | `/api/v1/packages` | Publish, atomic | `SSS-FG-REG-A5E` |
 | `POST` | `/api/v1/packages/{scope}/{name}/{version}/unlist` | Unlist | `SSS-FG-REG-U4D` |
 | `GET`/`POST`/`DELETE` | `/api/v1/keys` | API key management | `SSS-FG-REG-Y2L` |
-| `GET`/`POST`/`DELETE` | `/api/v1/packages/{scope}/{name}/maintainers` | Maintainer set | `SSS-FG-AUTH-M3C` |
 
-Read access to public packages requires no authentication (`SSS-FG-REG-Y2L`). Errors use RFC 9457
-problem details, carrying the correlation identifier so that a user-facing error can quote it
-(`SSS-PA-OBS-E6F` establishes that expectation on the Bloom side).
+Read access to public packages requires no authentication (`SSS-FG-REG-Y2L`). Errors use RFC 9457 problem details, carrying the correlation identifier so that a user-facing error can quote it (`SSS-PA-OBS-E6F` establishes that expectation on the Bloom side).
 
-**Every read endpoint filters to what the requesting principal may see** (`SSS-FG-AUTH-D4M`). Packages
-the principal is not authorised to read are absent from search results and from qualified-name
-resolution, and a direct request for one returns the same response as a package that does not exist —
-`404`, never `403`. The two cases are deliberately indistinguishable, so the endpoints above cannot be
-used to enumerate private package names.
+**Every read endpoint filters to what the requesting principal may see** (`SSS-FG-AUTH-D4M`). Packages the principal is not authorised to read are absent from search results and from qualified-name resolution, and a direct request for one returns the same response as a package that does not exist — `404`, never `403`. The two cases are deliberately indistinguishable, so the endpoints above cannot be used to enumerate private package names.
 
 ### 10.2 Client configuration
 
-`Mycelium.Forge.Client` is configured with a **base URL** and nothing else. Every address derives from
-it, because DD-11 makes the paths a permanent contract.
+`Mycelium.Forge.Client` is configured with a **base URL** and nothing else. Every address derives from it, because DD-11 makes the paths a permanent contract.
 
 ```
 https://forge.mycelium.example          SaaS
@@ -1867,13 +1154,11 @@ https://forge.acme.internal             on-premise
 https://forge.acme.internal             on-premise mirror of an upstream (§5.1)
 ```
 
-Pointing a client at a different installation is therefore a one-value change, and a mirror is
-indistinguishable from any other installation as far as the client is concerned.
+Pointing a client at a different installation is therefore a one-value change, and a mirror is indistinguishable from any other installation as far as the client is concerned.
 
 ### 10.3 Content negotiation
 
-Schema version and representation detail are selected by `Accept` (DD-12, DD-13). Wire format is not
-negotiated: JSON is the only metadata representation (DD-04).
+Schema version and representation detail are selected by `Accept` (DD-12, DD-13). Wire format is not negotiated: JSON is the only metadata representation (DD-04).
 
 | `Accept` | Response |
 |---|---|
@@ -1882,12 +1167,9 @@ negotiated: JSON is the only metadata representation (DD-04).
 | `application/vnd.mycelium.forge.v1+json` | v1, full |
 | `application/vnd.mycelium.forge.v1.abbreviated+json` | v1, resolver view |
 
-Every negotiated response sets `Vary: Accept`. Artefact downloads are exempt — they are opaque bytes
-served as `application/octet-stream` with the format's own media type where one is registered.
+Every negotiated response sets `Vary: Accept`. Artefact downloads are exempt — they are opaque bytes served as `application/octet-stream` with the format's own media type where one is registered.
 
-An unsupported version yields `406 Not Acceptable` with an RFC 9457 body listing the supported media
-types, rather than silently falling back to the latest — a silent downgrade would let a client parse a
-newer schema believing it had received the one it asked for.
+An unsupported version yields `406 Not Acceptable` with an RFC 9457 body listing the supported media types, rather than silently falling back to the latest — a silent downgrade would let a client parse a newer schema believing it had received the one it asked for.
 
 ---
 
@@ -1895,24 +1177,15 @@ newer schema believing it had received the one it asked for.
 
 ### 11.1 The .NET client library
 
-`SSS-FG-REG-C3M` is scoped to the **.NET ecosystem** and distribution as a NuGet package; the Java and
-TypeScript ecosystems are `SSS-FG-REG-J4V` and `SSS-FG-REG-T8S`, covered in §11.3.
+`SSS-FG-REG-C3M` is scoped to the **.NET ecosystem** and distribution as a NuGet package; the Java and TypeScript ecosystems are `SSS-FG-REG-J4V` and `SSS-FG-REG-T8S`, covered in §11.3.
 
-`Mycelium.Forge.Client` wraps every endpoint: search, metadata, version list,
-download, publish, unlist, credential management. It returns `FluentResults` values rather than
-throwing, registers through `IHttpClientFactory`, and depends only on `Mycelium.Forge.Common`. Per
-DD-11 it is configured with a base URL, from which every address derives.
+`Mycelium.Forge.Client` wraps every endpoint: search, metadata, version list, download, publish, unlist, credential management. It returns `FluentResults` values rather than throwing, registers through `IHttpClientFactory`, and depends only on `Mycelium.Forge.Common`. Per DD-11 it is configured with a base URL, from which every address derives.
 
 ### 11.2 The CLI
 
-**Required by `SSS-FG-REG-C5L`**, and built in this repository. The CLI was originally a scope addition
-inferred from the design — `SSS-FG-REG-C3M` mandates a client library and stops there — and the reason
-it earned a requirement is the one that justified it as an addition: CI/CD pipelines publish with a
-command, not by referencing a NuGet package, and without a first-party tool every customer writes their
-own wrapper, which is the fragmentation a first-party client exists to prevent.
+**Required by `SSS-FG-REG-C5L`**, and built in this repository. The CLI was originally a scope addition inferred from the design — `SSS-FG-REG-C3M` mandates a client library and stops there — and the reason it earned a requirement is the one that justified it as an addition: CI/CD pipelines publish with a command, not by referencing a NuGet package, and without a first-party tool every customer writes their own wrapper, which is the fragmentation a first-party client exists to prevent.
 
-It is a thin `System.CommandLine` shell over `Mycelium.Forge.Client`, so its command surface follows
-`SSS-FG-REG-C3M`'s seven operations, plus credential storage:
+It is a thin `System.CommandLine` shell over `Mycelium.Forge.Client`, so its command surface follows `SSS-FG-REG-C3M`'s seven operations, plus credential storage:
 
 | Command | Operation |
 |---|---|
@@ -1932,55 +1205,30 @@ It is a thin `System.CommandLine` shell over `Mycelium.Forge.Client`, so its com
 | **NuGet, as a `dotnet tool`** | .NET developers, and repositories pinning a version in a tool manifest | The idiomatic path for the ecosystem `SSS-FG-REG-C3M` targets. Installation is one command, versioning comes from NuGet on the same feed as the client library, and a tool manifest makes the version reproducible per repository rather than per machine |
 | **NativeAOT self-contained binary**, per platform | CI runners, air-gapped sites (§5.1), developers whose editor is not Visual Studio | A `dotnet tool` requires the **.NET SDK** on the target machine, not merely the runtime. That is a poor assumption precisely where publishing matters most, and it is the reason the tool package cannot be the only channel |
 
-DD-05's model-generated serialisers contain no reflection, which is what makes the NativeAOT half
-viable, so that channel costs nothing additional.
+DD-05's model-generated serialisers contain no reflection, which is what makes the NativeAOT half viable, so that channel costs nothing additional.
 
-**The two channels ship the same command surface at the same version**, from one project. They are a
-packaging difference, not two products — a command available in one and not the other would make the
-documentation of §3.2's `Docs CLI` page wrong for half its readers.
+**The two channels ship the same command surface at the same version**, from one project. They are a packaging difference, not two products — a command available in one and not the other would make the documentation of §3.2's `Docs CLI` page wrong for half its readers.
 
-**`forge login` writes to the operating system's credential store** — DPAPI on Windows, Keychain on
-macOS, the Secret Service API on Linux — and not to a file in the user's home directory. Where no
-store is available, which is the common case on a CI runner and on a minimal container, it falls back
-to a file with owner-only permissions, and **says so at the point of use** rather than falling back
-silently.
+**`forge login` writes to the operating system's credential store** — DPAPI on Windows, Keychain on macOS, the Secret Service API on Linux — and not to a file in the user's home directory. Where no store is available, which is the common case on a CI runner and on a minimal container, it falls back to a file with owner-only permissions, and **says so at the point of use** rather than falling back silently.
 
-This is stated because the alternative is the default that gets written by accident. npm keeps its
-token in plaintext in `~/.npmrc`, which is read by any process running as that user, is copied into
-container images by an unguarded `COPY . .`, and is collected by any backup or sync tool pointed at
-the home directory. §13's containment rules are worth little if the credential sits in a
-world-readable dotfile at the other end.
+This is stated because the alternative is the default that gets written by accident. npm keeps its token in plaintext in `~/.npmrc`, which is read by any process running as that user, is copied into container images by an unguarded `COPY . .`, and is collected by any backup or sync tool pointed at the home directory. §13's containment rules are worth little if the credential sits in a world-readable dotfile at the other end.
 
 ### 11.3 Clients in other languages
 
 Both are required, and each names its integration target rather than the library alone:
 
-- **Java** (`SSS-FG-REG-J4V`) — a Maven artefact, plus the integration by which the open-source Java
-  reference implementation of SysML v2 resolves and retrieves packages from a Forge registry.
-- **TypeScript** (`SSS-FG-REG-T8S`) — an npm package, plus a Visual Studio Code extension through which
-  a user searches, retrieves and publishes without leaving the editor. VS Code's extension host is
-  Node.js and its extension API is a JavaScript API, so any VS Code extension is TypeScript or
-  JavaScript.
+- **Java** (`SSS-FG-REG-J4V`) — a Maven artefact, plus the integration by which the open-source Java reference implementation of SysML v2 resolves and retrieves packages from a Forge registry.
+- **TypeScript** (`SSS-FG-REG-T8S`) — an npm package, plus a Visual Studio Code extension through which a user searches, retrieves and publishes without leaving the editor. VS Code's extension host is Node.js and its extension API is a JavaScript API, so any VS Code extension is TypeScript or JavaScript.
 
-**Sequencing between the two is not fixed by the requirements**, and the argument below is why it
-cannot be settled by picking whichever library is cheaper.
+**Sequencing between the two is not fixed by the requirements**, and the argument below is why it cannot be settled by picking whichever library is cheaper.
 
-**These are two separate pieces of work, not one.** Language extensions often split into a thin
-TypeScript extension plus a language server over LSP, and such a server can be written in any language
-— which would have let a single Java client serve both audiences. That is not the case here:
-**SysIDE is `sensmetry/sysml-2ls`, and it is TypeScript.** A Java client therefore gives no coverage of
-the VS Code ecosystem, and a TypeScript client is required in its own right.
+**These are two separate pieces of work, not one.** Language extensions often split into a thin TypeScript extension plus a language server over LSP, and such a server can be written in any language — which would have let a single Java client serve both audiences. That is not the case here: **SysIDE is `sensmetry/sysml-2ls`, and it is TypeScript.** A Java client therefore gives no coverage of the VS Code ecosystem, and a TypeScript client is required in its own right.
 
-The two targets are also independent in value. Java reaches the OMG reference implementation and the
-tooling built around it; TypeScript reaches the editor practitioners actually model in. Neither
-substitutes for the other, and the sequencing is a product decision rather than a technical one.
+The two targets are also independent in value. Java reaches the OMG reference implementation and the tooling built around it; TypeScript reaches the editor practitioners actually model in. Neither substitutes for the other, and the sequencing is a product decision rather than a technical one.
 
-Independently of that, the NativeAOT CLI is an integration path for **any** language: an extension can
-shell out to `forge` with no client library at all.
+Independently of that, the NativeAOT CLI is an integration path for **any** language: an extension can shell out to `forge` with no client library at all.
 
-Every client, first-party or otherwise, is configured with a base URL and works unchanged against the
-SaaS registry, an on-premise instance, or a mirror, because `/api/v1` is a permanent contract with
-identical paths everywhere (DD-11).
+Every client, first-party or otherwise, is configured with a base URL and works unchanged against the SaaS registry, an on-premise instance, or a mirror, because `/api/v1` is a permanent contract with identical paths everywhere (DD-11).
 
 ---
 
@@ -1988,60 +1236,39 @@ identical paths everywhere (DD-11).
 
 | Concern | Store |
 |---|---|
-| Packages, versions, maintainers, keys, audit | PostgreSQL (SSS §4.5, DD-14) |
+| Packages, versions, ownership, keys, audit | PostgreSQL (SSS §4.5, DD-14) |
 | Per-format artefact manifests | PostgreSQL, JSONB with GIN indexing (DD-14) |
 | Artefact blobs | S3-compatible object storage (SSS §4.5), content-addressed, over `AWSSDK.S3` (DD-21) |
+| Organization logos | The same object storage, re-encoded on upload and referenced by key (§8.4) |
 | Search index | PostgreSQL, behind an interface (DD-14); see §12.1 |
 | Download counts | PostgreSQL, append-only events plus a materialised aggregate (DD-15) |
 | Dependents counts | PostgreSQL, derived from the `usage[]` graph and maintained in the publish transaction (DD-19) |
 | Background job state and progress | PostgreSQL, claimed rows (DD-17) |
 | Schema version journal | PostgreSQL, written by DbUp (DD-18) |
 
-Every row in that table depends on **PostgreSQL 18 or later**, which DD-23 makes a prerequisite of every
-topology alongside DD-21's object storage.
+Every row in that table depends on **PostgreSQL 18 or later**, which DD-23 makes a prerequisite of every topology alongside DD-21's object storage.
 
 Horizontal scaling requires every instance to be interchangeable:
 
 - **No server-side session affinity.** Guaranteed by DD-02 — no circuits exist to pin.
-- **No local disk state.** Artefacts stream to and from object storage; instances hold no durable
-  local data. DD-21 declines a filesystem-backed store precisely so that this holds without exception.
-- **No instance is special.** Work that is not on a request path — counter aggregation, blob
-  collection, index replication, pre-warm — is claimed from a job table rather than scheduled into a
-  designated instance (DD-17). Any replica can run any job; none has to.
-- **The database does not scale out with the application.** Every replica connects to the same
-  PostgreSQL, so the connection budget, not CPU, is what actually caps replica count — see §12.2.
-- **Publish must be atomic across two stores.** `SSS-FG-REG-A5E` requires atomic registration, but a
-  publish writes a blob to S3 *and* rows to PostgreSQL. The design writes the blob first under a
-  content-addressed key, then commits the metadata transaction; an orphaned blob is harmless and
-  collectable, whereas a metadata row pointing at a missing blob is not. Concurrent publishes of the
-  same `{package, version}` are serialised by a unique constraint, which also enforces `SSS-FG-REG-I3C`.
+- **No local disk state.** Artefacts stream to and from object storage; instances hold no durable local data. DD-21 declines a filesystem-backed store precisely so that this holds without exception.
+- **No instance is special.** Work that is not on a request path — counter aggregation, blob collection, index replication, pre-warm — is claimed from a job table rather than scheduled into a designated instance (DD-17). Any replica can run any job; none has to.
+- **The database does not scale out with the application.** Every replica connects to the same PostgreSQL, so the connection budget, not CPU, is what actually caps replica count — see §12.2.
+- **Publish must be atomic across two stores.** `SSS-FG-REG-A5E` requires atomic registration, but a publish writes a blob to S3 *and* rows to PostgreSQL. The design writes the blob first under a content-addressed key, then commits the metadata transaction; an orphaned blob is harmless and collectable, whereas a metadata row pointing at a missing blob is not. Concurrent publishes of the same `{package, version}` are serialised by a unique constraint, which also enforces `SSS-FG-REG-I3C`.
 
 ### 12.1 When search leaves PostgreSQL
 
-DD-14 keeps search in PostgreSQL, behind an interface, until measurement says otherwise. This section
-records what would justify moving, and which engine each trigger points to, so that the eventual
-choice is evidence-driven rather than reactive — and so that options already evaluated are not
-re-proposed from first principles later.
+DD-14 keeps search in PostgreSQL, behind an interface, until measurement says otherwise. This section records what would justify moving, and which engine each trigger points to, so that the eventual choice is evidence-driven rather than reactive — and so that options already evaluated are not re-proposed from first principles later.
 
-**Search being scoped to package metadata substantially weakens the case for ever moving.** The scenario that would have forced a
-dedicated engine — free-text relevance over millions of element documents — is the capability declined
-there on quality grounds. What remains is metadata search over thousands of documents and a B-tree
-lookup, neither of which strains PostgreSQL at the commercial target. Moving is now a contingency
-rather than an anticipated phase.
+**Search being scoped to package metadata substantially weakens the case for ever moving.** The scenario that would have forced a dedicated engine — free-text relevance over millions of element documents — is the capability declined there on quality grounds. What remains is metadata search over thousands of documents and a B-tree lookup, neither of which strains PostgreSQL at the commercial target. Moving is now a contingency rather than an anticipated phase.
 
-**No engine is designated in advance.** Should a trigger fire, which engine wins depends on *which*
-one, because the candidates have genuinely different strengths. Measurement precedes selection.
+**No engine is designated in advance.** Should a trigger fire, which engine wins depends on *which* one, because the candidates have genuinely different strengths. Measurement precedes selection.
 
 #### The latency budget, and where it comes from
 
-**p95 of the search query is budgeted at 500 ms**, measured at the API boundary — the time to execute
-the search and produce the response, excluding network and rendering. That is the figure a
-database-versus-search-engine decision actually moves.
+**p95 of the search query is budgeted at 500 ms**, measured at the API boundary — the time to execute the search and produce the response, excluding network and rendering. That is the figure a database-versus-search-engine decision actually moves.
 
-It is derived rather than chosen. The relevant perceptual threshold is **one second**: below it a
-user's flow of thought survives the wait, above it the interaction feels interrupted (Miller's
-response-time limits, as popularised by Nielsen). The search results page is static SSR with enhanced
-navigation (DD-01), so the end-to-end budget decomposes as:
+It is derived rather than chosen. The relevant perceptual threshold is **one second**: below it a user's flow of thought survives the wait, above it the interaction feels interrupted (Miller's response-time limits, as popularised by Nielsen). The search results page is static SSR with enhanced navigation (DD-01), so the end-to-end budget decomposes as:
 
 | Component | Allowance |
 |---|---|
@@ -2051,27 +1278,15 @@ navigation (DD-01), so the end-to-end budget decomposes as:
 | Response transfer | ~50 ms |
 | Browser parse and paint, no full reload | ~100 ms |
 
-That leaves roughly 650 ms for the query inside a one-second page. Budgeting **500 ms** keeps about
-150 ms of margin.
+That leaves roughly 650 ms for the query inside a one-second page. Budgeting **500 ms** keeps about 150 ms of margin.
 
-**Why not tighter.** 200 ms is comfortably inside the perceptual budget, but it is close to the natural
-variance of a faceted query computing `GROUP BY` counts across several dimensions. A threshold that
-trips on ordinary variance gets muted, and a muted alarm is worse than none.
+**Why not tighter.** 200 ms is comfortably inside the perceptual budget, but it is close to the natural variance of a faceted query computing `GROUP BY` counts across several dimensions. A threshold that trips on ordinary variance gets muted, and a muted alarm is worse than none.
 
-**Why not looser.** One second spends the entire perceptual budget on the query alone, leaving nothing
-for network and render. By the time it fired, real page loads would be well past 1.5 s and search would
-have been visibly poor for a long time.
+**Why not looser.** One second spends the entire perceptual budget on the query alone, leaving nothing for network and render. By the time it fired, real page loads would be well past 1.5 s and search would have been visibly poor for a long time.
 
-**Why p95.** The mean conceals tail latency, and the tail is the signal here — slow queries correlate
-with broad terms and many facets, which are exactly what degrade as the corpus grows. p99 is dominated
-by cold caches, GC pauses and noisy neighbours, so it would report infrastructure noise rather than
-search fitness. p95 catches systematic degradation while tolerating outliers.
+**Why p95.** The mean conceals tail latency, and the tail is the signal here — slow queries correlate with broad terms and many facets, which are exactly what degrade as the corpus grows. p99 is dominated by cold caches, GC pauses and noisy neighbours, so it would report infrastructure noise rather than search fitness. p95 catches systematic degradation while tolerating outliers.
 
-**What it is measured against.** The commercial target corpus — thousands of packages — with facet
-counting enabled, since facets are the expensive part. Cold-start requests are excluded. At that scale
-PostgreSQL should answer in tens of milliseconds, so 500 ms represents roughly an order of magnitude of
-headroom: crossing it means something structural changed, not that the corpus grew a little. That gap
-is what makes it a useful trigger rather than a target.
+**What it is measured against.** The commercial target corpus — thousands of packages — with facet counting enabled, since facets are the expensive part. Cold-start requests are excluded. At that scale PostgreSQL should answer in tens of milliseconds, so 500 ms represents roughly an order of magnitude of headroom: crossing it means something structural changed, not that the corpus grew a little. That gap is what makes it a useful trigger rather than a target.
 
 #### Triggers and the candidate each points to
 
@@ -2097,87 +1312,41 @@ is what makes it a useful trigger rather than a target.
 
 #### Notes on each candidate
 
-**PostgreSQL FTS — the incumbent.** Its concrete deficiency is that `ts_rank` and `ts_rank_cd` weight
-by term frequency, position and coverage density but carry **no corpus-level IDF term**. In a corpus
-where most descriptions read "ECSS mission model: *X* subsystem", that is the difference between
-ranking on the discriminating word and ranking on boilerplate. Partial mitigation without leaving
-PostgreSQL: compute IDF in application code over a candidate set the database narrows first.
+**PostgreSQL FTS — the incumbent.** Its concrete deficiency is that `ts_rank` and `ts_rank_cd` weight by term frequency, position and coverage density but carry **no corpus-level IDF term**. In a corpus where most descriptions read "ECSS mission model: *X* subsystem", that is the difference between ranking on the discriminating word and ranking on boilerplate. Partial mitigation without leaving PostgreSQL: compute IDF in application code over a candidate set the database narrows first.
 
-**Apache Solr.** Apache-2.0 throughout, matching Forge's own licence — the cleanest possible SBOM entry
-under `SSS-CC-SUP-SBM`, with no dual-licence clause to reason about. Cost is the JVM: heap sizing, GC
-tuning, and a footprint well above a Rust binary. That weighs less than it first appears, because
-Forge's on-premise customers are institutional organisations that already operate JVM infrastructure.
-The .NET client (SolrNet) is community-maintained and lags Solr's release cadence; this is not
-load-bearing, since Solr's API is plain HTTP/JSON and can be consumed with `HttpClient` and
-source-generated `System.Text.Json` per DD-05.
+**Apache Solr.** Apache-2.0 throughout, matching Forge's own licence — the cleanest possible SBOM entry under `SSS-CC-SUP-SBM`, with no dual-licence clause to reason about. Cost is the JVM: heap sizing, GC tuning, and a footprint well above a Rust binary. That weighs less than it first appears, because Forge's on-premise customers are institutional organisations that already operate JVM infrastructure. The .NET client (SolrNet) is community-maintained and lags Solr's release cadence; this is not load-bearing, since Solr's API is plain HTTP/JSON and can be consumed with `HttpClient` and source-generated `System.Text.Json` per DD-05.
 
-**Meilisearch — single-node deployment is entirely MIT.** The engine is dual-licensed
-`MIT AND BUSL-1.1`. The BUSL portion covers files "residing in `enterprise_editions` modules/folders",
-and its Additional Use Grant permits **non-production use only** — production use of those parts
-"requires a commercial license agreement with Meilisearch", converting to MIT four years after
-publication. Inspection of the repository shows the Enterprise Edition is twelve files out of roughly
-two thousand, confined to multi-node operation: index sharding
-(`crates/milli/src/sharding/enterprise_edition.rs`), network topology, inter-node proxying, federated
-search across nodes, and S3 snapshot storage. None is reachable in a single instance, so a single-node
-deployment carries no BUSL component and raises no `SSS-CC-SUP-SBM` issue. The official .NET SDK is MIT
-throughout.
+**Meilisearch — single-node deployment is entirely MIT.** The engine is dual-licensed `MIT AND BUSL-1.1`. The BUSL portion covers files "residing in `enterprise_editions` modules/folders", and its Additional Use Grant permits **non-production use only** — production use of those parts "requires a commercial license agreement with Meilisearch", converting to MIT four years after publication. Inspection of the repository shows the Enterprise Edition is twelve files out of roughly two thousand, confined to multi-node operation: index sharding (`crates/milli/src/sharding/enterprise_edition.rs`), network topology, inter-node proxying, federated search across nodes, and S3 snapshot storage. None is reachable in a single instance, so a single-node deployment carries no BUSL component and raises no `SSS-CC-SUP-SBM` issue. The official .NET SDK is MIT throughout.
 
-Two constraints follow. **Sharding is the licensed feature** — DD-02 scales the *application*
-horizontally, which does not imply scaling the search node; if the corpus ever required sharding that
-is a commercial negotiation. **S3-backed snapshots are licensed** — backup must snapshot to disk and be
-shipped by the surrounding infrastructure.
+Two constraints follow. **Sharding is the licensed feature** — DD-02 scales the *application* horizontally, which does not imply scaling the search node; if the corpus ever required sharding that is a commercial negotiation. **S3-backed snapshots are licensed** — backup must snapshot to disk and be shipped by the surrounding infrastructure.
 
-**ParadeDB — rejected.** `pg_search` offers the best BM25 of the group, and "one datastore" is
-superficially attractive. Two disqualifiers. It is **AGPL-3.0** uniformly, with no MIT core, so it
-would appear as AGPL in every released image's SBOM — a question for legal before adoption, given Forge
-ships on-premise under Apache-2.0. And being a **PostgreSQL extension** it rules out managed PostgreSQL
-entirely and couples Forge's search choice to the *platform* database that Fabric also depends on.
-That inverts the apparent benefit: it replaces "run one more isolated container" with "run a
-non-standard PostgreSQL build beneath the whole platform", which is the more invasive ask for a
-customer-operated installation.
+**ParadeDB — rejected.** `pg_search` offers the best BM25 of the group, and "one datastore" is superficially attractive. Two disqualifiers. It is **AGPL-3.0** uniformly, with no MIT core, so it would appear as AGPL in every released image's SBOM — a question for legal before adoption, given Forge ships on-premise under Apache-2.0. And being a **PostgreSQL extension** it rules out managed PostgreSQL entirely and couples Forge's search choice to the *platform* database that Fabric also depends on. That inverts the apparent benefit: it replaces "run one more isolated container" with "run a non-standard PostgreSQL build beneath the whole platform", which is the more invasive ask for a customer-operated installation.
 
 ### 12.2 The connection budget
 
-Forge scales out; PostgreSQL does not. Every replica talks to the same instance, so the ceiling on
-replica count is reached through connections long before it is reached through CPU. This is recorded
-because it is the one place where DD-02's freedom to add replicas meets a limit that adding replicas
-cannot solve.
+Forge scales out; PostgreSQL does not. Every replica talks to the same instance, so the ceiling on replica count is reached through connections long before it is reached through CPU. This is recorded because it is the one place where DD-02's freedom to add replicas meets a limit that adding replicas cannot solve.
 
-PostgreSQL is **process-per-connection** — each backend is an operating-system process with its own
-memory — so throughput degrades once the connection count runs well ahead of the core count. A few
-hundred is the practical territory, and the stock `max_connections` is 100.
+PostgreSQL is **process-per-connection** — each backend is an operating-system process with its own memory — so throughput degrades once the connection count runs well ahead of the core count. A few hundred is the practical territory, and the stock `max_connections` is 100.
 
-Npgsql pools per `NpgsqlDataSource`, and its default `Max Pool Size` is 100 **per replica**. Two
-replicas at defaults therefore exhaust a default-configured PostgreSQL between them. **Pool size is a
-value to set deliberately, not one to inherit**, and the arithmetic to keep true is:
+Npgsql pools per `NpgsqlDataSource`, and its default `Max Pool Size` is 100 **per replica**. Two replicas at defaults therefore exhaust a default-configured PostgreSQL between them. **Pool size is a value to set deliberately, not one to inherit**, and the arithmetic to keep true is:
 
 ```
 replicas × Max Pool Size  +  migrator  +  operator sessions  ≤  max_connections − superuser_reserved_connections
 ```
 
-The two roles of DD-03 have opposite profiles and are sized separately rather than sharing a number:
-a web replica holds many connections briefly, while a job replica holds few for long transactions
-(DD-17's leases and the multi-hour pre-warm of §5.1.5).
+The two roles of DD-03 have opposite profiles and are sized separately rather than sharing a number: a web replica holds many connections briefly, while a job replica holds few for long transactions (DD-17's leases and the multi-hour pre-warm of §5.1.5).
 
 #### If the budget stops working: a pooler, as a contingency
 
-This section is structured like §12.1 deliberately. **No pooler is deployed, and none is planned.**
-What follows is the trigger, the candidate it points to, and what adopting it would require — so that
-the eventual choice is evidence-driven rather than reactive.
+This section is structured like §12.1 deliberately. **No pooler is deployed, and none is planned.** What follows is the trigger, the candidate it points to, and what adopting it would require — so that the eventual choice is evidence-driven rather than reactive.
 
 | Trigger | Candidate | Why that one |
 |---|---|---|
 | The budget above stops closing — replica count needed for load exceeds what `max_connections` will support, or connection establishment shows up in latency | **PgBouncer, transaction pooling mode** | Multiplexes many client connections onto few server ones. A deployment addition, not an application change; no per-instance state, so it does not compromise §12's interchangeability |
 
-**PgBouncer is not required for the §5.1 topologies and must not be read as a component every
-customer operates.** A `docker compose`, on-premise or air-gapped installation is typically one
-replica, where the default pool already fits comfortably. This is a SaaS scaling provision — and the
-objection §12.1 raises against ParadeDB and DD-17 raises against a message broker applies with equal
-force here.
+**PgBouncer is not required for the §5.1 topologies and must not be read as a component every customer operates.** A `docker compose`, on-premise or air-gapped installation is typically one replica, where the default pool already fits comfortably. This is a SaaS scaling provision — and the objection §12.1 raises against ParadeDB and DD-17 raises against a message broker applies with equal force here.
 
-Transaction pooling withholds anything that outlives a single transaction, because the next
-transaction may land on a different server connection. Four such features matter, and they divide
-into two groups that should not be confused:
+Transaction pooling withholds anything that outlives a single transaction, because the next transaction may land on a different server connection. Four such features matter, and they divide into two groups that should not be confused:
 
 **Already true, for reasons of their own** — so the door stays open at no cost:
 
@@ -2193,16 +1362,13 @@ into two groups that should not be confused:
 |---|---|
 | Server-side prepared statements | Npgsql's automatic preparation would need disabling, or the affected role routing around the pooler. **Left enabled.** Auto-preparation is a real performance feature, and turning it off now would pay a certain cost today against a contingency that may never arrive |
 
-That split is the point of recording this at all. Constraints that are free are honoured immediately;
-constraints that cost something wait until the trigger fires.
+That split is the point of recording this at all. Constraints that are free are honoured immediately; constraints that cost something wait until the trigger fires.
 
 ---
 
 ## 13. Authentication and authorisation
 
-**RD-01 is the authority on the role and permission model** — the scopes, the capability tables, and
-the reasoning behind them. This section records how Forge implements that model, and the parts of it
-that are Forge's own rather than the platform's.
+**RD-01 is the authority on the role and permission model** — the scopes, the capability tables, and the reasoning behind them. This section records how Forge implements that model, and the parts of it that are Forge's own rather than the platform's.
 
 **Three principals**, and only the first two are people:
 
@@ -2212,96 +1378,69 @@ that are Forge's own rather than the platform's.
 | **Account** | OIDC against Forge's own provider, provisioned on first sign-in (`SSS-FG-AUTH-S1A`, `A2F`) | Whatever its roles and the packages' visibility permit |
 | **API key** | Bearer credential, hashed at rest (`SSS-FG-REG-Y2L`) | Never more than the Account that issued it, narrowed to an operation set |
 
-**Identity is Forge's own.** The provider ships with the deployment; where an *upstream* provider is
-configured, Forge federates to it, and never requires one (DD-20). Accounts and Organizations are
-Forge's records rather than projections of an external directory, so registration, profile,
-organization creation, membership, invitations and deprovisioning are all Forge's to administer
-(`SSS-FG-ACC-*`, `SSS-FG-ORG-*`). That surface exists because a Forge installation must run with
-neither Bloom nor Fabric present.
+**Identity is Forge's own.** The provider ships with the deployment; where an *upstream* provider is configured, Forge federates to it, and never requires one (DD-20). Accounts and Organizations are Forge's records rather than projections of an external directory, so registration, profile, organization creation, membership, invitations and deprovisioning are all Forge's to administer (`SSS-FG-ACC-*`, `SSS-FG-ORG-*`). That surface exists because a Forge installation must run with neither Bloom nor Fabric present.
 
-**Read access is governed by visibility, not by a role.** A package is private, organization-visible or
-public (`SSS-FG-AUTH-V6K`), and what a principal cannot read is indistinguishable from what does not
-exist (`D4M`). `Reader` exists only to grant read where visibility would otherwise exclude, which is
-why it is not assignable on a public package (`K9R`).
+**Read access is governed by visibility, not by a role.** A package is private, organization-visible or public (`SSS-FG-AUTH-V6K`), and what a principal cannot read is indistinguishable from what does not exist (`D4M`). `Reader` exists only to grant read where visibility would otherwise exclude, which is why it is not assignable on a public package (`K9R`).
 
-**Write authority is the package role** — `Owner`, `Maintainer`, `Reader` (`SSS-FG-AUTH-M3C`, `K9R`) —
-with §8.1's invariants enforced in the domain layer rather than at the API boundary, so that every
-entry point is covered.
+**Write authority is ownership, and ownership is the scope** (§8.6). A package belongs to the principal owning its scope; where that principal is an Organization, its Administrators and Publishers act for it (`SSS-FG-AUTH-G6F`). There is no per-package role to consult. §8.1's invariants are enforced in the domain layer rather than at the API boundary, so that every entry point is covered.
 
-**Publishing is authorised against the declared scope**, never derived from the credential
-(`SSS-FG-AUTH-S2B`, `G6F`): an Account may hold publishing rights in several scopes and has to be able
-to say which one a publication targets.
+**Publishing is authorised against the declared scope**, never derived from the credential (`SSS-FG-AUTH-S2B`, `G6F`): an Account may hold publishing rights in several scopes and has to be able to say which one a publication targets.
 
-**Deletion and erasure belong to the Installation Administrator** (`SSS-FG-AUTH-E7N`). Unlisting is the
-only withdrawal an Owner or Maintainer has (`SSS-FG-REG-U4D`).
+**Deletion and erasure belong to the Installation Administrator** (`SSS-FG-AUTH-E7N`). Unlisting is the only withdrawal an owner has (`SSS-FG-REG-U4D`).
 
 **Every privileged operation** writes an append-only, tamper-evident audit entry (`SSS-FG-AUTH-R9J`).
 
 #### API keys are Forge's own, and are not Keycloak tokens
 
-Worth stating, because the opposite is a reasonable thing for a reviewer to propose and the reasoning
-should not have to be reconstructed. Keycloak issues tokens, not API keys; it has no
-personal-access-token concept, and the OAuth2 equivalent is a client-credentials grant. That is
-deliberately not used:
+Worth stating, because the opposite is a reasonable thing for a reviewer to propose and the reasoning should not have to be reconstructed. Keycloak issues tokens, not API keys; it has no personal-access-token concept, and the OAuth2 equivalent is a client-credentials grant. That is deliberately not used:
 
-- **Revocation.** `SSS-FG-REG-Y2L` requires revocable keys. A JWT remains valid until it expires
-  unless every request calls token introspection, which puts an IdP round trip on every publish and
-  every authenticated read. A hashed key in Forge's own database is revoked with one `UPDATE`.
-- **Scoping.** Keys scope to a publisher and an operation set, which are Forge domain objects.
-  Expressing them as IdP client roles would push Forge's authorisation model into the provider,
-  reintroducing the coupling DD-20 removed.
-- **Availability and reach.** Forge's own keys keep publishing working when the provider is down, and
-  a CI runner needs egress to the registry only — not to the registry *and* the IdP, which is a real
-  cost in §5.1's restricted and air-gapped deployments.
+- **Revocation.** `SSS-FG-REG-Y2L` requires revocable keys. A JWT remains valid until it expires unless every request calls token introspection, which puts an IdP round trip on every publish and every authenticated read. A hashed key in Forge's own database is revoked with one `UPDATE`.
+- **Scoping.** Keys scope to a publisher and an operation set, which are Forge domain objects. Expressing them as IdP client roles would push Forge's authorisation model into the provider, reintroducing the coupling DD-20 removed.
+- **Availability and reach.** Forge's own keys keep publishing working when the provider is down, and a CI runner needs egress to the registry only — not to the registry *and* the IdP, which is a real cost in §5.1's restricted and air-gapped deployments.
 
 nuget.org, npm, PyPI, crates.io and GitHub all issue opaque hashed tokens, for these reasons.
 
 #### The hash is SHA-256, not a password KDF
 
-This is the one place where the obvious answer is wrong, so it is fixed here rather than left to
-implementation.
+This is the one place where the obvious answer is wrong, so it is fixed here rather than left to implementation.
 
-A key is a credential, which invites hashing it as a password with bcrypt or Argon2. Those are slow
-*by design*, because passwords carry roughly 30 bits of entropy and are brute-forceable. **A key
-generated from a CSPRNG at 256 bits is not brute-forceable at any hash speed**, so slowness buys
-nothing — and it would be paid on every authenticated request, including the download path §12.1
-budgets at 500 ms p95.
+A key is a credential, which invites hashing it as a password with bcrypt or Argon2. Those are slow *by design*, because passwords carry roughly 30 bits of entropy and are brute-forceable. **A key generated from a CSPRNG at 256 bits is not brute-forceable at any hash speed**, so slowness buys nothing — and it would be paid on every authenticated request, including the download path §12.1 budgets at 500 ms p95.
 
-SHA-256 is therefore correct and sufficient, unsalted — salts defeat rainbow tables across users who
-chose the same password, and random tokens present no such collisions — with constant-time
-comparison. The token itself carries a fixed prefix so that secret scanners can detect it when leaked,
-and splits into an indexed lookup identifier plus the secret, so that verification is a seek rather
-than a scan of every key.
+SHA-256 is therefore correct and sufficient, unsalted — salts defeat rainbow tables across users who chose the same password, and random tokens present no such collisions — with constant-time comparison. The token itself carries a fixed prefix so that secret scanners can detect it when leaked, and splits into an indexed lookup identifier plus the secret, so that verification is a seek rather than a scan of every key.
 
-**Recording last use is a hot-row write** on the highest-volume authenticated path, and is subject to
-DD-15's rule rather than exempt from it: throttled, or aggregated, never a synchronous update per
-request.
+**Recording last use is a hot-row write** on the highest-volume authenticated path, and is subject to DD-15's rule rather than exempt from it: throttled, or aggregated, never a synchronous update per request.
+
+#### Keys expire, and the lifetime is chosen when the key is issued
+
+`SSS-FG-REG-Y2L` requires keys to be revocable and says nothing about expiry. Revocation alone is a control that only works when someone notices — and the leaks §13 is written against are precisely the ones nobody notices. A lifetime is the control that does not depend on detection.
+
+The issuer chooses from a fixed set: **one week, one month, three months, six months, one year, or indefinite.**
+
+**A fixed set rather than a date picker**, because the two are not equivalent in practice even though they express the same range. A free-form date makes a far-future value the path of least resistance — it is one interaction whichever date is picked, so the safe answer costs more thought than the unsafe one. A short list makes "one week" exactly as cheap to choose as "indefinite", which is the only thing that gets short-lived keys used for the one-off publish they suit.
+
+**The duration is an input constraint; the stored value is an instant.** `ExpiresAt` is absolute, and `null` means indefinite. The domain layer compares an instant on every authenticated request and has no use for the enumeration, which belongs to the request DTO and the issue form; storing the choice as well would put a presentation concern in the schema, and it is recoverable from `CreatedAt` and `ExpiresAt` anyway.
+
+**Expiry is enforced in the lookup, not by a sweep.** A key authenticates when it is neither revoked nor expired, evaluated in the same query that resolves the prefix and compares the hash. A background job that marks keys expired would leave a window between the instant and the sweep in which an expired key still works, and that window would be the one an attacker waits for.
+
+**Expired and revoked stay separate columns**, because they are different events. The audit trail needs to distinguish a key that lapsed from one an Account holder withdrew after a suspected leak, and so does the interface: "expired on 3 March" and "you revoked this on 3 March" call for different responses from the reader. Neither deletes the row — the audit entries in §8 refer to the key, so it outlives its usability.
+
+**Indefinite remains available**, and it is the honest place to say what it costs: a key with no expiry makes containment depend entirely on someone noticing the leak, which returns the whole surface to the situation the lifetime exists to improve. It is the right choice for a long-lived internal pipeline and the wrong one for everything else. An installation-wide maximum lifetime is the natural extension, and would need a requirement before it is built.
+
+**A key that outlives its usefulness is usually a key nobody could name**, which is why `ApiKey` carries a `Name`. Revoking safely means knowing what breaks, and an issue date is not enough to reconstruct that a year later.
+
+**Expiry has an operational cost, and it lands on CI.** A publishing key that lapses silently fails a pipeline at whatever moment the pipeline next runs, which is not when anyone is watching for it. The mitigation is a notification ahead of the date rather than at it, sent from DD-17's job runner, and it is what makes the shorter durations usable rather than merely available.
 
 #### Containing a leaked key
 
-A key cannot be prevented from leaking. It leaks from a committed `.env`, a CI log, a laptop or a
-screenshot in a support ticket — none of which Forge controls. What the design can do is bound the
-damage and keep revocation effective, and three rules follow from that.
+A key cannot be prevented from leaking. It leaks from a committed `.env`, a CI log, a laptop or a screenshot in a support ticket — none of which Forge controls. What the design can do is bound the damage and keep revocation effective, and three rules follow from that.
 
-**Keys travel in the `Authorization` header, never in a query string.** A credential in a URL is
-copied into access logs, proxy logs, browser history and `Referer` headers, several of them outside
-the operator's control and most of them retained longer than anyone intends. The rule is absolute:
-there is no query-parameter form of any authenticated request.
+**Keys travel in the `Authorization` header, never in a query string.** A credential in a URL is copied into access logs, proxy logs, browser history and `Referer` headers, several of them outside the operator's control and most of them retained longer than anyone intends. The rule is absolute: there is no query-parameter form of any authenticated request.
 
-**A key can never mint another key.** Key management — issuance and revocation — requires interactive
-OIDC authentication, and is not reachable with an API key. Without this rule theft is *permanent*
-rather than contained: a thief presents the stolen key, issues themselves a fresh one, and revoking
-the original achieves nothing. This is the single cheapest thing that separates a contained incident
-from an uncontained one.
+**A key can never mint another key.** Key management — issuance and revocation — requires interactive OIDC authentication, and is not reachable with an API key. Without this rule theft is *permanent* rather than contained: a thief presents the stolen key, issues themselves a fresh one, and revoking the original achieves nothing. This is the single cheapest thing that separates a contained incident from an uncontained one.
 
-**Credential scrubbing keys off the token format.** §14's Serilog destructuring policy redacts on the
-key prefix and on `Authorization` headers, and §10.1's problem details never echo a credential back.
-The fixed prefix is what makes this mechanical rather than a matter of remembering — a value that
-looks like a key is redacted wherever it appears, including in exception messages and request dumps
-nobody anticipated.
+**Credential scrubbing keys off the token format.** §14's Serilog destructuring policy redacts on the key prefix and on `Authorization` headers, and §10.1's problem details never echo a credential back. The fixed prefix is what makes this mechanical rather than a matter of remembering — a value that looks like a key is redacted wherever it appears, including in exception messages and request dumps nobody anticipated.
 
-**What limits the blast radius is already in the design**, though for unrelated reasons, and it is
-worth stating so that the residual risk is understood rather than assumed:
+**What limits the blast radius is already in the design**, though for unrelated reasons, and it is worth stating so that the residual risk is understood rather than assumed:
 
 | Property | Consequence for a stolen key |
 |---|---|
@@ -2309,43 +1448,23 @@ worth stating so that the residual risk is understood rather than assumed:
 | Unlisted versions still serve direct downloads (`SSS-FG-REG-U4D`) | Existing consumers cannot be cut off |
 | No package-level shadowing (DD-16) | A key for one scope cannot shadow another's package |
 | Every privileged operation is audited (`SSS-FG-AUTH-R9J`) | What was done with the key is reconstructable |
+| A key expires unless it was issued indefinite | A leak nobody ever notices still ends |
 
-The realistic worst case is therefore the publication of a malicious **new** version within a scope
-the key already covered — serious, since a consumer resolving the latest version receives it, but
-bounded, visible, and answerable by publishing a corrected higher version.
+The realistic worst case is therefore the publication of a malicious **new** version within a scope the key already covered — serious, since a consumer resolving the latest version receives it, but bounded, visible, and answerable by publishing a corrected higher version.
 
 ### 13.1 Verified publishers — deferred beyond the first version
 
-The interface shows a verification badge, but no SSS requirement defines it. It is **planned and
-deliberately not in the first release**; this section fixes its shape so that it is designed rather
-than improvised when the time comes.
+The interface shows a verification badge, but no SSS requirement defines it. It is **planned and deliberately not in the first release**; this section fixes its shape so that it is designed rather than improvised when the time comes.
 
-**It asserts identity, and only identity:** that a scope belongs to the organisation whose name it
-carries — that `@esa` is genuinely ESA. It makes **no claim about content quality**, and the interface
-must not present it as one.
+**It asserts identity, and only identity:** that a scope belongs to the organisation whose name it carries — that `@esa` is genuinely ESA. It makes **no claim about content quality**, and the interface must not present it as one.
 
-That restraint is the important part. Docker Hub's Verified Publisher programme certifies "high-quality
-images from commercial publishers verified by Docker" — an identity claim and a quality claim in a
-single sentence, leaving a user unable to tell which they are being told. Docker can afford the quality
-half because it staffs a curation team. Forge will not have review capacity, and a quality badge that
-is not backed by review is a liability: users read any badge as "safe to import", and the registry
-would own that reading.
+That restraint is the important part. Docker Hub's Verified Publisher programme certifies "high-quality images from commercial publishers verified by Docker" — an identity claim and a quality claim in a single sentence, leaving a user unable to tell which they are being told. Docker can afford the quality half because it staffs a curation team. Forge will not have review capacity, and a quality badge that is not backed by review is a liability: users read any badge as "safe to import", and the registry would own that reading.
 
-**Verification attaches to the `Scope`, not the `Package`.** Docker verifies publishers rather than
-individual images, and that is the right shape here too. The question a user actually has is "is this
-really ESA?", not "is this particular package genuine". Scope-level means one record per organisation
-rather than per package, inheritance is automatic, and it avoids the immutability problem — a `Scope`
-is mutable state, whereas a published `PackageVersion` is frozen by §8.1 and could never carry a
-revocable flag.
+**Verification attaches to the `Scope`, not the `Package`.** Docker verifies publishers rather than individual images, and that is the right shape here too. The question a user actually has is "is this really ESA?", not "is this particular package genuine". Scope-level means one record per organisation rather than per package, inheritance is automatic, and it avoids the immutability problem — a `Scope` is mutable state, whereas a published `PackageVersion` is frozen by §8.1 and could never carry a revocable flag.
 
-**Operator-published content is a separate matter and already covered.** `SSS-FG-AUTH-S2B` reserves the
-unscoped namespace for standard libraries distributed by the Mycelium operator, which is the same
-mechanism Docker uses for Official Images. That information is in the identifier and needs no badge.
+**Operator-published content is a separate matter and already covered.** `SSS-FG-AUTH-S2B` reserves the unscoped namespace for standard libraries distributed by the Mycelium operator, which is the same mechanism Docker uses for Official Images. That information is in the identifier and needs no badge.
 
-**What building it will require**, none of which is a first-release concern: an application and
-approval workflow, an operator-side grant and revocation capability, audit entries under
-`SSS-FG-AUTH-R9J` covering both, and the support burden of adjudicating claims. It is a staffed
-programme, not a boolean column, and should be scheduled as such.
+**What building it will require**, none of which is a first-release concern: an application and approval workflow, an operator-side grant and revocation capability, audit entries under `SSS-FG-AUTH-R9J` covering both, and the support burden of adjudicating claims. It is a staffed programme, not a boolean column, and should be scheduled as such.
 
 **It needs an SSS requirement** before implementation — see §3.2.
 
@@ -2362,88 +1481,54 @@ programme, not a boolean column, and should be scheduled as such.
 | Schema-version readiness gate | A `/ready` check that the migration journal holds every embedded script (DD-18) | `SSS-FB-OBS-H4D` |
 | Credential and PII scrubbing, bounded retention | Serilog enrichers and destructuring policy, redacting on the API key prefix and on `Authorization` headers (§13) | `SSS-FB-OBS-R8H` |
 
-The schema-version gate is deliberately on `/ready` and not `/healthz`. A replica whose schema is
-behind the code is not unhealthy — restarting it changes nothing — it is *not ready to serve*, and
-the correct response is removal from the load balancer until the migrator has run. Putting it on
-`/healthz` would instead have the orchestrator restart it in a loop.
+The schema-version gate is deliberately on `/ready` and not `/healthz`. A replica whose schema is behind the code is not unhealthy — restarting it changes nothing — it is *not ready to serve*, and the correct response is removal from the load balancer until the migrator has run. Putting it on `/healthz` would instead have the orchestrator restart it in a loop.
 
 ---
 
 ## 15. Build, development environment and deployment
 
-- **Runtime prerequisites** — **PostgreSQL 18 or later** (DD-23) and S3-compatible object storage,
-  implemented by **Garage** (DD-21), in every topology of §5.1 including air-gapped.
+- **Runtime prerequisites** — **PostgreSQL 18 or later** (DD-23) and S3-compatible object storage, implemented by **Garage** (DD-21), in every topology of §5.1 including air-gapped.
 - **Tailwind** — DD-08. `Directory.Build.targets`, `UseTailwind` opt-in, checksum-verified.
 - **Devcontainer** — one environment for the team; a prerequisite for running agent tooling in-container.
 - **Container image** — multi-stage; SDK image builds and publishes, ASP.NET runtime image serves on 8080.
 
 ### 15.1 SBOM and provenance
 
-Built with the same invocation already used for COMET-webservices, so that Starion's products share one
-supply-chain pattern:
+Built with the same invocation already used for COMET-webservices, so that Starion's products share one supply-chain pattern:
 
 ```
 docker buildx build --sbom=true --provenance=true
 ```
 
-**`--sbom=true` satisfies `SSS-CC-SUP-SBM`.** BuildKit generates the SBOM with `buildkit-syft-scanner`
-and emits **SPDX**, which is one of the two formats the requirement permits, and the one aerospace and
-government procurement most often asks for by name. Because it scans the built image rather than the
-restore graph, it captures base-image OS packages and the .NET runtime — the components a customer's
-vulnerability scanner will actually flag — not only managed dependencies.
+**`--sbom=true` satisfies `SSS-CC-SUP-SBM`.** BuildKit generates the SBOM with `buildkit-syft-scanner` and emits **SPDX**, which is one of the two formats the requirement permits, and the one aerospace and government procurement most often asks for by name. Because it scans the built image rather than the restore graph, it captures base-image OS packages and the .NET runtime — the components a customer's vulnerability scanner will actually flag — not only managed dependencies.
 
-Multi-stage means the final stage is what is attested. The SDK image, and the Tailwind CLI fetched into
-`build/tools/`, exist only in the build stage and correctly do not appear. **Build tooling is therefore
-not covered by the SBOM**; its supply-chain control is DD-08's SHA-256 verification instead.
+Multi-stage means the final stage is what is attested. The SDK image, and the Tailwind CLI fetched into `build/tools/`, exist only in the build stage and correctly do not appear. **Build tooling is therefore not covered by the SBOM**; its supply-chain control is DD-08's SHA-256 verification instead.
 
-**`--provenance=true` is above requirement and deliberately retained.** `SSS-CC-SUP-SBM` asks only for
-an SBOM. SLSA provenance additionally records how the image was built — builder, source revision,
-materials — which allows a customer to verify an image originated from the Starion pipeline, rather
-than only to enumerate its contents.
+**`--provenance=true` is above requirement and deliberately retained.** `SSS-CC-SUP-SBM` asks only for an SBOM. SLSA provenance additionally records how the image was built — builder, source revision, materials — which allows a customer to verify an image originated from the Starion pipeline, rather than only to enumerate its contents.
 
 #### Delivery to air-gapped sites
 
-Attestations are stored as separate OCI manifests **referring to** the image rather than inside it.
-They travel with a registry pull, but `docker save` does not carry them.
+Attestations are stored as separate OCI manifests **referring to** the image rather than inside it. They travel with a registry pull, but `docker save` does not carry them.
 
-Air-gapped customers take delivery as a tarball via `docker save` and `docker load`. On that path the
-attestation is lost, so **the SBOM is additionally published as a standalone release file** alongside
-the image. Without it, `SSS-CC-SUP-SBM` would be silently unmet for exactly the customers most likely
-to require it contractually.
+Air-gapped customers take delivery as a tarball via `docker save` and `docker load`. On that path the attestation is lost, so **the SBOM is additionally published as a standalone release file** alongside the image. Without it, `SSS-CC-SUP-SBM` would be silently unmet for exactly the customers most likely to require it contractually.
 
-The tarball route is retained deliberately rather than for want of alternatives. `skopeo copy --all`
-into an `oci-archive`, `oras copy --recursive`, and `docker buildx --output type=oci` all preserve
-attestations through an air gap. They are not adopted as the baseline because:
+The tarball route is retained deliberately rather than for want of alternatives. `skopeo copy --all` into an `oci-archive`, `oras copy --recursive`, and `docker buildx --output type=oci` all preserve attestations through an air gap. They are not adopted as the baseline because:
 
-- Verifying an attestation air-side also requires the trust root to be shipped out of band, so the
-  customer usually cannot complete the verification chain anyway. A file they can hand to procurement
-  is more useful than an attestation they cannot check.
-- `docker load` is what air-gapped operations teams already hold runbooks for. Requiring `skopeo` adds
-  an entry to an approved-software list, which is a real cost in these environments.
-- Customer vulnerability tooling generally scans the loaded image and generates its own inventory. The
-  delivered SBOM serves as a compliance record, and a file serves that purpose better.
+- Verifying an attestation air-side also requires the trust root to be shipped out of band, so the customer usually cannot complete the verification chain anyway. A file they can hand to procurement is more useful than an attestation they cannot check.
+- `docker load` is what air-gapped operations teams already hold runbooks for. Requiring `skopeo` adds an entry to an approved-software list, which is a real cost in these environments.
+- Customer vulnerability tooling generally scans the loaded image and generates its own inventory. The delivered SBOM serves as a compliance record, and a file serves that purpose better.
 
-`skopeo` is documented as the attestation-preserving option for customers able to use it, without
-being the default.
+`skopeo` is documented as the attestation-preserving option for customers able to use it, without being the default.
 
-> This is structurally the same problem as the air-gapped package bundle in §5.1.1 — transporting
-> verifiable content across a gap that the verification infrastructure does not cross. The two should
-> stay consistent when the bundle format is specified.
+> This is structurally the same problem as the air-gapped package bundle in §5.1.1 — transporting verifiable content across a gap that the verification infrastructure does not cross. The two should stay consistent when the bundle format is specified.
 
 #### The CLI carries its own SBOM
 
-`SSS-CC-SUP-SBM` names container images, so the CLI falls outside it as written on **both** of §11.2's
-distribution channels. Each is nonetheless a released, installed artefact with bundled dependencies, and
-the same procurement logic applies, so **the CLI carries an SBOM too** — one SBOM, since the two
-channels ship the same code at the same version.
+`SSS-CC-SUP-SBM` names container images, so the CLI falls outside it as written on **both** of §11.2's distribution channels. Each is nonetheless a released, installed artefact with bundled dependencies, and the same procurement logic applies, so **the CLI carries an SBOM too** — one SBOM, since the two channels ship the same code at the same version.
 
-Because there is no image to scan, it is generated from the .NET restore graph rather than by image
-scanning — which also gives more reliable licence data for managed dependencies, since NuGet packages
-declare `PackageLicenseExpression` directly.
+Because there is no image to scan, it is generated from the .NET restore graph rather than by image scanning — which also gives more reliable licence data for managed dependencies, since NuGet packages declare `PackageLicenseExpression` directly.
 
-The dependency review in §9.2 and §12.1 makes this consequential rather than procedural: COMET-SDK is
-LGPL-3.0, and the §12.1 contingencies would introduce either a BUSL clause or a substantial transitive
-Apache tree. The SBOM is where a customer's procurement function encounters those.
+The dependency review in §9.2 and §12.1 makes this consequential rather than procedural: COMET-SDK is LGPL-3.0, and the §12.1 contingencies would introduce either a BUSL clause or a substantial transitive Apache tree. The SBOM is where a customer's procurement function encounters those.
 
 ---
 
@@ -2460,12 +1545,9 @@ Apache tree. The SBOM is where a customer's procurement function encounters thos
 | `Mycelium.Forge.Client.Tests` | NUnit | No | Client library tests |
 | `Mycelium.Forge.EndToEndTests` | Playwright | No | Browser and HTTP API end-to-end suites |
 
-`Mycelium.Forge.Ui`, the Blazor WebAssembly project, is **not** in this list: no screen requires a
-component runtime (§7.4, DD-02). The name is reserved should one ever do so.
+`Mycelium.Forge.Ui`, the Blazor WebAssembly project, is **not** in this list: no screen requires a component runtime (§7.4, DD-02). The name is reserved should one ever do so.
 
-There is likewise **no separate persistence project**. The generated data-access layer lives in
-`Mycelium.Forge/Orm/`, because only the deployable consumes it and DD-03 has one deployable — see
-DD-18 for the reasoning and for why extracting it later is cheap.
+There is likewise **no separate persistence project**. The generated data-access layer lives in `Mycelium.Forge/Orm/`, because only the deployable consumes it and DD-03 has one deployable — see DD-18 for the reasoning and for why extracting it later is cheap.
 
 ---
 
@@ -2479,68 +1561,51 @@ DD-18 for the reasoning and for why extracting it later is cheap.
 | Persistence | NUnit, Testcontainers | Generated DAOs, hand-written repositories and the whole migration set against a real PostgreSQL, plus the drift check between a migrated database and the generated schema (DD-18) and DD-23's key-ordering assertion |
 | End-to-end | Playwright | Browser surface and HTTP API against a running host |
 
-End-to-end suites are tagged `EndToEnd` so `--filter TestCategory!=EndToEnd` gives a server-free run.
-They target a real host over the network rather than an in-memory server, so the API is exercised
-through the transport a real client uses. Persistence suites are tagged `Database` on the same
-principle: they need a container, so a developer without Docker can still run everything else.
+End-to-end suites are tagged `EndToEnd` so `--filter TestCategory!=EndToEnd` gives a server-free run. They target a real host over the network rather than an in-memory server, so the API is exercised through the transport a real client uses. Persistence suites are tagged `Database` on the same principle: they need a container, so a developer without Docker can still run everything else.
 
 ---
 
 ## 18. Open questions
 
-None. All questions raised during design have been resolved, and each answer is recorded in the section
-it affects.
+None. All questions raised during design have been resolved, and each answer is recorded in the section it affects.
 
-Questions arising during implementation should be added here with the section they affect, and removed
-once the answer has been written into that section.
+Questions arising during implementation should be added here with the section they affect, and removed once the answer has been written into that section.
 
 ---
 
 ## 19. Implementation sequencing
 
-Everything below is first-release scope. Sequencing exists to keep the work parallelisable and to stop
-mirroring from cutting across every other path, not to defer capability.
+Everything below is first-release scope. Sequencing exists to keep the work parallelisable and to stop mirroring from cutting across every other path, not to defer capability.
 
 ### 19.1 The principle: mirroring is additive if three seams exist
 
-Upstream mirroring (§5.1) touches publish, download, search, and every write path. Built after the
-fact without preparation it becomes an invasive change that revisits code the team has already
-finished, and every issue in phase 1 acquires an implicit "…and what does this do on a proxied scope?"
-clause that cannot yet be answered.
+Upstream mirroring (§5.1) touches publish, download, search, and every write path. Built after the fact without preparation it becomes an invasive change that revisits code the team has already finished, and every issue in phase 1 acquires an implicit "…and what does this do on a proxied scope?" clause that cannot yet be answered.
 
-Three seams must therefore be present from the first commit, even though phase 1 exercises only one
-branch of each. They are cheap to include and expensive to retrofit.
+Three seams must therefore be present from the first commit, even though phase 1 exercises only one branch of each. They are cheap to include and expensive to retrofit.
 
 | Seam | Phase 1 behaviour | What mirroring adds |
 |---|---|---|
 | **`Scope.Origin`** — every scope records whether it is local or proxied, and from where | Always `Local` | Proxied scopes, and DD-16's configuration-time rejections |
 | **Artefact resolution behind an interface** — `IArtifactStore` resolves by content hash | Reads the local blob store only | Fetch-on-miss from upstream, then cache |
-| **Write-authority check** — every publish, unlist, maintainer and ownership operation asks whether this scope is writable here | Always true | Returns false for proxied scopes (§5.1.3) |
+| **Write-authority check** — every publish, unlist and ownership operation asks whether this scope is writable here | Always true | Returns false for proxied scopes (§5.1.3) |
 
-The third is the one most likely to be skipped, because in phase 1 it is a function that always returns
-`true`. Adding it later means finding every write path and getting all of them right; adding it now
-means changing one implementation.
+The third is the one most likely to be skipped, because in phase 1 it is a function that always returns `true`. Adding it later means finding every write path and getting all of them right; adding it now means changing one implementation.
 
-**Metadata TTL is deliberately not a required seam.** It applies only to proxied version lists, which
-do not exist in phase 1, so it arrives with the proxy itself and disturbs nothing.
+**Metadata TTL is deliberately not a required seam.** It applies only to proxied version lists, which do not exist in phase 1, so it arrives with the proxy itself and disturbs nothing.
 
 ### 19.2 Phases
 
 | Phase | Contents | Depends on |
 |---|---|---|
-| **1 — Registry core** | kpar publish, download, unlist. Metadata projection. Metadata search (`SSS-FG-REG-Q7G`) and qualified-name resolution (`SSS-FG-REG-Z5Q`). Static SSR web interface. OIDC and API keys, maintainer model with the §8.1 invariants. The `/api/v1` surface (DD-11). Observability (§14). The job runner (DD-17), carrying counter aggregation and blob collection. **Plus the three seams.** | — |
+| **1 — Registry core** | kpar publish, download, unlist. Metadata projection. Metadata search (`SSS-FG-REG-Q7G`) and qualified-name resolution (`SSS-FG-REG-Z5Q`). Static SSR web interface. OIDC and API keys, the ownership model with the §8.1 invariants. The `/api/v1` surface (DD-11). Observability (§14). The job runner (DD-17), carrying counter aggregation and blob collection. **Plus the three seams.** | — |
 | **2 — Client surfaces** | `Mycelium.Forge.Client`, the CLI (§11.2) | Phase 1's `/api/v1` surface |
 | **3 — Multi-format** | Capella via `Auriga`, ECSS-E-TM-10-25 via `CDP4JsonFileDal-CE`, the publisher-supplied metadata path (§9.2.1) | Phase 1's extractor interface (§8.3) |
 | **4 — Mirroring** | Scope routing configuration, connected proxy with artefact cache and metadata TTL, metadata index replication with availability-aware search (§5.1.6), read-only enforcement, bulk pre-warm, air-gapped bundle export and import | Phase 1's three seams |
 
 ### 19.3 What parallelises
 
-**Phases 2, 3 and 4 are mutually independent** once phase 1 is complete, because they extend different
-seams: phase 2 consumes the public API, phase 3 extends manifest extraction, phase 4 extends scope
-origin and artefact resolution. Three teams can run concurrently without contending on the same code.
+**Phases 2, 3 and 4 are mutually independent** once phase 1 is complete, because they extend different seams: phase 2 consumes the public API, phase 3 extends manifest extraction, phase 4 extends scope origin and artefact resolution. Three teams can run concurrently without contending on the same code.
 
-Within phase 4 the air-gapped bundle depends on bulk pre-warm, since pre-warming a connected instance
-is how a bundle is produced. Those two are ordered internally.
+Within phase 4 the air-gapped bundle depends on bulk pre-warm, since pre-warming a connected instance is how a bundle is produced. Those two are ordered internally.
 
-The critical path is therefore **phase 1**, and specifically the seams: any of the three omitted turns
-a later phase from additive into invasive.
+The critical path is therefore **phase 1**, and specifically the seams: any of the three omitted turns a later phase from additive into invasive.
