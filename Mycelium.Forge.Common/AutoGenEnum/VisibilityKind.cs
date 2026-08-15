@@ -11,8 +11,6 @@
 // --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
 // ------------------------------------------------------------------------------------------------
 
-#nullable enable
-
 namespace Mycelium.Forge.Common
 {
     /// <summary>
