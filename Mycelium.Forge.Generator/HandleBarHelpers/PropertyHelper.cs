@@ -181,15 +181,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 if (isRedefinedPropertyInContext)
                 {
+                    // Every generated type lives in the single flat Mycelium.Forge.Common namespace
+                    // (the AutoGenDto/AutoGenEnum split is folder-only, not reflected in the C#
+                    // namespace), so the explicit interface implementation never needs qualifying
+                    // with anything beyond the bare interface name.
                     var owner = (INamedElement)property.Owner;
                     propertyName = $"I{owner.Name}.{propertyName}";
-
-                    var ownerNamespace = Extensions.NamedElementExtensions.QueryNamespace(owner);
-
-                    if (ownerNamespace != Extensions.NamedElementExtensions.QueryNamespace(classContext))
-                    {
-                        propertyName = $"{ownerNamespace}.{propertyName}";
-                    }
                 }
 
                 sb.Append(propertyName);
@@ -281,7 +278,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             if (redefinition.TryQueryRedefinedByProperty(context, out _))
             {
                 var owner = (INamedElement)redefinition.Owner;
-                redefinitionPropertyName = $"((Mycelium.Forge.Common.{Extensions.NamedElementExtensions.QueryNamespace(owner)}.I{owner.Name})this).{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
+                redefinitionPropertyName = $"((I{owner.Name})this).{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
             }
             else
             {
@@ -324,7 +321,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             if (redefinition.TryQueryRedefinedByProperty(context, out _))
             {
                 var owner = (INamedElement)redefinition.Owner;
-                redefinitionPropertyName = $"((Mycelium.Forge.Common.{Extensions.NamedElementExtensions.QueryNamespace(owner)}.I{owner.Name})this).{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
+                redefinitionPropertyName = $"((I{owner.Name})this).{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
             }
             else
             {
