@@ -9,7 +9,6 @@
 
 namespace Mycelium.Forge.Serializer.Json.Tests
 {
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text.Json;
@@ -18,8 +17,8 @@ namespace Mycelium.Forge.Serializer.Json.Tests
     using Mycelium.Forge.Common;
 
     /// <summary>
-    /// The contract-test harness for the generated serialisers (F-06): per DD-05, a defect in a
-    /// generator template is systematic rather than confined to one type, so the fixture in
+    /// The contract-test harness for the generated serialisers: a defect in a generator template is
+    /// systematic rather than confined to one type, so the fixture in
     /// <c>TestData/all-dto-types-and-enum-variations.json</c> carries one instance of every concrete
     /// generated DTO class, with enough repeated instances to cover every member of every generated
     /// enum at least once. Deserializing it and serializing the result again must reproduce the same
@@ -41,11 +40,10 @@ namespace Mycelium.Forge.Serializer.Json.Tests
         [Test]
         public void Verify_that_the_fixture_covers_every_concrete_generated_DTO_class()
         {
-            var expectedTypes = new[]
-            {
-                "APIKey", "Account", "Address", "Country", "Forge", "Organization", "OrganizationInvitation",
-                "Package", "PackageInvitation", "PackageMetaData", "PackageType", "PackageVersion", "ProfileLink", "ProfileType",
-            };
+            var expectedTypes = typeof(IThing).Assembly.GetTypes()
+                .Where(type => type.IsClass && !type.IsAbstract && typeof(IThing).IsAssignableFrom(type))
+                .Select(type => type.Name)
+                .ToArray();
 
             var actualTypes = JsonNode.Parse(this.fixtureJson)!.AsArray()
                 .Select(node => node!["@type"]!.GetValue<string>())
