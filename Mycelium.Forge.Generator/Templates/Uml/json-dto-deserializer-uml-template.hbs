@@ -128,6 +128,8 @@ namespace Mycelium.Forge.Serializer.Json
                                         dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetInt32());
                                     {{else if (Property.QueryIsDouble property) }}
                                         dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetDouble());
+                                    {{else if (Property.QueryIsByte property) }}
+                                        dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetByte());
                                     {{ else }}
                                         throw new NotImplementedException("Enumerable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                                     {{/if}}
@@ -152,6 +154,8 @@ namespace Mycelium.Forge.Serializer.Json
                                         dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetInt32();
                                     {{else if (Property.QueryIsDouble property) }}
                                         dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetDouble();
+                                    {{else if (Property.QueryIsByte property) }}
+                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetByte();
                                     {{ else }}
                                         throw new NotImplementedException("Nullable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                                     {{/if}}
@@ -173,6 +177,8 @@ namespace Mycelium.Forge.Serializer.Json
                                         dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetInt32();
                                     {{else if (Property.QueryIsDouble property) }}
                                         dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetDouble();
+                                    {{else if (Property.QueryIsByte property) }}
+                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetByte();
                                     {{ else }}
                                         throw new NotImplementedException("Scalar Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                                     {{/if}}

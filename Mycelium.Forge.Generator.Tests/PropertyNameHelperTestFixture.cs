@@ -185,5 +185,41 @@ namespace Mycelium.Forge.Generator.Tests
 
             Assert.That(() => template(new { property = "not-a-property" }), Throws.TypeOf<HandlebarsException>());
         }
+
+        [Test]
+        public void Verify_that_QueryIsByte_returns_true_for_a_byte_collection_property()
+        {
+            var property = GetOwnedProperty("APIKey", "secretHash");
+
+            var template = this.handlebars.Compile("{{#if (Property.QueryIsByte property)}}yes{{else}}no{{/if}}");
+
+            Assert.That(template(new { property }), Is.EqualTo("yes"));
+        }
+
+        [Test]
+        public void Verify_that_QueryIsByte_returns_false_for_a_non_byte_property()
+        {
+            var property = GetOwnedProperty("APIKey", "name");
+
+            var template = this.handlebars.Compile("{{#if (Property.QueryIsByte property)}}yes{{else}}no{{/if}}");
+
+            Assert.That(template(new { property }), Is.EqualTo("no"));
+        }
+
+        [Test]
+        public void Verify_that_QueryIsByte_throws_when_given_no_arguments()
+        {
+            var template = this.handlebars.Compile("{{#if (Property.QueryIsByte)}}yes{{else}}no{{/if}}");
+
+            Assert.That(() => template(new { }), Throws.TypeOf<HandlebarsException>());
+        }
+
+        [Test]
+        public void Verify_that_QueryIsByte_throws_when_given_a_non_IProperty_argument()
+        {
+            var template = this.handlebars.Compile("{{#if (Property.QueryIsByte property)}}yes{{else}}no{{/if}}");
+
+            Assert.That(() => template(new { property = "not-a-property" }), Throws.TypeOf<HandlebarsException>());
+        }
     }
 }

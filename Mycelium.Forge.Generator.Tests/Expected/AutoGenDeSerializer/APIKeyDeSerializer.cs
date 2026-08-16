@@ -150,7 +150,7 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 foreach (var arrayItem in secretHashProperty.EnumerateArray())
                 {
-                    throw new NotImplementedException("Enumerable Numeric - APIKey.secretHash is not yet supported");
+                    dtoInstance.SecretHash.Add(arrayItem.GetByte());
                 }
             }
             else
