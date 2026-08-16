@@ -1,0 +1,72 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="{{ this.Name }}Serializer.cs" company="Starion Group S.A.">
+// 
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+// 
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Serializer.Json
+{
+    using System;
+    using System.Text.Json;
+    
+    using Mycelium.Forge.Common;
+
+    /// <summary>
+    /// The purpose of the <see cref="{{ this.Name }}Serializer"/> is to provide serialization capabilities
+    /// capabilities for the <see cref="I{{ this.Name }}"/> interface
+    /// </summary>
+    internal static class {{ this.Name }}Serializer
+    {
+        /// <summary>
+        /// Serializes an instance of <see cref="I{{ this.Name }}"/> using an <see cref="Utf8JsonWriter"/>
+        /// </summary>
+        /// <param name="obj">
+        /// The <see cref="I{{ this.Name }}"/> to serialize
+        /// </param>
+        /// <param name="writer">
+        /// The target <see cref="Utf8JsonWriter"/>
+        /// </param>
+        internal static void Serialize(object obj, Utf8JsonWriter writer)
+        {
+            if (obj is not I{{ this.Name }} i{{this.Name }})
+            {
+                throw new ArgumentException("The object shall be an I{{ this.Name }}", nameof(obj));
+            }
+            
+            writer.WriteStartObject();
+            
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("{{ this.Name }}"u8);
+            
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(i{{this.Name }}.Id);
+
+            {{#with this as |class| }}
+                {{ #each (Class.QueryAllProperties this) as | property | }}
+                    {{#unless this.IsDerived}}
+                        {{#unless this.IsTransient}}
+                            {{#unless (Property.IsRedefinedByPropertyWithSameName this class)}}
+                                {{#withPropertyClassContext property class}}
+                                    {{> json-dto-serializer-uml-partial-template this}}
+                                {{/withPropertyClassContext}}
+                            {{/unless}}
+                        {{/unless}}
+                    {{/unless}}
+                {{/each}}
+            {{/with}}
+
+            writer.WriteEndObject();
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------

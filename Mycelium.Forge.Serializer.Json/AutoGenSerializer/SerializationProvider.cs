@@ -1,0 +1,68 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="SerializationProvider.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Serializer.Json
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Text.Json;
+
+    /// <summary>
+    /// Delegate provider for the appropriate serialization method to serialize a <see cref="Type" />
+    /// </summary>
+    internal static class SerializationProvider
+    {
+        /// <summary>
+        /// Caches the delegate <see cref="Action{object, Utf8JsonWriter, SerializationModeKind, bool}"/> for the
+        /// <see cref="System.Type"/> that is to be serialized
+        /// </summary>
+        private static readonly Dictionary<System.Type, Action<object, Utf8JsonWriter>> SerializerActionMap = new Dictionary<System.Type, Action<object, Utf8JsonWriter>>
+        {
+            { typeof(Mycelium.Forge.Common.Account), Mycelium.Forge.Common.Account.Serialize },
+        };
+
+        /// <summary>
+        /// Provides the delegate <see cref="Action{object, Utf8JsonWriter}"/> for the
+        /// <see cref="System.Type"/> that is to be serialized
+        /// </summary>
+        /// <param name="type">
+        /// The subject <see cref="System.Type"/> that is to be serialized
+        /// </param>
+        /// <returns>
+        /// A Delegate of <see cref="Action{object, Utf8JsonWriter}"/>
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown when the <see cref="System.Type"/> is not supported.
+        /// </exception>
+        internal static Action<object, Utf8JsonWriter> Provide(System.Type type)
+        {
+            return !SerializerActionMap.TryGetValue(type, out var action) ? throw new NotSupportedException($"The {type.Name} is not supported by the SerializationProvider.") : action;
+        }
+
+        /// <summary>
+        /// Asserts whether the <paramref name="type"/> is supported by the provider
+        /// </summary>
+        /// <param name="type">
+        /// The <see cref="System.Type"/> for which support is asserted
+        /// </param>
+        /// <returns></returns>
+        internal static bool IsTypeSupported(System.Type type)
+        {
+            return SerializerActionMap.ContainsKey(type);
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
