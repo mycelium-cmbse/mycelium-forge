@@ -7,7 +7,7 @@
         <LangVersion>14.0</LangVersion>
         <Company>Starion Group S.A.</Company>
         <Authors>Sam Gerene</Authors>
-        <Description>First-party client library for the Mycelium Forge package registry HTTP API. Consumable by Mycelium Bloom, CI/CD pipelines and third-party tooling. Implements SSS-FG-REG-C3M.</Description>
+        <Description>First-party client library for the Mycelium Forge package registry HTTP API. Consumable by Mycelium Bloom, CI/CD pipelines and third-party tooling.</Description>
         <Copyright>Copyright © Starion Group S.A.</Copyright>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
@@ -25,7 +25,7 @@
 
     <ItemGroup>
       <PackageReference Include="FluentResults" Version="4.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.11" />
     </ItemGroup>
 
 </Project>

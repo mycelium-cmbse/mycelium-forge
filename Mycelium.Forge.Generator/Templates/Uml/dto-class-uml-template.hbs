@@ -1,0 +1,40 @@
+// ------------------------------------------------------------------------------------------------
+// <copyright file="{{this.Name}}.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Common
+{
+    using System;
+    using System.Collections.Generic;
+
+    using Mycelium.Forge.Common.Decorators;
+
+    {{ #Documentation this }}
+    {{ #Decorator.WriteClassAttribute this }}
+    {{ Enum.ToString this.Visibility }} partial class {{this.Name}} : I{{this.Name}}
+    {
+        {{ #each (Class.QueryAllProperties this) as | property | }}
+        {{ #Documentation property }}
+        {{ #Decorator.WritePropertyAttribute property }}
+        {{ #Decorator.WriteSubsettedPropertyAttribute property }}
+        {{ #Decorator.WriteRedefinedPropertyAttribute property }}
+        {{ #Decorator.WriteRedefinedByPropertyAttribute property ../ }}
+        {{ #Decorator.WriteImplementsAttribute property }}
+        {{ #Property.WriteForDTOClass property ../ }}
+
+        {{/each}}
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------

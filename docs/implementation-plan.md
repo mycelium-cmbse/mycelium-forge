@@ -82,7 +82,7 @@ Blocks everything else. Small, and worth doing properly.
 | F-01 | **Decide the data-access and migration stack** (D-1); record as a DD | S | — |
 | F-02 | **Decide the object-storage client and the on-premise storage question** (D-2); record as a DD | S | — |
 | F-03 | **Author the Forge domain model in Enterprise Architect and export XMI.** §8's class diagram is the specification, **including `Account`, `Organization` and `Membership`** — DD-20 makes those Forge's own records rather than an external directory's | L | — |
-| F-04 | **uml4net DTO generation**: templates, MSBuild target, output into `Common/Generated/` (DD-07) | M | F-03 |
+| F-04 | **uml4net DTO generation**: templates, test-fixture-driven generator (`Mycelium.Forge.Generator` + `Mycelium.Forge.Generator.Tests`), output into `Common/AutoGenDto/` and `Common/AutoGenEnum/` (DD-07) | M | F-03 |
 | F-05 | **uml4net JSON serialiser generation** (DD-05), including DD-13's abbreviated projection | M | F-04 |
 | F-06 | **Contract-test harness** for generated serialisers (§17) — a template defect is systematic, so this is the test that matters most | S | F-05 |
 | F-07 | **Local environment**: compose with **PostgreSQL 18** (DD-23), **Garage** (DD-21) and the Forge Keycloak — which since DD-20 is the production component rather than a stand-in — plus a one-shot migrator service, since migrations are an explicit invocation and without it the local database never gets a schema (DD-18); devcontainer wiring (DD-09) | M | F-01, F-02 |

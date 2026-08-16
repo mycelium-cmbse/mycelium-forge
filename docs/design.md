@@ -343,7 +343,7 @@ Reversing this is additive, not structural. `Accept` already selects a represent
 
 **Context.** The DTOs are generated from the Enterprise Architect model via `uml4net` (DD-07). Their serialisers could come from three places: runtime reflection, the Roslyn source generator shipped by `System.Text.Json`, or the same `uml4net` pipeline that produces the DTOs.
 
-**Decision.** Serialisers are **emitted by the `uml4net` pipeline**, from the same model, into the same `Generated/` folder. They are not reflection-based, and they do not rely on third-party source generators.
+**Decision.** Serialisers are **emitted by the `uml4net` pipeline**, from the same model, alongside the DTOs in `Mycelium.Forge.Common` (see DD-07 for the DTO output convention). They are not reflection-based, and they do not rely on third-party source generators.
 
 **Reasoning.**
 
@@ -353,7 +353,7 @@ Reversing this is additive, not structural. `Accept` already selects a represent
 
 *The performance properties are unchanged.* Generated serialisers contain no reflection, so they remain AOT-friendly and trim-safe, and the download and search paths stay off the reflection path. If anything the position is stronger, because there is no dependency on a third-party generator's analyser version or its compatibility with a given SDK.
 
-**Consequences.** Serialisers live under `Generated/` and are never hand-edited, exactly as the DTOs are. The JSON round-trip contract tests in §17 become *more* important rather than less: a defect in a template is not a single-type bug but a systematic one affecting every generated serialiser. DD-13's abbreviated representation is a projection defined in the model, so its serialiser is generated on the same terms. Generation is performed by uml4net at design-time, not at run-time.
+**Consequences.** Serialisers are never hand-edited, exactly as the DTOs are — see DD-07 for where they land. The JSON round-trip contract tests in §17 become *more* important rather than less: a defect in a template is not a single-type bug but a systematic one affecting every generated serialiser. DD-13's abbreviated representation is a projection defined in the model, so its serialiser is generated on the same terms. Generation is performed by uml4net at design-time, not at run-time.
 
 ### DD-06 — Library selection
 
@@ -373,7 +373,7 @@ Reversing this is additive, not structural. `Accept` already selects a represent
 
 ### DD-07 — DTOs are generated from an Enterprise Architect model via uml4net
 
-The shared DTOs in `Mycelium.Forge.Common` are generated from an EA model exported as XMI, using the `uml4net` toolchain (`uml4net.xmi` to read, `uml4net.HandleBars` and `uml4net.Reporting` to emit). Output lands in `Mycelium.Forge.Common/Generated/` and is never hand-edited; extensions are written as `partial` declarations outside that folder.
+The shared DTOs in `Mycelium.Forge.Common` are generated from an EA model exported as XMI, using the `uml4net` toolchain (`uml4net.xmi` to read, `uml4net.HandleBars` and `uml4net.Reporting` to emit). Output lands in `Mycelium.Forge.Common/AutoGenDto/` (DTO interfaces and classes) and `Mycelium.Forge.Common/AutoGenEnum/` (enumerations) and is never hand-edited; extensions are written as `partial` declarations outside those folders.
 
 The same pipeline emits the JSON serialisers for those types — see DD-05.
 
