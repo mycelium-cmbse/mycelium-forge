@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Generator.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Serializer.Json", "Mycelium.Forge.Serializer.Json\Mycelium.Forge.Serializer.Json.csproj", "{BE476BDB-5EB5-44F9-A0C1-484F188EABE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Serializer.Json.Tests", "Mycelium.Forge.Serializer.Json.Tests\Mycelium.Forge.Serializer.Json.Tests.csproj", "{08A853BD-E551-4544-A226-EBC20918C344}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,18 @@ Global
 		{BE476BDB-5EB5-44F9-A0C1-484F188EABE5}.Release|x64.Build.0 = Release|Any CPU
 		{BE476BDB-5EB5-44F9-A0C1-484F188EABE5}.Release|x86.ActiveCfg = Release|Any CPU
 		{BE476BDB-5EB5-44F9-A0C1-484F188EABE5}.Release|x86.Build.0 = Release|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Debug|x64.Build.0 = Debug|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Debug|x86.Build.0 = Debug|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Release|x64.ActiveCfg = Release|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Release|x64.Build.0 = Release|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Release|x86.ActiveCfg = Release|Any CPU
+		{08A853BD-E551-4544-A226-EBC20918C344}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SerializationProvider.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -23,23 +23,36 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class SerializationProvider
     {
         /// <summary>
-        /// Caches the delegate <see cref="Action{object, Utf8JsonWriter, SerializationModeKind, bool}"/> for the
+        /// Caches the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for the
         /// <see cref="System.Type"/> that is to be serialized
         /// </summary>
         private static readonly Dictionary<System.Type, Action<object, Utf8JsonWriter>> SerializerActionMap = new Dictionary<System.Type, Action<object, Utf8JsonWriter>>
         {
-            { typeof(Mycelium.Forge.Common.Account), Mycelium.Forge.Common.Account.Serialize },
+            { typeof(Mycelium.Forge.Common.Account), AccountSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Address), AddressSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.APIKey), APIKeySerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Country), CountrySerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Forge), ForgeSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Organization), OrganizationSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.OrganizationInvitation), OrganizationInvitationSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Package), PackageSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageInvitation), PackageInvitationSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageMetaData), PackageMetaDataSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageType), PackageTypeSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageVersion), PackageVersionSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.ProfileLink), ProfileLinkSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.ProfileType), ProfileTypeSerializer.Serialize },
         };
 
         /// <summary>
-        /// Provides the delegate <see cref="Action{object, Utf8JsonWriter}"/> for the
+        /// Provides the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for the
         /// <see cref="System.Type"/> that is to be serialized
         /// </summary>
         /// <param name="type">
         /// The subject <see cref="System.Type"/> that is to be serialized
         /// </param>
         /// <returns>
-        /// A Delegate of <see cref="Action{object, Utf8JsonWriter}"/>
+        /// A Delegate of <c>Action&lt;object, Utf8JsonWriter&gt;</c>
         /// </returns>
         /// <exception cref="NotSupportedException">
         /// Thrown when the <see cref="System.Type"/> is not supported.

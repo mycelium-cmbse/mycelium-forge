@@ -23,25 +23,25 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class SerializationProvider
     {
         /// <summary>
-        /// Caches the delegate <see cref="Action{object, Utf8JsonWriter}"/> for the
+        /// Caches the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for the
         /// <see cref="System.Type"/> that is to be serialized
         /// </summary>
         private static readonly Dictionary<System.Type, Action<object, Utf8JsonWriter>> SerializerActionMap = new Dictionary<System.Type, Action<object, Utf8JsonWriter>>
         {
             {{#each this as | class |}}
-            { typeof(Mycelium.Forge.{{ class.Name }}), {{ class.Name }}Serializer.Serialize },
+            { typeof(Mycelium.Forge.Common.{{ class.Name }}), {{ class.Name }}Serializer.Serialize },
             {{/each}}
         };
 
         /// <summary>
-        /// Provides the delegate <see cref="Action{object, Utf8JsonWriter}"/> for the
+        /// Provides the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for the
         /// <see cref="System.Type"/> that is to be serialized
         /// </summary>
         /// <param name="type">
         /// The subject <see cref="System.Type"/> that is to be serialized
         /// </param>
         /// <returns>
-        /// A Delegate of <see cref="Action{object, Utf8JsonWriter}"/>
+        /// A Delegate of <c>Action&lt;object, Utf8JsonWriter&gt;</c>
         /// </returns>
         /// <exception cref="NotSupportedException">
         /// Thrown when the <see cref="System.Type"/> is not supported.

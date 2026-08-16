@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="IDeSerializer.cs" company="Starion Group S.A.">
+// <copyright file="DeSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -151,9 +151,7 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 var typeName = typeElement.GetString();
 
-                Func<JsonElement, SerializationModeKind, bool, ILoggerFactory, IThing> func;
-
-                func = DeSerializationProvider.Provide(typeName);
+                var func = DeSerializationProvider.Provide(typeName);
                 return func(jsonObject, this.loggerFactory);
             }
 

@@ -1,9 +1,9 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="{{ this.Name }}Serializer.cs" company="Starion Group S.A.">
-// 
+//
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-// 
+//
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ namespace Mycelium.Forge.Serializer.Json
 {
     using System;
     using System.Text.Json;
-    
+
     using Mycelium.Forge.Common;
 
     /// <summary>
@@ -39,24 +39,95 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 throw new ArgumentException("The object shall be an I{{ this.Name }}", nameof(obj));
             }
-            
+
             writer.WriteStartObject();
-            
+
             writer.WritePropertyName("@type"u8);
             writer.WriteStringValue("{{ this.Name }}"u8);
-            
+
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(i{{this.Name }}.Id);
 
             {{#with this as |class| }}
                 {{ #each (Class.QueryAllProperties this) as | property | }}
                     {{#unless this.IsDerived}}
-                        {{#unless this.IsTransient}}
-                            {{#unless (Property.IsRedefinedByPropertyWithSameName this class)}}
-                                {{#withPropertyClassContext property class}}
-                                    {{> json-dto-serializer-uml-partial-template this}}
-                                {{/withPropertyClassContext}}
-                            {{/unless}}
+                        {{#unless (Property.IsThingId property)}}
+                        {{#unless (Property.IsRedefined property class)}}
+                            {{#if (Property.QueryIsEnumerable property)}}
+                                writer.WriteStartArray("{{String.LowerCaseFirstLetter property.Name }}"u8);
+
+                                foreach (var item in i{{class.Name}}.{{Property.WritePropertyName property}})
+                                {
+                                {{#if (Property.QueryIsReferenceProperty property)}}
+                                    writer.WriteStartObject();
+                                    writer.WritePropertyName("@id"u8);
+                                    writer.WriteStringValue(item);
+                                    writer.WriteEndObject();
+                                {{else if (Property.QueryIsBool property)}}
+                                    writer.WriteBooleanValue(item);
+                                {{else if (Property.QueryIsEnum property)}}
+                                    writer.WriteStringValue({{Property.WriteTypeName property}}Provider.ToUtf8LowerBytes(item));
+                                {{else if (Property.QueryIsDateTime property)}}
+                                    writer.WriteStringValue(item);
+                                {{else if (Property.QueryIsNumeric property)}}
+                                    writer.WriteNumberValue(item);
+                                {{else}}
+                                    writer.WriteStringValue(item);
+                                {{/if}}
+                                }
+
+                                writer.WriteEndArray();
+                            {{else if (Property.QueryIsNullable property)}}
+                                writer.WritePropertyName("{{ String.LowerCaseFirstLetter property.Name }}"u8);
+                                {{#if (Property.QueryIsCSharpString property )}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{ else }}
+                                    if (i{{class.Name}}.{{Property.WritePropertyName property}}.HasValue)
+                                    {
+                                    {{#if (Property.QueryIsReferenceProperty property)}}
+                                        writer.WriteStartObject();
+                                        writer.WritePropertyName("@id"u8);
+                                        writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                        writer.WriteEndObject();
+                                    {{else if (Property.QueryIsBool property )}}
+                                        writer.WriteBooleanValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{else if (Property.QueryIsEnum property )}}
+                                        writer.WriteStringValue({{Property.WriteTypeName property}}Provider.ToUtf8LowerBytes(i{{class.Name}}.{{Property.WritePropertyName property}}.Value));
+                                    {{else if (Property.QueryIsDateTime property )}}
+                                        writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{else if (Property.QueryIsNumeric property )}}
+                                        writer.WriteNumberValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{else}}
+                                        writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{/if}}
+                                    }
+                                    else
+                                    {
+                                    writer.WriteNullValue();
+                                    }
+                                {{/if}}
+                            {{ else if (Property.QueryIsScalar property)}}
+                                writer.WritePropertyName("{{ String.LowerCaseFirstLetter property.Name }}"u8);
+                                {{#if (Property.QueryIsReferenceProperty property)}}
+                                    writer.WriteStartObject();
+                                    writer.WritePropertyName("@id"u8);
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                    writer.WriteEndObject();
+                                {{else if (Property.QueryIsBool property )}}
+                                    writer.WriteBooleanValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else if (Property.QueryIsCSharpString property )}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else if (Property.QueryIsEnum property )}}
+                                    writer.WriteStringValue({{Property.WriteTypeName property}}Provider.ToUtf8LowerBytes(i{{class.Name}}.{{Property.WritePropertyName property}}));
+                                {{else if (Property.QueryIsDateTime property )}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else if (Property.QueryIsNumeric property )}}
+                                    writer.WriteNumberValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{/if}}
+                            {{/if}}
+                        {{/unless}}
                         {{/unless}}
                     {{/unless}}
                 {{/each}}

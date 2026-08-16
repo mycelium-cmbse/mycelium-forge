@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="SerializationProvider.cs" company="Starion Group S.A.">
-//
+// <copyright file="DeSerializationProvider.cs" company="Starion Group S.A.">
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -31,7 +31,20 @@ namespace Mycelium.Forge.Serializer.Json
         /// </summary>
         private static readonly Dictionary<string, Func<JsonElement, ILoggerFactory, IThing>> DeSerializerActionMap = new Dictionary<string, Func<JsonElement, ILoggerFactory, IThing>>
         {
-            { "Account", Account.DeSerialize },
+            { "Account", AccountDeSerializer.DeSerialize },
+            { "Address", AddressDeSerializer.DeSerialize },
+            { "APIKey", APIKeyDeSerializer.DeSerialize },
+            { "Country", CountryDeSerializer.DeSerialize },
+            { "Forge", ForgeDeSerializer.DeSerialize },
+            { "Organization", OrganizationDeSerializer.DeSerialize },
+            { "OrganizationInvitation", OrganizationInvitationDeSerializer.DeSerialize },
+            { "Package", PackageDeSerializer.DeSerialize },
+            { "PackageInvitation", PackageInvitationDeSerializer.DeSerialize },
+            { "PackageMetaData", PackageMetaDataDeSerializer.DeSerialize },
+            { "PackageType", PackageTypeDeSerializer.DeSerialize },
+            { "PackageVersion", PackageVersionDeSerializer.DeSerialize },
+            { "ProfileLink", ProfileLinkDeSerializer.DeSerialize },
+            { "ProfileType", ProfileTypeDeSerializer.DeSerialize },
         };
 
         /// <summary>
