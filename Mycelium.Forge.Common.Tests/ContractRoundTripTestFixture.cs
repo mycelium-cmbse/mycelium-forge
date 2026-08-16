@@ -58,8 +58,8 @@ namespace Mycelium.Forge.Common.Tests
         [Test]
         public void Verify_that_deserializing_and_reserializing_the_fixture_reproduces_the_same_JSON()
         {
-            IDeSerializer deSerializer = new DeSerializer();
-            ISerializer serializer = new Serializer();
+            var deSerializer = new DeSerializer();
+            var serializer = new Serializer();
 
             using var inputStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(this.fixtureJson));
             var things = deSerializer.DeSerialize(inputStream).ToList();

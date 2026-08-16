@@ -246,6 +246,8 @@ namespace Mycelium.Forge.Common.Tests
                 TestContext.CurrentContext.TestDirectory, "..", "..", "..", "TestData", "all-dto-types-and-enum-variations.json");
 
             File.WriteAllText(Path.GetFullPath(targetPath), json);
+
+            Assert.That(Path.GetFullPath(targetPath), Does.Exist);
         }
     }
 }
