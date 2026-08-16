@@ -49,7 +49,7 @@ jobs:
           # hand-written code. The same pattern also matches the golden copies under
           # Mycelium.Forge.Generator.Tests/Expected/AutoGen*. Test projects (**/*.Tests/**) are excluded from
           # coverage so the coverage figure reflects production code only.
-          GENERATED='**/AutoGenDto/**/*.cs,**/AutoGenEnum/**/*.cs,**/AutoGenEnumProvider/**/*.cs,**/AutoGenJsonDeSerializers/**/*.cs,**/AutoGenJsonSerializers/**/*.cs'
+          GENERATED='**/AutoGenDto/**/*.cs,**/AutoGenEnum/**/*.cs,**/AutoGenEnumProvider/**/*.cs,**/AutoGenSerializer/**/*.cs,**/AutoGenDeSerializer/**/*.cs'
           TESTS='**/*.Tests/**/*.cs'
           dotnet sonarscanner begin /k:"mycelium-cmbse_mycelium-forge" /o:"mycelium-cmbse" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml /d:sonar.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.cpd.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.coverage.exclusions="$TESTS"
 
