@@ -1,0 +1,29 @@
+# Garage (DD-21) - S3-compatible object storage, single-node local development configuration.
+#
+# The secrets below are fixed, checked-in, dev-only values - never used outside `docker compose`.
+# `--single-node --default-bucket` (Garage v2.3.0+, see docker-compose.yml's `garage` service) reads
+# GARAGE_DEFAULT_ACCESS_KEY/GARAGE_DEFAULT_SECRET_KEY/GARAGE_DEFAULT_BUCKET from the environment and
+# bootstraps the cluster layout, the default bucket and that access key automatically on first start -
+# no separate init container or manual `garage` CLI bootstrap step is needed.
+
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+db_engine = "sqlite"
+
+replication_factor = 1
+
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+# Dev-only, checked-in on purpose - not a production secret. Must be exactly 32 bytes of hex.
+rpc_secret = "303ab2f89e73c94250ef6518327de64af57061dec1a0eb1ed1307ffd00ca6b50"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = ".s3.garage.localhost"
+
+[admin]
+api_bind_addr = "[::]:3903"
+# Dev-only, checked-in on purpose - not a production secret.
+admin_token = "dev-admin-token-0000000000000000000000000000"
+metrics_token = "dev-metrics-token-0000000000000000000000000"

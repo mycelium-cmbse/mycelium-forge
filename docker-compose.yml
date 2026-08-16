@@ -1,0 +1,125 @@
+# Local development environment (F-07, DD-09): PostgreSQL, object storage and an identity provider,
+# plus the one-shot migrator the app depends on (DD-18). See docs/local-development.md for the seed
+# path. Every credential below is a fixed, checked-in, dev-only value - never used outside this file.
+
+services:
+  postgres:
+    # DD-23: PostgreSQL 18 is the floor; this pins the compose file's image accordingly.
+    image: postgres:18
+    environment:
+      POSTGRES_DB: forge
+      POSTGRES_USER: forge
+      POSTGRES_PASSWORD: forge-dev-password
+    volumes:
+      # PostgreSQL 18's image expects a single mount at /var/lib/postgresql (not .../data as with
+      # earlier major versions) - it manages a version-specific subdirectory itself so that
+      # `pg_upgrade --link` isn't blocked by a mount-point boundary.
+      - postgres-data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forge -d forge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  garage:
+    # DD-21: Garage is the named object-storage implementation - "the local development and CI
+    # target, so the path exercised in development is the path production runs." Pinned >= v2.3.0
+    # for --default-bucket's automatic key/bucket bootstrap (see docker/garage.toml).
+    image: dxflrs/garage:v2.3.0
+    # The image sets no ENTRYPOINT, only CMD ["/garage", "server"] - overriding `command:` replaces
+    # that CMD entirely, so the binary path has to be spelled out here too.
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: GKdevlocal000000000
+      GARAGE_DEFAULT_SECRET_KEY: dev0000000000000000000000000000000000000000000000000000000000
+      GARAGE_DEFAULT_BUCKET: forge-artefacts
+    volumes:
+      - ./docker/garage.toml:/etc/garage.toml:ro
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    ports:
+      - "3900:3900"
+      - "3903:3903"
+    healthcheck:
+      # The official image is minimal (no curl/wget), so the healthcheck has to be the garage
+      # binary itself rather than an HTTP probe.
+      test: ["CMD", "/garage", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  keycloak:
+    # DD-20: Forge ships its own Keycloak - the same component production runs, not a stand-in.
+    # --import-realm bootstraps the minimal "forge" realm in docker/keycloak/forge-realm.json.
+    # The account/organization administration surface is separate, later Phase 1 work; this only
+    # stands up the identity provider container itself.
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: forge-dev-password
+      # Health endpoints (used by the healthcheck below, on the management port) are opt-in.
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      - ./docker/keycloak/forge-realm.json:/opt/keycloak/data/import/forge-realm.json:ro
+    ports:
+      - "8081:8080"
+    healthcheck:
+      # No curl/wget in the Keycloak image either; probe the management health endpoint over the
+      # container's own /dev/tcp instead.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  # DD-18: migrations are an explicit, one-shot invocation - never something every replica runs at
+  # startup - so this runs the same image as `app` with its `migrate` command, and `app` depends on
+  # it completing successfully rather than migrating itself.
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["migrate"]
+    environment:
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=forge;Username=forge;Password=forge-dev-password"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=forge;Username=forge;Password=forge-dev-password"
+    ports:
+      - "8080:8080"
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+      garage:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+
+  # Not started by a plain `docker compose up` (no depends_on references it) - this is the
+  # devcontainer's workspace, see .devcontainer/devcontainer.json. Built from the same Dockerfile's
+  # SDK stage rather than a second Dockerfile, so there is one build definition to keep in sync.
+  workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    command: ["sleep", "infinity"]
+    volumes:
+      - .:/workspaces/mycelium-forge:cached
+    environment:
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=forge;Username=forge;Password=forge-dev-password"
+
+volumes:
+  postgres-data:
+  garage-meta:
+  garage-data:
