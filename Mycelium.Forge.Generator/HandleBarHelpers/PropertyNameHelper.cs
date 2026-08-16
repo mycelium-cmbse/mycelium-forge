@@ -79,6 +79,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 return property.QueryCSharpTypeName() == "string";
             });
+
+            // Property.QueryIsInteger/QueryIsDouble (uml4net core) match on the C# type name
+            // containing "int" or "double"/"real" respectively - "byte" (e.g. APIKey.SecretHash,
+            // List<byte>) matches neither, so the JSON deserializer template's numeric branches need
+            // an explicit byte case of their own.
+            handlebars.RegisterHelper("Property.QueryIsByte", (context, arguments) =>
+            {
+                if (arguments.Length != 1 || arguments[0] is not IProperty property)
+                {
+                    throw new HandlebarsException("{{#Property.QueryIsByte}} helper must have exactly one IProperty argument");
+                }
+
+                return property.QueryCSharpTypeName() == "byte";
+            });
         }
     }
 }

@@ -43,4 +43,16 @@
         <ProjectReference Include="..\Mycelium.Forge.Serializer.Json\Mycelium.Forge.Serializer.Json.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- The contract-test fixture (F-06): a hand-curated, checked-in JSON array covering every
+             concrete generated DTO class and every member of every generated enum. Regenerated (rarely,
+             only when the model changes) by the [Explicit] bootstrap test in
+             ContractRoundTripFixtureBootstrap.cs, reviewed, and committed - the same "regenerate once,
+             hand-review, commit" workflow already used for the golden files under
+             Mycelium.Forge.Generator.Tests/Expected/. -->
+        <None Include="TestData\**\*.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
