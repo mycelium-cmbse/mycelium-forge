@@ -115,5 +115,21 @@ namespace Mycelium.Forge.Generator.Tests
 
             Assert.That(generated, Is.EqualTo(expected));
         }
+
+        [TestCase("VisibilityKind")]
+        public async Task Verify_that_the_expected_enumeration_provider_is_generated(string enumerationName)
+        {
+            var generator = new UmlCoreEnumProviderGenerator();
+
+            var outputDirectory = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.WorkDirectory, "_Forge.Common.AutoGenEnumProvider"));
+            outputDirectory.Create();
+
+            var generated = await generator.GenerateEnumerationProviderAsync(GeneratorSetupFixture.XmiReaderResult, outputDirectory, enumerationName);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenEnumProvider", $"{enumerationName}Provider.cs"));
+
+            Assert.That(generated, Is.EqualTo(expected));
+        }
     }
 }
