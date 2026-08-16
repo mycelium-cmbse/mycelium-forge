@@ -4,8 +4,9 @@ Shared data transfer objects for the Mycelium Forge package registry.
 
 ## Generated code
 
-`AutoGenDto/` (DTO interfaces and classes) and `AutoGenEnum/` (enumerations) are **generated
-output** and are not edited by hand.
+`AutoGenDto/` (DTO interfaces and classes), `AutoGenEnum/` (enumerations) and `AutoGenEnumProvider/`
+(allocation-free `Parse`/`TryParse`/`ToUtf8LowerBytes` string-conversion helpers for each enum, not
+reflection-based) are **generated output** and are not edited by hand.
 
 The Mycelium Forge DTOs and enums are produced from an Enterprise Architect model exported as an
 XMI document — shipped as the NuGet package
@@ -17,13 +18,13 @@ therefore neither reflection-based nor dependent on third-party source generator
 
 JSON is the only wire format for Forge metadata (DD-04), so only JSON serialisers are emitted.
 
-Hand-written code that extends a generated type belongs **outside** `AutoGenDto/`/`AutoGenEnum/`,
-as a `partial` declaration in this project's root. **The hand-written file's namespace must match
-the generated type's namespace** — `Mycelium.Forge.Common`, the project's own root namespace, not
-a namespace named after the `AutoGenDto`/`AutoGenEnum` folder — otherwise the two halves compile as
-two unrelated types instead of merging into one `partial` type. The `AutoGenDto`/`AutoGenEnum`
-split is a folder-level, on-disk organisation by artefact kind; it is not reflected in the C#
-namespace.
+Hand-written code that extends a generated type belongs **outside** `AutoGenDto/`/`AutoGenEnum/`/
+`AutoGenEnumProvider/`, as a `partial` declaration in this project's root. **The hand-written file's
+namespace must match the generated type's namespace** — `Mycelium.Forge.Common`, the project's own
+root namespace, not a namespace named after the `AutoGenDto`/`AutoGenEnum`/`AutoGenEnumProvider`
+folder — otherwise the two halves compile as two unrelated types instead of merging into one
+`partial` type. The `AutoGenDto`/`AutoGenEnum`/`AutoGenEnumProvider` split is a folder-level,
+on-disk organisation by artefact kind; it is not reflected in the C# namespace.
 
 Generation is performed by `Mycelium.Forge.Generator` (a plain class library, no build-time
 integration) at design-time, not at run-time — it is driven by the `Mycelium.Forge.Generator.Tests`
@@ -36,9 +37,10 @@ visual-inspection step by design:
   "interesting" classes (covering every type/multiplicity/subsetting variation in the model, per
   `uml4net`'s `ModelInspector`) and diffs it against `Expected/` golden files. This is what catches
   template regressions on every run — it does not cover every class in the model.
-- **`*RegenerationTests`** (marked `[Explicit]` so they never run by default) render the *full* set of
-  DTOs/enums to this test project's own build output — `_Forge.Common.AutoGenDto/` and
-  `_Forge.Common.AutoGenEnum/` (a future generator targeting a different project, e.g. a JSON
+- **`*RegenerationTests`** render the *full* set of DTOs/enums/enum providers to this test project's
+  own build output — `_Forge.Common.AutoGenDto/`, `_Forge.Common.AutoGenEnum/` and
+  `_Forge.Common.AutoGenEnumProvider/` (a future generator targeting a different project, e.g. a JSON
   serialiser, would use its own prefixed folder, such as `_Forge.Serializer.Json.AutoGenSerializer/`).
-  After a model change: run these deliberately, review the output there by eye (or diff it against
-  `AutoGenDto/`/`AutoGenEnum/`), and manually copy over whatever you accept.
+  They run on every `dotnet test`, but only write to that scratch output, never to the committed
+  folders — after a model change, review the output there by eye (or diff it against
+  `AutoGenDto/`/`AutoGenEnum/`/`AutoGenEnumProvider/`), and manually copy over whatever you accept.
