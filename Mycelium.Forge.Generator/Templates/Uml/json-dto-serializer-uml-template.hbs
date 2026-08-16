@@ -1,0 +1,143 @@
+// ------------------------------------------------------------------------------------------------
+// <copyright file="{{ this.Name }}Serializer.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Serializer.Json
+{
+    using System;
+    using System.Text.Json;
+
+    using Mycelium.Forge.Common;
+
+    /// <summary>
+    /// The purpose of the <see cref="{{ this.Name }}Serializer"/> is to provide serialization capabilities
+    /// capabilities for the <see cref="I{{ this.Name }}"/> interface
+    /// </summary>
+    internal static class {{ this.Name }}Serializer
+    {
+        /// <summary>
+        /// Serializes an instance of <see cref="I{{ this.Name }}"/> using an <see cref="Utf8JsonWriter"/>
+        /// </summary>
+        /// <param name="obj">
+        /// The <see cref="I{{ this.Name }}"/> to serialize
+        /// </param>
+        /// <param name="writer">
+        /// The target <see cref="Utf8JsonWriter"/>
+        /// </param>
+        internal static void Serialize(object obj, Utf8JsonWriter writer)
+        {
+            if (obj is not I{{ this.Name }} i{{this.Name }})
+            {
+                throw new ArgumentException("The object shall be an I{{ this.Name }}", nameof(obj));
+            }
+
+            writer.WriteStartObject();
+
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("{{ this.Name }}"u8);
+
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(i{{this.Name }}.Id);
+
+            {{#with this as |class| }}
+                {{ #each (Class.QueryAllProperties this) as | property | }}
+                    {{#unless this.IsDerived}}
+                        {{#unless (Property.IsThingId property)}}
+                        {{#unless (Property.IsRedefined property class)}}
+                            {{#if (Property.QueryIsEnumerable property)}}
+                                writer.WriteStartArray("{{String.LowerCaseFirstLetter property.Name }}"u8);
+
+                                foreach (var item in i{{class.Name}}.{{Property.WritePropertyName property}})
+                                {
+                                {{#if (Property.QueryIsReferenceProperty property)}}
+                                    writer.WriteStartObject();
+                                    writer.WritePropertyName("@id"u8);
+                                    writer.WriteStringValue(item);
+                                    writer.WriteEndObject();
+                                {{else if (Property.QueryIsBool property)}}
+                                    writer.WriteBooleanValue(item);
+                                {{else if (Property.QueryIsEnum property)}}
+                                    writer.WriteStringValue({{Property.WriteTypeName property}}Provider.ToUtf8LowerBytes(item));
+                                {{else if (Property.QueryIsDateTime property)}}
+                                    writer.WriteStringValue(item);
+                                {{else if (Property.QueryIsNumeric property)}}
+                                    writer.WriteNumberValue(item);
+                                {{else}}
+                                    writer.WriteStringValue(item);
+                                {{/if}}
+                                }
+
+                                writer.WriteEndArray();
+                            {{else if (Property.QueryIsNullable property)}}
+                                writer.WritePropertyName("{{ String.LowerCaseFirstLetter property.Name }}"u8);
+                                {{#if (Property.QueryIsCSharpString property )}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{ else }}
+                                    if (i{{class.Name}}.{{Property.WritePropertyName property}}.HasValue)
+                                    {
+                                    {{#if (Property.QueryIsReferenceProperty property)}}
+                                        writer.WriteStartObject();
+                                        writer.WritePropertyName("@id"u8);
+                                        writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                        writer.WriteEndObject();
+                                    {{else if (Property.QueryIsBool property )}}
+                                        writer.WriteBooleanValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{else if (Property.QueryIsEnum property )}}
+                                        writer.WriteStringValue({{Property.WriteTypeName property}}Provider.ToUtf8LowerBytes(i{{class.Name}}.{{Property.WritePropertyName property}}.Value));
+                                    {{else if (Property.QueryIsDateTime property )}}
+                                        writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{else if (Property.QueryIsNumeric property )}}
+                                        writer.WriteNumberValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{else}}
+                                        writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}}.Value);
+                                    {{/if}}
+                                    }
+                                    else
+                                    {
+                                    writer.WriteNullValue();
+                                    }
+                                {{/if}}
+                            {{ else if (Property.QueryIsScalar property)}}
+                                writer.WritePropertyName("{{ String.LowerCaseFirstLetter property.Name }}"u8);
+                                {{#if (Property.QueryIsReferenceProperty property)}}
+                                    writer.WriteStartObject();
+                                    writer.WritePropertyName("@id"u8);
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                    writer.WriteEndObject();
+                                {{else if (Property.QueryIsBool property )}}
+                                    writer.WriteBooleanValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else if (Property.QueryIsCSharpString property )}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else if (Property.QueryIsEnum property )}}
+                                    writer.WriteStringValue({{Property.WriteTypeName property}}Provider.ToUtf8LowerBytes(i{{class.Name}}.{{Property.WritePropertyName property}}));
+                                {{else if (Property.QueryIsDateTime property )}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else if (Property.QueryIsNumeric property )}}
+                                    writer.WriteNumberValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{else}}
+                                    writer.WriteStringValue(i{{class.Name}}.{{Property.WritePropertyName property}});
+                                {{/if}}
+                            {{/if}}
+                        {{/unless}}
+                        {{/unless}}
+                    {{/unless}}
+                {{/each}}
+            {{/with}}
+
+            writer.WriteEndObject();
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------

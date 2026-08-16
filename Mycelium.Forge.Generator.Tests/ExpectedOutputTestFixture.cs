@@ -131,5 +131,31 @@ namespace Mycelium.Forge.Generator.Tests
 
             Assert.That(generated, Is.EqualTo(expected));
         }
+
+        [TestCaseSource(nameof(ConcreteInterestingClasses))]
+        public async Task Verify_that_the_expected_serializer_is_generated(string className)
+        {
+            var generator = new UmlCoreJsonDtoSerializerGenerator();
+
+            var generated = await generator.GenerateDtoSerializerClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenSerializer", $"{className}Serializer.cs"));
+
+            Assert.That(generated, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(ConcreteInterestingClasses))]
+        public async Task Verify_that_the_expected_deserializer_is_generated(string className)
+        {
+            var generator = new UmlCoreJsonDtoDeSerializerGenerator();
+
+            var generated = await generator.GenerateDtoDeSerializerClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDeSerializer", $"{className}DeSerializer.cs"));
+
+            Assert.That(generated, Is.EqualTo(expected));
+        }
     }
 }
