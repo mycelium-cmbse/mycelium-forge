@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Common.Tests
+namespace Mycelium.Forge.Serializer.Json.Tests
 {
     using System.Collections.Generic;
     using System.IO;
@@ -15,7 +15,7 @@ namespace Mycelium.Forge.Common.Tests
     using System.Text.Json;
     using System.Text.Json.Nodes;
 
-    using Mycelium.Forge.Serializer.Json;
+    using Mycelium.Forge.Common;
 
     /// <summary>
     /// The contract-test harness for the generated serialisers (F-06): per DD-05, a defect in a

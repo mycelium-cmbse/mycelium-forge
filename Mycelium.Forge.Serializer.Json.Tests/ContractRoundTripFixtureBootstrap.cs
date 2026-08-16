@@ -7,14 +7,14 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Common.Tests
+namespace Mycelium.Forge.Serializer.Json.Tests
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text.Json;
 
-    using Mycelium.Forge.Serializer.Json;
+    using Mycelium.Forge.Common;
 
     /// <summary>
     /// Not part of the regular suite: run manually to (re)generate <c>TestData/all-dto-types-and-enum-variations.json</c>,
