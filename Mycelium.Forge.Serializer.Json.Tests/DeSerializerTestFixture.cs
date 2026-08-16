@@ -18,6 +18,8 @@ namespace Mycelium.Forge.Serializer.Json.Tests
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.Extensions.Logging;
+
     using Mycelium.Forge.Common;
 
     /// <summary>
@@ -29,8 +31,8 @@ namespace Mycelium.Forge.Serializer.Json.Tests
     [TestFixture]
     public class DeSerializerTestFixture
     {
-        private ISerializer serializer;
-        private IDeSerializer deSerializer;
+        private Serializer serializer;
+        private DeSerializer deSerializer;
 
         [SetUp]
         public void SetUp()
@@ -146,6 +148,85 @@ namespace Mycelium.Forge.Serializer.Json.Tests
                 () => method!.Invoke(this.deSerializer, [nonArrayElement]));
 
             Assert.That(exception!.InnerException, Is.TypeOf<ArgumentException>());
+        }
+
+        /// <summary>
+        /// <see cref="DeSerializer.DeSerialize(Stream)"/>/<see cref="DeSerializer.DeSerializeAsync"/>
+        /// only log their completion message when <c>ILogger.IsEnabled(LogLevel.Information)</c> is
+        /// true - with the default (parameterless) <see cref="DeSerializer"/> constructor, the logger
+        /// is <see cref="Microsoft.Extensions.Logging.Abstractions.NullLogger"/>, which is always
+        /// disabled, so every other test in this fixture only exercises the disabled branch. This test
+        /// supplies a minimal always-enabled <see cref="ILogger"/> (no mocking framework is referenced
+        /// by this project) to reach the enabled one too.
+        /// </summary>
+        [Test]
+        public async Task Verify_that_DeSerialize_and_DeSerializeAsync_still_work_with_an_always_enabled_logger()
+        {
+            var loggingDeSerializer = new DeSerializer(new AlwaysEnabledLoggerFactory());
+
+            var thing = new Package { Id = Guid.NewGuid(), Name = "a", ShortName = "a", PackageType = Guid.NewGuid(), Visibility = VisibilityKind.PUBLIC };
+
+            using var syncStream = new MemoryStream();
+            this.serializer.Serialize(thing, syncStream, default(JsonWriterOptions));
+            syncStream.Position = 0;
+
+            var syncResult = loggingDeSerializer.DeSerialize(syncStream);
+
+            using var asyncStream = new MemoryStream();
+            this.serializer.Serialize(thing, asyncStream, default(JsonWriterOptions));
+            asyncStream.Position = 0;
+
+            var asyncResult = await loggingDeSerializer.DeSerializeAsync(asyncStream, CancellationToken.None);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(syncResult.Single().Id, Is.EqualTo(thing.Id));
+                Assert.That(asyncResult.Single().Id, Is.EqualTo(thing.Id));
+            });
+        }
+
+        private sealed class AlwaysEnabledLoggerFactory : ILoggerFactory
+        {
+            public void AddProvider(ILoggerProvider provider)
+            {
+            }
+
+            public ILogger CreateLogger(string categoryName)
+            {
+                return AlwaysEnabledLogger.Instance;
+            }
+
+            public void Dispose()
+            {
+            }
+        }
+
+        private sealed class AlwaysEnabledLogger : ILogger
+        {
+            public static readonly AlwaysEnabledLogger Instance = new();
+
+            public IDisposable BeginScope<TState>(TState state) where TState : notnull
+            {
+                return NullScope.Instance;
+            }
+
+            public bool IsEnabled(LogLevel logLevel)
+            {
+                return true;
+            }
+
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+            {
+            }
+
+            private sealed class NullScope : IDisposable
+            {
+                public static readonly NullScope Instance = new();
+
+                public void Dispose()
+                {
+                }
+            }
         }
     }
 }

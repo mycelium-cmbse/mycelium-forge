@@ -84,7 +84,10 @@ namespace Mycelium.Forge.Serializer.Json
                 }
             }
 
-            this.logger.LogInformation("stream deserialized in {ElapsedTime} [ms]", sw.ElapsedMilliseconds);
+            if (this.logger.IsEnabled(LogLevel.Information))
+            {
+                this.logger.LogInformation("stream deserialized in {ElapsedTime} [ms]", sw.ElapsedMilliseconds);
+            }
 
             return result;
         }
@@ -126,7 +129,10 @@ namespace Mycelium.Forge.Serializer.Json
                 }
             }
 
-            this.logger.LogInformation("stream deserialized asynchronously in {ElapsedMilliseconds} [ms]", sw.ElapsedMilliseconds);
+            if (this.logger.IsEnabled(LogLevel.Information))
+            {
+                this.logger.LogInformation("stream deserialized asynchronously in {ElapsedMilliseconds} [ms]", sw.ElapsedMilliseconds);
+            }
 
             return result;
         }
@@ -167,7 +173,7 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an <see cref="IEnumerable{IThing}"/>
         /// </returns>
-        private IEnumerable<IThing> DeserializeArray(JsonElement jsonArray)
+        private List<IThing> DeserializeArray(JsonElement jsonArray)
         {
             if (jsonArray.ValueKind != JsonValueKind.Array)
             {

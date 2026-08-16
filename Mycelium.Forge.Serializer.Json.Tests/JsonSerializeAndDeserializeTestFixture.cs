@@ -26,8 +26,8 @@ namespace Mycelium.Forge.Serializer.Json.Tests
     [TestFixture]
     public class JsonSerializeAndDeserializeTestFixture
     {
-        private ISerializer serializer;
-        private IDeSerializer deSerializer;
+        private Serializer serializer;
+        private DeSerializer deSerializer;
 
         [SetUp]
         public void SetUp()
@@ -66,17 +66,20 @@ namespace Mycelium.Forge.Serializer.Json.Tests
 
             var roundTripped = (IPackage)result.Single();
 
-            Assert.That(roundTripped.Id, Is.EqualTo(original.Id));
-            Assert.That(roundTripped.CreatedAt, Is.EqualTo(original.CreatedAt));
-            Assert.That(roundTripped.ModifiedAt, Is.EqualTo(original.ModifiedAt));
-            Assert.That(roundTripped.Listed, Is.EqualTo(original.Listed));
-            Assert.That(roundTripped.Name, Is.EqualTo(original.Name));
-            Assert.That(roundTripped.ShortName, Is.EqualTo(original.ShortName));
-            Assert.That(roundTripped.PackageType, Is.EqualTo(original.PackageType));
-            Assert.That(roundTripped.Visibility, Is.EqualTo(original.Visibility));
-            Assert.That(roundTripped.PackageMaintainer, Is.EquivalentTo(original.PackageMaintainer));
-            Assert.That(roundTripped.PackageOwner, Is.EquivalentTo(original.PackageOwner));
-            Assert.That(roundTripped.Version, Is.EquivalentTo(original.Version));
+            Assert.Multiple(() =>
+            {
+                Assert.That(roundTripped.Id, Is.EqualTo(original.Id));
+                Assert.That(roundTripped.CreatedAt, Is.EqualTo(original.CreatedAt));
+                Assert.That(roundTripped.ModifiedAt, Is.EqualTo(original.ModifiedAt));
+                Assert.That(roundTripped.Listed, Is.EqualTo(original.Listed));
+                Assert.That(roundTripped.Name, Is.EqualTo(original.Name));
+                Assert.That(roundTripped.ShortName, Is.EqualTo(original.ShortName));
+                Assert.That(roundTripped.PackageType, Is.EqualTo(original.PackageType));
+                Assert.That(roundTripped.Visibility, Is.EqualTo(original.Visibility));
+                Assert.That(roundTripped.PackageMaintainer, Is.EquivalentTo(original.PackageMaintainer));
+                Assert.That(roundTripped.PackageOwner, Is.EquivalentTo(original.PackageOwner));
+                Assert.That(roundTripped.Version, Is.EquivalentTo(original.Version));
+            });
         }
 
         /// <summary>
@@ -107,13 +110,16 @@ namespace Mycelium.Forge.Serializer.Json.Tests
 
             var roundTripped = (IAddress)result.Single();
 
-            Assert.That(roundTripped.Id, Is.EqualTo(original.Id));
-            Assert.That(roundTripped.Country, Is.EqualTo(original.Country));
-            Assert.That(roundTripped.AddressLine1, Is.EqualTo(original.AddressLine1));
-            Assert.That(roundTripped.AddressLine2, Is.EqualTo(original.AddressLine2));
-            Assert.That(roundTripped.Locality, Is.EqualTo(original.Locality));
-            Assert.That(roundTripped.PostalCode, Is.Null);
-            Assert.That(roundTripped.Region, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(roundTripped.Id, Is.EqualTo(original.Id));
+                Assert.That(roundTripped.Country, Is.EqualTo(original.Country));
+                Assert.That(roundTripped.AddressLine1, Is.EqualTo(original.AddressLine1));
+                Assert.That(roundTripped.AddressLine2, Is.EqualTo(original.AddressLine2));
+                Assert.That(roundTripped.Locality, Is.EqualTo(original.Locality));
+                Assert.That(roundTripped.PostalCode, Is.Null);
+                Assert.That(roundTripped.Region, Is.Null);
+            });
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Serializer.Json.Tests
     [TestFixture]
     public class SerializerTestFixture
     {
-        private ISerializer serializer;
+        private Serializer serializer;
 
         [SetUp]
         public void SetUp()
@@ -61,8 +61,11 @@ namespace Mycelium.Forge.Serializer.Json.Tests
             stream.Position = 0;
             var json = new StreamReader(stream).ReadToEnd();
 
-            Assert.That(json.TrimStart(), Does.StartWith("["));
-            Assert.That(json.TrimEnd(), Does.EndWith("]"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(json.TrimStart(), Does.StartWith("["));
+                Assert.That(json.TrimEnd(), Does.EndWith("]"));
+            });
         }
 
         [Test]
@@ -89,8 +92,11 @@ namespace Mycelium.Forge.Serializer.Json.Tests
             stream.Position = 0;
             var json = new StreamReader(stream).ReadToEnd();
 
-            Assert.That(json.TrimStart(), Does.StartWith("["));
-            Assert.That(json.TrimEnd(), Does.EndWith("]"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(json.TrimStart(), Does.StartWith("["));
+                Assert.That(json.TrimEnd(), Does.EndWith("]"));
+            });
         }
 
         [Test]
