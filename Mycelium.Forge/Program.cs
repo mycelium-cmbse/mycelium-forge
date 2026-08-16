@@ -16,6 +16,7 @@ namespace Mycelium.Forge
     using Carter;
 
     using Mycelium.Forge.Components;
+    using Mycelium.Forge.Orm;
 
     using OpenTelemetry.Resources;
     using OpenTelemetry.Trace;
@@ -48,8 +49,29 @@ namespace Mycelium.Forge
         /// <param name="args">
         /// The command-line arguments provided when starting the application.
         /// </param>
-        public static void Main(string[] args)
+        /// <returns>
+        /// The process exit code.
+        /// </returns>
+        public static int Main(string[] args)
         {
+            // DD-18: migrations run as an explicit, one-shot invocation - an init container, a
+            // `docker compose` one-shot, or an operator command - never at every replica's startup,
+            // since DD-03 makes replicas interchangeable and N of them starting together would race.
+            // This is checked before the web host is built at all, rather than as a mode flag threaded
+            // through the normal startup pipeline: migrating needs a connection string, not Kestrel,
+            // Serilog or the rest of the host.
+            if (args is ["migrate"])
+            {
+                var configuration = new ConfigurationBuilder()
+                    .AddEnvironmentVariables()
+                    .Build();
+
+                var connectionString = configuration.GetConnectionString("Default")
+                    ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
+
+                return Migrator.Run(connectionString) ? 0 : 1;
+            }
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -105,6 +127,8 @@ namespace Mycelium.Forge
             app.MapRazorComponents<App>();
 
             app.Run();
+
+            return 0;
         }
     }
 }

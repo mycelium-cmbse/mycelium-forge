@@ -1,0 +1,14 @@
+-- Takes a transaction-scoped advisory lock (DD-18) so that two concurrent migrator invocations
+-- serialise rather than race: the lock is held for the lifetime of this whole migration batch
+-- (DbUp runs every script in one transaction - see Orm/Migrator.cs's WithTransaction()) and is
+-- released automatically at commit/rollback, so it cannot leak the way a session-scoped lock could
+-- if a connection were returned to a pool still holding it.
+--
+-- A migrator that arrives here while another is already running blocks until the first commits.
+-- Its own script list was computed before it acquired the lock, so it does not know the first
+-- migrator has since applied everything - it will hit a real SQL error re-applying already-applied
+-- DDL, and its whole transaction rolls back cleanly rather than corrupting anything. It can simply
+-- be retried, at which point it finds nothing left to do. Preventing corruption from concurrent
+-- migrators is the DD-18 requirement this satisfies; graceful mutual awareness between two racing
+-- migrators is not required.
+SELECT pg_advisory_xact_lock(872634102);

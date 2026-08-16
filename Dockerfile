@@ -25,6 +25,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
 WORKDIR /app
 
+# Npgsql (F-07, DD-18) probes for libgssapi_krb5 at startup to support GSSAPI authentication, which
+# this image otherwise lacks - harmless (password auth still works) but logs a scary-looking warning
+# on every start without it.
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/publish .
 
 EXPOSE 8080

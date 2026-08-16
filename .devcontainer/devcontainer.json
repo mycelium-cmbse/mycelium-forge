@@ -1,0 +1,19 @@
+{
+  "name": "Mycelium Forge",
+  // Open Dev Containers specification (https://containers.dev/) - not VS Code-proprietary. JetBrains
+  // Rider opens this same file via JetBrains Gateway, no separate JetBrains-only config needed.
+  "dockerComposeFile": "../docker-compose.yml",
+  // The `workspace` service (Dockerfile's `build` stage, i.e. the SDK, not the runtime-only `app`
+  // image) is where the editor lands. `runServices` brings up the supporting services alongside it -
+  // Postgres, Garage, Keycloak, and a completed migrator run - but deliberately excludes `app`, so it
+  // doesn't fight the `dotnet run`/debug session started interactively from inside `workspace`.
+  "service": "workspace",
+  "runServices": ["postgres", "garage", "keycloak", "migrator"],
+  "workspaceFolder": "/workspaces/mycelium-forge",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-dotnettools.csdevkit"]
+    }
+  }
+}
