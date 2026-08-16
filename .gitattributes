@@ -1,0 +1,29 @@
+# Line-ending policy, repo-wide and independent of any contributor's or environment's global git
+# config. Without this, a Windows host (core.autocrlf=true, the common default) and a Linux
+# devcontainer (no gitconfig at all, autocrlf effectively off) disagree about what "clean" looks
+# like for the exact same on-disk bytes - every text file shows as modified on whichever side
+# didn't write it, even though nothing actually changed.
+#
+# Auto-detect text vs binary, normalize line endings to LF in the repository for anything text.
+* text=auto eol=lf
+
+# Visual Studio's own convention; keep it, don't fight it.
+*.sln text eol=crlf
+
+# Windows-specific scripts.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Never touched, regardless of content sniffing.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.exe binary
+*.dll binary
