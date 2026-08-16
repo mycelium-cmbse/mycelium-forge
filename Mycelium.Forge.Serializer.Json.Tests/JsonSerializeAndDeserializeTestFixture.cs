@@ -66,7 +66,7 @@ namespace Mycelium.Forge.Serializer.Json.Tests
 
             var roundTripped = (IPackage)result.Single();
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(roundTripped.Id, Is.EqualTo(original.Id));
                 Assert.That(roundTripped.CreatedAt, Is.EqualTo(original.CreatedAt));
@@ -79,7 +79,7 @@ namespace Mycelium.Forge.Serializer.Json.Tests
                 Assert.That(roundTripped.PackageMaintainer, Is.EquivalentTo(original.PackageMaintainer));
                 Assert.That(roundTripped.PackageOwner, Is.EquivalentTo(original.PackageOwner));
                 Assert.That(roundTripped.Version, Is.EquivalentTo(original.Version));
-            });
+            }
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Mycelium.Forge.Serializer.Json.Tests
 
             var roundTripped = (IAddress)result.Single();
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(roundTripped.Id, Is.EqualTo(original.Id));
                 Assert.That(roundTripped.Country, Is.EqualTo(original.Country));
@@ -119,7 +119,7 @@ namespace Mycelium.Forge.Serializer.Json.Tests
                 Assert.That(roundTripped.Locality, Is.EqualTo(original.Locality));
                 Assert.That(roundTripped.PostalCode, Is.Null);
                 Assert.That(roundTripped.Region, Is.Null);
-            });
+            }
         }
     }
 }

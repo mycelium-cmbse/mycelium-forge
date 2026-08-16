@@ -178,11 +178,11 @@ namespace Mycelium.Forge.Serializer.Json.Tests
 
             var asyncResult = await loggingDeSerializer.DeSerializeAsync(asyncStream, CancellationToken.None);
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(syncResult.Single().Id, Is.EqualTo(thing.Id));
                 Assert.That(asyncResult.Single().Id, Is.EqualTo(thing.Id));
-            });
+            }
         }
 
         private sealed class AlwaysEnabledLoggerFactory : ILoggerFactory
