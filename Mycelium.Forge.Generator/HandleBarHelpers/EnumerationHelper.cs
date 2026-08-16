@@ -9,8 +9,10 @@
 
 namespace Mycelium.Forge.Generator.HandleBarHelpers
 {
+    using System.Linq;
+
     using HandlebarsDotNet;
-    
+
     using uml4net.SimpleClassifiers;
 
     /// <summary>
@@ -33,16 +35,17 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new HandlebarsException("{{#Enumeration.WriteLengthLongestLiteral}} helper must have exactly one argument");
                 }
 
-                var enumeration = arguments.Single() as Enumeration;
-
-                int maxLenght = 0;
-                foreach (var enumerationLiteral in enumeration.OwnedLiteral)
+                if (arguments.Single() is not Enumeration enumeration)
                 {
-                    if (!string.IsNullOrEmpty(enumerationLiteral.Name) && enumerationLiteral.Name.Length > maxLenght)
-                    {
-                        maxLenght = enumerationLiteral.Name.Length;
-                    }
+                    throw new HandlebarsException("{{#Enumeration.WriteLengthLongestLiteral}} argument must be an Enumeration");
                 }
+
+                var maxLenght = enumeration.OwnedLiteral
+                    .Select(enumerationLiteral => enumerationLiteral.Name)
+                    .Where(name => !string.IsNullOrEmpty(name))
+                    .Select(name => name.Length)
+                    .DefaultIfEmpty(0)
+                    .Max();
 
                 writer.WriteSafeString(maxLenght);
             });

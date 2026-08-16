@@ -34,7 +34,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new HandlebarsException("{{#EnumerationLiteral.Write}} helper must have exactly one argument");
                 }
 
-                var enumerationLiteral = arguments.Single() as EnumerationLiteral;
+                if (arguments.Single() is not EnumerationLiteral enumerationLiteral)
+                {
+                    throw new HandlebarsException("{{#EnumerationLiteral.Write}} argument must be an EnumerationLiteral");
+                }
 
                 var name = enumerationLiteral.Name.CapitalizeFirstLetter();
 
