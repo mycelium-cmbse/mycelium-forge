@@ -73,6 +73,15 @@ already run.
   container. If you also want to see the fully containerized app running side-by-side, see
   [Just run it](#just-run-it) in a separate terminal.
 
+### Claude Code inside the Dev Container
+
+The Dev Container includes the Claude Code CLI and runs as a non-root user (`forge`), so
+`claude --dangerously-skip-permissions` is available from the integrated terminal if you want it — the CLI
+refuses that flag when launched as root, which is why the container doesn't run as root in the first place.
+Login state persists across rebuilds (it lives in a named Docker volume), so you only need to `claude login`
+once. Skipping permission prompts is still a real trust decision, not just a root-vs-non-root technicality —
+only use it in a container you're comfortable giving broad, prompt-free access to.
+
 ## Option B: run the supporting services only
 
 If you'd rather work outside a Dev Container — plain Rider on your host, .NET SDK installed locally —
