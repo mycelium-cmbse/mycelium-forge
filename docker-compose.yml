@@ -1,5 +1,5 @@
 # Local development environment (F-07, DD-09): PostgreSQL, object storage and an identity provider,
-# plus the one-shot migrator the app depends on (DD-18). See docs/local-development.md for the seed
+# plus the one-shot migrator the app depends on (DD-18). See docs/getting-started.md for the seed
 # path. Every credential below is a fixed, checked-in, dev-only value - never used outside this file.
 
 services:

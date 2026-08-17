@@ -11,6 +11,29 @@
   "runServices": ["postgres", "garage", "keycloak", "migrator"],
   "workspaceFolder": "/workspaces/mycelium-forge",
   "shutdownAction": "stopCompose",
+  "features": {
+    // Non-root user: the workspace image itself has none (its Dockerfile stage never sets USER, so a
+    // plain `docker compose up workspace` still runs as root) - the Claude Code CLI refuses
+    // `--dangerously-skip-permissions` when launched as root, so a non-root remote user is what
+    // actually makes that flag usable here, not just a hardening nicety.
+    // No explicit userUid/userGid: the SDK base image already occupies GID 1000 with its own group,
+    // so a hardcoded 1000 collides ("GID '1000' already exists") - "automatic" (the feature's
+    // default) picks a free id instead, which is more robust to base-image changes anyway.
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "forge"
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+  "remoteUser": "forge",
+  // `~/.claude.json` lives outside `~/.claude`, so persisting only the `.claude` directory isn't
+  // enough on its own - CLAUDE_CONFIG_DIR redirects Claude Code's full state (including that file)
+  // into the directory the named volume below actually covers, so login survives container rebuilds.
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/forge/.claude"
+  },
+  "mounts": [
+    "source=mycelium-forge-claude-config,target=/home/forge/.claude,type=volume"
+  ],
   "customizations": {
     "vscode": {
       "extensions": ["ms-dotnettools.csdevkit"]
