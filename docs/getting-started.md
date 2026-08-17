@@ -72,6 +72,12 @@ already run.
   container — you're running the app yourself, interactively, instead of it running as its own
   container. If you also want to see the fully containerized app running side-by-side, see
   [Just run it](#just-run-it) in a separate terminal.
+- **Getting a shell**: Rider's integrated terminal already opens inside the container — no extra step
+  needed. From a plain host terminal instead (Rider not open, or not connected right now), with the
+  container already running:
+  ```
+  docker compose exec workspace bash
+  ```
 
 ### Claude Code inside the Dev Container
 
