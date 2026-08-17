@@ -106,13 +106,17 @@ services:
         condition: service_healthy
 
   # Not started by a plain `docker compose up` (no depends_on references it) - this is the
-  # devcontainer's workspace, see .devcontainer/devcontainer.json. Built from the same Dockerfile's
-  # SDK stage rather than a second Dockerfile, so there is one build definition to keep in sync.
+  # devcontainer's workspace, see .devcontainer/devcontainer.json. Uses the public SDK image
+  # directly rather than `build: {dockerfile: Dockerfile, target: build}` - workspace bind-mounts
+  # live source and never runs `dotnet publish` itself, so reusing the multi-stage Dockerfile's
+  # build stage was only ever a restore-caching nicety, not a real requirement. It's also broken in
+  # JetBrains Gateway/Rider: a compose service's `build.target` isn't carried through correctly when
+  # devcontainer features are layered on top (JetBrains bug IJPL-182853, "Build from a multistage
+  # Dockerfile fails when target stage is specified in Docker Compose" - fails with "target stage
+  # 'build' could not be found" at the `up` step, even though the plain image builds fine). Using the
+  # base image directly sidesteps that: no `target` field anywhere in this file for Gateway to drop.
   workspace:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: build
+    image: mcr.microsoft.com/dotnet/sdk:10.0
     command: ["sleep", "infinity"]
     volumes:
       - .:/workspaces/mycelium-forge:cached
