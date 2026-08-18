@@ -1,4 +1,4 @@
-﻿/* Semantics Collection
+/* Semantics Collection
  * Contextual design tokens aliasing raw primitives.
  * Rule: All component styles and Tailwind utilities consume semantic tokens exclusively.
  */
@@ -34,6 +34,16 @@
   --btn-signin-fg: var(--primitive-color-slate-900);
   --btn-signin-hover-bg: var(--primitive-color-slate-50);
   --btn-signin-hover-border: var(--primitive-color-slate-400);
+
+  /* Hero & Format Strip Semantics */
+  --hero-search-bg: var(--primitive-color-white);
+  --hero-search-border: var(--primitive-color-slate-300);
+  --hero-kbd-bg: var(--primitive-color-slate-50);
+  --hero-kbd-border: var(--primitive-color-slate-150);
+  --format-pill-bg: var(--primitive-color-white);
+  --format-pill-border: var(--primitive-color-slate-250);
+  --format-pill-fg: var(--primitive-color-slate-900);
+  --format-strip-label: var(--primitive-color-slate-450);
 
   /* Core Design System Tokens */
   --background: var(--primitive-color-white);
@@ -92,6 +102,16 @@
   --btn-signin-fg: var(--primitive-color-slate-100);
   --btn-signin-hover-bg: var(--primitive-color-slate-800);
   --btn-signin-hover-border: var(--primitive-color-slate-600);
+
+  /* Hero & Format Strip Semantics - Dark Mode */
+  --hero-search-bg: var(--primitive-color-slate-900);
+  --hero-search-border: var(--primitive-color-slate-700);
+  --hero-kbd-bg: var(--primitive-color-slate-950);
+  --hero-kbd-border: var(--primitive-color-slate-800);
+  --format-pill-bg: var(--primitive-color-slate-900);
+  --format-pill-border: var(--primitive-color-slate-700);
+  --format-pill-fg: var(--primitive-color-slate-100);
+  --format-strip-label: var(--primitive-color-slate-400);
 
   /* Core Design System Tokens - Dark Mode */
   --background: var(--primitive-color-slate-950);

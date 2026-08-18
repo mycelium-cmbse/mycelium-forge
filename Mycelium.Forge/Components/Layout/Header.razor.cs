@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -43,10 +43,10 @@ namespace Mycelium.Forge.Components.Layout
 
             if (isActive)
             {
-                return "text-[13px] leading-4 font-semibold text-nav-link-active";
+                return "forge-nav-link font-semibold text-nav-link-active";
             }
 
-            return "text-[13px] leading-4 font-medium text-nav-link-inactive hover:text-nav-link-hover transition-colors";
+            return "forge-nav-link font-medium text-nav-link-inactive hover:text-nav-link-hover transition-colors";
         }
 
         /// <summary>

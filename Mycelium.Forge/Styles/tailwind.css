@@ -1,4 +1,4 @@
-﻿/* Tailwind source for Mycelium Forge.
+/* Tailwind source for Mycelium Forge.
  *
  * Compiled to wwwroot/css/app.css by the BuildTailwindCss target in Mycelium.Forge.csproj.
  * This file lives outside wwwroot deliberately: it is build input, not a served asset.
@@ -46,6 +46,15 @@
   --color-btn-signin-hover-bg: var(--btn-signin-hover-bg);
   --color-btn-signin-hover-border: var(--btn-signin-hover-border);
 
+  --color-hero-search-bg: var(--hero-search-bg);
+  --color-hero-search-border: var(--hero-search-border);
+  --color-hero-kbd-bg: var(--hero-kbd-bg);
+  --color-hero-kbd-border: var(--hero-kbd-border);
+  --color-format-pill-bg: var(--format-pill-bg);
+  --color-format-pill-border: var(--format-pill-border);
+  --color-format-pill-fg: var(--format-pill-fg);
+  --color-format-strip-label: var(--format-strip-label);
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -71,7 +80,8 @@
   --radius-xs: var(--primitive-radius-xs);
   --radius-sm: var(--primitive-radius-sm);
   --radius-md: var(--primitive-radius-md);
-  --radius-lg: var(--radius);
+  --radius-lg: var(--primitive-radius-lg);
+  --radius-input: var(--primitive-radius-input);
   --radius-xl: var(--primitive-radius-xl);
   --radius-full: var(--primitive-radius-full);
 }

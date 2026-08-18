@@ -1,0 +1,48 @@
+/* Scoped layout and typography styles for Home page Hero section */
+
+.hero-container {
+    padding-top: 64px;
+    padding-bottom: 64px;
+}
+
+.hero-title {
+    font-size: var(--primitive-font-size-3xl);
+    line-height: var(--primitive-line-height-3xl);
+}
+
+.hero-subtitle {
+    font-size: var(--primitive-font-size-md);
+    line-height: var(--primitive-line-height-sm);
+}
+
+.hero-search-container {
+    width: 100%;
+    max-width: 640px;
+    height: 48px;
+}
+
+.hero-search-input {
+    font-size: var(--primitive-font-size-md);
+    line-height: var(--primitive-line-height-sm);
+}
+
+.hero-kbd {
+    font-size: var(--primitive-font-size-2xs);
+    line-height: var(--primitive-line-height-3xs);
+}
+
+.hero-stats {
+    gap: 48px;
+}
+
+.format-strip-label {
+    font-size: var(--primitive-font-size-sm);
+    line-height: var(--primitive-line-height-xs);
+}
+
+.format-pill {
+    height: 30px;
+    padding: 7px 14px;
+    font-size: var(--primitive-font-size-sm);
+    line-height: var(--primitive-line-height-xs);
+}

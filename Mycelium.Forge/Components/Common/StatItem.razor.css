@@ -1,0 +1,20 @@
+/* Scoped styles for StatItem component */
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.stat-value {
+    font-size: var(--primitive-font-size-xl);
+    line-height: var(--primitive-line-height-xl);
+    text-align: center;
+}
+
+.stat-label {
+    font-size: var(--primitive-font-size-xs);
+    line-height: var(--primitive-line-height-2xs);
+    text-align: center;
+}

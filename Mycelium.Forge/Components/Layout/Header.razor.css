@@ -1,9 +1,17 @@
-/* Scoped layout styles for Header component */
+/* Scoped layout and typography styles for Header component */
 
 .forge-header {
     height: 56px;
 }
 
+.forge-nav-link {
+    font-size: var(--primitive-font-size-sm);
+    line-height: var(--primitive-line-height-xs);
+}
+
 .forge-signin-btn {
     height: 32px;
+    padding: 8px 14px;
+    font-size: var(--primitive-font-size-sm);
+    line-height: var(--primitive-line-height-xs);
 }

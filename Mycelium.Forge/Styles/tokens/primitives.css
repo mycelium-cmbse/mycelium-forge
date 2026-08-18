@@ -1,4 +1,4 @@
-﻿/* Primitives Collection
+/* Primitives Collection
  * Raw design tokens (palette colors, typography, sizing, spacing, radiuses).
  * Rule: Never apply a primitive token directly to a component — always alias it through a semantic token.
  */
@@ -19,9 +19,12 @@
   /* Neutral Primitive Palette - Slate */
   --primitive-color-slate-50: #f7fafc;
   --primitive-color-slate-100: #edf2f7;
+  --primitive-color-slate-150: #e3e8ed;
   --primitive-color-slate-200: #e2e8f0;
+  --primitive-color-slate-250: #dbe0e8;
   --primitive-color-slate-300: #d1d6db;
   --primitive-color-slate-400: #94a3b8;
+  --primitive-color-slate-450: #6b7a8c;
   --primitive-color-slate-500: #738294;
   --primitive-color-slate-600: #475569;
   --primitive-color-slate-700: #334155;
@@ -39,21 +42,31 @@
   --primitive-color-green-500: #22c55e;
   --primitive-color-green-600: #16a34a;
 
-  /* Typography Primitives */
+  /* Typography Primitives - Font Family */
   --primitive-font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --primitive-font-size-xs: 0.75rem;     /* 12px */
-  --primitive-font-size-sm: 0.8125rem;   /* 13px */
-  --primitive-font-size-base: 0.875rem;  /* 14px */
-  --primitive-font-size-md: 0.9375rem;   /* 15px */
-  --primitive-font-size-lg: 1rem;        /* 16px */
-  --primitive-font-size-xl: 1.25rem;     /* 20px */
-  --primitive-font-size-2xl: 1.5rem;     /* 24px */
 
+  /* Typography Primitives - Font Size */
+  --primitive-font-size-2xs: 0.6875rem; /* 11px */
+  --primitive-font-size-xs: 0.75rem;    /* 12px */
+  --primitive-font-size-sm: 0.8125rem;  /* 13px */
+  --primitive-font-size-base: 0.875rem; /* 14px */
+  --primitive-font-size-md: 0.9375rem;  /* 15px */
+  --primitive-font-size-lg: 1rem;       /* 16px */
+  --primitive-font-size-xl: 1.375rem;   /* 22px */
+  --primitive-font-size-2xl: 1.5rem;    /* 24px */
+  --primitive-font-size-3xl: 2.25rem;   /* 36px */
+
+  /* Typography Primitives - Line Height */
+  --primitive-line-height-3xs: 0.8125rem; /* 13px */
+  --primitive-line-height-2xs: 0.9375rem; /* 15px */
   --primitive-line-height-xs: 1rem;       /* 16px */
   --primitive-line-height-sm: 1.125rem;   /* 18px */
   --primitive-line-height-base: 1.25rem;  /* 20px */
   --primitive-line-height-lg: 1.5rem;     /* 24px */
+  --primitive-line-height-xl: 1.6875rem;  /* 27px */
+  --primitive-line-height-3xl: 2.75rem;   /* 44px */
 
+  /* Typography Primitives - Font Weight */
   --primitive-font-weight-normal: 400;
   --primitive-font-weight-medium: 500;
   --primitive-font-weight-semibold: 600;
@@ -65,6 +78,7 @@
   --primitive-radius-sm: 4px;
   --primitive-radius-md: 6px;
   --primitive-radius-lg: 8px;
+  --primitive-radius-input: 10px;
   --primitive-radius-xl: 12px;
   --primitive-radius-full: 9999px;
 }
