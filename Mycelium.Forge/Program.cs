@@ -24,6 +24,7 @@ namespace Mycelium.Forge
     using OpenTelemetry.Trace;
 
     using Serilog;
+    using Serilog.Formatting.Compact;
 
     /// <summary>
     /// Provides the entry point for the Mycelium Forge package registry.
@@ -69,7 +70,7 @@ namespace Mycelium.Forge
                     .Build();
 
                 var connectionString = configuration.GetConnectionString("Default")
-                    ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
+                                       ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
 
                 return Migrator.Run(connectionString) ? 0 : 1;
             }
@@ -82,7 +83,7 @@ namespace Mycelium.Forge
             builder.Host.UseSerilog((context, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration)
                 .Enrich.FromLogContext()
-                .WriteTo.Console(new Serilog.Formatting.Compact.CompactJsonFormatter()));
+                .WriteTo.Console(new CompactJsonFormatter()));
 
             // SSS-FB-OBS-D2B: OpenTelemetry traces covering inbound HTTP requests.
             builder.Services.AddOpenTelemetry()

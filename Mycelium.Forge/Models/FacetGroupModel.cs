@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Models
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Represents a group of related facet filter options.
     /// </summary>

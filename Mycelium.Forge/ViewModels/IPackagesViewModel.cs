@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using System.Collections.Generic;
-
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -63,13 +61,15 @@ namespace Mycelium.Forge.ViewModels
         /// </summary>
         /// <param name="query">The search query parameter from URL route.</param>
         /// <param name="sort">The sort order parameter from URL route.</param>
-        /// <param name="format">The format filter parameter from URL route.</param>
-        /// <param name="category">The category filter parameter from URL route.</param>
-        void InitializeViewModel(string query, string sort, string format, string category);
+        /// <param name="includePrereleases">A value indicating whether prerelease packages should be included.</param>
+        void InitializeViewModel(string query, PackageSortOption sort, bool includePrereleases);
 
         /// <summary>
-        /// Executes a search operation and refreshes facet options and package results.
+        /// Executes a search operation with query, sort option, and prerelease inclusion parameters.
         /// </summary>
-        void Search();
+        /// <param name="query">The search query text filter.</param>
+        /// <param name="sort">The sort option filter.</param>
+        /// <param name="includePrereleases">A value indicating whether prerelease packages should be included.</param>
+        void Search(string query = "", PackageSortOption sort = PackageSortOption.Relevance, bool includePrereleases = false);
     }
 }

@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using System.Collections.Generic;
-
     using Mycelium.Forge.Models;
 
     /// <summary>

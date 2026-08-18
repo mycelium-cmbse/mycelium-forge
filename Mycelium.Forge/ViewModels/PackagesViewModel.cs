@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using System.Collections.Generic;
-
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -18,6 +16,74 @@ namespace Mycelium.Forge.ViewModels
     /// </summary>
     public class PackagesViewModel : IPackagesViewModel
     {
+        /// <summary>
+        /// The master collection of package search result items.
+        /// </summary>
+        private readonly IReadOnlyList<PackageRowModel> allPackages =
+        [
+            new(
+                "ecss-e-st-10-04c",
+                "/packages/esa/ecss-e-st-10-04c",
+                "Space environment standard reference model for space systems engineering.",
+                "SysML v2",
+                "@esa",
+                "v1.4.0",
+                "aocs · thermal · space · environment · ecss",
+                "3 days ago",
+                "420"),
+            new(
+                "ecss-e-st-70-46c",
+                "/packages/esa/ecss-e-st-70-46c",
+                "Electrical and power system architectures following ECSS engineering standards.",
+                "SysML v2",
+                "@esa",
+                "v2.1.0",
+                "power · electrical · subsystems · ecss",
+                "2 weeks ago",
+                "315"),
+            new(
+                "ecss-e-st-50-14c",
+                "/packages/esa/ecss-e-st-50-14c",
+                "Attitude and orbit control system spacecraft dynamics reference package.",
+                "SysML v2",
+                "@esa",
+                "v0.9.2",
+                "aocs · dynamics · navigation · ecss",
+                "1 month ago",
+                "280"),
+            new(
+                "ecss-e-st-32-10c",
+                "/packages/starion/ecss-e-st-32-10c",
+                "RF telecommunication link budget and space communication interfaces.",
+                "SysML v2",
+                "@starion",
+                "v0.3.0",
+                "comms · rf · telemetry · ecss",
+                "2 months ago",
+                "190"),
+            new(
+                "ecss-e-st-31-01c",
+                "/packages/starion/ecss-e-st-31-01c",
+                "Structural and mechanical engineering domain metamodels and loads analysis.",
+                "SysML v2",
+                "@starion",
+                "v1.0.0",
+                "mechanical · structures · loads · ecss",
+                "3 months ago",
+                "165"),
+            new(
+                "ECSS-E-TM-10-25-Schema",
+                "/packages/esa/ECSS-E-TM-10-25-Schema",
+                "Space engineering model-based data exchange engineering ontology.",
+                "CDP4-COMET",
+                "@esa",
+                "v1.2.0",
+                "ecss · cdp4 · space · ontology · exchange",
+                "4 months ago",
+                "940",
+                true)
+        ];
+
         /// <summary>
         /// Gets or sets the collection of format facet filter options.
         /// </summary>
@@ -63,20 +129,34 @@ namespace Mycelium.Forge.ViewModels
         /// </summary>
         /// <param name="query">The search query parameter from URL route.</param>
         /// <param name="sort">The sort order parameter from URL route.</param>
-        /// <param name="format">The format filter parameter from URL route.</param>
-        /// <param name="category">The category filter parameter from URL route.</param>
-        public void InitializeViewModel(string query, string sort, string format, string category)
+        /// <param name="includePrereleases">A value indicating whether prerelease packages should be included.</param>
+        public void InitializeViewModel(string query, PackageSortOption sort, bool includePrereleases)
         {
-            this.Search();
+            this.InitializeFacets();
+            this.Search(query, sort, includePrereleases);
         }
 
         /// <summary>
-        /// Executes a search operation and refreshes facet options and package results.
+        /// Executes a search operation with query, sort option, and prerelease inclusion parameters.
         /// </summary>
-        public void Search()
+        /// <param name="query">The search query text filter.</param>
+        /// <param name="sort">The sort option filter.</param>
+        /// <param name="includePrereleases">A value indicating whether prerelease packages should be included.</param>
+        public void Search(string query = "", PackageSortOption sort = PackageSortOption.Relevance, bool includePrereleases = false)
         {
-            this.InitializeFacets();
-            this.InitializePackages();
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                this.PackageResults = this.allPackages;
+                return;
+            }
+
+            var trimmed = query.Trim();
+
+            this.PackageResults =
+            [
+                .. this.allPackages.Where(p =>
+                    p.Name.Contains(trimmed, StringComparison.OrdinalIgnoreCase))
+            ];
         }
 
         /// <summary>
@@ -106,9 +186,9 @@ namespace Mycelium.Forge.ViewModels
 
             this.Categories =
             [
-                new FacetItemModel("mission-model", 6, true),
-                new FacetItemModel("standard-library", 0),
-                new FacetItemModel("quantities-units", 0),
+                new FacetItemModel("mission-model", 5, true),
+                new FacetItemModel("standard-library", 1),
+                new FacetItemModel("quantities-units", 1),
                 new FacetItemModel("view-definitions", 0)
             ];
 
@@ -123,7 +203,7 @@ namespace Mycelium.Forge.ViewModels
 
             this.Metamodels =
             [
-                new FacetItemModel("SysML v2 (2025-02)", 5),
+                new FacetItemModel("SysML v2 (2025-02)", 6),
                 new FacetItemModel("ECSS-E-TM-10-25", 1)
             ];
 
@@ -131,77 +211,6 @@ namespace Mycelium.Forge.ViewModels
             [
                 new FacetItemModel("Apache-2.0", 5),
                 new FacetItemModel("MIT", 1)
-            ];
-        }
-
-        /// <summary>
-        /// Populates the package search result items.
-        /// </summary>
-        private void InitializePackages()
-        {
-            this.PackageResults =
-            [
-                new PackageRowModel(
-                    "ecss-e-st-10-04c",
-                    "/packages/esa/ecss-e-st-10-04c",
-                    "Space environment standard reference model for space systems engineering.",
-                    "SysML v2",
-                    "@esa",
-                    "v1.4.0",
-                    "aocs · thermal · space · environment · ecss",
-                    "3 days ago",
-                    "420"),
-                new PackageRowModel(
-                    "ecss-e-st-70-46c",
-                    "/packages/esa/ecss-e-st-70-46c",
-                    "Electrical and power system architectures following ECSS engineering standards.",
-                    "SysML v2",
-                    "@esa",
-                    "v2.1.0",
-                    "power · electrical · subsystems · ecss",
-                    "2 weeks ago",
-                    "315"),
-                new PackageRowModel(
-                    "ecss-e-st-50-14c",
-                    "/packages/esa/ecss-e-st-50-14c",
-                    "Attitude and orbit control system spacecraft dynamics reference package.",
-                    "SysML v2",
-                    "@esa",
-                    "v0.9.2",
-                    "aocs · dynamics · navigation · ecss",
-                    "1 month ago",
-                    "280"),
-                new PackageRowModel(
-                    "ecss-e-st-32-10c",
-                    "/packages/starion/ecss-e-st-32-10c",
-                    "RF telecommunication link budget and space communication interfaces.",
-                    "SysML v2",
-                    "@starion",
-                    "v0.3.0",
-                    "comms · rf · telemetry · ecss",
-                    "2 months ago",
-                    "190"),
-                new PackageRowModel(
-                    "ecss-e-st-31-01c",
-                    "/packages/starion/ecss-e-st-31-01c",
-                    "Structural and mechanical engineering domain metamodels and loads analysis.",
-                    "SysML v2",
-                    "@starion",
-                    "v1.0.0",
-                    "mechanical · structures · loads · ecss",
-                    "3 months ago",
-                    "165"),
-                new PackageRowModel(
-                    "ECSS-E-TM-10-25-Schema",
-                    "/packages/esa/ECSS-E-TM-10-25-Schema",
-                    "Space engineering model-based data exchange engineering ontology.",
-                    "CDP4-COMET",
-                    "@esa",
-                    "v1.2.0",
-                    "ecss · cdp4 · space · ontology · exchange",
-                    "4 months ago",
-                    "940",
-                    true)
             ];
         }
     }

@@ -15,7 +15,7 @@ namespace Mycelium.Forge.Models
     public class FacetItemModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FacetItemModel"/> class.
+        /// Initializes a new instance of the <see cref="FacetItemModel" /> class.
         /// </summary>
         /// <param name="label">The display label of the facet option.</param>
         /// <param name="count">The count of matching packages for this facet option.</param>

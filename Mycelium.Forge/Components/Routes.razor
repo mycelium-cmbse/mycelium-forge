@@ -1,11 +1,11 @@
-@*
+﻿@*
     Routing for the Forge web interface. Unmatched routes are handled by the status-code-pages
     re-execution configured in Program.cs, which re-issues the request against /not-found.
 *@
 
 <Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)"/>
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
         <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
     </Found>
 </Router>

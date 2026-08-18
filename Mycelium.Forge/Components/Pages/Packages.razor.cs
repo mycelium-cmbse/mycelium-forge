@@ -9,9 +9,6 @@
 
 namespace Mycelium.Forge.Components.Pages
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
@@ -53,9 +50,9 @@ namespace Mycelium.Forge.Components.Pages
         public string SearchQuery { get; set; } = "ecss";
 
         /// <summary>
-        /// Gets or sets the currently selected sort option display name.
+        /// Gets or sets the currently selected sort option enum value.
         /// </summary>
-        public string SelectedSortOption { get; set; } = "Relevance";
+        public PackageSortOption SelectedSortOption { get; set; } = PackageSortOption.Relevance;
 
         /// <summary>
         /// Gets or sets a value indicating whether the sort options dropdown is visible.
@@ -68,14 +65,14 @@ namespace Mycelium.Forge.Components.Pages
         public bool IncludePrereleases { get; set; }
 
         /// <summary>
-        /// Gets the list of available sort option labels.
+        /// Gets the list of available sort option enum values.
         /// </summary>
-        public IReadOnlyList<string> SortOptions { get; } =
+        public IReadOnlyList<PackageSortOption> SortOptions { get; } =
         [
-            "Relevance",
-            "Downloads",
-            "Recently updated",
-            "Alphabetical"
+            PackageSortOption.Relevance,
+            PackageSortOption.Downloads,
+            PackageSortOption.RecentlyUpdated,
+            PackageSortOption.Alphabetical
         ];
 
         /// <summary>
@@ -83,6 +80,23 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         [Inject]
         public IPackagesViewModel ViewModel { get; set; }
+
+        /// <summary>
+        /// Gets the display text representation for a sort option enum value.
+        /// </summary>
+        /// <param name="option">The package sort option.</param>
+        /// <returns>The human-readable sort option label.</returns>
+        public static string GetSortOptionLabel(PackageSortOption option)
+        {
+            return option switch
+            {
+                PackageSortOption.Relevance => "Relevance",
+                PackageSortOption.Downloads => "Downloads",
+                PackageSortOption.RecentlyUpdated => "Recently updated",
+                PackageSortOption.Alphabetical => "Alphabetical",
+                _ => nameof(PackageSortOption.Relevance)
+            };
+        }
 
         /// <summary>
         /// Gets the human-readable search results summary heading text.
@@ -94,8 +108,15 @@ namespace Mycelium.Forge.Components.Pages
         {
             var count = this.ViewModel.PackageResults.Count;
 
-            return !string.IsNullOrWhiteSpace(this.SearchQuery) 
-                ? $"{count} packages matching “{this.SearchQuery}”" 
+            if (!string.IsNullOrWhiteSpace(this.SearchQuery))
+            {
+                return count == 1
+                    ? $"1 package matches “{this.SearchQuery}”"
+                    : $"{count} packages match “{this.SearchQuery}”";
+            }
+
+            return count == 1
+                ? "1 package"
                 : $"{count} packages";
         }
 
@@ -106,6 +127,7 @@ namespace Mycelium.Forge.Components.Pages
         public void OnSearchValueChanged(string value)
         {
             this.SearchQuery = value ?? string.Empty;
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 
         /// <summary>
@@ -114,7 +136,7 @@ namespace Mycelium.Forge.Components.Pages
         public void ClearSearch()
         {
             this.SearchQuery = string.Empty;
-            this.ViewModel.Search();
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 
         /// <summary>
@@ -128,11 +150,12 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Selects the specified sort option and closes the dropdown menu.
         /// </summary>
-        /// <param name="sortOption">The selected sort option label.</param>
-        public void SelectSortOption(string sortOption)
+        /// <param name="sortOption">The selected sort option.</param>
+        public void SelectSortOption(PackageSortOption sortOption)
         {
             this.SelectedSortOption = sortOption;
             this.IsSortDropdownOpen = false;
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 
         /// <summary>
@@ -142,6 +165,7 @@ namespace Mycelium.Forge.Components.Pages
         public void OnIncludePrereleasesChanged(bool isChecked)
         {
             this.IncludePrereleases = isChecked;
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 
         /// <summary>
@@ -158,7 +182,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         public void ApplyFilters()
         {
-            this.ViewModel.Search();
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 
         /// <summary>
@@ -167,7 +191,18 @@ namespace Mycelium.Forge.Components.Pages
         public void ResetFilters()
         {
             this.SearchQuery = string.Empty;
-            this.ViewModel.Search();
+            this.ResetFacetSelections();
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
+        }
+
+        /// <summary>
+        /// Clears all active filters and search terms and browses the full catalog.
+        /// </summary>
+        public void BrowseAllPackages()
+        {
+            this.SearchQuery = string.Empty;
+            this.ResetFacetSelections();
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 
         /// <summary>
@@ -184,15 +219,54 @@ namespace Mycelium.Forge.Components.Pages
 
             if (!string.IsNullOrWhiteSpace(this.Sort))
             {
-                var matchedSort = this.SortOptions.FirstOrDefault(x => x.ToLowerInvariant() == this.Sort.ToLowerInvariant());
-
-                if (!string.IsNullOrWhiteSpace(matchedSort))
+                if (Enum.TryParse<PackageSortOption>(this.Sort, true, out var parsedSort))
                 {
-                    this.SelectedSortOption = matchedSort;
+                    this.SelectedSortOption = parsedSort;
                 }
             }
 
-            this.ViewModel.InitializeViewModel(this.SearchQuery, this.Sort, this.Format, this.Category);
+            this.ViewModel.InitializeViewModel(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
+        }
+
+        /// <summary>
+        /// Resets the checked state of all facet filter options across all categories.
+        /// </summary>
+        private void ResetFacetSelections()
+        {
+            foreach (var item in this.ViewModel.Formats)
+            {
+                item.IsChecked = false;
+            }
+
+            foreach (var item in this.ViewModel.Kinds)
+            {
+                item.IsChecked = false;
+            }
+
+            foreach (var item in this.ViewModel.Scopes)
+            {
+                item.IsChecked = false;
+            }
+
+            foreach (var item in this.ViewModel.Categories)
+            {
+                item.IsChecked = false;
+            }
+
+            foreach (var item in this.ViewModel.Tags)
+            {
+                item.IsChecked = false;
+            }
+
+            foreach (var item in this.ViewModel.Metamodels)
+            {
+                item.IsChecked = false;
+            }
+
+            foreach (var item in this.ViewModel.Licenses)
+            {
+                item.IsChecked = false;
+            }
         }
     }
 }
