@@ -1,0 +1,51 @@
+﻿@using Mycelium.Forge.Models
+
+@if (this.Model != null)
+{
+    <a href="@(this.Model.Href)"
+       class="block select-none group focus:outline-none w-full">
+        <div class="px-[18px] py-4 rounded-lg bg-card border border-card-border hover:border-ring transition-colors shadow-xs flex flex-col justify-between min-h-[99px] gap-2 w-full @(this.Class)">
+            <div class="flex items-center gap-2 w-full h-5">
+                <LucideIcon Name="box"
+                            Size="20"
+                            Class="text-muted-foreground shrink-0"/>
+                <span class="text-md leading-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                    @(this.Model.Name)
+                </span>
+                @if (this.Model.IsVerified)
+                {
+                    <LucideIcon Name="badge-check"
+                                Size="16"
+                                Class="text-primary shrink-0"/>
+                }
+                <BbBadge Variant="BadgeVariant.Outline"
+                         Class="px-1.5 py-0.5 rounded-sm bg-card border border-slate-250 dark:border-slate-700 shrink-0 text-3xs leading-4xs font-medium text-slate-450 dark:text-muted-foreground">
+                    @(this.Model.Format)
+                </BbBadge>
+                <div class="flex-1"></div>
+                <span class="text-sm leading-xs font-medium text-muted-foreground shrink-0">
+                    @(this.Model.Version)
+                </span>
+            </div>
+
+            @if (!string.IsNullOrEmpty(this.Model.Description))
+            {
+                <p class="text-sm leading-xs text-muted-foreground line-clamp-1 w-full">
+                    @(this.Model.Description)
+                </p>
+            }
+
+            <div class="flex items-center justify-between gap-2.5 w-full h-[15px] text-xs leading-2xs">
+                @if (!string.IsNullOrEmpty(this.Model.Tags))
+                {
+                    <span class="text-muted-foreground truncate flex-1">
+                        @(this.Model.Tags)
+                    </span>
+                }
+                <span class="text-muted-foreground shrink-0">
+                    by @(this.Model.Publisher) · @(this.Model.UpdatedAgo) · @(this.Model.ImportCount) imports
+                </span>
+            </div>
+        </div>
+    </a>
+}

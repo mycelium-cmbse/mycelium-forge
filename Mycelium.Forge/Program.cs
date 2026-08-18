@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -15,7 +15,9 @@ namespace Mycelium.Forge
 
     using Carter;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Components;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Orm;
 
     using OpenTelemetry.Resources;
@@ -102,15 +104,17 @@ namespace Mycelium.Forge
 
             builder.Services.AddBlazorBlueprintComponents();
 
+            builder.RegisterViewModels();
+
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/error", true);
+                app.UseExceptionHandler(PageRoutes.Error, true);
                 app.UseHsts();
             }
 
-            app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+            app.UseStatusCodePagesWithReExecute(PageRoutes.NotFound, createScopeForStatusCodePages: true);
 
             // SSS-CC-EXT-FG1: the Forge HTTP API is served over HTTPS.
             app.UseHttpsRedirection();

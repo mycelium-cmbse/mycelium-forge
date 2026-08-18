@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@attribute [Route(PageRoutes.Home)]
 @using Mycelium.Forge.Common
 @using Mycelium.Forge.Components.Common
 
@@ -20,7 +20,7 @@
                     Size="18"
                     Class="text-muted-foreground shrink-0"/>
         <BbInput Type="InputType.Search"
-                 Name="q"
+                 Name="@UrlParameterNames.Query"
                  Placeholder="Search models, libraries, units, quantity kinds..."
                  Class="w-full bg-transparent text-md leading-sm text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
         <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-2xs leading-3xs font-medium text-muted-foreground bg-muted border border-border rounded shrink-0">
@@ -29,16 +29,16 @@
     </form>
 
     <div class="flex flex-wrap items-center justify-center gap-12 pt-2">
-        <StatItem Value="@(this.PackageCount)"
+        <StatItem Value="@(this.ViewModel.PackageCount)"
                   Label="packages"
                   Class="min-w-[55px]"/>
-        <StatItem Value="@(this.VersionCount)"
+        <StatItem Value="@(this.ViewModel.VersionCount)"
                   Label="versions"
                   Class="min-w-[48px]"/>
-        <StatItem Value="@(this.PublisherCount)"
+        <StatItem Value="@(this.ViewModel.PublisherCount)"
                   Label="publishers"
                   Class="min-w-[59px]"/>
-        <StatItem Value="@(this.ImportCount)"
+        <StatItem Value="@(this.ViewModel.ImportCount)"
                   Label="imports"
                   Class="min-w-[62px]"/>
     </div>
@@ -46,17 +46,17 @@
     <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
         <span class="text-sm leading-xs text-slate-450 dark:text-muted-foreground mr-1">Browse by format</span>
         <BbButton Variant="ButtonVariant.Outline"
-                  Href="@($"{PageRoutes.Packages}?format=sysml-v2")"
+                  Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=sysml-v2")"
                   Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             SysML v2 libraries
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
-                  Href="@($"{PageRoutes.Packages}?format=cdp4-comet")"
+                  Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=cdp4-comet")"
                   Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             CDP4-COMET models
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
-                  Href="@($"{PageRoutes.Packages}?format=capella")"
+                  Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=capella")"
                   Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             Capella models
         </BbButton>
@@ -66,19 +66,19 @@
 <div class="w-full bg-body-bg border-t border-border/40 py-12 select-none">
     <div class="max-w-[1200px] mx-auto px-6 flex flex-col gap-12">
         <PackageSection Title="Standard libraries"
-                        ViewAllHref="@($"{PageRoutes.Packages}?category=standard")"
-                        Packages="@(this.StandardLibraries)"/>
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Category}=standard")"
+                        Packages="@(this.ViewModel.StandardLibraries)"/>
 
         <PackageSection Title="Recently updated"
-                        ViewAllHref="@($"{PageRoutes.Packages}?sort=updated")"
-                        Packages="@(this.RecentlyUpdated)"/>
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Sort}=updated")"
+                        Packages="@(this.ViewModel.RecentlyUpdated)"/>
 
         <PackageSection Title="Most used"
-                        ViewAllHref="@($"{PageRoutes.Packages}?sort=downloads")"
-                        Packages="@(this.MostUsed)"/>
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Sort}=downloads")"
+                        Packages="@(this.ViewModel.MostUsed)"/>
 
         <PackageSection Title="Models from other MBSE tools"
-                        ViewAllHref="@($"{PageRoutes.Packages}?category=mbse")"
-                        Packages="@(this.ModelsFromOtherMbseTools)"/>
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Category}=mbse")"
+                        Packages="@(this.ViewModel.ModelsFromOtherMbseTools)"/>
     </div>
 </div>
