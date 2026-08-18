@@ -1,0 +1,9 @@
+/* Scoped layout styles for Header component */
+
+.forge-header {
+    height: 56px;
+}
+
+.forge-signin-btn {
+    height: 32px;
+}

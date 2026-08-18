@@ -1,0 +1,119 @@
+﻿/* Semantics Collection
+ * Contextual design tokens aliasing raw primitives.
+ * Rule: All component styles and Tailwind utilities consume semantic tokens exclusively.
+ */
+
+:root {
+  /* Surface & Header Semantics */
+  --header-bg: var(--primitive-color-white);
+  --header-fg: var(--primitive-color-slate-900);
+  --header-border: var(--primitive-color-slate-300);
+
+  /* Brand & Logo Semantics */
+  --brand-icon-bg: var(--primitive-color-terracotta-500);
+  --brand-icon-fg: var(--primitive-color-white);
+  --brand-wordmark-primary: var(--primitive-color-slate-900);
+  --brand-wordmark-accent: var(--primitive-color-terracotta-500);
+
+  /* Navigation Semantics */
+  --nav-link-active: var(--primitive-color-terracotta-500);
+  --nav-link-inactive: var(--primitive-color-slate-500);
+  --nav-link-hover: var(--primitive-color-slate-900);
+
+  /* Search Semantics */
+  --search-input-bg: var(--primitive-color-slate-50);
+  --search-input-border: var(--primitive-color-slate-300);
+  --search-input-fg: var(--primitive-color-slate-900);
+  --search-input-placeholder: var(--primitive-color-slate-500);
+  --search-input-focus-border: var(--primitive-color-terracotta-500);
+  --search-input-focus-ring: var(--primitive-color-terracotta-500);
+
+  /* Button Semantics */
+  --btn-signin-bg: var(--primitive-color-white);
+  --btn-signin-border: var(--primitive-color-slate-300);
+  --btn-signin-fg: var(--primitive-color-slate-900);
+  --btn-signin-hover-bg: var(--primitive-color-slate-50);
+  --btn-signin-hover-border: var(--primitive-color-slate-400);
+
+  /* Core Design System Tokens */
+  --background: var(--primitive-color-white);
+  --foreground: var(--primitive-color-slate-900);
+  --card: var(--primitive-color-white);
+  --card-foreground: var(--primitive-color-slate-900);
+  --popover: var(--primitive-color-white);
+  --popover-foreground: var(--primitive-color-slate-900);
+
+  --primary: var(--primitive-color-terracotta-500);
+  --primary-foreground: var(--primitive-color-white);
+  --secondary: var(--primitive-color-slate-100);
+  --secondary-foreground: var(--primitive-color-slate-900);
+  --muted: var(--primitive-color-slate-50);
+  --muted-foreground: var(--primitive-color-slate-500);
+  --accent: var(--primitive-color-slate-100);
+  --accent-foreground: var(--primitive-color-slate-900);
+
+  --destructive: var(--primitive-color-red-600);
+  --destructive-foreground: var(--primitive-color-white);
+
+  --border: var(--primitive-color-slate-300);
+  --input: var(--primitive-color-slate-300);
+  --ring: var(--primitive-color-terracotta-500);
+  --radius: var(--primitive-radius-lg);
+}
+
+.dark {
+  /* Surface & Header Semantics - Dark Mode */
+  --header-bg: var(--primitive-color-slate-950);
+  --header-fg: var(--primitive-color-slate-100);
+  --header-border: var(--primitive-color-slate-800);
+
+  /* Brand & Logo Semantics - Dark Mode */
+  --brand-icon-bg: var(--primitive-color-terracotta-500);
+  --brand-icon-fg: var(--primitive-color-white);
+  --brand-wordmark-primary: var(--primitive-color-slate-100);
+  --brand-wordmark-accent: var(--primitive-color-terracotta-400);
+
+  /* Navigation Semantics - Dark Mode */
+  --nav-link-active: var(--primitive-color-terracotta-400);
+  --nav-link-inactive: var(--primitive-color-slate-400);
+  --nav-link-hover: var(--primitive-color-slate-100);
+
+  /* Search Semantics - Dark Mode */
+  --search-input-bg: var(--primitive-color-slate-900);
+  --search-input-border: var(--primitive-color-slate-700);
+  --search-input-fg: var(--primitive-color-slate-100);
+  --search-input-placeholder: var(--primitive-color-slate-400);
+  --search-input-focus-border: var(--primitive-color-terracotta-400);
+  --search-input-focus-ring: var(--primitive-color-terracotta-400);
+
+  /* Button Semantics - Dark Mode */
+  --btn-signin-bg: var(--primitive-color-slate-900);
+  --btn-signin-border: var(--primitive-color-slate-700);
+  --btn-signin-fg: var(--primitive-color-slate-100);
+  --btn-signin-hover-bg: var(--primitive-color-slate-800);
+  --btn-signin-hover-border: var(--primitive-color-slate-600);
+
+  /* Core Design System Tokens - Dark Mode */
+  --background: var(--primitive-color-slate-950);
+  --foreground: var(--primitive-color-slate-100);
+  --card: var(--primitive-color-slate-950);
+  --card-foreground: var(--primitive-color-slate-100);
+  --popover: var(--primitive-color-slate-950);
+  --popover-foreground: var(--primitive-color-slate-100);
+
+  --primary: var(--primitive-color-terracotta-400);
+  --primary-foreground: var(--primitive-color-white);
+  --secondary: var(--primitive-color-slate-800);
+  --secondary-foreground: var(--primitive-color-slate-100);
+  --muted: var(--primitive-color-slate-900);
+  --muted-foreground: var(--primitive-color-slate-400);
+  --accent: var(--primitive-color-slate-800);
+  --accent-foreground: var(--primitive-color-slate-100);
+
+  --destructive: var(--primitive-color-red-500);
+  --destructive-foreground: var(--primitive-color-white);
+
+  --border: var(--primitive-color-slate-800);
+  --input: var(--primitive-color-slate-800);
+  --ring: var(--primitive-color-terracotta-400);
+}

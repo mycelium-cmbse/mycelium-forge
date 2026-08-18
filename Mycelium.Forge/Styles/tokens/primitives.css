@@ -1,0 +1,70 @@
+﻿/* Primitives Collection
+ * Raw design tokens (palette colors, typography, sizing, spacing, radiuses).
+ * Rule: Never apply a primitive token directly to a component — always alias it through a semantic token.
+ */
+
+:root {
+  /* Brand Primitive Palette - Forge Terracotta */
+  --primitive-color-terracotta-50: #fdf8f5;
+  --primitive-color-terracotta-100: #fbede6;
+  --primitive-color-terracotta-200: #f6d8cc;
+  --primitive-color-terracotta-300: #eeb8a3;
+  --primitive-color-terracotta-400: #cb6b41;
+  --primitive-color-terracotta-500: #a34a24;
+  --primitive-color-terracotta-600: #8b3e1e;
+  --primitive-color-terracotta-700: #743419;
+  --primitive-color-terracotta-800: #5e2a14;
+  --primitive-color-terracotta-900: #492010;
+
+  /* Neutral Primitive Palette - Slate */
+  --primitive-color-slate-50: #f7fafc;
+  --primitive-color-slate-100: #edf2f7;
+  --primitive-color-slate-200: #e2e8f0;
+  --primitive-color-slate-300: #d1d6db;
+  --primitive-color-slate-400: #94a3b8;
+  --primitive-color-slate-500: #738294;
+  --primitive-color-slate-600: #475569;
+  --primitive-color-slate-700: #334155;
+  --primitive-color-slate-800: #1e293b;
+  --primitive-color-slate-900: #293342;
+  --primitive-color-slate-950: #0f172a;
+
+  /* Base Primitive Colors */
+  --primitive-color-white: #ffffff;
+  --primitive-color-black: #000000;
+
+  /* Semantic Feedback Primitives */
+  --primitive-color-red-500: #ef4444;
+  --primitive-color-red-600: #dc2626;
+  --primitive-color-green-500: #22c55e;
+  --primitive-color-green-600: #16a34a;
+
+  /* Typography Primitives */
+  --primitive-font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --primitive-font-size-xs: 0.75rem;     /* 12px */
+  --primitive-font-size-sm: 0.8125rem;   /* 13px */
+  --primitive-font-size-base: 0.875rem;  /* 14px */
+  --primitive-font-size-md: 0.9375rem;   /* 15px */
+  --primitive-font-size-lg: 1rem;        /* 16px */
+  --primitive-font-size-xl: 1.25rem;     /* 20px */
+  --primitive-font-size-2xl: 1.5rem;     /* 24px */
+
+  --primitive-line-height-xs: 1rem;       /* 16px */
+  --primitive-line-height-sm: 1.125rem;   /* 18px */
+  --primitive-line-height-base: 1.25rem;  /* 20px */
+  --primitive-line-height-lg: 1.5rem;     /* 24px */
+
+  --primitive-font-weight-normal: 400;
+  --primitive-font-weight-medium: 500;
+  --primitive-font-weight-semibold: 600;
+  --primitive-font-weight-bold: 700;
+
+  /* Radius Primitives */
+  --primitive-radius-none: 0px;
+  --primitive-radius-xs: 2px;
+  --primitive-radius-sm: 4px;
+  --primitive-radius-md: 6px;
+  --primitive-radius-lg: 8px;
+  --primitive-radius-xl: 12px;
+  --primitive-radius-full: 9999px;
+}
