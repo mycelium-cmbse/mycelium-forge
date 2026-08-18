@@ -1,9 +1,9 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
-// 
+//
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-// 
+//
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,6 @@ namespace Mycelium.Forge.Components.Layout
         public void Dispose()
         {
             this.NavigationManager.LocationChanged -= this.OnLocationChanged;
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -43,10 +42,10 @@ namespace Mycelium.Forge.Components.Layout
 
             if (isActive)
             {
-                return "forge-nav-link font-semibold text-nav-link-active";
+                return "text-sm leading-xs font-semibold text-primary";
             }
 
-            return "forge-nav-link font-medium text-nav-link-inactive hover:text-nav-link-hover transition-colors";
+            return "text-sm leading-xs font-medium text-muted-foreground hover:text-foreground transition-colors";
         }
 
         /// <summary>

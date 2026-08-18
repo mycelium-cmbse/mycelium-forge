@@ -1,0 +1,53 @@
+﻿@if (this.Model != null)
+{
+    <a href="@(this.Model.Href)"
+       class="block select-none group focus:outline-none">
+        <div class="p-4 rounded-lg bg-card border border-card-border hover:border-ring transition-colors shadow-xs flex flex-col justify-between min-h-[121px] gap-2.5 @(this.Class)">
+            <div class="flex items-center gap-2 w-full h-[18px]">
+                <LucideIcon Name="box"
+                            Size="18"
+                            Class="text-muted-foreground shrink-0"/>
+                <span class="text-base leading-17 font-semibold text-foreground truncate group-hover:text-primary transition-colors flex-1">
+                    @(this.Model.Name)
+                </span>
+                @if (this.Model.IsVerified)
+                {
+                    <LucideIcon Name="badge-check"
+                                Size="16"
+                                Class="text-primary shrink-0"/>
+                }
+                <div class="px-1.5 py-0.5 rounded-sm bg-card border border-slate-250 dark:border-slate-700 shrink-0 flex items-center">
+                    <span class="text-3xs leading-4xs font-medium text-slate-450 dark:text-muted-foreground">
+                        @(this.Model.Format)
+                    </span>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(this.Model.Description))
+            {
+                <p class="text-xs leading-2xs text-muted-foreground line-clamp-2 w-full">
+                    @(this.Model.Description)
+                </p>
+            }
+
+            @if (!string.IsNullOrEmpty(this.Model.Tags))
+            {
+                <span class="text-2xs leading-3xs text-muted-foreground truncate">
+                    @(this.Model.Tags)
+                </span>
+            }
+
+            <div class="flex items-center justify-between gap-2 w-full h-[13px] text-2xs leading-3xs">
+                <span class="text-slate-700 dark:text-slate-300 truncate flex-1">
+                    by @(this.Model.Publisher) · @(this.Model.Version)
+                </span>
+                @if (!string.IsNullOrEmpty(this.Model.ImportCount))
+                {
+                    <span class="text-muted-foreground shrink-0">
+                        @(this.Model.ImportCount) imports
+                    </span>
+                }
+            </div>
+        </div>
+    </a>
+}

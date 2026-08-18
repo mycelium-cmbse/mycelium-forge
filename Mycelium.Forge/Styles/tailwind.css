@@ -1,4 +1,4 @@
-/* Tailwind source for Mycelium Forge.
+﻿/* Tailwind source for Mycelium Forge.
  *
  * Compiled to wwwroot/css/app.css by the BuildTailwindCss target in Mycelium.Forge.csproj.
  * This file lives outside wwwroot deliberately: it is build input, not a served asset.
@@ -14,52 +14,43 @@
 /* Class-based dark mode (toggle .dark on <html>). */
 @custom-variant dark (&:is(.dark *));
 
-/* Theme extensions mapping semantic tokens to Tailwind v4 namespaces */
+/* Theme extensions mapping tokens to Tailwind v4 namespaces */
 @theme {
-  /* Font namespace: --font-* -> font-* */
+  /* Font Family namespace: --font-* -> font-* */
   --font-sans: var(--primitive-font-sans);
 
+  /* Typography Scale namespace: --text-* -> text-* */
+  --text-3xs: var(--primitive-font-size-3xs); /* 10px */
+  --text-2xs: var(--primitive-font-size-2xs); /* 11px */
+  --text-xs: var(--primitive-font-size-xs);   /* 12px */
+  --text-sm: var(--primitive-font-size-sm);   /* 13px */
+  --text-base: var(--primitive-font-size-base); /* 14px */
+  --text-md: var(--primitive-font-size-md);   /* 15px */
+  --text-lg: var(--primitive-font-size-lg);   /* 16px */
+  --text-xl: var(--primitive-font-size-xl);   /* 20px */
+  --text-2xl: var(--primitive-font-size-2xl); /* 22px */
+  --text-3xl: var(--primitive-font-size-3xl); /* 36px */
+
+  /* Line Height namespace: --leading-* -> leading-* */
+  --leading-4xs: var(--primitive-line-height-4xs); /* 12px */
+  --leading-3xs: var(--primitive-line-height-3xs); /* 13px */
+  --leading-2xs: var(--primitive-line-height-2xs); /* 15px */
+  --leading-xs: var(--primitive-line-height-xs);   /* 16px */
+  --leading-17: var(--primitive-line-height-17);   /* 17px */
+  --leading-sm: var(--primitive-line-height-sm);   /* 18px */
+  --leading-base: var(--primitive-line-height-base); /* 20px */
+  --leading-lg: var(--primitive-line-height-lg);   /* 24px */
+  --leading-xl: var(--primitive-line-height-xl);   /* 27px */
+  --leading-3xl: var(--primitive-line-height-3xl); /* 44px */
+
   /* Color namespace: --color-* -> bg-*, text-*, border-*, ring-*, fill-*, stroke-* */
-  --color-header-bg: var(--header-bg);
-  --color-header-fg: var(--header-fg);
-  --color-header-border: var(--header-border);
-
-  --color-brand-icon-bg: var(--brand-icon-bg);
-  --color-brand-icon-fg: var(--brand-icon-fg);
-  --color-brand-wordmark-primary: var(--brand-wordmark-primary);
-  --color-brand-wordmark-accent: var(--brand-wordmark-accent);
-
-  --color-nav-link-active: var(--nav-link-active);
-  --color-nav-link-inactive: var(--nav-link-inactive);
-  --color-nav-link-hover: var(--nav-link-hover);
-
-  --color-search-input-bg: var(--search-input-bg);
-  --color-search-input-border: var(--search-input-border);
-  --color-search-input-fg: var(--search-input-fg);
-  --color-search-input-placeholder: var(--search-input-placeholder);
-  --color-search-input-focus-border: var(--search-input-focus-border);
-  --color-search-input-focus-ring: var(--search-input-focus-ring);
-
-  --color-btn-signin-bg: var(--btn-signin-bg);
-  --color-btn-signin-border: var(--btn-signin-border);
-  --color-btn-signin-fg: var(--btn-signin-fg);
-  --color-btn-signin-hover-bg: var(--btn-signin-hover-bg);
-  --color-btn-signin-hover-border: var(--btn-signin-hover-border);
-
-  --color-hero-search-bg: var(--hero-search-bg);
-  --color-hero-search-border: var(--hero-search-border);
-  --color-hero-kbd-bg: var(--hero-kbd-bg);
-  --color-hero-kbd-border: var(--hero-kbd-border);
-  --color-format-pill-bg: var(--format-pill-bg);
-  --color-format-pill-border: var(--format-pill-border);
-  --color-format-pill-fg: var(--format-pill-fg);
-  --color-format-strip-label: var(--format-strip-label);
-
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-body-bg: var(--body-bg);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -73,8 +64,15 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Specific palette helpers for badges & borders */
+  --color-slate-150: var(--primitive-color-slate-150);
+  --color-slate-250: var(--primitive-color-slate-250);
+  --color-slate-450: var(--primitive-color-slate-450);
 
   /* Radius namespace: --radius-* -> rounded-* */
   --radius-xs: var(--primitive-radius-xs);

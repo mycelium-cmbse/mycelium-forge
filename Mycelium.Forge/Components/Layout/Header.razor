@@ -1,21 +1,19 @@
-@using Mycelium.Forge.Common
+﻿@using Mycelium.Forge.Common
 @using Mycelium.Forge.Components.Common
-@using BlazorBlueprint.Components
-
-<header class="forge-header w-full px-6 flex items-center gap-6 bg-header-bg border-b border-header-border shrink-0 select-none">
-    <ForgeLogo />
+<header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
+    <ForgeLogo/>
 
     <nav class="flex items-center gap-5">
         <a href="@PageRoutes.Packages"
-           class="@GetNavLinkClass(PageRoutes.Packages)">
+           class="@(this.GetNavLinkClass(PageRoutes.Packages))">
             Browse
         </a>
         <a href="@PageRoutes.Publish"
-           class="@GetNavLinkClass(PageRoutes.Publish)">
+           class="@(this.GetNavLinkClass(PageRoutes.Publish))">
             Publish
         </a>
         <a href="@PageRoutes.Docs"
-           class="@GetNavLinkClass(PageRoutes.Docs)">
+           class="@(this.GetNavLinkClass(PageRoutes.Docs))">
             Docs
         </a>
     </nav>
@@ -26,7 +24,7 @@
         <BbButton Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Href="@PageRoutes.Login"
-                  Class="forge-signin-btn rounded-lg border-btn-signin-border bg-btn-signin-bg text-btn-signin-fg hover:bg-btn-signin-hover-bg hover:border-btn-signin-hover-border font-medium transition-colors">
+                  Class="h-8 px-3.5 rounded-lg border-border bg-background text-foreground hover:bg-muted text-sm leading-xs font-medium transition-colors">
             Sign in
         </BbButton>
     </div>

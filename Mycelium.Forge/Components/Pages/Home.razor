@@ -1,67 +1,84 @@
-@page "/"
+﻿@page "/"
 @using Mycelium.Forge.Common
 @using Mycelium.Forge.Components.Common
 
 <PageTitle>Mycelium Forge &mdash; The MBSE model and package registry</PageTitle>
 
-<section class="hero-container flex flex-col items-center gap-5 w-full select-none">
-    <h1 class="hero-title font-semibold text-center text-foreground tracking-tight max-w-2xl">
+<section class="w-full py-16 flex flex-col items-center gap-5 select-none">
+    <h1 class="text-3xl leading-3xl font-semibold text-center text-foreground tracking-tight max-w-2xl">
         The MBSE model and package registry
     </h1>
 
-    <p class="hero-subtitle text-center text-muted-foreground max-w-2xl">
+    <p class="text-md leading-sm text-center text-muted-foreground max-w-2xl">
         Publish, discover and reuse system models and libraries across SysML v2, CDP4-COMET and Capella.
     </p>
 
     <form method="get"
           action="@PageRoutes.Packages"
-          class="hero-search-container px-4 flex items-center gap-2.5 rounded-input bg-hero-search-bg border border-hero-search-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-sm transition-colors">
+          class="w-full max-w-[640px] h-12 px-4 flex items-center gap-2.5 rounded-input bg-background border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors">
         <LucideIcon Name="search"
                     Size="18"
                     Class="text-muted-foreground shrink-0"/>
         <BbInput Type="InputType.Search"
                  Name="q"
                  Placeholder="Search models, libraries, units, quantity kinds..."
-                 Class="hero-search-input w-full bg-transparent text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
-        <kbd class="hero-kbd hidden sm:inline-flex items-center px-1.5 py-0.5 font-medium text-muted-foreground bg-hero-kbd-bg border border-hero-kbd-border rounded shrink-0">
+                 Class="w-full bg-transparent text-md leading-sm text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
+        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-2xs leading-3xs font-medium text-muted-foreground bg-muted border border-border rounded shrink-0">
             Ctrl K
         </kbd>
     </form>
 
-    <div class="hero-stats flex flex-wrap items-center justify-center pt-2">
+    <div class="flex flex-wrap items-center justify-center gap-12 pt-2">
         <StatItem Value="@(this.PackageCount)"
                   Label="packages"
                   Class="min-w-[55px]"/>
-
         <StatItem Value="@(this.VersionCount)"
                   Label="versions"
                   Class="min-w-[48px]"/>
-
         <StatItem Value="@(this.PublisherCount)"
                   Label="publishers"
                   Class="min-w-[59px]"/>
-
         <StatItem Value="@(this.ImportCount)"
                   Label="imports"
                   Class="min-w-[62px]"/>
     </div>
 
     <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-        <span class="format-strip-label mr-1">Browse by format</span>
+        <span class="text-sm leading-xs text-slate-450 dark:text-muted-foreground mr-1">Browse by format</span>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?format=sysml-v2")"
-                  Class="format-pill rounded-full bg-format-pill-bg border-format-pill-border font-medium text-format-pill-fg hover:bg-muted hover:border-muted-foreground/30 transition-colors">
+                  Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             SysML v2 libraries
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?format=cdp4-comet")"
-                  Class="format-pill rounded-full bg-format-pill-bg border-format-pill-border font-medium text-format-pill-fg hover:bg-muted hover:border-muted-foreground/30 transition-colors">
+                  Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             CDP4-COMET models
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?format=capella")"
-                  Class="format-pill rounded-full bg-format-pill-bg border-format-pill-border font-medium text-format-pill-fg hover:bg-muted hover:border-muted-foreground/30 transition-colors">
+                  Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             Capella models
         </BbButton>
     </div>
 </section>
+
+<div class="w-full bg-body-bg border-t border-border/40 py-12 select-none">
+    <div class="max-w-[1200px] mx-auto px-6 flex flex-col gap-12">
+        <PackageSection Title="Standard libraries"
+                        ViewAllHref="@($"{PageRoutes.Packages}?category=standard")"
+                        Packages="@(this.StandardLibraries)"/>
+
+        <PackageSection Title="Recently updated"
+                        ViewAllHref="@($"{PageRoutes.Packages}?sort=updated")"
+                        Packages="@(this.RecentlyUpdated)"/>
+
+        <PackageSection Title="Most used"
+                        ViewAllHref="@($"{PageRoutes.Packages}?sort=downloads")"
+                        Packages="@(this.MostUsed)"/>
+
+        <PackageSection Title="Models from other MBSE tools"
+                        ViewAllHref="@($"{PageRoutes.Packages}?category=mbse")"
+                        Packages="@(this.ModelsFromOtherMbseTools)"/>
+    </div>
+</div>
