@@ -39,8 +39,17 @@
   /* Semantic Feedback Primitives */
   --primitive-color-red-500: #ef4444;
   --primitive-color-red-600: #dc2626;
+  --primitive-color-green-400: #4ade80;
   --primitive-color-green-500: #22c55e;
   --primitive-color-green-600: #16a34a;
+  --primitive-color-emerald-50: #ecfdf5;
+  --primitive-color-emerald-200: #a7f3d0;
+  --primitive-color-emerald-300: #6ee7b7;
+  --primitive-color-emerald-400: #34d399;
+  --primitive-color-emerald-700: #047857;
+  --primitive-color-emerald-800: #065f46;
+  --primitive-color-emerald-900: #064e3b;
+  --primitive-color-emerald-950: #022c22;
 
   /* Code Syntax Highlighting Primitives */
   --primitive-color-code-bg: #252c37;

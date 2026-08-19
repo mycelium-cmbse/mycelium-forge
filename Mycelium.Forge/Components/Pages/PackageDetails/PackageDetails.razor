@@ -32,7 +32,7 @@
         <div class="flex flex-wrap items-center gap-2.5 w-full">
             <LucideIcon Name="box"
                         Size="26"
-                        Class="text-slate-700 dark:text-slate-300 shrink-0"/>
+                        Class="text-secondary-text shrink-0"/>
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
                 @(this.ViewModel.Package.FullName)
             </h1>
@@ -46,7 +46,7 @@
                      Class="badge-format">
                 @(this.ViewModel.Package.Format)
             </BbBadge>
-            <div class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-sm leading-xs font-semibold text-slate-700 dark:text-slate-300">
+            <div class="px-2 py-0.5 rounded-md bg-secondary text-sm leading-xs font-semibold text-secondary-text">
                 @(this.ViewModel.Package.Version)
             </div>
             <span class="text-xs leading-2xs text-muted-foreground">
@@ -83,8 +83,9 @@
         </div>
 
         <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedInstallTab)"
-                                                OnValueChange="@(this.SelectInstallTab)"
-                                                class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2.5">
+                                               DefaultValue="Forge CLI"
+                                               OnValueChange="@(this.SelectInstallTab)"
+                                               class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2.5">
             <BlazorBlueprint.Primitives.Tabs.BbTabsList class="flex items-center gap-4.5 text-xs leading-2xs">
                 @foreach (var tab in this.InstallTabs)
                 {
@@ -107,7 +108,7 @@
                     {
                         <LucideIcon Name="check"
                                     Size="16"
-                                    Class="text-green-600 dark:text-green-400 shrink-0"/>
+                                    Class="text-validated shrink-0"/>
                     }
                     else
                     {
@@ -168,6 +169,7 @@
     <div class="page-container flex flex-col lg:flex-row items-start gap-8">
         <div class="flex-1 w-full flex flex-col">
             <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedContentTab)"
+                                                   DefaultValue="Overview"
                                                    OnValueChange="@(this.SelectContentTab)"
                                                    class="w-full flex flex-col gap-4">
                 <BlazorBlueprint.Primitives.Tabs.BbTabsList class="w-full h-10 rounded-lg bg-card border border-border flex items-center gap-0.5 p-0.5 overflow-x-auto">
@@ -253,17 +255,17 @@
 
                 <div class="flex items-center justify-between gap-2 text-sm leading-xs">
                     <span class="font-semibold text-foreground">Release validated</span>
-                    <span class="font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span class="font-semibold text-success-icon">
                         @(this.ViewModel.Package.QualityScore)
                     </span>
                 </div>
 
                 @foreach (var check in this.ViewModel.Package.QualityChecks)
                 {
-                    <div class="flex items-center gap-2 text-xs leading-2xs text-slate-700 dark:text-slate-300">
+                    <div class="flex items-center gap-2 text-xs leading-2xs text-secondary-text">
                         <LucideIcon Name="check"
                                     Size="14"
-                                    Class="text-green-600 dark:text-green-400 shrink-0"/>
+                                    Class="text-validated shrink-0"/>
                         <span class="flex-1 truncate">
                             @(check.Label)
                         </span>
@@ -279,7 +281,7 @@
                 @foreach (var maintainer in this.ViewModel.Package.Maintainers)
                 {
                     <div class="flex items-center gap-2 h-6.5">
-                        <div class="w-6.5 h-6.5 rounded-full bg-slate-600 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                        <div class="w-6.5 h-6.5 rounded-full bg-avatar-bg flex items-center justify-center shrink-0">
                             <span class="text-2xs leading-3xs font-semibold text-white">
                                 @(maintainer.Initials)
                             </span>
@@ -305,7 +307,7 @@
                 <div class="flex flex-wrap gap-2">
                     @foreach (var tag in this.ViewModel.Package.Tags)
                     {
-                        <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs leading-2xs font-medium text-slate-700 dark:text-slate-300">
+                        <span class="px-2.5 py-1 rounded-md bg-secondary text-xs leading-2xs font-medium text-secondary-text">
                             @(tag)
                         </span>
                     }

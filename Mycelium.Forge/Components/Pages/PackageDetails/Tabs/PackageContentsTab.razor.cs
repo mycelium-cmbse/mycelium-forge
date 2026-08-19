@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageContentsTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -25,12 +25,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         public IReadOnlyList<PackageElementModel> Elements { get; set; } = [];
 
         /// <summary>
-        /// Gets or sets the additional CSS class names for styling the tab container.
-        /// </summary>
-        [Parameter]
-        public string Class { get; set; } = string.Empty;
-
-        /// <summary>
         /// Gets or sets the currently selected element kind filter tab.
         /// </summary>
         public string SelectedKindTab { get; set; } = "Parts";
@@ -55,6 +49,20 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         public void SelectKindTab(string kindTab)
         {
             this.SelectedKindTab = kindTab;
+        }
+
+        /// <summary>
+        /// Gets the CSS classes for an element kind filter button.
+        /// </summary>
+        /// <param name="kindTab">The kind category tab name.</param>
+        /// <returns>The computed CSS class string.</returns>
+        public string GetKindButtonClass(string kindTab)
+        {
+            const string baseClass = "h-7 px-3 rounded-full text-xs leading-2xs font-medium cursor-pointer transition-colors shadow-none";
+
+            return this.SelectedKindTab == kindTab
+                ? $"{baseClass} bg-primary/10 border border-primary text-primary font-semibold hover:bg-primary/15"
+                : $"{baseClass} bg-card border border-border text-secondary-text hover:bg-muted";
         }
 
         /// <summary>

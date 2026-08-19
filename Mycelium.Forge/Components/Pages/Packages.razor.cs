@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Packages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -60,11 +60,6 @@ namespace Mycelium.Forge.Components.Pages
         public bool IncludePrereleases { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the sort dropdown is currently open.
-        /// </summary>
-        public bool IsSortDropdownOpen { get; set; }
-
-        /// <summary>
         /// Gets the list of available sort option enum values.
         /// </summary>
         public IReadOnlyList<PackageSortOption> SortOptions { get; } =
@@ -82,21 +77,12 @@ namespace Mycelium.Forge.Components.Pages
         public IPackagesViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Toggles the open/closed state of the sort dropdown menu.
-        /// </summary>
-        public void ToggleSortDropdown()
-        {
-            this.IsSortDropdownOpen = !this.IsSortDropdownOpen;
-        }
-
-        /// <summary>
-        /// Selects a sort option, closes the dropdown, and updates search results.
+        /// Selects a sort option and updates search results.
         /// </summary>
         /// <param name="sortOption">The selected sort option.</param>
         public void SelectSortOption(PackageSortOption sortOption)
         {
             this.SelectedSortOption = sortOption;
-            this.IsSortDropdownOpen = false;
             this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 
@@ -115,6 +101,34 @@ namespace Mycelium.Forge.Components.Pages
                 PackageSortOption.Alphabetical => "Alphabetical",
                 _ => nameof(PackageSortOption.Relevance)
             };
+        }
+
+        /// <summary>
+        /// Gets the CSS classes for a sort dropdown menu item.
+        /// </summary>
+        /// <param name="sortOption">The sort option for the item.</param>
+        /// <returns>The computed CSS class string.</returns>
+        public string GetSortItemClass(PackageSortOption sortOption)
+        {
+            const string baseClass = "px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer";
+
+            return this.SelectedSortOption == sortOption
+                ? $"{baseClass} font-semibold text-primary"
+                : $"{baseClass} font-normal";
+        }
+
+        /// <summary>
+        /// Gets the CSS classes for a facet option label.
+        /// </summary>
+        /// <param name="item">The facet item model.</param>
+        /// <returns>The computed CSS class string.</returns>
+        public static string GetFacetLabelClass(FacetItemModel item)
+        {
+            const string baseClass = "text-xs leading-2xs flex-1 truncate transition-colors cursor-pointer";
+
+            return item.IsChecked
+                ? $"{baseClass} font-medium text-foreground"
+                : $"{baseClass} font-normal text-secondary-text hover:text-foreground";
         }
 
         /// <summary>

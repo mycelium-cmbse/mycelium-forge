@@ -70,6 +70,13 @@
   --color-ring: var(--ring);
   --color-badge-border: var(--badge-border);
   --color-badge-foreground: var(--badge-foreground);
+  --color-secondary-text: var(--secondary-text);
+  --color-avatar-bg: var(--avatar-bg);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-border: var(--success-border);
+  --color-success-icon: var(--success-icon);
+  --color-validated: var(--validated);
 
   /* Code snippet surfaces and syntax highlighting */
   --color-code-bg: var(--code-bg);

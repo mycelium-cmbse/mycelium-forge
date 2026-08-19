@@ -1,4 +1,4 @@
-﻿@if (this.Model != null)
+@if (this.Model != null)
 {
     <a href="@(this.Model.Href)"
        class="block select-none group focus:outline-none">
@@ -37,7 +37,7 @@
             }
 
             <div class="flex items-center justify-between gap-2 w-full h-3.5 text-2xs leading-3xs">
-                <span class="text-slate-700 dark:text-slate-300 truncate flex-1">
+                <span class="text-secondary-text truncate flex-1">
                     by @(this.Model.Publisher) · @(this.Model.Version)
                 </span>
                 @if (!string.IsNullOrEmpty(this.Model.ImportCount))

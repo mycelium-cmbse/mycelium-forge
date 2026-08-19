@@ -1,9 +1,9 @@
-﻿@if (this.Dependents == null || this.Dependents.Count == 0)
+@if (this.Dependents == null || this.Dependents.Count == 0)
 {
     return;
 }
 
-<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3 @(this.Class)">
+<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3">
     <h2 class="text-lg leading-lg font-semibold text-foreground">
         Dependents
     </h2>
@@ -11,48 +11,55 @@
         Packages and projects that import or specialize this package. Computed from the resolved dependency graph.
     </p>
 
-    <div class="w-full rounded-lg bg-card border border-border flex flex-col divide-y divide-border overflow-hidden mt-1">
-        @foreach (var dependent in this.Dependents)
-        {
-            <div class="px-4 py-3 flex items-center gap-2.5 text-sm leading-xs">
-                @if (dependent.IsProject)
+    <div class="w-full rounded-lg bg-card border border-border overflow-hidden mt-1">
+        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Dependents)"
+                                                class="w-full text-left text-sm leading-xs">
+            <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
+                @foreach (var dependent in this.Dependents)
                 {
-                    <LucideIcon Name="folder"
-                                Size="16"
-                                Class="text-slate-500 dark:text-slate-400 shrink-0"/>
-                }
-                else
-                {
-                    <LucideIcon Name="box"
-                                Size="16"
-                                Class="text-slate-500 dark:text-slate-400 shrink-0"/>
-                }
+                    <BlazorBlueprint.Primitives.Table.BbTableRow Item="@dependent"
+                                                                class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
+                            @if (dependent.IsProject)
+                            {
+                                <LucideIcon Name="folder"
+                                            Size="16"
+                                            Class="text-muted-foreground shrink-0"/>
+                            }
+                            else
+                            {
+                                <LucideIcon Name="box"
+                                            Size="16"
+                                            Class="text-muted-foreground shrink-0"/>
+                            }
 
-                @if (!string.IsNullOrEmpty(dependent.Href))
-                {
-                    <a href="@dependent.Href"
-                       class="font-semibold text-primary hover:underline">
-                        @(dependent.Name)
-                    </a>
-                }
-                else
-                {
-                    <span class="font-semibold text-primary">
-                        @(dependent.Name)
-                    </span>
-                }
+                            @if (!string.IsNullOrEmpty(dependent.Href))
+                            {
+                                <a href="@dependent.Href"
+                                   class="font-semibold text-primary hover:underline">
+                                    @(dependent.Name)
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="font-semibold text-primary">
+                                    @(dependent.Name)
+                                </span>
+                            }
 
-                @if (dependent.IsVerified)
-                {
-                    <LucideIcon Name="badge-check"
-                                Size="14"
-                                Class="text-primary shrink-0"/>
+                            @if (dependent.IsVerified)
+                            {
+                                <LucideIcon Name="badge-check"
+                                            Size="14"
+                                            Class="text-primary shrink-0"/>
+                            }
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="text-xs leading-2xs text-muted-foreground shrink-0 p-0">
+                            @(dependent.RelationshipSummary)
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                    </BlazorBlueprint.Primitives.Table.BbTableRow>
                 }
-                <div class="flex-1"></div>
-                <span class="text-xs leading-2xs text-muted-foreground shrink-0">
-                    @(dependent.RelationshipSummary)
-                </span>
-            </div>
-        }
+            </BlazorBlueprint.Primitives.Table.BbTableBody>
+        </BlazorBlueprint.Primitives.Table.BbTable>
     </div>
 </div>

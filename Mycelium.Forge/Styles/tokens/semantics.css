@@ -36,6 +36,13 @@
   --ring: var(--primitive-color-terracotta-500);
   --badge-border: var(--primitive-color-slate-250);
   --badge-foreground: var(--primitive-color-slate-450);
+  --secondary-text: var(--primitive-color-slate-700);
+  --avatar-bg: var(--primitive-color-slate-600);
+  --success: var(--primitive-color-emerald-50);
+  --success-foreground: var(--primitive-color-emerald-800);
+  --success-border: var(--primitive-color-emerald-200);
+  --success-icon: var(--primitive-color-emerald-700);
+  --validated: var(--primitive-color-green-600);
   --code-bg: var(--primitive-color-code-bg);
   --code-import: var(--primitive-color-code-import);
   --code-body: var(--primitive-color-code-body);
@@ -75,6 +82,13 @@
   --ring: var(--primitive-color-terracotta-400);
   --badge-border: var(--primitive-color-slate-700);
   --badge-foreground: var(--primitive-color-slate-400);
+  --secondary-text: var(--primitive-color-slate-300);
+  --avatar-bg: var(--primitive-color-slate-700);
+  --success: rgba(2, 44, 34, 0.4);
+  --success-foreground: var(--primitive-color-emerald-300);
+  --success-border: rgba(6, 78, 59, 0.6);
+  --success-icon: var(--primitive-color-emerald-400);
+  --validated: var(--primitive-color-green-400);
   --code-bg: var(--primitive-color-slate-950);
   --code-import: var(--primitive-color-code-import);
   --code-body: var(--primitive-color-code-body);

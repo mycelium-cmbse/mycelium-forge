@@ -1,9 +1,9 @@
-﻿@if (this.Versions == null || this.Versions.Count == 0)
+@if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
 }
 
-<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3 @(this.Class)">
+<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3">
     <h2 class="text-lg leading-lg font-semibold text-foreground">
         Versions
     </h2>
@@ -11,65 +11,70 @@
         Published versions are immutable: a correction means a new version. Yanked/unlisted versions stay downloadable to existing consumers.
     </p>
 
-    <div class="w-full rounded-lg bg-card border border-border flex flex-col divide-y divide-border overflow-x-auto mt-1">
-        <div class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 flex items-center text-3xs leading-4xs font-semibold text-muted-foreground uppercase tracking-wider">
-            <span class="w-28 shrink-0">VERSION</span>
-            <span class="w-36 shrink-0">PUBLISHED</span>
-            <span class="w-28 shrink-0">DEPENDENTS</span>
-            <span class="w-36 shrink-0">VALIDATION</span>
-            <span class="w-24 shrink-0">SIZE</span>
-            <span class="flex-1"></span>
-            <span class="w-20 shrink-0 text-right"></span>
-        </div>
+    <div class="w-full rounded-lg bg-card border border-border overflow-x-auto mt-1">
+        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Versions)"
+                                                class="w-full text-left text-xs leading-2xs">
+            <BlazorBlueprint.Primitives.Table.BbTableHeader class="px-4 py-2.5 bg-secondary flex items-center text-3xs leading-4xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <span class="w-28 shrink-0">VERSION</span>
+                <span class="w-36 shrink-0">PUBLISHED</span>
+                <span class="w-28 shrink-0">DEPENDENTS</span>
+                <span class="w-36 shrink-0">VALIDATION</span>
+                <span class="w-24 shrink-0">SIZE</span>
+                <span class="flex-1"></span>
+                <span class="w-20 shrink-0 text-right"></span>
+            </BlazorBlueprint.Primitives.Table.BbTableHeader>
+            <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
+                @foreach (var ver in this.Versions)
+                {
+                    <BlazorBlueprint.Primitives.Table.BbTableRow Item="@ver"
+                                                                class="px-4 py-2.5 flex items-center hover:bg-muted/50 transition-colors">
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 flex items-center gap-1.5 p-0">
+                            <span class="font-semibold @(ver.IsUnlisted ? "text-muted-foreground" : "text-primary")">
+                                @(ver.Version)
+                            </span>
+                            @if (!string.IsNullOrEmpty(ver.Badge))
+                            {
+                                <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-secondary text-secondary-text">
+                                    @(ver.Badge)
+                                </span>
+                            }
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 text-muted-foreground p-0">
+                            @(ver.PublishedAgo)
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 text-secondary-text p-0">
+                            @(ver.DependentCount)
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 flex items-center gap-1.5 p-0">
+                            @if (ver.IsValidated)
+                            {
+                                <LucideIcon Name="check"
+                                            Size="13"
+                                            Class="text-validated shrink-0"/>
 
-        @foreach (var ver in this.Versions)
-        {
-            <div class="px-4 py-2.5 flex items-center text-xs leading-2xs hover:bg-muted/50 transition-colors">
-                <div class="w-28 shrink-0 flex items-center gap-1.5">
-                    <span class="font-semibold @(ver.IsUnlisted ? "text-muted-foreground" : "text-primary")">
-                        @(ver.Version)
-                    </span>
-                    @if (!string.IsNullOrEmpty(ver.Badge))
-                    {
-                        <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                            @(ver.Badge)
-                        </span>
-                    }
-                </div>
-                <span class="w-36 shrink-0 text-muted-foreground">
-                    @(ver.PublishedAgo)
-                </span>
-                <span class="w-28 shrink-0 text-slate-700 dark:text-slate-300">
-                    @(ver.DependentCount)
-                </span>
-                <div class="w-36 shrink-0 flex items-center gap-1.5">
-                    @if (ver.IsValidated)
-                    {
-                        <LucideIcon Name="check"
-                                    Size="13"
-                                    Class="text-green-600 dark:text-green-400 shrink-0"/>
-
-                        <span class="text-green-600 dark:text-green-400 font-medium">Validated</span>
-                    }
-                </div>
-                <span class="w-24 shrink-0 text-muted-foreground">
-                    @(ver.Size)
-                </span>
-                <div class="flex-1"></div>
-                <div class="w-20 shrink-0 text-right">
-                    @if (ver.IsUnlisted)
-                    {
-                        <span class="text-muted-foreground font-medium">Unlisted</span>
-                    }
-                    else
-                    {
-                        <a href="@ver.DownloadUrl"
-                           class="text-primary hover:underline font-medium">
-                            Download
-                        </a>
-                    }
-                </div>
-            </div>
-        }
+                                <span class="text-validated font-medium">Validated</span>
+                            }
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-24 shrink-0 text-muted-foreground p-0">
+                            @(ver.Size)
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <div class="flex-1"></div>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-20 shrink-0 text-right p-0">
+                            @if (ver.IsUnlisted)
+                            {
+                                <span class="text-muted-foreground font-medium">Unlisted</span>
+                            }
+                            else
+                            {
+                                <a href="@ver.DownloadUrl"
+                                   class="text-primary hover:underline font-medium">
+                                    Download
+                                </a>
+                            }
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                    </BlazorBlueprint.Primitives.Table.BbTableRow>
+                }
+            </BlazorBlueprint.Primitives.Table.BbTableBody>
+        </BlazorBlueprint.Primitives.Table.BbTable>
     </div>
 </div>
