@@ -1,0 +1,322 @@
+﻿@using Mycelium.Forge.Components.PackageTabs
+@attribute [Route(PageRoutes.Package)]
+@attribute [Route(PageRoutes.ScopedPackage)]
+@rendermode InteractiveServer
+
+@if (this.ViewModel.Package == null)
+{
+    return;
+}
+
+<PageTitle>@(this.ViewModel.Package.FullName) &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen select-none">
+<header class="w-full bg-card border-b border-border py-7">
+    <div class="page-container flex flex-col gap-3.5">
+        <nav class="flex items-center gap-1.5 text-xs leading-2xs">
+            <a href="@PageRoutes.Packages"
+               class="text-primary hover:underline font-normal">
+                Browse
+            </a>
+            <span class="text-muted-foreground font-normal">/</span>
+            <a href="@($"/organizations/{this.ViewModel.Package.Scope.TrimStart('@')}")"
+               class="text-primary hover:underline font-normal">
+                @(this.ViewModel.Package.Scope)
+            </a>
+            <span class="text-muted-foreground font-normal">/</span>
+            <span class="text-muted-foreground font-normal">
+                @(this.ViewModel.Package.Name)
+            </span>
+        </nav>
+
+        <div class="flex flex-wrap items-center gap-2.5 w-full">
+            <LucideIcon Name="box"
+                        Size="26"
+                        Class="text-slate-700 dark:text-slate-300 shrink-0"/>
+            <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
+                @(this.ViewModel.Package.FullName)
+            </h1>
+            @if (this.ViewModel.Package.IsVerified)
+            {
+                <LucideIcon Name="badge-check"
+                            Size="20"
+                            Class="text-primary shrink-0"/>
+            }
+            <BbBadge Variant="BadgeVariant.Outline"
+                     Class="badge-format">
+                @(this.ViewModel.Package.Format)
+            </BbBadge>
+            <div class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-sm leading-xs font-semibold text-slate-700 dark:text-slate-300">
+                @(this.ViewModel.Package.Version)
+            </div>
+            <span class="text-xs leading-2xs text-muted-foreground">
+                @(this.ViewModel.Package.ReleaseStatus)
+            </span>
+        </div>
+
+        <p class="text-md leading-sm text-muted-foreground">
+            @(this.ViewModel.Package.Description)
+        </p>
+
+        <p class="text-xs leading-2xs text-muted-foreground">
+            @(this.ViewModel.Package.Provenance)
+        </p>
+
+        <div class="flex items-center gap-3 pt-1">
+            <BbButton Variant="ButtonVariant.Default"
+                      Type="ButtonType.Button"
+                      Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-17 font-semibold flex items-center gap-1.5 transition-colors">
+                <LucideIcon Name="plus"
+                            Size="16"
+                            Class="text-primary-foreground shrink-0"/>
+                <span>Add to project</span>
+            </BbButton>
+
+            <BbButton Variant="ButtonVariant.Outline"
+                      Type="ButtonType.Button"
+                      Class="h-9 px-4 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-base leading-17 font-medium flex items-center gap-1.5 transition-colors">
+                <LucideIcon Name="download"
+                            Size="16"
+                            Class="text-foreground shrink-0"/>
+                <span>Download kpar</span>
+            </BbButton>
+        </div>
+
+        <div class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2.5">
+            <div class="flex items-center gap-4.5 text-xs leading-2xs">
+                @foreach (var tab in this.InstallTabs)
+                {
+                    <button type="button"
+                            @onclick="() => this.SelectInstallTab(tab)"
+                            class="cursor-pointer transition-colors @(this.SelectedInstallTab == tab ? "font-semibold text-primary" : "font-medium text-muted-foreground hover:text-foreground")">
+                        @(tab)
+                    </button>
+                }
+            </div>
+
+            <div class="w-full px-3 py-2.5 rounded-md bg-card border border-border flex items-center justify-between gap-2">
+                <code class="font-mono text-sm leading-17 text-foreground truncate flex-1 select-all">
+                    @(this.CurrentInstallCommand)
+                </code>
+                <button type="button"
+                        @onclick="this.CopyInstallCommandToClipboard"
+                        title="Copy command"
+                        class="text-muted-foreground hover:text-foreground transition-colors p-1 shrink-0 cursor-pointer">
+                    @if (this.IsCopied)
+                    {
+                        <LucideIcon Name="check"
+                                    Size="16"
+                                    Class="text-green-600 dark:text-green-400 shrink-0"/>
+                    }
+                    else
+                    {
+                        <LucideIcon Name="copy"
+                                    Size="16"
+                                    Class="text-muted-foreground hover:text-foreground shrink-0"/>
+                    }
+                </button>
+            </div>
+        </div>
+
+        <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-border">
+            <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    IMPORTS
+                </span>
+                <span class="text-xl leading-lg font-semibold text-foreground">
+                    @(this.ViewModel.Package.ImportCount)
+                </span>
+            </div>
+            <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    QUALITY
+                </span>
+                <span class="text-xl leading-lg font-semibold text-foreground">
+                    @(this.ViewModel.Package.QualityScore)
+                </span>
+            </div>
+            <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    LATEST
+                </span>
+                <span class="text-xl leading-lg font-semibold text-foreground">
+                    @(this.ViewModel.Package.Version)
+                </span>
+            </div>
+            <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    PUBLISHED
+                </span>
+                <span class="text-xl leading-lg font-semibold text-foreground">
+                    @(this.ViewModel.Package.PublishedAgo)
+                </span>
+            </div>
+            <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    LICENSE
+                </span>
+                <span class="text-xl leading-lg font-semibold text-foreground">
+                    @(this.ViewModel.Package.License)
+                </span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="w-full bg-body-bg py-7">
+    <div class="page-container flex flex-col lg:flex-row items-start gap-8">
+        <div class="flex-1 w-full flex flex-col gap-4">
+            <div class="w-full h-10 rounded-lg bg-card border border-border flex items-center gap-0.5 p-0.5 overflow-x-auto">
+                @foreach (var tab in this.GetVisibleContentTabs())
+                {
+                    <button type="button"
+                            @onclick="() => this.SelectContentTab(tab)"
+                            class="h-full px-4 rounded-md text-sm leading-xs transition-colors whitespace-nowrap cursor-pointer @(this.SelectedContentTab == tab ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium")">
+                        @(tab)
+                    </button>
+                }
+            </div>
+
+            @switch (this.SelectedContentTab)
+            {
+                case "Overview":
+                    <PackageOverviewTab Model="@(this.ViewModel.Package)"/>
+
+                    break;
+                case "Contents":
+                    <PackageContentsTab Elements="@(this.ViewModel.Package.Elements)"/>
+
+                    break;
+                case "Dependencies":
+                    <PackageDependenciesTab Dependencies="@(this.ViewModel.Package.Dependencies)"/>
+
+                    break;
+                case "Dependents":
+                    <PackageDependentsTab Dependents="@(this.ViewModel.Package.Dependents)"/>
+
+                    break;
+                case "Versions":
+                    <PackageVersionsTab Versions="@(this.ViewModel.Package.Versions)"/>
+
+                    break;
+                case "Validation":
+                    <PackageValidationTab Report="@(this.ViewModel.Package.ValidationReport)"/>
+
+                    break;
+            }
+        </div>
+
+        <aside class="w-full lg:w-[340px] shrink-0 flex flex-col gap-4">
+            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    METADATA
+                </span>
+
+                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground">Latest stable</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.Version)</span>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground">Published</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.PublishedAgo)</span>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground">License</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.License)</span>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground">Metamodel</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.Metamodel)</span>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground">Repository</span>
+                    <a href="@(this.ViewModel.Package.RepositoryUrl)"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="font-medium text-primary hover:underline text-right truncate">
+                        @(this.ViewModel.Package.RepositoryDisplayName)
+                    </a>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground">Package URL</span>
+                    <span class="font-medium text-primary text-right truncate"
+                          title="@(this.ViewModel.Package.PackageUrl)">
+                        @(this.ViewModel.Package.PackageUrlDisplayName)
+                    </span>
+                </div>
+            </div>
+
+            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    QUALITY
+                </span>
+
+                <div class="flex items-center justify-between gap-2 text-sm leading-xs">
+                    <span class="font-semibold text-foreground">Release validated</span>
+                    <span class="font-semibold text-emerald-700 dark:text-emerald-400">
+                        @(this.ViewModel.Package.QualityScore)
+                    </span>
+                </div>
+
+                @foreach (var check in this.ViewModel.Package.QualityChecks)
+                {
+                    <div class="flex items-center gap-2 text-xs leading-2xs text-slate-700 dark:text-slate-300">
+                        <LucideIcon Name="check"
+                                    Size="14"
+                                    Class="text-green-600 dark:text-green-400 shrink-0"/>
+                        <span class="flex-1 truncate">
+                            @(check.Label)
+                        </span>
+                    </div>
+                }
+            </div>
+
+            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    MAINTAINERS
+                </span>
+
+                @foreach (var maintainer in this.ViewModel.Package.Maintainers)
+                {
+                    <div class="flex items-center gap-2 h-6.5">
+                        <div class="w-6.5 h-6.5 rounded-full bg-slate-600 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                            <span class="text-2xs leading-3xs font-semibold text-white">
+                                @(maintainer.Initials)
+                            </span>
+                        </div>
+                        <span class="text-xs leading-2xs font-medium text-foreground flex-1 truncate">
+                            @(maintainer.Name)
+                        </span>
+                        @if (maintainer.IsVerified)
+                        {
+                            <LucideIcon Name="badge-check"
+                                        Size="14"
+                                        Class="text-primary shrink-0"/>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    TAGS
+                </span>
+
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var tag in this.ViewModel.Package.Tags)
+                    {
+                        <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs leading-2xs font-medium text-slate-700 dark:text-slate-300">
+                            @(tag)
+                        </span>
+                    }
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+</div>

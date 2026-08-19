@@ -30,6 +30,16 @@ namespace Mycelium.Forge.Common
         public const string Publish = "/publish";
 
         /// <summary>
+        /// The package details page route path.
+        /// </summary>
+        public const string Package = "/packages/{id}";
+
+        /// <summary>
+        /// The scoped package details page route path.
+        /// </summary>
+        public const string ScopedPackage = "/packages/{scope}/{id}";
+
+        /// <summary>
         /// The organization and publisher profile page route path.
         /// </summary>
         public const string Organization = "/organizations/{id}";

@@ -1,0 +1,30 @@
+﻿@if (this.Model != null)
+{
+    <div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3 @(this.Class)">
+        <h2 class="text-xl leading-lg font-semibold text-foreground">
+            @(this.Model.Name)
+        </h2>
+        <p class="text-sm leading-xs text-slate-700 dark:text-slate-300">
+            @(this.Model.ReadmeDescription)
+        </p>
+
+        <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
+            Contents
+        </h3>
+        <p class="text-sm leading-xs text-slate-700 dark:text-slate-300">
+            @(this.Model.ReadmeContents)
+        </p>
+
+        <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
+            Usage
+        </h3>
+        <div class="w-full p-3 px-3.5 rounded-md bg-[#252C37] dark:bg-slate-950 font-mono text-sm leading-17 flex flex-col gap-0.5 overflow-x-auto">
+            <span class="text-[#CCE6DB] select-all">
+                @(this.Model.CodeUsageImport)
+            </span>
+            <span class="text-[#B3C7DB] select-all">
+                @(this.Model.CodeUsageBody)
+            </span>
+        </div>
+    </div>
+}
