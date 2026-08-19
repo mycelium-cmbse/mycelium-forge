@@ -27,6 +27,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<IPackagesViewModel, PackagesViewModel>();
             builder.Services.AddTransient<IOrganizationDetailsViewModel, OrganizationDetailsViewModel>();
             builder.Services.AddTransient<IPackageDetailsViewModel, PackageDetailsViewModel>();
+            builder.Services.AddTransient<IPublishViewModel, PublishViewModel>();
 
             return builder;
         }

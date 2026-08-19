@@ -1,4 +1,4 @@
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @attribute [Route(PageRoutes.Package)]
 @attribute [Route(PageRoutes.ScopedPackage)]
 @rendermode InteractiveServer
@@ -83,14 +83,14 @@
         </div>
 
         <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedInstallTab)"
-                                               DefaultValue="Forge CLI"
-                                               OnValueChange="@(this.SelectInstallTab)"
-                                               class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2.5">
+                                                DefaultValue="Forge CLI"
+                                                OnValueChange="@(this.SelectInstallTab)"
+                                                class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2.5">
             <BlazorBlueprint.Primitives.Tabs.BbTabsList class="flex items-center gap-4.5 text-xs leading-2xs">
                 @foreach (var tab in this.InstallTabs)
                 {
                     <BlazorBlueprint.Primitives.Tabs.BbTabsTrigger Value="@tab"
-                                                                  class="@(this.GetInstallTabClass(tab))">
+                                                                   class="@(this.GetInstallTabClass(tab))">
                         @(tab)
                     </BlazorBlueprint.Primitives.Tabs.BbTabsTrigger>
                 }
@@ -169,14 +169,14 @@
     <div class="page-container flex flex-col lg:flex-row items-start gap-8">
         <div class="flex-1 w-full flex flex-col">
             <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedContentTab)"
-                                                   DefaultValue="Overview"
-                                                   OnValueChange="@(this.SelectContentTab)"
-                                                   class="w-full flex flex-col gap-4">
+                                                    DefaultValue="Overview"
+                                                    OnValueChange="@(this.SelectContentTab)"
+                                                    class="w-full flex flex-col gap-4">
                 <BlazorBlueprint.Primitives.Tabs.BbTabsList class="w-full h-10 rounded-lg bg-card border border-border flex items-center gap-0.5 p-0.5 overflow-x-auto">
                     @foreach (var tab in this.GetVisibleContentTabs())
                     {
                         <BlazorBlueprint.Primitives.Tabs.BbTabsTrigger Value="@tab"
-                                                                      class="@(this.GetContentTabClass(tab))">
+                                                                       class="@(this.GetContentTabClass(tab))">
                             @(tab)
                         </BlazorBlueprint.Primitives.Tabs.BbTabsTrigger>
                     }

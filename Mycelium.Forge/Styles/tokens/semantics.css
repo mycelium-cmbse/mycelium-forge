@@ -1,4 +1,4 @@
-/* Semantics Collection
+﻿/* Semantics Collection
  * Contextual design tokens aliasing raw primitives for theme surfaces and roles.
  * Rule: Components consume semantic tokens via standard Tailwind utility classes.
  */
@@ -43,6 +43,10 @@
   --success-border: var(--primitive-color-emerald-200);
   --success-icon: var(--primitive-color-emerald-700);
   --validated: var(--primitive-color-green-600);
+  --warning: #fffbeb;
+  --warning-foreground: var(--primitive-color-amber-700);
+  --warning-border: #fde68a;
+  --warning-icon: var(--primitive-color-amber-700);
   --code-bg: var(--primitive-color-code-bg);
   --code-import: var(--primitive-color-code-import);
   --code-body: var(--primitive-color-code-body);
@@ -89,6 +93,10 @@
   --success-border: rgba(6, 78, 59, 0.6);
   --success-icon: var(--primitive-color-emerald-400);
   --validated: var(--primitive-color-green-400);
+  --warning: rgba(120, 53, 15, 0.4);
+  --warning-foreground: var(--primitive-color-amber-400);
+  --warning-border: rgba(180, 83, 9, 0.6);
+  --warning-icon: var(--primitive-color-amber-400);
   --code-bg: var(--primitive-color-slate-950);
   --code-import: var(--primitive-color-code-import);
   --code-body: var(--primitive-color-code-body);

@@ -1,4 +1,4 @@
-/* Primitives Collection
+﻿/* Primitives Collection
  * Raw design tokens (palette colors, typography, sizing, spacing, radiuses).
  * Rule: Never apply a primitive token directly to a component — always alias it through a semantic token or theme utility.
  */
@@ -39,6 +39,10 @@
   /* Semantic Feedback Primitives */
   --primitive-color-red-500: #ef4444;
   --primitive-color-red-600: #dc2626;
+  --primitive-color-amber-400: #fbbf24;
+  --primitive-color-amber-500: #f59e0b;
+  --primitive-color-amber-600: #d97706;
+  --primitive-color-amber-700: #b45309;
   --primitive-color-green-400: #4ade80;
   --primitive-color-green-500: #22c55e;
   --primitive-color-green-600: #16a34a;
