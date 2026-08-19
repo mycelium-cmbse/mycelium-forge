@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="Organization.razor.cs" company="Starion Group S.A.">
+// <copyright file="OrganizationDetails.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Components.Pages
     /// <summary>
     /// Represents the organization publisher profile and packages view of the Mycelium Forge registry.
     /// </summary>
-    public partial class Organization : ComponentBase
+    public partial class OrganizationDetails : ComponentBase
     {
         /// <summary>
         /// Gets or sets the organization identifier supplied from the URL route.
@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Gets or sets the view model for the organization profile page.
         /// </summary>
         [Inject]
-        public IOrganizationViewModel ViewModel { get; set; }
+        public IOrganizationDetailsViewModel ViewModel { get; set; }
 
         /// <summary>
         /// Gets the formatted metadata summary line for the organization.

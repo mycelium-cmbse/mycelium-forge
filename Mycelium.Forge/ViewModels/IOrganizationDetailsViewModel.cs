@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="IOrganizationViewModel.cs" company="Starion Group S.A.">
+// <copyright file="IOrganizationDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -14,7 +14,7 @@ namespace Mycelium.Forge.ViewModels
     /// <summary>
     /// Defines the view model contract for the Mycelium Forge organization and publisher profile page.
     /// </summary>
-    public interface IOrganizationViewModel
+    public interface IOrganizationDetailsViewModel
     {
         /// <summary>
         /// Gets or sets the organization profile details.

@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="Package.razor.cs" company="Starion Group S.A.">
+// <copyright file="PackageDetails.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -17,7 +17,7 @@ namespace Mycelium.Forge.Components.Pages
     /// <summary>
     /// Represents the package details and release overview page for Mycelium Forge packages.
     /// </summary>
-    public partial class Package : ComponentBase
+    public partial class PackageDetails : ComponentBase
     {
         /// <summary>
         /// Gets or sets the optional scope segment supplied from the URL route.
@@ -35,13 +35,13 @@ namespace Mycelium.Forge.Components.Pages
         /// Gets or sets the view model for the package details page.
         /// </summary>
         [Inject]
-        public IPackageViewModel ViewModel { get; set; }
+        public IPackageDetailsViewModel ViewModel { get; set; }
 
         /// <summary>
         /// Gets or sets the JavaScript runtime instance for browser interactions.
         /// </summary>
         [Inject]
-        public IJSRuntime JSRuntime { get; set; }
+        public IJSRuntime JsRuntime { get; set; }
 
         /// <summary>
         /// Gets or sets the currently selected install method tab.
@@ -156,7 +156,7 @@ namespace Mycelium.Forge.Components.Pages
         {
             try
             {
-                await this.JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", this.CurrentInstallCommand);
+                await this.JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", this.CurrentInstallCommand);
                 this.IsCopied = true;
             }
             catch (Exception)

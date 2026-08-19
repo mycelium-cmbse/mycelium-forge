@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageViewModel.cs" company="Starion Group S.A.">
+// <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -14,7 +14,7 @@ namespace Mycelium.Forge.ViewModels
     /// <summary>
     /// Provides view model state and initialization logic for the Mycelium Forge package details page.
     /// </summary>
-    public class PackageViewModel : IPackageViewModel
+    public class PackageDetailsViewModel : IPackageDetailsViewModel
     {
         /// <summary>
         /// Gets or sets the package details and metadata.
