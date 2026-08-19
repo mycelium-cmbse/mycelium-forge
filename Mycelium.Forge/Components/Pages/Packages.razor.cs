@@ -55,14 +55,14 @@ namespace Mycelium.Forge.Components.Pages
         public PackageSortOption SelectedSortOption { get; set; } = PackageSortOption.Relevance;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the sort options dropdown is visible.
-        /// </summary>
-        public bool IsSortDropdownOpen { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether prerelease packages should be included in results.
         /// </summary>
         public bool IncludePrereleases { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the sort dropdown is currently open.
+        /// </summary>
+        public bool IsSortDropdownOpen { get; set; }
 
         /// <summary>
         /// Gets the list of available sort option enum values.
@@ -80,6 +80,25 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         [Inject]
         public IPackagesViewModel ViewModel { get; set; }
+
+        /// <summary>
+        /// Toggles the open/closed state of the sort dropdown menu.
+        /// </summary>
+        public void ToggleSortDropdown()
+        {
+            this.IsSortDropdownOpen = !this.IsSortDropdownOpen;
+        }
+
+        /// <summary>
+        /// Selects a sort option, closes the dropdown, and updates search results.
+        /// </summary>
+        /// <param name="sortOption">The selected sort option.</param>
+        public void SelectSortOption(PackageSortOption sortOption)
+        {
+            this.SelectedSortOption = sortOption;
+            this.IsSortDropdownOpen = false;
+            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
+        }
 
         /// <summary>
         /// Gets the display text representation for a sort option enum value.
@@ -127,34 +146,6 @@ namespace Mycelium.Forge.Components.Pages
         public void OnSearchValueChanged(string value)
         {
             this.SearchQuery = value ?? string.Empty;
-            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
-        }
-
-        /// <summary>
-        /// Clears the active search query text and updates results.
-        /// </summary>
-        public void ClearSearch()
-        {
-            this.SearchQuery = string.Empty;
-            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
-        }
-
-        /// <summary>
-        /// Toggles the open/closed state of the sort dropdown menu.
-        /// </summary>
-        public void ToggleSortDropdown()
-        {
-            this.IsSortDropdownOpen = !this.IsSortDropdownOpen;
-        }
-
-        /// <summary>
-        /// Selects the specified sort option and closes the dropdown menu.
-        /// </summary>
-        /// <param name="sortOption">The selected sort option.</param>
-        public void SelectSortOption(PackageSortOption sortOption)
-        {
-            this.SelectedSortOption = sortOption;
-            this.IsSortDropdownOpen = false;
             this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
         }
 

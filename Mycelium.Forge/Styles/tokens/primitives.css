@@ -84,4 +84,11 @@
   --primitive-radius-input: 10px;
   --primitive-radius-xl: 12px;
   --primitive-radius-full: 9999px;
+
+  /* Layout & Sizing Primitives */
+  --primitive-layout-container-max-width: 1200px;
+  --primitive-spacing-container-padding: 1.5rem;
+  --primitive-spacing-badge-py: 2px;
+  --primitive-spacing-badge-px: 6px;
+  --primitive-border-width-default: 1px;
 }

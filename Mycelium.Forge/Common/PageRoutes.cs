@@ -32,7 +32,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The organization and publisher profile page route path.
         /// </summary>
-        public const string Organization = "/organization";
+        public const string Organization = "/organizations/{id}";
 
         /// <summary>
         /// The documentation page route path.

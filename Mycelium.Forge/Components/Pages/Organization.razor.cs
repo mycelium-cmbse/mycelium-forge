@@ -19,6 +19,12 @@ namespace Mycelium.Forge.Components.Pages
     public partial class Organization : ComponentBase
     {
         /// <summary>
+        /// Gets or sets the organization identifier supplied from the URL route.
+        /// </summary>
+        [Parameter]
+        public string Id { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets the view model for the organization profile page.
         /// </summary>
         [Inject]
@@ -35,12 +41,17 @@ namespace Mycelium.Forge.Components.Pages
         }
 
         /// <summary>
-        /// Initializes the component lifecycle and populates the view model state.
+        /// Handles component parameter updates and initializes the view model with the parsed organization identifier.
         /// </summary>
-        protected override void OnInitialized()
+        protected override void OnParametersSet()
         {
-            base.OnInitialized();
-            this.ViewModel.InitializeViewModel();
+            base.OnParametersSet();
+
+            var idParsed = Guid.TryParse(this.Id, out var parsedGuid)
+                ? parsedGuid
+                : Guid.Empty;
+
+            this.ViewModel.InitializeViewModel(idParsed);
         }
     }
 }

@@ -5,20 +5,9 @@
 <PageTitle>Packages &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-body-bg min-h-screen py-8 select-none">
-    <div class="max-w-[1200px] w-full mx-auto px-6 flex flex-col gap-5">
-        <form method="get"
-              action="@PageRoutes.Packages"
-              class="w-full h-11 px-4 flex items-center gap-2.5 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors">
-            <LucideIcon Name="search"
-                        Size="18"
-                        Class="text-muted-foreground shrink-0"/>
-            <BbInput Type="InputType.Search"
-                     Name="@UrlParameterNames.Query"
-                     Value="@(this.SearchQuery)"
-                     ValueChanged="@(this.OnSearchValueChanged)"
-                     Placeholder="Search models, libraries, units, quantity kinds..."
-                     Class="w-full bg-transparent text-md leading-sm text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
-        </form>
+    <div class="page-container flex flex-col gap-5">
+        <SearchInput Value="@(this.SearchQuery)"
+                     ValueChanged="@(this.OnSearchValueChanged)"/>
 
         <div class="w-full flex items-center justify-between gap-3 h-8">
             <span class="text-sm leading-xs font-medium text-slate-700 dark:text-slate-300 flex-1 truncate">

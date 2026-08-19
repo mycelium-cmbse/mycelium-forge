@@ -27,8 +27,9 @@ namespace Mycelium.Forge.ViewModels
         IReadOnlyList<PackageRowModel> Packages { get; set; }
 
         /// <summary>
-        /// Initializes the organization view model state.
+        /// Initializes the organization view model state for the specified organization identifier.
         /// </summary>
-        void InitializeViewModel();
+        /// <param name="id">The unique identifier of the organization.</param>
+        void InitializeViewModel(Guid id);
     }
 }

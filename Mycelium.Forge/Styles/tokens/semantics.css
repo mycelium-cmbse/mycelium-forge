@@ -34,6 +34,8 @@
   --border: var(--primitive-color-slate-300);
   --input: var(--primitive-color-slate-300);
   --ring: var(--primitive-color-terracotta-500);
+  --badge-border: var(--primitive-color-slate-250);
+  --badge-foreground: var(--primitive-color-slate-450);
   --radius: var(--primitive-radius-lg);
 }
 
@@ -68,4 +70,6 @@
   --border: var(--primitive-color-slate-800);
   --input: var(--primitive-color-slate-800);
   --ring: var(--primitive-color-terracotta-400);
+  --badge-border: var(--primitive-color-slate-700);
+  --badge-foreground: var(--primitive-color-slate-400);
 }

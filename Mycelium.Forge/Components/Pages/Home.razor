@@ -12,20 +12,8 @@
         Publish, discover and reuse system models and libraries across SysML v2, CDP4-COMET and Capella.
     </p>
 
-    <form method="get"
-          action="@PageRoutes.Packages"
-          class="w-full max-w-[640px] h-12 px-4 flex items-center gap-2.5 rounded-input bg-background border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors">
-        <LucideIcon Name="search"
-                    Size="18"
-                    Class="text-muted-foreground shrink-0"/>
-        <BbInput Type="InputType.Search"
-                 Name="@UrlParameterNames.Query"
-                 Placeholder="Search models, libraries, units, quantity kinds..."
-                 Class="w-full bg-transparent text-md leading-sm text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
-        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-2xs leading-3xs font-medium text-muted-foreground bg-muted border border-border rounded shrink-0">
-            Ctrl K
-        </kbd>
-    </form>
+    <SearchInput Class="max-w-2xl"
+                 ShowShortcut="true"/>
 
     <div class="flex flex-wrap items-center justify-center gap-12 pt-2">
         <StatItem Value="@(this.ViewModel.PackageCount)"
@@ -43,27 +31,27 @@
     </div>
 
     <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-        <span class="text-sm leading-xs text-slate-450 dark:text-muted-foreground mr-1">Browse by format</span>
+        <span class="text-sm leading-xs text-muted-foreground mr-1">Browse by format</span>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=sysml-v2")"
-                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-badge-border text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             SysML v2 libraries
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=cdp4-comet")"
-                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-badge-border text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             CDP4-COMET models
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=capella")"
-                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-badge-border text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             Capella models
         </BbButton>
     </div>
 </section>
 
 <div class="w-full bg-body-bg border-t border-border/40 py-12 select-none">
-    <div class="max-w-[1200px] mx-auto px-6 flex flex-col gap-12">
+    <div class="page-container flex flex-col gap-12">
         <PackageSection Title="Standard libraries"
                         ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Category}=standard")"
                         Packages="@(this.ViewModel.StandardLibraries)"/>

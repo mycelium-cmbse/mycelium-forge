@@ -68,6 +68,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-badge-border: var(--badge-border);
+  --color-badge-foreground: var(--badge-foreground);
 
   /* Specific palette helpers for badges & borders */
   --color-slate-150: var(--primitive-color-slate-150);
@@ -82,6 +84,33 @@
   --radius-input: var(--primitive-radius-input);
   --radius-xl: var(--primitive-radius-xl);
   --radius-full: var(--primitive-radius-full);
+}
+
+/* Page container with standard width constraint */
+.page-container {
+  max-width: var(--primitive-layout-container-max-width);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--primitive-spacing-container-padding);
+  padding-right: var(--primitive-spacing-container-padding);
+}
+
+/* Package format badge referencing design primitives */
+.badge-format {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--primitive-spacing-badge-py) var(--primitive-spacing-badge-px);
+  border-radius: var(--primitive-radius-sm);
+  background-color: var(--card);
+  border-width: var(--primitive-border-width-default);
+  border-style: solid;
+  border-color: var(--badge-border);
+  flex-shrink: 0;
+  font-size: var(--primitive-font-size-3xs);
+  line-height: var(--primitive-line-height-4xs);
+  font-weight: var(--primitive-font-weight-medium);
+  color: var(--badge-foreground);
 }
 
 /* Container with responsive max-width. */
