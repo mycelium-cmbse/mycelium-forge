@@ -1,4 +1,4 @@
-@if (this.Versions == null || this.Versions.Count == 0)
+﻿@if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
 }
@@ -14,14 +14,31 @@
     <div class="w-full rounded-lg bg-card border border-border overflow-x-auto mt-1">
         <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Versions)"
                                                 class="w-full text-left text-xs leading-2xs">
-            <BlazorBlueprint.Primitives.Table.BbTableHeader class="px-4 py-2.5 bg-secondary flex items-center text-3xs leading-4xs font-semibold text-muted-foreground uppercase tracking-wider">
-                <span class="w-28 shrink-0">VERSION</span>
-                <span class="w-36 shrink-0">PUBLISHED</span>
-                <span class="w-28 shrink-0">DEPENDENTS</span>
-                <span class="w-36 shrink-0">VALIDATION</span>
-                <span class="w-24 shrink-0">SIZE</span>
-                <span class="flex-1"></span>
-                <span class="w-20 shrink-0 text-right"></span>
+            <BlazorBlueprint.Primitives.Table.BbTableHeader Class="px-4 py-2.5 bg-secondary flex items-center text-3xs leading-4xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                                                                    Class="w-28 shrink-0 p-0 text-left font-semibold">
+                    VERSION
+                </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                                                                    Class="w-36 shrink-0 p-0 text-left font-semibold">
+                    PUBLISHED
+                </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                                                                    Class="w-28 shrink-0 p-0 text-left font-semibold">
+                    DEPENDENTS
+                </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                                                                    Class="w-36 shrink-0 p-0 text-left font-semibold">
+                    VALIDATION
+                </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                                                                    Class="w-24 shrink-0 p-0 text-left font-semibold">
+                    SIZE
+                </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                <div class="flex-1"></div>
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                                                                    Class="w-20 shrink-0 p-0 text-right font-semibold">
+                </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
             </BlazorBlueprint.Primitives.Table.BbTableHeader>
             <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
                 @foreach (var ver in this.Versions)

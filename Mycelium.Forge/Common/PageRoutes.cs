@@ -63,5 +63,10 @@ namespace Mycelium.Forge.Common
         /// The page not found route path.
         /// </summary>
         public const string NotFound = "/not-found";
+
+        /// <summary>
+        /// The user's personal package management page route path.
+        /// </summary>
+        public const string MyPackages = "/my-packages";
     }
 }

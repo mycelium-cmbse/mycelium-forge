@@ -1,0 +1,123 @@
+﻿@using BlazorBlueprint.Primitives.Table
+@attribute [Route(PageRoutes.MyPackages)]
+
+<PageTitle>My Packages &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-10 select-none">
+    <div class="page-container flex flex-col gap-5">
+
+        <div class="flex flex-row items-center gap-3">
+            <div class="flex flex-col gap-1 flex-1">
+                <h1 class="text-3xl leading-3xl font-semibold text-foreground">My packages</h1>
+                <p class="text-sm leading-xs text-muted-foreground">
+                    Packages you own or maintain across your account and organizations.
+                </p>
+            </div>
+            <a href="@PageRoutes.Publish"
+               class="flex flex-row items-center gap-1.5 px-3.5 py-2.5 bg-primary hover:bg-primary/90 rounded-lg no-underline transition-colors">
+                <LucideIcon Name="plus"
+                            Size="16"
+                            Class="text-white shrink-0"/>
+                <span class="text-sm leading-xs font-semibold text-white">Publish a package</span>
+            </a>
+        </div>
+
+        @if (this.ViewModel.Packages.Count > 0)
+        {
+            <div class="w-full flex items-center justify-start">
+                <BbToggleGroup TValue="string"
+                               @bind-Value="this.SelectedPublisher"
+                               Class="flex flex-row items-center gap-2">
+                    @foreach (var option in this.GetPublisherFilterOptions())
+                    {
+                        <BbToggleGroupItem TValue="string"
+                                           Value="@option.Key"
+                                           Class="@(this.GetPublisherChipClass(option.Key))">
+                            @(option.Label)
+                        </BbToggleGroupItem>
+                    }
+                </BbToggleGroup>
+            </div>
+
+            <div class="w-full rounded-lg bg-card border border-border overflow-hidden">
+                <BbTable Data="@(this.FilteredPackages())"
+                         Class="w-full text-left text-sm leading-xs">
+                    <BbTableHeader Class="px-5 py-3 bg-muted border-b border-border flex items-center text-2xs leading-3xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <BbTableHeaderCell TData="PackageModel" Class="w-[430px] shrink-0 p-0 text-left font-semibold">
+                            PACKAGE
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="PackageModel" Class="w-[120px] shrink-0 p-0 text-left font-semibold">
+                            LATEST
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="PackageModel" Class="w-[130px] shrink-0 p-0 text-left font-semibold">
+                            VISIBILITY
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="PackageModel" Class="w-[110px] shrink-0 p-0 text-left font-semibold">
+                            IMPORTS
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="PackageModel" Class="w-[180px] shrink-0 p-0 text-left font-semibold">
+                            LAST PUBLISHED
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="PackageModel" Class="w-[150px] shrink-0 p-0 text-left font-semibold">
+                            ROLE
+                        </BbTableHeaderCell>
+                    </BbTableHeader>
+                    <BbTableBody Class="divide-y divide-border">
+                        @foreach (var package in this.FilteredPackages())
+                        {
+                            <BbTableRow Item="@package"
+                                        Class="px-5 py-3.5 flex items-center hover:bg-muted/50 transition-colors">
+                                <BbTableCell Class="w-[430px] shrink-0 p-0">
+                                    <a href="@(package.Href)"
+                                       class="font-semibold text-foreground hover:text-primary transition-colors truncate">
+                                        @(package.Name)
+                                    </a>
+                                </BbTableCell>
+                                <BbTableCell Class="w-[120px] shrink-0 font-normal text-secondary-foreground p-0">
+                                    @(package.Version)
+                                </BbTableCell>
+                                <BbTableCell Class="@(this.GetVisibilityCellClass(package))">
+                                    @(package.Visibility)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[110px] shrink-0 font-normal text-secondary-foreground p-0">
+                                    @(package.ImportCount)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[180px] shrink-0 font-normal text-muted-foreground p-0">
+                                    @(package.LastPublished)
+                                </BbTableCell>
+                                <BbTableCell Class="@(this.GetRoleCellClass(package))">
+                                    @(package.Role)
+                                </BbTableCell>
+                            </BbTableRow>
+                        }
+                    </BbTableBody>
+                </BbTable>
+            </div>
+        }
+        else
+        {
+            <div class="w-full rounded-xl bg-card border border-border flex flex-col items-center py-20 gap-3">
+                <div class="w-15 h-15 rounded-full flex items-center justify-center shrink-0"
+                     style="background-color: #FAECE3;">
+                    <LucideIcon Name="package-open"
+                                Size="28"
+                                Class="text-primary shrink-0"/>
+                </div>
+                <h2 class="text-md leading-sm font-semibold text-foreground text-center">
+                    No packages yet
+                </h2>
+                <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-lg">
+                    Publish a SysML v2 library so other teams can discover, version, and import it into their projects.
+                </p>
+                <a href="@PageRoutes.Publish"
+                   class="flex flex-row items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary/90 rounded-lg no-underline transition-colors mt-0.5">
+                    <LucideIcon Name="plus"
+                                Size="16"
+                                Class="text-white shrink-0"/>
+                    <span class="text-sm leading-xs font-semibold text-white">Publish a package</span>
+                </a>
+            </div>
+        }
+
+    </div>
+</div>
