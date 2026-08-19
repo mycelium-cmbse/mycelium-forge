@@ -1,36 +1,38 @@
-﻿@if (this.Dependencies != null && this.Dependencies.Count > 0)
+﻿@if (this.Dependencies == null || this.Dependencies.Count == 0)
 {
-    <div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3 @(this.Class)">
-        <h2 class="text-lg leading-lg font-semibold text-foreground">
-            Dependencies
-        </h2>
-        <p class="text-xs leading-2xs text-muted-foreground">
-            @(this.Dependencies.Count) direct dependency, resolved against your project’s Forge index. No dev or build dependencies.
-        </p>
-
-        <div class="w-full rounded-lg bg-card border border-border flex flex-col divide-y divide-border overflow-hidden mt-1">
-            @foreach (var dep in this.Dependencies)
-            {
-                <div class="px-4 py-3 flex items-center gap-2.5 text-sm leading-xs">
-                    <LucideIcon Name="box"
-                                Size="16"
-                                Class="text-slate-500 dark:text-slate-400 shrink-0"/>
-                    <a href="@dep.Href"
-                       class="font-semibold text-primary hover:underline">
-                        @(dep.Name)
-                    </a>
-                    @if (dep.IsVerified)
-                    {
-                        <LucideIcon Name="badge-check"
-                                    Size="14"
-                                    Class="text-primary shrink-0"/>
-                    }
-                    <div class="flex-1"></div>
-                    <span class="text-xs leading-2xs text-muted-foreground shrink-0">
-                        @(dep.Requirement)
-                    </span>
-                </div>
-            }
-        </div>
-    </div>
+    return;
 }
+
+<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3 @(this.Class)">
+    <h2 class="text-lg leading-lg font-semibold text-foreground">
+        Dependencies
+    </h2>
+    <p class="text-xs leading-2xs text-muted-foreground">
+        @(this.Dependencies.Count) direct dependency, resolved against your project’s Forge index. No dev or build dependencies.
+    </p>
+
+    <div class="w-full rounded-lg bg-card border border-border flex flex-col divide-y divide-border overflow-hidden mt-1">
+        @foreach (var dep in this.Dependencies)
+        {
+            <div class="px-4 py-3 flex items-center gap-2.5 text-sm leading-xs">
+                <LucideIcon Name="box"
+                            Size="16"
+                            Class="text-slate-500 dark:text-slate-400 shrink-0"/>
+                <a href="@dep.Href"
+                   class="font-semibold text-primary hover:underline">
+                    @(dep.Name)
+                </a>
+                @if (dep.IsVerified)
+                {
+                    <LucideIcon Name="badge-check"
+                                Size="14"
+                                Class="text-primary shrink-0"/>
+                }
+                <div class="flex-1"></div>
+                <span class="text-xs leading-2xs text-muted-foreground shrink-0">
+                    @(dep.Requirement)
+                </span>
+            </div>
+        }
+    </div>
+</div>

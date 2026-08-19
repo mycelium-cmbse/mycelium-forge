@@ -49,34 +49,32 @@ namespace Mycelium.Forge.Components.PackageTabs
         ];
 
         /// <summary>
-        /// Gets the collection of model elements filtered by the selected element kind category.
-        /// </summary>
-        public IReadOnlyList<PackageElementModel> FilteredElements
-        {
-            get
-            {
-                if (this.Elements == null || this.Elements.Count == 0)
-                {
-                    return [];
-                }
-
-                var filtered = this.Elements
-                    .Where(element => string.Equals(element.Category, this.SelectedKindTab, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-                return filtered.Count > 0
-                    ? filtered
-                    : this.Elements;
-            }
-        }
-
-        /// <summary>
         /// Selects an element kind category filter tab.
         /// </summary>
         /// <param name="kindTab">The name of the kind category tab.</param>
         public void SelectKindTab(string kindTab)
         {
             this.SelectedKindTab = kindTab;
+        }
+
+        /// <summary>
+        /// Gets the collection of model elements filtered by the selected element kind category.
+        /// </summary>
+        /// <returns>A list of model elements matching the selected kind category or all elements if none match.</returns>
+        public IReadOnlyList<PackageElementModel> GetFilteredElements()
+        {
+            if (this.Elements == null || this.Elements.Count == 0)
+            {
+                return [];
+            }
+
+            var filtered = this.Elements
+                .Where(element => string.Equals(element.Category, this.SelectedKindTab, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            return filtered.Count > 0
+                ? filtered
+                : this.Elements;
         }
     }
 }

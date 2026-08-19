@@ -1,56 +1,58 @@
-﻿@if (this.Dependents != null && this.Dependents.Count > 0)
+﻿@if (this.Dependents == null || this.Dependents.Count == 0)
 {
-    <div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3 @(this.Class)">
-        <h2 class="text-lg leading-lg font-semibold text-foreground">
-            Dependents
-        </h2>
-        <p class="text-xs leading-2xs text-muted-foreground">
-            Packages and projects that import or specialize this package. Computed from the resolved dependency graph.
-        </p>
-
-        <div class="w-full rounded-lg bg-card border border-border flex flex-col divide-y divide-border overflow-hidden mt-1">
-            @foreach (var dependent in this.Dependents)
-            {
-                <div class="px-4 py-3 flex items-center gap-2.5 text-sm leading-xs">
-                    @if (dependent.IsProject)
-                    {
-                        <LucideIcon Name="folder"
-                                    Size="16"
-                                    Class="text-slate-500 dark:text-slate-400 shrink-0"/>
-                    }
-                    else
-                    {
-                        <LucideIcon Name="box"
-                                    Size="16"
-                                    Class="text-slate-500 dark:text-slate-400 shrink-0"/>
-                    }
-
-                    @if (!string.IsNullOrEmpty(dependent.Href))
-                    {
-                        <a href="@dependent.Href"
-                           class="font-semibold text-primary hover:underline">
-                            @(dependent.Name)
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="font-semibold text-primary">
-                            @(dependent.Name)
-                        </span>
-                    }
-
-                    @if (dependent.IsVerified)
-                    {
-                        <LucideIcon Name="badge-check"
-                                    Size="14"
-                                    Class="text-primary shrink-0"/>
-                    }
-                    <div class="flex-1"></div>
-                    <span class="text-xs leading-2xs text-muted-foreground shrink-0">
-                        @(dependent.RelationshipSummary)
-                    </span>
-                </div>
-            }
-        </div>
-    </div>
+    return;
 }
+
+<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3 @(this.Class)">
+    <h2 class="text-lg leading-lg font-semibold text-foreground">
+        Dependents
+    </h2>
+    <p class="text-xs leading-2xs text-muted-foreground">
+        Packages and projects that import or specialize this package. Computed from the resolved dependency graph.
+    </p>
+
+    <div class="w-full rounded-lg bg-card border border-border flex flex-col divide-y divide-border overflow-hidden mt-1">
+        @foreach (var dependent in this.Dependents)
+        {
+            <div class="px-4 py-3 flex items-center gap-2.5 text-sm leading-xs">
+                @if (dependent.IsProject)
+                {
+                    <LucideIcon Name="folder"
+                                Size="16"
+                                Class="text-slate-500 dark:text-slate-400 shrink-0"/>
+                }
+                else
+                {
+                    <LucideIcon Name="box"
+                                Size="16"
+                                Class="text-slate-500 dark:text-slate-400 shrink-0"/>
+                }
+
+                @if (!string.IsNullOrEmpty(dependent.Href))
+                {
+                    <a href="@dependent.Href"
+                       class="font-semibold text-primary hover:underline">
+                        @(dependent.Name)
+                    </a>
+                }
+                else
+                {
+                    <span class="font-semibold text-primary">
+                        @(dependent.Name)
+                    </span>
+                }
+
+                @if (dependent.IsVerified)
+                {
+                    <LucideIcon Name="badge-check"
+                                Size="14"
+                                Class="text-primary shrink-0"/>
+                }
+                <div class="flex-1"></div>
+                <span class="text-xs leading-2xs text-muted-foreground shrink-0">
+                    @(dependent.RelationshipSummary)
+                </span>
+            </div>
+        }
+    </div>
+</div>

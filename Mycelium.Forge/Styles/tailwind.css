@@ -1,4 +1,4 @@
-﻿/* Tailwind source for Mycelium Forge.
+/* Tailwind source for Mycelium Forge.
  *
  * Compiled to wwwroot/css/app.css by the BuildTailwindCss target in Mycelium.Forge.csproj.
  * This file lives outside wwwroot deliberately: it is build input, not a served asset.
@@ -70,6 +70,11 @@
   --color-ring: var(--ring);
   --color-badge-border: var(--badge-border);
   --color-badge-foreground: var(--badge-foreground);
+
+  /* Code snippet surfaces and syntax highlighting */
+  --color-code-bg: var(--code-bg);
+  --color-code-import: var(--code-import);
+  --color-code-body: var(--code-body);
 
   /* Specific palette helpers for badges & borders */
   --color-slate-150: var(--primitive-color-slate-150);
