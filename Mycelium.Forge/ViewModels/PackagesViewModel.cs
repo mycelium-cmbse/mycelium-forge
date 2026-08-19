@@ -85,39 +85,9 @@ namespace Mycelium.Forge.ViewModels
         ];
 
         /// <summary>
-        /// Gets or sets the collection of format facet filter options.
+        /// Gets or sets the collection of facet filter options.
         /// </summary>
-        public IReadOnlyList<FacetItemModel> Formats { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the collection of kind facet filter options.
-        /// </summary>
-        public IReadOnlyList<FacetItemModel> Kinds { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the collection of scope and publisher facet filter options.
-        /// </summary>
-        public IReadOnlyList<FacetItemModel> Scopes { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the collection of category facet filter options.
-        /// </summary>
-        public IReadOnlyList<FacetItemModel> Categories { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the collection of tag facet filter options.
-        /// </summary>
-        public IReadOnlyList<FacetItemModel> Tags { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the collection of metamodel facet filter options.
-        /// </summary>
-        public IReadOnlyList<FacetItemModel> Metamodels { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the collection of license facet filter options.
-        /// </summary>
-        public IReadOnlyList<FacetItemModel> Licenses { get; set; } = [];
+        public IReadOnlyList<FacetItemModel> Facets { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the collection of displayed package search result items.
@@ -164,53 +134,29 @@ namespace Mycelium.Forge.ViewModels
         /// </summary>
         private void InitializeFacets()
         {
-            this.Formats =
+            this.Facets =
             [
-                new FacetItemModel("SysML v2 (kpar)", 5),
-                new FacetItemModel("CDP4-COMET (10-25)", 1),
-                new FacetItemModel("Capella", 0)
-            ];
-
-            this.Kinds =
-            [
-                new FacetItemModel("Library", 0),
-                new FacetItemModel("Model", 6)
-            ];
-
-            this.Scopes =
-            [
-                new FacetItemModel("@esa", 4),
-                new FacetItemModel("@starion", 2),
-                new FacetItemModel("@mycelium", 0)
-            ];
-
-            this.Categories =
-            [
-                new FacetItemModel("mission-model", 5, true),
-                new FacetItemModel("standard-library", 1),
-                new FacetItemModel("quantities-units", 1),
-                new FacetItemModel("view-definitions", 0)
-            ];
-
-            this.Tags =
-            [
-                new FacetItemModel("aocs", 1),
-                new FacetItemModel("power", 1),
-                new FacetItemModel("thermal", 1),
-                new FacetItemModel("mechanical", 1),
-                new FacetItemModel("comms", 1)
-            ];
-
-            this.Metamodels =
-            [
-                new FacetItemModel("SysML v2 (2025-02)", 6),
-                new FacetItemModel("ECSS-E-TM-10-25", 1)
-            ];
-
-            this.Licenses =
-            [
-                new FacetItemModel("Apache-2.0", 5),
-                new FacetItemModel("MIT", 1)
+                new FacetItemModel("FORMAT", "SysML v2 (kpar)", 5),
+                new FacetItemModel("FORMAT", "CDP4-COMET (10-25)", 1),
+                new FacetItemModel("FORMAT", "Capella", 0),
+                new FacetItemModel("KIND", "Library", 0),
+                new FacetItemModel("KIND", "Model", 6),
+                new FacetItemModel("SCOPE / PUBLISHER", "@esa", 4),
+                new FacetItemModel("SCOPE / PUBLISHER", "@starion", 2),
+                new FacetItemModel("SCOPE / PUBLISHER", "@mycelium", 0),
+                new FacetItemModel("CATEGORY", "mission-model", 5, true),
+                new FacetItemModel("CATEGORY", "standard-library", 1),
+                new FacetItemModel("CATEGORY", "quantities-units", 1),
+                new FacetItemModel("CATEGORY", "view-definitions", 0),
+                new FacetItemModel("TAGS", "aocs", 1),
+                new FacetItemModel("TAGS", "power", 1),
+                new FacetItemModel("TAGS", "thermal", 1),
+                new FacetItemModel("TAGS", "mechanical", 1),
+                new FacetItemModel("TAGS", "comms", 1),
+                new FacetItemModel("METAMODEL", "SysML v2 (2025-02)", 6),
+                new FacetItemModel("METAMODEL", "ECSS-E-TM-10-25", 1),
+                new FacetItemModel("LICENSE", "Apache-2.0", 5),
+                new FacetItemModel("LICENSE", "MIT", 1)
             ];
         }
     }

@@ -2,7 +2,7 @@
 {
     <a href="@(this.Model.Href)"
        class="block select-none group focus:outline-none w-full">
-        <div class="px-[18px] py-4 rounded-lg bg-card border border-card-border hover:border-ring transition-colors shadow-xs flex flex-col justify-between min-h-[99px] gap-2 w-full @(this.Class)">
+        <div class="px-4.5 py-4 rounded-lg bg-card border border-card-border hover:border-ring transition-colors shadow-xs flex flex-col justify-between min-h-25 gap-2 w-full @(this.Class)">
             <div class="flex items-center gap-2 w-full h-5">
                 <LucideIcon Name="box"
                             Size="20"
@@ -33,7 +33,7 @@
                 </p>
             }
 
-            <div class="flex items-center justify-between gap-2.5 w-full h-[15px] text-xs leading-2xs">
+            <div class="flex items-center justify-between gap-2.5 w-full h-4 text-xs leading-2xs">
                 @if (!string.IsNullOrEmpty(this.Model.Tags))
                 {
                     <span class="text-muted-foreground truncate flex-1">

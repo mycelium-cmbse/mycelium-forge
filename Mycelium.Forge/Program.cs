@@ -101,7 +101,8 @@ namespace Mycelium.Forge
             // Every component is statically server-rendered. No interactive render mode is
             // registered: InteractiveServer is ruled out by horizontal scaling, and no screen
             // requires a component runtime (docs/design.md DD-02, section 7.4).
-            builder.Services.AddRazorComponents();
+            builder.Services.AddRazorComponents()
+                .AddInteractiveServerComponents();
 
             builder.Services.AddBlazorBlueprintComponents();
 
@@ -129,7 +130,8 @@ namespace Mycelium.Forge
 
             app.MapCarter();
 
-            app.MapRazorComponents<App>();
+            app.MapRazorComponents<App>()
+                .AddInteractiveServerRenderMode();
 
             app.Run();
 

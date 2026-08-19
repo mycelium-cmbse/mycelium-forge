@@ -10,22 +10,29 @@
 namespace Mycelium.Forge.Models
 {
     /// <summary>
-    /// Represents a single facet option with a display label, result count, and selection state.
+    /// Represents a single facet option with a display label, result count, property group, and selection state.
     /// </summary>
     public class FacetItemModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FacetItemModel" /> class.
         /// </summary>
+        /// <param name="property">The property group name that this facet belongs to.</param>
         /// <param name="label">The display label of the facet option.</param>
         /// <param name="count">The count of matching packages for this facet option.</param>
         /// <param name="isChecked">A value indicating whether the facet option is currently selected.</param>
-        public FacetItemModel(string label, int count, bool isChecked = false)
+        public FacetItemModel(string property, string label, int count, bool isChecked = false)
         {
+            this.Property = property;
             this.Label = label;
             this.Count = count;
             this.IsChecked = isChecked;
         }
+
+        /// <summary>
+        /// Gets or sets the property group name that this facet belongs to.
+        /// </summary>
+        public string Property { get; set; }
 
         /// <summary>
         /// Gets or sets the display label of the facet option.

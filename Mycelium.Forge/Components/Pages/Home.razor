@@ -30,33 +30,33 @@
     <div class="flex flex-wrap items-center justify-center gap-12 pt-2">
         <StatItem Value="@(this.ViewModel.PackageCount)"
                   Label="packages"
-                  Class="min-w-[55px]"/>
+                  Class="min-w-14"/>
         <StatItem Value="@(this.ViewModel.VersionCount)"
                   Label="versions"
-                  Class="min-w-[48px]"/>
+                  Class="min-w-12"/>
         <StatItem Value="@(this.ViewModel.PublisherCount)"
                   Label="publishers"
-                  Class="min-w-[59px]"/>
+                  Class="min-w-15"/>
         <StatItem Value="@(this.ViewModel.ImportCount)"
                   Label="imports"
-                  Class="min-w-[62px]"/>
+                  Class="min-w-16"/>
     </div>
 
     <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
         <span class="text-sm leading-xs text-slate-450 dark:text-muted-foreground mr-1">Browse by format</span>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=sysml-v2")"
-                  Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             SysML v2 libraries
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=cdp4-comet")"
-                  Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             CDP4-COMET models
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=capella")"
-                  Class="h-[30px] px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-slate-250 dark:border-slate-700 text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
             Capella models
         </BbButton>
     </div>

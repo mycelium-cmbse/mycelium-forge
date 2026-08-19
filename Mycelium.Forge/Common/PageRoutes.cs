@@ -30,6 +30,11 @@ namespace Mycelium.Forge.Common
         public const string Publish = "/publish";
 
         /// <summary>
+        /// The organization and publisher profile page route path.
+        /// </summary>
+        public const string Organization = "/organization";
+
+        /// <summary>
         /// The documentation page route path.
         /// </summary>
         public const string Docs = "/docs";

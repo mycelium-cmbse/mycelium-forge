@@ -2,8 +2,8 @@
 {
     <a href="@(this.Model.Href)"
        class="block select-none group focus:outline-none">
-        <div class="p-4 rounded-lg bg-card border border-card-border hover:border-ring transition-colors shadow-xs flex flex-col justify-between min-h-[121px] gap-2.5 @(this.Class)">
-            <div class="flex items-center gap-2 w-full h-[18px]">
+        <div class="p-4 rounded-lg bg-card border border-card-border hover:border-ring transition-colors shadow-xs flex flex-col justify-between min-h-30 gap-2.5 @(this.Class)">
+            <div class="flex items-center gap-2 w-full h-4.5">
                 <LucideIcon Name="box"
                             Size="18"
                             Class="text-muted-foreground shrink-0"/>
@@ -37,7 +37,7 @@
                 </span>
             }
 
-            <div class="flex items-center justify-between gap-2 w-full h-[13px] text-2xs leading-3xs">
+            <div class="flex items-center justify-between gap-2 w-full h-3.5 text-2xs leading-3xs">
                 <span class="text-slate-700 dark:text-slate-300 truncate flex-1">
                     by @(this.Model.Publisher) · @(this.Model.Version)
                 </span>

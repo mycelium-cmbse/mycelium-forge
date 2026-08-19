@@ -1,279 +1,145 @@
 ﻿@using Mycelium.Forge.Components.Common
 @attribute [Route(PageRoutes.Packages)]
+@rendermode InteractiveServer
 
 <PageTitle>Packages &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-body-bg min-h-screen py-8 select-none">
-<div class="max-w-[1200px] w-full mx-auto px-6 flex flex-col gap-5">
-<form method="get"
-      action="@PageRoutes.Packages"
-      class="w-full h-11 px-4 flex items-center gap-2.5 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors">
-    <LucideIcon Name="search"
-                Size="18"
-                Class="text-muted-foreground shrink-0"/>
-    <BbInput Type="InputType.Search"
-             Name="@UrlParameterNames.Query"
-             Value="@(this.SearchQuery)"
-             ValueChanged="@(this.OnSearchValueChanged)"
-             Placeholder="Search models, libraries, units, quantity kinds..."
-             Class="w-full bg-transparent text-md leading-sm text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
-</form>
+    <div class="max-w-[1200px] w-full mx-auto px-6 flex flex-col gap-5">
+        <form method="get"
+              action="@PageRoutes.Packages"
+              class="w-full h-11 px-4 flex items-center gap-2.5 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors">
+            <LucideIcon Name="search"
+                        Size="18"
+                        Class="text-muted-foreground shrink-0"/>
+            <BbInput Type="InputType.Search"
+                     Name="@UrlParameterNames.Query"
+                     Value="@(this.SearchQuery)"
+                     ValueChanged="@(this.OnSearchValueChanged)"
+                     Placeholder="Search models, libraries, units, quantity kinds..."
+                     Class="w-full bg-transparent text-md leading-sm text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
+        </form>
 
-<div class="w-full flex items-center justify-between gap-3 h-8">
-    <span class="text-sm leading-xs font-medium text-slate-700 dark:text-slate-300 flex-1 truncate">
-        @(this.GetResultsCountText())
-    </span>
+        <div class="w-full flex items-center justify-between gap-3 h-8">
+            <span class="text-sm leading-xs font-medium text-slate-700 dark:text-slate-300 flex-1 truncate">
+                @(this.GetResultsCountText())
+            </span>
 
-    <div class="flex items-center gap-4 shrink-0">
-        <div class="relative">
-            <BbButton Variant="ButtonVariant.Outline"
-                      Type="ButtonType.Button"
-                      OnClick="@(this.ToggleSortDropdown)"
-                      Class="h-8 px-3 rounded-lg bg-card border border-border hover:border-slate-400 dark:hover:border-slate-600 flex items-center gap-1.5 text-sm leading-xs font-normal transition-colors cursor-pointer focus:outline-none">
-                <span class="text-muted-foreground font-normal">Sort:</span>
-                <span class="text-foreground font-medium">@(GetSortOptionLabel(this.SelectedSortOption))</span>
-                <LucideIcon Name="chevron-down"
-                            Size="14"
-                            Class="text-muted-foreground shrink-0 ml-1"/>
-            </BbButton>
+            <div class="flex items-center gap-4 shrink-0">
+                <div class="relative">
+                    <BbButton Variant="ButtonVariant.Outline"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.ToggleSortDropdown)"
+                              Class="h-8 px-3 rounded-lg bg-card border border-border hover:border-slate-400 dark:hover:border-slate-600 flex items-center gap-1.5 text-sm leading-xs font-normal transition-colors cursor-pointer focus:outline-none">
+                        <span class="text-muted-foreground font-normal">Sort:</span>
+                        <span class="text-foreground font-medium">@(GetSortOptionLabel(this.SelectedSortOption))</span>
+                        <LucideIcon Name="chevron-down"
+                                    Size="14"
+                                    Class="text-muted-foreground shrink-0 ml-1"/>
+                    </BbButton>
 
-            @if (this.IsSortDropdownOpen)
-            {
-                <div class="absolute right-0 top-9 w-40 py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                    @foreach (var sortOption in this.SortOptions)
+                    @if (this.IsSortDropdownOpen)
                     {
-                        <button type="button"
-                                @onclick="() => this.SelectSortOption(sortOption)"
-                                class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors @(this.SelectedSortOption == sortOption ? "font-semibold text-primary" : "font-normal")">
-                            @(GetSortOptionLabel(sortOption))
-                        </button>
+                        <div class="absolute right-0 top-9 w-40 py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
+                            @foreach (var sortOption in this.SortOptions)
+                            {
+                                <button type="button"
+                                        @onclick="() => this.SelectSortOption(sortOption)"
+                                        class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors @(this.SelectedSortOption == sortOption ? "font-semibold text-primary" : "font-normal")">
+                                    @(GetSortOptionLabel(sortOption))
+                                </button>
+                            }
+                        </div>
                     }
                 </div>
-            }
+
+                <div @onclick="@(() => this.OnIncludePrereleasesChanged(!this.IncludePrereleases))"
+                     class="flex items-center gap-2 h-4 cursor-pointer select-none group">
+                    <BbCheckbox Checked="@(this.IncludePrereleases)"
+                                CheckedChanged="@(this.OnIncludePrereleasesChanged)"
+                                Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
+                    <span class="text-sm leading-xs font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground transition-colors">
+                        Include prereleases
+                    </span>
+                </div>
+            </div>
         </div>
 
-        <div @onclick="@(() => this.OnIncludePrereleasesChanged(!this.IncludePrereleases))"
-             class="flex items-center gap-2 h-4 cursor-pointer select-none group">
-            <BbCheckbox Checked="@(this.IncludePrereleases)"
-                        CheckedChanged="@(this.OnIncludePrereleasesChanged)"
-                        Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-            <span class="text-sm leading-xs font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground transition-colors">
-                Include prereleases
-            </span>
+        <div class="w-full flex flex-col lg:flex-row items-start gap-8">
+            <aside class="w-full lg:w-72 shrink-0 p-4 rounded-lg bg-card border border-card-border shadow-xs flex flex-col gap-5.5">
+                @foreach (var group in this.ViewModel.Facets.GroupBy(x => x.Property))
+                {
+                    <div class="flex flex-col gap-2.5 w-full">
+                        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            @(group.Key)
+                        </span>
+                        <div class="flex flex-col gap-2.5 w-full">
+                            @foreach (var item in group)
+                            {
+                                <div @onclick="() => this.ToggleFacet(item)"
+                                     class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
+                                    <BbCheckbox Checked="@(item.IsChecked)"
+                                                CheckedChanged="@(_ => this.ToggleFacet(item))"
+                                                Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
+                                    <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
+                                        @(item.Label)
+                                    </span>
+                                    <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
+                                        @(item.Count)
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="flex items-center gap-2 w-full pt-1">
+                    <BbButton Variant="ButtonVariant.Default"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.ApplyFilters)"
+                              Class="flex-1 h-8 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm leading-xs font-semibold transition-colors">
+                        Apply filters
+                    </BbButton>
+                    <BbButton Variant="ButtonVariant.Outline"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.ResetFilters)"
+                              Class="h-8 px-3.5 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-sm leading-xs font-medium transition-colors">
+                        Reset
+                    </BbButton>
+                </div>
+            </aside>
+
+            <main class="flex-1 w-full flex flex-col gap-3">
+                @if (this.ViewModel.PackageResults.Count > 0)
+                {
+                    @foreach (var package in this.ViewModel.PackageResults)
+                    {
+                        <PackageRow Model="@package"/>
+                    }
+                }
+                else
+                {
+                    <div class="w-full py-20 flex flex-col items-center justify-center gap-2.5 select-none">
+                        <div class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                            <LucideIcon Name="box"
+                                        Size="26"
+                                        Class="text-slate-400 dark:text-slate-500 shrink-0"/>
+                        </div>
+                        <h2 class="text-lg leading-17 font-semibold text-foreground text-center">
+                            No packages found
+                        </h2>
+                        <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-xl">
+                            Nothing matches your search. Try different keywords, or clear the filters and browse everything.
+                        </p>
+                        <BbButton Variant="ButtonVariant.Default"
+                                  Type="ButtonType.Button"
+                                  OnClick="@(this.BrowseAllPackages)"
+                                  Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-17 font-semibold transition-colors mt-0.5">
+                            Browse all packages
+                        </BbButton>
+                    </div>
+                }
+            </main>
         </div>
     </div>
-</div>
-
-<div class="w-full flex flex-col lg:flex-row items-start gap-8">
-    <aside class="w-full lg:w-[292px] shrink-0 p-4 rounded-lg bg-card border border-card-border shadow-xs flex flex-col gap-[22px]">
-        <div class="flex flex-col gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                FORMAT
-            </span>
-            <div class="flex flex-col gap-2.5 w-full">
-                @foreach (var item in this.ViewModel.Formats)
-                {
-                    <div @onclick="() => this.ToggleFacet(item)"
-                         class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
-                        <BbCheckbox Checked="@(item.IsChecked)"
-                                    CheckedChanged="@(_ => this.ToggleFacet(item))"
-                                    Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-                        <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
-                            @(item.Label)
-                        </span>
-                        <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
-                            @(item.Count)
-                        </span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                KIND
-            </span>
-            <div class="flex flex-col gap-2.5 w-full">
-                @foreach (var item in this.ViewModel.Kinds)
-                {
-                    <div @onclick="() => this.ToggleFacet(item)"
-                         class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
-                        <BbCheckbox Checked="@(item.IsChecked)"
-                                    CheckedChanged="@(_ => this.ToggleFacet(item))"
-                                    Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-                        <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
-                            @(item.Label)
-                        </span>
-                        <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
-                            @(item.Count)
-                        </span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                SCOPE / PUBLISHER
-            </span>
-            <div class="flex flex-col gap-2.5 w-full">
-                @foreach (var item in this.ViewModel.Scopes)
-                {
-                    <div @onclick="() => this.ToggleFacet(item)"
-                         class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
-                        <BbCheckbox Checked="@(item.IsChecked)"
-                                    CheckedChanged="@(_ => this.ToggleFacet(item))"
-                                    Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-                        <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
-                            @(item.Label)
-                        </span>
-                        <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
-                            @(item.Count)
-                        </span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                CATEGORY
-            </span>
-            <div class="flex flex-col gap-2.5 w-full">
-                @foreach (var item in this.ViewModel.Categories)
-                {
-                    <div @onclick="() => this.ToggleFacet(item)"
-                         class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
-                        <BbCheckbox Checked="@(item.IsChecked)"
-                                    CheckedChanged="@(_ => this.ToggleFacet(item))"
-                                    Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-                        <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
-                            @(item.Label)
-                        </span>
-                        <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
-                            @(item.Count)
-                        </span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                TAGS
-            </span>
-            <div class="flex flex-col gap-2.5 w-full">
-                @foreach (var item in this.ViewModel.Tags)
-                {
-                    <div @onclick="() => this.ToggleFacet(item)"
-                         class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
-                        <BbCheckbox Checked="@(item.IsChecked)"
-                                    CheckedChanged="@(_ => this.ToggleFacet(item))"
-                                    Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-                        <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
-                            @(item.Label)
-                        </span>
-                        <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
-                            @(item.Count)
-                        </span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                METAMODEL
-            </span>
-            <div class="flex flex-col gap-2.5 w-full">
-                @foreach (var item in this.ViewModel.Metamodels)
-                {
-                    <div @onclick="() => this.ToggleFacet(item)"
-                         class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
-                        <BbCheckbox Checked="@(item.IsChecked)"
-                                    CheckedChanged="@(_ => this.ToggleFacet(item))"
-                                    Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-                        <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
-                            @(item.Label)
-                        </span>
-                        <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
-                            @(item.Count)
-                        </span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                LICENSE
-            </span>
-            <div class="flex flex-col gap-2.5 w-full">
-                @foreach (var item in this.ViewModel.Licenses)
-                {
-                    <div @onclick="() => this.ToggleFacet(item)"
-                         class="flex flex-row items-center gap-2 w-full cursor-pointer select-none group">
-                        <BbCheckbox Checked="@(item.IsChecked)"
-                                    CheckedChanged="@(_ => this.ToggleFacet(item)))"
-                                    Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0 pointer-events-none"/>
-                        <span class="text-xs leading-2xs flex-1 truncate transition-colors @(item.IsChecked ? "font-medium text-foreground" : "font-normal text-slate-700 dark:text-slate-300 group-hover:text-foreground")">
-                            @(item.Label)
-                        </span>
-                        <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
-                            @(item.Count)
-                        </span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="flex items-center gap-2 w-full pt-1">
-            <BbButton Variant="ButtonVariant.Default"
-                      Type="ButtonType.Button"
-                      OnClick="@(this.ApplyFilters)"
-                      Class="flex-1 h-8 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm leading-xs font-semibold transition-colors">
-                Apply filters
-            </BbButton>
-            <BbButton Variant="ButtonVariant.Outline"
-                      Type="ButtonType.Button"
-                      OnClick="@(this.ResetFilters)"
-                      Class="h-8 px-3.5 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-sm leading-xs font-medium transition-colors">
-                Reset
-            </BbButton>
-        </div>
-    </aside>
-
-    <main class="flex-1 w-full flex flex-col gap-3">
-        @if (this.ViewModel.PackageResults.Count > 0)
-        {
-            @foreach (var package in this.ViewModel.PackageResults)
-            {
-                <PackageRow Model="@package"/>
-            }
-        }
-        else
-        {
-            <div class="w-full py-20 flex flex-col items-center justify-center gap-2.5 select-none">
-                <div class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <LucideIcon Name="box"
-                                Size="26"
-                                Class="text-slate-400 dark:text-slate-500 shrink-0"/>
-                </div>
-                <h2 class="text-lg leading-17 font-semibold text-foreground text-center">
-                    No packages found
-                </h2>
-                <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-[591px]">
-                    Nothing matches your search. Try different keywords, or clear the filters and browse everything.
-                </p>
-                <BbButton Variant="ButtonVariant.Default"
-                          Type="ButtonType.Button"
-                          OnClick="@(this.BrowseAllPackages)"
-                          Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-17 font-semibold transition-colors mt-0.5">
-                    Browse all packages
-                </BbButton>
-            </div>
-        }
-    </main>
-</div>
-</div>
 </div>

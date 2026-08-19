@@ -17,39 +17,9 @@ namespace Mycelium.Forge.ViewModels
     public interface IPackagesViewModel
     {
         /// <summary>
-        /// Gets or sets the collection of format facet filter options.
+        /// Gets or sets the collection of facet filter options.
         /// </summary>
-        IReadOnlyList<FacetItemModel> Formats { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of kind facet filter options.
-        /// </summary>
-        IReadOnlyList<FacetItemModel> Kinds { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of scope and publisher facet filter options.
-        /// </summary>
-        IReadOnlyList<FacetItemModel> Scopes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of category facet filter options.
-        /// </summary>
-        IReadOnlyList<FacetItemModel> Categories { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of tag facet filter options.
-        /// </summary>
-        IReadOnlyList<FacetItemModel> Tags { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of metamodel facet filter options.
-        /// </summary>
-        IReadOnlyList<FacetItemModel> Metamodels { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of license facet filter options.
-        /// </summary>
-        IReadOnlyList<FacetItemModel> Licenses { get; set; }
+        IReadOnlyList<FacetItemModel> Facets { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of displayed package search result items.

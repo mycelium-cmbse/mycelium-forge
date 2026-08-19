@@ -233,37 +233,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         private void ResetFacetSelections()
         {
-            foreach (var item in this.ViewModel.Formats)
-            {
-                item.IsChecked = false;
-            }
-
-            foreach (var item in this.ViewModel.Kinds)
-            {
-                item.IsChecked = false;
-            }
-
-            foreach (var item in this.ViewModel.Scopes)
-            {
-                item.IsChecked = false;
-            }
-
-            foreach (var item in this.ViewModel.Categories)
-            {
-                item.IsChecked = false;
-            }
-
-            foreach (var item in this.ViewModel.Tags)
-            {
-                item.IsChecked = false;
-            }
-
-            foreach (var item in this.ViewModel.Metamodels)
-            {
-                item.IsChecked = false;
-            }
-
-            foreach (var item in this.ViewModel.Licenses)
+            foreach (var item in this.ViewModel.Facets)
             {
                 item.IsChecked = false;
             }
