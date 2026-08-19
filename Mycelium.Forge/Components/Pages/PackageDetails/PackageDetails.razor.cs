@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Components.Pages
+namespace Mycelium.Forge.Components.Pages.PackageDetails
 {
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
@@ -72,18 +72,15 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Gets the install command string for the currently selected install tab.
         /// </summary>
-        public string CurrentInstallCommand
+        /// <returns>The resolved install command string, or an empty string if not available.</returns>
+        public string GetCurrentInstallCommand()
         {
-            get
+            if (this.ViewModel.Package.InstallCommands != null && this.ViewModel.Package.InstallCommands.TryGetValue(this.SelectedInstallTab, out var command))
             {
-                if (this.ViewModel?.Package?.InstallCommands != null &&
-                    this.ViewModel.Package.InstallCommands.TryGetValue(this.SelectedInstallTab, out var command))
-                {
-                    return command;
-                }
-
-                return string.Empty;
+                return command;
             }
+
+            return string.Empty;
         }
 
         /// <summary>
@@ -99,29 +96,27 @@ namespace Mycelium.Forge.Components.Pages
                 return tabs;
             }
 
-            if (this.ViewModel.Package.Elements != null && this.ViewModel.Package.Elements.Count > 0)
+            if (this.ViewModel.Package.Elements is { Count: > 0 })
             {
                 tabs.Add("Contents");
             }
 
-            if (this.ViewModel.Package.Dependencies != null && this.ViewModel.Package.Dependencies.Count > 0)
+            if (this.ViewModel.Package.Dependencies is { Count: > 0 })
             {
                 tabs.Add("Dependencies");
             }
 
-            if (this.ViewModel.Package.Dependents != null && this.ViewModel.Package.Dependents.Count > 0)
+            if (this.ViewModel.Package.Dependents is { Count: > 0 })
             {
                 tabs.Add("Dependents");
             }
 
-            if (this.ViewModel.Package.Versions != null && this.ViewModel.Package.Versions.Count > 0)
+            if (this.ViewModel.Package.Versions is { Count: > 0 })
             {
                 tabs.Add("Versions");
             }
 
-            if (this.ViewModel.Package.ValidationReport != null &&
-                this.ViewModel.Package.ValidationReport.Checks != null &&
-                this.ViewModel.Package.ValidationReport.Checks.Count > 0)
+            if (this.ViewModel.Package.ValidationReport is { Checks.Count: > 0 })
             {
                 tabs.Add("Validation");
             }
@@ -149,6 +144,34 @@ namespace Mycelium.Forge.Components.Pages
         }
 
         /// <summary>
+        /// Gets the CSS classes for an installation method tab trigger.
+        /// </summary>
+        /// <param name="tab">The installation method tab name.</param>
+        /// <returns>The computed CSS class string.</returns>
+        public string GetInstallTabClass(string tab)
+        {
+            const string baseClass = "cursor-pointer transition-colors";
+
+            return this.SelectedInstallTab == tab
+                ? $"{baseClass} font-semibold text-primary"
+                : $"{baseClass} font-medium text-muted-foreground hover:text-foreground";
+        }
+
+        /// <summary>
+        /// Gets the CSS classes for a content section tab trigger.
+        /// </summary>
+        /// <param name="tab">The content section tab name.</param>
+        /// <returns>The computed CSS class string.</returns>
+        public string GetContentTabClass(string tab)
+        {
+            const string baseClass = "h-full px-4 rounded-md text-sm leading-xs transition-colors whitespace-nowrap cursor-pointer";
+
+            return this.SelectedContentTab == tab
+                ? $"{baseClass} bg-primary/10 text-primary font-semibold"
+                : $"{baseClass} text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium";
+        }
+
+        /// <summary>
         /// Copies the currently active install command to the user clipboard.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous copy operation.</returns>
@@ -156,7 +179,7 @@ namespace Mycelium.Forge.Components.Pages
         {
             try
             {
-                await this.JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", this.CurrentInstallCommand);
+                await this.JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", this.GetCurrentInstallCommand());
                 this.IsCopied = true;
             }
             catch (Exception)

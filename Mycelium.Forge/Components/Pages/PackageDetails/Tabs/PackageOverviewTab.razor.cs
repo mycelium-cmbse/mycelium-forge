@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageVersionsTab.razor.cs" company="Starion Group S.A.">
+// <copyright file="PackageOverviewTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -7,22 +7,22 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Components.PackageTabs
+namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 {
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Models;
 
     /// <summary>
-    /// Represents the release versions history tab component for package details.
+    /// Represents the overview and usage README tab component for package details.
     /// </summary>
-    public partial class PackageVersionsTab : ComponentBase
+    public partial class PackageOverviewTab : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the collection of released versions for the package.
+        /// Gets or sets the package details model data.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<PackageVersionModel> Versions { get; set; } = [];
+        public PackageDetailsModel Model { get; set; }
 
         /// <summary>
         /// Gets or sets the additional CSS class names for styling the tab container.
