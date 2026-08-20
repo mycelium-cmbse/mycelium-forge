@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using System.Collections.Generic;
-
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
 
@@ -45,7 +43,7 @@ namespace Mycelium.Forge.ViewModels
                 new("v1.0.0", "published 4 months ago", isUnlisted: true)
             };
 
-            var resolvedScope = string.IsNullOrWhiteSpace(scope) ? "@starion" : (scope.StartsWith('@') ? scope : $"@{scope}");
+            var resolvedScope = string.IsNullOrWhiteSpace(scope) ? "@starion" : scope.StartsWith('@') ? scope : $"@{scope}";
             var resolvedName = string.IsNullOrWhiteSpace(id) ? "ECSS-MM-PWR" : id;
 
             this.Package = new PackageModel(

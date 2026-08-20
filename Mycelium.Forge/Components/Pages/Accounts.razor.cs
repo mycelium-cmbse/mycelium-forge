@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Accounts.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Components.Pages
 {
-    using System;
-
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Models;

@@ -1,5 +1,4 @@
-@using Mycelium.Forge.Common
-@attribute [Route(PageRoutes.AccountSettings)]
+﻿@attribute [Route(PageRoutes.AccountSettings)]
 @rendermode InteractiveServer
 
 @if (this.ViewModel.Profile == null)
@@ -10,214 +9,214 @@
 <PageTitle>Account Settings &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-body-bg min-h-screen py-9 select-none">
-    <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-        <nav class="flex items-center gap-1.5 text-xs leading-2xs">
-            <a href="@PageRoutes.Docs"
-               class="text-primary hover:underline font-normal">
-                Core concepts
-            </a>
-            <span class="text-muted-foreground font-normal">/</span>
-            <span class="text-muted-foreground font-normal">
-                Packages &amp; the kpar format
+<div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
+<nav class="flex items-center gap-1.5 text-xs leading-2xs">
+    <a href="@PageRoutes.Docs"
+       class="text-primary hover:underline font-normal">
+        Core concepts
+    </a>
+    <span class="text-muted-foreground font-normal">/</span>
+    <span class="text-muted-foreground font-normal">
+        Packages &amp; the kpar format
+    </span>
+</nav>
+
+<h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
+    Account settings
+</h1>
+
+<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+    <div class="flex items-center gap-2.5 w-full">
+        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+            PROFILE
+        </span>
+    </div>
+
+    <div class="flex flex-col w-full divide-y divide-border">
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Username
             </span>
-        </nav>
-
-        <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
-            Account settings
-        </h1>
-
-        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
-            <div class="flex items-center gap-2.5 w-full">
-                <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    PROFILE
-                </span>
-            </div>
-
-            <div class="flex flex-col w-full divide-y divide-border">
-                <div class="flex items-center gap-3 py-2.25 w-full">
-                    <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
-                        Username
-                    </span>
-                    <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                        @(this.ViewModel.Profile.Username)
-                    </span>
-                    <button type="button"
-                            @onclick="this.OnChangeUsername"
-                            class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
-                        Change
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 py-2.25 w-full">
-                    <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
-                        Email
-                    </span>
-                    <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                        @(this.ViewModel.Profile.Email)
-                    </span>
-                    @if (this.ViewModel.Profile.IsEmailVerified)
-                    {
-                        <span class="px-1.75 py-0.5 rounded-md bg-success text-success-icon text-2xs leading-3xs font-medium shrink-0">
-                            Verified
-                        </span>
-                    }
-                    <button type="button"
-                            @onclick="this.OnChangeEmail"
-                            class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
-                        Change
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 py-2.25 w-full">
-                    <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
-                        Display name
-                    </span>
-                    <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                        @(this.ViewModel.Profile.DisplayName)
-                    </span>
-                    <button type="button"
-                            @onclick="this.OnEditDisplayName"
-                            class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
-                        Edit
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 py-2.25 w-full">
-                    <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
-                        Company
-                    </span>
-                    <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                        @(this.ViewModel.Profile.Company)
-                    </span>
-                    <button type="button"
-                            @onclick="this.OnEditCompany"
-                            class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
-                        Edit
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 py-2.25 w-full">
-                    <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
-                        Location
-                    </span>
-                    <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                        @(this.ViewModel.Profile.Location)
-                    </span>
-                    <button type="button"
-                            @onclick="this.OnEditLocation"
-                            class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
-                        Edit
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 py-2.25 w-full">
-                    <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
-                        Website
-                    </span>
-                    <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                        @(this.ViewModel.Profile.Website)
-                    </span>
-                    <button type="button"
-                            @onclick="this.OnEditWebsite"
-                            class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
-                        Edit
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 py-2.25 w-full">
-                    <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
-                        Biography
-                    </span>
-                    <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                        @(this.ViewModel.Profile.Biography)
-                    </span>
-                    <button type="button"
-                            @onclick="this.OnEditBiography"
-                            class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
-                        Edit
-                    </button>
-                </div>
-            </div>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Username)
+            </span>
+            <button type="button"
+                    @onclick="this.OnChangeUsername"
+                    class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                Change
+            </button>
         </div>
 
-        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
-            <div class="flex items-center justify-between gap-2 w-full h-8">
-                <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
-                    ORGANIZATIONS
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Email
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Email)
+            </span>
+            @if (this.ViewModel.Profile.IsEmailVerified)
+            {
+                <span class="px-1.75 py-0.5 rounded-md bg-success text-success-icon text-2xs leading-3xs font-medium shrink-0">
+                    Verified
                 </span>
-                <button type="button"
-                        @onclick="this.OnCreateOrganization"
-                        class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
-                    Transfer
-                </button>
-            </div>
-
-            <div class="flex flex-col w-full divide-y divide-border">
-                @foreach (var organization in this.ViewModel.Organizations)
-                {
-                    <div class="flex items-center gap-3 py-2.25 w-full">
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-[#335999]")">
-                            @(organization.Initials)
-                        </div>
-
-                        <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
-                            @(organization.Scope)
-                        </span>
-
-                        <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
-                            @(organization.Name)
-                        </span>
-
-                        <div class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-amber-950/40 text-2xs leading-3xs font-medium shrink-0 @(organization.IsAdministrator ? "text-primary" : "text-muted-foreground")">
-                            @(organization.Role)
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <p class="text-xs leading-2xs text-muted-foreground w-full">
-                An Organization controls who belongs to it, not whether your Account exists. Leaving an Organization never deletes your Account.
-            </p>
+            }
+            <button type="button"
+                    @onclick="this.OnChangeEmail"
+                    class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                Change
+            </button>
         </div>
 
-        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
-            <h2 class="text-md leading-sm font-semibold text-foreground">
-                Danger zone
-            </h2>
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Display name
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.DisplayName)
+            </span>
+            <button type="button"
+                    @onclick="this.OnEditDisplayName"
+                    class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                Edit
+            </button>
+        </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 w-full border-t border-border">
-                <div class="flex-1 flex flex-col gap-0.5 min-w-0">
-                    <span class="text-sm leading-xs font-medium text-foreground">
-                        Deactivate account
-                    </span>
-                    <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                        Hides your profile and suspends publishing. Reversible.
-                    </span>
-                </div>
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Company
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Company)
+            </span>
+            <button type="button"
+                    @onclick="this.OnEditCompany"
+                    class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                Edit
+            </button>
+        </div>
 
-                <button type="button"
-                        @onclick="this.OnDeactivateAccount"
-                        class="h-8 px-3.5 rounded-lg bg-card border border-border hover:bg-muted text-secondary-text text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
-                    Deactivate
-                </button>
-            </div>
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Location
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Location)
+            </span>
+            <button type="button"
+                    @onclick="this.OnEditLocation"
+                    class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                Edit
+            </button>
+        </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 w-full border-t border-border">
-                <div class="flex-1 flex flex-col gap-0.5 min-w-0">
-                    <span class="text-sm leading-xs font-medium text-foreground">
-                        Delete account
-                    </span>
-                    <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                        Refused while you are the last individual Owner of a package. Transfer ownership first.
-                    </span>
-                </div>
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Website
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Website)
+            </span>
+            <button type="button"
+                    @onclick="this.OnEditWebsite"
+                    class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                Edit
+            </button>
+        </div>
 
-                <button type="button"
-                        @onclick="this.OnDeleteAccount"
-                        class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
-                    Delete
-                </button>
-            </div>
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Biography
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Biography)
+            </span>
+            <button type="button"
+                    @onclick="this.OnEditBiography"
+                    class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                Edit
+            </button>
         </div>
     </div>
+</div>
+
+<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+    <div class="flex items-center justify-between gap-2 w-full h-8">
+        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
+            ORGANIZATIONS
+        </span>
+        <button type="button"
+                @onclick="this.OnCreateOrganization"
+                class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+            Transfer
+        </button>
+    </div>
+
+    <div class="flex flex-col w-full divide-y divide-border">
+        @foreach (var organization in this.ViewModel.Organizations)
+        {
+            <div class="flex items-center gap-3 py-2.25 w-full">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-[#335999]")">
+                    @(organization.Initials)
+                </div>
+
+                <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
+                    @(organization.Scope)
+                </span>
+
+                <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
+                    @(organization.Name)
+                </span>
+
+                <div class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-amber-950/40 text-2xs leading-3xs font-medium shrink-0 @(organization.IsAdministrator ? "text-primary" : "text-muted-foreground")">
+                    @(organization.Role)
+                </div>
+            </div>
+        }
+    </div>
+
+    <p class="text-xs leading-2xs text-muted-foreground w-full">
+        An Organization controls who belongs to it, not whether your Account exists. Leaving an Organization never deletes your Account.
+    </p>
+</div>
+
+<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+    <h2 class="text-md leading-sm font-semibold text-foreground">
+        Danger zone
+    </h2>
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 w-full border-t border-border">
+        <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+            <span class="text-sm leading-xs font-medium text-foreground">
+                Deactivate account
+            </span>
+            <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                Hides your profile and suspends publishing. Reversible.
+            </span>
+        </div>
+
+        <button type="button"
+                @onclick="this.OnDeactivateAccount"
+                class="h-8 px-3.5 rounded-lg bg-card border border-border hover:bg-muted text-secondary-text text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+            Deactivate
+        </button>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 w-full border-t border-border">
+        <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+            <span class="text-sm leading-xs font-medium text-foreground">
+                Delete account
+            </span>
+            <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                Refused while you are the last individual Owner of a package. Transfer ownership first.
+            </span>
+        </div>
+
+        <button type="button"
+                @onclick="this.OnDeleteAccount"
+                class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+            Delete
+        </button>
+    </div>
+</div>
+</div>
 </div>

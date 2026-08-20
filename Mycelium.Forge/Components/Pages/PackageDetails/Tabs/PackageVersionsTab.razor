@@ -1,4 +1,4 @@
-@if (this.Versions == null || this.Versions.Count == 0)
+﻿@if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
 }
@@ -13,7 +13,7 @@
 
     <div class="w-full rounded-lg bg-card border border-border overflow-x-auto mt-1">
         <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Versions)"
-                                                class="w-full text-left text-xs leading-2xs">
+                                                  class="w-full text-left text-xs leading-2xs">
             <BlazorBlueprint.Primitives.Table.BbTableHeader Class="px-4 py-2.5 bg-secondary flex items-center text-3xs leading-4xs font-semibold text-muted-foreground uppercase tracking-wider">
                 <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
                                                                     Class="w-28 shrink-0 p-0 text-left font-semibold">
@@ -44,7 +44,7 @@
                 @foreach (var ver in this.Versions)
                 {
                     <BlazorBlueprint.Primitives.Table.BbTableRow Item="@ver"
-                                                                class="px-4 py-2.5 flex items-center hover:bg-muted/50 transition-colors">
+                                                                 class="px-4 py-2.5 flex items-center hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 flex items-center gap-1.5 p-0">
                             <span class="font-semibold @(ver.IsUnlisted ? "text-muted-foreground" : "text-primary")">
                                 @(ver.Version)

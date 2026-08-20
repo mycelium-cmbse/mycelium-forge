@@ -1,5 +1,4 @@
-@using Mycelium.Forge.Common
-@attribute [Route(PageRoutes.OrganizationSettings)]
+﻿@attribute [Route(PageRoutes.OrganizationSettings)]
 @rendermode InteractiveServer
 
 @if (this.ViewModel.Organization == null)
@@ -76,7 +75,7 @@
 
                         <div class="w-[230px] shrink-0">
                             <select value="@member.Role"
-                                    @onchange="(e) => this.OnChangeMemberRole(member, e.Value?.ToString())"
+                                    @onchange="e => this.OnChangeMemberRole(member, e.Value?.ToString())"
                                     class="w-full h-7 px-2.5 py-1 rounded-md bg-card border border-border text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
                                 @foreach (var role in this.ViewModel.RoleOptions)
                                 {

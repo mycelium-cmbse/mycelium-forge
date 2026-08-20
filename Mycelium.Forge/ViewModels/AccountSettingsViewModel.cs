@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AccountSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -17,6 +17,15 @@ namespace Mycelium.Forge.ViewModels
     public class AccountSettingsViewModel : IAccountSettingsViewModel
     {
         /// <summary>
+        /// The initial seed organization memberships.
+        /// </summary>
+        private readonly List<AccountOrganizationMembershipModel> seedOrganizations =
+        [
+            new("@starion", "Starion Group", "SG", "Organization Administrator", true),
+            new("@esa", "European Space Agency", "ES", "Organization Administrator")
+        ];
+
+        /// <summary>
         /// The initial seed profile information.
         /// </summary>
         private readonly UserProfileModel seedProfile = new(
@@ -28,15 +37,6 @@ namespace Mycelium.Forge.ViewModels
             "Toulouse, France",
             "stariongroup.eu",
             "Systems engineer, concurrent design.");
-
-        /// <summary>
-        /// The initial seed organization memberships.
-        /// </summary>
-        private readonly List<AccountOrganizationMembershipModel> seedOrganizations =
-        [
-            new("@starion", "Starion Group", "SG", "Organization Administrator", true),
-            new("@esa", "European Space Agency", "ES", "Organization Administrator", false)
-        ];
 
         /// <summary>
         /// Gets or sets the user profile details.

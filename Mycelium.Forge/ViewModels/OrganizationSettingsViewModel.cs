@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,9 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -60,7 +57,7 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="id">The unique identifier or slug handle of the organization.</param>
         public void InitializeViewModel(string id)
         {
-            var scope = string.IsNullOrWhiteSpace(id) ? "@starion" : (id.StartsWith('@') ? id : $"@{id}");
+            var scope = string.IsNullOrWhiteSpace(id) ? "@starion" : id.StartsWith('@') ? id : $"@{id}";
 
             this.Organization = new OrganizationModel(
                 "Starion Group",
@@ -77,15 +74,15 @@ namespace Mycelium.Forge.ViewModels
 
             this.Members =
             [
-                new("R. André", "@r.andre", "RA", "Organization Administrator"),
-                new("S. Kramer", "@s.kramer", "SK", "Organization Administrator"),
-                new("J. Klein", "@j.klein", "JK", "Forge Publisher"),
-                new("M. Blanc", "@m.blanc", "MB", "Organization Member")
+                new OrganizationMemberModel("R. André", "@r.andre", "RA", "Organization Administrator"),
+                new OrganizationMemberModel("S. Kramer", "@s.kramer", "SK", "Organization Administrator"),
+                new OrganizationMemberModel("J. Klein", "@j.klein", "JK", "Forge Publisher"),
+                new OrganizationMemberModel("M. Blanc", "@m.blanc", "MB", "Organization Member")
             ];
 
             this.PendingInvitations =
             [
-                new("a.novak@esa.int", "Organization Administrator", "Sent 2 days ago · expires in 5 days")
+                new OrganizationInvitationModel("a.novak@esa.int", "Organization Administrator", "Sent 2 days ago · expires in 5 days")
             ];
         }
 

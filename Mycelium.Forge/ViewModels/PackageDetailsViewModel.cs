@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -81,7 +81,7 @@ namespace Mycelium.Forge.ViewModels
 
             var versions = new List<PackageVersionModel>
             {
-                new("v1.2.0", "2 weeks ago", 3, true, "42 KB", isLatest: true),
+                new("v1.2.0", "2 weeks ago", 3, true, "42 KB", true),
                 new("v1.1.0", "2 months ago", 5, true, "40 KB"),
                 new("v1.0.0", "4 months ago", 2, true, "38 KB", isUnlisted: true),
                 new("v0.9.0", "5 months ago", 0, true, "35 KB")

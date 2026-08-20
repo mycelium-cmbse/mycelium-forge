@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AdminAccountsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,10 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -107,6 +103,7 @@ namespace Mycelium.Forge.ViewModels
             if (!string.IsNullOrWhiteSpace(this.SearchQuery))
             {
                 var query = this.SearchQuery.Trim();
+
                 filtered = filtered.Where(account =>
                     account.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     account.Username.Contains(query, StringComparison.OrdinalIgnoreCase) ||

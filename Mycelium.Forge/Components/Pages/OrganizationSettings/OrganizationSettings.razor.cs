@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationSettings.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -15,7 +15,8 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
-    /// Represents the organization settings, membership administration, and scope management view of the Mycelium Forge registry.
+    /// Represents the organization settings, membership administration, and scope management view of the Mycelium Forge
+    /// registry.
     /// </summary>
     public partial class OrganizationSettings : ComponentBase
     {
