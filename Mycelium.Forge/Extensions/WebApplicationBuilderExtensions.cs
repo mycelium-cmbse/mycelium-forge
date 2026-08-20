@@ -34,6 +34,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<IAccountSettingsViewModel, AccountSettingsViewModel>();
             builder.Services.AddTransient<IOrganizationSettingsViewModel, OrganizationSettingsViewModel>();
             builder.Services.AddTransient<IAdminAccountsViewModel, AdminAccountsViewModel>();
+            builder.Services.AddTransient<ISignUpViewModel, SignUpViewModel>();
 
             return builder;
         }

@@ -50,6 +50,11 @@ namespace Mycelium.Forge.Common
         public const string Login = "/login";
 
         /// <summary>
+        /// The user registration and sign-up page route path.
+        /// </summary>
+        public const string SignUp = "/signup";
+
+        /// <summary>
         /// The generic error handling page route path.
         /// </summary>
         public const string Error = "/error";
