@@ -22,6 +22,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// Gets or sets the collection of dependent packages and projects.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<PackageDependentModel> Dependents { get; set; } = [];
+        public IReadOnlyList<PackageRelationshipModel> Dependents { get; set; } = [];
     }
 }

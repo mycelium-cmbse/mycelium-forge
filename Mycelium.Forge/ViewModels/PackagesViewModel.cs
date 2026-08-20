@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -87,7 +87,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of facet filter options.
         /// </summary>
-        public IReadOnlyList<FacetItemModel> Facets { get; set; } = [];
+        public IReadOnlyList<OptionModel> Facets { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the collection of displayed package search result items.
@@ -136,27 +136,27 @@ namespace Mycelium.Forge.ViewModels
         {
             this.Facets =
             [
-                new FacetItemModel("FORMAT", "SysML v2 (kpar)", 5),
-                new FacetItemModel("FORMAT", "CDP4-COMET (10-25)", 1),
-                new FacetItemModel("FORMAT", "Capella", 0),
-                new FacetItemModel("KIND", "Library", 0),
-                new FacetItemModel("KIND", "Model", 6),
-                new FacetItemModel("SCOPE / PUBLISHER", "@esa", 4),
-                new FacetItemModel("SCOPE / PUBLISHER", "@starion", 2),
-                new FacetItemModel("SCOPE / PUBLISHER", "@mycelium", 0),
-                new FacetItemModel("CATEGORY", "mission-model", 5, true),
-                new FacetItemModel("CATEGORY", "standard-library", 1),
-                new FacetItemModel("CATEGORY", "quantities-units", 1),
-                new FacetItemModel("CATEGORY", "view-definitions", 0),
-                new FacetItemModel("TAGS", "aocs", 1),
-                new FacetItemModel("TAGS", "power", 1),
-                new FacetItemModel("TAGS", "thermal", 1),
-                new FacetItemModel("TAGS", "mechanical", 1),
-                new FacetItemModel("TAGS", "comms", 1),
-                new FacetItemModel("METAMODEL", "SysML v2 (2025-02)", 6),
-                new FacetItemModel("METAMODEL", "ECSS-E-TM-10-25", 1),
-                new FacetItemModel("LICENSE", "Apache-2.0", 5),
-                new FacetItemModel("LICENSE", "MIT", 1)
+                new OptionModel("FORMAT", "SysML v2 (kpar)", 5),
+                new OptionModel("FORMAT", "CDP4-COMET (10-25)", 1),
+                new OptionModel("FORMAT", "Capella", 0),
+                new OptionModel("KIND", "Library", 0),
+                new OptionModel("KIND", "Model", 6),
+                new OptionModel("SCOPE / PUBLISHER", "@esa", 4),
+                new OptionModel("SCOPE / PUBLISHER", "@starion", 2),
+                new OptionModel("SCOPE / PUBLISHER", "@mycelium", 0),
+                new OptionModel("CATEGORY", "mission-model", 5, true),
+                new OptionModel("CATEGORY", "standard-library", 1),
+                new OptionModel("CATEGORY", "quantities-units", 1),
+                new OptionModel("CATEGORY", "view-definitions", 0),
+                new OptionModel("TAGS", "aocs", 1),
+                new OptionModel("TAGS", "power", 1),
+                new OptionModel("TAGS", "thermal", 1),
+                new OptionModel("TAGS", "mechanical", 1),
+                new OptionModel("TAGS", "comms", 1),
+                new OptionModel("METAMODEL", "SysML v2 (2025-02)", 6),
+                new OptionModel("METAMODEL", "ECSS-E-TM-10-25", 1),
+                new OptionModel("LICENSE", "Apache-2.0", 5),
+                new OptionModel("LICENSE", "MIT", 1)
             ];
         }
     }

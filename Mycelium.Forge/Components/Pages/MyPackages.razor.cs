@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -53,9 +53,9 @@ namespace Mycelium.Forge.Components.Pages
         /// Computes the list of publisher filter options with item counts.
         /// </summary>
         /// <returns>The collection of publisher filter options.</returns>
-        public IReadOnlyList<PublisherFilterOption> GetPublisherFilterOptions()
+        public IReadOnlyList<OptionModel> GetPublisherFilterOptions()
         {
-            var options = new List<PublisherFilterOption>
+            var options = new List<OptionModel>
             {
                 new("all", $"All ({this.ViewModel.Packages.Count})")
             };
@@ -66,7 +66,7 @@ namespace Mycelium.Forge.Components.Pages
 
             foreach (var group in publisherGroups)
             {
-                options.Add(new PublisherFilterOption(group.Key, $"{group.Key} ({group.Count()})"));
+                options.Add(new OptionModel(group.Key, $"{group.Key} ({group.Count()})"));
             }
 
             return options;

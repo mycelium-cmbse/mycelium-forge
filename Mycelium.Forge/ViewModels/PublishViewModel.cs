@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -31,7 +31,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the list of pre-publishing validation rule evaluation results.
         /// </summary>
-        public IReadOnlyList<PublishValidationCheckModel> ValidationChecks { get; set; } = [];
+        public IReadOnlyList<ValidationCheckModel> ValidationChecks { get; set; } = [];
 
         /// <summary>
         /// Gets the available scope publisher options.
@@ -114,12 +114,12 @@ namespace Mycelium.Forge.ViewModels
 
             this.ValidationChecks =
             [
-                new PublishValidationCheckModel("Schema validation", "Pass"),
-                new PublishValidationCheckModel("Namespace uniqueness", "Pass"),
-                new PublishValidationCheckModel("Required metadata", "Pass"),
-                new PublishValidationCheckModel("Dependency resolution", "Pass"),
-                new PublishValidationCheckModel("License file", "Warning", PublishValidationStatus.Warning),
-                new PublishValidationCheckModel("README.md", "Missing", PublishValidationStatus.Missing)
+                new ValidationCheckModel("Schema validation"),
+                new ValidationCheckModel("Namespace uniqueness"),
+                new ValidationCheckModel("Required metadata"),
+                new ValidationCheckModel("Dependency resolution"),
+                new ValidationCheckModel("License file", Status: ValidationStatus.Warning),
+                new ValidationCheckModel("README.md", Status: ValidationStatus.Missing)
             ];
 
             this.IsPublishing = false;

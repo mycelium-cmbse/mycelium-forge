@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRoutes.Publish)]
+@attribute [Route(PageRoutes.Publish)]
 @rendermode InteractiveServer
 
 <PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
@@ -240,7 +240,7 @@
         @foreach (var check in this.ViewModel.ValidationChecks)
         {
             <div class="flex items-center gap-2 w-full">
-                @if (check.Status == PublishValidationStatus.Pass)
+                @if (check.Status == ValidationStatus.Pass)
                 {
                     <LucideIcon Name="check"
                                 Size="16"
@@ -258,7 +258,7 @@
                 </span>
 
                 <span class="@(this.GetValidationStatusBadgeClass(check.Status))">
-                    @(check.StatusText)
+                    @(check.Status)
                 </span>
             </div>
         }

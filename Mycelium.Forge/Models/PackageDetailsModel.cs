@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -66,13 +66,13 @@ namespace Mycelium.Forge.Models
         string ReadmeContents,
         string CodeUsageImport,
         string CodeUsageBody,
-        IReadOnlyList<PackageQualityCheckModel> QualityChecks,
+        IReadOnlyList<ValidationCheckModel> QualityChecks,
         IReadOnlyList<PackageMaintainerModel> Maintainers,
         IReadOnlyList<string> Tags,
         IReadOnlyDictionary<string, string> InstallCommands,
         IReadOnlyList<PackageElementModel> Elements,
-        IReadOnlyList<PackageDependencyModel> Dependencies,
-        IReadOnlyList<PackageDependentModel> Dependents,
+        IReadOnlyList<PackageRelationshipModel> Dependencies,
+        IReadOnlyList<PackageRelationshipModel> Dependents,
         IReadOnlyList<PackageVersionModel> Versions,
         PackageValidationReportModel ValidationReport);
 }

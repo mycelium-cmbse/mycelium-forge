@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Publish.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -83,14 +83,14 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         /// <param name="status">The validation check status outcome.</param>
         /// <returns>The computed CSS class string for the status text.</returns>
-        public string GetValidationStatusBadgeClass(PublishValidationStatus status)
+        public string GetValidationStatusBadgeClass(ValidationStatus status)
         {
             return status switch
             {
-                PublishValidationStatus.Pass => "text-xs leading-2xs font-medium text-validated shrink-0",
-                PublishValidationStatus.Warning => "text-xs leading-2xs font-medium text-warning-foreground shrink-0",
-                PublishValidationStatus.Missing => "text-xs leading-2xs font-medium text-warning-foreground shrink-0",
-                PublishValidationStatus.Fail => "text-xs leading-2xs font-medium text-destructive shrink-0",
+                ValidationStatus.Pass => "text-xs leading-2xs font-medium text-validated shrink-0",
+                ValidationStatus.Warning => "text-xs leading-2xs font-medium text-warning-foreground shrink-0",
+                ValidationStatus.Missing => "text-xs leading-2xs font-medium text-warning-foreground shrink-0",
+                ValidationStatus.Fail => "text-xs leading-2xs font-medium text-destructive shrink-0",
                 _ => "text-xs leading-2xs font-medium text-muted-foreground shrink-0"
             };
         }
@@ -101,7 +101,7 @@ namespace Mycelium.Forge.Components.Pages
         /// <returns>A formatted string indicating the warning count.</returns>
         public string GetWarningsTitle()
         {
-            var count = this.ViewModel.ValidationChecks.Count(x => x.Status != PublishValidationStatus.Pass);
+            var count = this.ViewModel.ValidationChecks.Count(x => x.Status != ValidationStatus.Pass);
             return count == 1 ? "1 warning" : $"{count} warnings";
         }
 

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Packages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -122,7 +122,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         /// <param name="item">The facet item model.</param>
         /// <returns>The computed CSS class string.</returns>
-        public static string GetFacetLabelClass(FacetItemModel item)
+        public static string GetFacetLabelClass(OptionModel item)
         {
             const string baseClass = "text-xs leading-2xs flex-1 truncate transition-colors cursor-pointer";
 
@@ -177,7 +177,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Toggles the selection state of the specified facet item.
         /// </summary>
         /// <param name="item">The facet option item to toggle.</param>
-        public void ToggleFacet(FacetItemModel item)
+        public void ToggleFacet(OptionModel item)
         {
             item.IsChecked = !item.IsChecked;
         }

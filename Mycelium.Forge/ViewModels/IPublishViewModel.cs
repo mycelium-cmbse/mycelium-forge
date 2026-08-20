@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IPublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -31,7 +31,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the list of pre-publishing validation rule evaluation results.
         /// </summary>
-        IReadOnlyList<PublishValidationCheckModel> ValidationChecks { get; set; }
+        IReadOnlyList<ValidationCheckModel> ValidationChecks { get; set; }
 
         /// <summary>
         /// Gets the available scope publisher options.

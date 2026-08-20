@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IApiKeysViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Common;
 
     /// <summary>
     /// Defines the view model contract for the API keys management page.
@@ -19,7 +19,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of API keys displayed in the table.
         /// </summary>
-        IReadOnlyList<ApiKeyModel> ApiKeys { get; set; }
+        IReadOnlyList<APIKey> ApiKeys { get; set; }
 
         /// <summary>
         /// Initializes the view model state and populates the API key collection.
@@ -29,13 +29,13 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Creates and adds a new API key entry to the collection.
         /// </summary>
-        /// <param name="apiKey">The <see cref="ApiKeyModel" /> to create.</param>
-        void CreateApiKey(ApiKeyModel apiKey);
+        /// <param name="apiKey">The <see cref="APIKey" /> to create.</param>
+        void CreateApiKey(APIKey apiKey);
 
         /// <summary>
         /// Revokes an API key with the specified identifier.
         /// </summary>
         /// <param name="id">The identifier of the API key to revoke.</param>
-        void RevokeApiKey(string id);
+        void RevokeApiKey(Guid id);
     }
 }

@@ -1,4 +1,4 @@
-﻿@using BlazorBlueprint.Primitives.Table
+@using BlazorBlueprint.Primitives.Table
 @attribute [Route(PageRoutes.ApiKeys)]
 
 <PageTitle>API Keys &mdash; Mycelium Forge</PageTitle>
@@ -47,31 +47,31 @@
                 <BbTable Data="@(this.ViewModel.ApiKeys)"
                          Class="w-full text-left text-sm leading-xs">
                     <BbTableHeader Class="px-5 py-3 bg-muted border-b border-border flex items-center text-2xs leading-3xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        <BbTableHeaderCell TData="ApiKeyModel"
+                        <BbTableHeaderCell TData="APIKey"
                                            Class="w-[210px] shrink-0 p-0 text-left font-semibold">
                             NAME
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="ApiKeyModel"
+                        <BbTableHeaderCell TData="APIKey"
                                            Class="w-[140px] shrink-0 p-0 text-left font-semibold">
                             SCOPE
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="ApiKeyModel"
+                        <BbTableHeaderCell TData="APIKey"
                                            Class="w-[200px] shrink-0 p-0 text-left font-semibold">
                             PERMISSIONS
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="ApiKeyModel"
+                        <BbTableHeaderCell TData="APIKey"
                                            Class="w-[130px] shrink-0 p-0 text-left font-semibold">
                             CREATED
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="ApiKeyModel"
+                        <BbTableHeaderCell TData="APIKey"
                                            Class="w-[150px] shrink-0 p-0 text-left font-semibold">
                             EXPIRES
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="ApiKeyModel"
+                        <BbTableHeaderCell TData="APIKey"
                                            Class="w-[160px] shrink-0 p-0 text-left font-semibold">
                             LAST USED
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="ApiKeyModel"
+                        <BbTableHeaderCell TData="APIKey"
                                            Class="w-[90px] shrink-0 p-0 text-left font-semibold">
                         </BbTableHeaderCell>
                     </BbTableHeader>
@@ -84,19 +84,19 @@
                                     @(key.Name)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[140px] shrink-0 p-0 font-medium text-sm leading-xs text-secondary-text truncate">
-                                    @(key.Scope)
+                                    &#64;starion
                                 </BbTableCell>
                                 <BbTableCell Class="w-[200px] shrink-0 p-0 font-normal text-xs leading-2xs text-secondary-text truncate">
-                                    @(key.Permissions)
+                                    publish
                                 </BbTableCell>
                                 <BbTableCell Class="w-[130px] shrink-0 p-0 font-normal text-sm leading-xs text-muted-foreground">
-                                    @(key.Created)
+                                    @(key.CreatedAt.ToString("MMM yyyy"))
                                 </BbTableCell>
                                 <BbTableCell Class="w-[150px] shrink-0 p-0 font-normal text-sm leading-xs text-secondary-text">
-                                    @(key.Expires)
+                                    @(key.ExpiresAt.ToString("MMM yyyy"))
                                 </BbTableCell>
                                 <BbTableCell Class="w-[160px] shrink-0 p-0 font-normal text-sm leading-xs text-muted-foreground">
-                                    @(key.LastUsed)
+                                    @(key.LastUsedAt == default ? "never" : key.LastUsedAt.ToString("MMM yyyy"))
                                 </BbTableCell>
                                 <BbTableCell Class="w-[90px] shrink-0 p-0 text-left">
                                     <button type="button"

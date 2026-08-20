@@ -1,5 +1,5 @@
-﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PublishValidationStatus.cs" company="Starion Group S.A.">
+// ------------------------------------------------------------------------------------------------
+// <copyright file="ValidationStatus.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -10,9 +10,9 @@
 namespace Mycelium.Forge.Models
 {
     /// <summary>
-    /// Specifies the evaluation status outcome of a pre-publish validation rule.
+    /// Specifies the evaluation status outcome of a validation rule or check.
     /// </summary>
-    public enum PublishValidationStatus
+    public enum ValidationStatus
     {
         /// <summary>
         /// The validation check passed successfully with no errors.

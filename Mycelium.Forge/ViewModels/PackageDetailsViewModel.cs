@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -28,7 +28,7 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="scope">The scope of the package.</param>
         public void InitializeViewModel(Guid id, string scope)
         {
-            var qualityChecks = new List<PackageQualityCheckModel>
+            var qualityChecks = new List<ValidationCheckModel>
             {
                 new("Loads in a fresh workspace"),
                 new("Documentation provided"),
@@ -67,12 +67,12 @@ namespace Mycelium.Forge.ViewModels
                 new("BusVoltage", "«attribute def»", "Attributes", "typed by Voltage")
             };
 
-            var dependencies = new List<PackageDependencyModel>
+            var dependencies = new List<PackageRelationshipModel>
             {
-                new("@mycelium/ISQ-quantities-units", "/packages/mycelium/ISQ-quantities-units", "^2.4 → 2.5.0 · MIT", true)
+                new("@mycelium/ISQ-quantities-units", "/packages/mycelium/ISQ-quantities-units", "^2.4 → 2.5.0 · MIT", false, true)
             };
 
-            var dependents = new List<PackageDependentModel>
+            var dependents = new List<PackageRelationshipModel>
             {
                 new("Spacecraft Mission", string.Empty, "project · imports v1.2.0", true),
                 new("@esa/PlatformX", "/packages/esa/PlatformX", "specializes PowerBus · v3.1.0"),
@@ -87,13 +87,13 @@ namespace Mycelium.Forge.ViewModels
                 new("v0.9.0", "5 months ago", 0, true, "35 KB")
             };
 
-            var validationChecks = new List<PackageValidationCheckModel>
+            var validationChecks = new List<ValidationCheckModel>
             {
-                new("Loads in a fresh workspace", "Parsed 47 elements in 1.2s · 0 errors, 0 warnings", "Pass"),
-                new("Dependencies resolved", "1 dependency: @mycelium/ISQ-quantities-units ^2.4 → 2.5.0", "Pass"),
-                new("Metamodel conformance", "SysML v2 (2025-02) · packaged as KerML clause 10.3 kpar", "Pass"),
-                new("Documentation provided", "README.md present (2.1 KB)", "Pass"),
-                new("License present", "Apache-2.0 (SPDX)", "Pass")
+                new("Loads in a fresh workspace", "Parsed 47 elements in 1.2s · 0 errors, 0 warnings", ValidationStatus.Pass),
+                new("Dependencies resolved", "1 dependency: @mycelium/ISQ-quantities-units ^2.4 → 2.5.0", ValidationStatus.Pass),
+                new("Metamodel conformance", "SysML v2 (2025-02) · packaged as KerML clause 10.3 kpar", ValidationStatus.Pass),
+                new("Documentation provided", "README.md present (2.1 KB)", ValidationStatus.Pass),
+                new("License present", "Apache-2.0 (SPDX)", ValidationStatus.Pass)
             };
 
             var validationReport = new PackageValidationReportModel(

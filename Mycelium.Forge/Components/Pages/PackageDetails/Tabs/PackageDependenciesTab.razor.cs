@@ -22,6 +22,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// Gets or sets the collection of dependencies required by the package.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<PackageDependencyModel> Dependencies { get; set; } = [];
+        public IReadOnlyList<PackageRelationshipModel> Dependencies { get; set; } = [];
     }
 }
