@@ -1,10 +1,9 @@
 ﻿@using Mycelium.Forge.Common
 @using Mycelium.Forge.Components.Common
-@attribute [Route(PageRoutes.SignUp)]
-@attribute [Route("/register")]
+@attribute [Route(PageRoutes.Login)]
 @rendermode InteractiveServer
 
-<PageTitle>Sign Up &mdash; Mycelium Forge</PageTitle>
+<PageTitle>Sign In &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-body-bg min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center py-10 px-4 select-none">
     <div class="w-full max-w-[440px] p-8 sm:p-[34px_32px] rounded-[14px] bg-card border border-border shadow-[0px_6px_20px_-4px_rgba(15,23,41,0.06)] dark:shadow-none flex flex-col items-center gap-4.5">
@@ -12,7 +11,7 @@
 
         <div class="flex flex-col items-center gap-1 w-full text-center">
             <h1 class="text-xl sm:text-2xl leading-xl font-semibold text-foreground tracking-tight">
-                Create your Forge account
+                Sign in to Forge
             </h1>
             <p class="text-sm leading-xs font-normal text-muted-foreground">
                 Publish and reuse MBSE models and packages.
@@ -20,40 +19,24 @@
         </div>
 
         <div class="flex flex-col gap-1.5 w-full">
-            <BbLabel For="signup-username"
-                     Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                USERNAME
-            </BbLabel>
-            <BbInput Id="signup-username"
-                     Type="InputType.Text"
-                     Value="@(this.ViewModel.Username)"
-                     ValueChanged="@(this.OnUsernameChanged)"
-                     Placeholder="e.g. r.andre"
-                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
-        </div>
-
-        <div class="flex flex-col gap-1.5 w-full">
-            <BbLabel For="signup-email"
+            <BbLabel For="login-email"
                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 EMAIL
             </BbLabel>
-            <BbInput Id="signup-email"
+            <BbInput Id="login-email"
                      Type="InputType.Email"
                      Value="@(this.ViewModel.Email)"
                      ValueChanged="@(this.OnEmailChanged)"
                      Placeholder="e.g. name@organisation.eu"
                      Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
-            <span class="text-2xs leading-3xs font-normal text-muted-foreground">
-                Installation-unique username and a verified email address are required.
-            </span>
         </div>
 
         <div class="flex flex-col gap-1.5 w-full">
-            <BbLabel For="signup-password"
+            <BbLabel For="login-password"
                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 PASSWORD
             </BbLabel>
-            <BbInput Id="signup-password"
+            <BbInput Id="login-password"
                      Type="InputType.Password"
                      Value="@(this.ViewModel.Password)"
                      ValueChanged="@(this.OnPasswordChanged)"
@@ -63,14 +46,10 @@
 
         <BbButton Variant="ButtonVariant.Default"
                   Type="ButtonType.Button"
-                  OnClick="@(this.OnCreateAccount)"
+                  OnClick="@(this.OnLogin)"
                   Class="w-full h-8 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm leading-xs flex items-center justify-center transition-colors cursor-pointer">
-            Create account
+            Sign in
         </BbButton>
-
-        <div class="w-full p-2.5 px-3 rounded-lg bg-[#FAECE3] dark:bg-amber-950/40 text-[#6B381F] dark:text-amber-200 text-2xs leading-3xs font-normal">
-            We will send a verification message. Publishing and package-role assignment stay disabled until your address is verified.
-        </div>
 
         <div class="flex items-center gap-2.5 w-full">
             <div class="flex-1 h-px bg-border"></div>
@@ -86,10 +65,10 @@
         </BbButton>
 
         <div class="flex items-center gap-1.5 text-xs leading-2xs font-normal text-muted-foreground pt-0.5">
-            <span>Already have an account?</span>
-            <a href="@PageRoutes.Login"
+            <span>Don't have an account?</span>
+            <a href="@PageRoutes.SignUp"
                class="text-primary font-medium hover:underline">
-                Sign in
+                Sign up
             </a>
         </div>
     </div>

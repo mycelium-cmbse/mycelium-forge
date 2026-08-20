@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="SignUpViewModel.cs" company="Starion Group S.A.">
+// <copyright file="LoginViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -12,15 +12,10 @@ namespace Mycelium.Forge.ViewModels
     using FluentResults;
 
     /// <summary>
-    /// Provides view model state and operations for the user account registration and sign-up page.
+    /// Provides view model state and operations for the user authentication and sign-in page.
     /// </summary>
-    public class SignUpViewModel : ISignUpViewModel
+    public class LoginViewModel : ILoginViewModel
     {
-        /// <summary>
-        /// Gets or sets the installation-unique username handle.
-        /// </summary>
-        public string Username { get; set; } = string.Empty;
-
         /// <summary>
         /// Gets or sets the primary email address for the account.
         /// </summary>
@@ -32,32 +27,26 @@ namespace Mycelium.Forge.ViewModels
         public string Password { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets a value indicating whether an account registration submission is currently in progress.
+        /// Gets or sets a value indicating whether a login authentication submission is currently in progress.
         /// </summary>
         public bool IsSubmitting { get; set; }
 
         /// <summary>
-        /// Initializes the view model state and populates default registration form values.
+        /// Initializes the view model state and populates default sign-in form values.
         /// </summary>
         public void InitializeViewModel()
         {
-            this.Username = string.Empty;
             this.Email = string.Empty;
             this.Password = string.Empty;
             this.IsSubmitting = false;
         }
 
         /// <summary>
-        /// Submits the registration details to create a new user account.
+        /// Submits the credentials to authenticate the user.
         /// </summary>
-        /// <returns>A <see cref="Result" /> indicating success or failure of the registration operation.</returns>
-        public Result SignUp()
+        /// <returns>A <see cref="Result" /> indicating success or failure of the login operation.</returns>
+        public Result Login()
         {
-            if (string.IsNullOrWhiteSpace(this.Username))
-            {
-                return Result.Fail("Username is required.");
-            }
-
             if (string.IsNullOrWhiteSpace(this.Email))
             {
                 return Result.Fail("Email address is required.");

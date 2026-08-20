@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="SignUp.razor.cs" company="Starion Group S.A.">
+// <copyright file="Login.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -17,15 +17,15 @@ namespace Mycelium.Forge.Components.Pages
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
-    /// Represents the user registration and sign-up page of the Mycelium Forge registry.
+    /// Represents the user authentication and sign-in page of the Mycelium Forge registry.
     /// </summary>
-    public partial class SignUp : ComponentBase
+    public partial class Login : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the view model for the sign-up page.
+        /// Gets or sets the view model for the sign-in page.
         /// </summary>
         [Inject]
-        public ISignUpViewModel ViewModel { get; set; }
+        public ILoginViewModel ViewModel { get; set; }
 
         /// <summary>
         /// Gets or sets the toast notification service.
@@ -38,15 +38,6 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         [Inject]
         public NavigationManager NavigationManager { get; set; }
-
-        /// <summary>
-        /// Handles changes to the username input value.
-        /// </summary>
-        /// <param name="username">The new username value.</param>
-        public void OnUsernameChanged(string username)
-        {
-            this.ViewModel.Username = username ?? string.Empty;
-        }
 
         /// <summary>
         /// Handles changes to the email input value.
@@ -67,20 +58,20 @@ namespace Mycelium.Forge.Components.Pages
         }
 
         /// <summary>
-        /// Executes the account creation workflow.
+        /// Executes the login authentication workflow.
         /// </summary>
-        public void OnCreateAccount()
+        public void OnLogin()
         {
-            var result = this.ViewModel.SignUp();
+            var result = this.ViewModel.Login();
 
             if (result.IsSuccess)
             {
-                this.ToastService.Success("Account created successfully. Please check your email for verification.", "Account Created");
-                this.NavigationManager.NavigateTo(PageRoutes.Login);
+                this.ToastService.Success("Signed in successfully.", "Welcome");
+                this.NavigationManager.NavigateTo(PageRoutes.Home);
             }
             else
             {
-                var errorMessage = result.Reasons.Count > 0 ? result.Reasons[0].Message : "Failed to create account.";
+                var errorMessage = result.Reasons.Count > 0 ? result.Reasons[0].Message : "Failed to sign in.";
                 this.ToastService.Error(errorMessage, "Error");
             }
         }

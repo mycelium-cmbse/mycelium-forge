@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ISignUpViewModel.cs" company="Starion Group S.A.">
+// <copyright file="ILoginViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -12,15 +12,10 @@ namespace Mycelium.Forge.ViewModels
     using FluentResults;
 
     /// <summary>
-    /// Defines operations and state management for the user account registration and sign-up page.
+    /// Defines operations and state management for the user authentication and sign-in page.
     /// </summary>
-    public interface ISignUpViewModel
+    public interface ILoginViewModel
     {
-        /// <summary>
-        /// Gets or sets the installation-unique username handle.
-        /// </summary>
-        string Username { get; set; }
-
         /// <summary>
         /// Gets or sets the primary email address for the account.
         /// </summary>
@@ -32,20 +27,20 @@ namespace Mycelium.Forge.ViewModels
         string Password { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether an account registration submission is currently in progress.
+        /// Gets or sets a value indicating whether a login authentication submission is currently in progress.
         /// </summary>
         bool IsSubmitting { get; set; }
 
         /// <summary>
-        /// Initializes the view model state and populates default registration form values.
+        /// Initializes the view model state and populates default sign-in form values.
         /// </summary>
         void InitializeViewModel();
 
         /// <summary>
-        /// Submits the registration details to create a new user account.
+        /// Submits the credentials to authenticate the user.
         /// </summary>
-        /// <returns>A <see cref="Result" /> indicating success or failure of the registration operation.</returns>
-        Result SignUp();
+        /// <returns>A <see cref="Result" /> indicating success or failure of the login operation.</returns>
+        Result Login();
 
         /// <summary>
         /// Initiates single sign-on authentication via the configured organisation identity provider.
