@@ -1,4 +1,4 @@
-﻿@if (this.Elements == null || this.Elements.Count == 0)
+@if (this.Elements == null || this.Elements.Count == 0)
 {
     return;
 }
@@ -20,8 +20,9 @@
         @foreach (var kind in this.KindTabs)
         {
             <BbButton Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
                       Type="ButtonType.Button"
-                      @onclick="() => this.SelectKindTab(kind)"
+                      OnClick="@(() => this.SelectKindTab(kind))"
                       Class="@(this.GetKindButtonClass(kind))">
                 @(kind)
             </BbButton>

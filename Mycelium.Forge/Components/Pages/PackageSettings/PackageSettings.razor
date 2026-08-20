@@ -41,9 +41,10 @@
             Maintainers
         </h2>
         <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnAddMaintainer)"
-                  Class="h-7.5 px-3 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-sm leading-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer shrink-0">
+                  Class="shrink-0">
             <LucideIcon Name="plus"
                         Size="14"
                         Class="text-secondary-text shrink-0"/>
@@ -82,7 +83,7 @@
                           Size="ButtonSize.IconSmall"
                           OnClick="() => this.OnMaintainerMenu(maintainer)"
                           AriaLabel="Options"
-                          Class="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0">
+                          Class="shrink-0">
                     <LucideIcon Name="ellipsis-vertical"
                                 Size="18"
                                 Class="text-muted-foreground shrink-0"/>
@@ -232,8 +233,7 @@
                 @if (version.IsUnlisted)
                 {
                     <BbButton Variant="ButtonVariant.Link"
-                              OnClick="() => this.OnRelistVersion(version)"
-                              Class="text-xs leading-2xs font-medium text-primary hover:underline p-0 h-auto">
+                              OnClick="() => this.OnRelistVersion(version)">
                         Relist
                     </BbButton>
                 }
@@ -241,12 +241,12 @@
                 {
                     <BbButton Variant="ButtonVariant.Link"
                               OnClick="() => this.OnUnlistVersion(version)"
-                              Class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline p-0 h-auto">
+                              Class="text-secondary-text hover:text-foreground">
                         Unlist
                     </BbButton>
                     <BbButton Variant="ButtonVariant.Link"
                               OnClick="() => this.OnDeprecateVersion(version)"
-                              Class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline p-0 h-auto">
+                              Class="text-secondary-text hover:text-foreground">
                         Deprecate
                     </BbButton>
                 }
@@ -271,9 +271,10 @@
         </div>
 
         <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnTransferOwnership)"
-                  Class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+                  Class="btn-destructive-outline shrink-0">
             Transfer
         </BbButton>
     </div>

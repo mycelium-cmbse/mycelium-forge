@@ -58,11 +58,9 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// <returns>The computed CSS class string.</returns>
         public string GetKindButtonClass(string kindTab)
         {
-            const string baseClass = "h-7 px-3 rounded-full text-xs leading-2xs font-medium cursor-pointer transition-colors shadow-none";
-
             return this.SelectedKindTab == kindTab
-                ? $"{baseClass} bg-primary/10 border border-primary text-primary font-semibold hover:bg-primary/15"
-                : $"{baseClass} bg-card border border-border text-secondary-text hover:bg-muted";
+                ? "rounded-full bg-primary/10 border-primary text-primary font-semibold hover:bg-primary/15"
+                : "rounded-full";
         }
 
         /// <summary>

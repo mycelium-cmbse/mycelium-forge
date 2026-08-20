@@ -2,9 +2,24 @@
  * Imported into tailwind.css to provide unified styling across Forge components.
  */
 
+/* Base button styling defaults */
+button[data-slot="button"],
+a[data-slot="button"] {
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+
+button[data-slot="button"]:disabled,
+a[data-slot="button"]:disabled {
+  cursor: not-allowed;
+}
+
 /* Link-styled button reset and hover behaviors */
 button[data-variant="link"],
 a[data-variant="link"] {
+  padding: 0;
+  height: auto;
+  min-height: 0;
   text-underline-offset: 4px;
 }
 
@@ -14,13 +29,17 @@ a[data-variant="link"]:hover {
 }
 
 /* Destructive outline button styling */
-.btn-destructive-outline {
+.btn-destructive-outline,
+button[data-variant="outline"].btn-destructive,
+a[data-variant="outline"].btn-destructive {
   border-color: var(--destructive);
   color: var(--destructive);
   background-color: var(--card);
 }
 
-.btn-destructive-outline:hover {
+.btn-destructive-outline:hover,
+button[data-variant="outline"].btn-destructive:hover,
+a[data-variant="outline"].btn-destructive:hover {
   background-color: color-mix(in oklab, var(--destructive) 10%, transparent);
 }
 

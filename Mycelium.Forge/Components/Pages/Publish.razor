@@ -52,9 +52,10 @@
             </BbBadge>
 
             <BbButton Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnReplaceArtefact)"
-                      Class="px-2.5 py-1 rounded-md bg-card border border-border text-xs leading-2xs font-medium text-secondary-text hover:bg-muted transition-colors shrink-0 cursor-pointer">
+                      Class="shrink-0">
                 Replace
             </BbButton>
         </div>
@@ -286,10 +287,10 @@
     <BbButton Variant="ButtonVariant.Default"
               Type="ButtonType.Button"
               OnClick="@(this.PublishPackage)"
-              Class="w-full h-10 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm leading-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer mt-1">
+              Class="w-full mt-1">
         <LucideIcon Name="upload"
                     Size="16"
-                    Class="text-primary-foreground shrink-0"/>
+                    Class="shrink-0"/>
         <span>@(this.GetPublishButtonText())</span>
     </BbButton>
 </aside>

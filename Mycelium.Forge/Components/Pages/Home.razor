@@ -1,4 +1,4 @@
-﻿@using Mycelium.Forge.Components.Common
+@using Mycelium.Forge.Components.Common
 @attribute [Route(PageRoutes.Home)]
 
 <PageTitle>Mycelium Forge &mdash; The MBSE model and package registry</PageTitle>
@@ -33,18 +33,21 @@
     <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
         <span class="text-sm leading-xs text-muted-foreground mr-1">Browse by format</span>
         <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=sysml-v2")"
-                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-badge-border text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="rounded-full">
             SysML v2 libraries
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=cdp4-comet")"
-                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-badge-border text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="rounded-full">
             CDP4-COMET models
         </BbButton>
         <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
                   Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=capella")"
-                  Class="h-7.5 px-3.5 py-1.5 rounded-full bg-background border border-badge-border text-sm leading-xs font-medium text-foreground hover:bg-muted transition-colors">
+                  Class="rounded-full">
             Capella models
         </BbButton>
     </div>

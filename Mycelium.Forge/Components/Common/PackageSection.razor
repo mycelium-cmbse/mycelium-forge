@@ -6,8 +6,7 @@
         @if (!string.IsNullOrEmpty(this.ViewAllHref))
         {
             <BbButton Variant="ButtonVariant.Link"
-                      Href="@(this.ViewAllHref)"
-                      Class="flex items-center gap-1.5 text-sm leading-xs font-medium text-primary hover:opacity-80 transition-opacity p-0 h-auto">
+                      Href="@(this.ViewAllHref)">
                 <span>View all</span>
                 <LucideIcon Name="arrow-right"
                             Size="14"

@@ -64,20 +64,18 @@
 
         <div class="flex items-center gap-3 pt-1">
             <BbButton Variant="ButtonVariant.Default"
-                      Type="ButtonType.Button"
-                      Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-17 font-semibold flex items-center gap-1.5 transition-colors">
+                      Type="ButtonType.Button">
                 <LucideIcon Name="plus"
                             Size="16"
-                            Class="text-primary-foreground shrink-0"/>
+                            Class="shrink-0"/>
                 <span>Add to project</span>
             </BbButton>
 
             <BbButton Variant="ButtonVariant.Outline"
-                      Type="ButtonType.Button"
-                      Class="h-9 px-4 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-base leading-17 font-medium flex items-center gap-1.5 transition-colors">
+                      Type="ButtonType.Button">
                 <LucideIcon Name="download"
                             Size="16"
-                            Class="text-foreground shrink-0"/>
+                            Class="shrink-0"/>
                 <span>Download kpar</span>
             </BbButton>
         </div>
@@ -105,7 +103,7 @@
                           Type="ButtonType.Button"
                           OnClick="@(this.CopyInstallCommandToClipboard)"
                           AriaLabel="Copy command"
-                          Class="text-muted-foreground hover:text-foreground transition-colors p-1 shrink-0 cursor-pointer h-auto w-auto">
+                          Class="shrink-0">
                     @if (this.IsCopied)
                     {
                         <LucideIcon Name="check"
@@ -116,7 +114,7 @@
                     {
                         <LucideIcon Name="copy"
                                     Size="16"
-                                    Class="text-muted-foreground hover:text-foreground shrink-0"/>
+                                    Class="text-muted-foreground shrink-0"/>
                     }
                 </BbButton>
             </div>

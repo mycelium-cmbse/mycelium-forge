@@ -1,4 +1,4 @@
-﻿@using Mycelium.Forge.Components.Common
+@using Mycelium.Forge.Components.Common
 @attribute [Route(PageRoutes.Packages)]
 
 <PageTitle>Packages &mdash; Mycelium Forge</PageTitle>
@@ -80,15 +80,16 @@
 
                 <div class="flex items-center gap-2 w-full pt-1">
                     <BbButton Variant="ButtonVariant.Default"
+                              Size="ButtonSize.Small"
                               Type="ButtonType.Button"
                               OnClick="@(this.ApplyFilters)"
-                              Class="flex-1 h-8 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm leading-xs font-semibold transition-colors">
+                              Class="flex-1 font-semibold">
                         Apply filters
                     </BbButton>
                     <BbButton Variant="ButtonVariant.Outline"
+                              Size="ButtonSize.Small"
                               Type="ButtonType.Button"
-                              OnClick="@(this.ResetFilters)"
-                              Class="h-8 px-3.5 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-sm leading-xs font-medium transition-colors">
+                              OnClick="@(this.ResetFilters)">
                         Reset
                     </BbButton>
                 </div>

@@ -22,9 +22,10 @@
                 Accounts
             </h1>
             <BbButton Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnTransfer)"
-                      Class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+                      Class="btn-destructive-outline shrink-0">
                 Transfer
             </BbButton>
         </div>
@@ -205,7 +206,7 @@
                                                       Size="ButtonSize.IconSmall"
                                                       OnClick="() => this.OnAccountMenu(account)"
                                                       AriaLabel="Options"
-                                                      Class="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0">
+                                                      Class="shrink-0">
                                                 <LucideIcon Name="ellipsis"
                                                             Size="16"
                                                             Class="text-muted-foreground shrink-0"/>

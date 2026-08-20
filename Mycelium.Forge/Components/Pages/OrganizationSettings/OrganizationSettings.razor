@@ -51,9 +51,10 @@
                     MEMBERS
                 </span>
                 <BbButton Variant="ButtonVariant.Outline"
+                          Size="ButtonSize.Small"
                           Type="ButtonType.Button"
                           OnClick="@(this.OnTransferOrganization)"
-                          Class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+                          Class="btn-destructive-outline shrink-0">
                     Transfer
                 </BbButton>
             </div>
@@ -97,9 +98,10 @@
                         </div>
 
                         <BbButton Variant="ButtonVariant.Outline"
+                                  Size="ButtonSize.Small"
                                   Type="ButtonType.Button"
                                   OnClick="() => this.OnRemoveMember(member)"
-                                  Class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                                  Class="shrink-0">
                             Remove
                         </BbButton>
                     </div>
@@ -136,16 +138,18 @@
                         </span>
 
                         <BbButton Variant="ButtonVariant.Outline"
+                                  Size="ButtonSize.Small"
                                   Type="ButtonType.Button"
                                   OnClick="() => this.OnResendInvitation(invitation)"
-                                  Class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                                  Class="shrink-0">
                             Resend
                         </BbButton>
 
                         <BbButton Variant="ButtonVariant.Outline"
+                                  Size="ButtonSize.Small"
                                   Type="ButtonType.Button"
                                   OnClick="() => this.OnRevokeInvitation(invitation)"
-                                  Class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                                  Class="shrink-0">
                             Revoke
                         </BbButton>
                     </div>

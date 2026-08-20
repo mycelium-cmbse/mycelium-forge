@@ -15,10 +15,10 @@
             <BbButton Variant="ButtonVariant.Default"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnCreateKey)"
-                      Class="flex flex-row items-center gap-1.5 px-3.5 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm leading-xs font-semibold transition-colors cursor-pointer shrink-0">
+                      Class="shrink-0">
                 <LucideIcon Name="plus"
                             Size="16"
-                            Class="text-white shrink-0"/>
+                            Class="shrink-0"/>
                 <span>Create key</span>
             </BbButton>
         </div>
@@ -101,7 +101,7 @@
                                 <BbTableCell Class="w-[90px] shrink-0 p-0 text-left">
                                     <BbButton Variant="ButtonVariant.Link"
                                               OnClick="() => this.OnRevokeKey(key.Id)"
-                                              Class="text-sm leading-xs font-medium text-destructive hover:underline p-0 h-auto">
+                                              Class="text-destructive">
                                         Revoke
                                     </BbButton>
                                 </BbTableCell>
@@ -128,10 +128,10 @@
                 <BbButton Variant="ButtonVariant.Default"
                           Type="ButtonType.Button"
                           OnClick="@(this.OnCreateKey)"
-                          Class="flex flex-row items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm leading-xs font-semibold transition-colors mt-0.5 cursor-pointer">
+                          Class="mt-0.5">
                     <LucideIcon Name="plus"
                                 Size="16"
-                                Class="text-white shrink-0"/>
+                                Class="shrink-0"/>
                     <span>Create key</span>
                 </BbButton>
             </div>
