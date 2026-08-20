@@ -32,12 +32,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The package details page route path.
         /// </summary>
-        public const string Package = "/packages/{id}";
-
-        /// <summary>
-        /// The scoped package details page route path.
-        /// </summary>
-        public const string ScopedPackage = "/packages/{scope}/{id}";
+        public const string Package = "/packages/{scope}/{id}";
 
         /// <summary>
         /// The organization and publisher profile page route path.
@@ -73,5 +68,10 @@ namespace Mycelium.Forge.Common
         /// The API key management page route path.
         /// </summary>
         public const string ApiKeys = "/api-keys";
+
+        /// <summary>
+        /// The package settings page route path.
+        /// </summary>
+        public const string PackageSettings = "/packages/{scope}/{id}/settings";
     }
 }

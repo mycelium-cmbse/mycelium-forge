@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,9 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using System.Collections.Generic;
+
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -32,7 +35,7 @@ namespace Mycelium.Forge.ViewModels
                 string.Empty,
                 "210",
                 false,
-                "Public",
+                VisibilityKind.PUBLIC,
                 "2 weeks ago"),
             new(
                 "@starion/ECSS-MM-MEC",
@@ -44,7 +47,7 @@ namespace Mycelium.Forge.ViewModels
                 string.Empty,
                 "180",
                 false,
-                "Organization",
+                VisibilityKind.INTERNAL,
                 "2 weeks ago"),
             new(
                 "@mycelium/ISQ-quantities-units",
@@ -56,7 +59,7 @@ namespace Mycelium.Forge.ViewModels
                 string.Empty,
                 "1.2k",
                 false,
-                "Public",
+                VisibilityKind.PUBLIC,
                 "3 days ago",
                 "Maintainer"),
             new(
@@ -69,7 +72,7 @@ namespace Mycelium.Forge.ViewModels
                 string.Empty,
                 "560",
                 false,
-                "Public",
+                VisibilityKind.PUBLIC,
                 "1 month ago",
                 "Maintainer"),
             new(
@@ -82,7 +85,7 @@ namespace Mycelium.Forge.ViewModels
                 string.Empty,
                 "0",
                 false,
-                "Private",
+                VisibilityKind.PRIVATE,
                 "just now")
         ];
 

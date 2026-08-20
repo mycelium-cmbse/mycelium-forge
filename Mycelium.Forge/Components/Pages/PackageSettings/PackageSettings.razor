@@ -1,0 +1,276 @@
+@using Mycelium.Forge.Common
+@attribute [Route(PageRoutes.PackageSettings)]
+@rendermode InteractiveServer
+
+@if (this.ViewModel.Package == null)
+{
+    return;
+}
+
+<PageTitle>@(this.ViewModel.Package.Publisher)/@(this.ViewModel.Package.Name) Settings &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+    <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
+        <nav class="flex items-center gap-1.5 text-xs leading-2xs">
+            <a href="@PageRoutes.Packages"
+               class="text-primary hover:underline font-normal">
+                Browse
+            </a>
+            <span class="text-muted-foreground font-normal">/</span>
+            <a href="@($"/organizations/{this.ViewModel.Package.Publisher.TrimStart('@')}")"
+               class="text-primary hover:underline font-normal">
+                @(this.ViewModel.Package.Publisher)
+            </a>
+            <span class="text-muted-foreground font-normal">/</span>
+            <a href="@($"/packages/{this.ViewModel.Package.Publisher.TrimStart('@')}/{this.ViewModel.Package.Name}")"
+               class="text-primary hover:underline font-normal">
+                @(this.ViewModel.Package.Name)
+            </a>
+            <span class="text-muted-foreground font-normal">/</span>
+            <span class="text-muted-foreground font-normal">
+                Settings
+            </span>
+        </nav>
+
+        <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
+            @(this.ViewModel.Package.Publisher)/@(this.ViewModel.Package.Name)
+        </h1>
+
+        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+            <div class="flex items-center justify-between gap-2 w-full h-7.5">
+                <h2 class="text-lg leading-lg font-semibold text-foreground flex-1">
+                    Maintainers
+                </h2>
+                <button type="button"
+                        @onclick="this.OnAddMaintainer"
+                        class="h-7.5 px-3 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-sm leading-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer shrink-0">
+                    <LucideIcon Name="plus"
+                                Size="14"
+                                Class="text-secondary-text shrink-0"/>
+                    <span>Add maintainer</span>
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-3.5 w-full">
+                @foreach (var maintainer in this.ViewModel.Package.Maintainers)
+                {
+                    <div class="flex items-center gap-2.5 w-full">
+                        <div class="w-7.5 h-7.5 rounded-full bg-avatar-bg flex items-center justify-center shrink-0">
+                            <span class="text-2xs leading-3xs font-semibold text-white">
+                                @(maintainer.Initials)
+                            </span>
+                        </div>
+
+                        <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-sm leading-xs font-semibold text-foreground truncate">
+                                    @(maintainer.Name)
+                                </span>
+                                @if (maintainer.IsVerified)
+                                {
+                                    <LucideIcon Name="badge-check"
+                                                Size="14"
+                                                Class="text-primary shrink-0"/>
+                                }
+                            </div>
+                            <span class="text-2xs leading-3xs font-normal text-muted-foreground truncate">
+                                @(maintainer.Role)
+                            </span>
+                        </div>
+
+                        <button type="button"
+                                @onclick="() => this.OnMaintainerMenu(maintainer)"
+                                class="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
+                                title="Options">
+                            <LucideIcon Name="ellipsis-vertical"
+                                        Size="18"
+                                        Class="text-muted-foreground shrink-0"/>
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <p class="text-xs leading-2xs text-muted-foreground w-full">
+                Every package must keep at least one individual-account Owner. Transfer ownership before removing the last one.
+            </p>
+        </div>
+
+        <div class="w-full p-5 sm:px-5.5 rounded-xl bg-card border border-border flex flex-col gap-3.5">
+            <div class="flex items-center gap-2.5 w-full">
+                <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    VISIBILITY
+                </span>
+            </div>
+
+            <div class="flex flex-col w-full divide-y divide-border">
+                <div class="flex items-start gap-3 py-2.5 w-full cursor-pointer"
+                     @onclick="() => this.OnSelectVisibility(VisibilityKind.PRIVATE)">
+                    <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PRIVATE ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
+                    </div>
+
+                    <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+                        <span class="text-sm leading-xs font-medium text-foreground">
+                            Private
+                        </span>
+                        <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                            Only the package Maintainers, and Accounts explicitly granted the Reader role, can see or download it.
+                        </span>
+                    </div>
+
+                    @if (this.ViewModel.Package.Visibility == VisibilityKind.PRIVATE)
+                    {
+                        <div class="px-2.5 py-0.5 rounded-md bg-[#FAECE3] text-primary text-2xs leading-3xs font-medium shrink-0">
+                            Current
+                        </div>
+                    }
+                </div>
+
+                <div class="flex items-start gap-3 py-2.5 w-full cursor-pointer"
+                     @onclick="() => this.OnSelectVisibility(VisibilityKind.INTERNAL)">
+                    <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
+                    </div>
+
+                    <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+                        <span class="text-sm leading-xs font-medium text-foreground">
+                            Organization
+                        </span>
+                        <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                            Every member of @(this.ViewModel.Package.Publisher) can see and download it. Outside the organization it is invisible.
+                        </span>
+                    </div>
+
+                    @if (this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL)
+                    {
+                        <div class="px-2.5 py-0.5 rounded-md bg-[#FAECE3] text-primary text-2xs leading-3xs font-medium shrink-0">
+                            Current
+                        </div>
+                    }
+                </div>
+
+                <div class="flex items-start gap-3 py-2.5 w-full cursor-pointer"
+                     @onclick="() => this.OnSelectVisibility(VisibilityKind.PUBLIC)">
+                    <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PUBLIC ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
+                    </div>
+
+                    <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+                        <span class="text-sm leading-xs font-medium text-foreground">
+                            Public
+                        </span>
+                        <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                            Anyone, signed in or not, can find and download it.
+                        </span>
+                    </div>
+
+                    @if (this.ViewModel.Package.Visibility == VisibilityKind.PUBLIC)
+                    {
+                        <div class="px-2.5 py-0.5 rounded-md bg-[#FAECE3] text-primary text-2xs leading-3xs font-medium shrink-0">
+                            Current
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <p class="text-xs leading-2xs text-muted-foreground w-full">
+                New packages are created private unless the owning Organization sets a different default. A request for a package the caller may not read is answered exactly as for a package that does not exist, so visibility never leaks through error messages.
+            </p>
+        </div>
+
+        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+            <div class="flex items-center gap-2 w-full">
+                <h2 class="text-lg leading-lg font-semibold text-foreground flex-1">
+                    Versions
+                </h2>
+            </div>
+
+            <div class="flex flex-col gap-3.5 w-full">
+                @foreach (var version in this.ViewModel.Package.Versions)
+                {
+                    <div class="flex items-center gap-2.5 w-full h-6 text-xs leading-2xs">
+                        <span class="text-sm leading-xs font-semibold @(version.IsUnlisted ? "text-muted-foreground" : "text-foreground")">
+                            @(version.Version)
+                        </span>
+
+                        @if (version.IsLatest)
+                        {
+                            <span class="px-1.75 py-0.5 rounded-md bg-secondary text-2xs leading-3xs font-medium text-secondary-text">
+                                Latest
+                            </span>
+                        }
+                        else if (version.IsUnlisted)
+                        {
+                            <span class="px-1.75 py-0.5 rounded-md bg-secondary text-2xs leading-3xs font-medium text-muted-foreground">
+                                Unlisted
+                            </span>
+                        }
+                        else if (version.IsDeprecated)
+                        {
+                            <span class="px-1.75 py-0.5 rounded-md bg-secondary text-2xs leading-3xs font-medium text-muted-foreground">
+                                Deprecated
+                            </span>
+                        }
+
+                        <div class="flex-1"></div>
+
+                        <span class="text-muted-foreground shrink-0">
+                            @(version.PublishedAgo)
+                        </span>
+
+                        @if (version.IsUnlisted)
+                        {
+                            <button type="button"
+                                    @onclick="() => this.OnRelistVersion(version)"
+                                    class="text-xs leading-2xs font-medium text-primary hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                Relist
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    @onclick="() => this.OnUnlistVersion(version)"
+                                    class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                Unlist
+                            </button>
+                            <button type="button"
+                                    @onclick="() => this.OnDeprecateVersion(version)"
+                                    class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0">
+                                Deprecate
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-destructive flex flex-col gap-3.5">
+            <h2 class="text-lg leading-lg font-semibold text-destructive">
+                Danger zone
+            </h2>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
+                <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+                    <span class="text-sm leading-xs font-semibold text-foreground">
+                        Transfer ownership
+                    </span>
+                    <span class="text-xs leading-2xs text-muted-foreground">
+                        Move this package to another account or organization. The receiver must accept.
+                    </span>
+                </div>
+
+                <button type="button"
+                        @onclick="this.OnTransferOwnership"
+                        class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+                    Transfer
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-0.5 w-full">
+                <span class="text-sm leading-xs font-semibold text-foreground">
+                    Deleting a package
+                </span>
+                <span class="text-xs leading-2xs text-muted-foreground">
+                    Only the Installation Administrator can delete a package or erase a published version. Unlisting is the withdrawal available to you, and it keeps existing consumers working.
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -20,10 +20,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
     public partial class PackageDetails : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the optional scope segment supplied from the URL route.
+        /// Gets or sets the scope segment supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string Scope { get; set; }
+        public string Scope { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the package identifier supplied from the URL route.
@@ -199,7 +199,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 ? parsedGuid
                 : Guid.Empty;
 
-            this.ViewModel.InitializeViewModel(idParsed);
+            this.ViewModel.InitializeViewModel(idParsed, this.Scope);
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Mycelium.Forge.ViewModels
         /// Initializes the package view model state for the specified package identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the package.</param>
-        void InitializeViewModel(Guid id);
+        /// <param name="scope">The scope of the package.</param>
+        void InitializeViewModel(Guid id, string scope);
     }
 }

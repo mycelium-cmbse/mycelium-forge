@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Components.Pages
 {
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.ViewModels;
 
@@ -92,7 +93,7 @@ namespace Mycelium.Forge.Components.Pages
         /// <returns>The computed CSS class string for the visibility table cell.</returns>
         public string GetVisibilityCellClass(PackageModel entry)
         {
-            var isPrivate = string.Equals(entry.Visibility, "Private", StringComparison.OrdinalIgnoreCase);
+            var isPrivate = entry.Visibility == VisibilityKind.PRIVATE;
             var modifier = isPrivate ? "font-medium text-foreground" : "font-normal text-secondary-foreground";
             return $"w-[130px] shrink-0 p-0 {modifier}";
         }

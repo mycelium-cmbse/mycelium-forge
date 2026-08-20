@@ -1,4 +1,4 @@
-﻿@if (this.Versions == null || this.Versions.Count == 0)
+@if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
 }
@@ -49,10 +49,22 @@
                             <span class="font-semibold @(ver.IsUnlisted ? "text-muted-foreground" : "text-primary")">
                                 @(ver.Version)
                             </span>
-                            @if (!string.IsNullOrEmpty(ver.Badge))
+                            @if (ver.IsLatest)
                             {
                                 <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-secondary text-secondary-text">
-                                    @(ver.Badge)
+                                    Latest
+                                </span>
+                            }
+                            else if (ver.IsUnlisted)
+                            {
+                                <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-secondary text-muted-foreground">
+                                    Unlisted
+                                </span>
+                            }
+                            else if (ver.IsDeprecated)
+                            {
+                                <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-secondary text-muted-foreground">
+                                    Deprecated
                                 </span>
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>

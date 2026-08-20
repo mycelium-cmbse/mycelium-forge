@@ -30,6 +30,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<IPublishViewModel, PublishViewModel>();
             builder.Services.AddTransient<IMyPackagesViewModel, MyPackagesViewModel>();
             builder.Services.AddTransient<IApiKeysViewModel, ApiKeysViewModel>();
+            builder.Services.AddTransient<IPackageSettingsViewModel, PackageSettingsViewModel>();
 
             return builder;
         }
