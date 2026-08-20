@@ -23,11 +23,11 @@ namespace Mycelium.Forge.ViewModels
         public PackageModel Package { get; set; }
 
         /// <summary>
-        /// Initializes the package settings view model state for the specified package identifier.
+        /// Initializes the package settings view model state for the specified package name and organization.
         /// </summary>
-        /// <param name="id">The unique identifier or name of the package.</param>
-        /// <param name="scope">The scope identifier.</param>
-        public void InitializeViewModel(string id, string scope)
+        /// <param name="packageName">The name of the package.</param>
+        /// <param name="organization">The organization identifier.</param>
+        public void InitializeViewModel(string packageName, string organization)
         {
             var maintainers = new List<PackageMaintainerModel>
             {
@@ -43,8 +43,8 @@ namespace Mycelium.Forge.ViewModels
                 new("v1.0.0", "published 4 months ago", isUnlisted: true)
             };
 
-            var resolvedScope = string.IsNullOrWhiteSpace(scope) ? "@starion" : scope.StartsWith('@') ? scope : $"@{scope}";
-            var resolvedName = string.IsNullOrWhiteSpace(id) ? "ECSS-MM-PWR" : id;
+            var resolvedOrganization = string.IsNullOrWhiteSpace(organization) ? "@starion" : organization.StartsWith('@') ? organization : $"@{organization}";
+            var resolvedName = string.IsNullOrWhiteSpace(packageName) ? "ECSS-MM-PWR" : packageName;
 
             var packageDto = new Package
             {
@@ -55,13 +55,13 @@ namespace Mycelium.Forge.ViewModels
 
             this.Package = new PackageModel(
                 packageDto,
-                resolvedScope,
+                resolvedOrganization,
                 "v1.2.0",
                 importCount: "210",
                 isVerified: true,
                 lastPublished: "2 weeks ago",
                 role: PackageInvitationKind.OWNER,
-                href: $"/packages/{resolvedScope.TrimStart('@')}/{resolvedName}",
+                href: $"/packages/{resolvedOrganization.TrimStart('@')}/{resolvedName}",
                 maintainers: maintainers,
                 versions: versions);
         }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -25,7 +25,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of packages published by the organization.
         /// </summary>
-        public List<PackageRowModel> Packages { get; set; } = [];
+        public List<PackageModel> Packages { get; set; } = [];
 
         /// <summary>
         /// Initializes the organization view model state for the specified organization identifier.
@@ -37,9 +37,8 @@ namespace Mycelium.Forge.ViewModels
 
             this.Packages =
             [
-                new PackageRowModel(
+                new PackageModel(
                     "ecss-e-st-32-10c",
-                    "/packages/starion/ecss-e-st-32-10c",
                     "RF telecommunication link budget and space communication interfaces.",
                     "SysML v2",
                     "@starion",
@@ -47,9 +46,8 @@ namespace Mycelium.Forge.ViewModels
                     "comms · rf · telemetry · ecss",
                     "2 months ago",
                     "190"),
-                new PackageRowModel(
+                new PackageModel(
                     "ecss-e-st-31-01c",
-                    "/packages/starion/ecss-e-st-31-01c",
                     "Structural and mechanical engineering domain metamodels and loads analysis.",
                     "SysML v2",
                     "@starion",

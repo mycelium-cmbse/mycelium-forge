@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetails.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -20,16 +20,16 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
     public partial class PackageDetails : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the scope segment supplied from the URL route.
+        /// Gets or sets the organization segment supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string Scope { get; set; } = string.Empty;
+        public string Organization { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the package identifier supplied from the URL route.
+        /// Gets or sets the package name supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string Id { get; set; } = string.Empty;
+        public string PackageName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the view model for the package details page.
@@ -91,7 +91,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         {
             var tabs = new List<string> { "Overview" };
 
-            if (this.ViewModel?.Package == null)
+            if (this.ViewModel.Package == null)
             {
                 return tabs;
             }
@@ -111,7 +111,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 tabs.Add("Dependents");
             }
 
-            if (this.ViewModel.Package.Versions is { Count: > 0 })
+            if (this.ViewModel.Package.Package.Versions is { Count: > 0 })
             {
                 tabs.Add("Versions");
             }
@@ -189,17 +189,13 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         }
 
         /// <summary>
-        /// Handles component parameter updates and initializes the view model with the parsed unique identifier.
+        /// Handles component parameter updates and initializes the view model with the package name and organization.
         /// </summary>
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
 
-            var idParsed = Guid.TryParse(this.Id, out var parsedGuid)
-                ? parsedGuid
-                : Guid.Empty;
-
-            this.ViewModel.InitializeViewModel(idParsed, this.Scope);
+            this.ViewModel.InitializeViewModel(this.PackageName, this.Organization);
         }
     }
 }

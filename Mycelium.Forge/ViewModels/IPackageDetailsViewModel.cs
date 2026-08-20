@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,10 +22,10 @@ namespace Mycelium.Forge.ViewModels
         PackageDetailsModel Package { get; set; }
 
         /// <summary>
-        /// Initializes the package view model state for the specified package identifier.
+        /// Initializes the package view model state for the specified package name and organization.
         /// </summary>
-        /// <param name="id">The unique identifier of the package.</param>
-        /// <param name="scope">The scope of the package.</param>
-        void InitializeViewModel(Guid id, string scope);
+        /// <param name="packageName">The name of the package.</param>
+        /// <param name="organization">The organization of the package.</param>
+        void InitializeViewModel(string packageName, string organization);
     }
 }

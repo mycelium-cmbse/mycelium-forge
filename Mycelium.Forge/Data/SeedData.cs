@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Data
 {
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
+    using Mycelium.Forge.ViewModels;
 
     /// <summary>
     /// Provides centralized seed data and mock models for registry entities.
@@ -369,6 +370,71 @@ namespace Mycelium.Forge.Data
                     lastPublished: "2 months ago",
                     role: PackageInvitationKind.MAINTAINER)
             ];
+
+            CatalogPackages =
+            [
+                new PackageModel(
+                    "ECSS-MM-PWR",
+                    "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
+                    "SysML v2 (kpar)",
+                    "@starion",
+                    "v1.2.0",
+                    "mission-model · power · ecss",
+                    "2 weeks ago",
+                    "210",
+                    true),
+                new PackageModel(
+                    "SysMLv2-ISQ-Quantities",
+                    "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000. Quantities of kind, measurement units, and dimension vectors.",
+                    "SysML v2 (kpar)",
+                    "@omg",
+                    "v2025.2",
+                    "standard-library · quantities-units · isq · sysml2",
+                    "1 month ago",
+                    "1.4k",
+                    true),
+                new PackageModel(
+                    "SysMLv2-Kernel-Library",
+                    "Fundamental KerML metamodel library containing base types, collections, control functions, and measurement scales used by all SysML v2 packages.",
+                    "SysML v2 (kpar)",
+                    "@omg",
+                    "v2025.2",
+                    "standard-library · kerml · kernel · sysml2",
+                    "1 month ago",
+                    "2.1k",
+                    true),
+                new PackageModel(
+                    "ECSS-E-ST-10-04C",
+                    "Space environment definitions following ECSS-E-ST-10-04C. Earth atmosphere models, solar radiation, geomagnetic field, and planetary constants.",
+                    "SysML v2 (kpar)",
+                    "@esa",
+                    "v1.0.0",
+                    "mission-model · space-environment · ecss · esa",
+                    "2 months ago",
+                    "860",
+                    true),
+                new PackageModel(
+                    "SmallSat-Platform-Model",
+                    "Parametric smallsat platform model including bus geometry, mass properties, power budget, and propulsion subsystem interfaces.",
+                    "SysML v2 (kpar)",
+                    "@starion",
+                    "v0.8.2",
+                    "mission-model · smallsat · platform · starion",
+                    "3 weeks ago",
+                    "145",
+                    true),
+                new PackageModel(
+                    "CDP4-COMET-Core",
+                    "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25 concurrent design platform.",
+                    "CDP4-COMET (10-25)",
+                    "@starion",
+                    "v10.25.1",
+                    "concurrent-engineering · cdp4 · comet · ecss-10-25",
+                    "1 month ago",
+                    "320",
+                    true,
+                    license: "MIT")
+            ];
         }
 
         /// <summary>
@@ -465,5 +531,10 @@ namespace Mycelium.Forge.Data
         /// Gets the list of packages owned or maintained by the current user.
         /// </summary>
         public static IReadOnlyList<PackageModel> MyPackages { get; }
+
+        /// <summary>
+        /// Gets the list of package discovery and catalog search result items.
+        /// </summary>
+        public static IReadOnlyList<PackageModel> CatalogPackages { get; }
     }
 }

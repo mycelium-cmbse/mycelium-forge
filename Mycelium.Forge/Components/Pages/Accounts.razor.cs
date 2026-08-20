@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Components.Pages
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.ViewModels;
 
@@ -26,8 +27,8 @@ namespace Mycelium.Forge.Components.Pages
         private static readonly IReadOnlyList<string> AvailableStatusFilters =
         [
             "All",
-            nameof(ScopeStatusKind.ACTIVE),
-            nameof(ScopeStatusKind.DEACTIVATED)
+            nameof(ScopeStatusKind.ACTIVE).ToLowerCaseFirst(),
+            nameof(ScopeStatusKind.DEACTIVATED).ToLowerCaseFirst()
         ];
 
         /// <summary>

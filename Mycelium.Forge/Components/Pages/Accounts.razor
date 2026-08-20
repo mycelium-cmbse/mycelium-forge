@@ -64,7 +64,7 @@
                         {
                             <BlazorBlueprint.Primitives.Select.BbSelectItem @key="statusOption"
                                                                             Value="@statusOption"
-                                                                            Text="@($"Status: {statusOption}")"
+                                                                            Text="@statusOption"
                                                                             class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                         }
                     </BlazorBlueprint.Primitives.Select.BbSelectContent>
@@ -84,7 +84,7 @@
                         {
                             <BlazorBlueprint.Primitives.Select.BbSelectItem @key="verificationOption"
                                                                             Value="@verificationOption"
-                                                                            Text="@($"Verification: {verificationOption}")"
+                                                                            Text="@verificationOption"
                                                                             class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                         }
                     </BlazorBlueprint.Primitives.Select.BbSelectContent>
@@ -99,137 +99,133 @@
         </div>
 
         <div class="w-full rounded-lg bg-card border border-border overflow-hidden">
-            <div class="overflow-x-auto">
-                <div class="min-w-[900px]">
-                    <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.ViewModel.FilteredAccounts)"
-                                                              class="w-full text-left">
-                        <BlazorBlueprint.Primitives.Table.BbTableHeader Class="flex items-center px-4 py-2.5 bg-muted text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border gap-3">
-                            <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
-                                                                                Class="w-[250px] shrink-0 p-0 text-left font-semibold">
-                                ACCOUNT
-                            </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                            <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
-                                                                                Class="w-[250px] shrink-0 p-0 text-left font-semibold">
-                                EMAIL
-                            </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                            <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
-                                                                                Class="w-[90px] shrink-0 p-0 text-left font-semibold">
-                                VERIFIED
-                            </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                            <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
-                                                                                Class="w-[210px] shrink-0 p-0 text-left font-semibold">
-                                ORGANIZATIONS
-                            </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                            <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
-                                                                                Class="w-[90px] shrink-0 p-0 text-left font-semibold">
-                                STATUS
-                            </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                            <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
-                                                                                Class="flex-1 p-0">
-                            </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                        </BlazorBlueprint.Primitives.Table.BbTableHeader>
+            <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.ViewModel.FilteredAccounts)"
+                                                      class="w-full text-left">
+                <BlazorBlueprint.Primitives.Table.BbTableHeader Class="flex items-center px-4 py-2.5 bg-muted text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border gap-3">
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
+                        ACCOUNT
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
+                        EMAIL
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="w-[90px] shrink-0 p-0 text-left font-semibold">
+                        VERIFIED
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
+                        ORGANIZATIONS
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="w-[90px] shrink-0 p-0 text-left font-semibold">
+                        STATUS
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="w-8 shrink-0 p-0">
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                </BlazorBlueprint.Primitives.Table.BbTableHeader>
 
-                        <BlazorBlueprint.Primitives.Table.BbTableBody Class="divide-y divide-border">
-                            @if (this.ViewModel.FilteredAccounts.Count > 0)
-                            {
-                                @foreach (var account in this.ViewModel.FilteredAccounts)
-                                {
-                                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="account.Username"
-                                                                                 Item="@account"
-                                                                                 Class="flex items-center px-4 py-3 bg-card hover:bg-muted/50 transition-colors gap-3">
-                                        <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[250px] shrink-0 flex items-center gap-2.5 min-w-0 p-0">
-                                            <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
-                                                @(account.Initials)
-                                            </div>
+                <BlazorBlueprint.Primitives.Table.BbTableBody Class="divide-y divide-border">
+                    @if (this.ViewModel.FilteredAccounts.Count > 0)
+                    {
+                        @foreach (var account in this.ViewModel.FilteredAccounts)
+                        {
+                            <BlazorBlueprint.Primitives.Table.BbTableRow @key="account.Username"
+                                                                         Item="@account"
+                                                                         Class="flex items-center px-4 py-3 bg-card hover:bg-muted/50 transition-colors gap-3">
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 flex items-center gap-2.5 p-0">
+                                    <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
+                                        @(account.Initials)
+                                    </div>
 
-                                            <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
-                                                <div class="flex items-center gap-1.5 min-w-0">
-                                                    <span class="text-sm leading-xs font-medium text-foreground truncate">
-                                                        @(account.Name)
-                                                    </span>
-                                                    @if (account.IsAdministrator)
-                                                    {
-                                                        <BbBadge Variant="BadgeVariant.Secondary"
-                                                                 Class="badge-role text-primary">
-                                                            Admin
-                                                        </BbBadge>
-                                                    }
-                                                </div>
-                                                <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
-                                                    @(account.Username)
-                                                </span>
-                                            </div>
-                                        </BlazorBlueprint.Primitives.Table.BbTableCell>
-
-                                        <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[250px] shrink-0 truncate p-0">
-                                            <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
-                                                @(account.Email)
+                                    <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="text-sm leading-xs font-medium text-foreground truncate">
+                                                @(account.Name)
                                             </span>
-                                        </BlazorBlueprint.Primitives.Table.BbTableCell>
-
-                                        <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[90px] shrink-0 flex items-center p-0">
-                                            @if (string.Equals(account.VerificationStatus, "Verified", StringComparison.OrdinalIgnoreCase))
+                                            @if (account.IsAdministrator)
                                             {
                                                 <BbBadge Variant="BadgeVariant.Secondary"
-                                                         Class="badge-role text-success-icon">
-                                                    Verified
+                                                         Class="badge-role text-primary shrink-0">
+                                                    Admin
                                                 </BbBadge>
                                             }
-                                            else
-                                            {
-                                                <BbBadge Variant="BadgeVariant.Secondary"
-                                                         Class="badge-role text-warning-icon">
-                                                    Pending
-                                                </BbBadge>
-                                            }
-                                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                                        </div>
+                                        <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
+                                            @(account.Username)
+                                        </span>
+                                    </div>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
 
-                                        <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[210px] shrink-0 truncate p-0">
-                                            <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
-                                                @(account.Organizations)
-                                            </span>
-                                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 p-0">
+                                    <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text truncate block">
+                                        @(account.Email)
+                                    </span>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
 
-                                        <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[90px] shrink-0 flex items-center p-0">
-                                            @if (account.Status == ScopeStatusKind.ACTIVE)
-                                            {
-                                                <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
-                                                    Active
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <BbBadge Variant="BadgeVariant.Secondary"
-                                                         Class="badge-role text-muted-foreground">
-                                                    @(account.Status)
-                                                </BbBadge>
-                                            }
-                                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[90px] shrink-0 flex items-center p-0">
+                                    @if (string.Equals(account.VerificationStatus, "Verified", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <BbBadge Variant="BadgeVariant.Secondary"
+                                                 Class="badge-role text-success-icon">
+                                            Verified
+                                        </BbBadge>
+                                    }
+                                    else
+                                    {
+                                        <BbBadge Variant="BadgeVariant.Secondary"
+                                                 Class="badge-role text-warning-icon">
+                                            Pending
+                                        </BbBadge>
+                                    }
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
 
-                                        <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-1 flex justify-end p-0">
-                                            <BbButton Variant="ButtonVariant.Ghost"
-                                                      Size="ButtonSize.IconSmall"
-                                                      OnClick="() => this.OnAccountMenu(account)"
-                                                      AriaLabel="Options"
-                                                      Class="shrink-0">
-                                                <LucideIcon Name="ellipsis"
-                                                            Size="16"
-                                                            Class="text-muted-foreground shrink-0"/>
-                                            </BbButton>
-                                        </BlazorBlueprint.Primitives.Table.BbTableCell>
-                                    </BlazorBlueprint.Primitives.Table.BbTableRow>
-                                }
-                            }
-                            else
-                            {
-                                <BbEmpty Title="No accounts match the current filter."
-                                         Size="EmptySize.Small"
-                                         Class="py-12 text-center"/>
-                            }
-                        </BlazorBlueprint.Primitives.Table.BbTableBody>
-                    </BlazorBlueprint.Primitives.Table.BbTable>
-                </div>
-            </div>
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 p-0">
+                                    <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text truncate block">
+                                        @(account.Organizations)
+                                    </span>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[90px] shrink-0 flex items-center p-0">
+                                    @if (account.Status == ScopeStatusKind.ACTIVE)
+                                    {
+                                        <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <BbBadge Variant="BadgeVariant.Secondary"
+                                                 Class="badge-role text-muted-foreground">
+                                            @(account.Status)
+                                        </BbBadge>
+                                    }
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-8 shrink-0 flex justify-end p-0">
+                                    <BbButton Variant="ButtonVariant.Ghost"
+                                              Size="ButtonSize.IconSmall"
+                                              OnClick="() => this.OnAccountMenu(account)"
+                                              AriaLabel="Options"
+                                              Class="shrink-0">
+                                        <LucideIcon Name="ellipsis"
+                                                    Size="16"
+                                                    Class="text-muted-foreground shrink-0"/>
+                                    </BbButton>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+                            </BlazorBlueprint.Primitives.Table.BbTableRow>
+                        }
+                    }
+                    else
+                    {
+                        <BbEmpty Title="No accounts match the current filter."
+                                 Size="EmptySize.Small"
+                                 Class="py-12 text-center"/>
+                    }
+                </BlazorBlueprint.Primitives.Table.BbTableBody>
+            </BlazorBlueprint.Primitives.Table.BbTable>
         </div>
 
         <p class="text-xs leading-2xs text-muted-foreground w-full">

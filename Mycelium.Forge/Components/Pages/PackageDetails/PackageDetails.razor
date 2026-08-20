@@ -7,7 +7,7 @@
     return;
 }
 
-<PageTitle>@(this.ViewModel.Package.FullName) &mdash; Mycelium Forge</PageTitle>
+<PageTitle>@(this.ViewModel.Package.Package.FullName) &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-body-bg min-h-screen select-none">
 <header class="w-full bg-card border-b border-border py-7">
@@ -24,9 +24,9 @@
                     /
                 </BbBreadcrumbSeparator>
                 <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@($"/organizations/{this.ViewModel.Package.Scope.TrimStart('@')}")"
+                    <BbBreadcrumbLink Href="@($"/organizations/{this.ViewModel.Package.Package.Publisher.TrimStart('@')}")"
                                       Class="text-primary hover:underline font-normal">
-                        @(this.ViewModel.Package.Scope)
+                        @(this.ViewModel.Package.Package.Publisher)
                     </BbBreadcrumbLink>
                 </BbBreadcrumbItem>
                 <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
@@ -34,7 +34,7 @@
                 </BbBreadcrumbSeparator>
                 <BbBreadcrumbItem>
                     <BbBreadcrumbPage Class="text-muted-foreground font-normal">
-                        @(this.ViewModel.Package.Name)
+                        @(this.ViewModel.Package.Package.Name)
                     </BbBreadcrumbPage>
                 </BbBreadcrumbItem>
             </BbBreadcrumbList>
@@ -45,9 +45,9 @@
                         Size="26"
                         Class="text-secondary-text shrink-0"/>
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
-                @(this.ViewModel.Package.FullName)
+                @(this.ViewModel.Package.Package.FullName)
             </h1>
-            @if (this.ViewModel.Package.IsVerified)
+            @if (this.ViewModel.Package.Package.IsVerified)
             {
                 <LucideIcon Name="badge-check"
                             Size="20"
@@ -55,11 +55,11 @@
             }
             <BbBadge Variant="BadgeVariant.Outline"
                      Class="badge-format">
-                @(this.ViewModel.Package.Format)
+                @(this.ViewModel.Package.Package.Format)
             </BbBadge>
             <BbBadge Variant="BadgeVariant.Secondary"
                      Class="badge-format">
-                @(this.ViewModel.Package.Version)
+                @(this.ViewModel.Package.Package.Version)
             </BbBadge>
             <span class="text-xs leading-2xs text-muted-foreground">
                 @(this.ViewModel.Package.ReleaseStatus)
@@ -67,7 +67,7 @@
         </div>
 
         <p class="text-md leading-sm text-muted-foreground">
-            @(this.ViewModel.Package.Description)
+            @(this.ViewModel.Package.Package.Description)
         </p>
 
         <p class="text-xs leading-2xs text-muted-foreground">
@@ -138,7 +138,7 @@
                     IMPORTS
                 </span>
                 <span class="text-xl leading-lg font-semibold text-foreground">
-                    @(this.ViewModel.Package.ImportCount)
+                    @(this.ViewModel.Package.Package.ImportCount)
                 </span>
             </div>
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
@@ -154,7 +154,7 @@
                     LATEST
                 </span>
                 <span class="text-xl leading-lg font-semibold text-foreground">
-                    @(this.ViewModel.Package.Version)
+                    @(this.ViewModel.Package.Package.Version)
                 </span>
             </div>
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
@@ -162,7 +162,7 @@
                     PUBLISHED
                 </span>
                 <span class="text-xl leading-lg font-semibold text-foreground">
-                    @(this.ViewModel.Package.PublishedAgo)
+                    @(this.ViewModel.Package.Package.LastPublished)
                 </span>
             </div>
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
@@ -170,7 +170,7 @@
                     LICENSE
                 </span>
                 <span class="text-xl leading-lg font-semibold text-foreground">
-                    @(this.ViewModel.Package.License)
+                    @(this.ViewModel.Package.Package.License)
                 </span>
             </div>
         </div>
@@ -208,7 +208,7 @@
                     <PackageDependentsTab Dependents="@(this.ViewModel.Package.Dependents)"/>
                 </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
                 <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="Versions">
-                    <PackageVersionsTab Versions="@(this.ViewModel.Package.Versions)"/>
+                    <PackageVersionsTab Versions="@(this.ViewModel.Package.Package.Versions)"/>
                 </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
                 <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="Validation">
                     <PackageValidationTab Report="@(this.ViewModel.Package.ValidationReport)"/>
@@ -224,19 +224,19 @@
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground">Latest stable</span>
-                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.Version)</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.Package.Version)</span>
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground">Published</span>
-                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.PublishedAgo)</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.Package.LastPublished)</span>
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground">License</span>
                     <BbBadge Variant="BadgeVariant.Outline"
                              Class="badge-format">
-                        @(this.ViewModel.Package.License)
+                        @(this.ViewModel.Package.Package.License)
                     </BbBadge>
                 </div>
 
@@ -256,7 +256,7 @@
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
-                    <span class="text-muted-foreground">PackageDetails URL</span>
+                    <span class="text-muted-foreground">Package URL</span>
                     <span class="font-medium text-primary text-right truncate"
                           title="@(this.ViewModel.Package.PackageUrl)">
                         @(this.ViewModel.Package.PackageUrlDisplayName)
@@ -295,7 +295,7 @@
                     MAINTAINERS
                 </span>
 
-                @foreach (var maintainer in this.ViewModel.Package.Maintainers)
+                @foreach (var maintainer in this.ViewModel.Package.Package.Maintainers)
                 {
                     <div @key="maintainer.Name"
                          class="flex items-center gap-2 h-6.5">

@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Models
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents an organization that a user account is a member of, wrapping the organization DTO.
@@ -64,8 +65,6 @@ namespace Mycelium.Forge.Models
         /// <summary>
         /// Gets the uppercase initials extracted from the organization name.
         /// </summary>
-        public string Initials => this.Organization != null
-            ? string.Concat(this.Organization.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpperInvariant()
-            : string.Empty;
+        public string Initials => (this.Organization?.Name).ToInitials();
     }
 }

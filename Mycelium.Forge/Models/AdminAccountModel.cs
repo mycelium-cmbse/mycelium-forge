@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Models
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents an account entry displayed in the administrator accounts table wrapping the account DTO.
@@ -93,8 +94,6 @@ namespace Mycelium.Forge.Models
         /// <summary>
         /// Gets the uppercase initials extracted from the account name.
         /// </summary>
-        public string Initials => this.Account != null
-            ? string.Concat(this.Account.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpperInvariant()
-            : string.Empty;
+        public string Initials => (this.Account?.Name).ToInitials();
     }
 }

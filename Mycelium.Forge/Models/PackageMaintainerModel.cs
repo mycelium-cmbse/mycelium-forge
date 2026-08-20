@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Models
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents a maintainer of a package, optionally wrapping their user account DTO.
@@ -54,9 +55,7 @@ namespace Mycelium.Forge.Models
         public PackageMaintainerModel(IAccount account, PackageInvitationKind role = PackageInvitationKind.MAINTAINER, bool isVerified = false)
             : this(
                 account?.Name ?? string.Empty,
-                account != null
-                    ? string.Concat(account.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpperInvariant()
-                    : string.Empty,
+                (account?.Name).ToInitials(),
                 isVerified,
                 role,
                 account)

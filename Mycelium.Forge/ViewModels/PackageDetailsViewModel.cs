@@ -23,11 +23,11 @@ namespace Mycelium.Forge.ViewModels
         public PackageDetailsModel Package { get; set; }
 
         /// <summary>
-        /// Initializes the package view model state for the specified package unique identifier.
+        /// Initializes the package view model state for the specified package name and organization.
         /// </summary>
-        /// <param name="id">The unique identifier of the package.</param>
-        /// <param name="scope">The scope of the package.</param>
-        public void InitializeViewModel(Guid id, string scope)
+        /// <param name="packageName">The name of the package.</param>
+        /// <param name="organization">The organization of the package.</param>
+        public void InitializeViewModel(string packageName, string organization)
         {
             var qualityChecks = new List<ValidationCheckModel>
             {
@@ -41,7 +41,7 @@ namespace Mycelium.Forge.ViewModels
             var maintainers = new List<PackageMaintainerModel>
             {
                 new("Starion Group", "SG", true, PackageInvitationKind.OWNER),
-                new("R. André", "RA", false, PackageInvitationKind.MAINTAINER)
+                new("R. André", "RA")
             };
 
             var tags = new List<string>
@@ -50,12 +50,17 @@ namespace Mycelium.Forge.ViewModels
                 "power"
             };
 
+            var resolvedOrganization = string.IsNullOrWhiteSpace(organization) ? "@starion" : organization.StartsWith('@') ? organization : $"@{organization}";
+            var resolvedName = string.IsNullOrWhiteSpace(packageName) ? "ECSS-MM-PWR" : packageName;
+            var fullName = $"{resolvedOrganization}/{resolvedName}";
+            var orgWithoutAt = resolvedOrganization.TrimStart('@');
+
             var installCommands = new Dictionary<string, string>
             {
-                { "Forge CLI", "forge add @starion/ECSS-MM-PWR@^1.2" },
-                { "SysML v2 import", "import @starion/ECSS-MM-PWR::*;" },
-                { "Manifest", "@starion/ECSS-MM-PWR = \"^1.2.0\"" },
-                { "purl", "pkg:forge/@starion/ECSS-MM-PWR@1.2.0" }
+                { "Forge CLI", $"forge add {fullName}@^1.2" },
+                { "SysML v2 import", $"import {fullName}::*;" },
+                { "Manifest", $"{fullName} = \"^1.2.0\"" },
+                { "purl", $"pkg:forge/{fullName}@1.2.0" }
             };
 
             var elements = new List<PackageElementModel>
@@ -104,37 +109,49 @@ namespace Mycelium.Forge.ViewModels
                 true,
                 validationChecks);
 
-            this.Package = new PackageDetailsModel(
-                "ECSS-MM-PWR",
-                "@starion",
-                "@starion/ECSS-MM-PWR",
-                "SysML v2",
+            var packageDto = new Package
+            {
+                Name = resolvedName,
+                ShortName = resolvedName.ToLowerInvariant(),
+                Visibility = VisibilityKind.PUBLIC
+            };
+
+            var packageModel = new PackageModel(
+                packageDto,
+                resolvedOrganization,
                 "v1.2.0",
-                "Latest stable",
-                "ECSS mission model: Power subsystem. Part definitions for the power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
-                "Published 2 weeks ago by @starion · Apache-2.0 · 210 imports",
-                true,
+                "SysML v2",
+                $"{resolvedName} mission model: Power subsystem. Part definitions for the power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
+                string.Join(" · ", tags),
                 "210",
-                "5/5 checks",
+                true,
                 "2 weeks ago",
+                PackageInvitationKind.OWNER,
                 "Apache-2.0",
+                $"/packages/{resolvedOrganization.TrimStart('@')}/{resolvedName}",
+                maintainers,
+                versions);
+
+            this.Package = new PackageDetailsModel(
+                packageModel,
+                "Latest stable",
+                $"Published 2 weeks ago by {resolvedOrganization} · Apache-2.0 · 210 imports",
+                "5/5 checks",
                 "SysML v2 (2025-02)",
-                "https://github.com/starion/ecss-mm-pwr",
-                "github.com/starion/…",
-                "pkg:forge/@starion/ECSS-MM-PWR@1.2.0",
-                "pkg:forge/@starion/…",
-                "Power subsystem mission model following ECSS-E-ST-20C, published as a reusable SysML v2 library. It provides the electrical power architecture for early-phase spacecraft design.",
+                $"https://github.com/{orgWithoutAt}/{resolvedName.ToLowerInvariant()}",
+                $"github.com/{orgWithoutAt}/…",
+                $"pkg:forge/{fullName}@1.2.0",
+                $"pkg:forge/{orgWithoutAt}/…",
+                $"{resolvedName} subsystem mission model following ECSS-E-ST-20C, published as a reusable SysML v2 library. It provides the electrical power architecture for early-phase spacecraft design.",
                 "Part definitions: PowerBus, Battery, SolarArray, PowerConditioningUnit. Attribute definitions typed by ISQ quantity kinds (power, voltage, capacity). Interface definitions for the power distribution ports.",
-                "import ECSS::MM::PWR::*;",
+                $"import {resolvedName.Replace('-', '_')}::*;",
                 "part def MyPowerSystem :> PowerBus { }",
                 qualityChecks,
-                maintainers,
                 tags,
                 installCommands,
                 elements,
                 dependencies,
                 dependents,
-                versions,
                 validationReport);
         }
     }

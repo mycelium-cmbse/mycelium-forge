@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Components.Pages
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.ViewModels;
 
@@ -99,7 +100,7 @@ namespace Mycelium.Forge.Components.Pages
                 PackageSortOption.Downloads => "Downloads",
                 PackageSortOption.RecentlyUpdated => "Recently updated",
                 PackageSortOption.Alphabetical => "Alphabetical",
-                _ => nameof(PackageSortOption.Relevance)
+                _ => nameof(PackageSortOption.Relevance).ToLowerCaseFirst()
             };
         }
 

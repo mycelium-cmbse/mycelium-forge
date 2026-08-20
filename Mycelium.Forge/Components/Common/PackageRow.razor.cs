@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Components.Common
         /// Gets or sets the package row model data to display.
         /// </summary>
         [Parameter]
-        public PackageRowModel Model { get; set; }
+        public PackageModel Model { get; set; }
 
         /// <summary>
         /// Gets or sets optional additional CSS classes to apply to the row container.

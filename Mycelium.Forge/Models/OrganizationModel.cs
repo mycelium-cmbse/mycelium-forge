@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Models
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents an organization presentation model wrapping the organization DTO and exposing computed attributes.
@@ -48,9 +49,7 @@ namespace Mycelium.Forge.Models
 
             this.Initials = !string.IsNullOrEmpty(initials)
                 ? initials
-                : organization != null
-                    ? string.Concat(organization.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpperInvariant()
-                    : string.Empty;
+                : (organization?.Name).ToInitials();
 
             this.Description = !string.IsNullOrEmpty(description)
                 ? description

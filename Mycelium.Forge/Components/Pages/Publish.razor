@@ -189,7 +189,7 @@
                                                         ValueChanged="@(this.OnVisibilityChanged)">
                 <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-visibility"
                                                                    class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
-                    <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.Visibility)</span>
+                    <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.Visibility.ToLowerCaseFirst())</span>
                     <LucideIcon Name="chevron-down"
                                 Size="16"
                                 Class="text-muted-foreground shrink-0"/>
@@ -199,7 +199,7 @@
                     {
                         <BlazorBlueprint.Primitives.Select.BbSelectItem @key="visibilityOption"
                                                                         Value="@visibilityOption"
-                                                                        Text="@visibilityOption.ToString()"
+                                                                        Text="@(visibilityOption.ToLowerCaseFirst())"
                                                                         class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                     }
                 </BlazorBlueprint.Primitives.Select.BbSelectContent>

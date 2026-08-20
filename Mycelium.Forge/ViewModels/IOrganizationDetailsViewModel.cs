@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IOrganizationDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -24,7 +24,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of packages published by the organization.
         /// </summary>
-        List<PackageRowModel> Packages { get; set; }
+        List<PackageModel> Packages { get; set; }
 
         /// <summary>
         /// Initializes the organization view model state for the specified organization identifier.

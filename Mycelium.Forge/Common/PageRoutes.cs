@@ -32,7 +32,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The package details page route path.
         /// </summary>
-        public const string Package = "/packages/{scope}/{id}";
+        public const string Package = "/packages/{organization}/{packageName}";
 
         /// <summary>
         /// The organization and publisher profile page route path.
@@ -82,7 +82,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The package settings page route path.
         /// </summary>
-        public const string PackageSettings = "/packages/{scope}/{id}/settings";
+        public const string PackageSettings = "/packages/{organization}/{packageName}/settings";
 
         /// <summary>
         /// The user account settings page route path.

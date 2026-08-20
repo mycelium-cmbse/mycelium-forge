@@ -93,7 +93,7 @@
                                                                         Value="@member.Role"
                                                                         ValueChanged="@(role => this.OnChangeMemberRole(member, role))">
                                 <BlazorBlueprint.Primitives.Select.BbSelectTrigger class="w-full h-7 px-2.5 py-1 rounded-md bg-card border border-border flex items-center justify-between gap-1.5 text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
-                                    <span class="truncate">@member.Role</span>
+                                    <span class="truncate">@(member.Role.ToLowerCaseFirst())</span>
                                     <LucideIcon Name="chevron-down"
                                                 Size="12"
                                                 Class="text-muted-foreground shrink-0"/>
@@ -103,7 +103,7 @@
                                     {
                                         <BlazorBlueprint.Primitives.Select.BbSelectItem @key="role"
                                                                                         Value="@role"
-                                                                                        Text="@role.ToString()"
+                                                                                        Text="@(role.ToLowerCaseFirst())"
                                                                                         class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                                     }
                                 </BlazorBlueprint.Primitives.Select.BbSelectContent>

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,11 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Mycelium.Forge.Data;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -17,77 +22,34 @@ namespace Mycelium.Forge.ViewModels
     public class PackagesViewModel : IPackagesViewModel
     {
         /// <summary>
+        /// The library package tag descriptor constant.
+        /// </summary>
+        private const string LibraryKind = "library";
+
+        /// <summary>
+        /// The model package tag descriptor constant.
+        /// </summary>
+        private const string ModelKind = "model";
+
+        /// <summary>
+        /// The facet group identifier for package kind.
+        /// </summary>
+        private const string KindFacet = "Kind";
+
+        /// <summary>
+        /// The facet group identifier for package category.
+        /// </summary>
+        private const string CategoryFacet = "Category";
+
+        /// <summary>
+        /// The facet group identifier for metamodel definitions.
+        /// </summary>
+        private const string MetamodelFacet = "Metamodel";
+
+        /// <summary>
         /// The master collection of seed package catalog search results.
         /// </summary>
-        private readonly List<PackageRowModel> allPackages =
-        [
-            new(
-                "ECSS-MM-PWR",
-                "/packages/starion/ECSS-MM-PWR",
-                "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
-                "SysML v2",
-                "@starion",
-                "v1.2.0",
-                "mission-model · power · ecss",
-                "2 weeks ago",
-                "210",
-                true),
-            new(
-                "SysMLv2-ISQ-Quantities",
-                "/packages/omg/SysMLv2-ISQ-Quantities",
-                "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000. Quantities of kind, measurement units, and dimension vectors.",
-                "SysML v2",
-                "@omg",
-                "v2025.2",
-                "standard-library · quantities-units · isq · sysml2",
-                "1 month ago",
-                "1.4k",
-                true),
-            new(
-                "SysMLv2-Kernel-Library",
-                "/packages/omg/SysMLv2-Kernel-Library",
-                "Fundamental KerML metamodel library containing base types, collections, control functions, and measurement scales used by all SysML v2 packages.",
-                "SysML v2",
-                "@omg",
-                "v2025.2",
-                "standard-library · kerml · kernel · sysml2",
-                "1 month ago",
-                "2.1k",
-                true),
-            new(
-                "ECSS-E-ST-10-04C",
-                "/packages/esa/ECSS-E-ST-10-04C",
-                "Space environment definitions following ECSS-E-ST-10-04C. Earth atmosphere models, solar radiation, geomagnetic field, and planetary constants.",
-                "SysML v2",
-                "@esa",
-                "v1.0.0",
-                "mission-model · space-environment · ecss · esa",
-                "2 months ago",
-                "860",
-                true),
-            new(
-                "SmallSat-Platform-Model",
-                "/packages/starion/SmallSat-Platform-Model",
-                "Parametric smallsat platform model including bus geometry, mass properties, power budget, and propulsion subsystem interfaces.",
-                "SysML v2",
-                "@starion",
-                "v0.8.2",
-                "mission-model · smallsat · platform · starion",
-                "3 weeks ago",
-                "145",
-                true),
-            new(
-                "CDP4-COMET-Core",
-                "/packages/starion/CDP4-COMET-Core",
-                "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25 concurrent design platform.",
-                "CDP4-COMET (10-25)",
-                "@starion",
-                "v10.25.1",
-                "concurrent-engineering · cdp4 · comet · ecss-10-25",
-                "1 month ago",
-                "320",
-                true)
-        ];
+        private readonly List<PackageModel> allPackages = [];
 
         /// <summary>
         /// Gets or sets the collection of facet filter options.
@@ -97,7 +59,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of displayed package search result items.
         /// </summary>
-        public List<PackageRowModel> PackageResults { get; set; } = [];
+        public List<PackageModel> PackageResults { get; set; } = [];
 
         /// <summary>
         /// Initializes the view model state and executes the initial package search.
@@ -107,6 +69,9 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="includePrereleases">A value indicating whether prerelease packages should be included.</param>
         public void InitializeViewModel(string query, PackageSortOption sort, bool includePrereleases)
         {
+            this.allPackages.Clear();
+            this.allPackages.AddRange(SeedData.CatalogPackages);
+
             this.InitializeFacets();
             this.Search(query, sort, includePrereleases);
         }
@@ -119,50 +84,160 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="includePrereleases">A value indicating whether prerelease packages should be included.</param>
         public void Search(string query = "", PackageSortOption sort = PackageSortOption.Relevance, bool includePrereleases = false)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            var filtered = this.allPackages.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(query))
             {
-                this.PackageResults = [.. this.allPackages];
-                return;
+                var trimmed = query.Trim();
+
+                filtered = filtered.Where(package =>
+                    package.Name.Contains(trimmed, StringComparison.OrdinalIgnoreCase) ||
+                    package.Description.Contains(trimmed, StringComparison.OrdinalIgnoreCase) ||
+                    package.Tags.Contains(trimmed, StringComparison.OrdinalIgnoreCase));
             }
 
-            var trimmed = query.Trim();
+            filtered = this.ApplyFacetFilters(filtered);
 
-            this.PackageResults =
+            filtered = sort switch
+            {
+                PackageSortOption.Downloads => filtered.OrderByDescending(package => ParseImportCount(package.ImportCount)),
+                PackageSortOption.Alphabetical => filtered.OrderBy(package => package.Name),
+                PackageSortOption.RecentlyUpdated => filtered.OrderBy(package => package.LastPublished),
+                _ => filtered
+            };
+
+            this.PackageResults = [.. filtered];
+        }
+
+        /// <summary>
+        /// Filters the package collection based on currently checked facet options.
+        /// </summary>
+        /// <param name="source">The source collection of package row models.</param>
+        /// <returns>The filtered collection of package row models.</returns>
+        private IEnumerable<PackageModel> ApplyFacetFilters(IEnumerable<PackageModel> source)
+        {
+            var result = source;
+            var checkedGroups = this.Facets.Where(facet => facet.IsChecked).GroupBy(facet => facet.Property).ToList();
+
+            foreach (var group in checkedGroups)
+            {
+                var labels = group.Select(facet => facet.Label).ToList();
+
+                if (labels.Count == 0)
+                {
+                    continue;
+                }
+
+                result = group.Key switch
+                {
+                    nameof(PackageModel.Format) => result.Where(package => labels.Exists(label => package.Format.Contains(label.Replace(" (kpar)", string.Empty).Replace(" (10-25)", string.Empty), StringComparison.OrdinalIgnoreCase))),
+                    KindFacet => result.Where(package => labels.Exists(label => package.Tags.Contains(label, StringComparison.OrdinalIgnoreCase))),
+                    nameof(PackageModel.Publisher) => result.Where(package => labels.Exists(label => string.Equals(package.Publisher, label, StringComparison.OrdinalIgnoreCase))),
+                    CategoryFacet => result.Where(package => labels.Exists(label => package.Tags.Contains(label, StringComparison.OrdinalIgnoreCase))),
+                    nameof(PackageModel.Tags) => result.Where(package => labels.Exists(label => package.Tags.Contains(label, StringComparison.OrdinalIgnoreCase))),
+                    MetamodelFacet => result.Where(package => labels.Exists(label => (label.Contains("SysML", StringComparison.OrdinalIgnoreCase) && package.Format.Contains("SysML", StringComparison.OrdinalIgnoreCase)) || (label.Contains("ECSS", StringComparison.OrdinalIgnoreCase) && (package.Format.Contains("CDP4", StringComparison.OrdinalIgnoreCase) || package.Tags.Contains("ecss-10-25", StringComparison.OrdinalIgnoreCase))))),
+                    nameof(PackageModel.License) => result.Where(package => labels.Exists(label => string.Equals(package.License, label, StringComparison.OrdinalIgnoreCase))),
+                    _ => result
+                };
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Populates the initial facet filter lists dynamically computed by grouping seed packages.
+        /// </summary>
+        private void InitializeFacets()
+        {
+            var formatOptions = this.allPackages
+                .GroupBy(package => package.Format)
+                .OrderByDescending(group => group.Count())
+                .Select(group => new OptionModel(nameof(PackageModel.Format), group.Key, group.Count()));
+
+            var kindOptions = this.allPackages
+                .SelectMany(package => new[]
+                {
+                    package.Tags.Contains(LibraryKind, StringComparison.OrdinalIgnoreCase) ? "Library" : null,
+                    package.Tags.Contains(ModelKind, StringComparison.OrdinalIgnoreCase) ? "Model" : null
+                })
+                .Where(kind => !string.IsNullOrEmpty(kind))
+                .GroupBy(kind => kind)
+                .OrderByDescending(group => group.Count())
+                .Select(group => new OptionModel(KindFacet, group.Key, group.Count()));
+
+            var publisherOptions = this.allPackages
+                .GroupBy(package => package.Publisher)
+                .OrderByDescending(group => group.Count())
+                .Select(group => new OptionModel(nameof(PackageModel.Publisher), group.Key, group.Count()));
+
+            var categoryOptions = this.allPackages
+                .SelectMany(package => package.Tags.Split(['·', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                .Select(tag => tag.Trim())
+                .Where(tag => tag.Contains(ModelKind) || tag.Contains(LibraryKind) || tag.Contains("units") || tag.Contains("engineering"))
+                .GroupBy(tag => tag)
+                .OrderByDescending(group => group.Count())
+                .Select(group => new OptionModel(CategoryFacet, group.Key, group.Count(), string.Equals(group.Key, "mission-model", StringComparison.OrdinalIgnoreCase)));
+
+            var tagOptions = this.allPackages
+                .SelectMany(package => package.Tags.Split(['·', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                .Select(tag => tag.Trim())
+                .Where(tag => !tag.Contains(LibraryKind) && !tag.Contains("mission-model") && !tag.Contains("units") && !tag.Contains("engineering") && !tag.Contains("sysml"))
+                .GroupBy(tag => tag)
+                .OrderByDescending(group => group.Count())
+                .Select(group => new OptionModel(nameof(PackageModel.Tags), group.Key, group.Count()));
+
+            var metamodelOptions = this.allPackages
+                .Select(package => package.Format.Contains("SysML", StringComparison.OrdinalIgnoreCase) ? "SysML v2 (2025-02)" : "ECSS-E-TM-10-25")
+                .GroupBy(metamodel => metamodel)
+                .OrderByDescending(group => group.Count())
+                .Select(group => new OptionModel(MetamodelFacet, group.Key, group.Count()));
+
+            var licenseOptions = this.allPackages
+                .Where(package => !string.IsNullOrWhiteSpace(package.License))
+                .GroupBy(package => package.License)
+                .OrderByDescending(group => group.Count())
+                .Select(group => new OptionModel(nameof(PackageModel.License), group.Key, group.Count()));
+
+            this.Facets =
             [
-                .. this.allPackages.Where(p =>
-                    p.Name.Contains(trimmed, StringComparison.OrdinalIgnoreCase))
+                .. formatOptions,
+                .. kindOptions,
+                .. publisherOptions,
+                .. categoryOptions,
+                .. tagOptions,
+                .. metamodelOptions,
+                .. licenseOptions
             ];
         }
 
         /// <summary>
-        /// Populates the initial facet filter lists.
+        /// Parses a human-readable import count string into a numeric value for sorting.
         /// </summary>
-        private void InitializeFacets()
+        /// <param name="importCount">The formatted import count string.</param>
+        /// <returns>The parsed numeric count.</returns>
+        private static int ParseImportCount(string importCount)
         {
-            this.Facets =
-            [
-                new OptionModel("FORMAT", "SysML v2 (kpar)", 5),
-                new OptionModel("FORMAT", "CDP4-COMET (10-25)", 1),
-                new OptionModel("FORMAT", "Capella", 0),
-                new OptionModel("KIND", "Library", 0),
-                new OptionModel("KIND", "Model", 6),
-                new OptionModel("SCOPE / PUBLISHER", "@esa", 4),
-                new OptionModel("SCOPE / PUBLISHER", "@starion", 2),
-                new OptionModel("SCOPE / PUBLISHER", "@mycelium", 0),
-                new OptionModel("CATEGORY", "mission-model", 5, true),
-                new OptionModel("CATEGORY", "standard-library", 1),
-                new OptionModel("CATEGORY", "quantities-units", 1),
-                new OptionModel("CATEGORY", "view-definitions", 0),
-                new OptionModel("TAGS", "aocs", 1),
-                new OptionModel("TAGS", "power", 1),
-                new OptionModel("TAGS", "thermal", 1),
-                new OptionModel("TAGS", "mechanical", 1),
-                new OptionModel("TAGS", "comms", 1),
-                new OptionModel("METAMODEL", "SysML v2 (2025-02)", 6),
-                new OptionModel("METAMODEL", "ECSS-E-TM-10-25", 1),
-                new OptionModel("LICENSE", "Apache-2.0", 5),
-                new OptionModel("LICENSE", "MIT", 1)
-            ];
+            if (string.IsNullOrWhiteSpace(importCount))
+            {
+                return 0;
+            }
+
+            var clean = importCount.Trim().ToLowerInvariant();
+
+            if (clean.EndsWith('k'))
+            {
+                if (double.TryParse(clean[..^1], out var kValue))
+                {
+                    return (int)(kValue * 1000);
+                }
+            }
+
+            if (int.TryParse(clean, out var intValue))
+            {
+                return intValue;
+            }
+
+            return 0;
         }
     }
 }
