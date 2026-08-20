@@ -1,14 +1,14 @@
-﻿@using Mycelium.Forge.Components.Common
+@using Mycelium.Forge.Components.Common
 @attribute [Route(PageRoutes.VerifyEmail)]
 @rendermode InteractiveServer
 
 <PageTitle>Verify Email &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-body-bg min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center py-10 px-4 select-none">
-    <div class="w-full max-w-[440px] p-8 sm:p-[34px_32px] rounded-[14px] bg-card border border-border shadow-[0px_6px_20px_-4px_rgba(15,23,41,0.06)] dark:shadow-none flex flex-col items-center gap-4.5">
+    <div class="auth-card">
         <ForgeLogo/>
 
-        <div class="w-13 h-5.5 rounded-full bg-[#FAECE3] dark:bg-amber-950/40 flex items-center justify-center">
+        <div class="icon-circle-primary w-13 h-5.5">
             <LucideIcon Name="mail"
                         Size="14"
                         Class="text-primary"/>
@@ -23,12 +23,12 @@
             </p>
         </div>
 
-        <div class="w-full p-3 px-3.5 rounded-lg bg-body-bg dark:bg-card border border-border flex flex-col gap-1.5">
+        <div class="inner-panel">
             <div class="flex items-center justify-between gap-2 w-full">
                 <span class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
                     Account created
                 </span>
-                <span class="text-xs leading-2xs font-medium text-[#218C5C] dark:text-emerald-400 shrink-0">
+                <span class="text-xs leading-2xs font-medium text-success-icon shrink-0">
                     Done
                 </span>
             </div>
@@ -36,7 +36,7 @@
                 <span class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
                     Email verified
                 </span>
-                <span class="text-xs leading-2xs font-medium text-[#B2730D] dark:text-amber-400 shrink-0">
+                <span class="text-xs leading-2xs font-medium text-warning-icon shrink-0">
                     Pending
                 </span>
             </div>

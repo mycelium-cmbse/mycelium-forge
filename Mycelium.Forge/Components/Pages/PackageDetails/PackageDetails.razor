@@ -45,9 +45,10 @@
                      Class="badge-format">
                 @(this.ViewModel.Package.Format)
             </BbBadge>
-            <div class="px-2 py-0.5 rounded-md bg-secondary text-sm leading-xs font-semibold text-secondary-text">
+            <BbBadge Variant="BadgeVariant.Secondary"
+                     Class="badge-format">
                 @(this.ViewModel.Package.Version)
-            </div>
+            </BbBadge>
             <span class="text-xs leading-2xs text-muted-foreground">
                 @(this.ViewModel.Package.ReleaseStatus)
             </span>
@@ -220,7 +221,10 @@
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground">License</span>
-                    <span class="font-medium text-foreground text-right">@(this.ViewModel.Package.License)</span>
+                    <BbBadge Variant="BadgeVariant.Outline"
+                             Class="badge-format">
+                        @(this.ViewModel.Package.License)
+                    </BbBadge>
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
@@ -306,9 +310,10 @@
                 <div class="flex flex-wrap gap-2">
                     @foreach (var tag in this.ViewModel.Package.Tags)
                     {
-                        <span class="px-2.5 py-1 rounded-md bg-secondary text-xs leading-2xs font-medium text-secondary-text">
+                        <BbBadge Variant="BadgeVariant.Secondary"
+                                 Class="badge-tag">
                             @(tag)
-                        </span>
+                        </BbBadge>
                     }
                 </div>
             </div>

@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRoutes.AccountSettings)]
+@attribute [Route(PageRoutes.AccountSettings)]
 @rendermode InteractiveServer
 
 @if (this.ViewModel.Profile == null)
@@ -56,9 +56,10 @@
             </span>
             @if (this.ViewModel.Profile.IsEmailVerified)
             {
-                <span class="px-1.75 py-0.5 rounded-md bg-success text-success-icon text-2xs leading-3xs font-medium shrink-0">
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="badge-role text-success-icon">
                     Verified
-                </span>
+                </BbBadge>
             }
             <button type="button"
                     @onclick="this.OnChangeEmail"
@@ -155,7 +156,7 @@
         @foreach (var organization in this.ViewModel.Organizations)
         {
             <div class="flex items-center gap-3 py-2.25 w-full">
-                <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-[#335999]")">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-org-member-alt-avatar-bg")">
                     @(organization.Initials)
                 </div>
 
@@ -167,9 +168,10 @@
                     @(organization.Name)
                 </span>
 
-                <div class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-amber-950/40 text-2xs leading-3xs font-medium shrink-0 @(organization.IsAdministrator ? "text-primary" : "text-muted-foreground")">
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="@($"badge-role {(organization.IsAdministrator ? "text-primary" : "text-muted-foreground")}")">
                     @(organization.Role)
-                </div>
+                </BbBadge>
             </div>
         }
     </div>

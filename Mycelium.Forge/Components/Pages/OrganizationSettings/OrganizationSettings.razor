@@ -35,9 +35,10 @@
                 @(this.ViewModel.Organization.Scope)
             </h1>
 
-            <div class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-amber-950/40 text-primary text-2xs leading-3xs font-medium shrink-0">
+            <BbBadge Variant="BadgeVariant.Secondary"
+                     Class="badge-role text-primary">
                 @(this.ViewModel.CurrentUserRole)
-            </div>
+            </BbBadge>
         </div>
 
         <p class="text-sm leading-xs font-normal text-muted-foreground w-full">
@@ -60,7 +61,7 @@
                 @foreach (var member in this.ViewModel.Members)
                 {
                     <div class="flex items-center gap-3 py-2.25 w-full">
-                        <div class="w-7 h-7 rounded-full bg-[#334155] dark:bg-slate-700 flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
+                        <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
                             @(member.Initials)
                         </div>
 
@@ -113,9 +114,10 @@
                             @(invitation.Email)
                         </span>
 
-                        <div class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-amber-950/40 text-muted-foreground text-2xs leading-3xs font-medium shrink-0">
+                        <BbBadge Variant="BadgeVariant.Secondary"
+                                 Class="badge-role text-muted-foreground">
                             @(invitation.Role)
-                        </div>
+                        </BbBadge>
 
                         <span class="flex-1 text-xs leading-2xs font-normal text-muted-foreground truncate min-w-0">
                             @(invitation.StatusText)

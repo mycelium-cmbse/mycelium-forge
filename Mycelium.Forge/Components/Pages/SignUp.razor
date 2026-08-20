@@ -1,4 +1,4 @@
-﻿@using Mycelium.Forge.Components.Common
+@using Mycelium.Forge.Components.Common
 @attribute [Route(PageRoutes.SignUp)]
 @attribute [Route("/register")]
 @rendermode InteractiveServer
@@ -6,7 +6,7 @@
 <PageTitle>Sign Up &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-body-bg min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center py-10 px-4 select-none">
-    <div class="w-full max-w-[440px] p-8 sm:p-[34px_32px] rounded-[14px] bg-card border border-border shadow-[0px_6px_20px_-4px_rgba(15,23,41,0.06)] dark:shadow-none flex flex-col items-center gap-4.5">
+    <div class="auth-card">
         <ForgeLogo/>
 
         <div class="flex flex-col items-center gap-1 w-full text-center">
@@ -67,7 +67,7 @@
             Create account
         </BbButton>
 
-        <div class="w-full p-2.5 px-3 rounded-lg bg-[#FAECE3] dark:bg-amber-950/40 text-[#6B381F] dark:text-amber-200 text-2xs leading-3xs font-normal">
+        <div class="callout-warning">
             We will send a verification message. Publishing and package-role assignment stay disabled until your address is verified.
         </div>
 

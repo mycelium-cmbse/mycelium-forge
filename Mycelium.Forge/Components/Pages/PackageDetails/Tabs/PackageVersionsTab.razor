@@ -1,4 +1,4 @@
-﻿@if (this.Versions == null || this.Versions.Count == 0)
+@if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
 }
@@ -51,21 +51,24 @@
                             </span>
                             @if (ver.IsLatest)
                             {
-                                <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-secondary text-secondary-text">
+                                <BbBadge Variant="BadgeVariant.Secondary"
+                                         Class="badge-version-state text-secondary-text">
                                     Latest
-                                </span>
+                                </BbBadge>
                             }
                             else if (ver.IsUnlisted)
                             {
-                                <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-secondary text-muted-foreground">
+                                <BbBadge Variant="BadgeVariant.Secondary"
+                                         Class="badge-version-state text-muted-foreground">
                                     Unlisted
-                                </span>
+                                </BbBadge>
                             }
                             else if (ver.IsDeprecated)
                             {
-                                <span class="px-1.5 py-0.5 rounded text-3xs leading-4xs font-medium bg-secondary text-muted-foreground">
+                                <BbBadge Variant="BadgeVariant.Secondary"
+                                         Class="badge-version-state text-muted-foreground">
                                     Deprecated
-                                </span>
+                                </BbBadge>
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 text-muted-foreground p-0">
@@ -77,11 +80,10 @@
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 flex items-center gap-1.5 p-0">
                             @if (ver.IsValidated)
                             {
-                                <LucideIcon Name="check"
-                                            Size="13"
-                                            Class="text-validated shrink-0"/>
-
-                                <span class="text-validated font-medium">Validated</span>
+                                <BbBadge Variant="BadgeVariant.Secondary"
+                                         Class="badge-version-state text-validated">
+                                    Validated
+                                </BbBadge>
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-24 shrink-0 text-muted-foreground p-0">
@@ -91,7 +93,10 @@
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-20 shrink-0 text-right p-0">
                             @if (ver.IsUnlisted)
                             {
-                                <span class="text-muted-foreground font-medium">Unlisted</span>
+                                <BbBadge Variant="BadgeVariant.Secondary"
+                                         Class="badge-version-state text-muted-foreground">
+                                    Unlisted
+                                </BbBadge>
                             }
                             else
                             {

@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Components.Pages
 {
+    using BlazorBlueprint.Components;
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
@@ -89,27 +90,16 @@ namespace Mycelium.Forge.Components.Pages
         }
 
         /// <summary>
-        /// Gets the CSS class string for the visibility cell, applying bold foreground for private packages.
+        /// Gets the badge variant for the package visibility column.
+        /// Private packages use the default (primary-tinted) variant; others use secondary.
         /// </summary>
         /// <param name="entry">The package model item.</param>
-        /// <returns>The computed CSS class string for the visibility table cell.</returns>
-        public string GetVisibilityCellClass(PackageModel entry)
+        /// <returns>The badge variant for the given visibility.</returns>
+        public BadgeVariant GetVisibilityBadgeVariant(PackageModel entry)
         {
-            var isPrivate = entry.Visibility == VisibilityKind.PRIVATE;
-            var modifier = isPrivate ? "font-medium text-foreground" : "font-normal text-secondary-foreground";
-            return $"w-[130px] shrink-0 p-0 {modifier}";
-        }
-
-        /// <summary>
-        /// Gets the CSS class string for the role cell, applying primary color for owners.
-        /// </summary>
-        /// <param name="entry">The package model item.</param>
-        /// <returns>The computed CSS class string for the role table cell.</returns>
-        public string GetRoleCellClass(PackageModel entry)
-        {
-            var isOwner = entry.Role == PackageInvitationKind.OWNER;
-            var colorClass = isOwner ? "text-primary" : "text-muted-foreground";
-            return $"w-[150px] shrink-0 text-xs leading-2xs font-medium p-0 {colorClass}";
+            return entry.Visibility == VisibilityKind.PRIVATE
+                ? BadgeVariant.Default
+                : BadgeVariant.Secondary;
         }
 
         /// <summary>

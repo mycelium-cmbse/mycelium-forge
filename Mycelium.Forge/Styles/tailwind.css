@@ -1,4 +1,4 @@
-﻿/* Tailwind source for Mycelium Forge.
+/* Tailwind source for Mycelium Forge.
  *
  * Compiled to wwwroot/css/app.css by the BuildTailwindCss target in Mycelium.Forge.csproj.
  * This file lives outside wwwroot deliberately: it is build input, not a served asset.
@@ -54,6 +54,7 @@
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-destructive: var(--destructive);
@@ -72,6 +73,9 @@
   --color-badge-foreground: var(--badge-foreground);
   --color-secondary-text: var(--secondary-text);
   --color-avatar-bg: var(--avatar-bg);
+  --color-org-member-avatar-bg: var(--org-member-avatar-bg);
+  --color-org-member-alt-avatar-bg: var(--org-member-alt-avatar-bg);
+  --color-inner-panel-bg: var(--inner-panel-bg);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-success-border: var(--success-border);
@@ -132,6 +136,100 @@
   font-weight: var(--primitive-font-weight-medium);
   color: var(--badge-foreground);
 }
+
+/* Version state badge (Latest / Unlisted / Deprecated / Validated) */
+.badge-version-state {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--primitive-radius-xs);
+  font-size: var(--primitive-font-size-3xs);
+  line-height: var(--primitive-line-height-4xs);
+  font-weight: var(--primitive-font-weight-medium);
+  background-color: var(--secondary);
+  flex-shrink: 0;
+}
+
+/* Role / status mini badge (Admin, Owner, Current, verification labels, invitation roles) */
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5625rem;
+  border-radius: var(--primitive-radius-md);
+  font-size: var(--primitive-font-size-2xs);
+  line-height: var(--primitive-line-height-3xs);
+  font-weight: var(--primitive-font-weight-medium);
+  background-color: var(--primary-subtle);
+  flex-shrink: 0;
+}
+
+/* Tag badge used in the package tags list */
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--primitive-radius-md);
+  font-size: var(--primitive-font-size-xs);
+  line-height: var(--primitive-line-height-2xs);
+  font-weight: var(--primitive-font-weight-medium);
+  background-color: var(--secondary);
+  color: var(--secondary-text);
+}
+
+/* Auth page card container (Login, SignUp, VerifyEmail) */
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 2rem;
+  border-radius: 14px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0px 6px 20px -4px rgba(15, 23, 41, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--spacing, 0.25rem) * 4.5);
+}
+
+.dark .auth-card {
+  box-shadow: none;
+}
+
+/* Warning callout banner (e.g. email verification notice on SignUp) */
+.callout-warning {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--primitive-radius-lg);
+  background-color: var(--primary-subtle);
+  color: var(--warning-foreground);
+  font-size: var(--primitive-font-size-2xs);
+  line-height: var(--primitive-line-height-3xs);
+  font-weight: var(--primitive-font-weight-normal);
+}
+
+/* Inner panel surface (VerifyEmail progress list, etc.) */
+.inner-panel {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--primitive-radius-lg);
+  background-color: var(--inner-panel-bg);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Primary-subtle icon circle (VerifyEmail mail icon, MyPackages/ApiKeys empty states) */
+.icon-circle-primary {
+  border-radius: var(--primitive-radius-full);
+  background-color: var(--primary-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+
 
 /* Container with responsive max-width. */
 .container {

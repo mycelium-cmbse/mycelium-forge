@@ -1,4 +1,4 @@
-﻿/* Primitives Collection
+/* Primitives Collection
  * Raw design tokens (palette colors, typography, sizing, spacing, radiuses).
  * Rule: Never apply a primitive token directly to a component — always alias it through a semantic token or theme utility.
  */
@@ -6,6 +6,7 @@
 :root {
   /* Brand Primitive Palette - Forge Terracotta */
   --primitive-color-terracotta-50: #fdf8f5;
+  --primitive-color-terracotta-75: #faece3;
   --primitive-color-terracotta-100: #fbede6;
   --primitive-color-terracotta-200: #f6d8cc;
   --primitive-color-terracotta-300: #eeb8a3;
@@ -15,6 +16,7 @@
   --primitive-color-terracotta-700: #743419;
   --primitive-color-terracotta-800: #5e2a14;
   --primitive-color-terracotta-900: #492010;
+  --primitive-color-terracotta-950: oklch(27.9% 0.077 45.635);
 
   /* Neutral Primitive Palette - Slate */
   --primitive-color-slate-50: #f7fafc;
@@ -35,6 +37,7 @@
   /* Base Primitive Colors */
   --primitive-color-white: #ffffff;
   --primitive-color-black: #000000;
+  --primitive-color-blue-700: #335999;
 
   /* Semantic Feedback Primitives */
   --primitive-color-red-500: #ef4444;

@@ -1,4 +1,4 @@
-﻿@using BlazorBlueprint.Primitives.Table
+@using BlazorBlueprint.Primitives.Table
 @attribute [Route(PageRoutes.MyPackages)]
 
 <PageTitle>My Packages &mdash; Mycelium Forge</PageTitle>
@@ -76,8 +76,11 @@
                                 <BbTableCell Class="w-[120px] shrink-0 font-normal text-secondary-foreground p-0">
                                     @(package.Version)
                                 </BbTableCell>
-                                <BbTableCell Class="@(this.GetVisibilityCellClass(package))">
-                                    @(package.Visibility)
+                                <BbTableCell Class="w-[130px] shrink-0 p-0">
+                                    <BbBadge Variant="@(this.GetVisibilityBadgeVariant(package))"
+                                             Class="badge-role">
+                                        @(package.Visibility)
+                                    </BbBadge>
                                 </BbTableCell>
                                 <BbTableCell Class="w-[110px] shrink-0 font-normal text-secondary-foreground p-0">
                                     @(package.ImportCount)
@@ -85,8 +88,11 @@
                                 <BbTableCell Class="w-[180px] shrink-0 font-normal text-muted-foreground p-0">
                                     @(package.LastPublished)
                                 </BbTableCell>
-                                <BbTableCell Class="@(this.GetRoleCellClass(package))">
-                                    @(package.Role)
+                                <BbTableCell Class="w-[150px] shrink-0 p-0">
+                                    <BbBadge Variant="BadgeVariant.Secondary"
+                                             Class="@($"badge-role {(package.Role == PackageInvitationKind.OWNER ? "text-primary" : "text-muted-foreground")}")">
+                                        @(package.Role)
+                                    </BbBadge>
                                 </BbTableCell>
                             </BbTableRow>
                         }
@@ -97,8 +103,7 @@
         else
         {
             <div class="w-full rounded-xl bg-card border border-border flex flex-col items-center py-20 gap-3">
-                <div class="w-15 h-15 rounded-full flex items-center justify-center shrink-0"
-                     style="background-color: #FAECE3;">
+                <div class="icon-circle-primary w-15 h-15">
                     <LucideIcon Name="package-open"
                                 Size="28"
                                 Class="text-primary shrink-0"/>

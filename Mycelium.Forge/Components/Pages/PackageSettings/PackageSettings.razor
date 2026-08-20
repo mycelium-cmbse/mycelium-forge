@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRoutes.PackageSettings)]
+@attribute [Route(PageRoutes.PackageSettings)]
 @rendermode InteractiveServer
 
 @if (this.ViewModel.Package == null)
@@ -118,9 +118,10 @@
 
             @if (this.ViewModel.Package.Visibility == VisibilityKind.PRIVATE)
             {
-                <div class="px-2.5 py-0.5 rounded-md bg-[#FAECE3] text-primary text-2xs leading-3xs font-medium shrink-0">
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="badge-role text-primary">
                     Current
-                </div>
+                </BbBadge>
             }
         </div>
 
@@ -140,9 +141,10 @@
 
             @if (this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL)
             {
-                <div class="px-2.5 py-0.5 rounded-md bg-[#FAECE3] text-primary text-2xs leading-3xs font-medium shrink-0">
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="badge-role text-primary">
                     Current
-                </div>
+                </BbBadge>
             }
         </div>
 
@@ -162,9 +164,10 @@
 
             @if (this.ViewModel.Package.Visibility == VisibilityKind.PUBLIC)
             {
-                <div class="px-2.5 py-0.5 rounded-md bg-[#FAECE3] text-primary text-2xs leading-3xs font-medium shrink-0">
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="badge-role text-primary">
                     Current
-                </div>
+                </BbBadge>
             }
         </div>
     </div>
@@ -191,21 +194,24 @@
 
                 @if (version.IsLatest)
                 {
-                    <span class="px-1.75 py-0.5 rounded-md bg-secondary text-2xs leading-3xs font-medium text-secondary-text">
+                    <BbBadge Variant="BadgeVariant.Secondary"
+                             Class="badge-version-state text-secondary-text">
                         Latest
-                    </span>
+                    </BbBadge>
                 }
                 else if (version.IsUnlisted)
                 {
-                    <span class="px-1.75 py-0.5 rounded-md bg-secondary text-2xs leading-3xs font-medium text-muted-foreground">
+                    <BbBadge Variant="BadgeVariant.Secondary"
+                             Class="badge-version-state text-muted-foreground">
                         Unlisted
-                    </span>
+                    </BbBadge>
                 }
                 else if (version.IsDeprecated)
                 {
-                    <span class="px-1.75 py-0.5 rounded-md bg-secondary text-2xs leading-3xs font-medium text-muted-foreground">
+                    <BbBadge Variant="BadgeVariant.Secondary"
+                             Class="badge-version-state text-muted-foreground">
                         Deprecated
-                    </span>
+                    </BbBadge>
                 }
 
                 <div class="flex-1"></div>
