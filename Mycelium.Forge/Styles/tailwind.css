@@ -1,4 +1,4 @@
-﻿/* Tailwind source for Mycelium Forge.
+/* Tailwind source for Mycelium Forge.
  *
  * Compiled to wwwroot/css/app.css by the BuildTailwindCss target in Mycelium.Forge.csproj.
  * This file lives outside wwwroot deliberately: it is build input, not a served asset.
@@ -81,6 +81,10 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-warning-border: var(--warning-border);
   --color-warning-icon: var(--warning-icon);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-border: var(--info-border);
+  --color-info-icon: var(--info-icon);
 
   /* Code snippet surfaces and syntax highlighting */
   --color-code-bg: var(--code-bg);

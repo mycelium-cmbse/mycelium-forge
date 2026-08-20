@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="WebApplicationBuilderExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -29,6 +29,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<IPackageDetailsViewModel, PackageDetailsViewModel>();
             builder.Services.AddTransient<IPublishViewModel, PublishViewModel>();
             builder.Services.AddTransient<IMyPackagesViewModel, MyPackagesViewModel>();
+            builder.Services.AddTransient<IApiKeysViewModel, ApiKeysViewModel>();
 
             return builder;
         }

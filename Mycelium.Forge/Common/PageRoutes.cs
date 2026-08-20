@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PageRoutes.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -68,5 +68,10 @@ namespace Mycelium.Forge.Common
         /// The user's personal package management page route path.
         /// </summary>
         public const string MyPackages = "/my-packages";
+
+        /// <summary>
+        /// The API key management page route path.
+        /// </summary>
+        public const string ApiKeys = "/api-keys";
     }
 }

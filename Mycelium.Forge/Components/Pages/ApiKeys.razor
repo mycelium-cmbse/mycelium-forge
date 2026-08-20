@@ -1,0 +1,141 @@
+@using BlazorBlueprint.Primitives.Table
+@attribute [Route(PageRoutes.ApiKeys)]
+
+<PageTitle>API Keys &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-10 select-none">
+    <div class="page-container flex flex-col gap-5">
+        <div class="flex flex-row items-center gap-3">
+            <div class="flex flex-col gap-1 flex-1">
+                <h1 class="text-3xl leading-3xl font-semibold text-foreground">API keys</h1>
+                <p class="text-sm leading-17 text-muted-foreground">
+                    Tokens for publishing from the CLI or CI. Read access to public packages requires no key.
+                </p>
+            </div>
+            <BbButton Variant="ButtonVariant.Default"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnCreateKey)"
+                      Class="flex flex-row items-center gap-1.5 px-3.5 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm leading-xs font-semibold transition-colors cursor-pointer shrink-0">
+                <LucideIcon Name="plus"
+                            Size="16"
+                            Class="text-white shrink-0"/>
+                <span>Create key</span>
+            </BbButton>
+        </div>
+
+        <div class="w-full p-3.5 px-4 rounded-lg bg-info border border-info-border/50 flex flex-row items-start gap-2.5">
+            <LucideIcon Name="info"
+                        Size="16"
+                        Class="text-info-icon shrink-0 mt-0.5"/>
+            <div class="flex flex-col gap-0.5 flex-1">
+                <span class="text-sm leading-xs font-semibold text-info-foreground">
+                    Publishing from CI? Prefer trusted publishing (OIDC).
+                </span>
+                <p class="text-xs leading-2xs font-normal text-secondary-text">
+                    GitHub Actions and GitLab CI can exchange a short-lived token at publish time, so no long-lived secret lives in your repository.
+                </p>
+            </div>
+            <a href="@PageRoutes.Docs"
+               class="text-sm leading-xs font-semibold text-info-icon hover:underline shrink-0">
+                Configure
+            </a>
+        </div>
+
+        @if (this.ViewModel.ApiKeys.Count > 0)
+        {
+            <div class="w-full rounded-lg bg-card border border-border overflow-hidden">
+                <BbTable Data="@(this.ViewModel.ApiKeys)"
+                         Class="w-full text-left text-sm leading-xs">
+                    <BbTableHeader Class="px-5 py-3 bg-muted border-b border-border flex items-center text-2xs leading-3xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <BbTableHeaderCell TData="ApiKeyModel"
+                                           Class="w-[210px] shrink-0 p-0 text-left font-semibold">
+                            NAME
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="ApiKeyModel"
+                                           Class="w-[140px] shrink-0 p-0 text-left font-semibold">
+                            SCOPE
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="ApiKeyModel"
+                                           Class="w-[200px] shrink-0 p-0 text-left font-semibold">
+                            PERMISSIONS
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="ApiKeyModel"
+                                           Class="w-[130px] shrink-0 p-0 text-left font-semibold">
+                            CREATED
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="ApiKeyModel"
+                                           Class="w-[150px] shrink-0 p-0 text-left font-semibold">
+                            EXPIRES
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="ApiKeyModel"
+                                           Class="w-[160px] shrink-0 p-0 text-left font-semibold">
+                            LAST USED
+                        </BbTableHeaderCell>
+                        <BbTableHeaderCell TData="ApiKeyModel"
+                                           Class="w-[90px] shrink-0 p-0 text-left font-semibold">
+                        </BbTableHeaderCell>
+                    </BbTableHeader>
+                    <BbTableBody Class="divide-y divide-border">
+                        @foreach (var key in this.ViewModel.ApiKeys)
+                        {
+                            <BbTableRow Item="@key"
+                                        Class="px-5 py-3.5 flex items-center hover:bg-muted/50 transition-colors">
+                                <BbTableCell Class="w-[210px] shrink-0 p-0 font-semibold text-sm leading-xs text-foreground truncate">
+                                    @(key.Name)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[140px] shrink-0 p-0 font-medium text-sm leading-xs text-secondary-text truncate">
+                                    @(key.Scope)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[200px] shrink-0 p-0 font-normal text-xs leading-2xs text-secondary-text truncate">
+                                    @(key.Permissions)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[130px] shrink-0 p-0 font-normal text-sm leading-xs text-muted-foreground">
+                                    @(key.Created)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[150px] shrink-0 p-0 font-normal text-sm leading-xs text-secondary-text">
+                                    @(key.Expires)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[160px] shrink-0 p-0 font-normal text-sm leading-xs text-muted-foreground">
+                                    @(key.LastUsed)
+                                </BbTableCell>
+                                <BbTableCell Class="w-[90px] shrink-0 p-0 text-left">
+                                    <button type="button"
+                                            @onclick="() => this.OnRevokeKey(key.Id)"
+                                            class="text-sm leading-xs font-medium text-destructive hover:underline cursor-pointer bg-transparent border-0 p-0">
+                                        Revoke
+                                    </button>
+                                </BbTableCell>
+                            </BbTableRow>
+                        }
+                    </BbTableBody>
+                </BbTable>
+            </div>
+        }
+        else
+        {
+            <div class="w-full rounded-xl bg-card border border-border flex flex-col items-center py-20 gap-3">
+                <div class="w-15 h-15 rounded-full flex items-center justify-center shrink-0"
+                     style="background-color: #FAECE3;">
+                    <LucideIcon Name="key-round"
+                                Size="28"
+                                Class="text-primary shrink-0"/>
+                </div>
+                <h2 class="text-md leading-sm font-semibold text-foreground text-center">
+                    No API keys yet
+                </h2>
+                <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-lg">
+                    Generate an API key to publish packages from the command-line interface or continuous integration pipelines.
+                </p>
+                <BbButton Variant="ButtonVariant.Default"
+                          Type="ButtonType.Button"
+                          OnClick="@(this.OnCreateKey)"
+                          Class="flex flex-row items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm leading-xs font-semibold transition-colors mt-0.5 cursor-pointer">
+                    <LucideIcon Name="plus"
+                                Size="16"
+                                Class="text-white shrink-0"/>
+                    <span>Create key</span>
+                </BbButton>
+            </div>
+        }
+    </div>
+</div>

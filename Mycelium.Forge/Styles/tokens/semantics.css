@@ -1,4 +1,4 @@
-﻿/* Semantics Collection
+/* Semantics Collection
  * Contextual design tokens aliasing raw primitives for theme surfaces and roles.
  * Rule: Components consume semantic tokens via standard Tailwind utility classes.
  */
@@ -47,6 +47,10 @@
   --warning-foreground: var(--primitive-color-amber-700);
   --warning-border: #fde68a;
   --warning-icon: var(--primitive-color-amber-700);
+  --info: #e8f2ff;
+  --info-foreground: #1c478c;
+  --info-border: #bfdbfe;
+  --info-icon: #2b66c9;
   --code-bg: var(--primitive-color-code-bg);
   --code-import: var(--primitive-color-code-import);
   --code-body: var(--primitive-color-code-body);
@@ -85,7 +89,7 @@
   --input: var(--primitive-color-slate-800);
   --ring: var(--primitive-color-terracotta-400);
   --badge-border: var(--primitive-color-slate-700);
-  --badge-foreground: var(--primitive-color-slate-400);
+  --badge-foreground: var(--primitive-color-slate-450);
   --secondary-text: var(--primitive-color-slate-300);
   --avatar-bg: var(--primitive-color-slate-700);
   --success: rgba(2, 44, 34, 0.4);
@@ -97,6 +101,10 @@
   --warning-foreground: var(--primitive-color-amber-400);
   --warning-border: rgba(180, 83, 9, 0.6);
   --warning-icon: var(--primitive-color-amber-400);
+  --info: rgba(30, 58, 138, 0.25);
+  --info-foreground: #93c5fd;
+  --info-border: rgba(59, 130, 246, 0.4);
+  --info-icon: #60a5fa;
   --code-bg: var(--primitive-color-slate-950);
   --code-import: var(--primitive-color-code-import);
   --code-body: var(--primitive-color-code-body);
