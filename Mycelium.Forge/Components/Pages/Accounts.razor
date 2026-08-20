@@ -1,0 +1,202 @@
+@using Mycelium.Forge.Common
+@attribute [Route(PageRoutes.Accounts)]
+@attribute [Route("/accounts")]
+@rendermode InteractiveServer
+
+<PageTitle>Accounts &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+    <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
+        <nav class="flex items-center gap-1.5 text-xs leading-2xs">
+            <a href="@PageRoutes.Docs"
+               class="text-primary hover:underline font-normal">
+                Core concepts
+            </a>
+            <span class="text-muted-foreground font-normal">/</span>
+            <span class="text-muted-foreground font-normal">
+                Packages &amp; the kpar format
+            </span>
+        </nav>
+
+        <div class="flex flex-row items-center justify-between gap-3 w-full h-8">
+            <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight flex-1 truncate">
+                Accounts
+            </h1>
+            <button type="button"
+                    @onclick="this.OnTransfer"
+                    class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+                Transfer
+            </button>
+        </div>
+
+        <p class="text-sm leading-xs font-normal text-muted-foreground w-full">
+            Installation administration. Registration and Organization creation are self-service; these controls exist for support and recovery, and every action here is audited.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full">
+            <div class="w-full sm:w-[340px] h-[34px] px-3 flex items-center gap-2 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors shrink-0">
+                <LucideIcon Name="search"
+                            Size="14"
+                            Class="text-muted-foreground shrink-0"/>
+                <input type="text"
+                       value="@(this.ViewModel.SearchQuery)"
+                       @oninput="this.OnSearchInputChanged"
+                       placeholder="Filter by username or email…"
+                       class="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground border-0 shadow-none focus:outline-none p-0 h-auto"/>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <select value="@(this.ViewModel.SelectedStatusFilter)"
+                            @onchange="this.OnStatusFilterChanged"
+                            class="h-[34px] pl-3 pr-8 rounded-lg bg-card border border-border text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none">
+                        @foreach (var statusOption in this.ViewModel.StatusFilterOptions)
+                        {
+                            <option value="@statusOption">Status: @statusOption</option>
+                        }
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
+                        <LucideIcon Name="chevron-down"
+                                    Size="14"
+                                    Class="shrink-0"/>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <select value="@(this.ViewModel.SelectedVerificationFilter)"
+                            @onchange="this.OnVerificationFilterChanged"
+                            class="h-[34px] pl-3 pr-8 rounded-lg bg-card border border-border text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none">
+                        @foreach (var verificationOption in this.ViewModel.VerificationFilterOptions)
+                        {
+                            <option value="@verificationOption">Verification: @verificationOption</option>
+                        }
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
+                        <LucideIcon Name="chevron-down"
+                                    Size="14"
+                                    Class="shrink-0"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden sm:flex flex-1"></div>
+
+            <span class="text-xs leading-2xs font-normal text-muted-foreground shrink-0 self-center">
+                @(this.GetAccountsCountText())
+            </span>
+        </div>
+
+        <div class="w-full rounded-lg bg-card border border-border overflow-hidden">
+            <div class="overflow-x-auto">
+                <div class="min-w-[900px] flex flex-col">
+                    <div class="flex items-center px-4 py-2.5 bg-muted text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border gap-3">
+                        <span class="w-[250px] shrink-0">ACCOUNT</span>
+                        <span class="w-[250px] shrink-0">EMAIL</span>
+                        <span class="w-[90px] shrink-0">VERIFIED</span>
+                        <span class="w-[210px] shrink-0">ORGANIZATIONS</span>
+                        <span class="w-[90px] shrink-0">STATUS</span>
+                        <span class="flex-1"></span>
+                    </div>
+
+                    <div class="flex flex-col divide-y divide-border">
+                        @if (this.ViewModel.FilteredAccounts.Count > 0)
+                        {
+                            @foreach (var account in this.ViewModel.FilteredAccounts)
+                            {
+                                <div class="flex items-center px-4 py-3 bg-card hover:bg-muted/50 transition-colors gap-3">
+                                    <div class="w-[250px] shrink-0 flex items-center gap-2.5 min-w-0">
+                                        <div class="w-7 h-7 rounded-full bg-[#334155] dark:bg-slate-700 flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
+                                            @(account.Initials)
+                                        </div>
+
+                                        <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
+                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                <span class="text-sm leading-xs font-medium text-foreground truncate">
+                                                    @(account.Name)
+                                                </span>
+                                                @if (account.IsAdministrator)
+                                                {
+                                                    <span class="px-1.5 py-0.5 rounded-md bg-[#FAECE3] dark:bg-amber-950/40 text-primary text-2xs leading-3xs font-medium shrink-0">
+                                                        Admin
+                                                    </span>
+                                                }
+                                            </div>
+                                            <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
+                                                @(account.Username)
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-[250px] shrink-0 truncate">
+                                        <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
+                                            @(account.Email)
+                                        </span>
+                                    </div>
+
+                                    <div class="w-[90px] shrink-0 flex items-center">
+                                        @if (string.Equals(account.VerificationStatus, "Verified", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-emerald-950/40 text-[#218C5C] dark:text-emerald-400 text-2xs leading-3xs font-medium shrink-0">
+                                                Verified
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-amber-950/40 text-[#B2730D] dark:text-amber-400 text-2xs leading-3xs font-medium shrink-0">
+                                                Pending
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <div class="w-[210px] shrink-0 truncate">
+                                        <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
+                                            @(account.Organizations)
+                                        </span>
+                                    </div>
+
+                                    <div class="w-[90px] shrink-0 flex items-center">
+                                        @if (string.Equals(account.Status, "Active", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
+                                                Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="px-2.25 py-0.5 rounded-md bg-[#FAECE3] dark:bg-slate-800 text-muted-foreground text-2xs leading-3xs font-medium shrink-0">
+                                                @(account.Status)
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <div class="flex-1 flex justify-end">
+                                        <button type="button"
+                                                @onclick="() => this.OnAccountMenu(account)"
+                                                class="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
+                                                title="Options">
+                                            <LucideIcon Name="ellipsis"
+                                                        Size="16"
+                                                        Class="text-muted-foreground shrink-0"/>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="py-12 flex flex-col items-center justify-center gap-2 text-center">
+                                <span class="text-sm leading-xs font-medium text-muted-foreground">
+                                    No accounts match the current filter.
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-xs leading-2xs text-muted-foreground w-full">
+            The last Installation Administrator cannot have the role revoked, and an Account that is the last individual Owner of a package cannot be deleted until ownership is transferred.
+        </p>
+    </div>
+</div>
