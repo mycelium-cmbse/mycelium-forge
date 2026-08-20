@@ -55,6 +55,11 @@ namespace Mycelium.Forge.Common
         public const string SignUp = "/signup";
 
         /// <summary>
+        /// The user email verification page route path.
+        /// </summary>
+        public const string VerifyEmail = "/verify-email";
+
+        /// <summary>
         /// The generic error handling page route path.
         /// </summary>
         public const string Error = "/error";
