@@ -23,23 +23,21 @@
             </BbButton>
         </div>
 
-        <div class="w-full p-3.5 px-4 rounded-lg bg-info border border-info-border/50 flex flex-row items-start gap-2.5">
-            <LucideIcon Name="info"
-                        Size="16"
-                        Class="text-info-icon shrink-0 mt-0.5"/>
-            <div class="flex flex-col gap-0.5 flex-1">
-                <span class="text-sm leading-xs font-semibold text-info-foreground">
-                    Publishing from CI? Prefer trusted publishing (OIDC).
-                </span>
-                <p class="text-xs leading-2xs font-normal text-secondary-text">
-                    GitHub Actions and GitLab CI can exchange a short-lived token at publish time, so no long-lived secret lives in your repository.
-                </p>
-            </div>
-            <a href="@PageRoutes.Docs"
-               class="text-sm leading-xs font-semibold text-info-icon hover:underline shrink-0">
-                Configure
-            </a>
-        </div>
+        <ForgeAlert Variant="ForgeAlertVariant.Info"
+                    Title="Publishing from CI? Prefer trusted publishing (OIDC)."
+                    Description="GitHub Actions and GitLab CI can exchange a short-lived token at publish time, so no long-lived secret lives in your repository.">
+            <Icon>
+                <LucideIcon Name="info"
+                            Size="16"
+                            Class="text-info-icon shrink-0"/>
+            </Icon>
+            <Actions>
+                <a href="@PageRoutes.Docs"
+                   class="text-sm leading-xs font-semibold text-info-icon hover:underline shrink-0">
+                    Configure
+                </a>
+            </Actions>
+        </ForgeAlert>
 
         @if (this.ViewModel.ApiKeys.Count > 0)
         {
