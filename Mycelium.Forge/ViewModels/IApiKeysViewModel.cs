@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IApiKeysViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -19,7 +19,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of API keys displayed in the table.
         /// </summary>
-        IReadOnlyList<APIKey> ApiKeys { get; set; }
+        List<APIKey> ApiKeys { get; set; }
 
         /// <summary>
         /// Initializes the view model state and populates the API key collection.

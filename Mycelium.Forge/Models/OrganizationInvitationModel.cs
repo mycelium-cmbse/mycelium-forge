@@ -10,13 +10,43 @@
 namespace Mycelium.Forge.Models
 {
     /// <summary>
-    /// Represents a pending membership invitation sent to an external email address.
+    /// Represents a pending membership invitation sent to an external collaborator or member.
     /// </summary>
-    /// <param name="Email">The recipient email address of the invitation.</param>
-    /// <param name="Role">The role assigned to the invited member upon acceptance.</param>
-    /// <param name="StatusText">The formatted status string detailing when the invitation was sent and when it expires.</param>
-    public record OrganizationInvitationModel(
-        string Email,
-        string Role,
-        string StatusText);
+    public class OrganizationInvitationModel
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationInvitationModel" /> class.
+        /// </summary>
+        public OrganizationInvitationModel()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationInvitationModel" /> class with specified properties.
+        /// </summary>
+        /// <param name="email">The invitee email address.</param>
+        /// <param name="role">The assigned role upon accepting the invitation.</param>
+        /// <param name="statusText">The expiration or invitation status text.</param>
+        public OrganizationInvitationModel(string email, string role, string statusText = "")
+        {
+            this.Email = email;
+            this.Role = role;
+            this.StatusText = statusText;
+        }
+
+        /// <summary>
+        /// Gets or sets the invitee email address.
+        /// </summary>
+        public string Email { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the assigned role upon accepting the invitation.
+        /// </summary>
+        public string Role { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the expiration or invitation status text.
+        /// </summary>
+        public string StatusText { get; set; } = string.Empty;
+    }
 }

@@ -12,7 +12,7 @@ namespace Mycelium.Forge.ViewModels
     using Mycelium.Forge.Models;
 
     /// <summary>
-    /// Defines the view model contract for managing organization members, pending invitations, and scope settings.
+    /// Defines the view model contract for managing organization settings, members, and team roles.
     /// </summary>
     public interface IOrganizationSettingsViewModel
     {
@@ -29,17 +29,17 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of members belonging to the organization.
         /// </summary>
-        IReadOnlyList<OrganizationMemberModel> Members { get; set; }
+        List<OrganizationMemberModel> Members { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of pending invitations for the organization.
         /// </summary>
-        IReadOnlyList<OrganizationInvitationModel> PendingInvitations { get; set; }
+        List<OrganizationInvitationModel> PendingInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the available role options for organization members.
         /// </summary>
-        IReadOnlyList<string> RoleOptions { get; set; }
+        List<string> RoleOptions { get; set; }
 
         /// <summary>
         /// Initializes the view model state for the specified organization identifier or scope.

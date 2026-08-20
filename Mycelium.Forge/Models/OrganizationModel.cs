@@ -9,26 +9,108 @@
 
 namespace Mycelium.Forge.Models
 {
+    using Mycelium.Forge.Common;
+
     /// <summary>
-    /// Represents the organization or publisher profile information displayed on the organization page.
+    /// Represents an organization presentation model wrapping the organization DTO and exposing computed attributes.
     /// </summary>
-    /// <param name="Name">The display name of the organization.</param>
-    /// <param name="Initials">The organization initials used for avatar representation.</param>
-    /// <param name="Scope">The scope or namespace handle of the organization.</param>
-    /// <param name="Description">The summary description or mission statement of the organization.</param>
-    /// <param name="IsVerified">A value indicating whether the organization is a verified publisher.</param>
-    /// <param name="PackageCount">The number of packages published by this organization.</param>
-    /// <param name="VersionCount">The total number of package versions released.</param>
-    /// <param name="ImportCount">The total number of imports across all packages.</param>
-    /// <param name="MemberSinceYear">The year when the organization joined or became a member.</param>
-    public record OrganizationModel(
-        string Name,
-        string Initials,
-        string Scope,
-        string Description,
-        bool IsVerified,
-        int PackageCount,
-        int VersionCount,
-        int ImportCount,
-        int MemberSinceYear);
+    public class OrganizationModel
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationModel" /> class.
+        /// </summary>
+        public OrganizationModel()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationModel" /> class with specified properties.
+        /// </summary>
+        /// <param name="organization">The underlying organization DTO.</param>
+        /// <param name="initials">The short abbreviation or initials.</param>
+        /// <param name="description">The organization description text.</param>
+        /// <param name="isVerified">A value indicating whether the organization publisher is verified.</param>
+        /// <param name="packageCount">The number of published packages.</param>
+        /// <param name="versionCount">The total number of release versions.</param>
+        /// <param name="importCount">The total import count across packages.</param>
+        /// <param name="memberSinceYear">The year the organization was registered.</param>
+        public OrganizationModel(
+            IOrganization organization,
+            string initials = "",
+            string description = "",
+            bool isVerified = true,
+            int packageCount = 0,
+            int versionCount = 0,
+            int importCount = 0,
+            int memberSinceYear = 2025)
+        {
+            this.Organization = organization;
+
+            this.Initials = !string.IsNullOrEmpty(initials)
+                ? initials
+                : organization != null
+                    ? string.Concat(organization.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpperInvariant()
+                    : string.Empty;
+
+            this.Description = !string.IsNullOrEmpty(description)
+                ? description
+                : organization?.Origin ?? string.Empty;
+
+            this.IsVerified = isVerified;
+            this.PackageCount = packageCount;
+            this.VersionCount = versionCount;
+            this.ImportCount = importCount;
+            this.MemberSinceYear = memberSinceYear;
+        }
+
+        /// <summary>
+        /// Gets or sets the underlying organization DTO.
+        /// </summary>
+        public IOrganization Organization { get; set; }
+
+        /// <summary>
+        /// Gets the organization name from the underlying DTO.
+        /// </summary>
+        public string Name => this.Organization?.Name ?? string.Empty;
+
+        /// <summary>
+        /// Gets the scope namespace identifier (e.g., @starion) computed from the short name.
+        /// </summary>
+        public string Scope => this.Organization != null ? $"@{this.Organization.ShortName}" : string.Empty;
+
+        /// <summary>
+        /// Gets or sets the short abbreviation or initials.
+        /// </summary>
+        public string Initials { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the organization description text.
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the organization publisher is verified.
+        /// </summary>
+        public bool IsVerified { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of published packages.
+        /// </summary>
+        public int PackageCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total number of release versions.
+        /// </summary>
+        public int VersionCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total import count across packages.
+        /// </summary>
+        public int ImportCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the year the organization was registered.
+        /// </summary>
+        public int MemberSinceYear { get; set; } = 2025;
+    }
 }

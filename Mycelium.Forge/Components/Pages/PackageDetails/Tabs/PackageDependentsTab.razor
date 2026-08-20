@@ -1,4 +1,4 @@
-@if (this.Dependents == null || this.Dependents.Count == 0)
+﻿@if (this.Dependents == null || this.Dependents.Count == 0)
 {
     return;
 }
@@ -13,12 +13,12 @@
 
     <div class="w-full rounded-lg bg-card border border-border overflow-hidden mt-1">
         <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Dependents)"
-                                                class="w-full text-left text-sm leading-xs">
+                                                  class="w-full text-left text-sm leading-xs">
             <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
                 @foreach (var dependent in this.Dependents)
                 {
                     <BlazorBlueprint.Primitives.Table.BbTableRow Item="@dependent"
-                                                                class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
+                                                                 class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
                             @if (dependent.IsProject)
                             {

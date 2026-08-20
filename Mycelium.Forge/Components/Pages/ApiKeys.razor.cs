@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ApiKeys.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Pages
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
@@ -37,7 +37,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         public void OnCreateKey()
         {
-            var newKey = new Mycelium.Forge.Common.APIKey
+            var newKey = new APIKey
             {
                 Id = Guid.NewGuid(),
                 Name = "deploy-runner",

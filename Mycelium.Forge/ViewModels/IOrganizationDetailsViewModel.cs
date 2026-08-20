@@ -12,7 +12,7 @@ namespace Mycelium.Forge.ViewModels
     using Mycelium.Forge.Models;
 
     /// <summary>
-    /// Defines the view model contract for the Mycelium Forge organization and publisher profile page.
+    /// Defines the view model contract for the organization and publisher profile page.
     /// </summary>
     public interface IOrganizationDetailsViewModel
     {
@@ -24,7 +24,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of packages published by the organization.
         /// </summary>
-        IReadOnlyList<PackageRowModel> Packages { get; set; }
+        List<PackageRowModel> Packages { get; set; }
 
         /// <summary>
         /// Initializes the organization view model state for the specified organization identifier.

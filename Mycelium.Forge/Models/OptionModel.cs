@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OptionModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,7 +10,8 @@
 namespace Mycelium.Forge.Models
 {
     /// <summary>
-    /// Represents a selectable option or facet filter item with a display label, property group, result count, and selection state.
+    /// Represents a selectable option or facet filter item with a display label, property group, result count, and selection
+    /// state.
     /// </summary>
     public class OptionModel
     {

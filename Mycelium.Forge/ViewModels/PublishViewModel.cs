@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,12 +26,12 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the list of wizard workflow steps.
         /// </summary>
-        public IReadOnlyList<PublishStepModel> Steps { get; set; } = [];
+        public List<PublishStepModel> Steps { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the list of pre-publishing validation rule evaluation results.
         /// </summary>
-        public IReadOnlyList<ValidationCheckModel> ValidationChecks { get; set; } = [];
+        public List<ValidationCheckModel> ValidationChecks { get; set; } = [];
 
         /// <summary>
         /// Gets the available scope publisher options.
@@ -118,8 +118,8 @@ namespace Mycelium.Forge.ViewModels
                 new ValidationCheckModel("Namespace uniqueness"),
                 new ValidationCheckModel("Required metadata"),
                 new ValidationCheckModel("Dependency resolution"),
-                new ValidationCheckModel("License file", Status: ValidationStatus.Warning),
-                new ValidationCheckModel("README.md", Status: ValidationStatus.Missing)
+                new ValidationCheckModel("License file", status: ValidationStatus.Warning),
+                new ValidationCheckModel("README.md", status: ValidationStatus.Missing)
             ];
 
             this.IsPublishing = false;

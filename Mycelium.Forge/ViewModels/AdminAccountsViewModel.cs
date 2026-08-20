@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Data;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -37,27 +38,14 @@ namespace Mycelium.Forge.ViewModels
         ];
 
         /// <summary>
-        /// The master collection of seed account records.
-        /// </summary>
-        private readonly List<AdminAccountModel> seedAccounts =
-        [
-            new("1", "R. André", "@r.andre", "RA", "regis.andre@starion.eu", true, "Verified", "@starion (Admin), @esa", "Active"),
-            new("2", "S. Kramer", "@s.kramer", "SK", "s.kramer@starion.eu", false, "Verified", "@starion (Admin)", "Active"),
-            new("3", "J. Klein", "@j.klein", "JK", "j.klein@starion.eu", false, "Verified", "@starion (Admin)", "Active"),
-            new("4", "E. Weber", "@e.weber", "EW", "e.weber@starion.eu", false, "Pending", "@starion (Admin)", "Active"),
-            new("5", "M. Blanc", "@m.blanc", "MB", "m.blanc@starion.eu", false, "Verified", "@starion", "Suspended"),
-            new("6", "A. Novak", "@a.novak", "AN", "a.novak@esa.int", false, "Pending", "@starion (Admin)", "Active")
-        ];
-
-        /// <summary>
         /// Gets or sets the collection of all accounts.
         /// </summary>
-        public IReadOnlyList<AdminAccountModel> Accounts { get; set; } = [];
+        public List<AdminAccountModel> Accounts { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the filtered collection of accounts based on search query, status, and verification filters.
         /// </summary>
-        public IReadOnlyList<AdminAccountModel> FilteredAccounts { get; set; } = [];
+        public List<AdminAccountModel> FilteredAccounts { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the search filter query string.
@@ -89,7 +77,7 @@ namespace Mycelium.Forge.ViewModels
         /// </summary>
         public void InitializeViewModel()
         {
-            this.Accounts = [.. this.seedAccounts];
+            this.Accounts = [.. SeedData.AdminAccounts];
             this.ApplyFilters();
         }
 
@@ -98,7 +86,7 @@ namespace Mycelium.Forge.ViewModels
         /// </summary>
         public void ApplyFilters()
         {
-            var filtered = this.seedAccounts.AsEnumerable();
+            var filtered = this.Accounts.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(this.SearchQuery))
             {
@@ -122,7 +110,7 @@ namespace Mycelium.Forge.ViewModels
                     string.Equals(account.VerificationStatus, this.SelectedVerificationFilter, StringComparison.OrdinalIgnoreCase));
             }
 
-            this.FilteredAccounts = filtered.ToList();
+            this.FilteredAccounts = [.. filtered];
         }
 
         /// <summary>

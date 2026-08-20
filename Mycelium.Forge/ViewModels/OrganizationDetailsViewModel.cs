@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Data;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of packages published by the organization.
         /// </summary>
-        public IReadOnlyList<PackageRowModel> Packages { get; set; } = [];
+        public List<PackageRowModel> Packages { get; set; } = [];
 
         /// <summary>
         /// Initializes the organization view model state for the specified organization identifier.
@@ -32,16 +33,7 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="id">The unique identifier of the organization.</param>
         public void InitializeViewModel(Guid id)
         {
-            this.Organization = new OrganizationModel(
-                "Starion Group",
-                "SG",
-                "@starion",
-                "Systems engineering models and ECSS mission libraries for early-phase spacecraft design.",
-                true,
-                2,
-                4,
-                390,
-                2025);
+            this.Organization = SeedData.StarionOrganizationModel;
 
             this.Packages =
             [

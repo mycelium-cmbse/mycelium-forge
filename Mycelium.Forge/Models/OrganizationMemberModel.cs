@@ -9,17 +9,56 @@
 
 namespace Mycelium.Forge.Models
 {
+    using Mycelium.Forge.Common;
+
     /// <summary>
-    /// Represents a member belonging to an organization along with their display name, handle, avatar initials, and assigned
-    /// role.
+    /// Represents a member within an organization team wrapping their user account DTO.
     /// </summary>
-    /// <param name="Name">The full display name of the organization member.</param>
-    /// <param name="Username">The username handle of the member (e.g., @r.andre).</param>
-    /// <param name="Initials">The initials used for avatar representation.</param>
-    /// <param name="Role">The role assigned to the member within the organization.</param>
-    public record OrganizationMemberModel(
-        string Name,
-        string Username,
-        string Initials,
-        string Role);
+    public class OrganizationMemberModel
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationMemberModel" /> class.
+        /// </summary>
+        public OrganizationMemberModel()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationMemberModel" /> class with specified properties.
+        /// </summary>
+        /// <param name="account">The underlying user account DTO.</param>
+        /// <param name="role">The member's organizational role (e.g., Organization Administrator, Member).</param>
+        public OrganizationMemberModel(IAccount account, string role = "")
+        {
+            this.Account = account;
+            this.Role = role;
+        }
+
+        /// <summary>
+        /// Gets or sets the underlying user account DTO.
+        /// </summary>
+        public IAccount Account { get; set; }
+
+        /// <summary>
+        /// Gets or sets the member's organizational role.
+        /// </summary>
+        public string Role { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets the full display name from the underlying account.
+        /// </summary>
+        public string Name => this.Account?.Name ?? string.Empty;
+
+        /// <summary>
+        /// Gets the formatted handle with leading at-symbol.
+        /// </summary>
+        public string Username => this.Account != null ? $"@{this.Account.ShortName}" : string.Empty;
+
+        /// <summary>
+        /// Gets the uppercase initials extracted from the account name.
+        /// </summary>
+        public string Initials => this.Account != null
+            ? string.Concat(this.Account.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpperInvariant()
+            : string.Empty;
+    }
 }

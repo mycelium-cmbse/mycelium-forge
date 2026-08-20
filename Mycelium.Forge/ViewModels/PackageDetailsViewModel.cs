@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -89,11 +89,11 @@ namespace Mycelium.Forge.ViewModels
 
             var validationChecks = new List<ValidationCheckModel>
             {
-                new("Loads in a fresh workspace", "Parsed 47 elements in 1.2s · 0 errors, 0 warnings", ValidationStatus.Pass),
-                new("Dependencies resolved", "1 dependency: @mycelium/ISQ-quantities-units ^2.4 → 2.5.0", ValidationStatus.Pass),
-                new("Metamodel conformance", "SysML v2 (2025-02) · packaged as KerML clause 10.3 kpar", ValidationStatus.Pass),
-                new("Documentation provided", "README.md present (2.1 KB)", ValidationStatus.Pass),
-                new("License present", "Apache-2.0 (SPDX)", ValidationStatus.Pass)
+                new("Loads in a fresh workspace", "Parsed 47 elements in 1.2s · 0 errors, 0 warnings"),
+                new("Dependencies resolved", "1 dependency: @mycelium/ISQ-quantities-units ^2.4 → 2.5.0"),
+                new("Metamodel conformance", "SysML v2 (2025-02) · packaged as KerML clause 10.3 kpar"),
+                new("Documentation provided", "README.md present (2.1 KB)"),
+                new("License present", "Apache-2.0 (SPDX)")
             };
 
             var validationReport = new PackageValidationReportModel(

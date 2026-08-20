@@ -46,21 +46,24 @@ namespace Mycelium.Forge.ViewModels
             var resolvedScope = string.IsNullOrWhiteSpace(scope) ? "@starion" : scope.StartsWith('@') ? scope : $"@{scope}";
             var resolvedName = string.IsNullOrWhiteSpace(id) ? "ECSS-MM-PWR" : id;
 
+            var packageDto = new Package
+            {
+                Name = resolvedName,
+                ShortName = resolvedName.ToLowerInvariant(),
+                Visibility = VisibilityKind.PUBLIC
+            };
+
             this.Package = new PackageModel(
-                resolvedName,
-                $"/packages/{resolvedScope.TrimStart('@')}/{resolvedName}",
-                string.Empty,
-                "SysML v2",
+                packageDto,
                 resolvedScope,
                 "v1.2.0",
-                string.Empty,
-                "210",
-                true,
-                VisibilityKind.PUBLIC,
-                "2 weeks ago",
-                "Owner",
-                maintainers,
-                versions);
+                importCount: "210",
+                isVerified: true,
+                lastPublished: "2 weeks ago",
+                role: "Owner",
+                href: $"/packages/{resolvedScope.TrimStart('@')}/{resolvedName}",
+                maintainers: maintainers,
+                versions: versions);
         }
 
         /// <summary>

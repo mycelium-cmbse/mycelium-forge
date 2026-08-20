@@ -12,18 +12,17 @@ namespace Mycelium.Forge.ViewModels
     using Mycelium.Forge.Models;
 
     /// <summary>
-    /// Defines the view model contract for the My Packages page, which lists packages
-    /// owned or maintained by the current user across their account and organizations.
+    /// Defines the view model contract for the My Packages page.
     /// </summary>
     public interface IMyPackagesViewModel
     {
         /// <summary>
-        /// Gets or sets the collection of package entries to display in the table.
+        /// Gets or sets the collection of packages owned or maintained by the current user.
         /// </summary>
-        IReadOnlyList<PackageModel> Packages { get; set; }
+        List<PackageModel> Packages { get; set; }
 
         /// <summary>
-        /// Initializes the view model state and populates the package collection.
+        /// Initializes the view model state and populates the packages collection.
         /// </summary>
         void InitializeViewModel();
     }

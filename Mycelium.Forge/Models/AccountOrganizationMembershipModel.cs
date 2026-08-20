@@ -9,18 +9,66 @@
 
 namespace Mycelium.Forge.Models
 {
+    using Mycelium.Forge.Common;
+
     /// <summary>
-    /// Represents an organization membership associated with the user account.
+    /// Represents an organization that a user account is a member of, wrapping the organization DTO.
     /// </summary>
-    /// <param name="Scope">The handle or scope of the organization.</param>
-    /// <param name="Name">The full display name of the organization.</param>
-    /// <param name="Initials">The initials used for the organization avatar.</param>
-    /// <param name="Role">The role assigned to the user within the organization.</param>
-    /// <param name="IsAdministrator">A value indicating whether the user is an administrator of the organization.</param>
-    public record AccountOrganizationMembershipModel(
-        string Scope,
-        string Name,
-        string Initials,
-        string Role,
-        bool IsAdministrator = false);
+    public class AccountOrganizationMembershipModel
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountOrganizationMembershipModel" /> class.
+        /// </summary>
+        public AccountOrganizationMembershipModel()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountOrganizationMembershipModel" /> class with specified properties.
+        /// </summary>
+        /// <param name="organization">The underlying organization DTO.</param>
+        /// <param name="role">The user's role within this organization.</param>
+        /// <param name="isAdministrator">A value indicating whether the user is an administrator of the organization.</param>
+        public AccountOrganizationMembershipModel(
+            IOrganization organization,
+            string role = "",
+            bool isAdministrator = false)
+        {
+            this.Organization = organization;
+            this.Role = role;
+            this.IsAdministrator = isAdministrator;
+        }
+
+        /// <summary>
+        /// Gets or sets the underlying organization DTO.
+        /// </summary>
+        public IOrganization Organization { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user's role within this organization.
+        /// </summary>
+        public string Role { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user is an administrator of the organization.
+        /// </summary>
+        public bool IsAdministrator { get; set; }
+
+        /// <summary>
+        /// Gets the organization scope namespace identifier (e.g., @starion).
+        /// </summary>
+        public string Scope => this.Organization != null ? $"@{this.Organization.ShortName}" : string.Empty;
+
+        /// <summary>
+        /// Gets the full display name of the organization.
+        /// </summary>
+        public string Name => this.Organization?.Name ?? string.Empty;
+
+        /// <summary>
+        /// Gets the uppercase initials extracted from the organization name.
+        /// </summary>
+        public string Initials => this.Organization != null
+            ? string.Concat(this.Organization.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpperInvariant()
+            : string.Empty;
+    }
 }

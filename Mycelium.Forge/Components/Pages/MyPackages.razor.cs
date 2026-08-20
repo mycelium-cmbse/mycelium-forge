@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -44,9 +44,11 @@ namespace Mycelium.Forge.Components.Pages
                 return this.ViewModel.Packages;
             }
 
-            return this.ViewModel.Packages
-                .Where(package => string.Equals(package.Publisher, this.SelectedPublisher, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            return
+            [
+                .. this.ViewModel.Packages
+                    .Where(package => string.Equals(package.Publisher, this.SelectedPublisher, StringComparison.OrdinalIgnoreCase))
+            ];
         }
 
         /// <summary>

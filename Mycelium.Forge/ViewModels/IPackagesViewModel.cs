@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -19,12 +19,12 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of facet filter options.
         /// </summary>
-        IReadOnlyList<OptionModel> Facets { get; set; }
+        List<OptionModel> Facets { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of displayed package search result items.
         /// </summary>
-        IReadOnlyList<PackageRowModel> PackageResults { get; set; }
+        List<PackageRowModel> PackageResults { get; set; }
 
         /// <summary>
         /// Initializes the view model state and executes the initial package search.

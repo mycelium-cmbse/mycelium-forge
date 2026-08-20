@@ -12,19 +12,19 @@ namespace Mycelium.Forge.ViewModels
     using Mycelium.Forge.Models;
 
     /// <summary>
-    /// Defines the contract for the view model managing installation administration accounts.
+    /// Defines the view model contract for the installation accounts administration page.
     /// </summary>
     public interface IAdminAccountsViewModel
     {
         /// <summary>
         /// Gets or sets the collection of all accounts.
         /// </summary>
-        IReadOnlyList<AdminAccountModel> Accounts { get; set; }
+        List<AdminAccountModel> Accounts { get; set; }
 
         /// <summary>
-        /// Gets or sets the filtered collection of accounts based on search query, status, and verification filters.
+        /// Gets or sets the filtered collection of accounts based on active filters.
         /// </summary>
-        IReadOnlyList<AdminAccountModel> FilteredAccounts { get; set; }
+        List<AdminAccountModel> FilteredAccounts { get; set; }
 
         /// <summary>
         /// Gets or sets the search filter query string.
@@ -52,7 +52,7 @@ namespace Mycelium.Forge.ViewModels
         IReadOnlyList<string> VerificationFilterOptions { get; }
 
         /// <summary>
-        /// Initializes the view model state and loads initial seed accounts.
+        /// Initializes the view model state and loads accounts.
         /// </summary>
         void InitializeViewModel();
 

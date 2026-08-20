@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Data;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -17,28 +18,6 @@ namespace Mycelium.Forge.ViewModels
     public class AccountSettingsViewModel : IAccountSettingsViewModel
     {
         /// <summary>
-        /// The initial seed organization memberships.
-        /// </summary>
-        private readonly List<AccountOrganizationMembershipModel> seedOrganizations =
-        [
-            new("@starion", "Starion Group", "SG", "Organization Administrator", true),
-            new("@esa", "European Space Agency", "ES", "Organization Administrator")
-        ];
-
-        /// <summary>
-        /// The initial seed profile information.
-        /// </summary>
-        private readonly UserProfileModel seedProfile = new(
-            "r.andre",
-            "regis.andre@starion.eu",
-            true,
-            "R. André",
-            "Starion Group",
-            "Toulouse, France",
-            "stariongroup.eu",
-            "Systems engineer, concurrent design.");
-
-        /// <summary>
         /// Gets or sets the user profile details.
         /// </summary>
         public UserProfileModel Profile { get; set; }
@@ -46,15 +25,19 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of organization memberships associated with the user account.
         /// </summary>
-        public IReadOnlyList<AccountOrganizationMembershipModel> Organizations { get; set; } = [];
+        public List<AccountOrganizationMembershipModel> Organizations { get; set; } = [];
 
         /// <summary>
         /// Initializes the view model state and populates initial user profile and organization data.
         /// </summary>
         public void InitializeViewModel()
         {
-            this.Profile = this.seedProfile;
-            this.Organizations = [.. this.seedOrganizations];
+            this.Profile = new UserProfileModel(
+                SeedData.RegisAccount,
+                "Starion Group",
+                "Systems engineer, concurrent design.");
+
+            this.Organizations = [.. SeedData.RegisOrganizationMemberships];
         }
 
         /// <summary>

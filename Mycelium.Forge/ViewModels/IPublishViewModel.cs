@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IPublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,12 +26,12 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the list of wizard workflow steps.
         /// </summary>
-        IReadOnlyList<PublishStepModel> Steps { get; set; }
+        List<PublishStepModel> Steps { get; set; }
 
         /// <summary>
         /// Gets or sets the list of pre-publishing validation rule evaluation results.
         /// </summary>
-        IReadOnlyList<ValidationCheckModel> ValidationChecks { get; set; }
+        List<ValidationCheckModel> ValidationChecks { get; set; }
 
         /// <summary>
         /// Gets the available scope publisher options.

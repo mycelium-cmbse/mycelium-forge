@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Data;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -19,7 +20,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// The list of available role options for organization members.
         /// </summary>
-        private static readonly IReadOnlyList<string> AvailableRoles =
+        private static readonly List<string> AvailableRoles =
         [
             "Organization Administrator",
             "Forge Publisher",
@@ -39,17 +40,17 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of members belonging to the organization.
         /// </summary>
-        public IReadOnlyList<OrganizationMemberModel> Members { get; set; } = [];
+        public List<OrganizationMemberModel> Members { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the collection of pending invitations for the organization.
         /// </summary>
-        public IReadOnlyList<OrganizationInvitationModel> PendingInvitations { get; set; } = [];
+        public List<OrganizationInvitationModel> PendingInvitations { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the available role options for organization members.
         /// </summary>
-        public IReadOnlyList<string> RoleOptions { get; set; } = AvailableRoles;
+        public List<string> RoleOptions { get; set; } = AvailableRoles;
 
         /// <summary>
         /// Initializes the view model state for the specified organization identifier or scope.
@@ -57,28 +58,9 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="id">The unique identifier or slug handle of the organization.</param>
         public void InitializeViewModel(string id)
         {
-            var scope = string.IsNullOrWhiteSpace(id) ? "@starion" : id.StartsWith('@') ? id : $"@{id}";
-
-            this.Organization = new OrganizationModel(
-                "Starion Group",
-                "SG",
-                scope,
-                "the slug @starion is reserved as this organization’s package scope.",
-                true,
-                6,
-                14,
-                390,
-                2025);
-
+            this.Organization = SeedData.StarionOrganizationModel;
             this.CurrentUserRole = "Organization Administrator";
-
-            this.Members =
-            [
-                new OrganizationMemberModel("R. André", "@r.andre", "RA", "Organization Administrator"),
-                new OrganizationMemberModel("S. Kramer", "@s.kramer", "SK", "Organization Administrator"),
-                new OrganizationMemberModel("J. Klein", "@j.klein", "JK", "Forge Publisher"),
-                new OrganizationMemberModel("M. Blanc", "@m.blanc", "MB", "Organization Member")
-            ];
+            this.Members = [.. SeedData.StarionMembers];
 
             this.PendingInvitations =
             [
@@ -93,9 +75,7 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="newRole">The new role to assign to the member.</param>
         public void ChangeMemberRole(OrganizationMemberModel member, string newRole)
         {
-            this.Members = this.Members
-                .Select(m => m == member ? m with { Role = newRole } : m)
-                .ToList();
+            member?.Role = newRole;
         }
 
         /// <summary>
@@ -104,9 +84,7 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="member">The member to remove.</param>
         public void RemoveMember(OrganizationMemberModel member)
         {
-            this.Members = this.Members
-                .Where(m => m != member)
-                .ToList();
+            this.Members.Remove(member);
         }
 
         /// <summary>
@@ -123,9 +101,7 @@ namespace Mycelium.Forge.ViewModels
         /// <param name="invitation">The invitation to revoke.</param>
         public void RevokeInvitation(OrganizationInvitationModel invitation)
         {
-            this.PendingInvitations = this.PendingInvitations
-                .Where(i => i != invitation)
-                .ToList();
+            this.PendingInvitations.Remove(invitation);
         }
 
         /// <summary>

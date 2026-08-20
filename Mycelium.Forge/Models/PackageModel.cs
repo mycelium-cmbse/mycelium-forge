@@ -26,56 +26,67 @@ namespace Mycelium.Forge.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageModel" /> class with specified properties.
         /// </summary>
-        /// <param name="name">The package name.</param>
-        /// <param name="href">The relative URL to the package page.</param>
-        /// <param name="description">The package description.</param>
-        /// <param name="format">The format name (e.g., SysML v2, CDP4-COMET, Capella).</param>
-        /// <param name="publisher">The publisher namespace or author.</param>
+        /// <param name="package">The underlying package DTO.</param>
+        /// <param name="publisher">The publisher namespace or author handle.</param>
         /// <param name="version">The package release version.</param>
+        /// <param name="format">The format name (e.g., SysML v2, CDP4-COMET, Capella).</param>
+        /// <param name="description">The package description.</param>
         /// <param name="tags">The tags string.</param>
         /// <param name="importCount">The number of imports.</param>
         /// <param name="isVerified">Whether the publisher is verified.</param>
-        /// <param name="visibility">The visibility of the package.</param>
         /// <param name="lastPublished">The relative elapsed time since the last publish.</param>
         /// <param name="role">The user's role for this package (e.g., Owner, Maintainer).</param>
+        /// <param name="href">The relative URL to the package page.</param>
         /// <param name="maintainers">The collection of maintainers for the package.</param>
         /// <param name="versions">The collection of release versions for the package.</param>
         public PackageModel(
-            string name,
-            string href = "",
-            string description = "",
-            string format = "",
+            IPackage package,
             string publisher = "",
             string version = "",
+            string format = "SysML v2",
+            string description = "",
             string tags = "",
             string importCount = "",
             bool isVerified = false,
-            VisibilityKind visibility = VisibilityKind.PUBLIC,
             string lastPublished = "",
             string role = "Owner",
+            string href = "",
             IReadOnlyList<PackageMaintainerModel> maintainers = null,
             IReadOnlyList<PackageVersionModel> versions = null)
         {
-            this.Name = name;
-            this.Href = href;
-            this.Description = description;
-            this.Format = format;
+            this.Package = package;
             this.Publisher = publisher;
             this.Version = version;
+            this.Format = format;
+            this.Description = description;
             this.Tags = tags;
             this.ImportCount = importCount;
             this.IsVerified = isVerified;
-            this.Visibility = visibility;
             this.LastPublished = lastPublished;
             this.Role = role;
+
+            this.Href = !string.IsNullOrEmpty(href)
+                ? href
+                : $"/packages/{(string.IsNullOrEmpty(publisher) ? "starion" : publisher.TrimStart('@'))}/{package?.ShortName ?? string.Empty}";
+
             this.Maintainers = maintainers ?? [];
             this.Versions = versions ?? [];
         }
 
         /// <summary>
-        /// Gets or sets the package name.
+        /// Gets or sets the underlying package DTO.
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public IPackage Package { get; set; }
+
+        /// <summary>
+        /// Gets the package name.
+        /// </summary>
+        public string Name => this.Package?.Name ?? string.Empty;
+
+        /// <summary>
+        /// Gets the package short name handle.
+        /// </summary>
+        public string ShortName => this.Package?.ShortName ?? string.Empty;
 
         /// <summary>
         /// Gets or sets the relative URL to the package page.
@@ -118,9 +129,19 @@ namespace Mycelium.Forge.Models
         public bool IsVerified { get; set; }
 
         /// <summary>
-        /// Gets or sets the visibility of the package.
+        /// Gets or sets the visibility of the package from the underlying package DTO.
         /// </summary>
-        public VisibilityKind Visibility { get; set; } = VisibilityKind.PUBLIC;
+        public VisibilityKind Visibility
+        {
+            get => this.Package?.Visibility ?? VisibilityKind.PUBLIC;
+            set
+            {
+                if (this.Package != null)
+                {
+                    this.Package.Visibility = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the relative elapsed time since the last publish.

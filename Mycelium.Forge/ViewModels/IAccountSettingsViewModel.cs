@@ -12,7 +12,7 @@ namespace Mycelium.Forge.ViewModels
     using Mycelium.Forge.Models;
 
     /// <summary>
-    /// Defines the view model contract for the user account settings and profile management page.
+    /// Defines the view model contract for the user account settings and profile page.
     /// </summary>
     public interface IAccountSettingsViewModel
     {
@@ -24,7 +24,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of organization memberships associated with the user account.
         /// </summary>
-        IReadOnlyList<AccountOrganizationMembershipModel> Organizations { get; set; }
+        List<AccountOrganizationMembershipModel> Organizations { get; set; }
 
         /// <summary>
         /// Initializes the view model state and populates initial user profile and organization data.

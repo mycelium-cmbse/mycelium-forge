@@ -39,22 +39,22 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the standard library package models.
         /// </summary>
-        IReadOnlyList<PackageModel> StandardLibraries { get; set; }
+        List<PackageModel> StandardLibraries { get; set; }
 
         /// <summary>
         /// Gets or sets the recently updated package models.
         /// </summary>
-        IReadOnlyList<PackageModel> RecentlyUpdated { get; set; }
+        List<PackageModel> RecentlyUpdated { get; set; }
 
         /// <summary>
         /// Gets or sets the most used package models.
         /// </summary>
-        IReadOnlyList<PackageModel> MostUsed { get; set; }
+        List<PackageModel> MostUsed { get; set; }
 
         /// <summary>
         /// Gets or sets the package models from other MBSE tools.
         /// </summary>
-        IReadOnlyList<PackageModel> ModelsFromOtherMbseTools { get; set; }
+        List<PackageModel> ModelsFromOtherMbseTools { get; set; }
 
         /// <summary>
         /// Initializes the view model state and populates the package catalog collections.

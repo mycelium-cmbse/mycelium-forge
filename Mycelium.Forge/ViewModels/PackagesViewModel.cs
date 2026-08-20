@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,87 +12,92 @@ namespace Mycelium.Forge.ViewModels
     using Mycelium.Forge.Models;
 
     /// <summary>
-    /// Provides view model state and operations for the Mycelium Forge package discovery and filtering page.
+    /// Provides view model state and operations for the Mycelium Forge package discovery and catalog page.
     /// </summary>
     public class PackagesViewModel : IPackagesViewModel
     {
         /// <summary>
-        /// The master collection of package search result items.
+        /// The master collection of seed package catalog search results.
         /// </summary>
-        private readonly IReadOnlyList<PackageRowModel> allPackages =
+        private readonly List<PackageRowModel> allPackages =
         [
             new(
-                "ecss-e-st-10-04c",
-                "/packages/esa/ecss-e-st-10-04c",
-                "Space environment standard reference model for space systems engineering.",
-                "SysML v2",
-                "@esa",
-                "v1.4.0",
-                "aocs · thermal · space · environment · ecss",
-                "3 days ago",
-                "420"),
-            new(
-                "ecss-e-st-70-46c",
-                "/packages/esa/ecss-e-st-70-46c",
-                "Electrical and power system architectures following ECSS engineering standards.",
-                "SysML v2",
-                "@esa",
-                "v2.1.0",
-                "power · electrical · subsystems · ecss",
-                "2 weeks ago",
-                "315"),
-            new(
-                "ecss-e-st-50-14c",
-                "/packages/esa/ecss-e-st-50-14c",
-                "Attitude and orbit control system spacecraft dynamics reference package.",
-                "SysML v2",
-                "@esa",
-                "v0.9.2",
-                "aocs · dynamics · navigation · ecss",
-                "1 month ago",
-                "280"),
-            new(
-                "ecss-e-st-32-10c",
-                "/packages/starion/ecss-e-st-32-10c",
-                "RF telecommunication link budget and space communication interfaces.",
+                "ECSS-MM-PWR",
+                "/packages/starion/ECSS-MM-PWR",
+                "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
                 "SysML v2",
                 "@starion",
-                "v0.3.0",
-                "comms · rf · telemetry · ecss",
-                "2 months ago",
-                "190"),
-            new(
-                "ecss-e-st-31-01c",
-                "/packages/starion/ecss-e-st-31-01c",
-                "Structural and mechanical engineering domain metamodels and loads analysis.",
-                "SysML v2",
-                "@starion",
-                "v1.0.0",
-                "mechanical · structures · loads · ecss",
-                "3 months ago",
-                "165"),
-            new(
-                "ECSS-E-TM-10-25-Schema",
-                "/packages/esa/ECSS-E-TM-10-25-Schema",
-                "Space engineering model-based data exchange engineering ontology.",
-                "CDP4-COMET",
-                "@esa",
                 "v1.2.0",
-                "ecss · cdp4 · space · ontology · exchange",
-                "4 months ago",
-                "940",
+                "mission-model · power · ecss",
+                "2 weeks ago",
+                "210",
+                true),
+            new(
+                "SysMLv2-ISQ-Quantities",
+                "/packages/omg/SysMLv2-ISQ-Quantities",
+                "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000. Quantities of kind, measurement units, and dimension vectors.",
+                "SysML v2",
+                "@omg",
+                "v2025.2",
+                "standard-library · quantities-units · isq · sysml2",
+                "1 month ago",
+                "1.4k",
+                true),
+            new(
+                "SysMLv2-Kernel-Library",
+                "/packages/omg/SysMLv2-Kernel-Library",
+                "Fundamental KerML metamodel library containing base types, collections, control functions, and measurement scales used by all SysML v2 packages.",
+                "SysML v2",
+                "@omg",
+                "v2025.2",
+                "standard-library · kerml · kernel · sysml2",
+                "1 month ago",
+                "2.1k",
+                true),
+            new(
+                "ECSS-E-ST-10-04C",
+                "/packages/esa/ECSS-E-ST-10-04C",
+                "Space environment definitions following ECSS-E-ST-10-04C. Earth atmosphere models, solar radiation, geomagnetic field, and planetary constants.",
+                "SysML v2",
+                "@esa",
+                "v1.0.0",
+                "mission-model · space-environment · ecss · esa",
+                "2 months ago",
+                "860",
+                true),
+            new(
+                "SmallSat-Platform-Model",
+                "/packages/starion/SmallSat-Platform-Model",
+                "Parametric smallsat platform model including bus geometry, mass properties, power budget, and propulsion subsystem interfaces.",
+                "SysML v2",
+                "@starion",
+                "v0.8.2",
+                "mission-model · smallsat · platform · starion",
+                "3 weeks ago",
+                "145",
+                true),
+            new(
+                "CDP4-COMET-Core",
+                "/packages/starion/CDP4-COMET-Core",
+                "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25 concurrent design platform.",
+                "CDP4-COMET (10-25)",
+                "@starion",
+                "v10.25.1",
+                "concurrent-engineering · cdp4 · comet · ecss-10-25",
+                "1 month ago",
+                "320",
                 true)
         ];
 
         /// <summary>
         /// Gets or sets the collection of facet filter options.
         /// </summary>
-        public IReadOnlyList<OptionModel> Facets { get; set; } = [];
+        public List<OptionModel> Facets { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the collection of displayed package search result items.
         /// </summary>
-        public IReadOnlyList<PackageRowModel> PackageResults { get; set; } = [];
+        public List<PackageRowModel> PackageResults { get; set; } = [];
 
         /// <summary>
         /// Initializes the view model state and executes the initial package search.
@@ -116,7 +121,7 @@ namespace Mycelium.Forge.ViewModels
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                this.PackageResults = this.allPackages;
+                this.PackageResults = [.. this.allPackages];
                 return;
             }
 

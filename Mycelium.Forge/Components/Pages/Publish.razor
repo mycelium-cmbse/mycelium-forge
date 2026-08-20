@@ -1,4 +1,4 @@
-@attribute [Route(PageRoutes.Publish)]
+﻿@attribute [Route(PageRoutes.Publish)]
 @rendermode InteractiveServer
 
 <PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
@@ -45,10 +45,10 @@
             <span class="font-mono text-sm leading-17 text-foreground flex-1 truncate">
                 @(this.ViewModel.Metadata.ArtefactFileName)
             </span>
-            
+
             <BbBadge Variant="BadgeVariant.Secondary"
                      Class="badge-format">
-                    @(this.ViewModel.Metadata.ArtefactFormat)
+                @(this.ViewModel.Metadata.ArtefactFormat)
             </BbBadge>
 
             <button type="button"
