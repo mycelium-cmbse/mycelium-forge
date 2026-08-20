@@ -78,5 +78,10 @@ namespace Mycelium.Forge.Common
         /// The user account settings page route path.
         /// </summary>
         public const string AccountSettings = "/settings/account";
+
+        /// <summary>
+        /// The organization settings page route path.
+        /// </summary>
+        public const string OrganizationSettings = "/organizations/{id}/settings";
     }
 }
