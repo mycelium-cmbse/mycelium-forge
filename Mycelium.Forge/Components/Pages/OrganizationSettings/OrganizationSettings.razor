@@ -10,21 +10,33 @@
 
 <div class="w-full bg-body-bg min-h-screen py-9 select-none">
     <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-        <nav class="flex items-center gap-1.5 text-xs leading-2xs">
-            <a href="@PageRoutes.Packages"
-               class="text-primary hover:underline font-normal">
-                Browse
-            </a>
-            <span class="text-muted-foreground font-normal">/</span>
-            <a href="@($"/organizations/{this.ViewModel.Organization.Scope.TrimStart('@')}")"
-               class="text-primary hover:underline font-normal">
-                @(this.ViewModel.Organization.Scope)
-            </a>
-            <span class="text-muted-foreground font-normal">/</span>
-            <span class="text-muted-foreground font-normal">
-                ECSS-MM-PWR
-            </span>
-        </nav>
+        <BbBreadcrumb Class="text-xs leading-2xs">
+            <BbBreadcrumbList>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@PageRoutes.Packages"
+                                      Class="text-primary hover:underline font-normal">
+                        Browse
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@($"/organizations/{this.ViewModel.Organization.Scope.TrimStart('@')}")"
+                                      Class="text-primary hover:underline font-normal">
+                        @(this.ViewModel.Organization.Scope)
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                        ECSS-MM-PWR
+                    </BbBreadcrumbPage>
+                </BbBreadcrumbItem>
+            </BbBreadcrumbList>
+        </BbBreadcrumb>
 
         <div class="flex items-center gap-3 w-full">
             <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">

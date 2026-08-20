@@ -10,16 +10,23 @@
 
 <div class="w-full bg-body-bg min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-<nav class="flex items-center gap-1.5 text-xs leading-2xs">
-    <a href="@PageRoutes.Docs"
-       class="text-primary hover:underline font-normal">
-        Core concepts
-    </a>
-    <span class="text-muted-foreground font-normal">/</span>
-    <span class="text-muted-foreground font-normal">
-        Packages &amp; the kpar format
-    </span>
-</nav>
+<BbBreadcrumb Class="text-xs leading-2xs">
+    <BbBreadcrumbList>
+        <BbBreadcrumbItem>
+            <BbBreadcrumbLink Class="text-muted-foreground font-normal">
+                Account
+            </BbBreadcrumbLink>
+        </BbBreadcrumbItem>
+        <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+            /
+        </BbBreadcrumbSeparator>
+        <BbBreadcrumbItem>
+            <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                Settings
+            </BbBreadcrumbPage>
+        </BbBreadcrumbItem>
+    </BbBreadcrumbList>
+</BbBreadcrumb>
 
 <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
     Account settings
@@ -44,7 +51,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnChangeUsername)"
-                      Class="shrink-0">
+                      Class="h-7 text-xs px-2.5 shrink-0">
                 Change
             </BbButton>
         </div>
@@ -67,7 +74,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnChangeEmail)"
-                      Class="shrink-0">
+                      Class="h-7 text-xs px-2.5 shrink-0">
                 Change
             </BbButton>
         </div>
@@ -83,7 +90,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditDisplayName)"
-                      Class="shrink-0">
+                      Class="h-7 text-xs px-2.5 shrink-0">
                 Edit
             </BbButton>
         </div>
@@ -99,7 +106,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditCompany)"
-                      Class="shrink-0">
+                      Class="h-7 text-xs px-2.5 shrink-0">
                 Edit
             </BbButton>
         </div>
@@ -115,7 +122,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditLocation)"
-                      Class="shrink-0">
+                      Class="h-7 text-xs px-2.5 shrink-0">
                 Edit
             </BbButton>
         </div>
@@ -131,7 +138,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditWebsite)"
-                      Class="shrink-0">
+                      Class="h-7 text-xs px-2.5 shrink-0">
                 Edit
             </BbButton>
         </div>
@@ -147,7 +154,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditBiography)"
-                      Class="shrink-0">
+                      Class="h-7 text-xs px-2.5 shrink-0">
                 Edit
             </BbButton>
         </div>
@@ -163,7 +170,7 @@
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCreateOrganization)"
-                  Class="btn-destructive-outline shrink-0">
+                  Class="btn-destructive-outline h-7 text-xs px-2.5 shrink-0">
             Transfer
         </BbButton>
     </div>
@@ -216,7 +223,7 @@
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnDeactivateAccount)"
-                  Class="shrink-0">
+                  Class="h-7 text-xs px-2.5 shrink-0">
             Deactivate
         </BbButton>
     </div>
@@ -235,7 +242,7 @@
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnDeleteAccount)"
-                  Class="btn-destructive-outline shrink-0">
+                  Class="btn-destructive-outline h-7 text-xs px-2.5 shrink-0">
             Delete
         </BbButton>
     </div>

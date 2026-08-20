@@ -54,3 +54,10 @@ a[data-variant="outline"].btn-destructive:hover {
   background-color: transparent;
   border-width: 0;
 }
+
+/* Input placeholder text truncation and ellipsis behavior */
+input::placeholder {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Login.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -40,12 +40,23 @@ namespace Mycelium.Forge.Components.Pages
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
+        /// Gets or sets the validation error message for the email field.
+        /// </summary>
+        public string EmailError { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the validation error message for the password field.
+        /// </summary>
+        public string PasswordError { get; set; } = string.Empty;
+
+        /// <summary>
         /// Handles changes to the email input value.
         /// </summary>
         /// <param name="email">The new email address value.</param>
         public void OnEmailChanged(string email)
         {
             this.ViewModel.Email = email ?? string.Empty;
+            this.EmailError = string.Empty;
         }
 
         /// <summary>
@@ -55,6 +66,7 @@ namespace Mycelium.Forge.Components.Pages
         public void OnPasswordChanged(string password)
         {
             this.ViewModel.Password = password ?? string.Empty;
+            this.PasswordError = string.Empty;
         }
 
         /// <summary>
@@ -62,6 +74,14 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         public void OnLogin()
         {
+            this.EmailError = string.IsNullOrWhiteSpace(this.ViewModel.Email) ? "Email address is required." : string.Empty;
+            this.PasswordError = string.IsNullOrWhiteSpace(this.ViewModel.Password) ? "Password is required." : string.Empty;
+
+            if (!string.IsNullOrEmpty(this.EmailError) || !string.IsNullOrEmpty(this.PasswordError))
+            {
+                return;
+            }
+
             var result = this.ViewModel.Login();
 
             if (result.IsSuccess)

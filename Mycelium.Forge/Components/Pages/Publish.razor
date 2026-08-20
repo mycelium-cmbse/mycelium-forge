@@ -69,168 +69,184 @@
     </h2>
 
     <div class="w-full flex flex-col sm:flex-row items-start gap-3">
-        <div class="w-full sm:w-[200px] shrink-0 flex flex-col gap-1.5">
-            <BbLabel For="publish-scope"
-                     Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <BbField Class="w-full sm:w-[200px] shrink-0 flex flex-col gap-1.5">
+            <BbFieldLabel For="publish-scope"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 SCOPE
-            </BbLabel>
-            <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
-                                                        Value="@(this.ViewModel.Metadata.Scope)"
-                                                        ValueChanged="@(this.OnScopeChanged)">
-                <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-scope"
-                                                                   class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
-                    <div class="flex items-center gap-2 flex-1 truncate">
-                        <span class="truncate">@(this.ViewModel.Metadata.Scope)</span>
-                        @if (this.ViewModel.Metadata.IsScopeVerified)
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
+                                                            Value="@(this.ViewModel.Metadata.Scope)"
+                                                            ValueChanged="@(this.OnScopeChanged)">
+                    <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-scope"
+                                                                       class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
+                        <div class="flex items-center gap-2 flex-1 truncate">
+                            <span class="truncate">@(this.ViewModel.Metadata.Scope)</span>
+                            @if (this.ViewModel.Metadata.IsScopeVerified)
+                            {
+                                <LucideIcon Name="badge-check"
+                                            Size="14"
+                                            Class="text-primary shrink-0"/>
+                            }
+                        </div>
+                        <LucideIcon Name="chevron-down"
+                                    Size="16"
+                                    Class="text-muted-foreground shrink-0"/>
+                    </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
+                    <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
+                        @foreach (var scopeOption in this.ViewModel.ScopeOptions)
                         {
-                            <LucideIcon Name="badge-check"
-                                        Size="14"
-                                        Class="text-primary shrink-0"/>
+                            <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@scopeOption"
+                                                                            Text="@scopeOption"
+                                                                            class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                         }
-                    </div>
+                    </BlazorBlueprint.Primitives.Select.BbSelectContent>
+                </BlazorBlueprint.Primitives.Select.BbSelect>
+            </BbFieldContent>
+        </BbField>
+
+        <BbField Class="w-full sm:flex-1 flex flex-col gap-1.5">
+            <BbFieldLabel For="publish-package-name"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                PACKAGE NAME
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="publish-package-name"
+                         Value="@(this.ViewModel.Metadata.PackageName)"
+                         ValueChanged="@(this.OnPackageNameChanged)"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+    </div>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-version"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            VERSION
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="publish-version"
+                     Value="@(this.ViewModel.Metadata.Version)"
+                     ValueChanged="@(this.OnVersionChanged)"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+        </BbFieldContent>
+        <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
+            Must be greater than the latest published version (v1.2.0). SemVer 2.0.0.
+        </BbFieldDescription>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-description"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            DESCRIPTION
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbTextarea Id="publish-description"
+                        Value="@(this.ViewModel.Metadata.Description)"
+                        ValueChanged="@(this.OnDescriptionChanged)"
+                        Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-license"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            LICENSE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
+                                                        Value="@(this.ViewModel.Metadata.License)"
+                                                        ValueChanged="@(this.OnLicenseChanged)">
+                <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-license"
+                                                                   class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
+                    <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.License)</span>
                     <LucideIcon Name="chevron-down"
                                 Size="16"
                                 Class="text-muted-foreground shrink-0"/>
                 </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
                 <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                    @foreach (var scopeOption in this.ViewModel.ScopeOptions)
+                    @foreach (var licenseOption in this.ViewModel.LicenseOptions)
                     {
-                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@scopeOption"
-                                                                        Text="@scopeOption"
+                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@licenseOption"
+                                                                        Text="@licenseOption"
                                                                         class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                     }
                 </BlazorBlueprint.Primitives.Select.BbSelectContent>
             </BlazorBlueprint.Primitives.Select.BbSelect>
-        </div>
+        </BbFieldContent>
+    </BbField>
 
-        <div class="w-full sm:flex-1 flex flex-col gap-1.5">
-            <BbLabel For="publish-package-name"
-                     Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                PACKAGE NAME
-            </BbLabel>
-            <BbInput Id="publish-package-name"
-                     Value="@(this.ViewModel.Metadata.PackageName)"
-                     ValueChanged="@(this.OnPackageNameChanged)"
-                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-        </div>
-    </div>
-
-    <div class="w-full flex flex-col gap-1.5">
-        <BbLabel For="publish-version"
-                 Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-            VERSION
-        </BbLabel>
-        <BbInput Id="publish-version"
-                 Value="@(this.ViewModel.Metadata.Version)"
-                 ValueChanged="@(this.OnVersionChanged)"
-                 Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-        <span class="text-2xs leading-3xs font-normal text-muted-foreground">
-            Must be greater than the latest published version (v1.2.0). SemVer 2.0.0.
-        </span>
-    </div>
-
-    <div class="w-full flex flex-col gap-1.5">
-        <BbLabel For="publish-description"
-                 Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-            DESCRIPTION
-        </BbLabel>
-        <BbTextarea Id="publish-description"
-                    Value="@(this.ViewModel.Metadata.Description)"
-                    ValueChanged="@(this.OnDescriptionChanged)"
-                    Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
-    </div>
-
-    <div class="w-full flex flex-col gap-1.5">
-        <BbLabel For="publish-license"
-                 Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-            LICENSE
-        </BbLabel>
-        <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
-                                                    Value="@(this.ViewModel.Metadata.License)"
-                                                    ValueChanged="@(this.OnLicenseChanged)">
-            <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-license"
-                                                               class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
-                <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.License)</span>
-                <LucideIcon Name="chevron-down"
-                            Size="16"
-                            Class="text-muted-foreground shrink-0"/>
-            </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
-            <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                @foreach (var licenseOption in this.ViewModel.LicenseOptions)
-                {
-                    <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@licenseOption"
-                                                                    Text="@licenseOption"
-                                                                    class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
-                }
-            </BlazorBlueprint.Primitives.Select.BbSelectContent>
-        </BlazorBlueprint.Primitives.Select.BbSelect>
-    </div>
-
-    <div class="w-full flex flex-col gap-1.5">
-        <BbLabel For="publish-visibility"
-                 Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-visibility"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             VISIBILITY
-        </BbLabel>
-        <BlazorBlueprint.Primitives.Select.BbSelect TValue="VisibilityKind"
-                                                    Value="@(this.ViewModel.Metadata.Visibility)"
-                                                    ValueChanged="@(this.OnVisibilityChanged)">
-            <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-visibility"
-                                                               class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
-                <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.Visibility)</span>
-                <LucideIcon Name="chevron-down"
-                            Size="16"
-                            Class="text-muted-foreground shrink-0"/>
-            </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
-            <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                @foreach (var visibilityOption in this.ViewModel.VisibilityOptions)
-                {
-                    <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@visibilityOption"
-                                                                    Text="@visibilityOption.ToString()"
-                                                                    class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
-                }
-            </BlazorBlueprint.Primitives.Select.BbSelectContent>
-        </BlazorBlueprint.Primitives.Select.BbSelect>
-        <span class="text-2xs leading-3xs font-normal text-muted-foreground">
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BlazorBlueprint.Primitives.Select.BbSelect TValue="VisibilityKind"
+                                                        Value="@(this.ViewModel.Metadata.Visibility)"
+                                                        ValueChanged="@(this.OnVisibilityChanged)">
+                <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-visibility"
+                                                                   class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
+                    <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.Visibility)</span>
+                    <LucideIcon Name="chevron-down"
+                                Size="16"
+                                Class="text-muted-foreground shrink-0"/>
+                </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
+                <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
+                    @foreach (var visibilityOption in this.ViewModel.VisibilityOptions)
+                    {
+                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@visibilityOption"
+                                                                        Text="@visibilityOption.ToString()"
+                                                                        class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
+                    }
+                </BlazorBlueprint.Primitives.Select.BbSelectContent>
+            </BlazorBlueprint.Primitives.Select.BbSelect>
+        </BbFieldContent>
+        <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
             Public: anyone can find and download it. Organization: visible to members of the owning scope. Private: only Maintainers and Accounts granted the Reader role. New packages default to private.
-        </span>
-    </div>
+        </BbFieldDescription>
+    </BbField>
 
-    <div class="w-full flex flex-col gap-1.5">
-        <BbLabel For="publish-metamodel"
-                 Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-metamodel"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             METAMODEL
-        </BbLabel>
-        <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
-                                                    Value="@(this.ViewModel.Metadata.Metamodel)"
-                                                    ValueChanged="@(this.OnMetamodelChanged)">
-            <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-metamodel"
-                                                               class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
-                <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.Metamodel)</span>
-                <LucideIcon Name="chevron-down"
-                            Size="16"
-                            Class="text-muted-foreground shrink-0"/>
-            </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
-            <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                @foreach (var metamodelOption in this.ViewModel.MetamodelOptions)
-                {
-                    <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@metamodelOption"
-                                                                    Text="@metamodelOption"
-                                                                    class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
-                }
-            </BlazorBlueprint.Primitives.Select.BbSelectContent>
-        </BlazorBlueprint.Primitives.Select.BbSelect>
-    </div>
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
+                                                        Value="@(this.ViewModel.Metadata.Metamodel)"
+                                                        ValueChanged="@(this.OnMetamodelChanged)">
+                <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-metamodel"
+                                                                   class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
+                    <span class="flex-1 truncate text-left">@(this.ViewModel.Metadata.Metamodel)</span>
+                    <LucideIcon Name="chevron-down"
+                                Size="16"
+                                Class="text-muted-foreground shrink-0"/>
+                </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
+                <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
+                    @foreach (var metamodelOption in this.ViewModel.MetamodelOptions)
+                    {
+                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@metamodelOption"
+                                                                        Text="@metamodelOption"
+                                                                        class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
+                    }
+                </BlazorBlueprint.Primitives.Select.BbSelectContent>
+            </BlazorBlueprint.Primitives.Select.BbSelect>
+        </BbFieldContent>
+    </BbField>
 
-    <div class="w-full flex flex-col gap-1.5">
-        <BbLabel For="publish-tags"
-                 Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-tags"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             TAGS
-        </BbLabel>
-        <BbInput Id="publish-tags"
-                 Value="@(this.ViewModel.Metadata.Tags)"
-                 ValueChanged="@(this.OnTagsChanged)"
-                 Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-    </div>
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="publish-tags"
+                     Value="@(this.ViewModel.Metadata.Tags)"
+                     ValueChanged="@(this.OnTagsChanged)"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+        </BbFieldContent>
+    </BbField>
 </div>
 
 <aside class="w-full lg:w-[380px] shrink-0 p-5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
@@ -241,28 +257,30 @@
     <div class="flex flex-col gap-3 w-full">
         @foreach (var check in this.ViewModel.ValidationChecks)
         {
-            <div class="flex items-center gap-2 w-full">
-                @if (check.Status == ValidationStatus.Pass)
-                {
-                    <LucideIcon Name="check"
-                                Size="16"
-                                Class="text-validated shrink-0"/>
-                }
-                else
-                {
-                    <LucideIcon Name="alert-triangle"
-                                Size="16"
-                                Class="text-warning-icon shrink-0"/>
-                }
+            <BbMarker Class="flex items-center gap-2 w-full">
+                <BbMarkerIcon>
+                    @if (check.Status == ValidationStatus.Pass)
+                    {
+                        <LucideIcon Name="check"
+                                    Size="16"
+                                    Class="text-validated shrink-0"/>
+                    }
+                    else
+                    {
+                        <LucideIcon Name="alert-triangle"
+                                    Size="16"
+                                    Class="text-warning-icon shrink-0"/>
+                    }
+                </BbMarkerIcon>
 
-                <span class="text-sm leading-xs font-normal text-secondary-text flex-1 truncate">
+                <BbMarkerContent Class="text-sm leading-xs font-normal text-secondary-text flex-1 truncate">
                     @(check.Title)
-                </span>
+                </BbMarkerContent>
 
                 <span class="@(this.GetValidationStatusBadgeClass(check.Status))">
                     @(check.Status)
                 </span>
-            </div>
+            </BbMarker>
         }
     </div>
 
@@ -275,14 +293,16 @@
         </p>
     </div>
 
-    <div class="flex items-center gap-1.5 w-full pt-1">
-        <LucideIcon Name="badge-check"
-                    Size="14"
-                    Class="text-primary shrink-0"/>
-        <span class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
+    <BbMarker Class="flex items-center gap-1.5 w-full pt-1">
+        <BbMarkerIcon>
+            <LucideIcon Name="badge-check"
+                        Size="14"
+                        Class="text-primary shrink-0"/>
+        </BbMarkerIcon>
+        <BbMarkerContent Class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
             @(this.ViewModel.Metadata.Scope) is a verified scope
-        </span>
-    </div>
+        </BbMarkerContent>
+    </BbMarker>
 
     <BbButton Variant="ButtonVariant.Default"
               Type="ButtonType.Button"

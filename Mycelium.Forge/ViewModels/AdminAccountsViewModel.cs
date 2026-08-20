@@ -19,26 +19,6 @@ namespace Mycelium.Forge.ViewModels
     public class AdminAccountsViewModel : IAdminAccountsViewModel
     {
         /// <summary>
-        /// The list of available status filter options.
-        /// </summary>
-        private static readonly IReadOnlyList<string> AvailableStatusFilters =
-        [
-            "All",
-            nameof(ScopeStatusKind.ACTIVE),
-            nameof(ScopeStatusKind.DEACTIVATED)
-        ];
-
-        /// <summary>
-        /// The list of available verification filter options.
-        /// </summary>
-        private static readonly IReadOnlyList<string> AvailableVerificationFilters =
-        [
-            "All",
-            "Verified",
-            "Pending"
-        ];
-
-        /// <summary>
         /// Gets or sets the collection of all accounts.
         /// </summary>
         public List<AdminAccountModel> Accounts { get; set; } = [];
@@ -49,49 +29,30 @@ namespace Mycelium.Forge.ViewModels
         public List<AdminAccountModel> FilteredAccounts { get; set; } = [];
 
         /// <summary>
-        /// Gets or sets the search filter query string.
-        /// </summary>
-        public string SearchQuery { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the selected account status filter.
-        /// </summary>
-        public string SelectedStatusFilter { get; set; } = "All";
-
-        /// <summary>
-        /// Gets or sets the selected verification status filter.
-        /// </summary>
-        public string SelectedVerificationFilter { get; set; } = "All";
-
-        /// <summary>
-        /// Gets the available status filter options.
-        /// </summary>
-        public IReadOnlyList<string> StatusFilterOptions => AvailableStatusFilters;
-
-        /// <summary>
-        /// Gets the available verification filter options.
-        /// </summary>
-        public IReadOnlyList<string> VerificationFilterOptions => AvailableVerificationFilters;
-
-        /// <summary>
         /// Initializes the view model state and loads initial seed accounts.
         /// </summary>
-        public void InitializeViewModel()
+        /// <param name="searchQuery">The initial search filter query string.</param>
+        /// <param name="statusFilter">The initial status filter.</param>
+        /// <param name="verificationFilter">The initial verification filter.</param>
+        public void InitializeViewModel(string searchQuery = "", string statusFilter = "All", string verificationFilter = "All")
         {
             this.Accounts = [.. SeedData.AdminAccounts];
-            this.ApplyFilters();
+            this.ApplyFilters(searchQuery, statusFilter, verificationFilter);
         }
 
         /// <summary>
         /// Applies the current search query, status filter, and verification filter to the accounts collection.
         /// </summary>
-        public void ApplyFilters()
+        /// <param name="searchQuery">The search query text filter.</param>
+        /// <param name="statusFilter">The status filter.</param>
+        /// <param name="verificationFilter">The verification filter.</param>
+        public void ApplyFilters(string searchQuery, string statusFilter, string verificationFilter)
         {
             var filtered = this.Accounts.AsEnumerable();
 
-            if (!string.IsNullOrWhiteSpace(this.SearchQuery))
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var query = this.SearchQuery.Trim();
+                var query = searchQuery.Trim();
 
                 filtered = filtered.Where(account =>
                     account.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
@@ -99,16 +60,16 @@ namespace Mycelium.Forge.ViewModels
                     account.Email.Contains(query, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!string.Equals(this.SelectedStatusFilter, "All", StringComparison.OrdinalIgnoreCase) &&
-                Enum.TryParse<ScopeStatusKind>(this.SelectedStatusFilter, true, out var statusKind))
+            if (!string.Equals(statusFilter, "All", StringComparison.OrdinalIgnoreCase) &&
+                Enum.TryParse<ScopeStatusKind>(statusFilter, true, out var statusKind))
             {
                 filtered = filtered.Where(account => account.Status == statusKind);
             }
 
-            if (!string.Equals(this.SelectedVerificationFilter, "All", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(verificationFilter, "All", StringComparison.OrdinalIgnoreCase))
             {
                 filtered = filtered.Where(account =>
-                    string.Equals(account.VerificationStatus, this.SelectedVerificationFilter, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(account.VerificationStatus, verificationFilter, StringComparison.OrdinalIgnoreCase));
             }
 
             this.FilteredAccounts = [.. filtered];

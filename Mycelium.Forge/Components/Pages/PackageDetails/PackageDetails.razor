@@ -12,21 +12,33 @@
 <div class="w-full bg-body-bg min-h-screen select-none">
 <header class="w-full bg-card border-b border-border py-7">
     <div class="page-container flex flex-col gap-3.5">
-        <nav class="flex items-center gap-1.5 text-xs leading-2xs">
-            <a href="@PageRoutes.Packages"
-               class="text-primary hover:underline font-normal">
-                Browse
-            </a>
-            <span class="text-muted-foreground font-normal">/</span>
-            <a href="@($"/organizations/{this.ViewModel.Package.Scope.TrimStart('@')}")"
-               class="text-primary hover:underline font-normal">
-                @(this.ViewModel.Package.Scope)
-            </a>
-            <span class="text-muted-foreground font-normal">/</span>
-            <span class="text-muted-foreground font-normal">
-                @(this.ViewModel.Package.Name)
-            </span>
-        </nav>
+        <BbBreadcrumb Class="text-xs leading-2xs">
+            <BbBreadcrumbList>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@PageRoutes.Packages"
+                                      Class="text-primary hover:underline font-normal">
+                        Browse
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@($"/organizations/{this.ViewModel.Package.Scope.TrimStart('@')}")"
+                                      Class="text-primary hover:underline font-normal">
+                        @(this.ViewModel.Package.Scope)
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                        @(this.ViewModel.Package.Name)
+                    </BbBreadcrumbPage>
+                </BbBreadcrumbItem>
+            </BbBreadcrumbList>
+        </BbBreadcrumb>
 
         <div class="flex flex-wrap items-center gap-2.5 w-full">
             <LucideIcon Name="box"

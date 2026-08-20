@@ -6,16 +6,24 @@
 
 <div class="w-full bg-body-bg min-h-screen py-9 select-none">
     <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-        <nav class="flex items-center gap-1.5 text-xs leading-2xs">
-            <a href="@PageRoutes.Docs"
-               class="text-primary hover:underline font-normal">
-                Core concepts
-            </a>
-            <span class="text-muted-foreground font-normal">/</span>
-            <span class="text-muted-foreground font-normal">
-                Packages &amp; the kpar format
-            </span>
-        </nav>
+        <BbBreadcrumb Class="text-xs leading-2xs">
+            <BbBreadcrumbList>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@PageRoutes.Docs"
+                                      Class="text-primary hover:underline font-normal">
+                        Core concepts
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                        Packages &amp; the kpar format
+                    </BbBreadcrumbPage>
+                </BbBreadcrumbItem>
+            </BbBreadcrumbList>
+        </BbBreadcrumb>
 
         <div class="flex flex-row items-center justify-between gap-3 w-full h-8">
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight flex-1 truncate">
@@ -40,7 +48,7 @@
                             Size="14"
                             Class="text-muted-foreground shrink-0"/>
                 <BbInput Type="InputType.Search"
-                         Value="@(this.ViewModel.SearchQuery)"
+                         Value="@(this.SearchQuery)"
                          ValueChanged="@(this.OnSearchInputChanged)"
                          Placeholder="Filter by username or email…"
                          UpdateTiming="UpdateTiming.Immediate"
@@ -49,16 +57,16 @@
 
             <div class="flex items-center gap-2.5">
                 <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
-                                                            Value="@(this.ViewModel.SelectedStatusFilter)"
+                                                            Value="@(this.SelectedStatusFilter)"
                                                             ValueChanged="@(this.OnStatusFilterChanged)">
                     <BlazorBlueprint.Primitives.Select.BbSelectTrigger class="h-[34px] pl-3 pr-3 rounded-lg bg-card border border-border flex items-center justify-between gap-2 text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
-                        <span class="truncate">Status: @(this.ViewModel.SelectedStatusFilter)</span>
+                        <span class="truncate">Status: @(this.SelectedStatusFilter)</span>
                         <LucideIcon Name="chevron-down"
                                     Size="14"
                                     Class="text-muted-foreground shrink-0"/>
                     </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
                     <BlazorBlueprint.Primitives.Select.BbSelectContent class="min-w-[150px] py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                        @foreach (var statusOption in this.ViewModel.StatusFilterOptions)
+                        @foreach (var statusOption in this.StatusFilterOptions)
                         {
                             <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@statusOption"
                                                                             Text="@($"Status: {statusOption}")"
@@ -68,16 +76,16 @@
                 </BlazorBlueprint.Primitives.Select.BbSelect>
 
                 <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
-                                                            Value="@(this.ViewModel.SelectedVerificationFilter)"
+                                                            Value="@(this.SelectedVerificationFilter)"
                                                             ValueChanged="@(this.OnVerificationFilterChanged)">
                     <BlazorBlueprint.Primitives.Select.BbSelectTrigger class="h-[34px] pl-3 pr-3 rounded-lg bg-card border border-border flex items-center justify-between gap-2 text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
-                        <span class="truncate">Verification: @(this.ViewModel.SelectedVerificationFilter)</span>
+                        <span class="truncate">Verification: @(this.SelectedVerificationFilter)</span>
                         <LucideIcon Name="chevron-down"
                                     Size="14"
                                     Class="text-muted-foreground shrink-0"/>
                     </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
                     <BlazorBlueprint.Primitives.Select.BbSelectContent class="min-w-[160px] py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                        @foreach (var verificationOption in this.ViewModel.VerificationFilterOptions)
+                        @foreach (var verificationOption in this.VerificationFilterOptions)
                         {
                             <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@verificationOption"
                                                                             Text="@($"Verification: {verificationOption}")"

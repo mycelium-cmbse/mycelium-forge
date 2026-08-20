@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Components.Pages
 {
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.ViewModels;
 
@@ -20,10 +21,55 @@ namespace Mycelium.Forge.Components.Pages
     public partial class Accounts : ComponentBase
     {
         /// <summary>
+        /// The list of available status filter options.
+        /// </summary>
+        private static readonly IReadOnlyList<string> AvailableStatusFilters =
+        [
+            "All",
+            nameof(ScopeStatusKind.ACTIVE),
+            nameof(ScopeStatusKind.DEACTIVATED)
+        ];
+
+        /// <summary>
+        /// The list of available verification filter options.
+        /// </summary>
+        private static readonly IReadOnlyList<string> AvailableVerificationFilters =
+        [
+            "All",
+            "Verified",
+            "Pending"
+        ];
+
+        /// <summary>
         /// Gets or sets the view model managing installation administration accounts state.
         /// </summary>
         [Inject]
         public IAdminAccountsViewModel ViewModel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the search filter query string.
+        /// </summary>
+        public string SearchQuery { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the selected account status filter.
+        /// </summary>
+        public string SelectedStatusFilter { get; set; } = "All";
+
+        /// <summary>
+        /// Gets or sets the selected verification status filter.
+        /// </summary>
+        public string SelectedVerificationFilter { get; set; } = "All";
+
+        /// <summary>
+        /// Gets the available status filter options.
+        /// </summary>
+        public IReadOnlyList<string> StatusFilterOptions => AvailableStatusFilters;
+
+        /// <summary>
+        /// Gets the available verification filter options.
+        /// </summary>
+        public IReadOnlyList<string> VerificationFilterOptions => AvailableVerificationFilters;
 
         /// <summary>
         /// Initializes the component and loads initial view model state.
@@ -31,7 +77,7 @@ namespace Mycelium.Forge.Components.Pages
         protected override void OnInitialized()
         {
             base.OnInitialized();
-            this.ViewModel.InitializeViewModel();
+            this.ViewModel.InitializeViewModel(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
         }
 
         /// <summary>
@@ -40,8 +86,8 @@ namespace Mycelium.Forge.Components.Pages
         /// <param name="query">The new search query value.</param>
         private void OnSearchInputChanged(string query)
         {
-            this.ViewModel.SearchQuery = query ?? string.Empty;
-            this.ViewModel.ApplyFilters();
+            this.SearchQuery = query ?? string.Empty;
+            this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
         }
 
         /// <summary>
@@ -50,8 +96,8 @@ namespace Mycelium.Forge.Components.Pages
         /// <param name="status">The selected status filter.</param>
         private void OnStatusFilterChanged(string status)
         {
-            this.ViewModel.SelectedStatusFilter = status ?? "All";
-            this.ViewModel.ApplyFilters();
+            this.SelectedStatusFilter = status ?? "All";
+            this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
         }
 
         /// <summary>
@@ -60,8 +106,8 @@ namespace Mycelium.Forge.Components.Pages
         /// <param name="verification">The selected verification status filter.</param>
         private void OnVerificationFilterChanged(string verification)
         {
-            this.ViewModel.SelectedVerificationFilter = verification ?? "All";
-            this.ViewModel.ApplyFilters();
+            this.SelectedVerificationFilter = verification ?? "All";
+            this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
         }
 
         /// <summary>

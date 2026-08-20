@@ -1,4 +1,4 @@
-﻿<div class="w-full h-11 px-4 flex items-center gap-2.5 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors @(this.Class)">
+<div class="w-full h-11 px-4 flex items-center gap-2.5 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors @(this.Class)">
     <LucideIcon Name="search"
                 Size="18"
                 Class="text-muted-foreground shrink-0"/>
@@ -10,9 +10,7 @@
              Class="w-full bg-transparent text-md leading-sm text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
     @if (this.ShowShortcut)
     {
-        <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-2xs leading-3xs font-medium text-muted-foreground bg-muted border border-border rounded shrink-0"
-             title="Press Ctrl+K to search">
-            Ctrl K
-        </kbd>
+        <BbKbd Keys="Ctrl+K"
+               Class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-2xs leading-3xs font-medium text-muted-foreground bg-muted border border-border rounded shrink-0"/>
     }
 </div>

@@ -1,9 +1,9 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,8 @@ namespace Mycelium.Forge.Components.Layout
 {
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Routing;
+
+    using Mycelium.Forge.Common;
 
     /// <summary>
     /// Represents the top application header navigation bar for Mycelium Forge.
@@ -24,11 +26,27 @@ namespace Mycelium.Forge.Components.Layout
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is logged in.
+        /// </summary>
+        public bool IsLoggedIn { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the initials displayed in the user avatar when logged in.
+        /// </summary>
+        public string UserInitials { get; set; } = "RA";
+
+        /// <summary>
+        /// Gets or sets the bound search query value in the header search input.
+        /// </summary>
+        public string SearchQuery { get; set; } = string.Empty;
+
+        /// <summary>
         /// Releases unmanaged and managed resources used by the component.
         /// </summary>
         public void Dispose()
         {
             this.NavigationManager.LocationChanged -= this.OnLocationChanged;
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -69,6 +87,27 @@ namespace Mycelium.Forge.Components.Layout
             }
 
             return currentPath.StartsWith(normalizedHref, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Checks whether the current page is the root landing page.
+        /// </summary>
+        /// <returns>True if the current page is the root page; otherwise, false.</returns>
+        public bool IsHomePage()
+        {
+            var currentPath = this.NavigationManager.ToBaseRelativePath(this.NavigationManager.Uri);
+            var cleanPath = currentPath.Split('?')[0].Trim('/');
+
+            return string.IsNullOrEmpty(cleanPath) || cleanPath.Equals(PageRoutes.Home.TrimStart('/'), StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Handles changes to the header search input value.
+        /// </summary>
+        /// <param name="value">The updated search query value.</param>
+        public void OnSearchInputChanged(string value)
+        {
+            this.SearchQuery = value;
         }
 
         /// <summary>

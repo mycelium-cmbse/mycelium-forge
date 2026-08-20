@@ -1,11 +1,12 @@
 @using Mycelium.Forge.Components.Common
 @attribute [Route(PageRoutes.SignUp)]
 @attribute [Route("/register")]
+@layout AuthLayout
 @rendermode InteractiveServer
 
 <PageTitle>Sign Up &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center py-10 px-4 select-none">
+<div class="w-full bg-body-bg min-h-screen flex flex-col items-center justify-center py-10 px-4 select-none">
     <div class="auth-card">
         <ForgeLogo/>
 
@@ -18,47 +19,77 @@
             </p>
         </div>
 
-        <div class="flex flex-col gap-1.5 w-full">
-            <BbLabel For="signup-username"
-                     Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <BbField Class="flex flex-col gap-1.5 w-full"
+                 IsInvalid="@(!string.IsNullOrEmpty(this.UsernameError))">
+            <BbFieldLabel For="signup-username"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 USERNAME
-            </BbLabel>
-            <BbInput Id="signup-username"
-                     Type="InputType.Text"
-                     Value="@(this.ViewModel.Username)"
-                     ValueChanged="@(this.OnUsernameChanged)"
-                     Placeholder="e.g. r.andre"
-                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-        </div>
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="signup-username"
+                         Type="InputType.Text"
+                         Value="@(this.ViewModel.Username)"
+                         ValueChanged="@(this.OnUsernameChanged)"
+                         Placeholder="e.g. r.andre"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            @if (!string.IsNullOrEmpty(this.UsernameError))
+            {
+                <BbFieldError Class="text-2xs leading-3xs text-destructive">
+                    @(this.UsernameError)
+                </BbFieldError>
+            }
+        </BbField>
 
-        <div class="flex flex-col gap-1.5 w-full">
-            <BbLabel For="signup-email"
-                     Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <BbField Class="flex flex-col gap-1.5 w-full"
+                 IsInvalid="@(!string.IsNullOrEmpty(this.EmailError))">
+            <BbFieldLabel For="signup-email"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 EMAIL
-            </BbLabel>
-            <BbInput Id="signup-email"
-                     Type="InputType.Email"
-                     Value="@(this.ViewModel.Email)"
-                     ValueChanged="@(this.OnEmailChanged)"
-                     Placeholder="e.g. name@organisation.eu"
-                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-            <span class="text-2xs leading-3xs font-normal text-muted-foreground">
-                Installation-unique username and a verified email address are required.
-            </span>
-        </div>
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="signup-email"
+                         Type="InputType.Email"
+                         Value="@(this.ViewModel.Email)"
+                         ValueChanged="@(this.OnEmailChanged)"
+                         Placeholder="e.g. name@organisation.eu"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            @if (!string.IsNullOrEmpty(this.EmailError))
+            {
+                <BbFieldError Class="text-2xs leading-3xs text-destructive">
+                    @(this.EmailError)
+                </BbFieldError>
+            }
+            else
+            {
+                <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
+                    Installation-unique username and a verified email address are required.
+                </BbFieldDescription>
+            }
+        </BbField>
 
-        <div class="flex flex-col gap-1.5 w-full">
-            <BbLabel For="signup-password"
-                     Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <BbField Class="flex flex-col gap-1.5 w-full"
+                 IsInvalid="@(!string.IsNullOrEmpty(this.PasswordError))">
+            <BbFieldLabel For="signup-password"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 PASSWORD
-            </BbLabel>
-            <BbInput Id="signup-password"
-                     Type="InputType.Password"
-                     Value="@(this.ViewModel.Password)"
-                     ValueChanged="@(this.OnPasswordChanged)"
-                     Placeholder="••••••••"
-                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-        </div>
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="signup-password"
+                         Type="InputType.Password"
+                         Value="@(this.ViewModel.Password)"
+                         ValueChanged="@(this.OnPasswordChanged)"
+                         Placeholder="••••••••"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            @if (!string.IsNullOrEmpty(this.PasswordError))
+            {
+                <BbFieldError Class="text-2xs leading-3xs text-destructive">
+                    @(this.PasswordError)
+                </BbFieldError>
+            }
+        </BbField>
 
         <BbButton Variant="ButtonVariant.Default"
                   Type="ButtonType.Button"

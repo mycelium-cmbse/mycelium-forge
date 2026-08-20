@@ -1,4 +1,5 @@
 @using Mycelium.Forge.Components.Common
+
 <header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
     <ForgeLogo/>
 
@@ -19,11 +20,58 @@
 
     <div class="flex-1"></div>
 
-    <div class="flex items-center gap-3">
-        <BbButton Variant="ButtonVariant.Outline"
-                  Size="ButtonSize.Small"
-                  Href="@PageRoutes.Login">
-            Sign in
-        </BbButton>
-    </div>
+    @if (this.IsLoggedIn)
+    {
+        @if (!this.IsHomePage())
+        {
+            <div class="w-[220px] h-8 px-2.5 flex items-center gap-2 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors shrink-0">
+                <LucideIcon Name="search"
+                            Size="16"
+                            Class="text-muted-foreground shrink-0"/>
+                <BbInput Type="InputType.Search"
+                         Value="@(this.SearchQuery)"
+                         ValueChanged="@(this.OnSearchInputChanged)"
+                         Placeholder="Search models and packages…"
+                         Class="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground placeholder:truncate truncate text-ellipsis border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
+                <BbKbd Keys="Ctrl+K"
+                       Class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-3xs leading-4xs font-medium text-muted-foreground bg-card border border-border rounded shrink-0"/>
+            </div>
+        }
+
+        <div class="flex items-center gap-3 shrink-0">
+            <BbButton Variant="ButtonVariant.Default"
+                      Size="ButtonSize.Small"
+                      Href="@PageRoutes.Publish"
+                      Class="h-8 px-3.5 gap-1.5 shrink-0">
+                <LucideIcon Name="plus"
+                            Size="14"/>
+                <span>Publish</span>
+            </BbButton>
+
+            <button type="button"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                    aria-label="Notifications">
+                <LucideIcon Name="bell"
+                            Size="20"
+                            Class="shrink-0"/>
+            </button>
+
+            <a href="@PageRoutes.AccountSettings"
+               class="w-8 h-8 rounded-full bg-avatar-bg flex items-center justify-center shrink-0 text-white text-xs leading-2xs font-semibold select-none hover:opacity-90 transition-opacity"
+               title="Account settings">
+                @(this.UserInitials)
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="flex items-center gap-3">
+            <BbButton Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Href="@PageRoutes.Login"
+                      Class="h-8 px-3 text-xs shrink-0">
+                Sign in
+            </BbButton>
+        </div>
+    }
 </header>
