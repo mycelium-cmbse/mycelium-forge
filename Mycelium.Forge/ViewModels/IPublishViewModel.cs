@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IPublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,6 +11,7 @@ namespace Mycelium.Forge.ViewModels
 {
     using FluentResults;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -46,7 +47,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets the available package visibility options.
         /// </summary>
-        IReadOnlyList<string> VisibilityOptions { get; }
+        IReadOnlyList<VisibilityKind> VisibilityOptions { get; }
 
         /// <summary>
         /// Gets the available metamodel specification options.

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -39,8 +40,8 @@ namespace Mycelium.Forge.ViewModels
 
             var maintainers = new List<PackageMaintainerModel>
             {
-                new("Starion Group", "SG", true),
-                new("R. André", "RA")
+                new("Starion Group", "SG", true, PackageInvitationKind.OWNER),
+                new("R. André", "RA", false, PackageInvitationKind.MAINTAINER)
             };
 
             var tags = new List<string>

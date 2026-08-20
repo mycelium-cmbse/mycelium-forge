@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AdminAccountModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -30,13 +30,13 @@ namespace Mycelium.Forge.Models
         /// <param name="isAdministrator">A value indicating whether the user is an installation administrator.</param>
         /// <param name="verificationStatus">The email/identity verification status outcome.</param>
         /// <param name="organizations">The formatted summary of organizations and roles.</param>
-        /// <param name="status">The account activity status (e.g., Active, Suspended).</param>
+        /// <param name="status">The account activity status.</param>
         public AdminAccountModel(
             IAccount account,
             bool isAdministrator = false,
             string verificationStatus = "Verified",
             string organizations = "",
-            string status = "Active")
+            ScopeStatusKind status = ScopeStatusKind.ACTIVE)
         {
             this.Account = account;
             this.IsAdministrator = isAdministrator;
@@ -66,9 +66,9 @@ namespace Mycelium.Forge.Models
         public string Organizations { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the account activity status (e.g., Active, Suspended).
+        /// Gets or sets the account activity status.
         /// </summary>
-        public string Status { get; set; } = "Active";
+        public ScopeStatusKind Status { get; set; } = ScopeStatusKind.ACTIVE;
 
         /// <summary>
         /// Gets the unique identifier string from the account DTO.

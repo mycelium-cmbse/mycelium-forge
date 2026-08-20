@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AdminAccountsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Models;
 
@@ -23,8 +24,8 @@ namespace Mycelium.Forge.ViewModels
         private static readonly IReadOnlyList<string> AvailableStatusFilters =
         [
             "All",
-            "Active",
-            "Suspended"
+            nameof(ScopeStatusKind.ACTIVE),
+            nameof(ScopeStatusKind.DEACTIVATED)
         ];
 
         /// <summary>
@@ -98,10 +99,10 @@ namespace Mycelium.Forge.ViewModels
                     account.Email.Contains(query, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!string.Equals(this.SelectedStatusFilter, "All", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(this.SelectedStatusFilter, "All", StringComparison.OrdinalIgnoreCase) &&
+                Enum.TryParse<ScopeStatusKind>(this.SelectedStatusFilter, true, out var statusKind))
             {
-                filtered = filtered.Where(account =>
-                    string.Equals(account.Status, this.SelectedStatusFilter, StringComparison.OrdinalIgnoreCase));
+                filtered = filtered.Where(account => account.Status == statusKind);
             }
 
             if (!string.Equals(this.SelectedVerificationFilter, "All", StringComparison.OrdinalIgnoreCase))

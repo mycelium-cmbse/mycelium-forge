@@ -64,7 +64,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
                 return;
             }
 
-            this.ViewModel.Package.Visibility = visibility;
+            this.ViewModel.Package.Package.Visibility = visibility;
             this.ViewModel.SavePackage();
         }
 

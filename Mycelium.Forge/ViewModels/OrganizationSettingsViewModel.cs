@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Models;
 
@@ -20,11 +21,10 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// The list of available role options for organization members.
         /// </summary>
-        private static readonly List<string> AvailableRoles =
+        private static readonly List<OrganizationInvitationKind> AvailableRoles =
         [
-            "Organization Administrator",
-            "Forge Publisher",
-            "Organization Member"
+            OrganizationInvitationKind.ADMINISTRATOR,
+            OrganizationInvitationKind.MEMBER
         ];
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the current user's role within the organization.
         /// </summary>
-        public string CurrentUserRole { get; set; }
+        public OrganizationInvitationKind CurrentUserRole { get; set; } = OrganizationInvitationKind.ADMINISTRATOR;
 
         /// <summary>
         /// Gets or sets the collection of members belonging to the organization.
@@ -50,7 +50,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the available role options for organization members.
         /// </summary>
-        public List<string> RoleOptions { get; set; } = AvailableRoles;
+        public List<OrganizationInvitationKind> RoleOptions { get; set; } = AvailableRoles;
 
         /// <summary>
         /// Initializes the view model state for the specified organization identifier or scope.
@@ -59,12 +59,12 @@ namespace Mycelium.Forge.ViewModels
         public void InitializeViewModel(string id)
         {
             this.Organization = SeedData.StarionOrganizationModel;
-            this.CurrentUserRole = "Organization Administrator";
+            this.CurrentUserRole = OrganizationInvitationKind.ADMINISTRATOR;
             this.Members = [.. SeedData.StarionMembers];
 
             this.PendingInvitations =
             [
-                new OrganizationInvitationModel("a.novak@esa.int", "Organization Administrator", "Sent 2 days ago · expires in 5 days")
+                new OrganizationInvitationModel("a.novak@esa.int", OrganizationInvitationKind.ADMINISTRATOR, "Sent 2 days ago · expires in 5 days", InvitationStatusKind.PENDING)
             ];
         }
 
@@ -73,7 +73,7 @@ namespace Mycelium.Forge.ViewModels
         /// </summary>
         /// <param name="member">The member whose role is being updated.</param>
         /// <param name="newRole">The new role to assign to the member.</param>
-        public void ChangeMemberRole(OrganizationMemberModel member, string newRole)
+        public void ChangeMemberRole(OrganizationMemberModel member, OrganizationInvitationKind newRole)
         {
             member?.Role = newRole;
         }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AccountOrganizationMembershipModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -28,15 +28,12 @@ namespace Mycelium.Forge.Models
         /// </summary>
         /// <param name="organization">The underlying organization DTO.</param>
         /// <param name="role">The user's role within this organization.</param>
-        /// <param name="isAdministrator">A value indicating whether the user is an administrator of the organization.</param>
         public AccountOrganizationMembershipModel(
             IOrganization organization,
-            string role = "",
-            bool isAdministrator = false)
+            OrganizationInvitationKind role = OrganizationInvitationKind.MEMBER)
         {
             this.Organization = organization;
             this.Role = role;
-            this.IsAdministrator = isAdministrator;
         }
 
         /// <summary>
@@ -47,12 +44,12 @@ namespace Mycelium.Forge.Models
         /// <summary>
         /// Gets or sets the user's role within this organization.
         /// </summary>
-        public string Role { get; set; } = string.Empty;
+        public OrganizationInvitationKind Role { get; set; } = OrganizationInvitationKind.MEMBER;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the user is an administrator of the organization.
+        /// Gets a value indicating whether the user is an administrator of the organization.
         /// </summary>
-        public bool IsAdministrator { get; set; }
+        public bool IsAdministrator => this.Role == OrganizationInvitationKind.ADMINISTRATOR;
 
         /// <summary>
         /// Gets the organization scope namespace identifier (e.g., @starion).

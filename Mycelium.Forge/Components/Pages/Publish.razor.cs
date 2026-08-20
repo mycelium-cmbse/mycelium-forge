@@ -171,9 +171,9 @@ namespace Mycelium.Forge.Components.Pages
         /// Handles changes to the package visibility selection.
         /// </summary>
         /// <param name="visibility">The selected visibility setting.</param>
-        public void OnVisibilityChanged(string visibility)
+        public void OnVisibilityChanged(VisibilityKind visibility)
         {
-            this.ViewModel.Metadata.Visibility = visibility ?? string.Empty;
+            this.ViewModel.Metadata.Visibility = visibility;
         }
 
         /// <summary>

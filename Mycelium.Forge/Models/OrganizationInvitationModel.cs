@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationInvitationModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Models
 {
+    using Mycelium.Forge.Common;
+
     /// <summary>
     /// Represents a pending membership invitation sent to an external collaborator or member.
     /// </summary>
@@ -27,11 +29,17 @@ namespace Mycelium.Forge.Models
         /// <param name="email">The invitee email address.</param>
         /// <param name="role">The assigned role upon accepting the invitation.</param>
         /// <param name="statusText">The expiration or invitation status text.</param>
-        public OrganizationInvitationModel(string email, string role, string statusText = "")
+        /// <param name="status">The invitation status kind.</param>
+        public OrganizationInvitationModel(
+            string email,
+            OrganizationInvitationKind role = OrganizationInvitationKind.MEMBER,
+            string statusText = "",
+            InvitationStatusKind status = InvitationStatusKind.PENDING)
         {
             this.Email = email;
             this.Role = role;
             this.StatusText = statusText;
+            this.Status = status;
         }
 
         /// <summary>
@@ -42,7 +50,12 @@ namespace Mycelium.Forge.Models
         /// <summary>
         /// Gets or sets the assigned role upon accepting the invitation.
         /// </summary>
-        public string Role { get; set; } = string.Empty;
+        public OrganizationInvitationKind Role { get; set; } = OrganizationInvitationKind.MEMBER;
+
+        /// <summary>
+        /// Gets or sets the invitation status kind.
+        /// </summary>
+        public InvitationStatusKind Status { get; set; } = InvitationStatusKind.PENDING;
 
         /// <summary>
         /// Gets or sets the expiration or invitation status text.

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,6 +11,7 @@ namespace Mycelium.Forge.ViewModels
 {
     using FluentResults;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -61,11 +62,11 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets the available package visibility options.
         /// </summary>
-        public IReadOnlyList<string> VisibilityOptions { get; } =
+        public IReadOnlyList<VisibilityKind> VisibilityOptions { get; } =
         [
-            "Public",
-            "Organization",
-            "Private"
+            VisibilityKind.PUBLIC,
+            VisibilityKind.INTERNAL,
+            VisibilityKind.PRIVATE
         ];
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace Mycelium.Forge.ViewModels
                 Version = "1.3.0",
                 Description = "ECSS mission model: Power subsystem.",
                 License = "Apache-2.0",
-                Visibility = "Public",
+                Visibility = VisibilityKind.PUBLIC,
                 Metamodel = "SysML v2 (2025-02)",
                 Tags = "mission-model, power"
             };

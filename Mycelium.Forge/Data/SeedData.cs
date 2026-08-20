@@ -121,25 +121,25 @@ namespace Mycelium.Forge.Data
 
             StarionMembers =
             [
-                new OrganizationMemberModel(RegisAccount, "Organization Administrator"),
-                new OrganizationMemberModel(StefanAccount, "Organization Administrator"),
-                new OrganizationMemberModel(KleinAccount, "Forge Publisher"),
-                new OrganizationMemberModel(BlancAccount, "Organization Member")
+                new OrganizationMemberModel(RegisAccount, OrganizationInvitationKind.ADMINISTRATOR),
+                new OrganizationMemberModel(StefanAccount, OrganizationInvitationKind.ADMINISTRATOR),
+                new OrganizationMemberModel(KleinAccount, OrganizationInvitationKind.MEMBER),
+                new OrganizationMemberModel(BlancAccount, OrganizationInvitationKind.MEMBER)
             ];
 
             RegisOrganizationMemberships =
             [
-                new AccountOrganizationMembershipModel(StarionOrganization, "Organization Administrator", true),
-                new AccountOrganizationMembershipModel(EsaOrganization, "Organization Administrator")
+                new AccountOrganizationMembershipModel(StarionOrganization, OrganizationInvitationKind.ADMINISTRATOR),
+                new AccountOrganizationMembershipModel(EsaOrganization, OrganizationInvitationKind.ADMINISTRATOR)
             ];
 
             AdminAccounts =
             [
-                new AdminAccountModel(RegisAccount, true, "Verified", "@starion (admin), @esa (admin)"),
-                new AdminAccountModel(StefanAccount, false, "Verified", "@starion (admin)"),
-                new AdminAccountModel(KleinAccount, false, "Verified", "@starion (publisher)"),
-                new AdminAccountModel(BlancAccount, false, "Pending", "@starion (member)"),
-                new AdminAccountModel(NovakAccount, false, "Verified", "@esa (member)")
+                new AdminAccountModel(RegisAccount, true, "Verified", "@starion (admin), @esa (admin)", ScopeStatusKind.ACTIVE),
+                new AdminAccountModel(StefanAccount, false, "Verified", "@starion (admin)", ScopeStatusKind.ACTIVE),
+                new AdminAccountModel(KleinAccount, false, "Verified", "@starion (publisher)", ScopeStatusKind.ACTIVE),
+                new AdminAccountModel(BlancAccount, false, "Pending", "@starion (member)", ScopeStatusKind.ACTIVE),
+                new AdminAccountModel(NovakAccount, false, "Verified", "@esa (member)", ScopeStatusKind.ACTIVE)
             ];
 
             ApiKeys =
@@ -317,7 +317,7 @@ namespace Mycelium.Forge.Data
                     importCount: "210",
                     isVerified: true,
                     lastPublished: "2 weeks ago",
-                    role: "Owner"),
+                    role: PackageInvitationKind.OWNER),
                 new PackageModel(
                     new Package { Name = "SmallSat-Platform-Model", ShortName = "smallsat-platform-model", Visibility = VisibilityKind.PUBLIC },
                     "@starion",
@@ -327,7 +327,7 @@ namespace Mycelium.Forge.Data
                     importCount: "145",
                     isVerified: true,
                     lastPublished: "3 weeks ago",
-                    role: "Owner"),
+                    role: PackageInvitationKind.OWNER),
                 new PackageModel(
                     new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC },
                     "@starion",
@@ -337,7 +337,7 @@ namespace Mycelium.Forge.Data
                     importCount: "190",
                     isVerified: true,
                     lastPublished: "2 months ago",
-                    role: "Owner"),
+                    role: PackageInvitationKind.OWNER),
                 new PackageModel(
                     new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC },
                     "@starion",
@@ -347,7 +347,7 @@ namespace Mycelium.Forge.Data
                     importCount: "165",
                     isVerified: true,
                     lastPublished: "3 months ago",
-                    role: "Owner"),
+                    role: PackageInvitationKind.OWNER),
                 new PackageModel(
                     new Package { Name = "CDP4-COMET-Core", ShortName = "cdp4-comet-core", Visibility = VisibilityKind.INTERNAL },
                     "@starion",
@@ -357,7 +357,7 @@ namespace Mycelium.Forge.Data
                     importCount: "320",
                     isVerified: true,
                     lastPublished: "1 month ago",
-                    role: "Maintainer"),
+                    role: PackageInvitationKind.MAINTAINER),
                 new PackageModel(
                     new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC },
                     "@esa",
@@ -367,7 +367,7 @@ namespace Mycelium.Forge.Data
                     importCount: "860",
                     isVerified: true,
                     lastPublished: "2 months ago",
-                    role: "Maintainer")
+                    role: PackageInvitationKind.MAINTAINER)
             ];
         }
 

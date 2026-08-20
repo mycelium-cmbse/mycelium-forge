@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -107,7 +107,7 @@ namespace Mycelium.Forge.Components.Pages
         /// <returns>The computed CSS class string for the role table cell.</returns>
         public string GetRoleCellClass(PackageModel entry)
         {
-            var isOwner = string.Equals(entry.Role, "Owner", StringComparison.OrdinalIgnoreCase);
+            var isOwner = entry.Role == PackageInvitationKind.OWNER;
             var colorClass = isOwner ? "text-primary" : "text-muted-foreground";
             return $"w-[150px] shrink-0 text-xs leading-2xs font-medium p-0 {colorClass}";
         }

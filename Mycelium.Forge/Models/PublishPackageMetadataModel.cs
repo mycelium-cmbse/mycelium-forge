@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishPackageMetadataModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Models
 {
+    using Mycelium.Forge.Common;
+
     /// <summary>
     /// Represents the form metadata properties of a package being published.
     /// </summary>
@@ -55,9 +57,9 @@ namespace Mycelium.Forge.Models
         public string License { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the visibility level of the package (e.g., Public, Organization, Private).
+        /// Gets or sets the visibility level of the package.
         /// </summary>
-        public string Visibility { get; set; } = string.Empty;
+        public VisibilityKind Visibility { get; set; } = VisibilityKind.PUBLIC;
 
         /// <summary>
         /// Gets or sets the target metamodel specification and edition.

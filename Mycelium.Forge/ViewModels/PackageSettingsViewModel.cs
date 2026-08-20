@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -31,9 +31,9 @@ namespace Mycelium.Forge.ViewModels
         {
             var maintainers = new List<PackageMaintainerModel>
             {
-                new("Starion Group", "SG", true, "Organization · Owner"),
-                new("R. André", "SG", false, "You · individual account"),
-                new("J. Klein", "SG", false, "Maintainer")
+                new("Starion Group", "SG", true, PackageInvitationKind.OWNER),
+                new("R. André", "SG", false, PackageInvitationKind.OWNER),
+                new("J. Klein", "SG", false, PackageInvitationKind.MAINTAINER)
             };
 
             var versions = new List<PackageVersionModel>
@@ -60,7 +60,7 @@ namespace Mycelium.Forge.ViewModels
                 importCount: "210",
                 isVerified: true,
                 lastPublished: "2 weeks ago",
-                role: "Owner",
+                role: PackageInvitationKind.OWNER,
                 href: $"/packages/{resolvedScope.TrimStart('@')}/{resolvedName}",
                 maintainers: maintainers,
                 versions: versions);

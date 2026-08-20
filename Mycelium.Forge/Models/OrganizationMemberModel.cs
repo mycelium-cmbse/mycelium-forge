@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationMemberModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -27,8 +27,8 @@ namespace Mycelium.Forge.Models
         /// Initializes a new instance of the <see cref="OrganizationMemberModel" /> class with specified properties.
         /// </summary>
         /// <param name="account">The underlying user account DTO.</param>
-        /// <param name="role">The member's organizational role (e.g., Organization Administrator, Member).</param>
-        public OrganizationMemberModel(IAccount account, string role = "")
+        /// <param name="role">The member's organizational role.</param>
+        public OrganizationMemberModel(IAccount account, OrganizationInvitationKind role = OrganizationInvitationKind.MEMBER)
         {
             this.Account = account;
             this.Role = role;
@@ -42,7 +42,7 @@ namespace Mycelium.Forge.Models
         /// <summary>
         /// Gets or sets the member's organizational role.
         /// </summary>
-        public string Role { get; set; } = string.Empty;
+        public OrganizationInvitationKind Role { get; set; } = OrganizationInvitationKind.MEMBER;
 
         /// <summary>
         /// Gets the full display name from the underlying account.

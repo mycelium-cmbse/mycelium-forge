@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageMaintainerModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -29,13 +29,13 @@ namespace Mycelium.Forge.Models
         /// <param name="name">The maintainer display name.</param>
         /// <param name="initials">The maintainer initials.</param>
         /// <param name="isVerified">A value indicating whether the maintainer is verified.</param>
-        /// <param name="role">The maintainer role (e.g., Owner, Maintainer).</param>
+        /// <param name="role">The maintainer role.</param>
         /// <param name="account">The optional underlying account DTO.</param>
         public PackageMaintainerModel(
             string name,
             string initials,
             bool isVerified = false,
-            string role = "",
+            PackageInvitationKind role = PackageInvitationKind.MAINTAINER,
             IAccount account = null)
         {
             this.Name = name;
@@ -51,7 +51,7 @@ namespace Mycelium.Forge.Models
         /// <param name="account">The user account DTO.</param>
         /// <param name="role">The role.</param>
         /// <param name="isVerified">Whether the account is verified.</param>
-        public PackageMaintainerModel(IAccount account, string role = "", bool isVerified = false)
+        public PackageMaintainerModel(IAccount account, PackageInvitationKind role = PackageInvitationKind.MAINTAINER, bool isVerified = false)
             : this(
                 account?.Name ?? string.Empty,
                 account != null
@@ -79,9 +79,9 @@ namespace Mycelium.Forge.Models
         public bool IsVerified { get; set; }
 
         /// <summary>
-        /// Gets or sets the maintainer role (e.g., Owner, Maintainer).
+        /// Gets or sets the maintainer role.
         /// </summary>
-        public string Role { get; set; } = string.Empty;
+        public PackageInvitationKind Role { get; set; } = PackageInvitationKind.MAINTAINER;
 
         /// <summary>
         /// Gets or sets the optional underlying account DTO.

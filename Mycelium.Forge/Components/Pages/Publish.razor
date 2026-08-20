@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRoutes.Publish)]
+@attribute [Route(PageRoutes.Publish)]
 @rendermode InteractiveServer
 
 <PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
@@ -169,7 +169,7 @@
                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             VISIBILITY
         </BbLabel>
-        <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
+        <BlazorBlueprint.Primitives.Select.BbSelect TValue="VisibilityKind"
                                                     Value="@(this.ViewModel.Metadata.Visibility)"
                                                     ValueChanged="@(this.OnVisibilityChanged)">
             <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-visibility"
@@ -183,7 +183,7 @@
                 @foreach (var visibilityOption in this.ViewModel.VisibilityOptions)
                 {
                     <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@visibilityOption"
-                                                                    Text="@visibilityOption"
+                                                                    Text="@visibilityOption.ToString()"
                                                                     class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                 }
             </BlazorBlueprint.Primitives.Select.BbSelectContent>

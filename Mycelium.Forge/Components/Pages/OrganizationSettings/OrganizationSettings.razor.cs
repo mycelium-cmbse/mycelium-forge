@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationSettings.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
 {
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.ViewModels;
 
@@ -36,15 +37,18 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// Handles changing the assigned role of an organization member.
         /// </summary>
         /// <param name="member">The member whose role is changing.</param>
-        /// <param name="newRole">The selected new role name.</param>
-        public void OnChangeMemberRole(OrganizationMemberModel member, string newRole)
+        /// <param name="eventArgs">The change event args containing the selected new role name.</param>
+        public void OnChangeMemberRole(OrganizationMemberModel member, ChangeEventArgs eventArgs)
         {
-            if (member == null || string.IsNullOrWhiteSpace(newRole))
+            if (member == null || eventArgs?.Value == null)
             {
                 return;
             }
 
-            this.ViewModel.ChangeMemberRole(member, newRole);
+            if (Enum.TryParse<OrganizationInvitationKind>(eventArgs.Value.ToString(), out var role))
+            {
+                this.ViewModel.ChangeMemberRole(member, role);
+            }
         }
 
         /// <summary>

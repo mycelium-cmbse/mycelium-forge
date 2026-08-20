@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -35,7 +35,7 @@ namespace Mycelium.Forge.Models
         /// <param name="importCount">The number of imports.</param>
         /// <param name="isVerified">Whether the publisher is verified.</param>
         /// <param name="lastPublished">The relative elapsed time since the last publish.</param>
-        /// <param name="role">The user's role for this package (e.g., Owner, Maintainer).</param>
+        /// <param name="role">The user's role for this package.</param>
         /// <param name="href">The relative URL to the package page.</param>
         /// <param name="maintainers">The collection of maintainers for the package.</param>
         /// <param name="versions">The collection of release versions for the package.</param>
@@ -49,7 +49,7 @@ namespace Mycelium.Forge.Models
             string importCount = "",
             bool isVerified = false,
             string lastPublished = "",
-            string role = "Owner",
+            PackageInvitationKind role = PackageInvitationKind.OWNER,
             string href = "",
             IReadOnlyList<PackageMaintainerModel> maintainers = null,
             IReadOnlyList<PackageVersionModel> versions = null)
@@ -131,17 +131,7 @@ namespace Mycelium.Forge.Models
         /// <summary>
         /// Gets or sets the visibility of the package from the underlying package DTO.
         /// </summary>
-        public VisibilityKind Visibility
-        {
-            get => this.Package?.Visibility ?? VisibilityKind.PUBLIC;
-            set
-            {
-                if (this.Package != null)
-                {
-                    this.Package.Visibility = value;
-                }
-            }
-        }
+        public VisibilityKind Visibility => this.Package?.Visibility ?? VisibilityKind.PUBLIC;
 
         /// <summary>
         /// Gets or sets the relative elapsed time since the last publish.
@@ -149,9 +139,9 @@ namespace Mycelium.Forge.Models
         public string LastPublished { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the user's role for this package (e.g., Owner, Maintainer).
+        /// Gets or sets the user's role for this package.
         /// </summary>
-        public string Role { get; set; } = "Owner";
+        public PackageInvitationKind Role { get; set; } = PackageInvitationKind.OWNER;
 
         /// <summary>
         /// Gets or sets the collection of maintainers for the package.

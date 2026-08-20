@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IOrganizationSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the current user's role within the organization.
         /// </summary>
-        string CurrentUserRole { get; set; }
+        OrganizationInvitationKind CurrentUserRole { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of members belonging to the organization.
@@ -39,7 +40,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the available role options for organization members.
         /// </summary>
-        List<string> RoleOptions { get; set; }
+        List<OrganizationInvitationKind> RoleOptions { get; set; }
 
         /// <summary>
         /// Initializes the view model state for the specified organization identifier or scope.
@@ -52,7 +53,7 @@ namespace Mycelium.Forge.ViewModels
         /// </summary>
         /// <param name="member">The member whose role is being updated.</param>
         /// <param name="newRole">The new role to assign to the member.</param>
-        void ChangeMemberRole(OrganizationMemberModel member, string newRole);
+        void ChangeMemberRole(OrganizationMemberModel member, OrganizationInvitationKind newRole);
 
         /// <summary>
         /// Removes the specified member from the organization.
