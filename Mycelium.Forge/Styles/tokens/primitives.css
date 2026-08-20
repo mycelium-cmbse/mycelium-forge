@@ -111,5 +111,8 @@
   --primitive-spacing-container-padding: 1.5rem;
   --primitive-spacing-badge-py: 2px;
   --primitive-spacing-badge-px: 6px;
+  --primitive-spacing-button-sm-h: 1.75rem;
+  --primitive-spacing-button-sm-px: 0.625rem;
+  --primitive-spacing-button-sm-gap: 0.375rem;
   --primitive-border-width-default: 1px;
 }

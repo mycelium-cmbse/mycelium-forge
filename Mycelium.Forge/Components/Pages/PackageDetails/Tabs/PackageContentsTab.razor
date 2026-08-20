@@ -19,7 +19,8 @@
     <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
         @foreach (var kind in this.KindTabs)
         {
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton @key="kind"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(() => this.SelectKindTab(kind))"
@@ -35,7 +36,8 @@
             <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
                 @foreach (var element in this.GetFilteredElements())
                 {
-                    <BlazorBlueprint.Primitives.Table.BbTableRow Item="@element"
+                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="element.Name"
+                                                                 Item="@element"
                                                                  class="px-4 py-2.5 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
                             <LucideIcon Name="box"

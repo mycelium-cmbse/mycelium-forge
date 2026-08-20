@@ -55,6 +55,17 @@ a[data-variant="outline"].btn-destructive:hover {
   border-width: 0;
 }
 
+/* Small button utility */
+.button-sm {
+  height: var(--primitive-spacing-button-sm-h);
+  font-size: var(--primitive-font-size-xs);
+  line-height: var(--primitive-line-height-2xs);
+  padding-left: var(--primitive-spacing-button-sm-px);
+  padding-right: var(--primitive-spacing-button-sm-px);
+  gap: var(--primitive-spacing-button-sm-gap);
+  flex-shrink: 0;
+}
+
 /* Input placeholder text truncation and ellipsis behavior */
 input::placeholder {
   text-overflow: ellipsis;

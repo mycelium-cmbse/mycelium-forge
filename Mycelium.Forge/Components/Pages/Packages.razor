@@ -27,7 +27,8 @@
                                            Class="w-40 py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
                         @foreach (var sortOption in this.SortOptions)
                         {
-                            <BbDropdownMenuItem OnClick="() => this.SelectSortOption(sortOption)"
+                            <BbDropdownMenuItem @key="sortOption"
+                                                OnClick="() => this.SelectSortOption(sortOption)"
                                                 Class="@(this.GetSortItemClass(sortOption))">
                                 @(GetSortOptionLabel(sortOption))
                             </BbDropdownMenuItem>
@@ -52,7 +53,8 @@
             <aside class="w-full lg:w-72 shrink-0 p-4 rounded-lg bg-card border border-card-border shadow-xs flex flex-col gap-5.5">
                 @foreach (var group in this.ViewModel.Facets.GroupBy(x => x.Property))
                 {
-                    <div class="flex flex-col gap-2.5 w-full">
+                    <div @key="group.Key"
+                         class="flex flex-col gap-2.5 w-full">
                         <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                             @(group.Key)
                         </span>
@@ -60,7 +62,8 @@
                             @foreach (var item in group)
                             {
                                 var facetId = $"facet-{group.Key}-{item.Label}".ToLowerInvariant().Replace(" ", "-");
-                                <div class="flex flex-row items-center gap-2 w-full select-none">
+                                <div @key="item.Key"
+                                     class="flex flex-row items-center gap-2 w-full select-none">
                                     <BbCheckbox Checked="@(item.IsChecked)"
                                                 CheckedChanged="@(_ => this.ToggleFacet(item))"
                                                 Id="@facetId"
@@ -100,7 +103,8 @@
                 {
                     @foreach (var package in this.ViewModel.PackageResults)
                     {
-                        <PackageRow Model="@package"/>
+                        <PackageRow @key="package.Href"
+                                    Model="@package"/>
                     }
                 }
                 else

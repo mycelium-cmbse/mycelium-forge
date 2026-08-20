@@ -51,7 +51,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnChangeUsername)"
-                      Class="h-7 text-xs px-2.5 shrink-0">
+                      Class="button-sm">
                 Change
             </BbButton>
         </div>
@@ -74,7 +74,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnChangeEmail)"
-                      Class="h-7 text-xs px-2.5 shrink-0">
+                      Class="button-sm">
                 Change
             </BbButton>
         </div>
@@ -90,7 +90,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditDisplayName)"
-                      Class="h-7 text-xs px-2.5 shrink-0">
+                      Class="button-sm">
                 Edit
             </BbButton>
         </div>
@@ -106,7 +106,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditCompany)"
-                      Class="h-7 text-xs px-2.5 shrink-0">
+                      Class="button-sm">
                 Edit
             </BbButton>
         </div>
@@ -122,7 +122,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditLocation)"
-                      Class="h-7 text-xs px-2.5 shrink-0">
+                      Class="button-sm">
                 Edit
             </BbButton>
         </div>
@@ -138,7 +138,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditWebsite)"
-                      Class="h-7 text-xs px-2.5 shrink-0">
+                      Class="button-sm">
                 Edit
             </BbButton>
         </div>
@@ -154,7 +154,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditBiography)"
-                      Class="h-7 text-xs px-2.5 shrink-0">
+                      Class="button-sm">
                 Edit
             </BbButton>
         </div>
@@ -178,7 +178,8 @@
     <div class="flex flex-col w-full divide-y divide-border">
         @foreach (var organization in this.ViewModel.Organizations)
         {
-            <div class="flex items-center gap-3 py-2.25 w-full">
+            <div @key="organization.Scope"
+                 class="flex items-center gap-3 py-2.25 w-full">
                 <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-org-member-alt-avatar-bg")">
                     @(organization.Initials)
                 </div>
@@ -223,7 +224,7 @@
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnDeactivateAccount)"
-                  Class="h-7 text-xs px-2.5 shrink-0">
+                  Class="button-sm">
             Deactivate
         </BbButton>
     </div>
@@ -242,7 +243,7 @@
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnDeleteAccount)"
-                  Class="btn-destructive-outline h-7 text-xs px-2.5 shrink-0">
+                  Class="btn-destructive-outline button-sm">
             Delete
         </BbButton>
     </div>

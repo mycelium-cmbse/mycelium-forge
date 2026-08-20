@@ -187,7 +187,8 @@
                 <BlazorBlueprint.Primitives.Tabs.BbTabsList class="w-full h-10 rounded-lg bg-card border border-border flex items-center gap-0.5 p-0.5 overflow-x-auto">
                     @foreach (var tab in this.GetVisibleContentTabs())
                     {
-                        <BlazorBlueprint.Primitives.Tabs.BbTabsTrigger Value="@tab"
+                        <BlazorBlueprint.Primitives.Tabs.BbTabsTrigger @key="tab"
+                                                                       Value="@tab"
                                                                        class="@(this.GetContentTabClass(tab))">
                             @(tab)
                         </BlazorBlueprint.Primitives.Tabs.BbTabsTrigger>
@@ -277,7 +278,8 @@
 
                 @foreach (var check in this.ViewModel.Package.QualityChecks)
                 {
-                    <div class="flex items-center gap-2 text-xs leading-2xs text-secondary-text">
+                    <div @key="check.Title"
+                         class="flex items-center gap-2 text-xs leading-2xs text-secondary-text">
                         <LucideIcon Name="check"
                                     Size="14"
                                     Class="text-validated shrink-0"/>
@@ -295,7 +297,8 @@
 
                 @foreach (var maintainer in this.ViewModel.Package.Maintainers)
                 {
-                    <div class="flex items-center gap-2 h-6.5">
+                    <div @key="maintainer.Name"
+                         class="flex items-center gap-2 h-6.5">
                         <div class="w-6.5 h-6.5 rounded-full bg-avatar-bg flex items-center justify-center shrink-0">
                             <span class="text-2xs leading-3xs font-semibold text-white">
                                 @(maintainer.Initials)

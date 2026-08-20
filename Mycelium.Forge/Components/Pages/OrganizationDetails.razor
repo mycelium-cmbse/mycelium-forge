@@ -52,7 +52,8 @@
             <div class="w-full flex flex-col gap-3">
                 @foreach (var package in this.ViewModel.Packages)
                 {
-                    <PackageRow Model="@package"/>
+                    <PackageRow @key="package.Href"
+                                Model="@package"/>
                 }
             </div>
         </section>

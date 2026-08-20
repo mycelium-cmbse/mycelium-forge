@@ -1,5 +1,4 @@
 @attribute [Route(PageRoutes.Accounts)]
-@attribute [Route("/accounts")]
 @rendermode InteractiveServer
 
 <PageTitle>Accounts &mdash; Mycelium Forge</PageTitle>
@@ -11,7 +10,7 @@
                 <BbBreadcrumbItem>
                     <BbBreadcrumbLink Href="@PageRoutes.Docs"
                                       Class="text-primary hover:underline font-normal">
-                        Core concepts
+                        Installation
                     </BbBreadcrumbLink>
                 </BbBreadcrumbItem>
                 <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
@@ -19,7 +18,7 @@
                 </BbBreadcrumbSeparator>
                 <BbBreadcrumbItem>
                     <BbBreadcrumbPage Class="text-muted-foreground font-normal">
-                        Packages &amp; the kpar format
+                        Accounts
                     </BbBreadcrumbPage>
                 </BbBreadcrumbItem>
             </BbBreadcrumbList>
@@ -43,17 +42,12 @@
         </p>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full">
-            <div class="w-full sm:w-[340px] h-[34px] px-3 flex items-center gap-2 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors shrink-0">
-                <LucideIcon Name="search"
-                            Size="14"
-                            Class="text-muted-foreground shrink-0"/>
-                <BbInput Type="InputType.Search"
-                         Value="@(this.SearchQuery)"
+            <SearchInput Value="@(this.SearchQuery)"
                          ValueChanged="@(this.OnSearchInputChanged)"
                          Placeholder="Filter by username or email…"
-                         UpdateTiming="UpdateTiming.Immediate"
-                         Class="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"/>
-            </div>
+                         IconSize="14"
+                         InputClass="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"
+                         Class="!w-full sm:!w-[340px] !h-[34px] !px-3 !gap-2 shrink-0"/>
 
             <div class="flex items-center gap-2.5">
                 <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
@@ -68,7 +62,8 @@
                     <BlazorBlueprint.Primitives.Select.BbSelectContent class="min-w-[150px] py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
                         @foreach (var statusOption in this.StatusFilterOptions)
                         {
-                            <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@statusOption"
+                            <BlazorBlueprint.Primitives.Select.BbSelectItem @key="statusOption"
+                                                                            Value="@statusOption"
                                                                             Text="@($"Status: {statusOption}")"
                                                                             class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                         }
@@ -87,7 +82,8 @@
                     <BlazorBlueprint.Primitives.Select.BbSelectContent class="min-w-[160px] py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
                         @foreach (var verificationOption in this.VerificationFilterOptions)
                         {
-                            <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@verificationOption"
+                            <BlazorBlueprint.Primitives.Select.BbSelectItem @key="verificationOption"
+                                                                            Value="@verificationOption"
                                                                             Text="@($"Verification: {verificationOption}")"
                                                                             class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                         }
@@ -138,7 +134,8 @@
                             {
                                 @foreach (var account in this.ViewModel.FilteredAccounts)
                                 {
-                                    <BlazorBlueprint.Primitives.Table.BbTableRow Item="@account"
+                                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="account.Username"
+                                                                                 Item="@account"
                                                                                  Class="flex items-center px-4 py-3 bg-card hover:bg-muted/50 transition-colors gap-3">
                                         <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[250px] shrink-0 flex items-center gap-2.5 min-w-0 p-0">
                                             <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
@@ -225,11 +222,9 @@
                             }
                             else
                             {
-                                <div class="py-12 flex flex-col items-center justify-center gap-2 text-center">
-                                    <span class="text-sm leading-xs font-medium text-muted-foreground">
-                                        No accounts match the current filter.
-                                    </span>
-                                </div>
+                                <BbEmpty Title="No accounts match the current filter."
+                                         Size="EmptySize.Small"
+                                         Class="py-12 text-center"/>
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableBody>
                     </BlazorBlueprint.Primitives.Table.BbTable>

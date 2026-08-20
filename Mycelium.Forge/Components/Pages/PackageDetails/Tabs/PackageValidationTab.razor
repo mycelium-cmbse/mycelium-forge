@@ -1,4 +1,4 @@
-﻿@if (this.Report?.Checks == null || this.Report.Checks.Count == 0)
+@if (this.Report?.Checks == null || this.Report.Checks.Count == 0)
 {
     return;
 }
@@ -27,7 +27,8 @@
             <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
                 @foreach (var check in this.Report.Checks)
                 {
-                    <BlazorBlueprint.Primitives.Table.BbTableRow Item="@check"
+                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="check.Title"
+                                                                 Item="@check"
                                                                  class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
                             <LucideIcon Name="check"

@@ -66,7 +66,8 @@
                     <BbTableBody Class="divide-y divide-border">
                         @foreach (var package in this.FilteredPackages())
                         {
-                            <BbTableRow Item="@package"
+                            <BbTableRow @key="package.Name"
+                                        Item="@package"
                                         Class="px-5 py-3.5 flex items-center hover:bg-muted/50 transition-colors">
                                 <BbTableCell Class="w-[430px] shrink-0 p-0">
                                     <a href="@(package.Href)"
@@ -103,27 +104,28 @@
         }
         else
         {
-            <div class="w-full rounded-xl bg-card border border-border flex flex-col items-center py-20 gap-3">
-                <div class="icon-circle-primary w-15 h-15">
-                    <LucideIcon Name="package-open"
-                                Size="28"
-                                Class="text-primary shrink-0"/>
-                </div>
-                <h2 class="text-md leading-sm font-semibold text-foreground text-center">
-                    No packages yet
-                </h2>
-                <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-lg">
-                    Publish a SysML v2 library so other teams can discover, version, and import it into their projects.
-                </p>
-                <BbButton Variant="ButtonVariant.Default"
-                          Href="@PageRoutes.Publish"
-                          Class="mt-0.5">
-                    <LucideIcon Name="plus"
-                                Size="16"
-                                Class="shrink-0"/>
-                    <span>Publish a package</span>
-                </BbButton>
-            </div>
+            <BbEmpty Title="No packages yet"
+                     Description="Publish a SysML v2 library so other teams can discover, version, and import it into their projects."
+                     Size="EmptySize.Large"
+                     Class="w-full rounded-xl bg-card border border-border py-20">
+                <Icon>
+                    <div class="icon-circle-primary w-15 h-15">
+                        <LucideIcon Name="package-open"
+                                    Size="28"
+                                    Class="text-primary shrink-0"/>
+                    </div>
+                </Icon>
+                <ChildContent>
+                    <BbButton Variant="ButtonVariant.Default"
+                              Href="@PageRoutes.Publish"
+                              Class="mt-0.5">
+                        <LucideIcon Name="plus"
+                                    Size="16"
+                                    Class="shrink-0"/>
+                        <span>Publish a package</span>
+                    </BbButton>
+                </ChildContent>
+            </BbEmpty>
         }
 
     </div>

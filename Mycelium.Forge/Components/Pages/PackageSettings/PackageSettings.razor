@@ -71,7 +71,8 @@
     <div class="flex flex-col gap-3.5 w-full">
         @foreach (var maintainer in this.ViewModel.Package.Maintainers)
         {
-            <div class="flex items-center gap-2.5 w-full">
+            <div @key="maintainer.Name"
+                 class="flex items-center gap-2.5 w-full">
                 <div class="w-7.5 h-7.5 rounded-full bg-avatar-bg flex items-center justify-center shrink-0">
                     <span class="text-2xs leading-3xs font-semibold text-white">
                         @(maintainer.Initials)
@@ -213,7 +214,8 @@
     <div class="flex flex-col gap-3.5 w-full">
         @foreach (var version in this.ViewModel.Package.Versions)
         {
-            <div class="flex items-center gap-2.5 w-full h-6 text-xs leading-2xs">
+            <div @key="version.Version"
+                 class="flex items-center gap-2.5 w-full h-6 text-xs leading-2xs">
                 <span class="text-sm leading-xs font-semibold @(version.IsUnlisted ? "text-muted-foreground" : "text-foreground")">
                     @(version.Version)
                 </span>

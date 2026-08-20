@@ -17,7 +17,7 @@
 <div class="w-full h-12.5 px-5 py-3.5 rounded-lg bg-card border border-border flex items-center gap-3">
     @foreach (var step in this.ViewModel.Steps)
     {
-        <div class="flex items-center gap-2">
+        <div @key="step.Number" class="flex items-center gap-2">
             <div class="@(this.GetStepBubbleClass(step))">
                 <span class="@(this.GetStepNumberClass(step))">
                     @(step.Number)
@@ -55,7 +55,7 @@
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnReplaceArtefact)"
-                      Class="shrink-0">
+                      Class="button-sm">
                 Replace
             </BbButton>
         </div>
@@ -68,8 +68,8 @@
         Package metadata
     </h2>
 
-    <div class="w-full flex flex-col sm:flex-row items-start gap-3">
-        <BbField Class="w-full sm:w-[200px] shrink-0 flex flex-col gap-1.5">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+        <BbField Class="w-full sm:w-[220px] shrink-0 flex flex-col gap-1.5">
             <BbFieldLabel For="publish-scope"
                           Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 SCOPE
@@ -80,8 +80,8 @@
                                                             ValueChanged="@(this.OnScopeChanged)">
                     <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="publish-scope"
                                                                        class="h-10 w-full px-3 rounded-md bg-card border border-border flex items-center justify-between gap-2 text-sm leading-xs text-foreground cursor-pointer focus:outline-none">
-                        <div class="flex items-center gap-2 flex-1 truncate">
-                            <span class="truncate">@(this.ViewModel.Metadata.Scope)</span>
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span>@(this.ViewModel.Metadata.Scope)</span>
                             @if (this.ViewModel.Metadata.IsScopeVerified)
                             {
                                 <LucideIcon Name="badge-check"
@@ -96,7 +96,8 @@
                     <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
                         @foreach (var scopeOption in this.ViewModel.ScopeOptions)
                         {
-                            <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@scopeOption"
+                            <BlazorBlueprint.Primitives.Select.BbSelectItem @key="scopeOption"
+                                                                            Value="@scopeOption"
                                                                             Text="@scopeOption"
                                                                             class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                         }
@@ -167,7 +168,8 @@
                 <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
                     @foreach (var licenseOption in this.ViewModel.LicenseOptions)
                     {
-                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@licenseOption"
+                        <BlazorBlueprint.Primitives.Select.BbSelectItem @key="licenseOption"
+                                                                        Value="@licenseOption"
                                                                         Text="@licenseOption"
                                                                         class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                     }
@@ -195,7 +197,8 @@
                 <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
                     @foreach (var visibilityOption in this.ViewModel.VisibilityOptions)
                     {
-                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@visibilityOption"
+                        <BlazorBlueprint.Primitives.Select.BbSelectItem @key="visibilityOption"
+                                                                        Value="@visibilityOption"
                                                                         Text="@visibilityOption.ToString()"
                                                                         class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                     }
@@ -226,7 +229,8 @@
                 <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
                     @foreach (var metamodelOption in this.ViewModel.MetamodelOptions)
                     {
-                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@metamodelOption"
+                        <BlazorBlueprint.Primitives.Select.BbSelectItem @key="metamodelOption"
+                                                                        Value="@metamodelOption"
                                                                         Text="@metamodelOption"
                                                                         class="px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"/>
                     }
@@ -257,7 +261,7 @@
     <div class="flex flex-col gap-3 w-full">
         @foreach (var check in this.ViewModel.ValidationChecks)
         {
-            <BbMarker Class="flex items-center gap-2 w-full">
+            <BbMarker @key="check.Title" Class="flex items-center gap-2 w-full">
                 <BbMarkerIcon>
                     @if (check.Status == ValidationStatus.Pass)
                     {
