@@ -100,10 +100,12 @@
                 <code class="font-mono text-sm leading-17 text-foreground truncate flex-1 select-all">
                     @(this.GetCurrentInstallCommand())
                 </code>
-                <button type="button"
-                        @onclick="this.CopyInstallCommandToClipboard"
-                        title="Copy command"
-                        class="text-muted-foreground hover:text-foreground transition-colors p-1 shrink-0 cursor-pointer">
+                <BbButton Variant="ButtonVariant.Ghost"
+                          Size="ButtonSize.IconSmall"
+                          Type="ButtonType.Button"
+                          OnClick="@(this.CopyInstallCommandToClipboard)"
+                          AriaLabel="Copy command"
+                          Class="text-muted-foreground hover:text-foreground transition-colors p-1 shrink-0 cursor-pointer h-auto w-auto">
                     @if (this.IsCopied)
                     {
                         <LucideIcon Name="check"
@@ -116,7 +118,7 @@
                                     Size="16"
                                     Class="text-muted-foreground hover:text-foreground shrink-0"/>
                     }
-                </button>
+                </BbButton>
             </div>
         </BlazorBlueprint.Primitives.Tabs.BbTabs>
 

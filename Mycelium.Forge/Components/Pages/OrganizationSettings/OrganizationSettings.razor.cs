@@ -37,18 +37,15 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// Handles changing the assigned role of an organization member.
         /// </summary>
         /// <param name="member">The member whose role is changing.</param>
-        /// <param name="eventArgs">The change event args containing the selected new role name.</param>
-        public void OnChangeMemberRole(OrganizationMemberModel member, ChangeEventArgs eventArgs)
+        /// <param name="role">The selected new role for the member.</param>
+        public void OnChangeMemberRole(OrganizationMemberModel member, OrganizationInvitationKind role)
         {
-            if (member == null || eventArgs?.Value == null)
+            if (member == null)
             {
                 return;
             }
 
-            if (Enum.TryParse<OrganizationInvitationKind>(eventArgs.Value.ToString(), out var role))
-            {
-                this.ViewModel.ChangeMemberRole(member, role);
-            }
+            this.ViewModel.ChangeMemberRole(member, role);
         }
 
         /// <summary>

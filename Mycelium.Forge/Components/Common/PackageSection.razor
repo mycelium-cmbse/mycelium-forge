@@ -1,17 +1,18 @@
-﻿<section class="flex flex-col gap-4 w-full @(this.Class)">
+<section class="flex flex-col gap-4 w-full @(this.Class)">
     <div class="flex items-center justify-between gap-2 w-full h-6">
         <h2 class="text-xl leading-lg font-semibold text-foreground flex-1">
             @(this.Title)
         </h2>
         @if (!string.IsNullOrEmpty(this.ViewAllHref))
         {
-            <a href="@(this.ViewAllHref)"
-               class="flex items-center gap-1.5 text-sm leading-xs font-medium text-primary hover:opacity-80 transition-opacity">
+            <BbButton Variant="ButtonVariant.Link"
+                      Href="@(this.ViewAllHref)"
+                      Class="flex items-center gap-1.5 text-sm leading-xs font-medium text-primary hover:opacity-80 transition-opacity p-0 h-auto">
                 <span>View all</span>
                 <LucideIcon Name="arrow-right"
                             Size="14"
                             Class="shrink-0"/>
-            </a>
+            </BbButton>
         }
     </div>
 

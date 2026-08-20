@@ -40,14 +40,15 @@
         <h2 class="text-lg leading-lg font-semibold text-foreground flex-1">
             Maintainers
         </h2>
-        <button type="button"
-                @onclick="this.OnAddMaintainer"
-                class="h-7.5 px-3 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-sm leading-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer shrink-0">
+        <BbButton Variant="ButtonVariant.Outline"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnAddMaintainer)"
+                  Class="h-7.5 px-3 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-sm leading-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer shrink-0">
             <LucideIcon Name="plus"
                         Size="14"
                         Class="text-secondary-text shrink-0"/>
             <span>Add maintainer</span>
-        </button>
+        </BbButton>
     </div>
 
     <div class="flex flex-col gap-3.5 w-full">
@@ -77,14 +78,15 @@
                     </span>
                 </div>
 
-                <button type="button"
-                        @onclick="() => this.OnMaintainerMenu(maintainer)"
-                        class="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
-                        title="Options">
+                <BbButton Variant="ButtonVariant.Ghost"
+                          Size="ButtonSize.IconSmall"
+                          OnClick="() => this.OnMaintainerMenu(maintainer)"
+                          AriaLabel="Options"
+                          Class="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0">
                     <LucideIcon Name="ellipsis-vertical"
                                 Size="18"
                                 Class="text-muted-foreground shrink-0"/>
-                </button>
+                </BbButton>
             </div>
         }
     </div>
@@ -101,9 +103,14 @@
         </span>
     </div>
 
-    <div class="flex flex-col w-full divide-y divide-border">
-        <div class="flex items-start gap-3 py-2.5 w-full cursor-pointer"
-             @onclick="() => this.OnSelectVisibility(VisibilityKind.PRIVATE)">
+    <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroup TValue="VisibilityKind"
+                                                         Value="@(this.ViewModel.Package.Visibility)"
+                                                         ValueChanged="@(this.OnSelectVisibility)"
+                                                         AriaLabel="Package visibility"
+                                                         class="flex flex-col w-full divide-y divide-border">
+        <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
+                                                                 Value="VisibilityKind.PRIVATE"
+                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
             <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PRIVATE ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
             </div>
 
@@ -123,10 +130,11 @@
                     Current
                 </BbBadge>
             }
-        </div>
+        </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
 
-        <div class="flex items-start gap-3 py-2.5 w-full cursor-pointer"
-             @onclick="() => this.OnSelectVisibility(VisibilityKind.INTERNAL)">
+        <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
+                                                                 Value="VisibilityKind.INTERNAL"
+                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
             <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
             </div>
 
@@ -146,10 +154,11 @@
                     Current
                 </BbBadge>
             }
-        </div>
+        </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
 
-        <div class="flex items-start gap-3 py-2.5 w-full cursor-pointer"
-             @onclick="() => this.OnSelectVisibility(VisibilityKind.PUBLIC)">
+        <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
+                                                                 Value="VisibilityKind.PUBLIC"
+                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
             <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PUBLIC ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
             </div>
 
@@ -169,8 +178,8 @@
                     Current
                 </BbBadge>
             }
-        </div>
-    </div>
+        </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
+    </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroup>
 
     <p class="text-xs leading-2xs text-muted-foreground w-full">
         New packages are created private unless the owning Organization sets a different default. A request for a package the caller may not read is answered exactly as for a package that does not exist, so visibility never leaks through error messages.
@@ -222,24 +231,24 @@
 
                 @if (version.IsUnlisted)
                 {
-                    <button type="button"
-                            @onclick="() => this.OnRelistVersion(version)"
-                            class="text-xs leading-2xs font-medium text-primary hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0">
+                    <BbButton Variant="ButtonVariant.Link"
+                              OnClick="() => this.OnRelistVersion(version)"
+                              Class="text-xs leading-2xs font-medium text-primary hover:underline p-0 h-auto">
                         Relist
-                    </button>
+                    </BbButton>
                 }
                 else
                 {
-                    <button type="button"
-                            @onclick="() => this.OnUnlistVersion(version)"
-                            class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0">
+                    <BbButton Variant="ButtonVariant.Link"
+                              OnClick="() => this.OnUnlistVersion(version)"
+                              Class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline p-0 h-auto">
                         Unlist
-                    </button>
-                    <button type="button"
-                            @onclick="() => this.OnDeprecateVersion(version)"
-                            class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0">
+                    </BbButton>
+                    <BbButton Variant="ButtonVariant.Link"
+                              OnClick="() => this.OnDeprecateVersion(version)"
+                              Class="text-xs leading-2xs font-medium text-secondary-text hover:text-foreground hover:underline p-0 h-auto">
                         Deprecate
-                    </button>
+                    </BbButton>
                 }
             </div>
         }
@@ -261,11 +270,12 @@
             </span>
         </div>
 
-        <button type="button"
-                @onclick="this.OnTransferOwnership"
-                class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+        <BbButton Variant="ButtonVariant.Outline"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnTransferOwnership)"
+                  Class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
             Transfer
-        </button>
+        </BbButton>
     </div>
 
     <div class="flex flex-col gap-0.5 w-full">

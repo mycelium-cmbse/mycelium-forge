@@ -1,0 +1,37 @@
+/* Overrides for BlazorBlueprint button and component properties.
+ * Imported into tailwind.css to provide unified styling across Forge components.
+ */
+
+/* Link-styled button reset and hover behaviors */
+button[data-variant="link"],
+a[data-variant="link"] {
+  text-underline-offset: 4px;
+}
+
+button[data-variant="link"]:hover,
+a[data-variant="link"]:hover {
+  text-decoration-line: underline;
+}
+
+/* Destructive outline button styling */
+.btn-destructive-outline {
+  border-color: var(--destructive);
+  color: var(--destructive);
+  background-color: var(--card);
+}
+
+.btn-destructive-outline:hover {
+  background-color: color-mix(in oklab, var(--destructive) 10%, transparent);
+}
+
+/* Action table button overrides */
+.btn-table-action {
+  font-size: var(--primitive-font-size-xs);
+  line-height: var(--primitive-line-height-2xs);
+  font-weight: var(--primitive-font-weight-medium);
+  padding: 0;
+  height: auto;
+  min-height: 0;
+  background-color: transparent;
+  border-width: 0;
+}

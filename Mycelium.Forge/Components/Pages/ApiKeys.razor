@@ -99,11 +99,11 @@
                                     @(key.LastUsedAt == default ? "never" : key.LastUsedAt.ToString("MMM yyyy"))
                                 </BbTableCell>
                                 <BbTableCell Class="w-[90px] shrink-0 p-0 text-left">
-                                    <button type="button"
-                                            @onclick="() => this.OnRevokeKey(key.Id)"
-                                            class="text-sm leading-xs font-medium text-destructive hover:underline cursor-pointer bg-transparent border-0 p-0">
+                                    <BbButton Variant="ButtonVariant.Link"
+                                              OnClick="() => this.OnRevokeKey(key.Id)"
+                                              Class="text-sm leading-xs font-medium text-destructive hover:underline p-0 h-auto">
                                         Revoke
-                                    </button>
+                                    </BbButton>
                                 </BbTableCell>
                             </BbTableRow>
                         }

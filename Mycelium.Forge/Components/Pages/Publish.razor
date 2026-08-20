@@ -51,11 +51,12 @@
                 @(this.ViewModel.Metadata.ArtefactFormat)
             </BbBadge>
 
-            <button type="button"
-                    @onclick="this.OnReplaceArtefact"
-                    class="px-2.5 py-1 rounded-md bg-card border border-border text-xs leading-2xs font-medium text-secondary-text hover:bg-muted transition-colors shrink-0 cursor-pointer">
+            <BbButton Variant="ButtonVariant.Outline"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnReplaceArtefact)"
+                      Class="px-2.5 py-1 rounded-md bg-card border border-border text-xs leading-2xs font-medium text-secondary-text hover:bg-muted transition-colors shrink-0 cursor-pointer">
                 Replace
-            </button>
+            </BbButton>
         </div>
         <p class="text-xs leading-2xs font-normal text-muted-foreground">
             Format detected from the archive. The metadata below is read from the kpar manifest, so it is shown for confirmation rather than entry.

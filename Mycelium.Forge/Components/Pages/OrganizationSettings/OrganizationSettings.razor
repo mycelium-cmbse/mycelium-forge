@@ -50,11 +50,12 @@
                 <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
                     MEMBERS
                 </span>
-                <button type="button"
-                        @onclick="this.OnTransferOrganization"
-                        class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
+                <BbButton Variant="ButtonVariant.Outline"
+                          Type="ButtonType.Button"
+                          OnClick="@(this.OnTransferOrganization)"
+                          Class="h-8 px-3.5 rounded-lg bg-card border border-destructive text-destructive hover:bg-destructive/10 text-sm leading-xs font-medium transition-colors cursor-pointer shrink-0">
                     Transfer
-                </button>
+                </BbButton>
             </div>
 
             <div class="flex flex-col w-full divide-y divide-border">
@@ -75,21 +76,32 @@
                         </div>
 
                         <div class="w-[230px] shrink-0">
-                            <select value="@member.Role"
-                                    @onchange="e => this.OnChangeMemberRole(member, e)"
-                                    class="w-full h-7 px-2.5 py-1 rounded-md bg-card border border-border text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
-                                @foreach (var role in this.ViewModel.RoleOptions)
-                                {
-                                    <option value="@role">@role</option>
-                                }
-                            </select>
+                            <BlazorBlueprint.Primitives.Select.BbSelect TValue="OrganizationInvitationKind"
+                                                                        Value="@member.Role"
+                                                                        ValueChanged="@(role => this.OnChangeMemberRole(member, role))">
+                                <BlazorBlueprint.Primitives.Select.BbSelectTrigger class="w-full h-7 px-2.5 py-1 rounded-md bg-card border border-border flex items-center justify-between gap-1.5 text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+                                    <span class="truncate">@member.Role</span>
+                                    <LucideIcon Name="chevron-down"
+                                                Size="12"
+                                                Class="text-muted-foreground shrink-0"/>
+                                </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
+                                <BlazorBlueprint.Primitives.Select.BbSelectContent class="w-full py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
+                                    @foreach (var role in this.ViewModel.RoleOptions)
+                                    {
+                                        <BlazorBlueprint.Primitives.Select.BbSelectItem Value="@role"
+                                                                                        Text="@role.ToString()"
+                                                                                        class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
+                                    }
+                                </BlazorBlueprint.Primitives.Select.BbSelectContent>
+                            </BlazorBlueprint.Primitives.Select.BbSelect>
                         </div>
 
-                        <button type="button"
-                                @onclick="() => this.OnRemoveMember(member)"
-                                class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                        <BbButton Variant="ButtonVariant.Outline"
+                                  Type="ButtonType.Button"
+                                  OnClick="() => this.OnRemoveMember(member)"
+                                  Class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
                             Remove
-                        </button>
+                        </BbButton>
                     </div>
                 }
             </div>
@@ -123,17 +135,19 @@
                             @(invitation.StatusText)
                         </span>
 
-                        <button type="button"
-                                @onclick="() => this.OnResendInvitation(invitation)"
-                                class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                        <BbButton Variant="ButtonVariant.Outline"
+                                  Type="ButtonType.Button"
+                                  OnClick="() => this.OnResendInvitation(invitation)"
+                                  Class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
                             Resend
-                        </button>
+                        </BbButton>
 
-                        <button type="button"
-                                @onclick="() => this.OnRevokeInvitation(invitation)"
-                                class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
+                        <BbButton Variant="ButtonVariant.Outline"
+                                  Type="ButtonType.Button"
+                                  OnClick="() => this.OnRevokeInvitation(invitation)"
+                                  Class="px-2.5 py-1 rounded-md bg-card border border-border hover:bg-muted text-secondary-text text-xs leading-2xs font-medium transition-colors cursor-pointer shrink-0">
                             Revoke
-                        </button>
+                        </BbButton>
                     </div>
                 }
             </div>

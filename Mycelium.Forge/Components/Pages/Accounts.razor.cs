@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Accounts.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -37,30 +37,30 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Handles search input query changes and triggers account filtering.
         /// </summary>
-        /// <param name="eventArgs">The change event arguments containing the new search value.</param>
-        private void OnSearchInputChanged(ChangeEventArgs eventArgs)
+        /// <param name="query">The new search query value.</param>
+        private void OnSearchInputChanged(string query)
         {
-            this.ViewModel.SearchQuery = eventArgs.Value?.ToString() ?? string.Empty;
+            this.ViewModel.SearchQuery = query ?? string.Empty;
             this.ViewModel.ApplyFilters();
         }
 
         /// <summary>
         /// Handles status filter dropdown selection changes.
         /// </summary>
-        /// <param name="eventArgs">The change event arguments containing the selected status.</param>
-        private void OnStatusFilterChanged(ChangeEventArgs eventArgs)
+        /// <param name="status">The selected status filter.</param>
+        private void OnStatusFilterChanged(string status)
         {
-            this.ViewModel.SelectedStatusFilter = eventArgs.Value?.ToString() ?? "All";
+            this.ViewModel.SelectedStatusFilter = status ?? "All";
             this.ViewModel.ApplyFilters();
         }
 
         /// <summary>
         /// Handles verification status filter dropdown selection changes.
         /// </summary>
-        /// <param name="eventArgs">The change event arguments containing the selected verification filter.</param>
-        private void OnVerificationFilterChanged(ChangeEventArgs eventArgs)
+        /// <param name="verification">The selected verification status filter.</param>
+        private void OnVerificationFilterChanged(string verification)
         {
-            this.ViewModel.SelectedVerificationFilter = eventArgs.Value?.ToString() ?? "All";
+            this.ViewModel.SelectedVerificationFilter = verification ?? "All";
             this.ViewModel.ApplyFilters();
         }
 

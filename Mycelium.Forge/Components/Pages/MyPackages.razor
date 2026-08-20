@@ -13,13 +13,14 @@
                     Packages you own or maintain across your account and organizations.
                 </p>
             </div>
-            <a href="@PageRoutes.Publish"
-               class="flex flex-row items-center gap-1.5 px-3.5 py-2.5 bg-primary hover:bg-primary/90 rounded-lg no-underline transition-colors">
+            <BbButton Variant="ButtonVariant.Default"
+                      Href="@PageRoutes.Publish"
+                      Class="flex flex-row items-center gap-1.5 px-3.5 py-2.5 bg-primary hover:bg-primary/90 rounded-lg no-underline transition-colors">
                 <LucideIcon Name="plus"
                             Size="16"
                             Class="text-white shrink-0"/>
                 <span class="text-sm leading-xs font-semibold text-white">Publish a package</span>
-            </a>
+            </BbButton>
         </div>
 
         @if (this.ViewModel.Packages.Count > 0)
@@ -114,13 +115,14 @@
                 <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-lg">
                     Publish a SysML v2 library so other teams can discover, version, and import it into their projects.
                 </p>
-                <a href="@PageRoutes.Publish"
-                   class="flex flex-row items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary/90 rounded-lg no-underline transition-colors mt-0.5">
+                <BbButton Variant="ButtonVariant.Default"
+                          Href="@PageRoutes.Publish"
+                          Class="flex flex-row items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary/90 rounded-lg no-underline transition-colors mt-0.5">
                     <LucideIcon Name="plus"
                                 Size="16"
                                 Class="text-white shrink-0"/>
                     <span class="text-sm leading-xs font-semibold text-white">Publish a package</span>
-                </a>
+                </BbButton>
             </div>
         }
 
