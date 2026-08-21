@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AccountSettings.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,17 @@
 
 namespace Mycelium.Forge.Components.Pages.AccountSettings
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using BlazorBlueprint.Components;
+
+    using FluentResults;
+
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Components.Common;
+    using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
@@ -18,6 +27,12 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
     /// </summary>
     public partial class AccountSettings : ComponentBase
     {
+        /// <summary>
+        /// Gets or sets the dialog service used to display modal dialogs.
+        /// </summary>
+        [Inject]
+        public DialogService DialogService { get; set; }
+
         /// <summary>
         /// Gets or sets the view model for the account settings page.
         /// </summary>
@@ -76,8 +91,33 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <summary>
         /// Handles the action to create or transfer organization memberships.
         /// </summary>
-        public void OnCreateOrganization()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnCreateOrganization()
         {
+            var onResult = new EventCallbackFactory().Create(this, (CreateOrganizationResult result) => this.HandleCreateOrganization(result));
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(CreateOrganizationDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Create an organization",
+                Description = "An Organization owns a package scope and its members. You become its Organization Administrator."
+            };
+
+            await this.DialogService.OpenAsync<CreateOrganizationDialog>(parameters, options);
+        }
+
+        /// <summary>
+        /// Handles the result when an organization is created.
+        /// </summary>
+        /// <param name="result">The create organization result details.</param>
+        /// <returns>A <see cref="Result" /> indicating the outcome of the create organization operation.</returns>
+        public Result HandleCreateOrganization(CreateOrganizationResult result)
+        {
+            return this.ViewModel.CreateOrganization(result);
         }
 
         /// <summary>

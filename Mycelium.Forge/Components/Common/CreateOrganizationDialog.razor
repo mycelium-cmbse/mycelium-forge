@@ -1,0 +1,63 @@
+<div class="flex flex-col gap-4 px-6 py-3">
+    <p class="text-sm leading-xs font-normal text-muted-foreground">
+        An Organization owns a package scope and its members. You become its Organization Administrator.
+    </p>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="create-org-name"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            ORGANIZATION NAME
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="create-org-name"
+                     @bind-Value="this.OrganizationName"
+                     Placeholder="e.g. European Space Agency"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="create-org-scope"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            SCOPE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="create-org-scope"
+                     @bind-Value="this.Scope"
+                     Placeholder="e.g. @@esa"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
+        </BbFieldContent>
+        <BbFieldDescription Class="text-2xs leading-3xs font-normal text-validated">
+            Must be greater than the latest published version (v1.2.0). SemVer 2.0.0.
+        </BbFieldDescription>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="create-org-billing-email"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            BILLING EMAIL
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="create-org-billing-email"
+                     @bind-Value="this.BillingEmail"
+                     Placeholder="e.g. billing@esa.int"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
+        </BbFieldContent>
+    </BbField>
+
+    <div class="pt-2 flex items-center justify-end gap-2.5">
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCreateOrganizationClicked)">
+            Create organization
+        </BbButton>
+    </div>
+</div>

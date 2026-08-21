@@ -84,6 +84,18 @@
                 <span>Add to project</span>
             </BbButton>
 
+            @if (this.IsUserAdmin)
+            {
+                <BbButton Variant="ButtonVariant.Default"
+                          Type="ButtonType.Button"
+                          OnClick="@(this.OpenMigrateInBloomDialog)">
+                    <LucideIcon Name="external-link"
+                                Size="15"
+                                Class="shrink-0"/>
+                    <span>Migrate in Bloom</span>
+                </BbButton>
+            }
+
             <BbButton Variant="ButtonVariant.Outline"
                       Type="ButtonType.Button">
                 <LucideIcon Name="download"

@@ -11,6 +11,8 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
 {
     using BlazorBlueprint.Components;
 
+    using FluentResults;
+
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Components.Common;
@@ -45,6 +47,11 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// </summary>
         [Inject]
         public IPackageDetailsViewModel ViewModel { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the current user is an administrator of the package.
+        /// </summary>
+        public bool IsUserAdmin => this.ViewModel?.IsUserAdmin ?? false;
 
         /// <summary>
         /// Gets or sets the currently selected install method tab.
@@ -209,6 +216,45 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <param name="result">The result containing the target project name and version constraint.</param>
         public void HandleAddDependency(AddToProjectResult result)
         {
+        }
+
+        /// <summary>
+        /// Opens the Migrate in Bloom dialog.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OpenMigrateInBloomDialog()
+        {
+            var onResult = new EventCallbackFactory().Create(this, (MigrateInBloomResult result) => this.HandleMigrateInBloom(result));
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(MigrateInBloomDialog.Package), this.ViewModel.Package.Package },
+                { nameof(MigrateInBloomDialog.OnResult), onResult }
+            };
+
+            var package = this.ViewModel.Package.Package;
+
+            var formattedVersion = package.Version.StartsWith("v", StringComparison.OrdinalIgnoreCase)
+                ? package.Version
+                : $"v{package.Version}";
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Migrate in Bloom",
+                Description = $"{package.FullName} · {formattedVersion}"
+            };
+
+            await this.DialogService.OpenAsync<MigrateInBloomDialog>(parameters, options);
+        }
+
+        /// <summary>
+        /// Handles the event when a package migration in Bloom is initiated.
+        /// </summary>
+        /// <param name="result">The result containing the target project name and version constraint.</param>
+        /// <returns>A <see cref="Result" /> indicating the outcome of the migration initiation.</returns>
+        public Result HandleMigrateInBloom(MigrateInBloomResult result)
+        {
+            return this.ViewModel.MigrateInBloom(result);
         }
 
         /// <summary>

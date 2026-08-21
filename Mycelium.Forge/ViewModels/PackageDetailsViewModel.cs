@@ -9,8 +9,11 @@
 
 namespace Mycelium.Forge.ViewModels
 {
+    using FluentResults;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.DialogResults;
 
     /// <summary>
     /// Provides view model state and initialization logic for the Mycelium Forge package details page.
@@ -21,6 +24,11 @@ namespace Mycelium.Forge.ViewModels
         /// Gets or sets the package details and metadata.
         /// </summary>
         public PackageDetailsModel Package { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the current user is an administrator of the package.
+        /// </summary>
+        public bool IsUserAdmin { get; set; } = true;
 
         /// <summary>
         /// Initializes the package view model state for the specified package name and organization.
@@ -153,6 +161,21 @@ namespace Mycelium.Forge.ViewModels
                 dependencies,
                 dependents,
                 validationReport);
+        }
+
+        /// <summary>
+        /// Initiates a migration of the package in Bloom to the specified target project.
+        /// </summary>
+        /// <param name="result">The migration parameters including destination project and version constraint.</param>
+        /// <returns>A <see cref="Result" /> indicating the success or failure of the migration initiation.</returns>
+        public Result MigrateInBloom(MigrateInBloomResult result)
+        {
+            if (result == null || string.IsNullOrWhiteSpace(result.ProjectName))
+            {
+                return Result.Fail("Project name is required.");
+            }
+
+            return Result.Ok();
         }
     }
 }
