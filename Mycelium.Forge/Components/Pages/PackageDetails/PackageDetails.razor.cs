@@ -9,9 +9,13 @@
 
 namespace Mycelium.Forge.Components.Pages.PackageDetails
 {
+    using BlazorBlueprint.Components;
+
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
 
+    using Mycelium.Forge.Components.Common;
+    using Mycelium.Forge.Models;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
@@ -19,6 +23,12 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
     /// </summary>
     public partial class PackageDetails : ComponentBase
     {
+        /// <summary>
+        /// Gets or sets the dialog service used to display modal dialogs.
+        /// </summary>
+        [Inject]
+        public DialogService DialogService { get; set; }
+
         /// <summary>
         /// Gets or sets the organization segment supplied from the URL route.
         /// </summary>
@@ -186,6 +196,43 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             {
                 this.IsCopied = false;
             }
+        }
+
+        /// <summary>
+        /// Opens the Add to Project dialog.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OpenAddToProjectDialog()
+        {
+            var onResult = new EventCallbackFactory().Create(this, (AddToProjectResult result) => this.HandleAddDependency(result));
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(AddToProjectDialog.Package), this.ViewModel.Package.Package },
+                { nameof(AddToProjectDialog.OnResult), onResult }
+            };
+
+            var package = this.ViewModel.Package.Package;
+
+            var formattedVersion = package.Version.StartsWith("v", StringComparison.OrdinalIgnoreCase)
+                ? package.Version
+                : $"v{package.Version}";
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Add to project",
+                Description = $"{package.FullName} · {formattedVersion}"
+            };
+
+            await this.DialogService.OpenAsync<AddToProjectDialog>(parameters, options);
+        }
+
+        /// <summary>
+        /// Handles the event when a package dependency is added to a project.
+        /// </summary>
+        /// <param name="result">The result containing the target project name and version constraint.</param>
+        public void HandleAddDependency(AddToProjectResult result)
+        {
         }
 
         /// <summary>

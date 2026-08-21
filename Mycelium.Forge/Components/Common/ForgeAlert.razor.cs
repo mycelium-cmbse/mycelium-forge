@@ -23,6 +23,18 @@ namespace Mycelium.Forge.Components.Common
         public ForgeAlertVariant Variant { get; set; } = ForgeAlertVariant.Default;
 
         /// <summary>
+        /// Gets or sets the icon name from the Lucide icon set to display.
+        /// </summary>
+        [Parameter]
+        public string IconName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the size in pixels of the displayed icon.
+        /// </summary>
+        [Parameter]
+        public int IconSize { get; set; } = 16;
+
+        /// <summary>
         /// Gets or sets the heading text for the alert.
         /// </summary>
         [Parameter]
@@ -47,12 +59,6 @@ namespace Mycelium.Forge.Components.Common
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the optional leading icon rendered in the alert.
-        /// </summary>
-        [Parameter]
-        public RenderFragment Icon { get; set; }
-
-        /// <summary>
         /// Gets or sets the optional action buttons rendered in the alert actions slot.
         /// </summary>
         [Parameter]
@@ -68,7 +74,7 @@ namespace Mycelium.Forge.Components.Common
         /// Computes the CSS classes corresponding to the current alert variant.
         /// </summary>
         /// <returns>A string containing CSS utility classes for the variant background, border, and text.</returns>
-        private string GetVariantClass()
+        public string GetVariantClass()
         {
             return this.Variant switch
             {
@@ -76,7 +82,24 @@ namespace Mycelium.Forge.Components.Common
                 ForgeAlertVariant.Success => "bg-success border-success-border text-success-foreground",
                 ForgeAlertVariant.Warning => "bg-warning border-warning-border text-warning-foreground",
                 ForgeAlertVariant.Danger => "bg-destructive/10 border-destructive/20 text-destructive",
+                ForgeAlertVariant.Secondary => "bg-muted border-border text-secondary-text",
                 _ => "bg-body-bg border-border text-foreground"
+            };
+        }
+
+        /// <summary>
+        /// Computes the CSS classes for the icon corresponding to the current alert variant.
+        /// </summary>
+        /// <returns>A string containing CSS utility classes for the icon color.</returns>
+        public string GetIconClass()
+        {
+            return this.Variant switch
+            {
+                ForgeAlertVariant.Info => "text-info-icon shrink-0",
+                ForgeAlertVariant.Success => "text-success-icon shrink-0",
+                ForgeAlertVariant.Warning => "text-warning-icon shrink-0",
+                ForgeAlertVariant.Danger => "text-destructive shrink-0",
+                _ => "text-muted-foreground shrink-0"
             };
         }
     }

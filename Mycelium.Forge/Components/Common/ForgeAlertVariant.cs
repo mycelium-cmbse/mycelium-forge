@@ -37,6 +37,11 @@ namespace Mycelium.Forge.Components.Common
         /// <summary>
         /// Destructive or critical error surface with red tint.
         /// </summary>
-        Danger
+        Danger,
+
+        /// <summary>
+        /// Secondary surface with subtle background and secondary text.
+        /// </summary>
+        Secondary
     }
 }

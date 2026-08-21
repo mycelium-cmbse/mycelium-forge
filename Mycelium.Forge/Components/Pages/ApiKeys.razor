@@ -25,12 +25,8 @@
 
         <ForgeAlert Variant="ForgeAlertVariant.Info"
                     Title="Publishing from CI? Prefer trusted publishing (OIDC)."
-                    Description="GitHub Actions and GitLab CI can exchange a short-lived token at publish time, so no long-lived secret lives in your repository.">
-            <Icon>
-                <LucideIcon Name="info"
-                            Size="16"
-                            Class="text-info-icon shrink-0"/>
-            </Icon>
+                    Description="GitHub Actions and GitLab CI can exchange a short-lived token at publish time, so no long-lived secret lives in your repository."
+                    IconName="info">
             <Actions>
                 <a href="@PageRoutes.Docs"
                    class="text-sm leading-xs font-semibold text-info-icon hover:underline shrink-0">

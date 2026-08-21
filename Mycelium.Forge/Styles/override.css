@@ -72,3 +72,15 @@ input::placeholder {
   overflow: hidden;
   white-space: nowrap;
 }
+
+/* Dialog header override */
+[role="dialog"] > div:first-child {
+  border-bottom: var(--primitive-border-width-default) solid var(--border);
+  background-color: var(--card);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  padding-bottom: 0.625rem;
+}
