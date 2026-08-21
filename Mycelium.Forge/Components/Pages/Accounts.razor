@@ -50,45 +50,23 @@
                          Class="!w-full sm:!w-[340px] !h-[34px] !px-3 !gap-2 shrink-0"/>
 
             <div class="flex items-center gap-2.5">
-                <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
-                                                            Value="@(this.SelectedStatusFilter)"
-                                                            ValueChanged="@(this.OnStatusFilterChanged)">
-                    <BlazorBlueprint.Primitives.Select.BbSelectTrigger class="h-[34px] pl-3 pr-3 rounded-lg bg-card border border-border flex items-center justify-between gap-2 text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
-                        <span class="truncate">Status: @(this.SelectedStatusFilter)</span>
-                        <LucideIcon Name="chevron-down"
-                                    Size="14"
-                                    Class="text-muted-foreground shrink-0"/>
-                    </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
-                    <BlazorBlueprint.Primitives.Select.BbSelectContent class="min-w-[150px] py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                        @foreach (var statusOption in this.StatusFilterOptions)
-                        {
-                            <BlazorBlueprint.Primitives.Select.BbSelectItem @key="statusOption"
-                                                                            Value="@statusOption"
-                                                                            Text="@statusOption"
-                                                                            class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
-                        }
-                    </BlazorBlueprint.Primitives.Select.BbSelectContent>
-                </BlazorBlueprint.Primitives.Select.BbSelect>
+                <ForgeSelect TValue="string"
+                             Value="@(this.SelectedStatusFilter)"
+                             ValueChanged="@(this.OnStatusFilterChanged)"
+                             Items="@(this.StatusFilterOptions)"
+                             FilterStyle="true"
+                             Label="Status:"
+                             TriggerClass="text-xs"
+                             ItemClass="text-xs !leading-2xs"/>
 
-                <BlazorBlueprint.Primitives.Select.BbSelect TValue="string"
-                                                            Value="@(this.SelectedVerificationFilter)"
-                                                            ValueChanged="@(this.OnVerificationFilterChanged)">
-                    <BlazorBlueprint.Primitives.Select.BbSelectTrigger class="h-[34px] pl-3 pr-3 rounded-lg bg-card border border-border flex items-center justify-between gap-2 text-foreground text-xs leading-2xs font-normal focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
-                        <span class="truncate">Verification: @(this.SelectedVerificationFilter)</span>
-                        <LucideIcon Name="chevron-down"
-                                    Size="14"
-                                    Class="text-muted-foreground shrink-0"/>
-                    </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
-                    <BlazorBlueprint.Primitives.Select.BbSelectContent class="min-w-[160px] py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                        @foreach (var verificationOption in this.VerificationFilterOptions)
-                        {
-                            <BlazorBlueprint.Primitives.Select.BbSelectItem @key="verificationOption"
-                                                                            Value="@verificationOption"
-                                                                            Text="@verificationOption"
-                                                                            class="px-3 py-1.5 text-left text-xs leading-2xs text-foreground hover:bg-muted transition-colors cursor-pointer"/>
-                        }
-                    </BlazorBlueprint.Primitives.Select.BbSelectContent>
-                </BlazorBlueprint.Primitives.Select.BbSelect>
+                <ForgeSelect TValue="string"
+                             Value="@(this.SelectedVerificationFilter)"
+                             ValueChanged="@(this.OnVerificationFilterChanged)"
+                             Items="@(this.VerificationFilterOptions)"
+                             FilterStyle="true"
+                             Label="Verification:"
+                             TriggerClass="text-xs"
+                             ItemClass="!text-xs !leading-2xs"/>
             </div>
 
             <div class="hidden sm:flex flex-1"></div>

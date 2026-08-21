@@ -14,27 +14,13 @@
             </span>
 
             <div class="flex items-center gap-4 shrink-0">
-                <BbDropdownMenu>
-                    <BbDropdownMenuTrigger AsChild="false"
-                                           Class="h-8 px-3 rounded-lg bg-card border border-border hover:border-input flex items-center gap-1.5 text-sm leading-xs font-normal transition-colors cursor-pointer focus:outline-none">
-                        <span class="text-muted-foreground font-normal">Sort:</span>
-                        <span class="text-foreground font-medium">@(GetSortOptionLabel(this.SelectedSortOption))</span>
-                        <LucideIcon Name="chevron-down"
-                                    Size="14"
-                                    Class="text-muted-foreground shrink-0 ml-1"/>
-                    </BbDropdownMenuTrigger>
-                    <BbDropdownMenuContent Align="PopoverAlign.End"
-                                           Class="w-40 py-1 rounded-lg bg-popover border border-border shadow-md z-20 flex flex-col">
-                        @foreach (var sortOption in this.SortOptions)
-                        {
-                            <BbDropdownMenuItem @key="sortOption"
-                                                OnClick="() => this.SelectSortOption(sortOption)"
-                                                Class="@(this.GetSortItemClass(sortOption))">
-                                @(GetSortOptionLabel(sortOption))
-                            </BbDropdownMenuItem>
-                        }
-                    </BbDropdownMenuContent>
-                </BbDropdownMenu>
+                <ForgeSelect TValue="PackageSortOption"
+                             Value="@(this.SelectedSortOption)"
+                             ValueChanged="@(this.OnSortOptionChanged)"
+                             Items="@(this.SortOptions)"
+                             FilterStyle="true"
+                             Label="Sort:"
+                             DisplayTextSelector="@(GetSortOptionLabel)"/>
 
                 <div class="flex items-center gap-2 h-4 select-none">
                     <BbCheckbox Checked="@(this.IncludePrereleases)"

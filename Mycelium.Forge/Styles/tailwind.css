@@ -8,6 +8,7 @@
 @import './tokens/primitives.css';
 @import './tokens/semantics.css';
 @import './override.css';
+@important;
 
 /* Scan Razor components for utility classes. */
 @source "../Components";

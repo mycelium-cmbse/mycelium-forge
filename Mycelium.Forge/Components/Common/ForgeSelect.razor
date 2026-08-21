@@ -1,0 +1,55 @@
+@typeparam TValue
+
+<BlazorBlueprint.Primitives.Select.BbSelect TValue="TValue"
+                                            Value="@(this.Value)"
+                                            ValueChanged="@(this.OnValueChanged)">
+    <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="@(string.IsNullOrWhiteSpace(this.Id) ? null : this.Id)"
+                                                       class="@(this.GetTriggerClass())">
+        @if (this.TriggerContent != null)
+        {
+            @(this.TriggerContent)
+        }
+        else if (this.FilterStyle)
+        {
+            @if (!string.IsNullOrWhiteSpace(this.Label))
+            {
+                <span class="text-muted-foreground font-normal">@(this.Label)</span>
+            }
+
+            <span class="text-foreground font-medium truncate">@(this.GetDisplayText(this.Value))</span>
+
+            <LucideIcon Name="chevron-down"
+                        Size="14"
+                        Class="text-muted-foreground shrink-0 ml-1"/>
+        }
+        else
+        {
+            <span class="flex-1 truncate text-left">@(this.GetDisplayText(this.Value))</span>
+
+            <LucideIcon Name="chevron-down"
+                        Size="16"
+                        Class="text-muted-foreground shrink-0"/>
+        }
+    </BlazorBlueprint.Primitives.Select.BbSelectTrigger>
+    <BlazorBlueprint.Primitives.Select.BbSelectContent class="@(this.GetContentClass())">
+        @foreach (var item in this.Items)
+        {
+            @if (this.ItemTemplate != null)
+            {
+                <BlazorBlueprint.Primitives.Select.BbSelectItem @key="item"
+                                                                Value="@item"
+                                                                Text="@(this.GetDisplayText(item))"
+                                                                class="@(this.GetItemClass(item))">
+                    @(this.ItemTemplate(item))
+                </BlazorBlueprint.Primitives.Select.BbSelectItem>
+            }
+            else
+            {
+                <BlazorBlueprint.Primitives.Select.BbSelectItem @key="item"
+                                                                Value="@item"
+                                                                Text="@(this.GetDisplayText(item))"
+                                                                class="@(this.GetItemClass(item))"/>
+            }
+        }
+    </BlazorBlueprint.Primitives.Select.BbSelectContent>
+</BlazorBlueprint.Primitives.Select.BbSelect>

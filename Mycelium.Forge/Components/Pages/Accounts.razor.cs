@@ -27,8 +27,8 @@ namespace Mycelium.Forge.Components.Pages
         private static readonly IReadOnlyList<string> AvailableStatusFilters =
         [
             "All",
-            nameof(ScopeStatusKind.ACTIVE).ToLowerCaseFirst(),
-            nameof(ScopeStatusKind.DEACTIVATED).ToLowerCaseFirst()
+            nameof(ScopeStatusKind.ACTIVE).ToUpperCaseFirst(),
+            nameof(ScopeStatusKind.DEACTIVATED).ToUpperCaseFirst()
         ];
 
         /// <summary>

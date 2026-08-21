@@ -78,10 +78,10 @@ namespace Mycelium.Forge.Components.Pages
         public IPackagesViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Selects a sort option and updates search results.
+        /// Handles changes to the sort option selection and updates search results.
         /// </summary>
         /// <param name="sortOption">The selected sort option.</param>
-        public void SelectSortOption(PackageSortOption sortOption)
+        public void OnSortOptionChanged(PackageSortOption sortOption)
         {
             this.SelectedSortOption = sortOption;
             this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
@@ -100,23 +100,10 @@ namespace Mycelium.Forge.Components.Pages
                 PackageSortOption.Downloads => "Downloads",
                 PackageSortOption.RecentlyUpdated => "Recently updated",
                 PackageSortOption.Alphabetical => "Alphabetical",
-                _ => nameof(PackageSortOption.Relevance).ToLowerCaseFirst()
+                _ => nameof(PackageSortOption.Relevance).ToUpperCaseFirst()
             };
         }
 
-        /// <summary>
-        /// Gets the CSS classes for a sort dropdown menu item.
-        /// </summary>
-        /// <param name="sortOption">The sort option for the item.</param>
-        /// <returns>The computed CSS class string.</returns>
-        public string GetSortItemClass(PackageSortOption sortOption)
-        {
-            const string baseClass = "px-3 py-1.5 text-left text-sm text-foreground hover:bg-muted transition-colors cursor-pointer";
-
-            return this.SelectedSortOption == sortOption
-                ? $"{baseClass} font-semibold text-primary"
-                : $"{baseClass} font-normal";
-        }
 
         /// <summary>
         /// Gets the CSS classes for a facet option label.

@@ -18,10 +18,10 @@ namespace Mycelium.Forge.Extensions
         extension(string value)
         {
             /// <summary>
-            /// Converts the first character of the string to lowercase and the remaining characters to lowercase.
+            /// Converts the first character of the string to uppercase and the remaining characters to lowercase.
             /// </summary>
-            /// <returns>The converted string with lowercase characters, or an empty string if the input is null or empty.</returns>
-            public string ToLowerCaseFirst()
+            /// <returns>The converted string with uppercase characters, or an empty string if the input is null or empty.</returns>
+            public string ToUpperCaseFirst()
             {
                 if (string.IsNullOrEmpty(value))
                 {
@@ -30,10 +30,10 @@ namespace Mycelium.Forge.Extensions
 
                 if (value.Length == 1)
                 {
-                    return char.ToLowerInvariant(value[0]).ToString();
+                    return char.ToUpperInvariant(value[0]).ToString();
                 }
 
-                return char.ToLowerInvariant(value[0]) + value[1..].ToLowerInvariant();
+                return char.ToUpperInvariant(value[0]) + value[1..].ToLowerInvariant();
             }
 
             /// <summary>

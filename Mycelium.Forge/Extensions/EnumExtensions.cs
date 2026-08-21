@@ -23,12 +23,9 @@ namespace Mycelium.Forge.Extensions
         /// <returns>The string representation of the enumeration value formatted with lowercase characters.</returns>
         public static string ToLowerCaseFirst(this Enum value)
         {
-            if (value == null)
-            {
-                return string.Empty;
-            }
-
-            return value.ToString().ToLowerCaseFirst();
+            return value == null 
+                ? string.Empty 
+                : value.ToString().ToUpperCaseFirst();
         }
     }
 }
