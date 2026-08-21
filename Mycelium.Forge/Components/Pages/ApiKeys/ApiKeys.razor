@@ -1,5 +1,4 @@
-@using BlazorBlueprint.Primitives.Table
-@using Mycelium.Forge.Components.Pages.ApiKeys.Dialogs
+﻿@using BlazorBlueprint.Primitives.Table
 @using Mycelium.Forge.Models.ApiKey
 @attribute [Route(PageRoutes.ApiKeys)]
 
@@ -75,8 +74,8 @@
                         @foreach (var key in this.ViewModel.ApiKeys)
                         {
                             <BbTableRow @key="key.Id"
-                                         Item="@key"
-                                         Class="px-5 py-3.5 flex items-center hover:bg-muted/50 transition-colors">
+                                        Item="@key"
+                                        Class="px-5 py-3.5 flex items-center hover:bg-muted/50 transition-colors">
                                 <BbTableCell Class="w-[210px] shrink-0 p-0 font-semibold text-sm leading-xs text-foreground truncate">
                                     @(key.Name)
                                 </BbTableCell>
@@ -117,8 +116,8 @@
                 <Icon>
                     <div class="icon-circle-primary w-15 h-15">
                         <LucideIcon Name="key-round"
-                                     Size="28"
-                                     Class="text-primary shrink-0"/>
+                                    Size="28"
+                                    Class="text-primary shrink-0"/>
                     </div>
                 </Icon>
                 <ChildContent>
@@ -127,8 +126,8 @@
                               OnClick="@(this.OnCreateKey)"
                               Class="mt-0.5">
                         <LucideIcon Name="plus"
-                                     Size="16"
-                                     Class="shrink-0"/>
+                                    Size="16"
+                                    Class="shrink-0"/>
                         <span>Create key</span>
                     </BbButton>
                 </ChildContent>

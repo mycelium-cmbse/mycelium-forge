@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="CreateApiKeyDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,16 +9,10 @@
 
 namespace Mycelium.Forge.Components.Pages.ApiKeys.Dialogs
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.ApiKey;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
@@ -74,7 +68,7 @@ namespace Mycelium.Forge.Components.Pages.ApiKeys.Dialogs
         /// <summary>
         /// Gets the validation manager instance handling field validation states.
         /// </summary>
-        public ValidationManager ValidationManager { get; } = new ValidationManager();
+        public ValidationManager ValidationManager { get; } = new();
 
         /// <summary>
         /// Gets or sets the name for the new API key.
@@ -142,15 +136,6 @@ namespace Mycelium.Forge.Components.Pages.ApiKeys.Dialogs
         }
 
         /// <summary>
-        /// Initializes default values based on passed parameters when component parameters are initialized.
-        /// </summary>
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            this.SelectedScope = this.Scopes[0];
-        }
-
-        /// <summary>
         /// Handles the cancel action, cancelling the dialog and invoking the cancel callback.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -203,6 +188,15 @@ namespace Mycelium.Forge.Components.Pages.ApiKeys.Dialogs
             }
 
             await this.OnResult.InvokeAsync(result);
+        }
+
+        /// <summary>
+        /// Initializes default values based on passed parameters when component parameters are initialized.
+        /// </summary>
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            this.SelectedScope = this.Scopes[0];
         }
     }
 }

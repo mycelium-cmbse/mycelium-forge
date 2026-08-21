@@ -11,7 +11,6 @@ namespace Mycelium.Forge.Components.Pages
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.ViewModels;
     using Mycelium.Forge.ViewModels.Home;
 
     /// <summary>

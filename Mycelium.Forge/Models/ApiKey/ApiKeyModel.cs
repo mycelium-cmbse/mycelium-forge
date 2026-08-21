@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ApiKeyModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,6 @@
 
 namespace Mycelium.Forge.Models.ApiKey
 {
-    using System;
     using Mycelium.Forge.Common;
 
     /// <summary>

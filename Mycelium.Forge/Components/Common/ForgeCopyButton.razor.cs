@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ForgeCopyButton.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,10 +9,8 @@
 
 namespace Mycelium.Forge.Components.Common
 {
-    using System;
-    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using Mycelium.Forge.Common;
+
     using Mycelium.Forge.Services;
 
     /// <summary>

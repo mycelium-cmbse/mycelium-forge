@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels.Documentation
 {
-    using System.Collections.Generic;
-
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Documentation;
 
@@ -54,7 +52,7 @@ namespace Mycelium.Forge.ViewModels.Documentation
         /// </summary>
         public void InitializeOverview()
         {
-            this.PopulateNavGroups(activeItemTitle: "What is Forge");
+            this.PopulateNavGroups("What is Forge");
 
             this.KeySections =
             [
@@ -130,7 +128,7 @@ namespace Mycelium.Forge.ViewModels.Documentation
         /// </summary>
         public void InitializePackagesAndKpar()
         {
-            this.PopulateNavGroups(activeItemTitle: "Packages & the kpar format");
+            this.PopulateNavGroups("Packages & the kpar format");
 
             this.KeySections = [];
 

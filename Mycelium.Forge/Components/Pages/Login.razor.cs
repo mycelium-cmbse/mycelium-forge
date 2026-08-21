@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Login.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -15,7 +15,6 @@ namespace Mycelium.Forge.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Services;
-    using Mycelium.Forge.ViewModels;
     using Mycelium.Forge.ViewModels.Login;
 
     /// <summary>
@@ -44,7 +43,7 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Gets the validation manager instance handling field validation states.
         /// </summary>
-        public ValidationManager ValidationManager { get; } = new ValidationManager();
+        public ValidationManager ValidationManager { get; } = new();
 
         /// <summary>
         /// Handles changes to the email input value.

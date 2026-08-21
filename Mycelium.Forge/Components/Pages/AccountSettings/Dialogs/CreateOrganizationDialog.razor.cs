@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="CreateOrganizationDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,13 +9,10 @@
 
 namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
 {
-    using System.Threading.Tasks;
-
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
 
@@ -45,7 +42,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         /// <summary>
         /// Gets the validation manager instance handling field validation states.
         /// </summary>
-        public ValidationManager ValidationManager { get; } = new ValidationManager();
+        public ValidationManager ValidationManager { get; } = new();
 
         /// <summary>
         /// Gets or sets the organization name input value.

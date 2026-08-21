@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationLayout.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,9 +9,8 @@
 
 namespace Mycelium.Forge.Components.Layout
 {
-    using System;
     using Microsoft.AspNetCore.Components;
-    using Mycelium.Forge.Common;
+
     using Mycelium.Forge.Services;
 
     /// <summary>
@@ -26,20 +25,20 @@ namespace Mycelium.Forge.Components.Layout
         public IThemeService ThemeService { get; set; }
 
         /// <summary>
-        /// Subscribes to theme change notifications on initialization.
-        /// </summary>
-        protected override void OnInitialized()
-        {
-            this.ThemeService.OnChange += this.StateHasChanged;
-        }
-
-        /// <summary>
         /// Unsubscribes from theme change notifications when the layout is disposed.
         /// </summary>
         public void Dispose()
         {
             this.ThemeService.OnChange -= this.StateHasChanged;
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Subscribes to theme change notifications on initialization.
+        /// </summary>
+        protected override void OnInitialized()
+        {
+            this.ThemeService.OnChange += this.StateHasChanged;
         }
     }
 }

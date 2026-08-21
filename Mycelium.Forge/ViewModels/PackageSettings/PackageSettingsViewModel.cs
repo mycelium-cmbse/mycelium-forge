@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -33,7 +33,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             {
                 new("Starion Group", "SG", true, PackageInvitationKind.OWNER),
                 new("R. André", "SG", false, PackageInvitationKind.OWNER),
-                new("J. Klein", "SG", false, PackageInvitationKind.MAINTAINER)
+                new("J. Klein", "SG")
             };
 
             var versions = new List<PackageVersionModel>

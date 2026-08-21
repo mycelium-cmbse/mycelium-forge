@@ -14,7 +14,6 @@ namespace Mycelium.Forge.Components.Pages
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.ViewModels;
     using Mycelium.Forge.ViewModels.VerifyEmail;
 
     /// <summary>

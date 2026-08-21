@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetails.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -15,10 +15,8 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
 
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.PackageDetails.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.ViewModels;
     using Mycelium.Forge.ViewModels.PackageDetails;
 
     /// <summary>

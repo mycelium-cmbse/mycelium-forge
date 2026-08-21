@@ -1,4 +1,4 @@
-/* Primitives Collection
+﻿/* Primitives Collection
  * Raw design tokens (palette colors, typography, sizing, spacing, radiuses).
  * Rule: Never apply a primitive token directly to a component — always alias it through a semantic token or theme utility.
  */

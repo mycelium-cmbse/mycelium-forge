@@ -1,4 +1,4 @@
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @attribute [Route(PageRoutes.Package)]
 @rendermode InteractiveServer
 
@@ -119,7 +119,7 @@
                 }
             </BlazorBlueprint.Primitives.Tabs.BbTabsList>
 
-            <ForgeCopyText Text="@(this.GetCurrentInstallCommand())" />
+            <ForgeCopyText Text="@(this.GetCurrentInstallCommand())"/>
         </BlazorBlueprint.Primitives.Tabs.BbTabs>
 
         <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-border">

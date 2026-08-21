@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationNavGroupModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Models.Documentation
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Represents a grouped section of documentation navigation links displayed in the sidebar.
     /// </summary>

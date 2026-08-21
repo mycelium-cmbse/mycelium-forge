@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationToc.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,8 @@
 
 namespace Mycelium.Forge.Components.Pages.Documentation
 {
-    using System.Collections.Generic;
     using Microsoft.AspNetCore.Components;
+
     using Mycelium.Forge.Models.Documentation;
 
     /// <summary>
@@ -19,15 +19,15 @@ namespace Mycelium.Forge.Components.Pages.Documentation
     public partial class DocumentationToc : ComponentBase
     {
         /// <summary>
+        /// The base CSS class applied to all table of contents items.
+        /// </summary>
+        private const string BaseTocItemClass = "text-sm leading-xs transition-colors";
+
+        /// <summary>
         /// Gets or sets the collection of table of contents entries to display.
         /// </summary>
         [Parameter]
         public List<DocumentationTocItemModel> Items { get; set; } = [];
-
-        /// <summary>
-        /// The base CSS class applied to all table of contents items.
-        /// </summary>
-        private const string BaseTocItemClass = "text-sm leading-xs transition-colors";
 
         /// <summary>
         /// Computes the CSS classes applied to an on-page table of contents link item.

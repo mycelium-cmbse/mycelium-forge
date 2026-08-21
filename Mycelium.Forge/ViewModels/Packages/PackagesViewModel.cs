@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,10 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels.Packages
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Models.Package;
 

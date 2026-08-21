@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ApiKeys.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,15 +9,10 @@
 
 namespace Mycelium.Forge.Components.Pages.ApiKeys
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.ApiKeys.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.ApiKeys;
@@ -78,7 +73,7 @@ namespace Mycelium.Forge.Components.Pages.ApiKeys
         {
             var createdKey = this.ViewModel.CreateApiKey(result);
 
-            var onDone = new EventCallbackFactory().Create(this, () => {});
+            var onDone = new EventCallbackFactory().Create(this, () => { });
 
             var parameters = new Dictionary<string, object>
             {

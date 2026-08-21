@@ -1,11 +1,11 @@
-<div class="flex flex-col gap-3.5 px-6 py-3">
+﻿<div class="flex flex-col gap-3.5 px-6 py-3">
     <ForgeAlert Variant="ForgeAlertVariant.Warning"
                 Description="This secret is shown once. Store it in your CI secrets or a password manager."
                 IconName="triangle-alert"
                 IconSize="15"/>
 
     <ForgeCopyText Text="@(this.CreatedKey?.SecretToken)"
-                   Dark="true" />
+                   Dark="true"/>
 
     <div class="w-full flex flex-col gap-1.5 text-xs leading-2xs pt-1">
         <div class="flex items-center justify-between">

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IApiKeysViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,9 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels.ApiKeys
 {
-    using System;
-    using System.Collections.Generic;
-
     using Mycelium.Forge.Models.ApiKey;
     using Mycelium.Forge.Models.DialogResults;
 

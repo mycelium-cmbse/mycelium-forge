@@ -1,7 +1,5 @@
-@attribute [Route(PageRoutes.AccountSettings)]
+﻿@attribute [Route(PageRoutes.AccountSettings)]
 @rendermode InteractiveServer
-@using Mycelium.Forge.Models.Organization
-@using Mycelium.Forge.Models.Profile
 
 @if (this.ViewModel.Profile == null)
 {
@@ -203,7 +201,7 @@
     </div>
 
     <ForgeAlert Variant="ForgeAlertVariant.Default"
-                Description="An Organization controls who belongs to it, not whether your Account exists. Leaving an Organization never deletes your Account." />
+                Description="An Organization controls who belongs to it, not whether your Account exists. Leaving an Organization never deletes your Account."/>
 </div>
 
 <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">

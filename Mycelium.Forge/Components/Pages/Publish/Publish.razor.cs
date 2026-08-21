@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Publish.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,22 +9,14 @@
 
 namespace Mycelium.Forge.Components.Pages.Publish
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
-    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
-    using Mycelium.Forge.ViewModels;
     using Mycelium.Forge.ViewModels.Publish;
 
     /// <summary>

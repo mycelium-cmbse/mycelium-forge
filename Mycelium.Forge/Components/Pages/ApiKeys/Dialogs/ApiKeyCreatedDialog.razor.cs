@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ApiKeyCreatedDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Components.Pages.ApiKeys.Dialogs
 {
-    using System.Threading.Tasks;
-
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;

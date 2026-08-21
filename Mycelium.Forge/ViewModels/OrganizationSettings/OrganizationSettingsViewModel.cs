@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -64,7 +64,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             this.PendingInvitations =
             [
-                new OrganizationInvitationModel("a.novak@esa.int", OrganizationInvitationKind.ADMINISTRATOR, "Sent 2 days ago · expires in 5 days", InvitationStatusKind.PENDING)
+                new OrganizationInvitationModel("a.novak@esa.int", OrganizationInvitationKind.ADMINISTRATOR, "Sent 2 days ago · expires in 5 days")
             ];
         }
 

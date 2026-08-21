@@ -1,6 +1,5 @@
-@attribute [Route(PageRoutes.PackageSettings)]
+﻿@attribute [Route(PageRoutes.PackageSettings)]
 @rendermode InteractiveServer
-@using Mycelium.Forge.Models.Package
 
 @if (this.ViewModel.Package == null)
 {
@@ -123,13 +122,13 @@
     </div>
 
     <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroup TValue="VisibilityKind"
-                                                         Value="@(this.ViewModel.Package.Visibility)"
-                                                         ValueChanged="@(this.OnSelectVisibility)"
-                                                         AriaLabel="Package visibility"
-                                                         class="flex flex-col w-full divide-y divide-border">
+                                                        Value="@(this.ViewModel.Package.Visibility)"
+                                                        ValueChanged="@(this.OnSelectVisibility)"
+                                                        AriaLabel="Package visibility"
+                                                        class="flex flex-col w-full divide-y divide-border">
         <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
-                                                                 Value="VisibilityKind.PRIVATE"
-                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
+                                                                Value="VisibilityKind.PRIVATE"
+                                                                class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
             <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PRIVATE ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
             </div>
 
@@ -152,8 +151,8 @@
         </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
 
         <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
-                                                                 Value="VisibilityKind.INTERNAL"
-                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
+                                                                Value="VisibilityKind.INTERNAL"
+                                                                class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
             <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
             </div>
 
@@ -176,8 +175,8 @@
         </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
 
         <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
-                                                                 Value="VisibilityKind.PUBLIC"
-                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
+                                                                Value="VisibilityKind.PUBLIC"
+                                                                class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
             <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PUBLIC ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
             </div>
 
@@ -263,6 +262,7 @@
                               Class="text-secondary-text hover:text-foreground">
                         Unlist
                     </BbButton>
+
                     <BbButton Variant="ButtonVariant.Link"
                               OnClick="() => this.OnDeprecateVersion(version)"
                               Class="text-secondary-text hover:text-foreground">

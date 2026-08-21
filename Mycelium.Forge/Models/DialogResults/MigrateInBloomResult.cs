@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="MigrateInBloomResult.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,7 +10,8 @@
 namespace Mycelium.Forge.Models.DialogResults
 {
     /// <summary>
-    /// Represents the result payload containing destination project and version constraint when initiating a migration in Bloom.
+    /// Represents the result payload containing destination project and version constraint when initiating a migration in
+    /// Bloom.
     /// </summary>
     public class MigrateInBloomResult
     {

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationSidebar.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,8 @@
 
 namespace Mycelium.Forge.Components.Pages.Documentation
 {
-    using System.Collections.Generic;
     using Microsoft.AspNetCore.Components;
+
     using Mycelium.Forge.Models.Documentation;
 
     /// <summary>
@@ -19,15 +19,15 @@ namespace Mycelium.Forge.Components.Pages.Documentation
     public partial class DocumentationSidebar : ComponentBase
     {
         /// <summary>
+        /// The base CSS class applied to all sidebar navigation items.
+        /// </summary>
+        private const string BaseNavItemClass = "flex items-center px-3 h-7 rounded-md text-sm leading-xs transition-colors";
+
+        /// <summary>
         /// Gets or sets the collection of documentation navigation groups to render.
         /// </summary>
         [Parameter]
         public List<DocumentationNavGroupModel> Groups { get; set; } = [];
-
-        /// <summary>
-        /// The base CSS class applied to all sidebar navigation items.
-        /// </summary>
-        private const string BaseNavItemClass = "flex items-center px-3 h-7 rounded-md text-sm leading-xs transition-colors";
 
         /// <summary>
         /// Computes the CSS classes applied to a sidebar documentation navigation link item.

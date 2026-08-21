@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="EnumExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Extensions
 {
-    using System;
-
     /// <summary>
     /// Provides extension methods for enumeration values.
     /// </summary>
@@ -23,8 +21,8 @@ namespace Mycelium.Forge.Extensions
         /// <returns>The string representation of the enumeration value formatted with lowercase characters.</returns>
         public static string ToLowerCaseFirst(this Enum value)
         {
-            return value == null 
-                ? string.Empty 
+            return value == null
+                ? string.Empty
                 : value.ToString().ToUpperCaseFirst();
         }
     }

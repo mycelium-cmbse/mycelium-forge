@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,6 @@
 
 namespace Mycelium.Forge.Models.Package
 {
-    using System.Collections.Generic;
     using Mycelium.Forge.Models.Validation;
 
     /// <summary>
@@ -25,7 +24,8 @@ namespace Mycelium.Forge.Models.Package
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PackageDetailsModel" /> class with the specified package model and details.
+        /// Initializes a new instance of the <see cref="PackageDetailsModel" /> class with the specified package model and
+        /// details.
         /// </summary>
         /// <param name="package">The underlying package model.</param>
         /// <param name="releaseStatus">The release stability status.</param>

@@ -1,6 +1,5 @@
-@attribute [Route(PageRoutes.OrganizationSettings)]
+﻿@attribute [Route(PageRoutes.OrganizationSettings)]
 @rendermode InteractiveServer
-@using Mycelium.Forge.Models.Organization
 
 @if (this.ViewModel.Organization == null)
 {
@@ -75,7 +74,7 @@
             <div class="flex flex-col w-full divide-y divide-border">
                 @foreach (var member in this.ViewModel.Members)
                 {
-                    <div class="flex items-center gap-3 py-2.25 w-full" @key="(member.Account.Id)">
+                    <div class="flex items-center gap-3 py-2.25 w-full" @key="member.Account.Id">
                         <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
                             @(member.Initials)
                         </div>
@@ -160,7 +159,7 @@
             </div>
 
             <ForgeAlert Variant="ForgeAlertVariant.Default"
-                        Description="An invitation admits an Account only after explicit acceptance, and expires automatically." />
+                        Description="An invitation admits an Account only after explicit acceptance, and expires automatically."/>
         </div>
 
         <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">

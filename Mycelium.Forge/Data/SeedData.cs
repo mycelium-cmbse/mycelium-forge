@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,13 +11,8 @@ namespace Mycelium.Forge.Data
 {
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Admin;
-    using Mycelium.Forge.Models.ApiKey;
     using Mycelium.Forge.Models.Organization;
     using Mycelium.Forge.Models.Package;
-    using Mycelium.Forge.Models.Profile;
-    using Mycelium.Forge.Models.Publish;
-    using Mycelium.Forge.Models.Validation;
-    using Mycelium.Forge.ViewModels;
 
     /// <summary>
     /// Provides centralized seed data and mock models for registry entities.
@@ -130,8 +125,8 @@ namespace Mycelium.Forge.Data
             [
                 new OrganizationMemberModel(RegisAccount, OrganizationInvitationKind.ADMINISTRATOR),
                 new OrganizationMemberModel(StefanAccount, OrganizationInvitationKind.ADMINISTRATOR),
-                new OrganizationMemberModel(KleinAccount, OrganizationInvitationKind.MEMBER),
-                new OrganizationMemberModel(BlancAccount, OrganizationInvitationKind.MEMBER)
+                new OrganizationMemberModel(KleinAccount),
+                new OrganizationMemberModel(BlancAccount)
             ];
 
             RegisOrganizationMemberships =
@@ -142,11 +137,11 @@ namespace Mycelium.Forge.Data
 
             AdminAccounts =
             [
-                new AdminAccountModel(RegisAccount, true, "Verified", "@starion (admin), @esa (admin)", ScopeStatusKind.ACTIVE),
-                new AdminAccountModel(StefanAccount, false, "Verified", "@starion (admin)", ScopeStatusKind.ACTIVE),
-                new AdminAccountModel(KleinAccount, false, "Verified", "@starion (publisher)", ScopeStatusKind.ACTIVE),
-                new AdminAccountModel(BlancAccount, false, "Pending", "@starion (member)", ScopeStatusKind.ACTIVE),
-                new AdminAccountModel(NovakAccount, false, "Verified", "@esa (member)", ScopeStatusKind.ACTIVE)
+                new AdminAccountModel(RegisAccount, true, "Verified", "@starion (admin), @esa (admin)"),
+                new AdminAccountModel(StefanAccount, false, "Verified", "@starion (admin)"),
+                new AdminAccountModel(KleinAccount, false, "Verified", "@starion (publisher)"),
+                new AdminAccountModel(BlancAccount, false, "Pending", "@starion (member)"),
+                new AdminAccountModel(NovakAccount, false, "Verified", "@esa (member)")
             ];
 
             ApiKeys =

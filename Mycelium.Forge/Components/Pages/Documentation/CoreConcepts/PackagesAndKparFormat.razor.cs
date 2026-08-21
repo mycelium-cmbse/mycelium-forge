@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagesAndKparFormat.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -46,20 +46,20 @@ namespace Mycelium.Forge.Components.Pages.Documentation.CoreConcepts
             """;
 
         /// <summary>
-        /// Initializes the component state and sets up view model data for packages and kpar format.
-        /// </summary>
-        protected override void OnInitialized()
-        {
-            this.ViewModel.InitializePackagesAndKpar();
-        }
-
-        /// <summary>
         /// Records user feedback on the documentation page.
         /// </summary>
         /// <param name="isHelpful">A value indicating whether the page content was helpful.</param>
         public void SubmitFeedback(bool isHelpful)
         {
             this.ViewModel.RecordFeedback(isHelpful);
+        }
+
+        /// <summary>
+        /// Initializes the component state and sets up view model data for packages and kpar format.
+        /// </summary>
+        protected override void OnInitialized()
+        {
+            this.ViewModel.InitializePackagesAndKpar();
         }
     }
 }

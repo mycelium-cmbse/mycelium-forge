@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="StringExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -39,11 +39,14 @@ namespace Mycelium.Forge.Extensions
             /// <summary>
             /// Computes the uppercase initials from a string of words separated by whitespace.
             /// </summary>
-            /// <returns>The uppercase initials extracted from the first character of each word, or an empty string if the input is null or whitespace.</returns>
+            /// <returns>
+            /// The uppercase initials extracted from the first character of each word, or an empty string if the input is
+            /// null or whitespace.
+            /// </returns>
             public string ToInitials()
             {
-                return string.IsNullOrWhiteSpace(value) 
-                    ? string.Empty 
+                return string.IsNullOrWhiteSpace(value)
+                    ? string.Empty
                     : string.Concat(value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(word => word[0])).ToUpperInvariant();
             }
         }

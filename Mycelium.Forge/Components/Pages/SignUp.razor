@@ -1,5 +1,4 @@
-@using Mycelium.Forge.Components.Common
-@attribute [Route(PageRoutes.SignUp)]
+﻿@attribute [Route(PageRoutes.SignUp)]
 @layout AuthLayout
 @rendermode InteractiveServer
 
@@ -33,7 +32,7 @@
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
             <BbFieldError Class="text-2xs leading-3xs text-destructive"
-                         Errors="@(this.ValidationManager[nameof(this.ViewModel.Username)])" />
+                          Errors="@(this.ValidationManager[nameof(this.ViewModel.Username)])"/>
         </BbField>
 
         <BbField Class="flex flex-col gap-1.5 w-full"
@@ -51,7 +50,7 @@
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
             <BbFieldError Class="text-2xs leading-3xs text-destructive"
-                         Errors="@(this.ValidationManager[nameof(this.ViewModel.Email)])" />
+                          Errors="@(this.ValidationManager[nameof(this.ViewModel.Email)])"/>
             @if (!this.ValidationManager.HasError(nameof(this.ViewModel.Email)))
             {
                 <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
@@ -75,7 +74,7 @@
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
             <BbFieldError Class="text-2xs leading-3xs text-destructive"
-                         Errors="@(this.ValidationManager[nameof(this.ViewModel.Password)])" />
+                          Errors="@(this.ValidationManager[nameof(this.ViewModel.Password)])"/>
         </BbField>
 
         <BbButton Variant="ButtonVariant.Default"
@@ -86,7 +85,7 @@
         </BbButton>
 
         <ForgeAlert Variant="ForgeAlertVariant.Warning"
-                    Description="We will send a verification message. Publishing and package-role assignment stay disabled until your address is verified." />
+                    Description="We will send a verification message. Publishing and package-role assignment stay disabled until your address is verified."/>
 
         <div class="flex items-center gap-2.5 w-full">
             <div class="flex-1 h-px bg-border"></div>

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Packages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -103,7 +103,6 @@ namespace Mycelium.Forge.Components.Pages
                 _ => nameof(PackageSortOption.Relevance).ToUpperCaseFirst()
             };
         }
-
 
         /// <summary>
         /// Gets the CSS classes for a facet option label.

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,6 @@
 
 namespace Mycelium.Forge.Models.Package
 {
-    using System.Collections.Generic;
     using Mycelium.Forge.Common;
 
     /// <summary>
@@ -127,7 +126,7 @@ namespace Mycelium.Forge.Models.Package
         /// </summary>
         public string FullName => !string.IsNullOrEmpty(this.Publisher) && !string.IsNullOrEmpty(this.Name)
             ? $"{this.Publisher}/{this.Name}"
-            : (this.Name ?? string.Empty);
+            : this.Name ?? string.Empty;
 
         /// <summary>
         /// Gets or sets the relative URL to the package page.
