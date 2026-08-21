@@ -1,0 +1,10 @@
+<div class="@(this.GetContainerClass())">
+    @(this.ChildContent)
+
+    @if (this.Footer != null)
+    {
+        <div class="@(this.GetFooterClass())">
+            @(this.Footer)
+        </div>
+    }
+</div>

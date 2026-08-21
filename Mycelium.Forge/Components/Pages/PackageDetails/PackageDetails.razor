@@ -1,4 +1,4 @@
-﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @attribute [Route(PageRoutes.Package)]
 @rendermode InteractiveServer
 
@@ -24,7 +24,7 @@
                     /
                 </BbBreadcrumbSeparator>
                 <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@($"/organizations/{this.ViewModel.Package.Package.Publisher.TrimStart('@')}")"
+                    <BbBreadcrumbLink Href="@(PageRoutes.GetOrganizationRoute(this.ViewModel.Package.Package.Publisher))"
                                       Class="text-primary hover:underline font-normal">
                         @(this.ViewModel.Package.Package.Publisher)
                     </BbBreadcrumbLink>

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -70,7 +70,7 @@ namespace Mycelium.Forge.Models.Package
 
             this.Href = !string.IsNullOrEmpty(href)
                 ? href
-                : $"/packages/{(string.IsNullOrEmpty(publisher) ? "starion" : publisher.TrimStart('@'))}/{package?.ShortName ?? string.Empty}";
+                : PageRoutes.GetPackageRoute(string.IsNullOrEmpty(publisher) ? "starion" : publisher, package?.ShortName ?? string.Empty);
 
             this.Maintainers = maintainers ?? [];
             this.Versions = versions ?? [];

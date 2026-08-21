@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -61,7 +61,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
                 isVerified: true,
                 lastPublished: "2 weeks ago",
                 role: PackageInvitationKind.OWNER,
-                href: $"/packages/{resolvedOrganization.TrimStart('@')}/{resolvedName}",
+                href: PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
                 maintainers: maintainers,
                 versions: versions);
         }

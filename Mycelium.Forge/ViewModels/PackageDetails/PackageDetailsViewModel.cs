@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -84,14 +84,14 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             var dependencies = new List<PackageRelationshipModel>
             {
-                new("@mycelium/ISQ-quantities-units", "/packages/mycelium/ISQ-quantities-units", "^2.4 → 2.5.0 · MIT", false, true)
+                new("@mycelium/ISQ-quantities-units", PageRoutes.GetPackageRoute("mycelium", "ISQ-quantities-units"), "^2.4 → 2.5.0 · MIT", false, true)
             };
 
             var dependents = new List<PackageRelationshipModel>
             {
                 new("Spacecraft Mission", string.Empty, "project · imports v1.2.0", true),
-                new("@esa/PlatformX", "/packages/esa/PlatformX", "specializes PowerBus · v3.1.0"),
-                new("@starion/SmallSat-Bus", "/packages/starion/SmallSat-Bus", "imports v1.1.0", false, true)
+                new("@esa/PlatformX", PageRoutes.GetPackageRoute("esa", "PlatformX"), "specializes PowerBus · v3.1.0"),
+                new("@starion/SmallSat-Bus", PageRoutes.GetPackageRoute("starion", "SmallSat-Bus"), "imports v1.1.0", false, true)
             };
 
             var versions = new List<PackageVersionModel>
@@ -137,7 +137,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 "2 weeks ago",
                 PackageInvitationKind.OWNER,
                 "Apache-2.0",
-                $"/packages/{resolvedOrganization.TrimStart('@')}/{resolvedName}",
+                PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
                 maintainers,
                 versions);
 

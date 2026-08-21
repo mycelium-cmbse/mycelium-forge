@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRoutes.PackageSettings)]
+@attribute [Route(PageRoutes.PackageSettings)]
 @rendermode InteractiveServer
 
 @if (this.ViewModel.Package == null)
@@ -22,7 +22,7 @@
             /
         </BbBreadcrumbSeparator>
         <BbBreadcrumbItem>
-            <BbBreadcrumbLink Href="@($"/organizations/{this.ViewModel.Package.Publisher.TrimStart('@')}")"
+            <BbBreadcrumbLink Href="@(PageRoutes.GetOrganizationRoute(this.ViewModel.Package.Publisher))"
                               Class="text-primary hover:underline font-normal">
                 @(this.ViewModel.Package.Publisher)
             </BbBreadcrumbLink>
@@ -31,7 +31,7 @@
             /
         </BbBreadcrumbSeparator>
         <BbBreadcrumbItem>
-            <BbBreadcrumbLink Href="@($"/packages/{this.ViewModel.Package.Publisher.TrimStart('@')}/{this.ViewModel.Package.Name}")"
+            <BbBreadcrumbLink Href="@(PageRoutes.GetPackageRoute(this.ViewModel.Package.Publisher, this.ViewModel.Package.Name))"
                               Class="text-primary hover:underline font-normal">
                 @(this.ViewModel.Package.Name)
             </BbBreadcrumbLink>

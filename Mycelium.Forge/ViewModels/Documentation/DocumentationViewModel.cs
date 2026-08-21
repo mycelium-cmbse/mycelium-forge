@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -106,14 +106,14 @@ namespace Mycelium.Forge.ViewModels.Documentation
                 {
                     Title = "What is Mycelium Forge?",
                     TargetId = "what-is-mycelium-forge",
-                    Href = "#what-is-mycelium-forge",
+                    Href = $"{PageRoutes.Documentation.Overview}#what-is-mycelium-forge",
                     IsActive = true
                 },
                 new DocumentationTocItemModel
                 {
                     Title = "Key sections",
                     TargetId = "key-sections",
-                    Href = "#key-sections",
+                    Href = $"{PageRoutes.Documentation.Overview}#key-sections",
                     IsActive = false
                 }
             ];
@@ -138,21 +138,21 @@ namespace Mycelium.Forge.ViewModels.Documentation
                 {
                     Title = "What is a package?",
                     TargetId = "what-is-a-package",
-                    Href = "#what-is-a-package",
+                    Href = $"{PageRoutes.Documentation.PackagesAndKparFormat}#what-is-a-package",
                     IsActive = true
                 },
                 new DocumentationTocItemModel
                 {
                     Title = "The kpar archive",
                     TargetId = "the-kpar-archive",
-                    Href = "#the-kpar-archive",
+                    Href = $"{PageRoutes.Documentation.PackagesAndKparFormat}#the-kpar-archive",
                     IsActive = false
                 },
                 new DocumentationTocItemModel
                 {
                     Title = "Package identity",
                     TargetId = "package-identity",
-                    Href = "#package-identity",
+                    Href = $"{PageRoutes.Documentation.PackagesAndKparFormat}#package-identity",
                     IsActive = false
                 }
             ];

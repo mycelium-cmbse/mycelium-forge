@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AccountSettings.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -128,9 +128,23 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <summary>
         /// Handles the action to delete the user account.
         /// </summary>
-        public void OnDeleteAccount()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnDeleteAccount()
         {
-            this.ViewModel.DeleteAccount();
+            var result = await this.DialogService.ConfirmAsync(
+                "Delete account",
+                "Are you sure you want to delete your account? This action cannot be undone.",
+                new ConfirmDialogOptions
+                {
+                    Destructive = true,
+                    ConfirmText = "Delete",
+                    CancelText = "Cancel"
+                });
+
+            if (result.Confirmed)
+            {
+                this.ViewModel.DeleteAccount();
+            }
         }
 
         /// <summary>

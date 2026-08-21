@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishedToForgeDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -173,7 +173,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
 
             if (!string.IsNullOrEmpty(cleanPackageName))
             {
-                return $"/packages/{cleanScope}/{cleanPackageName}";
+                return PageRoutes.GetPackageRoute(cleanScope, cleanPackageName);
             }
 
             return PageRoutes.Packages;

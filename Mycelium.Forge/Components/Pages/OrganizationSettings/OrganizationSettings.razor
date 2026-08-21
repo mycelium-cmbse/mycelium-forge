@@ -1,4 +1,4 @@
-﻿@attribute [Route(PageRoutes.OrganizationSettings)]
+@attribute [Route(PageRoutes.OrganizationSettings)]
 @rendermode InteractiveServer
 
 @if (this.ViewModel.Organization == null)
@@ -22,7 +22,7 @@
                     /
                 </BbBreadcrumbSeparator>
                 <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@($"/organizations/{this.ViewModel.Organization.Scope.TrimStart('@')}")"
+                    <BbBreadcrumbLink Href="@(PageRoutes.GetOrganizationRoute(this.ViewModel.Organization.Scope))"
                                       Class="text-primary hover:underline font-normal">
                         @(this.ViewModel.Organization.Scope)
                     </BbBreadcrumbLink>

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PageRoutes.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -108,6 +108,52 @@ namespace Mycelium.Forge.Common
             /// The documentation packages and kpar format page route path.
             /// </summary>
             public const string PackagesAndKparFormat = "/docs/packages-and-the-kpar-format";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for the package details page.
+        /// </summary>
+        /// <param name="organization">The organization scope or publisher name.</param>
+        /// <param name="packageName">The package name.</param>
+        /// <returns>The formatted package route path.</returns>
+        public static string GetPackageRoute(string organization, string packageName)
+        {
+            var cleanOrg = (organization ?? string.Empty).TrimStart('@');
+            return $"/packages/{cleanOrg}/{packageName}";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for the organization profile page.
+        /// </summary>
+        /// <param name="id">The organization identifier or scope.</param>
+        /// <returns>The formatted organization route path.</returns>
+        public static string GetOrganizationRoute(string id)
+        {
+            var cleanId = (id ?? string.Empty).TrimStart('@');
+            return $"/organizations/{cleanId}";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for the package settings page.
+        /// </summary>
+        /// <param name="organization">The organization scope or publisher name.</param>
+        /// <param name="packageName">The package name.</param>
+        /// <returns>The formatted package settings route path.</returns>
+        public static string GetPackageSettingsRoute(string organization, string packageName)
+        {
+            var cleanOrg = (organization ?? string.Empty).TrimStart('@');
+            return $"/packages/{cleanOrg}/{packageName}/settings";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for the organization settings page.
+        /// </summary>
+        /// <param name="id">The organization identifier or scope.</param>
+        /// <returns>The formatted organization settings route path.</returns>
+        public static string GetOrganizationSettingsRoute(string id)
+        {
+            var cleanId = (id ?? string.Empty).TrimStart('@');
+            return $"/organizations/{cleanId}/settings";
         }
     }
 }
