@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ApiKeys.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,9 +9,16 @@
 
 namespace Mycelium.Forge.Components.Pages
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using BlazorBlueprint.Components;
+
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Common;
+    using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
@@ -20,6 +27,12 @@ namespace Mycelium.Forge.Components.Pages
     /// </summary>
     public partial class ApiKeys : ComponentBase
     {
+        /// <summary>
+        /// Gets or sets the dialog service used to display modal dialogs.
+        /// </summary>
+        [Inject]
+        public DialogService DialogService { get; set; }
+
         /// <summary>
         /// Gets or sets the view model for the API keys page.
         /// </summary>
@@ -33,19 +46,52 @@ namespace Mycelium.Forge.Components.Pages
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
-        /// Handles the event to create a new API key.
+        /// Handles the event to create a new API key by opening the creation dialog.
         /// </summary>
-        public void OnCreateKey()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnCreateKey()
         {
-            var newKey = new APIKey
+            var onResult = new EventCallbackFactory().Create(this, (CreateApiKeyResult result) => this.HandleCreateApiKey(result));
+
+            var parameters = new Dictionary<string, object>
             {
-                Id = Guid.NewGuid(),
-                Name = "deploy-runner",
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddMonths(6)
+                { nameof(CreateApiKeyDialog.OnResult), onResult }
             };
 
-            this.ViewModel.CreateApiKey(newKey);
+            var options = new DialogOpenOptions
+            {
+                Title = "Create API key",
+                Description = "The secret is shown once, right after creation."
+            };
+
+            await this.DialogService.OpenAsync<CreateApiKeyDialog>(parameters, options);
+        }
+
+        /// <summary>
+        /// Handles the result from the create API key dialog, delegates to the viewmodel to create the key,
+        /// and opens the success dialog to reveal the generated secret token.
+        /// </summary>
+        /// <param name="result">The dialog result containing the key configuration.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task HandleCreateApiKey(CreateApiKeyResult result)
+        {
+            var createdKey = this.ViewModel.CreateApiKey(result);
+
+            var onDone = new EventCallbackFactory().Create(this, () => {});
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(ApiKeyCreatedDialog.CreatedKey), createdKey },
+                { nameof(ApiKeyCreatedDialog.OnDone), onDone }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "API key created",
+                Description = "Copy it now: you will not be able to see it again."
+            };
+
+            await this.DialogService.OpenAsync<ApiKeyCreatedDialog>(parameters, options);
         }
 
         /// <summary>

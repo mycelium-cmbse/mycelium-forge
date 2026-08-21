@@ -12,10 +12,9 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
-    using Microsoft.JSInterop;
 
     using Mycelium.Forge.Components.Common;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
@@ -46,12 +45,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// </summary>
         [Inject]
         public IPackageDetailsViewModel ViewModel { get; set; }
-
-        /// <summary>
-        /// Gets or sets the JavaScript runtime instance for browser interactions.
-        /// </summary>
-        [Inject]
-        public IJSRuntime JsRuntime { get; set; }
 
         /// <summary>
         /// Gets or sets the currently selected install method tab.
@@ -179,23 +172,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             return this.SelectedContentTab == tab
                 ? $"{baseClass} bg-primary/10 text-primary font-semibold"
                 : $"{baseClass} text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium";
-        }
-
-        /// <summary>
-        /// Copies the currently active install command to the user clipboard.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous copy operation.</returns>
-        public async Task CopyInstallCommandToClipboard()
-        {
-            try
-            {
-                await this.JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", this.GetCurrentInstallCommand());
-                this.IsCopied = true;
-            }
-            catch (Exception)
-            {
-                this.IsCopied = false;
-            }
         }
 
         /// <summary>

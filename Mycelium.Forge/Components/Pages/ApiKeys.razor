@@ -41,31 +41,31 @@
                 <BbTable Data="@(this.ViewModel.ApiKeys)"
                          Class="w-full text-left text-sm leading-xs">
                     <BbTableHeader Class="px-5 py-3 bg-muted border-b border-border flex items-center text-2xs leading-3xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        <BbTableHeaderCell TData="APIKey"
+                        <BbTableHeaderCell TData="ApiKeyModel"
                                            Class="w-[210px] shrink-0 p-0 text-left font-semibold">
                             NAME
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="APIKey"
+                        <BbTableHeaderCell TData="ApiKeyModel"
                                            Class="w-[140px] shrink-0 p-0 text-left font-semibold">
                             SCOPE
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="APIKey"
+                        <BbTableHeaderCell TData="ApiKeyModel"
                                            Class="w-[200px] shrink-0 p-0 text-left font-semibold">
                             PERMISSIONS
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="APIKey"
+                        <BbTableHeaderCell TData="ApiKeyModel"
                                            Class="w-[130px] shrink-0 p-0 text-left font-semibold">
                             CREATED
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="APIKey"
+                        <BbTableHeaderCell TData="ApiKeyModel"
                                            Class="w-[150px] shrink-0 p-0 text-left font-semibold">
                             EXPIRES
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="APIKey"
+                        <BbTableHeaderCell TData="ApiKeyModel"
                                            Class="w-[160px] shrink-0 p-0 text-left font-semibold">
                             LAST USED
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="APIKey"
+                        <BbTableHeaderCell TData="ApiKeyModel"
                                            Class="w-[90px] shrink-0 p-0 text-left font-semibold">
                         </BbTableHeaderCell>
                     </BbTableHeader>
@@ -79,10 +79,10 @@
                                     @(key.Name)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[140px] shrink-0 p-0 font-medium text-sm leading-xs text-secondary-text truncate">
-                                    &#64;starion
+                                    @(key.Scope)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[200px] shrink-0 p-0 font-normal text-xs leading-2xs text-secondary-text truncate">
-                                    publish
+                                    @(key.PermissionsText)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[130px] shrink-0 p-0 font-normal text-sm leading-xs text-muted-foreground">
                                     @(key.CreatedAt.ToString("MMM yyyy"))

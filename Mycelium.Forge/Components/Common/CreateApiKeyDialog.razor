@@ -1,0 +1,76 @@
+<div class="flex flex-col gap-4">
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="create-api-key-name"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            KEY NAME
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="create-api-key-name"
+                     @bind-Value="this.KeyName"
+                     Placeholder="e.g. ci-publish or deploy-runner"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="create-api-key-scope"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            SCOPE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="string"
+                         @bind-Value="this.SelectedScope"
+                         Items="@(this.Scopes)"
+                         Id="create-api-key-scope" />
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-2">
+        <BbFieldLabel Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            PERMISSIONS
+        </BbFieldLabel>
+        <BbFieldContent Class="flex flex-col gap-2">
+            @foreach (var permission in this.Permissions)
+            {
+                <div @key="permission.Name"
+                     class="flex items-center gap-2">
+                    <BbCheckbox @bind-Checked="permission.IsGranted"
+                                Id="@($"create-api-key-perm-{permission.Name}")" />
+                    <label for="@($"create-api-key-perm-{permission.Name}")"
+                           class="text-sm leading-xs text-secondary-text cursor-pointer select-none">
+                        @(permission.Label)
+                    </label>
+                </div>
+            }
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="create-api-key-expiration"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            EXPIRATION
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="string"
+                         @bind-Value="this.SelectedExpiration"
+                         Items="@(this.ExpirationOptionKeys)"
+                         Id="create-api-key-expiration" />
+        </BbFieldContent>
+    </BbField>
+
+    <div class="pt-2 flex items-center justify-end gap-2.5">
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCreateKeyClicked)">
+            Create key
+        </BbButton>
+    </div>
+</div>

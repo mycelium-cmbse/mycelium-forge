@@ -9,11 +9,15 @@
 
 namespace Mycelium.Forge.Components.Common
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.DialogResults;
 
     /// <summary>
     /// Represents a dialog component for adding a package dependency constraint to a selected project.
@@ -69,7 +73,7 @@ namespace Mycelium.Forge.Components.Common
         /// Handles the cancel action, cancelling the dialog and invoking the cancel callback.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnCancelClicked()
+        private async Task OnCancelClicked()
         {
             await this.OnCancel.InvokeAsync();
 
@@ -83,7 +87,7 @@ namespace Mycelium.Forge.Components.Common
         /// Handles the add dependency action, emitting the selected project and version constraint before closing.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnAddDependencyClicked()
+        private async Task OnAddDependencyClicked()
         {
             var result = new AddToProjectResult
             {

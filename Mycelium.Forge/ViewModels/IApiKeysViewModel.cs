@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IApiKeysViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,11 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using Mycelium.Forge.Common;
+    using System;
+    using System.Collections.Generic;
+
+    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.DialogResults;
 
     /// <summary>
     /// Defines the view model contract for the API keys management page.
@@ -19,7 +23,7 @@ namespace Mycelium.Forge.ViewModels
         /// <summary>
         /// Gets or sets the collection of API keys displayed in the table.
         /// </summary>
-        List<APIKey> ApiKeys { get; set; }
+        List<ApiKeyModel> ApiKeys { get; set; }
 
         /// <summary>
         /// Initializes the view model state and populates the API key collection.
@@ -27,10 +31,17 @@ namespace Mycelium.Forge.ViewModels
         void InitializeViewModel();
 
         /// <summary>
-        /// Creates and adds a new API key entry to the collection.
+        /// Creates and adds a new API key model entry to the collection.
         /// </summary>
-        /// <param name="apiKey">The <see cref="APIKey" /> to create.</param>
-        void CreateApiKey(APIKey apiKey);
+        /// <param name="apiKey">The <see cref="ApiKeyModel" /> to create.</param>
+        void CreateApiKey(ApiKeyModel apiKey);
+
+        /// <summary>
+        /// Creates and stores a new API key based on the dialog configuration result, returning the created model.
+        /// </summary>
+        /// <param name="result">The <see cref="CreateApiKeyResult" /> containing the key parameters.</param>
+        /// <returns>The created <see cref="ApiKeyModel" /> containing the entity and revealed plain-text secret token.</returns>
+        ApiKeyModel CreateApiKey(CreateApiKeyResult result);
 
         /// <summary>
         /// Revokes an API key with the specified identifier.

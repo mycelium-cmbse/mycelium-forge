@@ -1,0 +1,23 @@
+<div class="w-full flex items-center justify-between gap-2 rounded-md @(this.GetContainerClass()) @(this.Class)">
+    <code class="font-mono text-sm leading-17 truncate flex-1 select-all @(this.GetTextClass()) @(this.TextClass)">
+        @(this.Text)
+    </code>
+    <button type="button"
+            class="@GetButtonClass()"
+            aria-label="@(this.AriaLabel)"
+            title="@(this.AriaLabel)"
+            @onclick="this.CopyTextToClipboard">
+        @if (this.IsCopied)
+        {
+            <LucideIcon Name="check"
+                        Size="16"
+                        Class="text-validated shrink-0"/>
+        }
+        else
+        {
+            <LucideIcon Name="copy"
+                        Size="16"
+                        Class="text-muted-foreground shrink-0"/>
+        }
+    </button>
+</div>

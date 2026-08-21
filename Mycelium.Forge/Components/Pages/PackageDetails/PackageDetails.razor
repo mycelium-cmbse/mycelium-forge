@@ -107,30 +107,7 @@
                 }
             </BlazorBlueprint.Primitives.Tabs.BbTabsList>
 
-            <div class="w-full px-3 py-0 rounded-md bg-card border border-border flex items-center justify-between gap-2">
-                <code class="font-mono text-sm leading-17 text-foreground truncate flex-1 select-all">
-                    @(this.GetCurrentInstallCommand())
-                </code>
-                <BbButton Variant="ButtonVariant.Ghost"
-                          Size="ButtonSize.IconSmall"
-                          Type="ButtonType.Button"
-                          OnClick="@(this.CopyInstallCommandToClipboard)"
-                          AriaLabel="Copy command"
-                          Class="shrink-0">
-                    @if (this.IsCopied)
-                    {
-                        <LucideIcon Name="check"
-                                    Size="16"
-                                    Class="text-validated shrink-0"/>
-                    }
-                    else
-                    {
-                        <LucideIcon Name="copy"
-                                    Size="16"
-                                    Class="text-muted-foreground shrink-0"/>
-                    }
-                </BbButton>
-            </div>
+            <ForgeCopyText Text="@(this.GetCurrentInstallCommand())" />
         </BlazorBlueprint.Primitives.Tabs.BbTabs>
 
         <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-border">

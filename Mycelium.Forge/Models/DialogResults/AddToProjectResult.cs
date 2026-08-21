@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Models
+namespace Mycelium.Forge.Models.DialogResults
 {
     /// <summary>
     /// Represents the result payload containing the project selection and version constraint when adding a dependency.
