@@ -10,7 +10,7 @@
 namespace Mycelium.Forge.ViewModels
 {
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Provides view model state and management logic for the Mycelium Forge package settings page.

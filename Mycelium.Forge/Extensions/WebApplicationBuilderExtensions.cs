@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="WebApplicationBuilderExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Extensions
 {
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>
@@ -37,6 +39,9 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<ISignUpViewModel, SignUpViewModel>();
             builder.Services.AddTransient<ILoginViewModel, LoginViewModel>();
             builder.Services.AddTransient<IVerifyEmailViewModel, VerifyEmailViewModel>();
+            builder.Services.AddTransient<IDocumentationViewModel, DocumentationViewModel>();
+            builder.Services.AddScoped<IThemeService, ThemeService>();
+            builder.Services.AddScoped<IJsInterop, JsInterop>();
 
             return builder;
         }

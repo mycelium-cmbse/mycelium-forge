@@ -12,7 +12,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>

@@ -12,16 +12,19 @@ namespace Mycelium.Forge.Components.Common
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
 
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Services;
+
     /// <summary>
     /// Represents a styled text snippet container with built-in clipboard copying capabilities.
     /// </summary>
     public partial class ForgeCopyText : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the JavaScript runtime instance for clipboard interactions.
+        /// Gets or sets the JavaScript interop service for clipboard interactions.
         /// </summary>
         [Inject]
-        public IJSRuntime JsRuntime { get; set; }
+        public IJsInterop JsInterop { get; set; }
 
         /// <summary>
         /// Gets or sets the text content to display and copy.
@@ -60,35 +63,6 @@ namespace Mycelium.Forge.Components.Common
         public EventCallback<bool> OnCopied { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the text was recently copied to the clipboard.
-        /// </summary>
-        private bool IsCopied { get; set; }
-
-        /// <summary>
-        /// Copies the text content to the user's clipboard and manages the copied state indicator.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous copy operation.</returns>
-        private async Task CopyTextToClipboard()
-        {
-            if (string.IsNullOrWhiteSpace(this.Text))
-            {
-                return;
-            }
-
-            try
-            {
-                await this.JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", this.Text);
-                this.IsCopied = true;
-                await this.OnCopied.InvokeAsync(true);
-            }
-            catch (Exception)
-            {
-                this.IsCopied = false;
-                await this.OnCopied.InvokeAsync(false);
-            }
-        }
-
-        /// <summary>
         /// Computes the CSS classes for the outer container based on the selected variant.
         /// </summary>
         /// <returns>The combined CSS class string.</returns>
@@ -110,15 +84,6 @@ namespace Mycelium.Forge.Components.Common
             return this.Dark
                 ? "text-code-import"
                 : "text-foreground";
-        }
-
-        /// <summary>
-        /// Computes the CSS classes for the copy button based on the selected variant.
-        /// </summary>
-        /// <returns>The combined CSS class string.</returns>
-        private static string GetButtonClass()
-        {
-            return "p-1 shrink-0 cursor-pointer transition-colors focus:outline-none text-muted-foreground hover:text-foreground";
         }
     }
 }

@@ -10,7 +10,8 @@
 namespace Mycelium.Forge.ViewModels
 {
     using Mycelium.Forge.Data;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Organization;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Provides view model state and operations for the Mycelium Forge organization and publisher profile page.

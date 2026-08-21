@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Represents the release versions history tab component for package details.

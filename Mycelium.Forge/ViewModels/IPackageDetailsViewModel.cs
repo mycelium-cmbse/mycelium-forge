@@ -11,8 +11,8 @@ namespace Mycelium.Forge.ViewModels
 {
     using FluentResults;
 
-    using Mycelium.Forge.Models;
     using Mycelium.Forge.Models.DialogResults;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Defines the view model contract for the Mycelium Forge package details page.

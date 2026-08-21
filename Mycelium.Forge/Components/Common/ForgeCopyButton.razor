@@ -1,0 +1,32 @@
+<button type="button"
+        class="@(this.GetButtonClass())"
+        title="@(this.AriaLabel)"
+        aria-label="@(this.AriaLabel)"
+        @onclick="this.CopyTextToClipboard">
+    @if (this.IsCopied)
+    {
+        <LucideIcon Name="check"
+                    Size="@(this.IconSize)"
+                    Class="text-validated shrink-0"/>
+        @if (!string.IsNullOrWhiteSpace(this.Label))
+        {
+            <span>Copied!</span>
+        }
+    }
+    else
+    {
+        <LucideIcon Name="copy"
+                    Size="@(this.IconSize)"
+                    Class="@(this.IconClass)"/>
+        @if (!string.IsNullOrWhiteSpace(this.Label))
+        {
+            <span>@(this.Label)</span>
+        }
+        @if (this.ShowDropdownChevron)
+        {
+            <LucideIcon Name="chevron-down"
+                        Size="14"
+                        Class="text-muted-foreground shrink-0"/>
+        }
+    }
+</button>

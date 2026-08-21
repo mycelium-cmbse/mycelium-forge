@@ -1,0 +1,274 @@
+@using Mycelium.Forge.Components.Pages.Publish.Dialogs
+@using Mycelium.Forge.Models.Publish
+@using Mycelium.Forge.Models.Validation
+@attribute [Route(PageRoutes.Publish)]
+@rendermode InteractiveServer
+
+<PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-10 select-none">
+<div class="max-w-[1100px] w-full mx-auto px-6 flex flex-col gap-6">
+<div class="flex flex-col gap-1.5 w-full">
+    <h1 class="text-3xl leading-3xl font-semibold text-foreground tracking-tight">
+        Publish to Forge
+    </h1>
+    <p class="text-base leading-17 text-muted-foreground">
+        Publish a library or a model so others can discover, version and, where the format allows it, import it into their projects.
+    </p>
+</div>
+
+<div class="w-full h-12.5 px-5 py-3.5 rounded-lg bg-card border border-border flex items-center gap-3">
+    @foreach (var step in this.ViewModel.Steps)
+    {
+        <div @key="step.Number" class="flex items-center gap-2">
+            <div class="@(this.GetStepBubbleClass(step))">
+                <span class="@(this.GetStepNumberClass(step))">
+                    @(step.Number)
+                </span>
+            </div>
+            <span class="@(this.GetStepTitleClass(step))">
+                @(step.Title)
+            </span>
+        </div>
+
+        @if (step.Number < this.ViewModel.Steps.Count)
+        {
+            <div class="w-10 h-px bg-border shrink-0"></div>
+        }
+    }
+</div>
+
+<div class="w-full flex flex-col lg:flex-row items-start gap-6">
+<div class="w-full lg:flex-1 p-6 rounded-lg bg-card border border-border flex flex-col gap-4">
+    <div class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2">
+        <div class="flex items-center gap-2.5 w-full">
+            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ARTEFACT
+            </span>
+            <span class="font-mono text-sm leading-17 text-foreground flex-1 truncate">
+                @(this.ViewModel.Metadata.ArtefactFileName)
+            </span>
+
+            <BbBadge Variant="BadgeVariant.Secondary"
+                     Class="badge-format">
+                @(this.ViewModel.Metadata.ArtefactFormat)
+            </BbBadge>
+
+            <BbButton Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnReplaceArtefact)"
+                      Class="button-sm">
+                Replace
+            </BbButton>
+        </div>
+        <p class="text-xs leading-2xs font-normal text-muted-foreground">
+            Format detected from the archive. The metadata below is read from the kpar manifest, so it is shown for confirmation rather than entry.
+        </p>
+    </div>
+
+    <h2 class="text-md leading-sm font-semibold text-foreground">
+        Package metadata
+    </h2>
+
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+        <BbField Class="w-full sm:w-[220px] shrink-0 flex flex-col gap-1.5">
+            <BbFieldLabel For="publish-scope"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                SCOPE
+            </BbFieldLabel>
+            <BbFieldContent>
+                <ForgeSelect TValue="string"
+                             Value="@(this.ViewModel.Metadata.Scope)"
+                             ValueChanged="@(this.OnScopeChanged)"
+                             Items="@(this.ViewModel.ScopeOptions)"
+                             Id="publish-scope">
+                    <TriggerContent>
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span>@(this.ViewModel.Metadata.Scope)</span>
+                            @if (this.ViewModel.Metadata.IsScopeVerified)
+                            {
+                                <LucideIcon Name="badge-check"
+                                            Size="14"
+                                            Class="text-primary shrink-0"/>
+                            }
+                        </div>
+                        <LucideIcon Name="chevron-down"
+                                    Size="16"
+                                    Class="text-muted-foreground shrink-0"/>
+                    </TriggerContent>
+                </ForgeSelect>
+            </BbFieldContent>
+        </BbField>
+
+        <BbField Class="w-full sm:flex-1 flex flex-col gap-1.5">
+            <BbFieldLabel For="publish-package-name"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                PACKAGE NAME
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="publish-package-name"
+                         Value="@(this.ViewModel.Metadata.PackageName)"
+                         ValueChanged="@(this.OnPackageNameChanged)"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+    </div>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-version"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            VERSION
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="publish-version"
+                     Value="@(this.ViewModel.Metadata.Version)"
+                     ValueChanged="@(this.OnVersionChanged)"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+        </BbFieldContent>
+        <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
+            Must be greater than the latest published version (v1.2.0). SemVer 2.0.0.
+        </BbFieldDescription>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-description"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            DESCRIPTION
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbTextarea Id="publish-description"
+                        Value="@(this.ViewModel.Metadata.Description)"
+                        ValueChanged="@(this.OnDescriptionChanged)"
+                        Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-license"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            LICENSE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="string"
+                         Value="@(this.ViewModel.Metadata.License)"
+                         ValueChanged="@(this.OnLicenseChanged)"
+                         Items="@(this.ViewModel.LicenseOptions)"
+                         Id="publish-license"/>
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-visibility"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            VISIBILITY
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="VisibilityKind"
+                         Value="@(this.ViewModel.Metadata.Visibility)"
+                         ValueChanged="@(this.OnVisibilityChanged)"
+                         Items="@(this.ViewModel.VisibilityOptions)"
+                         Id="publish-visibility"
+                         DisplayTextSelector="@(x => x.ToLowerCaseFirst())"/>
+        </BbFieldContent>
+        <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
+            Public: anyone can find and download it. Organization: visible to members of the owning scope. Private: only Maintainers and Accounts granted the Reader role. New packages default to private.
+        </BbFieldDescription>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-metamodel"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            METAMODEL
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="string"
+                         Value="@(this.ViewModel.Metadata.Metamodel)"
+                         ValueChanged="@(this.OnMetamodelChanged)"
+                         Items="@(this.ViewModel.MetamodelOptions)"
+                         Id="publish-metamodel"/>
+        </BbFieldContent>
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-tags"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            TAGS
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="publish-tags"
+                     Value="@(this.ViewModel.Metadata.Tags)"
+                     ValueChanged="@(this.OnTagsChanged)"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+        </BbFieldContent>
+    </BbField>
+</div>
+
+<aside class="w-full lg:w-[380px] shrink-0 p-5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+    <h2 class="text-md leading-sm font-semibold text-foreground">
+        Pre-publish validation
+    </h2>
+
+    <div class="flex flex-col gap-3 w-full">
+        @foreach (var check in this.ViewModel.ValidationChecks)
+        {
+            <BbMarker @key="check.Title" Class="flex items-center gap-2 w-full">
+                <BbMarkerIcon>
+                    @if (check.Status == ValidationStatus.Pass)
+                    {
+                        <LucideIcon Name="check"
+                                    Size="16"
+                                    Class="text-validated shrink-0"/>
+                    }
+                    else
+                    {
+                        <LucideIcon Name="alert-triangle"
+                                    Size="16"
+                                    Class="text-warning-icon shrink-0"/>
+                    }
+                </BbMarkerIcon>
+
+                <BbMarkerContent Class="text-sm leading-xs font-normal text-secondary-text flex-1 truncate">
+                    @(check.Title)
+                </BbMarkerContent>
+
+                <span class="@(this.GetValidationStatusBadgeClass(check.Status))">
+                    @(check.Status)
+                </span>
+            </BbMarker>
+        }
+    </div>
+
+    <div class="flex flex-col gap-1 w-full pt-1">
+        <span class="text-xs leading-2xs font-semibold text-warning-foreground">
+            @(this.GetWarningsTitle())
+        </span>
+        <p class="text-xs leading-2xs font-normal text-muted-foreground">
+            The package can be published, but consider resolving these before release.
+        </p>
+    </div>
+
+    <BbMarker Class="flex items-center gap-1.5 w-full pt-1">
+        <BbMarkerIcon>
+            <LucideIcon Name="badge-check"
+                        Size="14"
+                        Class="text-primary shrink-0"/>
+        </BbMarkerIcon>
+        <BbMarkerContent Class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
+            @(this.ViewModel.Metadata.Scope) is a verified scope
+        </BbMarkerContent>
+    </BbMarker>
+
+    <BbButton Variant="ButtonVariant.Default"
+              Type="ButtonType.Button"
+              OnClick="@(this.PublishPackage)"
+              Class="w-full mt-1">
+        <LucideIcon Name="upload"
+                    Size="16"
+                    Class="shrink-0"/>
+        <span>@(this.GetPublishButtonText())</span>
+    </BbButton>
+</aside>
+</div>
+</div>
+</div>

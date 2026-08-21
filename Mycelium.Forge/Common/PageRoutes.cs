@@ -40,11 +40,6 @@ namespace Mycelium.Forge.Common
         public const string Organization = "/organizations/{id}";
 
         /// <summary>
-        /// The documentation page route path.
-        /// </summary>
-        public const string Docs = "/docs";
-
-        /// <summary>
         /// The user authentication and sign-in page route path.
         /// </summary>
         public const string Login = "/login";
@@ -98,5 +93,21 @@ namespace Mycelium.Forge.Common
         /// The installation accounts administration page route path.
         /// </summary>
         public const string Accounts = "/admin/accounts";
+
+        /// <summary>
+        /// Contains route constants for documentation pages.
+        /// </summary>
+        public static class Documentation
+        {
+            /// <summary>
+            /// The documentation overview page route path.
+            /// </summary>
+            public const string Overview = "/docs";
+
+            /// <summary>
+            /// The documentation packages and kpar format page route path.
+            /// </summary>
+            public const string PackagesAndKparFormat = "/docs/packages-and-the-kpar-format";
+        }
     }
 }

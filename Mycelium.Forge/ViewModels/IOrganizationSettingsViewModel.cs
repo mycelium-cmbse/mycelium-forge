@@ -10,7 +10,7 @@
 namespace Mycelium.Forge.ViewModels
 {
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Organization;
 
     /// <summary>
     /// Defines the view model contract for managing organization settings, members, and team roles.

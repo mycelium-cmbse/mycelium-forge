@@ -12,7 +12,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Organization;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>

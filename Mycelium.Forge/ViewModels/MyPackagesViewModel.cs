@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,7 +10,7 @@
 namespace Mycelium.Forge.ViewModels
 {
     using Mycelium.Forge.Data;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Provides view model state and operations for the My Packages page, listing packages

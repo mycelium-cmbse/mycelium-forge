@@ -1,0 +1,37 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full @(this.Class)">
+    @if (!string.IsNullOrWhiteSpace(this.PrevTitle))
+    {
+        <a href="@(this.PrevHref)"
+           class="flex flex-col items-start p-3.5 px-4 rounded-lg bg-card border border-border gap-1 hover:border-primary/50 transition-colors group">
+            <div class="flex items-center gap-1.5 text-xs leading-2xs font-normal text-muted-foreground">
+                <LucideIcon Name="arrow-left"
+                            Size="13"
+                            Class="shrink-0"/>
+                <span>Previous</span>
+            </div>
+            <span class="text-sm leading-xs font-semibold text-primary group-hover:underline">
+                @(this.PrevTitle)
+            </span>
+        </a>
+    }
+    else
+    {
+        <div></div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(this.NextTitle))
+    {
+        <a href="@(this.NextHref)"
+           class="flex flex-col items-end p-3.5 px-4 rounded-lg bg-card border border-border gap-1 hover:border-primary/50 transition-colors group">
+            <div class="flex items-center gap-1.5 text-xs leading-2xs font-normal text-muted-foreground">
+                <span>Next</span>
+                <LucideIcon Name="arrow-right"
+                            Size="13"
+                            Class="shrink-0"/>
+            </div>
+            <span class="text-sm leading-xs font-semibold text-primary group-hover:underline">
+                @(this.NextTitle)
+            </span>
+        </a>
+    }
+</div>

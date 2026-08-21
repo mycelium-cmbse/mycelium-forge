@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSection.razor.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Common
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Displays a categorized grid of package cards with a title and action link.

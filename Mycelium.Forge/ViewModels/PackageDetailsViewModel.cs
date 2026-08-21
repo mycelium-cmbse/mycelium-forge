@@ -12,8 +12,9 @@ namespace Mycelium.Forge.ViewModels
     using FluentResults;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models;
     using Mycelium.Forge.Models.DialogResults;
+    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.Models.Validation;
 
     /// <summary>
     /// Provides view model state and initialization logic for the Mycelium Forge package details page.

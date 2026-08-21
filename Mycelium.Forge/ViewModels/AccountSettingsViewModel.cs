@@ -13,8 +13,9 @@ namespace Mycelium.Forge.ViewModels
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
-    using Mycelium.Forge.Models;
     using Mycelium.Forge.Models.DialogResults;
+    using Mycelium.Forge.Models.Organization;
+    using Mycelium.Forge.Models.Profile;
 
     /// <summary>
     /// Provides view model state and operations for the user account settings and profile management page.

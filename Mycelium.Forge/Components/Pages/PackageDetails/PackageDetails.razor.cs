@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Components.Common;
+    using Mycelium.Forge.Components.Pages.PackageDetails.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels;
 

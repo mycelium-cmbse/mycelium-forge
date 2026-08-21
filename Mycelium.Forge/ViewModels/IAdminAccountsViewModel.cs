@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Admin;
 
     /// <summary>
     /// Defines the view model contract for the installation accounts administration page.

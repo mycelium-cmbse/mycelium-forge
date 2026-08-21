@@ -13,7 +13,7 @@ namespace Mycelium.Forge.Models.DialogResults
     using System.Collections.Generic;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.ApiKey;
 
     /// <summary>
     /// Represents the result payload and created state when configuring and generating a new API key.

@@ -1,5 +1,6 @@
 @attribute [Route(PageRoutes.Accounts)]
 @rendermode InteractiveServer
+@using Mycelium.Forge.Models.Admin
 
 <PageTitle>Accounts &mdash; Mycelium Forge</PageTitle>
 
@@ -8,7 +9,7 @@
         <BbBreadcrumb Class="text-xs leading-2xs">
             <BbBreadcrumbList>
                 <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@PageRoutes.Docs"
+                    <BbBreadcrumbLink Href="@PageRoutes.Documentation.Overview"
                                       Class="text-primary hover:underline font-normal">
                         Installation
                     </BbBreadcrumbLink>

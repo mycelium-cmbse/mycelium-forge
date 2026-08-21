@@ -12,7 +12,8 @@ namespace Mycelium.Forge.ViewModels
     using FluentResults;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Publish;
+    using Mycelium.Forge.Models.Validation;
 
     /// <summary>
     /// Defines the view model contract for the Mycelium Forge package publishing wizard page.

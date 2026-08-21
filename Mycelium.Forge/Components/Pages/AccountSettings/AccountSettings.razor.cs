@@ -19,6 +19,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Components.Common;
+    using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels;
 

@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels
 {
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Defines the view model contract for the Mycelium Forge package discovery and filtering page.

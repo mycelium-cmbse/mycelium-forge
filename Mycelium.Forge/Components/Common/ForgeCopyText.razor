@@ -2,22 +2,10 @@
     <code class="font-mono text-sm leading-17 truncate flex-1 select-all @(this.GetTextClass()) @(this.TextClass)">
         @(this.Text)
     </code>
-    <button type="button"
-            class="@GetButtonClass()"
-            aria-label="@(this.AriaLabel)"
-            title="@(this.AriaLabel)"
-            @onclick="this.CopyTextToClipboard">
-        @if (this.IsCopied)
-        {
-            <LucideIcon Name="check"
-                        Size="16"
-                        Class="text-validated shrink-0"/>
-        }
-        else
-        {
-            <LucideIcon Name="copy"
-                        Size="16"
-                        Class="text-muted-foreground shrink-0"/>
-        }
-    </button>
+    <ForgeCopyButton Text="@(this.Text)"
+                     AriaLabel="@(this.AriaLabel)"
+                     IconSize="16"
+                     IconClass="text-muted-foreground shrink-0"
+                     Class="p-1 shrink-0 cursor-pointer transition-colors focus:outline-none text-muted-foreground hover:text-foreground"
+                     OnCopied="@(this.OnCopied)"/>
 </div>

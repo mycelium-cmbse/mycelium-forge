@@ -9,10 +9,12 @@
 
 namespace Mycelium.Forge.Components.Layout
 {
+    using System;
+    using System.Collections.Generic;
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Routing;
-
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Services;
 
     /// <summary>
     /// Represents the top application header navigation bar for Mycelium Forge.
@@ -24,6 +26,18 @@ namespace Mycelium.Forge.Components.Layout
         /// </summary>
         [Inject]
         public NavigationManager NavigationManager { get; set; }
+
+        /// <summary>
+        /// Gets or sets the application theme management service.
+        /// </summary>
+        [Inject]
+        public IThemeService ThemeService { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this header is displayed in documentation mode.
+        /// </summary>
+        [Parameter]
+        public bool IsDocumentation { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is logged in.
@@ -41,12 +55,49 @@ namespace Mycelium.Forge.Components.Layout
         public string SearchQuery { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the currently selected documentation language code.
+        /// </summary>
+        public string SelectedLanguage { get; set; } = "EN";
+
+        /// <summary>
+        /// Gets the list of selectable language code options.
+        /// </summary>
+        public IReadOnlyList<string> LanguageOptions { get; } = ["EN", "PT"];
+
+        /// <summary>
+        /// Gets the collection of supported documentation languages.
+        /// </summary>
+        public Dictionary<string, string> SupportedLanguages { get; } = new()
+        {
+            { "EN", "English" },
+            { "PT", "Português" }
+        };
+
+        /// <summary>
         /// Releases unmanaged and managed resources used by the component.
         /// </summary>
         public void Dispose()
         {
             this.NavigationManager.LocationChanged -= this.OnLocationChanged;
+            this.ThemeService.OnChange -= this.StateHasChanged;
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Toggles between light and dark visual themes.
+        /// </summary>
+        public void ToggleDarkMode()
+        {
+            this.ThemeService.ToggleDarkMode();
+        }
+
+        /// <summary>
+        /// Updates the selected documentation language.
+        /// </summary>
+        /// <param name="languageCode">The language code (e.g. EN or PT).</param>
+        public void SelectLanguage(string languageCode)
+        {
+            this.SelectedLanguage = languageCode;
         }
 
         /// <summary>
@@ -111,12 +162,13 @@ namespace Mycelium.Forge.Components.Layout
         }
 
         /// <summary>
-        /// Initializes the component and subscribes to location changes.
+        /// Initializes the component and subscribes to location and theme changes.
         /// </summary>
         protected override void OnInitialized()
         {
             base.OnInitialized();
             this.NavigationManager.LocationChanged += this.OnLocationChanged;
+            this.ThemeService.OnChange += this.StateHasChanged;
         }
 
         /// <summary>

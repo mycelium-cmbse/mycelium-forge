@@ -12,7 +12,7 @@ namespace Mycelium.Forge.ViewModels
     using System;
     using System.Collections.Generic;
 
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.ApiKey;
     using Mycelium.Forge.Models.DialogResults;
 
     /// <summary>

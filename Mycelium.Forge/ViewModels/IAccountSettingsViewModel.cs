@@ -11,8 +11,9 @@ namespace Mycelium.Forge.ViewModels
 {
     using FluentResults;
 
-    using Mycelium.Forge.Models;
     using Mycelium.Forge.Models.DialogResults;
+    using Mycelium.Forge.Models.Organization;
+    using Mycelium.Forge.Models.Profile;
 
     /// <summary>
     /// Defines the view model contract for the user account settings and profile page.

@@ -1,0 +1,78 @@
+<div class="flex flex-col gap-4 px-6 py-3">
+    <p class="text-sm leading-xs font-normal text-muted-foreground">
+        An Organization owns a package scope and its members. You become its Organization Administrator.
+    </p>
+
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(this.OrganizationName)))">
+        <BbFieldLabel For="create-org-name"
+                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            ORGANIZATION NAME
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="create-org-name"
+                     Value="@(this.OrganizationName)"
+                     ValueChanged="@(this.OnOrganizationNameChanged)"
+                     Placeholder="e.g. European Space Agency"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
+        </BbFieldContent>
+        <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                      Errors="@(this.ValidationManager[nameof(this.OrganizationName)])" />
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(this.Scope)))">
+        <BbFieldLabel For="create-org-scope"
+                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            SCOPE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="create-org-scope"
+                     Value="@(this.Scope)"
+                     ValueChanged="@(this.OnScopeChanged)"
+                     Placeholder="e.g. @@esa"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
+        </BbFieldContent>
+        <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                      Errors="@(this.ValidationManager[nameof(this.Scope)])" />
+        @if (!this.ValidationManager.HasError(nameof(this.Scope)))
+        {
+            <BbFieldDescription Class="text-2xs leading-3xs font-normal text-validated">
+                Must be lowercase and globally unique across Forge.
+            </BbFieldDescription>
+        }
+    </BbField>
+
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(this.BillingEmail)))">
+        <BbFieldLabel For="create-org-billing-email"
+                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            BILLING EMAIL
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput Id="create-org-billing-email"
+                     Value="@(this.BillingEmail)"
+                     ValueChanged="@(this.OnBillingEmailChanged)"
+                     Placeholder="e.g. billing@esa.int"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
+        </BbFieldContent>
+        <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                      Errors="@(this.ValidationManager[nameof(this.BillingEmail)])" />
+    </BbField>
+
+    <div class="pt-2 flex items-center justify-end gap-2.5">
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCreateOrganizationClicked)">
+            Create organization
+        </BbButton>
+    </div>
+</div>

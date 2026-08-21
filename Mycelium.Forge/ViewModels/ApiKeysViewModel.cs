@@ -11,7 +11,7 @@ namespace Mycelium.Forge.ViewModels
 {
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.ApiKey;
     using Mycelium.Forge.Models.DialogResults;
 
     /// <summary>

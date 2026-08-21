@@ -1,0 +1,99 @@
+@attribute [Route(PageRoutes.Documentation.PackagesAndKparFormat)]
+@layout DocumentationLayout
+@rendermode InteractiveServer
+@using Mycelium.Forge.Components.Pages.Documentation
+@using Mycelium.Forge.Models.Documentation
+
+<PageTitle>Packages & the kpar format &mdash; Documentation &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-background min-h-screen flex flex-col md:flex-row items-start select-none">
+    <DocumentationSidebar Groups="@(this.ViewModel.NavGroups)"/>
+
+    <div class="flex-1 min-w-0 flex flex-col items-center py-8 sm:py-11 px-4 sm:px-8 lg:px-16 overflow-y-auto">
+        <div class="max-w-[820px] w-full flex flex-col gap-3.5">
+            <nav class="flex items-center gap-1.5 text-xs leading-2xs select-none">
+                <a href="@PageRoutes.Documentation.Overview"
+                   class="font-normal text-muted-foreground hover:text-foreground transition-colors">
+                    Core concepts
+                </a>
+                <span class="font-normal text-muted-foreground">/</span>
+                <span class="font-normal text-secondary-text">
+                    Packages & the kpar format
+                </span>
+            </nav>
+
+            <div class="flex flex-row items-center justify-between gap-3 w-full">
+                <h1 class="text-3xl leading-3xl font-semibold text-foreground tracking-tight">
+                    Packages & the kpar format
+                </h1>
+
+                <ForgeCopyButton Text="@(this.NavigationManager.Uri)"
+                                 Label="Copy page"
+                                 ShowDropdownChevron="true"
+                                 IconSize="15"
+                                 IconClass="text-foreground shrink-0"/>
+            </div>
+
+            <p class="text-md leading-sm font-normal text-muted-foreground">
+                Everything published to Forge is a package: a versioned, immutable bundle of SysML v2 model elements plus metadata, distributed as a single kpar file.
+            </p>
+
+            <h2 id="what-is-a-package"
+                class="text-2xl leading-xl font-semibold text-foreground scroll-mt-6 pt-1">
+                What is a package?
+            </h2>
+
+            <p class="text-md leading-sm font-normal text-secondary-text">
+                A package is a LibraryPackage exported from a project together with its metadata (name, version, license, tags, dependencies) and its transitive library dependencies. Consumers import a package into their project and specialize or reference its elements; the package content itself is read-only.
+            </p>
+
+            <h2 id="the-kpar-archive"
+                class="text-2xl leading-xl font-semibold text-foreground scroll-mt-6 pt-1">
+                The kpar archive
+            </h2>
+
+            <p class="text-md leading-sm font-normal text-secondary-text">
+                Forge accepts and distributes every package as a single kpar file (KerML Project Archive, KerML clause 10.3). A kpar carries the model source, a .project.json manifest, a README, and its licences.
+            </p>
+
+            <ForgeAlert Title="KerML 1.0 §10.3 compliance"
+                        Description="kpar archives produced by Bloom, sysand, or the Forge CLI conform strictly to the KerML interchange standard and can be unpacked by any compliant KerML tool."
+                        IconName="info"
+                        IconSize="18"
+                        Variant="ForgeAlertVariant.Info"/>
+
+            <ForgeCodeBlock FileName=".project.json"
+                            Code="@(this.ProjectJsonSnippet)"/>
+
+            <h2 id="package-identity"
+                class="text-2xl leading-xl font-semibold text-foreground scroll-mt-6 pt-1">
+                Package identity
+            </h2>
+
+            <p class="text-md leading-sm font-normal text-secondary-text">
+                Every package has a scoped identifier of the form @@scope/name, where the scope resolves to a Mycelium account or organization slug. The unscoped, global namespace is reserved for standard libraries distributed by the Mycelium operator.
+            </p>
+
+            <ForgeAlert Title="Scope ownership"
+                        Description="Publishing to an organization scope requires the Publisher role. Personal scopes are reserved exclusively for the corresponding account."
+                        IconName="alert-triangle"
+                        IconSize="18"
+                        Variant="ForgeAlertVariant.Warning"/>
+
+            <div class="w-full h-3"></div>
+
+            <DocumentationPrevNext PrevTitle="Platform overview"
+                                   PrevHref="@PageRoutes.Documentation.Overview"
+                                   NextTitle="Scopes & identifiers"
+                                   NextHref="#"/>
+
+            <DocumentationPageMeta LastUpdated="@(this.ViewModel.LastUpdated)"
+                                   FeedbackGiven="@(this.ViewModel.FeedbackGiven)"
+                                   OnFeedback="@(this.SubmitFeedback)"/>
+
+            <div class="w-full h-18"></div>
+        </div>
+    </div>
+
+    <DocumentationToc Items="@(this.ViewModel.TableOfContents)"/>
+</div>

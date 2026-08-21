@@ -13,7 +13,7 @@ namespace Mycelium.Forge.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Admin;
     using Mycelium.Forge.ViewModels;
 
     /// <summary>

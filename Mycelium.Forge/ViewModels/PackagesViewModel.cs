@@ -14,7 +14,7 @@ namespace Mycelium.Forge.ViewModels
     using System.Linq;
 
     using Mycelium.Forge.Data;
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Provides view model state and operations for the Mycelium Forge package discovery and catalog page.

@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models;
+    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Represents the model elements and declarations tab component for package details.
