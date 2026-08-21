@@ -75,6 +75,11 @@ input::placeholder {
 
 /* Dialog header override */
 [role="dialog"] > div:first-child {
+  display: none;
+}
+
+/* Hides dialog title if title is empty */
+[role="dialog"] > div:first-child:has([id*="bb-dialog"][id*="-title"]:not(:empty)) {
   border-bottom: var(--primitive-border-width-default) solid var(--border);
   background-color: var(--card);
   display: flex;
@@ -82,5 +87,11 @@ input::placeholder {
   align-items: flex-start;
   text-align: left;
   width: 100%;
-  padding-bottom: 0.625rem;
+  padding: var(--primitive-spacing-dialog-header-pt) var(--primitive-spacing-dialog-header-px) var(--primitive-spacing-dialog-header-pb) var(--primitive-spacing-dialog-header-px);
+}
+
+/* Dialog container padding override for BlazorBlueprint dialogs */
+div[role="dialog"][aria-labelledby*="bb-dialog"] {
+  padding: var(--primitive-spacing-dialog-padding-none);
+  overflow: hidden;
 }

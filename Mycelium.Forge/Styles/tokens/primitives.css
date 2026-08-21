@@ -109,6 +109,10 @@
   /* Layout & Sizing Primitives */
   --primitive-layout-container-max-width: 1200px;
   --primitive-spacing-container-padding: 1.5rem;
+  --primitive-spacing-dialog-header-pt: 1.25rem;
+  --primitive-spacing-dialog-header-px: 1.5rem;
+  --primitive-spacing-dialog-header-pb: 1rem;
+  --primitive-spacing-dialog-padding-none: 0px;
   --primitive-spacing-badge-py: 2px;
   --primitive-spacing-badge-px: 6px;
   --primitive-spacing-button-sm-h: 1.75rem;

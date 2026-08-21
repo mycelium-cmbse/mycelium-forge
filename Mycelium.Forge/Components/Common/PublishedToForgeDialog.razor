@@ -1,0 +1,35 @@
+﻿<div class="w-full flex flex-col overflow-hidden rounded-b-xl">
+    <div class="w-full flex flex-col items-center p-7 gap-3 text-center">
+        <div class="w-13 h-13 rounded-full flex items-center justify-center bg-success shrink-0">
+            <LucideIcon Name="check"
+                        Size="26"
+                        Class="text-validated shrink-0" />
+        </div>
+
+        <h2 class="text-md leading-2xl font-semibold text-foreground text-center">
+            @(this.Title)
+        </h2>
+
+        <p class="text-sm leading-xs font-normal text-muted-foreground text-center">
+            @(this.GetDescriptionText())
+        </p>
+    </div>
+
+    <div class="w-full h-16 py-4 px-6 flex flex-row items-center justify-center gap-2.5 bg-body-bg border-t border-card-border rounded-b-xl box-border">
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCloseClicked)"
+                  Class="h-8 px-3.5 rounded-lg border-border text-foreground font-medium text-sm">
+            Close
+        </BbButton>
+
+        <BbButton Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnViewPackageClicked)"
+                  Class="h-8 px-3.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm">
+            View package
+        </BbButton>
+    </div>
+</div>

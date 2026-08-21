@@ -9,11 +9,15 @@
 
 namespace Mycelium.Forge.Components.Pages
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.ViewModels;
 
@@ -39,6 +43,12 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         [Inject]
         public NavigationManager NavigationManager { get; set; }
+
+        /// <summary>
+        /// Gets or sets the dialog service used to display modal dialogs.
+        /// </summary>
+        [Inject]
+        public DialogService DialogService { get; set; }
 
         /// <summary>
         /// Gets the CSS classes for the step bubble circle indicator.
@@ -197,16 +207,31 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Executes the validation and publish submission workflow.
         /// </summary>
-        public void PublishPackage()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task PublishPackage()
         {
             var result = this.ViewModel.Publish();
 
             if (result.IsSuccess)
             {
-                this.ToastService.Success($"Package {this.ViewModel.Metadata.PackageName} v{this.ViewModel.Metadata.Version} published successfully.", "Published");
+                var scope = this.ViewModel.Metadata.Scope;
+                var packageName = this.ViewModel.Metadata.PackageName;
+                var version = this.ViewModel.Metadata.Version;
 
-                // TODO: Redirect the user to the my-packages page in the future.
-                this.NavigationManager.NavigateTo(PageRoutes.Home);
+                var parameters = new Dictionary<string, object>
+                {
+                    { nameof(PublishedToForgeDialog.Scope), scope },
+                    { nameof(PublishedToForgeDialog.PackageName), packageName },
+                    { nameof(PublishedToForgeDialog.Version), version }
+                };
+
+                var options = new DialogOpenOptions
+                {
+                    ShowClose = false,
+                    Size = DialogSize.Small
+                };
+
+                await this.DialogService.OpenAsync<PublishedToForgeDialog>(parameters, options);
             }
             else
             {
