@@ -20,7 +20,7 @@ namespace Mycelium.Forge.Components.Pages.ApiKeys
     using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.ApiKeys.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.ApiKeys;
 
     /// <summary>
     /// Represents the API keys management page, allowing users to view, create, and revoke

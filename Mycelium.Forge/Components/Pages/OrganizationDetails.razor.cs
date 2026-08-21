@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Pages
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.OrganizationDetails;
 
     /// <summary>
     /// Represents the organization publisher profile and packages view of the Mycelium Forge registry.

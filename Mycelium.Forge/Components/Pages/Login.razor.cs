@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Components.Pages
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.Login;
 
     /// <summary>
     /// Represents the user authentication and sign-in page of the Mycelium Forge registry.

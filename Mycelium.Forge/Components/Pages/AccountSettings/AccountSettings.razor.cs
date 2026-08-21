@@ -21,7 +21,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
     using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.AccountSettings;
 
     /// <summary>
     /// Represents the user account settings and profile configuration view of the Mycelium Forge registry.

@@ -14,7 +14,7 @@ namespace Mycelium.Forge.Components.Pages
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Package;
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.Packages;
 
     /// <summary>
     /// Represents the package discovery and facet filtering page of the Mycelium Forge registry.

@@ -10,7 +10,8 @@
 namespace Mycelium.Forge.Components.Pages.Documentation.CoreConcepts
 {
     using Microsoft.AspNetCore.Components;
-    using Mycelium.Forge.ViewModels;
+
+    using Mycelium.Forge.ViewModels.Documentation;
 
     /// <summary>
     /// Code-behind logic for the Packages and kpar format documentation topic page.

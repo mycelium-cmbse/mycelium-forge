@@ -13,7 +13,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Package;
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.PackageSettings;
 
     /// <summary>
     /// Represents the package settings and governance management view of the Mycelium Forge registry.

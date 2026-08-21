@@ -10,11 +10,12 @@
 namespace Mycelium.Forge.Components.Pages
 {
     using BlazorBlueprint.Components;
+
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Package;
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.MyPackages;
 
     /// <summary>
     /// Represents the My Packages page, which lists all packages owned or maintained

@@ -13,7 +13,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Organization;
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.OrganizationSettings;
 
     /// <summary>
     /// Represents the organization settings, membership administration, and scope management view of the Mycelium Forge

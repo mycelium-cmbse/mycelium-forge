@@ -19,6 +19,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
     using Mycelium.Forge.Components.Pages.PackageDetails.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.PackageDetails;
 
     /// <summary>
     /// Represents the package details and release overview page for Mycelium Forge packages.

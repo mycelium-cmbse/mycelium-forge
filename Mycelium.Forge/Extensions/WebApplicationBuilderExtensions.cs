@@ -12,6 +12,21 @@ namespace Mycelium.Forge.Extensions
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.AccountSettings;
+    using Mycelium.Forge.ViewModels.AdminAccounts;
+    using Mycelium.Forge.ViewModels.ApiKeys;
+    using Mycelium.Forge.ViewModels.Documentation;
+    using Mycelium.Forge.ViewModels.Home;
+    using Mycelium.Forge.ViewModels.Login;
+    using Mycelium.Forge.ViewModels.MyPackages;
+    using Mycelium.Forge.ViewModels.OrganizationDetails;
+    using Mycelium.Forge.ViewModels.OrganizationSettings;
+    using Mycelium.Forge.ViewModels.PackageDetails;
+    using Mycelium.Forge.ViewModels.Packages;
+    using Mycelium.Forge.ViewModels.PackageSettings;
+    using Mycelium.Forge.ViewModels.Publish;
+    using Mycelium.Forge.ViewModels.SignUp;
+    using Mycelium.Forge.ViewModels.VerifyEmail;
 
     /// <summary>
     /// Provides extension methods for <see cref="WebApplicationBuilder" /> to configure application dependencies.

@@ -10,7 +10,8 @@
 namespace Mycelium.Forge.Components.Pages.Documentation
 {
     using Microsoft.AspNetCore.Components;
-    using Mycelium.Forge.ViewModels;
+
+    using Mycelium.Forge.ViewModels.Documentation;
 
     /// <summary>
     /// Code-behind logic for the Mycelium Forge documentation overview and index page.

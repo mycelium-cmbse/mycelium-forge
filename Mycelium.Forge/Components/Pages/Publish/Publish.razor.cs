@@ -25,6 +25,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.Publish;
 
     /// <summary>
     /// Represents the package publishing wizard page of the Mycelium Forge registry.

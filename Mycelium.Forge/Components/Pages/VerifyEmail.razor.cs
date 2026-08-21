@@ -15,6 +15,7 @@ namespace Mycelium.Forge.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.VerifyEmail;
 
     /// <summary>
     /// Represents the user email verification page of the Mycelium Forge registry.

@@ -14,7 +14,7 @@ namespace Mycelium.Forge.Components.Pages
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Admin;
-    using Mycelium.Forge.ViewModels;
+    using Mycelium.Forge.ViewModels.AdminAccounts;
 
     /// <summary>
     /// Code-behind logic for the installation administration accounts management page.
