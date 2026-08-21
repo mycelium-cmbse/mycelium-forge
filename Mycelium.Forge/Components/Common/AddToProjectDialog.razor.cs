@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Components.Common
 
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.Models.DialogResults;
 
@@ -60,20 +61,45 @@ namespace Mycelium.Forge.Components.Common
         public EventCallback OnCancel { get; set; }
 
         /// <summary>
+        /// Gets the validation manager instance handling field validation states.
+        /// </summary>
+        public ValidationManager ValidationManager { get; } = new ValidationManager();
+
+        /// <summary>
         /// Gets or sets the currently selected destination project.
         /// </summary>
-        private string SelectedProject { get; set; } = "Spacecraft Mission";
+        public string SelectedProject { get; set; } = "Spacecraft Mission";
 
         /// <summary>
         /// Gets or sets the version constraint expression.
         /// </summary>
-        private string VersionConstraint { get; set; } = "^1.2.0";
+        public string VersionConstraint { get; set; } = "^1.2.0";
+
+        /// <summary>
+        /// Handles changes to the selected project value.
+        /// </summary>
+        /// <param name="value">The newly selected project.</param>
+        public void OnProjectChanged(string value)
+        {
+            this.SelectedProject = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.SelectedProject));
+        }
+
+        /// <summary>
+        /// Handles changes to the version constraint input value.
+        /// </summary>
+        /// <param name="value">The new version constraint expression.</param>
+        public void OnVersionConstraintChanged(string value)
+        {
+            this.VersionConstraint = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.VersionConstraint));
+        }
 
         /// <summary>
         /// Handles the cancel action, cancelling the dialog and invoking the cancel callback.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnCancelClicked()
+        public async Task OnCancelClicked()
         {
             await this.OnCancel.InvokeAsync();
 
@@ -84,11 +110,21 @@ namespace Mycelium.Forge.Components.Common
         }
 
         /// <summary>
-        /// Handles the add dependency action, emitting the selected project and version constraint before closing.
+        /// Handles the add dependency action, validating and emitting the selected project and version constraint before closing.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnAddDependencyClicked()
+        public async Task OnAddDependencyClicked()
         {
+            var isValid = this.ValidationManager
+                .Check(nameof(this.SelectedProject), !string.IsNullOrWhiteSpace(this.SelectedProject), "Project selection is required.")
+                .Check(nameof(this.VersionConstraint), !string.IsNullOrWhiteSpace(this.VersionConstraint), "Version constraint is required.")
+                .IsValid;
+
+            if (!isValid)
+            {
+                return;
+            }
+
             var result = new AddToProjectResult
             {
                 ProjectName = this.SelectedProject,
@@ -116,10 +152,7 @@ namespace Mycelium.Forge.Components.Common
                 this.VersionConstraint = $"^{cleanVersion}";
             }
 
-            if (this.Projects.Count > 0)
-            {
-                this.SelectedProject = this.Projects[0];
-            }
+            this.SelectedProject = this.Projects[0];
         }
     }
 }

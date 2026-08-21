@@ -40,14 +40,9 @@ namespace Mycelium.Forge.Components.Pages
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
-        /// Gets or sets the validation error message for the email field.
+        /// Gets the validation manager instance handling field validation states.
         /// </summary>
-        public string EmailError { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the validation error message for the password field.
-        /// </summary>
-        public string PasswordError { get; set; } = string.Empty;
+        public ValidationManager ValidationManager { get; } = new ValidationManager();
 
         /// <summary>
         /// Handles changes to the email input value.
@@ -56,7 +51,7 @@ namespace Mycelium.Forge.Components.Pages
         public void OnEmailChanged(string email)
         {
             this.ViewModel.Email = email ?? string.Empty;
-            this.EmailError = string.Empty;
+            this.ValidationManager.ClearError(nameof(this.ViewModel.Email));
         }
 
         /// <summary>
@@ -66,7 +61,7 @@ namespace Mycelium.Forge.Components.Pages
         public void OnPasswordChanged(string password)
         {
             this.ViewModel.Password = password ?? string.Empty;
-            this.PasswordError = string.Empty;
+            this.ValidationManager.ClearError(nameof(this.ViewModel.Password));
         }
 
         /// <summary>
@@ -74,10 +69,12 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         public void OnLogin()
         {
-            this.EmailError = string.IsNullOrWhiteSpace(this.ViewModel.Email) ? "Email address is required." : string.Empty;
-            this.PasswordError = string.IsNullOrWhiteSpace(this.ViewModel.Password) ? "Password is required." : string.Empty;
+            var isValid = this.ValidationManager
+                .Check(nameof(this.ViewModel.Email), !string.IsNullOrWhiteSpace(this.ViewModel.Email), "Email address is required.")
+                .Check(nameof(this.ViewModel.Password), !string.IsNullOrWhiteSpace(this.ViewModel.Password), "Password is required.")
+                .IsValid;
 
-            if (!string.IsNullOrEmpty(this.EmailError) || !string.IsNullOrEmpty(this.PasswordError))
+            if (!isValid)
             {
                 return;
             }

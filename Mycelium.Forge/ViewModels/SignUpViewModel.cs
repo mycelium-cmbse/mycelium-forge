@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SignUpViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -53,21 +53,6 @@ namespace Mycelium.Forge.ViewModels
         /// <returns>A <see cref="Result" /> indicating success or failure of the registration operation.</returns>
         public Result SignUp()
         {
-            if (string.IsNullOrWhiteSpace(this.Username))
-            {
-                return Result.Fail("Username is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(this.Email))
-            {
-                return Result.Fail("Email address is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(this.Password))
-            {
-                return Result.Fail("Password is required.");
-            }
-
             this.IsSubmitting = true;
             this.IsSubmitting = false;
 

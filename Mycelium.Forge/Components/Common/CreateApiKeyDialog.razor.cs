@@ -13,6 +13,7 @@ namespace Mycelium.Forge.Components.Common
 
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models;
     using Mycelium.Forge.Models.DialogResults;
 
@@ -65,29 +66,34 @@ namespace Mycelium.Forge.Components.Common
         public EventCallback OnCancel { get; set; }
 
         /// <summary>
+        /// Gets the validation manager instance handling field validation states.
+        /// </summary>
+        public ValidationManager ValidationManager { get; } = new ValidationManager();
+
+        /// <summary>
         /// Gets or sets the name for the new API key.
         /// </summary>
-        private string KeyName { get; set; } = string.Empty;
+        public string KeyName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the currently selected scope for the API key.
         /// </summary>
-        private string SelectedScope { get; set; } = "@starion";
+        public string SelectedScope { get; set; } = "@starion";
 
         /// <summary>
         /// Gets or sets the list of available expiration duration option keys.
         /// </summary>
-        private IReadOnlyList<string> ExpirationOptionKeys { get; set; } = [.. ExpirationOptions.Keys];
+        public IReadOnlyList<string> ExpirationOptionKeys { get; set; } = [.. ExpirationOptions.Keys];
 
         /// <summary>
         /// Gets or sets the currently selected expiration duration option.
         /// </summary>
-        private string SelectedExpiration { get; set; } = ExpirationOptions.Keys.FirstOrDefault();
+        public string SelectedExpiration { get; set; } = ExpirationOptions.Keys.FirstOrDefault();
 
         /// <summary>
         /// Gets or sets the list of permission configuration options for the new API key.
         /// </summary>
-        private List<ApiKeyPermissionModel> Permissions { get; set; } =
+        public List<ApiKeyPermissionModel> Permissions { get; set; } =
         [
             new()
             {
@@ -110,6 +116,26 @@ namespace Mycelium.Forge.Components.Common
         ];
 
         /// <summary>
+        /// Handles changes to the key name input value.
+        /// </summary>
+        /// <param name="value">The new key name.</param>
+        public void OnKeyNameChanged(string value)
+        {
+            this.KeyName = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.KeyName));
+        }
+
+        /// <summary>
+        /// Handles changes to the selected scope value.
+        /// </summary>
+        /// <param name="value">The newly selected scope.</param>
+        public void OnScopeChanged(string value)
+        {
+            this.SelectedScope = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.SelectedScope));
+        }
+
+        /// <summary>
         /// Initializes default values based on passed parameters when component parameters are initialized.
         /// </summary>
         protected override void OnInitialized()
@@ -122,7 +148,7 @@ namespace Mycelium.Forge.Components.Common
         /// Handles the cancel action, cancelling the dialog and invoking the cancel callback.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnCancelClicked()
+        public async Task OnCancelClicked()
         {
             await this.OnCancel.InvokeAsync();
 
@@ -133,11 +159,21 @@ namespace Mycelium.Forge.Components.Common
         }
 
         /// <summary>
-        /// Handles the create key action, emitting the configured API key details before closing.
+        /// Handles the create key action, validating and emitting the configured API key details before closing.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnCreateKeyClicked()
+        public async Task OnCreateKeyClicked()
         {
+            var isValid = this.ValidationManager
+                .Check(nameof(this.KeyName), !string.IsNullOrWhiteSpace(this.KeyName), "Key name is required.")
+                .Check(nameof(this.SelectedScope), !string.IsNullOrWhiteSpace(this.SelectedScope), "Scope selection is required.")
+                .IsValid;
+
+            if (!isValid)
+            {
+                return;
+            }
+
             var duration = ExpirationOptions.TryGetValue(this.SelectedExpiration, out var timespan)
                 ? timespan
                 : TimeSpan.FromDays(180);
@@ -148,7 +184,7 @@ namespace Mycelium.Forge.Components.Common
 
             var result = new CreateApiKeyResult
             {
-                KeyName = string.IsNullOrWhiteSpace(this.KeyName) ? "api-key" : this.KeyName.Trim(),
+                KeyName = this.KeyName.Trim(),
                 Scope = this.SelectedScope,
                 Permissions = this.Permissions,
                 Expiration = this.SelectedExpiration,

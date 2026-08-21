@@ -60,18 +60,13 @@ namespace Mycelium.Forge.ViewModels
         /// <returns>A <see cref="Result" /> indicating the success or failure of the operation.</returns>
         public Result CreateOrganization(CreateOrganizationResult result)
         {
-            if (result == null || string.IsNullOrWhiteSpace(result.OrganizationName))
-            {
-                return Result.Fail("Organization name is required.");
-            }
-
             var cleanScope = result.Scope?.TrimStart('@').ToLowerInvariant() ?? string.Empty;
 
             var org = new Organization
             {
-                Name = result.OrganizationName,
+                Name = result.OrganizationName ?? string.Empty,
                 ShortName = cleanScope,
-                BillingEmail = result.BillingEmail
+                BillingEmail = result.BillingEmail ?? string.Empty
             };
 
             var membership = new AccountOrganizationMembershipModel(org, OrganizationInvitationKind.ADMINISTRATOR);

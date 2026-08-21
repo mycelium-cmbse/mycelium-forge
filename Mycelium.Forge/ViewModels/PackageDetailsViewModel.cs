@@ -170,11 +170,6 @@ namespace Mycelium.Forge.ViewModels
         /// <returns>A <see cref="Result" /> indicating the success or failure of the migration initiation.</returns>
         public Result MigrateInBloom(MigrateInBloomResult result)
         {
-            if (result == null || string.IsNullOrWhiteSpace(result.ProjectName))
-            {
-                return Result.Fail("Project name is required.");
-            }
-
             return Result.Ok();
         }
     }

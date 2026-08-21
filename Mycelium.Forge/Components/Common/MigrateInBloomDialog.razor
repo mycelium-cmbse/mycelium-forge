@@ -1,27 +1,35 @@
 <div class="flex flex-col gap-4 px-6 py-3">
-    <BbField Class="w-full flex flex-col gap-1.5">
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(this.SelectedProject)))">
         <BbFieldLabel For="migrate-in-bloom-project-select"
                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             PROJECT
         </BbFieldLabel>
         <BbFieldContent>
             <ForgeSelect TValue="string"
-                         @bind-Value="this.SelectedProject"
+                         Value="@(this.SelectedProject)"
+                         ValueChanged="@(this.OnProjectChanged)"
                          Items="@(this.Projects)"
                          Id="migrate-in-bloom-project-select" />
         </BbFieldContent>
+        <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                     Errors="@(this.ValidationManager[nameof(this.SelectedProject)])" />
     </BbField>
 
-    <BbField Class="w-full flex flex-col gap-1.5">
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(this.VersionConstraint)))">
         <BbFieldLabel For="migrate-in-bloom-version-constraint"
                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             VERSION CONSTRAINT
         </BbFieldLabel>
         <BbFieldContent>
             <BbInput Id="migrate-in-bloom-version-constraint"
-                     @bind-Value="this.VersionConstraint"
+                     Value="@(this.VersionConstraint)"
+                     ValueChanged="@(this.OnVersionConstraintChanged)"
                      Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
         </BbFieldContent>
+        <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                     Errors="@(this.ValidationManager[nameof(this.VersionConstraint)])" />
     </BbField>
 
     <ForgeAlert Variant="ForgeAlertVariant.Secondary"

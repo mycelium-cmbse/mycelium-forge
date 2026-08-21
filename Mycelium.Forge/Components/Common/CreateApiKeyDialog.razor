@@ -1,28 +1,36 @@
 <div class="flex flex-col gap-4 px-6 py-3">
-    <BbField Class="w-full flex flex-col gap-1.5">
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(this.KeyName)))">
         <BbFieldLabel For="create-api-key-name"
                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             KEY NAME
         </BbFieldLabel>
         <BbFieldContent>
             <BbInput Id="create-api-key-name"
-                     @bind-Value="this.KeyName"
+                     Value="@(this.KeyName)"
+                     ValueChanged="@(this.OnKeyNameChanged)"
                      Placeholder="e.g. ci-publish or deploy-runner"
                      Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none" />
         </BbFieldContent>
+        <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                     Errors="@(this.ValidationManager[nameof(this.KeyName)])" />
     </BbField>
 
-    <BbField Class="w-full flex flex-col gap-1.5">
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(this.SelectedScope)))">
         <BbFieldLabel For="create-api-key-scope"
                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             SCOPE
         </BbFieldLabel>
         <BbFieldContent>
             <ForgeSelect TValue="string"
-                         @bind-Value="this.SelectedScope"
+                         Value="@(this.SelectedScope)"
+                         ValueChanged="@(this.OnScopeChanged)"
                          Items="@(this.Scopes)"
                          Id="create-api-key-scope" />
         </BbFieldContent>
+        <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                     Errors="@(this.ValidationManager[nameof(this.SelectedScope)])" />
     </BbField>
 
     <BbField Class="w-full flex flex-col gap-2">

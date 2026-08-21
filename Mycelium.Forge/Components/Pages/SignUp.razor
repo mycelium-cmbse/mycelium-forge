@@ -19,7 +19,7 @@
         </div>
 
         <BbField Class="flex flex-col gap-1.5 w-full"
-                 IsInvalid="@(!string.IsNullOrEmpty(this.UsernameError))">
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Username)))">
             <BbFieldLabel For="signup-username"
                           Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 USERNAME
@@ -32,16 +32,12 @@
                          Placeholder="e.g. r.andre"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            @if (!string.IsNullOrEmpty(this.UsernameError))
-            {
-                <BbFieldError Class="text-2xs leading-3xs text-destructive">
-                    @(this.UsernameError)
-                </BbFieldError>
-            }
+            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                         Errors="@(this.ValidationManager[nameof(this.ViewModel.Username)])" />
         </BbField>
 
         <BbField Class="flex flex-col gap-1.5 w-full"
-                 IsInvalid="@(!string.IsNullOrEmpty(this.EmailError))">
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Email)))">
             <BbFieldLabel For="signup-email"
                           Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 EMAIL
@@ -54,13 +50,9 @@
                          Placeholder="e.g. name@organisation.eu"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            @if (!string.IsNullOrEmpty(this.EmailError))
-            {
-                <BbFieldError Class="text-2xs leading-3xs text-destructive">
-                    @(this.EmailError)
-                </BbFieldError>
-            }
-            else
+            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                         Errors="@(this.ValidationManager[nameof(this.ViewModel.Email)])" />
+            @if (!this.ValidationManager.HasError(nameof(this.ViewModel.Email)))
             {
                 <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
                     Installation-unique username and a verified email address are required.
@@ -69,7 +61,7 @@
         </BbField>
 
         <BbField Class="flex flex-col gap-1.5 w-full"
-                 IsInvalid="@(!string.IsNullOrEmpty(this.PasswordError))">
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Password)))">
             <BbFieldLabel For="signup-password"
                           Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 PASSWORD
@@ -82,12 +74,8 @@
                          Placeholder="••••••••"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            @if (!string.IsNullOrEmpty(this.PasswordError))
-            {
-                <BbFieldError Class="text-2xs leading-3xs text-destructive">
-                    @(this.PasswordError)
-                </BbFieldError>
-            }
+            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                         Errors="@(this.ValidationManager[nameof(this.ViewModel.Password)])" />
         </BbField>
 
         <BbButton Variant="ButtonVariant.Default"
