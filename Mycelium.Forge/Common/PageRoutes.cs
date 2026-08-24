@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PageRoutes.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -95,22 +95,6 @@ namespace Mycelium.Forge.Common
         public const string Accounts = "/admin/accounts";
 
         /// <summary>
-        /// Contains route constants for documentation pages.
-        /// </summary>
-        public static class Documentation
-        {
-            /// <summary>
-            /// The documentation overview page route path.
-            /// </summary>
-            public const string Overview = "/docs";
-
-            /// <summary>
-            /// The documentation packages and kpar format page route path.
-            /// </summary>
-            public const string PackagesAndKparFormat = "/docs/packages-and-the-kpar-format";
-        }
-
-        /// <summary>
         /// Generates the relative URL for the package details page.
         /// </summary>
         /// <param name="organization">The organization scope or publisher name.</param>
@@ -154,6 +138,22 @@ namespace Mycelium.Forge.Common
         {
             var cleanId = (id ?? string.Empty).TrimStart('@');
             return $"/organizations/{cleanId}/settings";
+        }
+
+        /// <summary>
+        /// Contains route constants for documentation pages.
+        /// </summary>
+        public static class Documentation
+        {
+            /// <summary>
+            /// The documentation overview page route path.
+            /// </summary>
+            public const string Overview = "/docs";
+
+            /// <summary>
+            /// The documentation packages and kpar format page route path.
+            /// </summary>
+            public const string PackagesAndKparFormat = "/docs/packages-and-the-kpar-format";
         }
     }
 }

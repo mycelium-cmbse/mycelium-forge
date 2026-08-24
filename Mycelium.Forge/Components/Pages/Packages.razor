@@ -25,7 +25,7 @@
                 <div class="flex items-center gap-2 h-4 select-none">
                     <BbCheckbox Checked="@(this.IncludePrereleases)"
                                 CheckedChanged="@(this.OnIncludePrereleasesChanged)"
-                                Id="include-prereleases"
+                                id="include-prereleases"
                                 Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0"/>
                     <BbLabel For="include-prereleases"
                              Class="text-sm leading-xs font-normal text-secondary-text hover:text-foreground cursor-pointer transition-colors">
@@ -52,7 +52,7 @@
                                      class="flex flex-row items-center gap-2 w-full select-none">
                                     <BbCheckbox Checked="@(item.IsChecked)"
                                                 CheckedChanged="@(_ => this.ToggleFacet(item))"
-                                                Id="@facetId"
+                                                id="@facetId"
                                                 Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0"/>
                                     <BbLabel For="@facetId"
                                              Class="@(GetFacetLabelClass(item))">
@@ -68,14 +68,16 @@
                 }
 
                 <div class="flex items-center gap-2 w-full pt-1">
-                    <BbButton Variant="ButtonVariant.Default"
+                    <BbButton id="packages-apply-filters-button"
+                              Variant="ButtonVariant.Default"
                               Size="ButtonSize.Small"
                               Type="ButtonType.Button"
                               OnClick="@(this.ApplyFilters)"
                               Class="flex-1 font-semibold">
                         Apply filters
                     </BbButton>
-                    <BbButton Variant="ButtonVariant.Outline"
+                    <BbButton id="packages-reset-filters-button"
+                              Variant="ButtonVariant.Outline"
                               Size="ButtonSize.Small"
                               Type="ButtonType.Button"
                               OnClick="@(this.ResetFilters)">
@@ -107,7 +109,8 @@
                         <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-xl">
                             Nothing matches your search. Try different keywords, or clear the filters and browse everything.
                         </p>
-                        <BbButton Variant="ButtonVariant.Default"
+                        <BbButton id="packages-browse-all-button"
+                                  Variant="ButtonVariant.Default"
                                   Type="ButtonType.Button"
                                   OnClick="@(this.BrowseAllPackages)"
                                   Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-17 font-semibold transition-colors mt-0.5">

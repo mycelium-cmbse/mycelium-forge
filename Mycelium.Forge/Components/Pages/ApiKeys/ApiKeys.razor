@@ -13,7 +13,8 @@
                     Tokens for publishing from the CLI or CI. Read access to public packages requires no key.
                 </p>
             </div>
-            <BbButton Variant="ButtonVariant.Default"
+            <BbButton id="api-keys-create-key-button"
+                      Variant="ButtonVariant.Default"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnCreateKey)"
                       Class="shrink-0">
@@ -97,7 +98,7 @@
                                 <BbTableCell Class="w-[90px] shrink-0 p-0 text-left">
                                     <BbButton Variant="ButtonVariant.Link"
                                               OnClick="() => this.OnRevokeKey(key.Id)"
-                                              Class="text-destructive">
+                                              Class="revoke-api-key-button text-destructive">
                                         Revoke
                                     </BbButton>
                                 </BbTableCell>

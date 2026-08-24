@@ -24,7 +24,7 @@
                 USERNAME
             </BbFieldLabel>
             <BbFieldContent>
-                <BbInput Id="signup-username"
+                <BbInput id="signup-username"
                          Type="InputType.Text"
                          Value="@(this.ViewModel.Username)"
                          ValueChanged="@(this.OnUsernameChanged)"
@@ -42,7 +42,7 @@
                 EMAIL
             </BbFieldLabel>
             <BbFieldContent>
-                <BbInput Id="signup-email"
+                <BbInput id="signup-email"
                          Type="InputType.Email"
                          Value="@(this.ViewModel.Email)"
                          ValueChanged="@(this.OnEmailChanged)"
@@ -66,7 +66,7 @@
                 PASSWORD
             </BbFieldLabel>
             <BbFieldContent>
-                <BbInput Id="signup-password"
+                <BbInput id="signup-password"
                          Type="InputType.Password"
                          Value="@(this.ViewModel.Password)"
                          ValueChanged="@(this.OnPasswordChanged)"
@@ -77,7 +77,8 @@
                           Errors="@(this.ValidationManager[nameof(this.ViewModel.Password)])"/>
         </BbField>
 
-        <BbButton Variant="ButtonVariant.Default"
+        <BbButton id="signup-create-account-button"
+                  Variant="ButtonVariant.Default"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCreateAccount)"
                   Class="w-full">
@@ -93,7 +94,8 @@
             <div class="flex-1 h-px bg-border"></div>
         </div>
 
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="signup-sso-button"
+                  Variant="ButtonVariant.Outline"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnContinueWithSso)"
                   Class="w-full">

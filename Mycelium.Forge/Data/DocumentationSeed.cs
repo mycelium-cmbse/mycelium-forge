@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationSeed.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,12 +9,15 @@
 
 namespace Mycelium.Forge.Data
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Documentation;
 
     /// <summary>
     /// Provides centralized seed data for the documentation navigation and content structure.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class DocumentationSeed
     {
         /// <summary>

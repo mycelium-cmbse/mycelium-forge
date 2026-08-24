@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Data
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Admin;
     using Mycelium.Forge.Models.Organization;
@@ -17,6 +19,7 @@ namespace Mycelium.Forge.Data
     /// <summary>
     /// Provides centralized seed data and mock models for registry entities.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class SeedData
     {
         static SeedData()

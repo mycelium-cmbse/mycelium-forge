@@ -1,4 +1,4 @@
-@attribute [Route(PageRoutes.PackageSettings)]
+﻿@attribute [Route(PageRoutes.PackageSettings)]
 @rendermode InteractiveServer
 
 @if (this.ViewModel.Package == null)
@@ -56,7 +56,8 @@
         <h2 class="text-lg leading-lg font-semibold text-foreground flex-1">
             Maintainers
         </h2>
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="package-settings-add-maintainer-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnAddMaintainer)"
@@ -100,7 +101,7 @@
                           Size="ButtonSize.IconSmall"
                           OnClick="() => this.OnMaintainerMenu(maintainer)"
                           AriaLabel="Options"
-                          Class="shrink-0">
+                          Class="package-maintainer-menu-button shrink-0">
                     <LucideIcon Name="ellipsis-vertical"
                                 Size="18"
                                 Class="text-muted-foreground shrink-0"/>
@@ -251,7 +252,8 @@
                 @if (version.IsUnlisted)
                 {
                     <BbButton Variant="ButtonVariant.Link"
-                              OnClick="() => this.OnRelistVersion(version)">
+                              OnClick="() => this.OnRelistVersion(version)"
+                              Class="package-relist-version-button">
                         Relist
                     </BbButton>
                 }
@@ -259,13 +261,13 @@
                 {
                     <BbButton Variant="ButtonVariant.Link"
                               OnClick="() => this.OnUnlistVersion(version)"
-                              Class="text-secondary-text hover:text-foreground">
+                              Class="package-unlist-version-button text-secondary-text hover:text-foreground">
                         Unlist
                     </BbButton>
 
                     <BbButton Variant="ButtonVariant.Link"
                               OnClick="() => this.OnDeprecateVersion(version)"
-                              Class="text-secondary-text hover:text-foreground">
+                              Class="package-deprecate-version-button text-secondary-text hover:text-foreground">
                         Deprecate
                     </BbButton>
                 }
@@ -289,7 +291,8 @@
             </span>
         </div>
 
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="package-settings-transfer-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnTransferOwnership)"

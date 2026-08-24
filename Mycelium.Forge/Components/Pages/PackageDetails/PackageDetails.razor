@@ -1,4 +1,4 @@
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @attribute [Route(PageRoutes.Package)]
 @rendermode InteractiveServer
 
@@ -75,7 +75,8 @@
         </p>
 
         <div class="flex items-center gap-3 pt-1">
-            <BbButton Variant="ButtonVariant.Default"
+            <BbButton id="package-details-add-to-project-button"
+                      Variant="ButtonVariant.Default"
                       Type="ButtonType.Button"
                       OnClick="@(this.OpenAddToProjectDialog)">
                 <LucideIcon Name="plus"
@@ -86,7 +87,8 @@
 
             @if (this.IsUserAdmin)
             {
-                <BbButton Variant="ButtonVariant.Default"
+                <BbButton id="package-details-migrate-in-bloom-button"
+                          Variant="ButtonVariant.Default"
                           Type="ButtonType.Button"
                           OnClick="@(this.OpenMigrateInBloomDialog)">
                     <LucideIcon Name="external-link"

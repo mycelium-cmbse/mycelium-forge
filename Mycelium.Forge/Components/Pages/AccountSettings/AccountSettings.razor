@@ -47,7 +47,8 @@
             <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
                 @(this.ViewModel.Profile.Username)
             </span>
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton id="account-settings-change-username-button"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnChangeUsername)"
@@ -70,7 +71,8 @@
                     Verified
                 </BbBadge>
             }
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton id="account-settings-change-email-button"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnChangeEmail)"
@@ -86,7 +88,8 @@
             <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
                 @(this.ViewModel.Profile.DisplayName)
             </span>
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton id="account-settings-edit-displayname-button"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditDisplayName)"
@@ -102,7 +105,8 @@
             <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
                 @(this.ViewModel.Profile.Company)
             </span>
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton id="account-settings-edit-company-button"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditCompany)"
@@ -118,9 +122,10 @@
             <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
                 @(this.ViewModel.Profile.Location)
             </span>
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton id="account-settings-edit-location-button"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
-                      Type="ButtonType.Button"
+                              TyForgeSelect.razor.cspe="ButtonType.Button"
                       OnClick="@(this.OnEditLocation)"
                       Class="button-sm">
                 Edit
@@ -134,7 +139,8 @@
             <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
                 @(this.ViewModel.Profile.Website)
             </span>
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton id="account-settings-edit-website-button"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditWebsite)"
@@ -150,7 +156,8 @@
             <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
                 @(this.ViewModel.Profile.Biography)
             </span>
-            <BbButton Variant="ButtonVariant.Outline"
+            <BbButton id="account-settings-edit-biography-button"
+                      Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
                       Type="ButtonType.Button"
                       OnClick="@(this.OnEditBiography)"
@@ -166,7 +173,8 @@
         <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
             ORGANIZATIONS
         </span>
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="account-settings-transfer-org-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCreateOrganization)"
@@ -219,7 +227,8 @@
             </span>
         </div>
 
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="account-settings-deactivate-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnDeactivateAccount)"
@@ -238,7 +247,8 @@
             </span>
         </div>
 
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="account-settings-delete-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnDeleteAccount)"

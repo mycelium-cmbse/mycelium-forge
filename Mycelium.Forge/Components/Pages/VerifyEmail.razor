@@ -50,7 +50,8 @@
             </div>
         </div>
 
-        <BbButton Variant="ButtonVariant.Default"
+        <BbButton id="verify-email-resend-button"
+                  Variant="ButtonVariant.Default"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnSendEmail)"
                   Disabled="@(this.ViewModel.IsSending)"

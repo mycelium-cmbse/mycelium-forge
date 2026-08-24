@@ -1,4 +1,4 @@
-<header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
+﻿<header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
     <div class="flex items-center gap-2.5">
         <ForgeLogo/>
     </div>
@@ -53,15 +53,15 @@
                 </ItemTemplate>
             </ForgeSelect>
         }
-            <button type="button"
-                    class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
-                    title="@(this.ThemeService.IsDarkMode ? "Switch to light mode" : "Switch to dark mode")"
-                    aria-label="Toggle visual theme"
-                    @onclick="this.ToggleDarkMode">
-                <LucideIcon Name="@(this.ThemeService.IsDarkMode ? "sun" : "moon")"
-                            Size="18"
-                            Class="shrink-0"/>
-            </button>
+        <button type="button"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
+                title="@(this.ThemeService.IsDarkMode ? "Switch to light mode" : "Switch to dark mode")"
+                aria-label="Toggle visual theme"
+                @onclick="this.ToggleDarkMode">
+            <LucideIcon Name="@(this.ThemeService.IsDarkMode ? "sun" : "moon")"
+                        Size="18"
+                        Class="shrink-0"/>
+        </button>
 
         @if (this.IsLoggedIn)
         {

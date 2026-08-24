@@ -80,7 +80,7 @@
                              Value="@(this.ViewModel.Metadata.Scope)"
                              ValueChanged="@(this.OnScopeChanged)"
                              Items="@(this.ViewModel.ScopeOptions)"
-                             Id="publish-scope">
+                             id="publish-scope">
                     <TriggerContent>
                         <div class="flex items-center gap-1.5 truncate">
                             <span>@(this.ViewModel.Metadata.Scope)</span>
@@ -105,7 +105,7 @@
                 PACKAGE NAME
             </BbFieldLabel>
             <BbFieldContent>
-                <BbInput Id="publish-package-name"
+                <BbInput id="publish-package-name"
                          Value="@(this.ViewModel.Metadata.PackageName)"
                          ValueChanged="@(this.OnPackageNameChanged)"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
@@ -119,7 +119,7 @@
             VERSION
         </BbFieldLabel>
         <BbFieldContent>
-            <BbInput Id="publish-version"
+            <BbInput id="publish-version"
                      Value="@(this.ViewModel.Metadata.Version)"
                      ValueChanged="@(this.OnVersionChanged)"
                      Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
@@ -135,7 +135,7 @@
             DESCRIPTION
         </BbFieldLabel>
         <BbFieldContent>
-            <BbTextarea Id="publish-description"
+            <BbTextarea id="publish-description"
                         Value="@(this.ViewModel.Metadata.Description)"
                         ValueChanged="@(this.OnDescriptionChanged)"
                         Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
@@ -152,7 +152,7 @@
                          Value="@(this.ViewModel.Metadata.License)"
                          ValueChanged="@(this.OnLicenseChanged)"
                          Items="@(this.ViewModel.LicenseOptions)"
-                         Id="publish-license"/>
+                         id="publish-license"/>
         </BbFieldContent>
     </BbField>
 
@@ -166,7 +166,7 @@
                          Value="@(this.ViewModel.Metadata.Visibility)"
                          ValueChanged="@(this.OnVisibilityChanged)"
                          Items="@(this.ViewModel.VisibilityOptions)"
-                         Id="publish-visibility"
+                         id="publish-visibility"
                          DisplayTextSelector="@(x => x.ToLowerCaseFirst())"/>
         </BbFieldContent>
         <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
@@ -184,7 +184,7 @@
                          Value="@(this.ViewModel.Metadata.Metamodel)"
                          ValueChanged="@(this.OnMetamodelChanged)"
                          Items="@(this.ViewModel.MetamodelOptions)"
-                         Id="publish-metamodel"/>
+                         id="publish-metamodel"/>
         </BbFieldContent>
     </BbField>
 
@@ -194,7 +194,7 @@
             TAGS
         </BbFieldLabel>
         <BbFieldContent>
-            <BbInput Id="publish-tags"
+            <BbInput id="publish-tags"
                      Value="@(this.ViewModel.Metadata.Tags)"
                      ValueChanged="@(this.OnTagsChanged)"
                      Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
@@ -260,7 +260,8 @@
     <BbButton Variant="ButtonVariant.Default"
               Type="ButtonType.Button"
               OnClick="@(this.PublishPackage)"
-              Class="w-full mt-1">
+              Class="w-full mt-1"
+              id="publish-submit-button">
         <LucideIcon Name="upload"
                     Size="16"
                     Class="shrink-0"/>
