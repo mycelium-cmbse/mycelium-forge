@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IThemeService.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -25,14 +25,22 @@ namespace Mycelium.Forge.Services
         event Action OnChange;
 
         /// <summary>
+        /// Initializes the theme mode from client storage or system preferences.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task InitializeThemeAsync();
+
+        /// <summary>
         /// Toggles between light and dark mode and notifies subscribers.
         /// </summary>
-        void ToggleDarkMode();
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task ToggleDarkMode();
 
         /// <summary>
         /// Sets whether dark mode should be enabled.
         /// </summary>
         /// <param name="isDark">True to enable dark mode, false for light mode.</param>
-        void SetDarkMode(bool isDark);
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task SetDarkMode(bool isDark);
     }
 }

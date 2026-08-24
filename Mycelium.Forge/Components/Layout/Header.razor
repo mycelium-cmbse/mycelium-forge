@@ -1,4 +1,4 @@
-﻿<header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
+<header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
     <div class="flex items-center gap-2.5">
         <ForgeLogo/>
     </div>
@@ -21,7 +21,7 @@
     <div class="flex-1"></div>
 
     <div class="flex items-center gap-3 shrink-0">
-        @if (this.IsDocumentation)
+        @if (this.IsDocumentationPage())
         {
             <ForgeSelect TValue="string"
                          Value="@(this.SelectedLanguage)"
@@ -52,7 +52,7 @@
                     </div>
                 </ItemTemplate>
             </ForgeSelect>
-
+        }
             <button type="button"
                     class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
                     title="@(this.ThemeService.IsDarkMode ? "Switch to light mode" : "Switch to dark mode")"
@@ -62,7 +62,6 @@
                             Size="18"
                             Class="shrink-0"/>
             </button>
-        }
 
         @if (this.IsLoggedIn)
         {

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="JsInterop.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -50,6 +50,25 @@ namespace Mycelium.Forge.Services
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Retrieves the current dark mode preference from local storage or system preferences.
+        /// </summary>
+        /// <returns>A <see cref="Task{Boolean}" /> that is <c>true</c> if dark mode is active, <c>false</c> otherwise.</returns>
+        public Task<bool> GetDarkMode()
+        {
+            return this.jsRuntime.InvokeAsync<bool>("forgeInterop.getDarkMode").AsTask();
+        }
+
+        /// <summary>
+        /// Applies the dark mode setting to the DOM and persists it to local storage.
+        /// </summary>
+        /// <param name="isDark"><c>true</c> to enable dark mode; <c>false</c> for light mode.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public Task SetDarkMode(bool isDark)
+        {
+            return this.jsRuntime.InvokeVoidAsync("forgeInterop.setDarkMode", isDark).AsTask();
         }
     }
 }

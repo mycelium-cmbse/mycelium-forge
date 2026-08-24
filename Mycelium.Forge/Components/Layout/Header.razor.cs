@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -31,12 +31,6 @@ namespace Mycelium.Forge.Components.Layout
         /// </summary>
         [Inject]
         public IThemeService ThemeService { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this header is displayed in documentation mode.
-        /// </summary>
-        [Parameter]
-        public bool IsDocumentation { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is logged in.
@@ -85,9 +79,10 @@ namespace Mycelium.Forge.Components.Layout
         /// <summary>
         /// Toggles between light and dark visual themes.
         /// </summary>
-        public void ToggleDarkMode()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task ToggleDarkMode()
         {
-            this.ThemeService.ToggleDarkMode();
+            await this.ThemeService.ToggleDarkMode();
         }
 
         /// <summary>
@@ -152,6 +147,18 @@ namespace Mycelium.Forge.Components.Layout
         }
 
         /// <summary>
+        /// Checks whether the current page is a documentation page.
+        /// </summary>
+        /// <returns>True if the current page is under the documentation route; otherwise, false.</returns>
+        public bool IsDocumentationPage()
+        {
+            var currentPath = this.NavigationManager.ToBaseRelativePath(this.NavigationManager.Uri);
+            var normalizedDocs = PageRoutes.Documentation.Overview.TrimStart('/');
+
+            return currentPath.StartsWith(normalizedDocs, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         /// Handles changes to the header search input value.
         /// </summary>
         /// <param name="value">The updated search query value.</param>
@@ -168,6 +175,21 @@ namespace Mycelium.Forge.Components.Layout
             base.OnInitialized();
             this.NavigationManager.LocationChanged += this.OnLocationChanged;
             this.ThemeService.OnChange += this.StateHasChanged;
+        }
+
+        /// <summary>
+        /// Synchronizes theme preferences from the client after the first render pass.
+        /// </summary>
+        /// <param name="firstRender">A value indicating whether this is the first render pass.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                await this.ThemeService.InitializeThemeAsync();
+            }
         }
 
         /// <summary>

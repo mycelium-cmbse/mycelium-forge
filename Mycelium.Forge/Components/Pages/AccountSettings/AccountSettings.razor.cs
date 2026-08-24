@@ -131,15 +131,14 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnDeleteAccount()
         {
-            var result = await this.DialogService.ConfirmAsync(
-                "Delete account",
-                "Are you sure you want to delete your account? This action cannot be undone.",
-                new ConfirmDialogOptions
-                {
-                    Destructive = true,
-                    ConfirmText = "Delete",
-                    CancelText = "Cancel"
-                });
+            var options = new ConfirmDialogOptions
+            {
+                Destructive = true,
+                ConfirmText = "Delete",
+                CancelText = "Cancel"
+            };
+
+            var result = await this.DialogService.ConfirmAsync("Delete account", "Are you sure you want to delete your account? This action cannot be undone.", options);
 
             if (result.Confirmed)
             {
