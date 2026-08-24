@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -67,12 +67,11 @@ namespace Mycelium.Forge.Components.Layout
         };
 
         /// <summary>
-        /// Releases unmanaged and managed resources used by the component.
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            this.NavigationManager.LocationChanged -= this.OnLocationChanged;
-            this.ThemeService.OnChange -= this.StateHasChanged;
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -165,6 +164,29 @@ namespace Mycelium.Forge.Components.Layout
         public void OnSearchInputChanged(string value)
         {
             this.SearchQuery = value;
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
+        /// unmanaged resources.
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.NavigationManager != null)
+                {
+                    this.NavigationManager.LocationChanged -= this.OnLocationChanged;
+                }
+
+                if (this.ThemeService != null)
+                {
+                    this.ThemeService.OnChange -= this.StateHasChanged;
+                }
+            }
         }
 
         /// <summary>

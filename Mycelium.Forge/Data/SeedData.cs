@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,6 +22,26 @@ namespace Mycelium.Forge.Data
     [ExcludeFromCodeCoverage]
     public static class SeedData
     {
+        /// <summary>
+        /// Constant label representing verified account status.
+        /// </summary>
+        private const string VerifiedStatus = "Verified";
+
+        /// <summary>
+        /// Constant representing the Starion publisher scope prefix.
+        /// </summary>
+        private const string StarionScope = "@starion";
+
+        /// <summary>
+        /// Constant representing the SysML v2 format name.
+        /// </summary>
+        private const string SysmlV2Format = "SysML v2";
+
+        /// <summary>
+        /// Constant representing version 1.0.0.
+        /// </summary>
+        private const string Version100 = "v1.0.0";
+
         static SeedData()
         {
             RegisAccount = new Account
@@ -33,7 +53,7 @@ namespace Mycelium.Forge.Data
                 Website = "stariongroup.eu",
                 Origin = "Toulouse, France",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 15)
+                CreatedAt = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc)
             };
 
             StefanAccount = new Account
@@ -43,7 +63,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "s.kramer",
                 Email = "stefan.kramer@starion.eu",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 2, 1)
+                CreatedAt = new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
             KleinAccount = new Account
@@ -53,7 +73,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "j.klein",
                 Email = "j.klein@esa.int",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 3, 10)
+                CreatedAt = new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc)
             };
 
             BlancAccount = new Account
@@ -63,7 +83,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "m.blanc",
                 Email = "m.blanc@starion.eu",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 4, 5)
+                CreatedAt = new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc)
             };
 
             NovakAccount = new Account
@@ -73,7 +93,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "a.novak",
                 Email = "a.novak@esa.int",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 5, 20)
+                CreatedAt = new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc)
             };
 
             StarionOrganization = new Organization
@@ -83,7 +103,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "starion",
                 Origin = "Systems engineering models and ECSS mission libraries for early-phase spacecraft design.",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 1)
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
             EsaOrganization = new Organization
@@ -93,7 +113,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "esa",
                 Origin = "European Space Agency engineering libraries and flight dynamics models.",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 1)
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
             OmgOrganization = new Organization
@@ -103,7 +123,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "omg",
                 Origin = "Official SysML v2 and KerML specification standard libraries.",
                 Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 1)
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
             StarionOrganizationModel = new OrganizationModel(
@@ -140,11 +160,11 @@ namespace Mycelium.Forge.Data
 
             AdminAccounts =
             [
-                new AdminAccountModel(RegisAccount, true, "Verified", "@starion (admin), @esa (admin)"),
-                new AdminAccountModel(StefanAccount, false, "Verified", "@starion (admin)"),
-                new AdminAccountModel(KleinAccount, false, "Verified", "@starion (publisher)"),
+                new AdminAccountModel(RegisAccount, true, VerifiedStatus, "@starion (admin), @esa (admin)"),
+                new AdminAccountModel(StefanAccount, false, VerifiedStatus, "@starion (admin)"),
+                new AdminAccountModel(KleinAccount, false, VerifiedStatus, "@starion (publisher)"),
                 new AdminAccountModel(BlancAccount, false, "Pending", "@starion (member)"),
-                new AdminAccountModel(NovakAccount, false, "Verified", "@esa (member)")
+                new AdminAccountModel(NovakAccount, false, VerifiedStatus, "@esa (member)")
             ];
 
             ApiKeys =
@@ -153,24 +173,24 @@ namespace Mycelium.Forge.Data
                 {
                     Id = Guid.Parse("c1111111-1111-1111-1111-111111111111"),
                     Name = "ci-publish",
-                    CreatedAt = new DateTime(2026, 1, 1),
-                    ExpiresAt = new DateTime(2026, 7, 1),
+                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ExpiresAt = new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-3)
                 },
                 new APIKey
                 {
                     Id = Guid.Parse("c2222222-2222-2222-2222-222222222222"),
                     Name = "release-bot",
-                    CreatedAt = new DateTime(2025, 12, 1),
-                    ExpiresAt = new DateTime(2026, 6, 1),
+                    CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ExpiresAt = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-14)
                 },
                 new APIKey
                 {
                     Id = Guid.Parse("c3333333-3333-3333-3333-333333333333"),
                     Name = "local-dev",
-                    CreatedAt = new DateTime(2025, 11, 1),
-                    ExpiresAt = new DateTime(2026, 4, 1),
+                    CreatedAt = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ExpiresAt = new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-30)
                 }
             ];
@@ -207,64 +227,70 @@ namespace Mycelium.Forge.Data
             [
                 new PackageModel(
                     EcssPowerSubsystemPackageModel.Package,
-                    "@starion",
+                    StarionScope,
                     "v1.2.0",
-                    "SysML v2",
+                    SysmlV2Format,
                     "ECSS mission model: Power subsystem.",
-                    importCount: "210",
-                    isVerified: true,
-                    lastPublished: "2 weeks ago",
-                    role: PackageInvitationKind.OWNER),
+                    importCount: "210")
+                {
+                    IsVerified = true,
+                    Role = PackageInvitationKind.OWNER
+                },
                 new PackageModel(
                     SmallSatPlatformPackageModel.Package,
-                    "@starion",
+                    StarionScope,
                     "v0.8.2",
-                    "SysML v2",
+                    SysmlV2Format,
                     "Parametric smallsat platform model.",
-                    importCount: "145",
-                    isVerified: true,
-                    lastPublished: "3 weeks ago",
-                    role: PackageInvitationKind.OWNER),
+                    importCount: "145")
+                {
+                    IsVerified = true,
+                    Role = PackageInvitationKind.OWNER
+                },
                 new PackageModel(
                     EcssRfCommsPackageModel.Package,
-                    "@starion",
+                    StarionScope,
                     "v0.3.0",
-                    "SysML v2",
+                    SysmlV2Format,
                     "RF telecommunication link budget.",
-                    importCount: "190",
-                    isVerified: true,
-                    lastPublished: "2 months ago",
-                    role: PackageInvitationKind.OWNER),
+                    importCount: "190")
+                {
+                    IsVerified = true,
+                    Role = PackageInvitationKind.OWNER
+                },
                 new PackageModel(
                     EcssMechanicalPackageModel.Package,
-                    "@starion",
-                    "v1.0.0",
-                    "SysML v2",
+                    StarionScope,
+                    Version100,
+                    SysmlV2Format,
                     "Structural and mechanical engineering domain metamodels.",
-                    importCount: "165",
-                    isVerified: true,
-                    lastPublished: "3 months ago",
-                    role: PackageInvitationKind.OWNER),
+                    importCount: "165")
+                {
+                    IsVerified = true,
+                    Role = PackageInvitationKind.OWNER
+                },
                 new PackageModel(
                     Cdp4CometCorePackageModel.Package,
-                    "@starion",
+                    StarionScope,
                     "v10.25.1",
                     "CDP4-COMET",
                     "Core concurrent engineering data definitions.",
-                    importCount: "320",
-                    isVerified: true,
-                    lastPublished: "1 month ago",
-                    role: PackageInvitationKind.MAINTAINER),
+                    importCount: "320")
+                {
+                    IsVerified = true,
+                    Role = PackageInvitationKind.MAINTAINER
+                },
                 new PackageModel(
                     EcssEnvironmentPackageModel.Package,
                     "@esa",
-                    "v1.0.0",
-                    "SysML v2",
+                    Version100,
+                    SysmlV2Format,
                     "Space environment definitions and planetary constants.",
-                    importCount: "860",
-                    isVerified: true,
-                    lastPublished: "2 months ago",
-                    role: PackageInvitationKind.MAINTAINER)
+                    importCount: "860")
+                {
+                    IsVerified = true,
+                    Role = PackageInvitationKind.MAINTAINER
+                }
             ];
 
             CatalogPackages =
@@ -382,126 +408,135 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the SysMLv2-ISQ-Quantities package.
         /// </summary>
         public static PackageModel SysmlIsqQuantitiesPackageModel { get; } = new(
-            new Package { Name = "SysMLv2-ISQ-Quantities", ShortName = "sysmlv2-isq-quantities", Visibility = VisibilityKind.PUBLIC },
+            new Package { Name = "SysMLv2-ISQ-Quantities", ShortName = "sysmlv2-isq-quantities", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-30) },
             "@omg",
             "v2025.2",
-            "SysML v2",
+            SysmlV2Format,
             "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000.",
             "standard-library · units · quantities · isq",
-            "1.4k",
-            true,
-            "1 month ago");
+            "1.4k")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the SysMLv2-Kernel-Library package.
         /// </summary>
         public static PackageModel SysmlKernelLibraryPackageModel { get; } = new(
-            new Package { Name = "SysMLv2-Kernel-Library", ShortName = "sysmlv2-kernel-library", Visibility = VisibilityKind.PUBLIC },
+            new Package { Name = "SysMLv2-Kernel-Library", ShortName = "sysmlv2-kernel-library", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-30) },
             "@omg",
             "v2025.2",
-            "SysML v2",
+            SysmlV2Format,
             "Fundamental KerML metamodel library containing base types, collections, and control functions.",
             "standard-library · kerml · kernel",
-            "2.1k",
-            true,
-            "1 month ago");
+            "2.1k")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the ECSS-E-ST-10-04C package.
         /// </summary>
         public static PackageModel EcssEnvironmentPackageModel { get; } = new(
-            new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC },
+            new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60) },
             "@esa",
-            "v1.0.0",
-            "SysML v2",
+            Version100,
+            SysmlV2Format,
             "Space environment definitions and planetary constants for mission analysis and spacecraft design.",
             "standard-library · space-environment · ecss",
-            "860",
-            true,
-            "2 months ago");
+            "860")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the ECSS-MM-PWR package.
         /// </summary>
         public static PackageModel EcssPowerSubsystemPackageModel { get; } = new(
-            new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
-            "@starion",
+            new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-14) },
+            StarionScope,
             "v1.2.0",
-            "SysML v2",
+            SysmlV2Format,
             "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and PCU.",
             "mission-model · power · ecss",
-            "210",
-            true,
-            "2 weeks ago");
+            "210")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the SmallSat-Platform-Model package.
         /// </summary>
         public static PackageModel SmallSatPlatformPackageModel { get; } = new(
-            new Package { Name = "SmallSat-Platform-Model", ShortName = "smallsat-platform-model", Visibility = VisibilityKind.PUBLIC },
-            "@starion",
+            new Package { Name = "SmallSat-Platform-Model", ShortName = "smallsat-platform-model", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-21) },
+            StarionScope,
             "v0.8.2",
-            "SysML v2",
+            SysmlV2Format,
             "Parametric smallsat platform model including propulsion and telemetry budget templates.",
             "mission-model · smallsat · platform",
-            "145",
-            true,
-            "3 weeks ago");
+            "145")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the ecss-e-st-32-10c package.
         /// </summary>
         public static PackageModel EcssRfCommsPackageModel { get; } = new(
-            new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC },
-            "@starion",
+            new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60) },
+            StarionScope,
             "v0.3.0",
-            "SysML v2",
+            SysmlV2Format,
             "RF telecommunication link budget and space communication interfaces.",
             "comms · rf · telemetry · ecss",
-            "190",
-            true,
-            "2 months ago");
+            "190")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the CDP4-COMET-Core package.
         /// </summary>
         public static PackageModel Cdp4CometCorePackageModel { get; } = new(
-            new Package { Name = "CDP4-COMET-Core", ShortName = "cdp4-comet-core", Visibility = VisibilityKind.PUBLIC },
-            "@starion",
+            new Package { Name = "CDP4-COMET-Core", ShortName = "cdp4-comet-core", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-30) },
+            StarionScope,
             "v10.25.1",
             "CDP4-COMET",
             "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25.",
             "concurrent-design · cdp4 · ecss-10-25",
-            "320",
-            true,
-            "1 month ago");
+            "320")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the Capella-System-Template package.
         /// </summary>
         public static PackageModel CapellaSystemTemplatePackageModel { get; } = new(
-            new Package { Name = "Capella-System-Template", ShortName = "capella-system-template", Visibility = VisibilityKind.PUBLIC },
+            new Package { Name = "Capella-System-Template", ShortName = "capella-system-template", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90) },
             "@esa",
             "v6.1.0",
             "Capella",
             "Arcadia methodology operational analysis and system architecture template for space instruments.",
             "arcadia · capella · operational-analysis",
-            "185",
-            true,
-            "3 months ago");
+            "185")
+        {
+            IsVerified = true
+        };
 
         /// <summary>
         /// Gets the mock model for the ecss-e-st-31-01c package.
         /// </summary>
         public static PackageModel EcssMechanicalPackageModel { get; } = new(
-            new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC },
-            "@starion",
-            "v1.0.0",
-            "SysML v2",
+            new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90) },
+            StarionScope,
+            Version100,
+            SysmlV2Format,
             "Structural and mechanical engineering domain metamodels and loads analysis.",
             "mechanical · structures · loads · ecss",
-            "165",
-            true,
-            "3 months ago");
+            "165")
+        {
+            IsVerified = true
+        };
     }
 }

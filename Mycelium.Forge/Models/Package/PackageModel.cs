@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Models.Package
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents a package item displayed in the catalog sections, package lists, and package settings.
@@ -33,13 +34,6 @@ namespace Mycelium.Forge.Models.Package
         /// <param name="description">The package description.</param>
         /// <param name="tags">The tags string.</param>
         /// <param name="importCount">The number of imports.</param>
-        /// <param name="isVerified">Whether the publisher is verified.</param>
-        /// <param name="lastPublished">The relative elapsed time since the last publish.</param>
-        /// <param name="role">The user's role for this package.</param>
-        /// <param name="license">The SPDX license identifier of the package.</param>
-        /// <param name="href">The relative URL to the package page.</param>
-        /// <param name="maintainers">The collection of maintainers for the package.</param>
-        /// <param name="versions">The collection of release versions for the package.</param>
         public PackageModel(
             IPackage package,
             string publisher = "",
@@ -47,14 +41,7 @@ namespace Mycelium.Forge.Models.Package
             string format = "SysML v2",
             string description = "",
             string tags = "",
-            string importCount = "",
-            bool isVerified = false,
-            string lastPublished = "",
-            PackageInvitationKind role = PackageInvitationKind.OWNER,
-            string license = "Apache-2.0",
-            string href = "",
-            IReadOnlyList<PackageMaintainerModel> maintainers = null,
-            IReadOnlyList<PackageVersionModel> versions = null)
+            string importCount = "")
         {
             this.Package = package;
             this.Publisher = publisher;
@@ -63,17 +50,9 @@ namespace Mycelium.Forge.Models.Package
             this.Description = description;
             this.Tags = tags;
             this.ImportCount = importCount;
-            this.IsVerified = isVerified;
-            this.LastPublished = lastPublished;
-            this.Role = role;
-            this.License = license;
 
-            this.Href = !string.IsNullOrEmpty(href)
-                ? href
-                : PageRoutes.GetPackageRoute(string.IsNullOrEmpty(publisher) ? "starion" : publisher, package?.ShortName ?? string.Empty);
-
-            this.Maintainers = maintainers ?? [];
-            this.Versions = versions ?? [];
+            var publisherRoute = string.IsNullOrEmpty(publisher) ? "starion" : publisher;
+            this.Href = PageRoutes.GetPackageRoute(publisherRoute, package?.ShortName ?? string.Empty);
         }
 
         /// <summary>
@@ -85,11 +64,7 @@ namespace Mycelium.Forge.Models.Package
         /// <param name="publisher">The publisher namespace or author handle.</param>
         /// <param name="version">The package release version.</param>
         /// <param name="tags">The tags string.</param>
-        /// <param name="lastPublished">The relative elapsed time since the last publish.</param>
         /// <param name="importCount">The number of imports.</param>
-        /// <param name="isVerified">Whether the publisher is verified.</param>
-        /// <param name="role">The user's role for this package.</param>
-        /// <param name="license">The SPDX license identifier of the package.</param>
         public PackageModel(
             string name,
             string description = "",
@@ -97,12 +72,8 @@ namespace Mycelium.Forge.Models.Package
             string publisher = "",
             string version = "",
             string tags = "",
-            string lastPublished = "",
-            string importCount = "",
-            bool isVerified = false,
-            PackageInvitationKind role = PackageInvitationKind.OWNER,
-            string license = "Apache-2.0")
-            : this(new Package { Name = name, ShortName = name.ToLowerInvariant() }, publisher, version, format, description, tags, importCount, isVerified, lastPublished, role, license)
+            string importCount = "")
+            : this(new Package { Name = name, ShortName = name.ToLowerInvariant() }, publisher, version, format, description, tags, importCount)
         {
         }
 
@@ -115,11 +86,6 @@ namespace Mycelium.Forge.Models.Package
         /// Gets the package name.
         /// </summary>
         public string Name => this.Package?.Name ?? string.Empty;
-
-        /// <summary>
-        /// Gets the package short name handle.
-        /// </summary>
-        public string ShortName => this.Package?.ShortName ?? string.Empty;
 
         /// <summary>
         /// Gets the full scoped package identifier.
@@ -174,9 +140,11 @@ namespace Mycelium.Forge.Models.Package
         public VisibilityKind Visibility => this.Package?.Visibility ?? VisibilityKind.PUBLIC;
 
         /// <summary>
-        /// Gets or sets the relative elapsed time since the last publish.
+        /// Gets the relative elapsed time since the last publish.
         /// </summary>
-        public string LastPublished { get; set; } = string.Empty;
+        public string LastPublished => this.Package != null && this.Package.CreatedAt != default
+            ? this.Package.CreatedAt.ToTimeAgo()
+            : string.Empty;
 
         /// <summary>
         /// Gets or sets the user's role for this package.

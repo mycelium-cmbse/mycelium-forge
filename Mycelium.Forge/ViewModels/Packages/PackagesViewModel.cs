@@ -220,12 +220,9 @@ namespace Mycelium.Forge.ViewModels.Packages
 
             var clean = importCount.Trim().ToLowerInvariant();
 
-            if (clean.EndsWith('k'))
+            if (clean.EndsWith('k') && double.TryParse(clean[..^1], out var kValue))
             {
-                if (double.TryParse(clean[..^1], out var kValue))
-                {
-                    return (int)(kValue * 1000);
-                }
+                return (int)(kValue * 1000);
             }
 
             if (int.TryParse(clean, out var intValue))

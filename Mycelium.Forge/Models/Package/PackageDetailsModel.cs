@@ -24,71 +24,12 @@ namespace Mycelium.Forge.Models.Package
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PackageDetailsModel" /> class with the specified package model and
-        /// details.
+        /// Initializes a new instance of the <see cref="PackageDetailsModel" /> class with the specified package model.
         /// </summary>
         /// <param name="package">The underlying package model.</param>
-        /// <param name="releaseStatus">The release stability status.</param>
-        /// <param name="provenance">The provenance summary text.</param>
-        /// <param name="qualityScore">The overall quality score text.</param>
-        /// <param name="metamodel">The target metamodel and version.</param>
-        /// <param name="repositoryUrl">The source repository URL.</param>
-        /// <param name="repositoryDisplayName">The shortened display text for the repository URL.</param>
-        /// <param name="packageUrl">The standard package URL identifier.</param>
-        /// <param name="packageUrlDisplayName">The shortened display text for the package URL.</param>
-        /// <param name="readmeDescription">The overview section description.</param>
-        /// <param name="readmeContents">The contents specification description.</param>
-        /// <param name="codeUsageImport">The import statement code example.</param>
-        /// <param name="codeUsageBody">The body code example.</param>
-        /// <param name="qualityChecks">The collection of quality evaluation checks.</param>
-        /// <param name="tags">The collection of classification tags.</param>
-        /// <param name="installCommands">The dictionary mapping install method tabs to command strings.</param>
-        /// <param name="elements">The collection of model element definitions contained within the package.</param>
-        /// <param name="dependencies">The collection of dependencies required by the package.</param>
-        /// <param name="dependents">The collection of packages and projects depending on this package.</param>
-        /// <param name="validationReport">The automated release validation report for this package.</param>
-        public PackageDetailsModel(
-            PackageModel package,
-            string releaseStatus = "Latest stable",
-            string provenance = "",
-            string qualityScore = "5/5 checks",
-            string metamodel = "SysML v2 (2025-02)",
-            string repositoryUrl = "",
-            string repositoryDisplayName = "",
-            string packageUrl = "",
-            string packageUrlDisplayName = "",
-            string readmeDescription = "",
-            string readmeContents = "",
-            string codeUsageImport = "",
-            string codeUsageBody = "",
-            IReadOnlyList<ValidationCheckModel> qualityChecks = null,
-            IReadOnlyList<string> tags = null,
-            IReadOnlyDictionary<string, string> installCommands = null,
-            IReadOnlyList<PackageElementModel> elements = null,
-            IReadOnlyList<PackageRelationshipModel> dependencies = null,
-            IReadOnlyList<PackageRelationshipModel> dependents = null,
-            PackageValidationReportModel validationReport = null)
+        public PackageDetailsModel(PackageModel package = null)
         {
             this.Package = package;
-            this.ReleaseStatus = releaseStatus;
-            this.Provenance = provenance;
-            this.QualityScore = qualityScore;
-            this.Metamodel = metamodel;
-            this.RepositoryUrl = repositoryUrl;
-            this.RepositoryDisplayName = repositoryDisplayName;
-            this.PackageUrl = packageUrl;
-            this.PackageUrlDisplayName = packageUrlDisplayName;
-            this.ReadmeDescription = readmeDescription;
-            this.ReadmeContents = readmeContents;
-            this.CodeUsageImport = codeUsageImport;
-            this.CodeUsageBody = codeUsageBody;
-            this.QualityChecks = qualityChecks ?? [];
-            this.Tags = tags ?? [];
-            this.InstallCommands = installCommands ?? new Dictionary<string, string>();
-            this.Elements = elements ?? [];
-            this.Dependencies = dependencies ?? [];
-            this.Dependents = dependents ?? [];
-            this.ValidationReport = validationReport;
         }
 
         /// <summary>

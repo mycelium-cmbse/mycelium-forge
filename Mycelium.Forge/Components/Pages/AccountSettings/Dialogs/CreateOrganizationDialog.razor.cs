@@ -122,9 +122,9 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
 
             var result = new CreateOrganizationResult
             {
-                OrganizationName = this.OrganizationName.Trim(),
-                Scope = this.Scope.Trim(),
-                BillingEmail = this.BillingEmail.Trim()
+                OrganizationName = this.OrganizationName,
+                Scope = this.Scope,
+                BillingEmail = this.BillingEmail
             };
 
             await this.OnResult.InvokeAsync(result);

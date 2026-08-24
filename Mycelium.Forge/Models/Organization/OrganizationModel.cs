@@ -34,7 +34,6 @@ namespace Mycelium.Forge.Models.Organization
         /// <param name="packageCount">The number of published packages.</param>
         /// <param name="versionCount">The total number of release versions.</param>
         /// <param name="importCount">The total import count across packages.</param>
-        /// <param name="memberSinceYear">The year the organization was registered.</param>
         public OrganizationModel(
             IOrganization organization,
             string initials = "",
@@ -42,8 +41,7 @@ namespace Mycelium.Forge.Models.Organization
             bool isVerified = true,
             int packageCount = 0,
             int versionCount = 0,
-            int importCount = 0,
-            int memberSinceYear = 2025)
+            int importCount = 0)
         {
             this.Organization = organization;
 
@@ -59,7 +57,6 @@ namespace Mycelium.Forge.Models.Organization
             this.PackageCount = packageCount;
             this.VersionCount = versionCount;
             this.ImportCount = importCount;
-            this.MemberSinceYear = memberSinceYear;
         }
 
         /// <summary>

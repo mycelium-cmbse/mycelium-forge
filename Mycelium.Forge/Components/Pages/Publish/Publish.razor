@@ -19,12 +19,12 @@
     @foreach (var step in this.ViewModel.Steps)
     {
         <div @key="step.Number" class="flex items-center gap-2">
-            <div class="@(this.GetStepBubbleClass(step))">
-                <span class="@(this.GetStepNumberClass(step))">
+            <div class="@(GetStepBubbleClass(step))">
+                <span class="@(GetStepNumberClass(step))">
                     @(step.Number)
                 </span>
             </div>
-            <span class="@(this.GetStepTitleClass(step))">
+            <span class="@(GetStepTitleClass(step))">
                 @(step.Title)
             </span>
         </div>
@@ -230,7 +230,7 @@
                     @(check.Title)
                 </BbMarkerContent>
 
-                <span class="@(this.GetValidationStatusBadgeClass(check.Status))">
+                <span class="@(GetValidationStatusBadgeClass(check.Status))">
                     @(check.Status)
                 </span>
             </BbMarker>

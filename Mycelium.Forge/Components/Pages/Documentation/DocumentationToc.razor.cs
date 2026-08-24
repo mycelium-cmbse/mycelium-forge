@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationToc.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -41,7 +41,7 @@ namespace Mycelium.Forge.Components.Pages.Documentation
         /// </summary>
         /// <param name="item">The table of contents item model.</param>
         /// <returns>The combined CSS class string.</returns>
-        public string GetTocItemClass(DocumentationTocItemModel item)
+        public static string GetTocItemClass(DocumentationTocItemModel item)
         {
             if (item == null)
             {

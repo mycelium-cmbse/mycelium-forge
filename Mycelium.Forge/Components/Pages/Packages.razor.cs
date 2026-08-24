@@ -164,7 +164,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Toggles the selection state of the specified facet item.
         /// </summary>
         /// <param name="item">The facet option item to toggle.</param>
-        public void ToggleFacet(OptionModel item)
+        public static void ToggleFacet(OptionModel item)
         {
             item.IsChecked = !item.IsChecked;
         }
@@ -192,9 +192,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         public void BrowseAllPackages()
         {
-            this.SearchQuery = string.Empty;
-            this.ResetFacetSelections();
-            this.ViewModel.Search(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);
+            this.ResetFilters();
         }
 
         /// <summary>
@@ -209,12 +207,9 @@ namespace Mycelium.Forge.Components.Pages
                 this.SearchQuery = this.Query;
             }
 
-            if (!string.IsNullOrWhiteSpace(this.Sort))
+            if (!string.IsNullOrWhiteSpace(this.Sort) && Enum.TryParse<PackageSortOption>(this.Sort, true, out var parsedSort))
             {
-                if (Enum.TryParse<PackageSortOption>(this.Sort, true, out var parsedSort))
-                {
-                    this.SelectedSortOption = parsedSort;
-                }
+                this.SelectedSortOption = parsedSort;
             }
 
             this.ViewModel.InitializeViewModel(this.SearchQuery, this.SelectedSortOption, this.IncludePrereleases);

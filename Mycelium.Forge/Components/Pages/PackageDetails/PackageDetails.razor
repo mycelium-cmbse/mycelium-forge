@@ -268,15 +268,15 @@
                     </span>
                 </div>
 
-                @foreach (var check in this.ViewModel.Package.QualityChecks)
+                @foreach (var title in this.ViewModel.Package.QualityChecks.Select(check => check.Title))
                 {
-                    <div @key="check.Title"
+                    <div @key="title"
                          class="flex items-center gap-2 text-xs leading-2xs text-secondary-text">
                         <LucideIcon Name="check"
                                     Size="14"
                                     Class="text-validated shrink-0"/>
                         <span class="flex-1 truncate">
-                            @(check.Title)
+                            @(title)
                         </span>
                     </div>
                 }

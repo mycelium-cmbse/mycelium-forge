@@ -51,8 +51,10 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 isVerified: true,
                 packageCount: 12,
                 versionCount: 48,
-                importCount: 3500,
-                memberSinceYear: 2023);
+                importCount: 3500)
+            {
+                MemberSinceYear = 2023
+            };
 
             this.viewModelMock.SetupGet(x => x.Organization).Returns(organization);
             this.viewModelMock.SetupGet(x => x.Packages).Returns(new List<PackageModel>());

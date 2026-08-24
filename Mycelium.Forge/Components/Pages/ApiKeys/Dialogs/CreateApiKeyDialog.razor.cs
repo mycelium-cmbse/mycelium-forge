@@ -175,7 +175,7 @@ namespace Mycelium.Forge.Components.Pages.ApiKeys.Dialogs
 
             var result = new CreateApiKeyResult
             {
-                KeyName = this.KeyName.Trim(),
+                KeyName = this.KeyName,
                 Scope = this.SelectedScope,
                 Permissions = this.Permissions,
                 Expiration = this.SelectedExpiration,

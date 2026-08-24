@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -21,6 +21,16 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
     /// </summary>
     public class PackageDetailsViewModel : IPackageDetailsViewModel
     {
+        /// <summary>
+        /// Constant representing the part definition stereotype text.
+        /// </summary>
+        private const string PartDefinitionStereotype = "«part def»";
+
+        /// <summary>
+        /// Constant representing the parts category label.
+        /// </summary>
+        private const string PartsCategory = "Parts";
+
         /// <summary>
         /// Gets or sets the package details and metadata.
         /// </summary>
@@ -59,7 +69,17 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 "power"
             };
 
-            var resolvedOrganization = string.IsNullOrWhiteSpace(organization) ? "@starion" : organization.StartsWith('@') ? organization : $"@{organization}";
+            string resolvedOrganization;
+
+            if (string.IsNullOrWhiteSpace(organization))
+            {
+                resolvedOrganization = "@starion";
+            }
+            else
+            {
+                resolvedOrganization = organization.StartsWith('@') ? organization : $"@{organization}";
+            }
+
             var resolvedName = string.IsNullOrWhiteSpace(packageName) ? "ECSS-MM-PWR" : packageName;
             var fullName = $"{resolvedOrganization}/{resolvedName}";
             var orgWithoutAt = resolvedOrganization.TrimStart('@');
@@ -74,11 +94,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             var elements = new List<PackageElementModel>
             {
-                new("PowerBus", "«part def»", "Parts", "8 attributes"),
-                new("Battery", "«part def»", "Parts", "12 attributes"),
-                new("SolarArray", "«part def»", "Parts", "6 attributes"),
-                new("PowerConditioningUnit", "«part def»", "Parts", "9 attributes"),
-                new("powerOut", "«port def»", "Parts", "2 attributes"),
+                new("PowerBus", PartDefinitionStereotype, PartsCategory, "8 attributes"),
+                new("Battery", PartDefinitionStereotype, PartsCategory, "12 attributes"),
+                new("SolarArray", PartDefinitionStereotype, PartsCategory, "6 attributes"),
+                new("PowerConditioningUnit", PartDefinitionStereotype, PartsCategory, "9 attributes"),
+                new("powerOut", "«port def»", PartsCategory, "2 attributes"),
                 new("BusVoltage", "«attribute def»", "Attributes", "typed by Voltage")
             };
 
@@ -122,7 +142,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             {
                 Name = resolvedName,
                 ShortName = resolvedName.ToLowerInvariant(),
-                Visibility = VisibilityKind.PUBLIC
+                Visibility = VisibilityKind.PUBLIC,
+                CreatedAt = DateTime.UtcNow.AddDays(-14)
             };
 
             var packageModel = new PackageModel(
@@ -132,36 +153,38 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 "SysML v2",
                 $"{resolvedName} mission model: Power subsystem. Part definitions for the power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
                 string.Join(" · ", tags),
-                "210",
-                true,
-                "2 weeks ago",
-                PackageInvitationKind.OWNER,
-                "Apache-2.0",
-                PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
-                maintainers,
-                versions);
+                "210")
+            {
+                IsVerified = true,
+                Role = PackageInvitationKind.OWNER,
+                License = "Apache-2.0",
+                Href = PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
+                Maintainers = maintainers,
+                Versions = versions
+            };
 
-            this.Package = new PackageDetailsModel(
-                packageModel,
-                "Latest stable",
-                $"Published 2 weeks ago by {resolvedOrganization} · Apache-2.0 · 210 imports",
-                "5/5 checks",
-                "SysML v2 (2025-02)",
-                $"https://github.com/{orgWithoutAt}/{resolvedName.ToLowerInvariant()}",
-                $"github.com/{orgWithoutAt}/…",
-                $"pkg:forge/{fullName}@1.2.0",
-                $"pkg:forge/{orgWithoutAt}/…",
-                $"{resolvedName} subsystem mission model following ECSS-E-ST-20C, published as a reusable SysML v2 library. It provides the electrical power architecture for early-phase spacecraft design.",
-                "Part definitions: PowerBus, Battery, SolarArray, PowerConditioningUnit. Attribute definitions typed by ISQ quantity kinds (power, voltage, capacity). Interface definitions for the power distribution ports.",
-                $"import {resolvedName.Replace('-', '_')}::*;",
-                "part def MyPowerSystem :> PowerBus { }",
-                qualityChecks,
-                tags,
-                installCommands,
-                elements,
-                dependencies,
-                dependents,
-                validationReport);
+            this.Package = new PackageDetailsModel(packageModel)
+            {
+                ReleaseStatus = "Latest stable",
+                Provenance = $"Published 2 weeks ago by {resolvedOrganization} · Apache-2.0 · 210 imports",
+                QualityScore = "5/5 checks",
+                Metamodel = "SysML v2 (2025-02)",
+                RepositoryUrl = $"https://github.com/{orgWithoutAt}/{resolvedName.ToLowerInvariant()}",
+                RepositoryDisplayName = $"github.com/{orgWithoutAt}/…",
+                PackageUrl = $"pkg:forge/{fullName}@1.2.0",
+                PackageUrlDisplayName = $"pkg:forge/{orgWithoutAt}/…",
+                ReadmeDescription = $"{resolvedName} subsystem mission model following ECSS-E-ST-20C, published as a reusable SysML v2 library. It provides the electrical power architecture for early-phase spacecraft design.",
+                ReadmeContents = "Part definitions: PowerBus, Battery, SolarArray, PowerConditioningUnit. Attribute definitions typed by ISQ quantity kinds (power, voltage, capacity). Interface definitions for the power distribution ports.",
+                CodeUsageImport = $"import {resolvedName.Replace('-', '_')}::*;",
+                CodeUsageBody = "part def MyPowerSystem :> PowerBus { }",
+                QualityChecks = qualityChecks,
+                Tags = tags,
+                InstallCommands = installCommands,
+                Elements = elements,
+                Dependencies = dependencies,
+                Dependents = dependents,
+                ValidationReport = validationReport
+            };
         }
 
         /// <summary>

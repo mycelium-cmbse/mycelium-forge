@@ -43,6 +43,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// </summary>
         public void OnAddMaintainer()
         {
+            // Implementation pending future maintainer management support.
         }
 
         /// <summary>
@@ -51,6 +52,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <param name="maintainer">The target maintainer model.</param>
         public void OnMaintainerMenu(PackageMaintainerModel maintainer)
         {
+            // Implementation pending future maintainer options support.
         }
 
         /// <summary>
@@ -118,6 +120,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// </summary>
         public void OnTransferOwnership()
         {
+            // Implementation pending future ownership transfer support.
         }
 
         /// <summary>

@@ -22,26 +22,6 @@ namespace Mycelium.Forge.Components.Pages
     public partial class Accounts : ComponentBase
     {
         /// <summary>
-        /// The list of available status filter options.
-        /// </summary>
-        private static readonly IReadOnlyList<string> AvailableStatusFilters =
-        [
-            "All",
-            nameof(ScopeStatusKind.ACTIVE).ToUpperCaseFirst(),
-            nameof(ScopeStatusKind.DEACTIVATED).ToUpperCaseFirst()
-        ];
-
-        /// <summary>
-        /// The list of available verification filter options.
-        /// </summary>
-        private static readonly IReadOnlyList<string> AvailableVerificationFilters =
-        [
-            "All",
-            "Verified",
-            "Pending"
-        ];
-
-        /// <summary>
         /// Gets or sets the view model managing installation administration accounts state.
         /// </summary>
         [Inject]
@@ -65,12 +45,22 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Gets the available status filter options.
         /// </summary>
-        public IReadOnlyList<string> StatusFilterOptions => AvailableStatusFilters;
+        public static IReadOnlyList<string> StatusFilterOptions { get; } =
+        [
+            "All",
+            nameof(ScopeStatusKind.ACTIVE).ToUpperCaseFirst(),
+            nameof(ScopeStatusKind.DEACTIVATED).ToUpperCaseFirst()
+        ];
 
         /// <summary>
         /// Gets the available verification filter options.
         /// </summary>
-        public IReadOnlyList<string> VerificationFilterOptions => AvailableVerificationFilters;
+        public static IReadOnlyList<string> VerificationFilterOptions { get; } =
+        [
+            "All",
+            "Verified",
+            "Pending"
+        ];
 
         /// <summary>
         /// Initializes the component and loads initial view model state.
@@ -123,8 +113,9 @@ namespace Mycelium.Forge.Components.Pages
         /// Handles opening the contextual options menu for the specified account.
         /// </summary>
         /// <param name="account">The <see cref="AdminAccountModel" /> instance whose menu was triggered.</param>
-        private void OnAccountMenu(AdminAccountModel account)
+        private static void OnAccountMenu(AdminAccountModel account)
         {
+            // Contextual menu action placeholder.
         }
 
         /// <summary>

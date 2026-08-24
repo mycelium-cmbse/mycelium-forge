@@ -34,7 +34,7 @@ namespace Mycelium.Forge.Components.Pages.Documentation
         /// </summary>
         /// <param name="item">The documentation navigation item model.</param>
         /// <returns>The combined CSS class string.</returns>
-        public string GetNavItemClass(DocumentationNavItemModel item)
+        public static string GetNavItemClass(DocumentationNavItemModel item)
         {
             if (item == null)
             {

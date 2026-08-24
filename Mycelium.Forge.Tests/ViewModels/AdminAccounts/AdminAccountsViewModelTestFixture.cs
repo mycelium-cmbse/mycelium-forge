@@ -45,7 +45,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AdminAccounts
                 Assert.That(nameCount, Is.GreaterThanOrEqualTo(1));
                 Assert.That(activeCount, Is.GreaterThanOrEqualTo(1));
                 Assert.That(verifiedCount, Is.GreaterThanOrEqualTo(1));
-                Assert.That(emptyCount, Is.EqualTo(0));
+                Assert.That(emptyCount, Is.Zero);
             }
         }
 

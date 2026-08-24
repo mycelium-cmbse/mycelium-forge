@@ -49,16 +49,18 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
             var packageModel = new PackageModel(
                 new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
-                "Starion Group",
-                maintainers:
+                "Starion Group")
+            {
+                Maintainers =
                 [
                     new PackageMaintainerModel("Alex Rivera", "AR")
                 ],
-                versions:
+                Versions =
                 [
                     this.activeVersion,
                     this.unlistedVersion
-                ]);
+                ]
+            };
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(packageModel);
 
@@ -115,7 +117,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         }
 
         [Test]
-        public async Task VerifyStubMethods()
+        public void VerifyStubMethods()
         {
             var packageSettingsPage = this.context.Render<PackageSettings>();
 
@@ -123,9 +125,12 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var maintainerMenuBtn = packageSettingsPage.Find(".package-maintainer-menu-button");
             var transferBtn = packageSettingsPage.Find("#package-settings-transfer-button");
 
-            await packageSettingsPage.InvokeAsync(() => addMaintainerBtn.ClickAsync());
-            await packageSettingsPage.InvokeAsync(() => maintainerMenuBtn.ClickAsync());
-            await packageSettingsPage.InvokeAsync(() => transferBtn.ClickAsync());
+            Assert.That(async () =>
+            {
+                await packageSettingsPage.InvokeAsync(() => addMaintainerBtn.ClickAsync());
+                await packageSettingsPage.InvokeAsync(() => maintainerMenuBtn.ClickAsync());
+                await packageSettingsPage.InvokeAsync(() => transferBtn.ClickAsync());
+            }, Throws.Nothing);
         }
 
         [Test]

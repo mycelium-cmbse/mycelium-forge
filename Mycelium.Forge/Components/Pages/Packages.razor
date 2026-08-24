@@ -51,7 +51,7 @@
                                 <div @key="item.Key"
                                      class="flex flex-row items-center gap-2 w-full select-none">
                                     <BbCheckbox Checked="@(item.IsChecked)"
-                                                CheckedChanged="@(_ => this.ToggleFacet(item))"
+                                                CheckedChanged="@(_ => ToggleFacet(item))"
                                                 id="@facetId"
                                                 Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0"/>
                                     <BbLabel For="@facetId"

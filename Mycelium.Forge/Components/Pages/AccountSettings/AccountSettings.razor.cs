@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AccountSettings.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -41,6 +41,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         public void OnChangeUsername()
         {
+            // Implementation pending future backend support.
         }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         public void OnChangeEmail()
         {
+            // Implementation pending future backend support.
         }
 
         /// <summary>
@@ -55,6 +57,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         public void OnEditDisplayName()
         {
+            // Implementation pending future backend support.
         }
 
         /// <summary>
@@ -62,6 +65,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         public void OnEditCompany()
         {
+            // Implementation pending future backend support.
         }
 
         /// <summary>
@@ -69,6 +73,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         public void OnEditLocation()
         {
+            // Implementation pending future backend support.
         }
 
         /// <summary>
@@ -76,6 +81,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         public void OnEditWebsite()
         {
+            // Implementation pending future backend support.
         }
 
         /// <summary>
@@ -83,6 +89,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         public void OnEditBiography()
         {
+            // Implementation pending future backend support.
         }
 
         /// <summary>

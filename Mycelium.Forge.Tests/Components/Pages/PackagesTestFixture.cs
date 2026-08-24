@@ -71,7 +71,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             var packagesPage = this.context.Render<Packages>();
 
             var facet = this.viewModelMock.Object.Facets[0];
-            packagesPage.Instance.ToggleFacet(facet);
+            Packages.ToggleFacet(facet);
 
             var applyBtn = packagesPage.Find("#packages-apply-filters-button");
             await packagesPage.InvokeAsync(() => applyBtn.ClickAsync());

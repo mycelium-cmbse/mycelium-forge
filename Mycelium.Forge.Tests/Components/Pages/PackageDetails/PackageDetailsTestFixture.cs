@@ -55,40 +55,43 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
                 "Starion Group",
                 "1.3.0",
-                description: "Power subsystem model.",
-                license: "Apache-2.0",
-                versions:
+                description: "Power subsystem model.")
+            {
+                License = "Apache-2.0",
+                Versions =
                 [
                     new PackageVersionModel { Version = "1.3.0" }
-                ]);
+                ]
+            };
 
-            var packageDetails = new PackageDetailsModel(
-                packageModel,
-                installCommands: new Dictionary<string, string>
+            var packageDetails = new PackageDetailsModel(packageModel)
+            {
+                InstallCommands = new Dictionary<string, string>
                 {
                     { "Forge CLI", "forge add @starion/ECSS-MM-PWR@1.3.0" },
                     { "SysML v2 import", "import @starion/ECSS-MM-PWR;" }
                 },
-                elements:
+                Elements =
                 [
                     new PackageElementModel("PowerSubsystem", "«part def»", "Parts", "Attributes")
                 ],
-                dependencies:
+                Dependencies =
                 [
                     new PackageRelationshipModel("@esa/CoreTypes", "/packages/@esa/coretypes", "^1.0.0")
                 ],
-                dependents:
+                Dependents =
                 [
                     new PackageRelationshipModel("@starion/ECSS-Mission", "/packages/@starion/ecss-mission", "^1.0.0")
                 ],
-                validationReport: new PackageValidationReportModel(
+                ValidationReport = new PackageValidationReportModel(
                     "Automated release validation",
                     "All checks passed",
                     "5 / 5",
                     true,
                     [
                         new ValidationCheckModel("Schema check", "Passed")
-                    ]));
+                    ])
+            };
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(packageDetails);
             this.viewModelMock.SetupGet(x => x.IsUserAdmin).Returns(true);

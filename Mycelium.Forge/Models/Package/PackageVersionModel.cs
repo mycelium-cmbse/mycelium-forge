@@ -31,8 +31,6 @@ namespace Mycelium.Forge.Models.Package
         /// <param name="size">The formatted package archive size.</param>
         /// <param name="isLatest">A value indicating whether the version is the latest release.</param>
         /// <param name="isUnlisted">A value indicating whether the package version is unlisted.</param>
-        /// <param name="isDeprecated">A value indicating whether the package version is deprecated.</param>
-        /// <param name="downloadUrl">The direct download URL for the package version artifact.</param>
         public PackageVersionModel(
             string version,
             string publishedAgo = "",
@@ -40,9 +38,7 @@ namespace Mycelium.Forge.Models.Package
             bool isValidated = false,
             string size = "",
             bool isLatest = false,
-            bool isUnlisted = false,
-            bool isDeprecated = false,
-            string downloadUrl = "#")
+            bool isUnlisted = false)
         {
             this.Version = version;
             this.PublishedAgo = publishedAgo;
@@ -51,8 +47,6 @@ namespace Mycelium.Forge.Models.Package
             this.Size = size;
             this.IsLatest = isLatest;
             this.IsUnlisted = isUnlisted;
-            this.IsDeprecated = isDeprecated;
-            this.DownloadUrl = downloadUrl;
         }
 
         /// <summary>

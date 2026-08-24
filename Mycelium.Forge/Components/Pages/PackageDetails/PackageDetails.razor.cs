@@ -216,6 +216,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <param name="result">The result containing the target project name and version constraint.</param>
         public void HandleAddDependency(AddToProjectResult result)
         {
+            // Implementation pending future project integration support.
         }
 
         /// <summary>

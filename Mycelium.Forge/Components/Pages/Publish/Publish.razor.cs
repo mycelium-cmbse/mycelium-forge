@@ -53,7 +53,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         /// <param name="step">The wizard step model.</param>
         /// <returns>The computed CSS class string for the step bubble.</returns>
-        public string GetStepBubbleClass(PublishStepModel step)
+        public static string GetStepBubbleClass(PublishStepModel step)
         {
             const string baseClass = "w-5.5 h-5.5 rounded-full flex items-center justify-center shrink-0";
 
@@ -67,7 +67,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         /// <param name="step">The wizard step model.</param>
         /// <returns>The computed CSS class string for the step number.</returns>
-        public string GetStepNumberClass(PublishStepModel step)
+        public static string GetStepNumberClass(PublishStepModel step)
         {
             return step.IsCurrent
                 ? "text-2xs leading-3xs font-semibold text-white"
@@ -79,7 +79,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         /// <param name="step">The wizard step model.</param>
         /// <returns>The computed CSS class string for the step title.</returns>
-        public string GetStepTitleClass(PublishStepModel step)
+        public static string GetStepTitleClass(PublishStepModel step)
         {
             return step.IsCurrent
                 ? "text-sm leading-xs font-semibold text-foreground"
@@ -91,7 +91,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         /// <param name="status">The validation check status outcome.</param>
         /// <returns>The computed CSS class string for the status text.</returns>
-        public string GetValidationStatusBadgeClass(ValidationStatus status)
+        public static string GetValidationStatusBadgeClass(ValidationStatus status)
         {
             return status switch
             {

@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     const THEME_STORAGE_KEY = 'forge_theme';
     const DARK_THEME = 'dark';
     const LIGHT_THEME = 'light';
@@ -8,7 +8,7 @@
      * @returns {boolean} True if the system prefers dark mode, false otherwise.
      */
     function getSystemPrefersDark() {
-        return Boolean(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        return Boolean(window.matchMedia?.('(prefers-color-scheme: dark)')?.matches);
     }
 
     /**
@@ -24,8 +24,8 @@
             if (stored === LIGHT_THEME) {
                 return false;
             }
-        } catch (e) {
-            // Storage access might be restricted in some browser contexts
+        } catch (error) {
+            console.warn('Storage access failed while reading theme preference:', error);
         }
         return getSystemPrefersDark();
     }
@@ -54,6 +54,7 @@
                 await navigator.clipboard.writeText(text);
                 return true;
             } catch (error) {
+                console.warn('Clipboard writeText failed:', error);
                 return false;
             }
         },
@@ -95,8 +96,8 @@
 
             try {
                 localStorage.setItem(THEME_STORAGE_KEY, active ? DARK_THEME : LIGHT_THEME);
-            } catch (e) {
-                // Storage quota exceeded or private mode error
+            } catch (error) {
+                console.warn('Storage access failed while writing theme preference:', error);
             }
         }
     };

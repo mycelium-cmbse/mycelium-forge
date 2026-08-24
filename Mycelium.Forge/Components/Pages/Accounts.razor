@@ -54,7 +54,7 @@
                 <ForgeSelect TValue="string"
                              Value="@(this.SelectedStatusFilter)"
                              ValueChanged="@(this.OnStatusFilterChanged)"
-                             Items="@(this.StatusFilterOptions)"
+                             Items="@(StatusFilterOptions)"
                              FilterStyle="true"
                              Label="Status:"
                              TriggerClass="text-xs"
@@ -63,7 +63,7 @@
                 <ForgeSelect TValue="string"
                              Value="@(this.SelectedVerificationFilter)"
                              ValueChanged="@(this.OnVerificationFilterChanged)"
-                             Items="@(this.VerificationFilterOptions)"
+                             Items="@(VerificationFilterOptions)"
                              FilterStyle="true"
                              Label="Verification:"
                              TriggerClass="text-xs"
@@ -186,7 +186,7 @@
                                 <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-8 shrink-0 flex justify-end p-0">
                                     <BbButton Variant="ButtonVariant.Ghost"
                                               Size="ButtonSize.IconSmall"
-                                              OnClick="() => this.OnAccountMenu(account)"
+                                              OnClick="() => OnAccountMenu(account)"
                                               AriaLabel="Options"
                                               Class="shrink-0">
                                         <LucideIcon Name="ellipsis"

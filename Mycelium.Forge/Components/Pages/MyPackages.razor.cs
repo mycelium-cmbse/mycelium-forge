@@ -96,7 +96,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         /// <param name="entry">The package model item.</param>
         /// <returns>The badge variant for the given visibility.</returns>
-        public BadgeVariant GetVisibilityBadgeVariant(PackageModel entry)
+        public static BadgeVariant GetVisibilityBadgeVariant(PackageModel entry)
         {
             return entry.Visibility == VisibilityKind.PRIVATE
                 ? BadgeVariant.Default

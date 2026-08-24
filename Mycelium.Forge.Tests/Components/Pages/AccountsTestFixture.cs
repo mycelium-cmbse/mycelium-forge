@@ -77,8 +77,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(accountsPage.Instance, Is.Not.Null);
-                Assert.That(accountsPage.Instance.StatusFilterOptions, Has.Count.EqualTo(3));
-                Assert.That(accountsPage.Instance.VerificationFilterOptions, Has.Count.EqualTo(3));
+                Assert.That(Accounts.StatusFilterOptions, Has.Count.EqualTo(3));
+                Assert.That(Accounts.VerificationFilterOptions, Has.Count.EqualTo(3));
                 this.viewModelMock.Verify(x => x.InitializeViewModel("", "All", "All"), Times.Once);
             }
         }

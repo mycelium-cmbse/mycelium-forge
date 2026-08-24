@@ -45,8 +45,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             this.viewModelMock = new Mock<IOrganizationSettingsViewModel>();
 
             var org = new OrganizationModel(
-                new Organization { Name = "Starion Group", ShortName = "starion", Origin = "Systems engineering" },
-                memberSinceYear: 2023);
+                new Organization { Name = "Starion Group", ShortName = "starion", Origin = "Systems engineering" })
+            {
+                MemberSinceYear = 2023
+            };
 
             this.testMember = new OrganizationMemberModel(
                 new Account { Name = "Alex Rivera", ShortName = "alex.rivera" },

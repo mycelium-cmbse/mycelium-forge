@@ -33,7 +33,7 @@ namespace Mycelium.Forge.Components.Pages.Documentation.CoreConcepts
         /// <summary>
         /// Gets the manifest JSON snippet code displayed in the code block.
         /// </summary>
-        public string ProjectJsonSnippet =>
+        public static string ProjectJsonSnippet =>
             """
             {
               "name": "@mycelium/isq-quantities-units",

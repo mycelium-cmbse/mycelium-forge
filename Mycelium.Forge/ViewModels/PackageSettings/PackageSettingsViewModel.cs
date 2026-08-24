@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -43,27 +43,39 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
                 new("v1.0.0", "published 4 months ago", isUnlisted: true)
             };
 
-            var resolvedOrganization = string.IsNullOrWhiteSpace(organization) ? "@starion" : organization.StartsWith('@') ? organization : $"@{organization}";
+            string resolvedOrganization;
+
+            if (string.IsNullOrWhiteSpace(organization))
+            {
+                resolvedOrganization = "@starion";
+            }
+            else
+            {
+                resolvedOrganization = organization.StartsWith('@') ? organization : $"@{organization}";
+            }
+
             var resolvedName = string.IsNullOrWhiteSpace(packageName) ? "ECSS-MM-PWR" : packageName;
 
             var packageDto = new Package
             {
                 Name = resolvedName,
                 ShortName = resolvedName.ToLowerInvariant(),
-                Visibility = VisibilityKind.PUBLIC
+                Visibility = VisibilityKind.PUBLIC,
+                CreatedAt = DateTime.UtcNow.AddDays(-14)
             };
 
             this.Package = new PackageModel(
                 packageDto,
                 resolvedOrganization,
                 "v1.2.0",
-                importCount: "210",
-                isVerified: true,
-                lastPublished: "2 weeks ago",
-                role: PackageInvitationKind.OWNER,
-                href: PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
-                maintainers: maintainers,
-                versions: versions);
+                importCount: "210")
+            {
+                IsVerified = true,
+                Role = PackageInvitationKind.OWNER,
+                Href = PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
+                Maintainers = maintainers,
+                Versions = versions
+            };
         }
 
         /// <summary>
@@ -71,6 +83,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// </summary>
         public void SavePackage()
         {
+            // Persistence logic pending repository implementation.
         }
     }
 }

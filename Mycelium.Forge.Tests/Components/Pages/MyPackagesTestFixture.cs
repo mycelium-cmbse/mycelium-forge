@@ -108,12 +108,11 @@ namespace Mycelium.Forge.Tests.Components.Pages
         [Test]
         public void VerifyGetVisibilityBadgeVariant()
         {
-            var myPackagesPage = this.context.Render<MyPackages>();
             var publicPkg = new PackageModel(new Package { Visibility = VisibilityKind.PUBLIC });
             var privatePkg = new PackageModel(new Package { Visibility = VisibilityKind.PRIVATE });
 
-            var publicVariant = myPackagesPage.Instance.GetVisibilityBadgeVariant(publicPkg);
-            var privateVariant = myPackagesPage.Instance.GetVisibilityBadgeVariant(privatePkg);
+            var publicVariant = MyPackages.GetVisibilityBadgeVariant(publicPkg);
+            var privateVariant = MyPackages.GetVisibilityBadgeVariant(privatePkg);
 
             using (Assert.EnterMultipleScope())
             {
