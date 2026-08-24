@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="LoginViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -50,15 +50,6 @@ namespace Mycelium.Forge.ViewModels.Login
             this.IsSubmitting = true;
             this.IsSubmitting = false;
 
-            return Result.Ok();
-        }
-
-        /// <summary>
-        /// Initiates single sign-on authentication via the configured organisation identity provider.
-        /// </summary>
-        /// <returns>A <see cref="Result" /> indicating the outcome of the SSO redirect initiation.</returns>
-        public Result ContinueWithSso()
-        {
             return Result.Ok();
         }
     }

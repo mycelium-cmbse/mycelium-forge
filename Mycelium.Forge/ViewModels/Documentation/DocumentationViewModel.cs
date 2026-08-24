@@ -52,12 +52,10 @@ namespace Mycelium.Forge.ViewModels.Documentation
         /// </summary>
         public void InitializeOverview()
         {
-            this.NavGroups = DocumentationSeed.BuildNavGroups("What is Forge");
-            this.KeySections = [..DocumentationSeed.OverviewKeySections];
-            this.TableOfContents = [..DocumentationSeed.OverviewTableOfContents];
-            this.LastUpdated = "29 July 2026";
-            this.FeedbackGiven = false;
-            this.IsHelpful = null;
+            this.InitializePage(
+                "What is Forge",
+                [..DocumentationSeed.OverviewKeySections],
+                [..DocumentationSeed.OverviewTableOfContents]);
         }
 
         /// <summary>
@@ -65,9 +63,26 @@ namespace Mycelium.Forge.ViewModels.Documentation
         /// </summary>
         public void InitializePackagesAndKpar()
         {
-            this.NavGroups = DocumentationSeed.BuildNavGroups("Packages & the kpar format");
-            this.KeySections = [];
-            this.TableOfContents = [..DocumentationSeed.PackagesAndKparTableOfContents];
+            this.InitializePage(
+                "Packages & the kpar format",
+                [],
+                [..DocumentationSeed.PackagesAndKparTableOfContents]);
+        }
+
+        /// <summary>
+        /// Initializes the page state with the provided navigation and content structure.
+        /// </summary>
+        /// <param name="activeItemTitle">The title of the active navigation item.</param>
+        /// <param name="keySections">The collection of key section feature cards.</param>
+        /// <param name="tableOfContents">The collection of table of contents navigation items.</param>
+        public void InitializePage(
+            string activeItemTitle,
+            List<DocumentationSectionCardModel> keySections,
+            List<DocumentationTocItemModel> tableOfContents)
+        {
+            this.NavGroups = DocumentationSeed.BuildNavGroups(activeItemTitle);
+            this.KeySections = keySections;
+            this.TableOfContents = tableOfContents;
             this.LastUpdated = "29 July 2026";
             this.FeedbackGiven = false;
             this.IsHelpful = null;

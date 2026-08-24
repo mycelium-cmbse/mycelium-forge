@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ISignUpViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -46,11 +46,5 @@ namespace Mycelium.Forge.ViewModels.SignUp
         /// </summary>
         /// <returns>A <see cref="Result" /> indicating success or failure of the registration operation.</returns>
         Result SignUp();
-
-        /// <summary>
-        /// Initiates single sign-on authentication via the configured organisation identity provider.
-        /// </summary>
-        /// <returns>A <see cref="Result" /> indicating the outcome of the SSO redirect initiation.</returns>
-        Result ContinueWithSso();
     }
 }

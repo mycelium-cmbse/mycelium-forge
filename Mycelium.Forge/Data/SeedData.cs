@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -177,144 +177,36 @@ namespace Mycelium.Forge.Data
 
             StandardLibraryPackages =
             [
-                new PackageModel(
-                    new Package { Name = "SysMLv2-ISQ-Quantities", ShortName = "sysmlv2-isq-quantities", Visibility = VisibilityKind.PUBLIC },
-                    "@omg",
-                    "v2025.2",
-                    "SysML v2",
-                    "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000.",
-                    "standard-library · units · quantities · isq",
-                    "1.4k",
-                    true,
-                    "1 month ago"),
-                new PackageModel(
-                    new Package { Name = "SysMLv2-Kernel-Library", ShortName = "sysmlv2-kernel-library", Visibility = VisibilityKind.PUBLIC },
-                    "@omg",
-                    "v2025.2",
-                    "SysML v2",
-                    "Fundamental KerML metamodel library containing base types, collections, and control functions.",
-                    "standard-library · kerml · kernel",
-                    "2.1k",
-                    true,
-                    "1 month ago"),
-                new PackageModel(
-                    new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC },
-                    "@esa",
-                    "v1.0.0",
-                    "SysML v2",
-                    "Space environment definitions and planetary constants for mission analysis and spacecraft design.",
-                    "standard-library · space-environment · ecss",
-                    "860",
-                    true,
-                    "2 months ago")
+                SysmlIsqQuantitiesPackageModel,
+                SysmlKernelLibraryPackageModel,
+                EcssEnvironmentPackageModel
             ];
 
             RecentlyUpdatedPackages =
             [
-                new PackageModel(
-                    new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
-                    "@starion",
-                    "v1.2.0",
-                    "SysML v2",
-                    "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and PCU.",
-                    "mission-model · power · ecss",
-                    "210",
-                    true,
-                    "2 weeks ago"),
-                new PackageModel(
-                    new Package { Name = "SmallSat-Platform-Model", ShortName = "smallsat-platform-model", Visibility = VisibilityKind.PUBLIC },
-                    "@starion",
-                    "v0.8.2",
-                    "SysML v2",
-                    "Parametric smallsat platform model including propulsion and telemetry budget templates.",
-                    "mission-model · smallsat · platform",
-                    "145",
-                    true,
-                    "3 weeks ago"),
-                new PackageModel(
-                    new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC },
-                    "@starion",
-                    "v0.3.0",
-                    "SysML v2",
-                    "RF telecommunication link budget and space communication interfaces.",
-                    "comms · rf · telemetry · ecss",
-                    "190",
-                    true,
-                    "2 months ago")
+                EcssPowerSubsystemPackageModel,
+                SmallSatPlatformPackageModel,
+                EcssRfCommsPackageModel
             ];
 
             MostUsedPackages =
             [
-                new PackageModel(
-                    new Package { Name = "SysMLv2-Kernel-Library", ShortName = "sysmlv2-kernel-library", Visibility = VisibilityKind.PUBLIC },
-                    "@omg",
-                    "v2025.2",
-                    "SysML v2",
-                    "Fundamental KerML metamodel library containing base types, collections, and control functions.",
-                    "standard-library · kerml · kernel",
-                    "2.1k",
-                    true,
-                    "1 month ago"),
-                new PackageModel(
-                    new Package { Name = "SysMLv2-ISQ-Quantities", ShortName = "sysmlv2-isq-quantities", Visibility = VisibilityKind.PUBLIC },
-                    "@omg",
-                    "v2025.2",
-                    "SysML v2",
-                    "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000.",
-                    "standard-library · units · quantities · isq",
-                    "1.4k",
-                    true,
-                    "1 month ago"),
-                new PackageModel(
-                    new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC },
-                    "@esa",
-                    "v1.0.0",
-                    "SysML v2",
-                    "Space environment definitions and planetary constants for mission analysis and spacecraft design.",
-                    "standard-library · space-environment · ecss",
-                    "860",
-                    true,
-                    "2 months ago")
+                SysmlKernelLibraryPackageModel,
+                SysmlIsqQuantitiesPackageModel,
+                EcssEnvironmentPackageModel
             ];
 
             ModelsFromOtherMbseTools =
             [
-                new PackageModel(
-                    new Package { Name = "CDP4-COMET-Core", ShortName = "cdp4-comet-core", Visibility = VisibilityKind.PUBLIC },
-                    "@starion",
-                    "v10.25.1",
-                    "CDP4-COMET",
-                    "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25.",
-                    "concurrent-design · cdp4 · ecss-10-25",
-                    "320",
-                    true,
-                    "1 month ago"),
-                new PackageModel(
-                    new Package { Name = "Capella-System-Template", ShortName = "capella-system-template", Visibility = VisibilityKind.PUBLIC },
-                    "@esa",
-                    "v6.1.0",
-                    "Capella",
-                    "Arcadia methodology operational analysis and system architecture template for space instruments.",
-                    "arcadia · capella · operational-analysis",
-                    "185",
-                    true,
-                    "3 months ago"),
-                new PackageModel(
-                    new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC },
-                    "@starion",
-                    "v1.0.0",
-                    "SysML v2",
-                    "Structural and mechanical engineering domain metamodels and loads analysis.",
-                    "mechanical · structures · loads · ecss",
-                    "165",
-                    true,
-                    "3 months ago")
+                Cdp4CometCorePackageModel,
+                CapellaSystemTemplatePackageModel,
+                EcssMechanicalPackageModel
             ];
 
             MyPackages =
             [
                 new PackageModel(
-                    new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
+                    EcssPowerSubsystemPackageModel.Package,
                     "@starion",
                     "v1.2.0",
                     "SysML v2",
@@ -324,7 +216,7 @@ namespace Mycelium.Forge.Data
                     lastPublished: "2 weeks ago",
                     role: PackageInvitationKind.OWNER),
                 new PackageModel(
-                    new Package { Name = "SmallSat-Platform-Model", ShortName = "smallsat-platform-model", Visibility = VisibilityKind.PUBLIC },
+                    SmallSatPlatformPackageModel.Package,
                     "@starion",
                     "v0.8.2",
                     "SysML v2",
@@ -334,7 +226,7 @@ namespace Mycelium.Forge.Data
                     lastPublished: "3 weeks ago",
                     role: PackageInvitationKind.OWNER),
                 new PackageModel(
-                    new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC },
+                    EcssRfCommsPackageModel.Package,
                     "@starion",
                     "v0.3.0",
                     "SysML v2",
@@ -344,7 +236,7 @@ namespace Mycelium.Forge.Data
                     lastPublished: "2 months ago",
                     role: PackageInvitationKind.OWNER),
                 new PackageModel(
-                    new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC },
+                    EcssMechanicalPackageModel.Package,
                     "@starion",
                     "v1.0.0",
                     "SysML v2",
@@ -354,7 +246,7 @@ namespace Mycelium.Forge.Data
                     lastPublished: "3 months ago",
                     role: PackageInvitationKind.OWNER),
                 new PackageModel(
-                    new Package { Name = "CDP4-COMET-Core", ShortName = "cdp4-comet-core", Visibility = VisibilityKind.INTERNAL },
+                    Cdp4CometCorePackageModel.Package,
                     "@starion",
                     "v10.25.1",
                     "CDP4-COMET",
@@ -364,7 +256,7 @@ namespace Mycelium.Forge.Data
                     lastPublished: "1 month ago",
                     role: PackageInvitationKind.MAINTAINER),
                 new PackageModel(
-                    new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC },
+                    EcssEnvironmentPackageModel.Package,
                     "@esa",
                     "v1.0.0",
                     "SysML v2",
@@ -377,67 +269,12 @@ namespace Mycelium.Forge.Data
 
             CatalogPackages =
             [
-                new PackageModel(
-                    "ECSS-MM-PWR",
-                    "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
-                    "SysML v2 (kpar)",
-                    "@starion",
-                    "v1.2.0",
-                    "mission-model · power · ecss",
-                    "2 weeks ago",
-                    "210",
-                    true),
-                new PackageModel(
-                    "SysMLv2-ISQ-Quantities",
-                    "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000. Quantities of kind, measurement units, and dimension vectors.",
-                    "SysML v2 (kpar)",
-                    "@omg",
-                    "v2025.2",
-                    "standard-library · quantities-units · isq · sysml2",
-                    "1 month ago",
-                    "1.4k",
-                    true),
-                new PackageModel(
-                    "SysMLv2-Kernel-Library",
-                    "Fundamental KerML metamodel library containing base types, collections, control functions, and measurement scales used by all SysML v2 packages.",
-                    "SysML v2 (kpar)",
-                    "@omg",
-                    "v2025.2",
-                    "standard-library · kerml · kernel · sysml2",
-                    "1 month ago",
-                    "2.1k",
-                    true),
-                new PackageModel(
-                    "ECSS-E-ST-10-04C",
-                    "Space environment definitions following ECSS-E-ST-10-04C. Earth atmosphere models, solar radiation, geomagnetic field, and planetary constants.",
-                    "SysML v2 (kpar)",
-                    "@esa",
-                    "v1.0.0",
-                    "mission-model · space-environment · ecss · esa",
-                    "2 months ago",
-                    "860",
-                    true),
-                new PackageModel(
-                    "SmallSat-Platform-Model",
-                    "Parametric smallsat platform model including bus geometry, mass properties, power budget, and propulsion subsystem interfaces.",
-                    "SysML v2 (kpar)",
-                    "@starion",
-                    "v0.8.2",
-                    "mission-model · smallsat · platform · starion",
-                    "3 weeks ago",
-                    "145",
-                    true),
-                new PackageModel(
-                    "CDP4-COMET-Core",
-                    "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25 concurrent design platform.",
-                    "CDP4-COMET (10-25)",
-                    "@starion",
-                    "v10.25.1",
-                    "concurrent-engineering · cdp4 · comet · ecss-10-25",
-                    "1 month ago",
-                    "320",
-                    true,
-                    license: "MIT")
+                EcssPowerSubsystemPackageModel,
+                SysmlIsqQuantitiesPackageModel,
+                SysmlKernelLibraryPackageModel,
+                EcssEnvironmentPackageModel,
+                SmallSatPlatformPackageModel,
+                Cdp4CometCorePackageModel
             ];
         }
 
@@ -540,5 +377,131 @@ namespace Mycelium.Forge.Data
         /// Gets the list of package discovery and catalog search result items.
         /// </summary>
         public static IReadOnlyList<PackageModel> CatalogPackages { get; }
+
+        /// <summary>
+        /// Gets the mock model for the SysMLv2-ISQ-Quantities package.
+        /// </summary>
+        public static PackageModel SysmlIsqQuantitiesPackageModel { get; } = new(
+            new Package { Name = "SysMLv2-ISQ-Quantities", ShortName = "sysmlv2-isq-quantities", Visibility = VisibilityKind.PUBLIC },
+            "@omg",
+            "v2025.2",
+            "SysML v2",
+            "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000.",
+            "standard-library · units · quantities · isq",
+            "1.4k",
+            true,
+            "1 month ago");
+
+        /// <summary>
+        /// Gets the mock model for the SysMLv2-Kernel-Library package.
+        /// </summary>
+        public static PackageModel SysmlKernelLibraryPackageModel { get; } = new(
+            new Package { Name = "SysMLv2-Kernel-Library", ShortName = "sysmlv2-kernel-library", Visibility = VisibilityKind.PUBLIC },
+            "@omg",
+            "v2025.2",
+            "SysML v2",
+            "Fundamental KerML metamodel library containing base types, collections, and control functions.",
+            "standard-library · kerml · kernel",
+            "2.1k",
+            true,
+            "1 month ago");
+
+        /// <summary>
+        /// Gets the mock model for the ECSS-E-ST-10-04C package.
+        /// </summary>
+        public static PackageModel EcssEnvironmentPackageModel { get; } = new(
+            new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC },
+            "@esa",
+            "v1.0.0",
+            "SysML v2",
+            "Space environment definitions and planetary constants for mission analysis and spacecraft design.",
+            "standard-library · space-environment · ecss",
+            "860",
+            true,
+            "2 months ago");
+
+        /// <summary>
+        /// Gets the mock model for the ECSS-MM-PWR package.
+        /// </summary>
+        public static PackageModel EcssPowerSubsystemPackageModel { get; } = new(
+            new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
+            "@starion",
+            "v1.2.0",
+            "SysML v2",
+            "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and PCU.",
+            "mission-model · power · ecss",
+            "210",
+            true,
+            "2 weeks ago");
+
+        /// <summary>
+        /// Gets the mock model for the SmallSat-Platform-Model package.
+        /// </summary>
+        public static PackageModel SmallSatPlatformPackageModel { get; } = new(
+            new Package { Name = "SmallSat-Platform-Model", ShortName = "smallsat-platform-model", Visibility = VisibilityKind.PUBLIC },
+            "@starion",
+            "v0.8.2",
+            "SysML v2",
+            "Parametric smallsat platform model including propulsion and telemetry budget templates.",
+            "mission-model · smallsat · platform",
+            "145",
+            true,
+            "3 weeks ago");
+
+        /// <summary>
+        /// Gets the mock model for the ecss-e-st-32-10c package.
+        /// </summary>
+        public static PackageModel EcssRfCommsPackageModel { get; } = new(
+            new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC },
+            "@starion",
+            "v0.3.0",
+            "SysML v2",
+            "RF telecommunication link budget and space communication interfaces.",
+            "comms · rf · telemetry · ecss",
+            "190",
+            true,
+            "2 months ago");
+
+        /// <summary>
+        /// Gets the mock model for the CDP4-COMET-Core package.
+        /// </summary>
+        public static PackageModel Cdp4CometCorePackageModel { get; } = new(
+            new Package { Name = "CDP4-COMET-Core", ShortName = "cdp4-comet-core", Visibility = VisibilityKind.PUBLIC },
+            "@starion",
+            "v10.25.1",
+            "CDP4-COMET",
+            "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25.",
+            "concurrent-design · cdp4 · ecss-10-25",
+            "320",
+            true,
+            "1 month ago");
+
+        /// <summary>
+        /// Gets the mock model for the Capella-System-Template package.
+        /// </summary>
+        public static PackageModel CapellaSystemTemplatePackageModel { get; } = new(
+            new Package { Name = "Capella-System-Template", ShortName = "capella-system-template", Visibility = VisibilityKind.PUBLIC },
+            "@esa",
+            "v6.1.0",
+            "Capella",
+            "Arcadia methodology operational analysis and system architecture template for space instruments.",
+            "arcadia · capella · operational-analysis",
+            "185",
+            true,
+            "3 months ago");
+
+        /// <summary>
+        /// Gets the mock model for the ecss-e-st-31-01c package.
+        /// </summary>
+        public static PackageModel EcssMechanicalPackageModel { get; } = new(
+            new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC },
+            "@starion",
+            "v1.0.0",
+            "SysML v2",
+            "Structural and mechanical engineering domain metamodels and loads analysis.",
+            "mechanical · structures · loads · ecss",
+            "165",
+            true,
+            "3 months ago");
     }
 }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IDocumentationViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -55,6 +55,17 @@ namespace Mycelium.Forge.ViewModels.Documentation
         /// Initializes the view model state for the packages and kpar format documentation page.
         /// </summary>
         void InitializePackagesAndKpar();
+
+        /// <summary>
+        /// Initializes the page state with the provided navigation and content structure.
+        /// </summary>
+        /// <param name="activeItemTitle">The title of the active navigation item.</param>
+        /// <param name="keySections">The collection of key section feature cards.</param>
+        /// <param name="tableOfContents">The collection of table of contents navigation items.</param>
+        void InitializePage(
+            string activeItemTitle,
+            List<DocumentationSectionCardModel> keySections,
+            List<DocumentationTocItemModel> tableOfContents);
 
         /// <summary>
         /// Records user feedback indicating whether the documentation page was helpful.

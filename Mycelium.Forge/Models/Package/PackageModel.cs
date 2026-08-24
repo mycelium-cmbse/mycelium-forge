@@ -194,8 +194,23 @@ namespace Mycelium.Forge.Models.Package
         public IReadOnlyList<PackageMaintainerModel> Maintainers { get; set; } = [];
 
         /// <summary>
-        /// Gets or sets the collection of release versions for the package.
+        /// Gets the collection of release versions for the package.
         /// </summary>
         public IReadOnlyList<PackageVersionModel> Versions { get; set; } = [];
+
+        /// <summary>
+        /// Gets the default caret-prefixed version constraint expression based on the release version.
+        /// </summary>
+        /// <returns>The formatted default version constraint string.</returns>
+        public string GetDefaultVersionConstraint()
+        {
+            if (string.IsNullOrWhiteSpace(this.Version))
+            {
+                return "^1.0.0";
+            }
+
+            var cleanVersion = this.Version.TrimStart('v', 'V');
+            return $"^{cleanVersion}";
+        }
     }
 }

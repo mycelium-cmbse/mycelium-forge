@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AddToProjectDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -143,13 +143,12 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         {
             base.OnInitialized();
 
-            if (this.Package != null && !string.IsNullOrWhiteSpace(this.Package.Version))
+            if (this.Package != null)
             {
-                var cleanVersion = this.Package.Version.TrimStart('v', 'V');
-                this.VersionConstraint = $"^{cleanVersion}";
+                this.VersionConstraint = this.Package.GetDefaultVersionConstraint();
             }
 
-            this.SelectedProject = this.Projects[0];
+            this.SelectedProject = this.Projects.Count > 0 ? this.Projects[0] : string.Empty;
         }
     }
 }

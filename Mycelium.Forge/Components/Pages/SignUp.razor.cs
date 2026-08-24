@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SignUp.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -110,17 +110,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         public void OnContinueWithSso()
         {
-            var result = this.ViewModel.ContinueWithSso();
-
-            if (result.IsSuccess)
-            {
-                this.ToastService.Info("Redirecting to identity provider...", "Single Sign-On");
-            }
-            else
-            {
-                var errorMessage = result.Reasons.Count > 0 ? result.Reasons[0].Message : "Failed to initiate SSO.";
-                this.ToastService.Error(errorMessage, "Error");
-            }
+            this.ToastService.Info("Redirecting to identity provider...", "Single Sign-On");
         }
 
         /// <summary>

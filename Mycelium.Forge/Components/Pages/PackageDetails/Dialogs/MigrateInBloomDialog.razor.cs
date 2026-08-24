@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MigrateInBloomDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,33 +23,9 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
     public partial class MigrateInBloomDialog : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the cascading dialog reference used to control and close the dialog.
+        /// Gets the validation manager instance handling field validation states.
         /// </summary>
-        [CascadingParameter]
-        public IDialogReference DialogReference { get; set; }
-
-        /// <summary>
-        /// Gets or sets the package model being migrated.
-        /// </summary>
-        [Parameter]
-        public PackageModel Package { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of available target projects.
-        /// </summary>
-        [Parameter]
-        public IReadOnlyList<string> Projects { get; set; } =
-        [
-            "Spacecraft Mission",
-            "CubeSat Constellation",
-            "Ground Station Network"
-        ];
-
-        /// <summary>
-        /// Gets or sets the event callback invoked when the user confirms migrating in Bloom.
-        /// </summary>
-        [Parameter]
-        public EventCallback<MigrateInBloomResult> OnResult { get; set; }
+        public ValidationManager ValidationManager { get; } = new();
 
         /// <summary>
         /// Gets or sets the event callback invoked when the dialog is cancelled or closed.
@@ -58,51 +34,56 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         public EventCallback OnCancel { get; set; }
 
         /// <summary>
-        /// Gets the validation manager instance handling field validation states.
+        /// Gets or sets the event callback invoked when the user confirms migrating in Bloom.
         /// </summary>
-        public ValidationManager ValidationManager { get; } = new();
+        [Parameter]
+        public EventCallback<MigrateInBloomResult> OnResult { get; set; }
 
         /// <summary>
-        /// Gets or sets the currently selected destination project.
+        /// Gets or sets the package model being migrated.
         /// </summary>
-        public string SelectedProject { get; set; } = "Spacecraft Mission";
+        [Parameter]
+        public PackageModel Package { get; set; }
+
+        /// <summary>
+        /// Gets or sets the cascading dialog reference used to control and close the dialog.
+        /// </summary>
+        [CascadingParameter]
+        public IDialogReference DialogReference { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of available target projects.
+        /// </summary>
+        [Parameter]
+        public IReadOnlyList<string> Projects { get; set; } =
+        [
+            "Spacecraft Mission",
+            "Ground Station Network",
+            "CubeSat Constellation"
+        ];
 
         /// <summary>
         /// Gets or sets the version constraint expression.
         /// </summary>
-        public string VersionConstraint { get; set; } = "^1.2.0";
+        public string VersionConstraint { get; set; } = string.Empty;
 
         /// <summary>
-        /// Handles changes to the selected project value.
+        /// Gets or sets the currently selected destination project.
         /// </summary>
-        /// <param name="value">The newly selected project.</param>
-        public void OnProjectChanged(string value)
-        {
-            this.SelectedProject = value ?? string.Empty;
-            this.ValidationManager.ClearError(nameof(this.SelectedProject));
-        }
+        public string SelectedProject { get; set; } = string.Empty;
 
         /// <summary>
-        /// Handles changes to the version constraint input value.
+        /// Initializes default values based on passed parameters when component parameters are initialized.
         /// </summary>
-        /// <param name="value">The new version constraint expression.</param>
-        public void OnVersionConstraintChanged(string value)
+        protected override void OnInitialized()
         {
-            this.VersionConstraint = value ?? string.Empty;
-            this.ValidationManager.ClearError(nameof(this.VersionConstraint));
-        }
+            base.OnInitialized();
 
-        /// <summary>
-        /// Handles the cancel action, cancelling the dialog and invoking the cancel callback.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnCancelClicked()
-        {
-            await this.OnCancel.InvokeAsync();
+            this.SelectedProject = this.Projects.Count > 0 ? this.Projects[0] : string.Empty;
 
-            if (this.DialogReference != null)
+            if (this.Package != null)
             {
-                await this.DialogReference.CancelAsync();
+                this.VersionConstraint = this.Package.GetDefaultVersionConstraint();
             }
         }
 
@@ -124,8 +105,8 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
 
             var result = new MigrateInBloomResult
             {
-                ProjectName = this.SelectedProject.Trim(),
-                VersionConstraint = this.VersionConstraint.Trim()
+                ProjectName = this.SelectedProject,
+                VersionConstraint = this.VersionConstraint
             };
 
             await this.OnResult.InvokeAsync(result);
@@ -137,19 +118,37 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         }
 
         /// <summary>
-        /// Initializes default values based on passed parameters when component parameters are initialized.
+        /// Handles changes to the version constraint input value.
         /// </summary>
-        protected override void OnInitialized()
+        /// <param name="value">The new version constraint expression.</param>
+        public void OnVersionConstraintChanged(string value)
         {
-            base.OnInitialized();
+            this.VersionConstraint = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.VersionConstraint));
+        }
 
-            if (this.Package != null && !string.IsNullOrWhiteSpace(this.Package.Version))
+        /// <summary>
+        /// Handles changes to the selected project value.
+        /// </summary>
+        /// <param name="value">The newly selected project.</param>
+        public void OnProjectChanged(string value)
+        {
+            this.SelectedProject = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.SelectedProject));
+        }
+
+        /// <summary>
+        /// Handles the cancel action, cancelling the dialog and invoking the cancel callback.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnCancelClicked()
+        {
+            await this.OnCancel.InvokeAsync();
+
+            if (this.DialogReference != null)
             {
-                var cleanVersion = this.Package.Version.TrimStart('v', 'V');
-                this.VersionConstraint = $"^{cleanVersion}";
+                await this.DialogReference.CancelAsync();
             }
-
-            this.SelectedProject = this.Projects[0];
         }
     }
 }
