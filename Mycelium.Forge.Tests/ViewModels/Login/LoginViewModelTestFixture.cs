@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="LoginViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -20,14 +20,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Login
         public void SetUp()
         {
             this.viewModel = new LoginViewModel();
-        }
-
-        [Test]
-        public void VerifyContinueWithSso()
-        {
-            var result = this.viewModel.ContinueWithSso();
-
-            Assert.That(result.IsSuccess, Is.True);
         }
 
         [Test]

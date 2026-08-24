@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -49,6 +49,22 @@ namespace Mycelium.Forge.Tests.ViewModels.Documentation
                 Assert.That(this.viewModel.KeySections, Has.Count.EqualTo(0));
                 Assert.That(this.viewModel.TableOfContents, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.FeedbackGiven, Is.False);
+            }
+        }
+
+        [Test]
+        public void VerifyInitializePage()
+        {
+            this.viewModel.InitializePage("What is Forge", [], []);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.NavGroups, Has.Count.GreaterThan(0));
+                Assert.That(this.viewModel.KeySections, Has.Count.EqualTo(0));
+                Assert.That(this.viewModel.TableOfContents, Has.Count.EqualTo(0));
+                Assert.That(this.viewModel.LastUpdated, Is.EqualTo("29 July 2026"));
+                Assert.That(this.viewModel.FeedbackGiven, Is.False);
+                Assert.That(this.viewModel.IsHelpful, Is.Null);
             }
         }
 
