@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Components.Pages
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Admin;
     using Mycelium.Forge.ViewModels.AdminAccounts;
@@ -35,19 +36,19 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Gets or sets the selected account status filter.
         /// </summary>
-        public string SelectedStatusFilter { get; set; } = "All";
+        public string SelectedStatusFilter { get; set; } = AdminAccountsViewModel.AllStatusFilter;
 
         /// <summary>
         /// Gets or sets the selected verification status filter.
         /// </summary>
-        public string SelectedVerificationFilter { get; set; } = "All";
+        public VerificationFilterOption SelectedVerificationFilter { get; set; } = VerificationFilterOption.All;
 
         /// <summary>
         /// Gets the available status filter options.
         /// </summary>
         public static IReadOnlyList<string> StatusFilterOptions { get; } =
         [
-            "All",
+            AdminAccountsViewModel.AllStatusFilter,
             nameof(ScopeStatusKind.ACTIVE).ToUpperCaseFirst(),
             nameof(ScopeStatusKind.DEACTIVATED).ToUpperCaseFirst()
         ];
@@ -55,21 +56,12 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Gets the available verification filter options.
         /// </summary>
-        public static IReadOnlyList<string> VerificationFilterOptions { get; } =
+        public static IReadOnlyList<VerificationFilterOption> VerificationFilterOptions { get; } =
         [
-            "All",
-            "Verified",
-            "Pending"
+            VerificationFilterOption.All,
+            VerificationFilterOption.Verified,
+            VerificationFilterOption.Pending
         ];
-
-        /// <summary>
-        /// Initializes the component and loads initial view model state.
-        /// </summary>
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            this.ViewModel.InitializeViewModel(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
-        }
 
         /// <summary>
         /// Handles search input query changes and triggers account filtering.
@@ -87,7 +79,7 @@ namespace Mycelium.Forge.Components.Pages
         /// <param name="status">The selected status filter.</param>
         public void OnStatusFilterChanged(string status)
         {
-            this.SelectedStatusFilter = status ?? "All";
+            this.SelectedStatusFilter = status ?? AdminAccountsViewModel.AllStatusFilter;
             this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
         }
 
@@ -95,9 +87,9 @@ namespace Mycelium.Forge.Components.Pages
         /// Handles verification status filter dropdown selection changes.
         /// </summary>
         /// <param name="verification">The selected verification status filter.</param>
-        public void OnVerificationFilterChanged(string verification)
+        public void OnVerificationFilterChanged(VerificationFilterOption verification)
         {
-            this.SelectedVerificationFilter = verification ?? "All";
+            this.SelectedVerificationFilter = verification;
             this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
         }
 
@@ -126,6 +118,15 @@ namespace Mycelium.Forge.Components.Pages
         {
             var count = this.ViewModel.FilteredAccounts.Count;
             return count == 1 ? "1 account" : $"{count} accounts";
+        }
+
+        /// <summary>
+        /// Initializes the component and loads initial view model state.
+        /// </summary>
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            this.ViewModel.InitializeViewModel(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
         }
     }
 }

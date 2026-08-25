@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Models.Package
+namespace Mycelium.Forge.Enums
 {
     /// <summary>
     /// Specifies the available sorting criteria for package search results.

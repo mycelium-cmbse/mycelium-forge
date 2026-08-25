@@ -24,6 +24,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Admin;
     using Mycelium.Forge.ViewModels.AdminAccounts;
 
@@ -109,7 +110,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             {
                 Assert.That(Accounts.StatusFilterOptions, Has.Count.EqualTo(3));
                 Assert.That(Accounts.VerificationFilterOptions, Has.Count.EqualTo(3));
-                this.viewModelMock.Verify(x => x.InitializeViewModel(string.Empty, "All", "All"), Times.Once);
+                this.viewModelMock.Verify(x => x.InitializeViewModel(string.Empty, AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All), Times.Once);
             }
         }
 
@@ -121,15 +122,15 @@ namespace Mycelium.Forge.Tests.Components.Pages
             accountsPage.Instance.OnSearchInputChanged("alex");
             var query = accountsPage.Instance.SearchQuery;
 
-            accountsPage.Instance.OnSearchInputChanged(null);
+            accountsPage.Instance.OnSearchInputChanged(null!);
             var nullQuery = accountsPage.Instance.SearchQuery;
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(query, Is.EqualTo("alex"));
                 Assert.That(nullQuery, Is.EqualTo(string.Empty));
-                this.viewModelMock.Verify(x => x.ApplyFilters("alex", "All", "All"), Times.Once);
-                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, "All", "All"), Times.Once);
+                this.viewModelMock.Verify(x => x.ApplyFilters("alex", AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All), Times.Once);
+                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All), Times.Once);
             }
         }
 
@@ -141,15 +142,15 @@ namespace Mycelium.Forge.Tests.Components.Pages
             accountsPage.Instance.OnStatusFilterChanged("Active");
             var status = accountsPage.Instance.SelectedStatusFilter;
 
-            accountsPage.Instance.OnStatusFilterChanged(null);
+            accountsPage.Instance.OnStatusFilterChanged(null!);
             var nullStatus = accountsPage.Instance.SelectedStatusFilter;
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(status, Is.EqualTo("Active"));
-                Assert.That(nullStatus, Is.EqualTo("All"));
-                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, "Active", "All"), Times.Once);
-                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, "All", "All"), Times.Once);
+                Assert.That(nullStatus, Is.EqualTo(AdminAccountsViewModel.AllStatusFilter));
+                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, "Active", VerificationFilterOption.All), Times.Once);
+                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All), Times.Once);
             }
         }
 
@@ -168,18 +169,18 @@ namespace Mycelium.Forge.Tests.Components.Pages
         {
             var accountsPage = this.context.Render<Accounts>();
 
-            accountsPage.Instance.OnVerificationFilterChanged("Verified");
+            accountsPage.Instance.OnVerificationFilterChanged(VerificationFilterOption.Verified);
             var verification = accountsPage.Instance.SelectedVerificationFilter;
 
-            accountsPage.Instance.OnVerificationFilterChanged(null);
-            var nullVerification = accountsPage.Instance.SelectedVerificationFilter;
+            accountsPage.Instance.OnVerificationFilterChanged(VerificationFilterOption.All);
+            var allVerification = accountsPage.Instance.SelectedVerificationFilter;
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(verification, Is.EqualTo("Verified"));
-                Assert.That(nullVerification, Is.EqualTo("All"));
-                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, "All", "Verified"), Times.Once);
-                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, "All", "All"), Times.Once);
+                Assert.That(verification, Is.EqualTo(VerificationFilterOption.Verified));
+                Assert.That(allVerification, Is.EqualTo(VerificationFilterOption.All));
+                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.Verified), Times.Once);
+                this.viewModelMock.Verify(x => x.ApplyFilters(string.Empty, AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All), Times.Once);
             }
         }
 

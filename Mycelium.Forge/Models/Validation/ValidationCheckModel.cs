@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Models.Validation
 {
+    using Mycelium.Forge.Enums;
+
     /// <summary>
     /// Represents an evaluation check and its execution outcome.
     /// </summary>
@@ -51,10 +53,5 @@ namespace Mycelium.Forge.Models.Validation
         /// Gets or sets the evaluation status outcome value.
         /// </summary>
         public ValidationStatus Status { get; set; } = ValidationStatus.Pass;
-
-        /// <summary>
-        /// Gets a value indicating whether the validation check passed successfully.
-        /// </summary>
-        public bool IsPassed => this.Status == ValidationStatus.Pass;
     }
 }

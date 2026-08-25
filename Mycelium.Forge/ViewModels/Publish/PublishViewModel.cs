@@ -12,6 +12,7 @@ namespace Mycelium.Forge.ViewModels.Publish
     using FluentResults;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
 

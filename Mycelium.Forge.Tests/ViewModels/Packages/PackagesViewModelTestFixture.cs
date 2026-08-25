@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.ViewModels.Packages
 {
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.Packages;
 

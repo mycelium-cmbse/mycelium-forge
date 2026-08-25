@@ -22,6 +22,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.Packages;
 

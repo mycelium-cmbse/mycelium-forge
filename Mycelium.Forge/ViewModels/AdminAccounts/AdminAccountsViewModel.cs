@@ -11,6 +11,7 @@ namespace Mycelium.Forge.ViewModels.AdminAccounts
 {
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Admin;
 
     /// <summary>
@@ -18,6 +19,11 @@ namespace Mycelium.Forge.ViewModels.AdminAccounts
     /// </summary>
     public class AdminAccountsViewModel : IAdminAccountsViewModel
     {
+        /// <summary>
+        /// Represents the filter value used to include all account statuses without filtering.
+        /// </summary>
+        public const string AllStatusFilter = "All";
+
         /// <summary>
         /// Gets or sets the collection of all accounts.
         /// </summary>
@@ -33,8 +39,8 @@ namespace Mycelium.Forge.ViewModels.AdminAccounts
         /// </summary>
         /// <param name="searchQuery">The initial search filter query string.</param>
         /// <param name="statusFilter">The initial status filter.</param>
-        /// <param name="verificationFilter">The initial verification filter.</param>
-        public void InitializeViewModel(string searchQuery = "", string statusFilter = "All", string verificationFilter = "All")
+        /// <param name="verificationFilter">The initial verification filter option.</param>
+        public void InitializeViewModel(string searchQuery = "", string statusFilter = AllStatusFilter, VerificationFilterOption verificationFilter = VerificationFilterOption.All)
         {
             this.Accounts = [.. SeedData.AdminAccounts];
             this.ApplyFilters(searchQuery, statusFilter, verificationFilter);
@@ -45,8 +51,8 @@ namespace Mycelium.Forge.ViewModels.AdminAccounts
         /// </summary>
         /// <param name="searchQuery">The search query text filter.</param>
         /// <param name="statusFilter">The status filter.</param>
-        /// <param name="verificationFilter">The verification filter.</param>
-        public void ApplyFilters(string searchQuery, string statusFilter, string verificationFilter)
+        /// <param name="verificationFilter">The verification filter option.</param>
+        public void ApplyFilters(string searchQuery, string statusFilter, VerificationFilterOption verificationFilter)
         {
             var filtered = this.Accounts.AsEnumerable();
 
@@ -60,16 +66,18 @@ namespace Mycelium.Forge.ViewModels.AdminAccounts
                     account.Email.Contains(query, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!string.Equals(statusFilter, "All", StringComparison.OrdinalIgnoreCase) &&
+            if (!string.Equals(statusFilter, AllStatusFilter, StringComparison.OrdinalIgnoreCase) &&
                 Enum.TryParse<ScopeStatusKind>(statusFilter, true, out var statusKind))
             {
                 filtered = filtered.Where(account => account.Status == statusKind);
             }
 
-            if (!string.Equals(verificationFilter, "All", StringComparison.OrdinalIgnoreCase))
+            if (verificationFilter != VerificationFilterOption.All)
             {
+                var filterName = verificationFilter.ToString();
+
                 filtered = filtered.Where(account =>
-                    string.Equals(account.VerificationStatus, verificationFilter, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(account.VerificationStatus, filterName, StringComparison.OrdinalIgnoreCase));
             }
 
             this.FilteredAccounts = [.. filtered];

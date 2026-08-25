@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.ViewModels.AdminAccounts
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.ViewModels.AdminAccounts;
 
     [TestFixture]
@@ -28,16 +29,19 @@ namespace Mycelium.Forge.Tests.ViewModels.AdminAccounts
         {
             this.viewModel.InitializeViewModel();
 
-            this.viewModel.ApplyFilters("r.andre", "All", "All");
+            this.viewModel.ApplyFilters("r.andre", AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All);
             var nameCount = this.viewModel.FilteredAccounts.Count;
 
-            this.viewModel.ApplyFilters(string.Empty, nameof(ScopeStatusKind.ACTIVE), "All");
+            this.viewModel.ApplyFilters(string.Empty, nameof(ScopeStatusKind.ACTIVE), VerificationFilterOption.All);
             var activeCount = this.viewModel.FilteredAccounts.Count;
 
-            this.viewModel.ApplyFilters(string.Empty, "All", "Verified");
+            this.viewModel.ApplyFilters(string.Empty, AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.Verified);
             var verifiedCount = this.viewModel.FilteredAccounts.Count;
 
-            this.viewModel.ApplyFilters("nonexistentuser12345", "All", "All");
+            this.viewModel.ApplyFilters(string.Empty, AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.Pending);
+            var pendingCount = this.viewModel.FilteredAccounts.Count;
+
+            this.viewModel.ApplyFilters("nonexistentuser12345", AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All);
             var emptyCount = this.viewModel.FilteredAccounts.Count;
 
             using (Assert.EnterMultipleScope())
@@ -45,6 +49,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AdminAccounts
                 Assert.That(nameCount, Is.GreaterThanOrEqualTo(1));
                 Assert.That(activeCount, Is.GreaterThanOrEqualTo(1));
                 Assert.That(verifiedCount, Is.GreaterThanOrEqualTo(1));
+                Assert.That(pendingCount, Is.GreaterThanOrEqualTo(1));
                 Assert.That(emptyCount, Is.Zero);
             }
         }

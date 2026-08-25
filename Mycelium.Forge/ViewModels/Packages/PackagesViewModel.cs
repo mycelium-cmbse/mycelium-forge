@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.ViewModels.Packages
 {
     using Mycelium.Forge.Data;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Package;
 
     /// <summary>

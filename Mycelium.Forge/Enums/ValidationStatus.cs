@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Models.Validation
+namespace Mycelium.Forge.Enums
 {
     /// <summary>
     /// Specifies the evaluation status outcome of a validation rule or check.
