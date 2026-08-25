@@ -49,7 +49,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 new(new Package { Name = "Internal-Core", ShortName = "internal-core", Visibility = VisibilityKind.PRIVATE }, "ESA")
             };
 
-            this.viewModelMock.SetupGet(x => x.Packages).Returns(packages);
+            this.viewModelMock.Setup(x => x.Packages).Returns(packages);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }

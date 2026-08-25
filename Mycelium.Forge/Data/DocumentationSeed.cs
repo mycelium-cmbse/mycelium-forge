@@ -74,20 +74,8 @@ namespace Mycelium.Forge.Data
         /// </summary>
         public static IReadOnlyList<DocumentationTocItemModel> OverviewTableOfContents { get; } =
         [
-            new()
-            {
-                Title = "What is Mycelium Forge?",
-                TargetId = "what-is-mycelium-forge",
-                Href = $"{PageRoutes.Documentation.Overview}#what-is-mycelium-forge",
-                IsActive = true
-            },
-            new()
-            {
-                Title = "Key sections",
-                TargetId = "key-sections",
-                Href = $"{PageRoutes.Documentation.Overview}#key-sections",
-                IsActive = false
-            }
+            CreateTocItem("What is Mycelium Forge?", "what-is-mycelium-forge", PageRoutes.Documentation.Overview, true),
+            CreateTocItem("Key sections", "key-sections", PageRoutes.Documentation.Overview)
         ];
 
         /// <summary>
@@ -95,27 +83,9 @@ namespace Mycelium.Forge.Data
         /// </summary>
         public static IReadOnlyList<DocumentationTocItemModel> PackagesAndKparTableOfContents { get; } =
         [
-            new()
-            {
-                Title = "What is a package?",
-                TargetId = "what-is-a-package",
-                Href = $"{PageRoutes.Documentation.PackagesAndKparFormat}#what-is-a-package",
-                IsActive = true
-            },
-            new()
-            {
-                Title = "The kpar archive",
-                TargetId = "the-kpar-archive",
-                Href = $"{PageRoutes.Documentation.PackagesAndKparFormat}#the-kpar-archive",
-                IsActive = false
-            },
-            new()
-            {
-                Title = "Package identity",
-                TargetId = "package-identity",
-                Href = $"{PageRoutes.Documentation.PackagesAndKparFormat}#package-identity",
-                IsActive = false
-            }
+            CreateTocItem("What is a package?", "what-is-a-package", PageRoutes.Documentation.PackagesAndKparFormat, true),
+            CreateTocItem("The kpar archive", "the-kpar-archive", PageRoutes.Documentation.PackagesAndKparFormat),
+            CreateTocItem("Package identity", "package-identity", PageRoutes.Documentation.PackagesAndKparFormat)
         ];
 
         /// <summary>
@@ -132,9 +102,9 @@ namespace Mycelium.Forge.Data
                     Title = "OVERVIEW",
                     Items =
                     [
-                        new DocumentationNavItemModel { Title = "What is Forge", Href = PageRoutes.Documentation.Overview, IsActive = activeItemTitle == "What is Forge" },
-                        new DocumentationNavItemModel { Title = "Platform overview", Href = "#", IsActive = activeItemTitle == "Platform overview" },
-                        new DocumentationNavItemModel { Title = "Quickstart", Href = "#", IsActive = activeItemTitle == "Quickstart" }
+                        CreateNavItem("What is Forge", PageRoutes.Documentation.Overview, activeItemTitle),
+                        CreateNavItem("Platform overview", "#", activeItemTitle),
+                        CreateNavItem("Quickstart", "#", activeItemTitle)
                     ]
                 },
                 new DocumentationNavGroupModel
@@ -142,101 +112,83 @@ namespace Mycelium.Forge.Data
                     Title = "CORE CONCEPTS",
                     Items =
                     [
-                        new DocumentationNavItemModel { Title = "Packages & the kpar format", Href = PageRoutes.Documentation.PackagesAndKparFormat, IsActive = activeItemTitle == "Packages & the kpar format" },
-                        new DocumentationNavItemModel { Title = "Supported formats", Href = "#", IsActive = activeItemTitle == "Supported formats" },
-                        new DocumentationNavItemModel { Title = "Scopes & identifiers", Href = "#", IsActive = activeItemTitle == "Scopes & identifiers" },
-                        new DocumentationNavItemModel { Title = "Versioning & SemVer", Href = "#", IsActive = activeItemTitle == "Versioning & SemVer" },
-                        new DocumentationNavItemModel { Title = "Immutability & yanking", Href = "#", IsActive = activeItemTitle == "Immutability & yanking" },
-                        new DocumentationNavItemModel { Title = "Release validation", Href = "#", IsActive = activeItemTitle == "Release validation" }
+                        CreateNavItem("Packages & the kpar format", PageRoutes.Documentation.PackagesAndKparFormat, activeItemTitle),
+                        CreateNavItem("Supported formats", "#", activeItemTitle),
+                        CreateNavItem("Scopes & identifiers", "#", activeItemTitle),
+                        CreateNavItem("Versioning & SemVer", "#", activeItemTitle),
+                        CreateNavItem("Immutability & yanking", "#", activeItemTitle),
+                        CreateNavItem("Release validation", "#", activeItemTitle)
                     ]
                 },
-                new DocumentationNavGroupModel
-                {
-                    Title = "CONSUMING",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Discover & search", Href = "#", IsActive = activeItemTitle == "Discover & search" },
-                        new DocumentationNavItemModel { Title = "Import into a project", Href = "#", IsActive = activeItemTitle == "Import into a project" },
-                        new DocumentationNavItemModel { Title = "The Library panel", Href = "#", IsActive = activeItemTitle == "The Library panel" },
-                        new DocumentationNavItemModel { Title = "Standard libraries", Href = "#", IsActive = activeItemTitle == "Standard libraries" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "PUBLISHING",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Prepare a package", Href = "#", IsActive = activeItemTitle == "Prepare a package" },
-                        new DocumentationNavItemModel { Title = "Publish from Bloom", Href = "#", IsActive = activeItemTitle == "Publish from Bloom" },
-                        new DocumentationNavItemModel { Title = "Publish with the CLI", Href = "#", IsActive = activeItemTitle == "Publish with the CLI" },
-                        new DocumentationNavItemModel { Title = "Manage versions", Href = "#", IsActive = activeItemTitle == "Manage versions" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "SECURITY",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "API keys", Href = "#", IsActive = activeItemTitle == "API keys" },
-                        new DocumentationNavItemModel { Title = "Trusted publishing", Href = "#", IsActive = activeItemTitle == "Trusted publishing" },
-                        new DocumentationNavItemModel { Title = "Provenance", Href = "#", IsActive = activeItemTitle == "Provenance" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "CLI REFERENCE",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Install & authenticate", Href = "#", IsActive = activeItemTitle == "Install & authenticate" },
-                        new DocumentationNavItemModel { Title = "Command reference", Href = "#", IsActive = activeItemTitle == "Command reference" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "HTTP API",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Overview", Href = "#", IsActive = activeItemTitle == "Overview" },
-                        new DocumentationNavItemModel { Title = "Endpoints", Href = "#", IsActive = activeItemTitle == "Endpoints" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "GOVERNANCE",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Ownership & maintainers", Href = "#", IsActive = activeItemTitle == "Ownership & maintainers" },
-                        new DocumentationNavItemModel { Title = "Verified scopes", Href = "#", IsActive = activeItemTitle == "Verified scopes" },
-                        new DocumentationNavItemModel { Title = "Roles & permissions", Href = "#", IsActive = activeItemTitle == "Roles & permissions" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "OPERATIONS",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Self-hosting", Href = "#", IsActive = activeItemTitle == "Self-hosting" },
-                        new DocumentationNavItemModel { Title = "Mirroring & proxying", Href = "#", IsActive = activeItemTitle == "Mirroring & proxying" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "REFERENCE & POLICIES",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Terms & policies", Href = "#", IsActive = activeItemTitle == "Terms & policies" },
-                        new DocumentationNavItemModel { Title = "Security", Href = "#", IsActive = activeItemTitle == "Security" }
-                    ]
-                },
-                new DocumentationNavGroupModel
-                {
-                    Title = "FAQ",
-                    Items =
-                    [
-                        new DocumentationNavItemModel { Title = "Troubleshooting", Href = "#", IsActive = activeItemTitle == "Troubleshooting" }
-                    ]
-                }
+                CreatePlaceholderGroup("CONSUMING", activeItemTitle, "Discover & search", "Import into a project", "The Library panel", "Standard libraries"),
+                CreatePlaceholderGroup("PUBLISHING", activeItemTitle, "Prepare a package", "Publish from Bloom", "Publish with the CLI", "Manage versions"),
+                CreatePlaceholderGroup("SECURITY", activeItemTitle, "API keys", "Trusted publishing", "Provenance"),
+                CreatePlaceholderGroup("CLI REFERENCE", activeItemTitle, "Install & authenticate", "Command reference"),
+                CreatePlaceholderGroup("HTTP API", activeItemTitle, "Overview", "Endpoints"),
+                CreatePlaceholderGroup("GOVERNANCE", activeItemTitle, "Ownership & maintainers", "Verified scopes", "Roles & permissions"),
+                CreatePlaceholderGroup("OPERATIONS", activeItemTitle, "Self-hosting", "Mirroring & proxying"),
+                CreatePlaceholderGroup("REFERENCE & POLICIES", activeItemTitle, "Terms & policies", "Security"),
+                CreatePlaceholderGroup("FAQ", activeItemTitle, "Troubleshooting")
             ];
+        }
+
+        /// <summary>
+        /// Creates a table of contents item model.
+        /// </summary>
+        /// <param name="title">The title of the section.</param>
+        /// <param name="targetId">The target element identifier.</param>
+        /// <param name="baseHref">The base page route.</param>
+        /// <param name="isActive">A value indicating whether this item is initially active.</param>
+        /// <returns>A new <see cref="DocumentationTocItemModel" />.</returns>
+        private static DocumentationTocItemModel CreateTocItem(string title, string targetId, string baseHref, bool isActive = false)
+        {
+            return new DocumentationTocItemModel
+            {
+                Title = title,
+                TargetId = targetId,
+                Href = $"{baseHref}#{targetId}",
+                IsActive = isActive
+            };
+        }
+
+        /// <summary>
+        /// Creates a navigation item model with the specified title, href, and active state.
+        /// </summary>
+        /// <param name="title">The item title.</param>
+        /// <param name="href">The destination URL.</param>
+        /// <param name="activeItemTitle">The currently active item title.</param>
+        /// <returns>A new <see cref="DocumentationNavItemModel" />.</returns>
+        private static DocumentationNavItemModel CreateNavItem(string title, string href, string activeItemTitle)
+        {
+            return new DocumentationNavItemModel
+            {
+                Title = title,
+                Href = href,
+                IsActive = title == activeItemTitle
+            };
+        }
+
+        /// <summary>
+        /// Creates a navigation group model with placeholder hash links for the given titles.
+        /// </summary>
+        /// <param name="groupTitle">The title of the group.</param>
+        /// <param name="activeItemTitle">The title of the active item.</param>
+        /// <param name="itemTitles">The titles of the navigation items in the group.</param>
+        /// <returns>A new <see cref="DocumentationNavGroupModel" />.</returns>
+        private static DocumentationNavGroupModel CreatePlaceholderGroup(string groupTitle, string activeItemTitle, params string[] itemTitles)
+        {
+            var items = new List<DocumentationNavItemModel>(itemTitles.Length);
+
+            foreach (var itemTitle in itemTitles)
+            {
+                items.Add(CreateNavItem(itemTitle, "#", activeItemTitle));
+            }
+
+            return new DocumentationNavGroupModel
+            {
+                Title = groupTitle,
+                Items = items
+            };
         }
     }
 }

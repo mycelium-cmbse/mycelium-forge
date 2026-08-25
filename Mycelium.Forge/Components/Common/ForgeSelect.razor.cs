@@ -107,17 +107,12 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The human-readable string representation.</returns>
         public string GetDisplayText(TValue item)
         {
-            if (EqualityComparer<TValue>.Default.Equals(item, default))
-            {
-                return string.Empty;
-            }
-
             if (this.DisplayTextSelector != null)
             {
                 return this.DisplayTextSelector(item);
             }
 
-            return item.ToString() ?? string.Empty;
+            return item?.ToString() ?? string.Empty;
         }
 
         /// <summary>

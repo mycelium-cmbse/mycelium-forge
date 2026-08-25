@@ -62,7 +62,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 ]
             };
 
-            this.viewModelMock.SetupGet(x => x.Package).Returns(packageModel);
+            this.viewModelMock.Setup(x => x.Package).Returns(packageModel);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }

@@ -46,12 +46,12 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
                 "Starion Group");
 
-            this.viewModelMock.SetupGet(x => x.Facets).Returns(
+            this.viewModelMock.Setup(x => x.Facets).Returns(
             [
                 new OptionModel(nameof(PackageModel.Format), "SysML v2", 3, true)
             ]);
 
-            this.viewModelMock.SetupGet(x => x.PackageResults).Returns([packageModel]);
+            this.viewModelMock.Setup(x => x.PackageResults).Returns([packageModel]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }
@@ -76,7 +76,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             var resetBtn = packagesPage.Find("#packages-reset-filters-button");
             await packagesPage.InvokeAsync(() => resetBtn.ClickAsync());
 
-            this.viewModelMock.SetupGet(x => x.PackageResults).Returns([]);
+            this.viewModelMock.Setup(x => x.PackageResults).Returns([]);
             var emptyPackagesPage = this.context.Render<Packages>();
             var browseAllBtn = emptyPackagesPage.Find("#packages-browse-all-button");
             await emptyPackagesPage.InvokeAsync(() => browseAllBtn.ClickAsync());
@@ -94,13 +94,13 @@ namespace Mycelium.Forge.Tests.Components.Pages
             var packagesPage = this.context.Render<Packages>();
 
             var countTextSingle = packagesPage.Instance.GetResultsCountText();
-            this.viewModelMock.SetupGet(x => x.PackageResults).Returns([]);
+            this.viewModelMock.Setup(x => x.PackageResults).Returns([]);
             var countTextEmpty = packagesPage.Instance.GetResultsCountText();
 
             packagesPage.Instance.SearchQuery = string.Empty;
-            this.viewModelMock.SetupGet(x => x.PackageResults).Returns([new PackageModel(new Package { Name = "P1" }, "@starion")]);
+            this.viewModelMock.Setup(x => x.PackageResults).Returns([new PackageModel(new Package { Name = "P1" }, "@starion")]);
             var countTextNoQuerySingle = packagesPage.Instance.GetResultsCountText();
-            this.viewModelMock.SetupGet(x => x.PackageResults).Returns([]);
+            this.viewModelMock.Setup(x => x.PackageResults).Returns([]);
             var countTextNoQueryEmpty = packagesPage.Instance.GetResultsCountText();
 
             using (Assert.EnterMultipleScope())

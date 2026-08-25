@@ -58,9 +58,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
             var profile = new UserProfileModel(account, "Starion Group", "MBSE engineer and space enthusiast.");
 
-            this.viewModelMock.SetupGet(x => x.Profile).Returns(profile);
+            this.viewModelMock.Setup(x => x.Profile).Returns(profile);
 
-            this.viewModelMock.SetupGet(x => x.Organizations).Returns(
+            this.viewModelMock.Setup(x => x.Organizations).Returns(
             [
                 new AccountOrganizationMembershipModel(new Organization { Name = "Starion Group", ShortName = "starion" }, OrganizationInvitationKind.ADMINISTRATOR),
                 new AccountOrganizationMembershipModel(new Organization { Name = "European Space Agency", ShortName = "esa" })

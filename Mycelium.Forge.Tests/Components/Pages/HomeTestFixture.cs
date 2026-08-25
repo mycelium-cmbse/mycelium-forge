@@ -52,14 +52,14 @@ namespace Mycelium.Forge.Tests.Components.Pages
                     description: "Power subsystem model.")
             };
 
-            this.viewModelMock.SetupGet(x => x.PackageCount).Returns("120");
-            this.viewModelMock.SetupGet(x => x.VersionCount).Returns("450");
-            this.viewModelMock.SetupGet(x => x.PublisherCount).Returns("35");
-            this.viewModelMock.SetupGet(x => x.ImportCount).Returns("15.2k");
-            this.viewModelMock.SetupGet(x => x.StandardLibraries).Returns(packages);
-            this.viewModelMock.SetupGet(x => x.RecentlyUpdated).Returns(packages);
-            this.viewModelMock.SetupGet(x => x.MostUsed).Returns(packages);
-            this.viewModelMock.SetupGet(x => x.ModelsFromOtherMbseTools).Returns(packages);
+            this.viewModelMock.Setup(x => x.PackageCount).Returns("120");
+            this.viewModelMock.Setup(x => x.VersionCount).Returns("450");
+            this.viewModelMock.Setup(x => x.PublisherCount).Returns("35");
+            this.viewModelMock.Setup(x => x.ImportCount).Returns("15.2k");
+            this.viewModelMock.Setup(x => x.StandardLibraries).Returns(packages);
+            this.viewModelMock.Setup(x => x.RecentlyUpdated).Returns(packages);
+            this.viewModelMock.Setup(x => x.MostUsed).Returns(packages);
+            this.viewModelMock.Setup(x => x.ModelsFromOtherMbseTools).Returns(packages);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }

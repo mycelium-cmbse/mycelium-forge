@@ -57,8 +57,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 new(account, true, "Verified", "@starion (Admin)")
             };
 
-            this.viewModelMock.SetupGet(x => x.Accounts).Returns(accounts);
-            this.viewModelMock.SetupGet(x => x.FilteredAccounts).Returns(accounts);
+            this.viewModelMock.Setup(x => x.Accounts).Returns(accounts);
+            this.viewModelMock.Setup(x => x.FilteredAccounts).Returns(accounts);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }

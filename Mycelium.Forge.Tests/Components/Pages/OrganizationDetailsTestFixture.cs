@@ -54,8 +54,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 MemberSinceYear = 2023
             };
 
-            this.viewModelMock.SetupGet(x => x.Organization).Returns(organization);
-            this.viewModelMock.SetupGet(x => x.Packages).Returns([]);
+            this.viewModelMock.Setup(x => x.Organization).Returns(organization);
+            this.viewModelMock.Setup(x => x.Packages).Returns([]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }

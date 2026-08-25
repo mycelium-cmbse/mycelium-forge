@@ -56,11 +56,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
 
             this.testInvitation = new OrganizationInvitationModel("a.novak@esa.int", OrganizationInvitationKind.ADMINISTRATOR, "Sent 2 days ago");
 
-            this.viewModelMock.SetupGet(x => x.Organization).Returns(org);
-            this.viewModelMock.SetupGet(x => x.CurrentUserRole).Returns(OrganizationInvitationKind.ADMINISTRATOR);
-            this.viewModelMock.SetupGet(x => x.Members).Returns([this.testMember]);
-            this.viewModelMock.SetupGet(x => x.PendingInvitations).Returns([this.testInvitation]);
-            this.viewModelMock.SetupGet(x => x.RoleOptions).Returns([OrganizationInvitationKind.ADMINISTRATOR, OrganizationInvitationKind.MEMBER]);
+            this.viewModelMock.Setup(x => x.Organization).Returns(org);
+            this.viewModelMock.Setup(x => x.CurrentUserRole).Returns(OrganizationInvitationKind.ADMINISTRATOR);
+            this.viewModelMock.Setup(x => x.Members).Returns([this.testMember]);
+            this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testInvitation]);
+            this.viewModelMock.Setup(x => x.RoleOptions).Returns([OrganizationInvitationKind.ADMINISTRATOR, OrganizationInvitationKind.MEMBER]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }

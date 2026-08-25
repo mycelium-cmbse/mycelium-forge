@@ -14,6 +14,27 @@ namespace Mycelium.Forge.Extensions
     /// </summary>
     public static class DateTimeExtensions
     {
+        /// <summary>
+        /// Ensures the specified <see cref="DateTime" /> is converted to Universal Coordinated Time (UTC).
+        /// </summary>
+        /// <param name="value">The date and time to convert.</param>
+        /// <returns>The <see cref="DateTime" /> in UTC.</returns>
+        private static DateTime ToUtc(DateTime value)
+        {
+            return value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
+        }
+
+        /// <summary>
+        /// Formats the specified elapsed value and time unit into a human-readable relative time string.
+        /// </summary>
+        /// <param name="value">The number of units elapsed.</param>
+        /// <param name="unit">The name of the time unit (e.g., 'minute', 'hour', 'day', 'week', 'month', 'year').</param>
+        /// <returns>A string formatted as '{value} {unit}(s) ago'.</returns>
+        private static string FormatTimeAgoUnit(int value, string unit)
+        {
+            return value <= 1 ? $"1 {unit} ago" : $"{value} {unit}s ago";
+        }
+
         /// <param name="dateTime">The date and time to format.</param>
         extension(DateTime dateTime)
         {
@@ -34,8 +55,8 @@ namespace Mycelium.Forge.Extensions
             /// <returns>A string describing the elapsed time relative to the reference time.</returns>
             public string ToTimeAgo(DateTime relativeTo)
             {
-                var utcDateTime = dateTime.Kind == DateTimeKind.Utc ? dateTime : dateTime.ToUniversalTime();
-                var utcRelativeTo = relativeTo.Kind == DateTimeKind.Utc ? relativeTo : relativeTo.ToUniversalTime();
+                var utcDateTime = ToUtc(dateTime);
+                var utcRelativeTo = ToUtc(relativeTo);
 
                 var elapsed = utcRelativeTo - utcDateTime;
 
@@ -46,36 +67,30 @@ namespace Mycelium.Forge.Extensions
 
                 if (elapsed.TotalMinutes < 60)
                 {
-                    var minutes = (int)elapsed.TotalMinutes;
-                    return minutes == 1 ? "1 minute ago" : $"{minutes} minutes ago";
+                    return FormatTimeAgoUnit((int)elapsed.TotalMinutes, "minute");
                 }
 
                 if (elapsed.TotalHours < 24)
                 {
-                    var hours = (int)elapsed.TotalHours;
-                    return hours == 1 ? "1 hour ago" : $"{hours} hours ago";
+                    return FormatTimeAgoUnit((int)elapsed.TotalHours, "hour");
                 }
 
                 if (elapsed.TotalDays < 7)
                 {
-                    var days = (int)elapsed.TotalDays;
-                    return days == 1 ? "1 day ago" : $"{days} days ago";
+                    return FormatTimeAgoUnit((int)elapsed.TotalDays, "day");
                 }
 
                 if (elapsed.TotalDays < 30)
                 {
-                    var weeks = (int)(elapsed.TotalDays / 7);
-                    return weeks == 1 ? "1 week ago" : $"{weeks} weeks ago";
+                    return FormatTimeAgoUnit((int)(elapsed.TotalDays / 7), "week");
                 }
 
                 if (elapsed.TotalDays < 365)
                 {
-                    var months = (int)(elapsed.TotalDays / 30);
-                    return months <= 1 ? "1 month ago" : $"{months} months ago";
+                    return FormatTimeAgoUnit((int)(elapsed.TotalDays / 30), "month");
                 }
 
-                var years = (int)(elapsed.TotalDays / 365);
-                return years <= 1 ? "1 year ago" : $"{years} years ago";
+                return FormatTimeAgoUnit((int)(elapsed.TotalDays / 365), "year");
             }
         }
     }

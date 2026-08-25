@@ -55,7 +55,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.ApiKeys
                 LastUsedAt = DateTime.UtcNow
             };
 
-            this.viewModelMock.SetupGet(x => x.ApiKeys).Returns(
+            this.viewModelMock.Setup(x => x.ApiKeys).Returns(
             [
                 new ApiKeyModel(this.testApiKey, "@starion", "publish", "secret")
             ]);

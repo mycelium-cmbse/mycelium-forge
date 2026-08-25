@@ -100,13 +100,13 @@ namespace Mycelium.Forge.Tests.Components.Pages
             var loginPage = this.context.Render<Login>();
             var loginButton = loginPage.Find("#login-submit-button");
 
-            this.viewModelMock.SetupGet(x => x.Email).Returns(string.Empty);
-            this.viewModelMock.SetupGet(x => x.Password).Returns(string.Empty);
+            this.viewModelMock.Setup(x => x.Email).Returns(string.Empty);
+            this.viewModelMock.Setup(x => x.Password).Returns(string.Empty);
             await loginPage.InvokeAsync(() => loginButton.ClickAsync());
             this.viewModelMock.Verify(x => x.Login(), Times.Never);
 
-            this.viewModelMock.SetupGet(x => x.Email).Returns("user@example.com");
-            this.viewModelMock.SetupGet(x => x.Password).Returns("Secret123!");
+            this.viewModelMock.Setup(x => x.Email).Returns("user@example.com");
+            this.viewModelMock.Setup(x => x.Password).Returns("Secret123!");
             this.viewModelMock.Setup(x => x.Login()).Returns(Result.Ok());
 
             await loginPage.InvokeAsync(() => loginButton.ClickAsync());

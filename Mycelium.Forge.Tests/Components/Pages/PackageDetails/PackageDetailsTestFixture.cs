@@ -93,8 +93,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                     ])
             };
 
-            this.viewModelMock.SetupGet(x => x.Package).Returns(packageDetails);
-            this.viewModelMock.SetupGet(x => x.IsUserAdmin).Returns(true);
+            this.viewModelMock.Setup(x => x.Package).Returns(packageDetails);
+            this.viewModelMock.Setup(x => x.IsUserAdmin).Returns(true);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
             this.context.Services.AddSingleton(this.jsInteropMock.Object);

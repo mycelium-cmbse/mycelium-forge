@@ -44,87 +44,63 @@ namespace Mycelium.Forge.Data
 
         static SeedData()
         {
-            RegisAccount = new Account
-            {
-                Id = Guid.Parse("a1111111-1111-1111-1111-111111111111"),
-                Name = "R. André",
-                ShortName = "r.andre",
-                Email = "regis.andre@starion.eu",
-                Website = "stariongroup.eu",
-                Origin = "Toulouse, France",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc)
-            };
+            RegisAccount = CreateAccount(
+                "a1111111-1111-1111-1111-111111111111",
+                "R. André",
+                "r.andre",
+                "regis.andre@starion.eu",
+                new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+                "stariongroup.eu",
+                "Toulouse, France");
 
-            StefanAccount = new Account
-            {
-                Id = Guid.Parse("a2222222-2222-2222-2222-222222222222"),
-                Name = "S. Kramer",
-                ShortName = "s.kramer",
-                Email = "stefan.kramer@starion.eu",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc)
-            };
+            StefanAccount = CreateAccount(
+                "a2222222-2222-2222-2222-222222222222",
+                "S. Kramer",
+                "s.kramer",
+                "stefan.kramer@starion.eu",
+                new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc));
 
-            KleinAccount = new Account
-            {
-                Id = Guid.Parse("a3333333-3333-3333-3333-333333333333"),
-                Name = "J. Klein",
-                ShortName = "j.klein",
-                Email = "j.klein@esa.int",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc)
-            };
+            KleinAccount = CreateAccount(
+                "a3333333-3333-3333-3333-333333333333",
+                "J. Klein",
+                "j.klein",
+                "j.klein@esa.int",
+                new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc));
 
-            BlancAccount = new Account
-            {
-                Id = Guid.Parse("a4444444-4444-4444-4444-444444444444"),
-                Name = "M. Blanc",
-                ShortName = "m.blanc",
-                Email = "m.blanc@starion.eu",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc)
-            };
+            BlancAccount = CreateAccount(
+                "a4444444-4444-4444-4444-444444444444",
+                "M. Blanc",
+                "m.blanc",
+                "m.blanc@starion.eu",
+                new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc));
 
-            NovakAccount = new Account
-            {
-                Id = Guid.Parse("a5555555-5555-5555-5555-555555555555"),
-                Name = "A. Novak",
-                ShortName = "a.novak",
-                Email = "a.novak@esa.int",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc)
-            };
+            NovakAccount = CreateAccount(
+                "a5555555-5555-5555-5555-555555555555",
+                "A. Novak",
+                "a.novak",
+                "a.novak@esa.int",
+                new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc));
 
-            StarionOrganization = new Organization
-            {
-                Id = Guid.Parse("b1111111-1111-1111-1111-111111111111"),
-                Name = "Starion Group",
-                ShortName = "starion",
-                Origin = "Systems engineering models and ECSS mission libraries for early-phase spacecraft design.",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            };
+            StarionOrganization = CreateOrganization(
+                "b1111111-1111-1111-1111-111111111111",
+                "Starion Group",
+                "starion",
+                "Systems engineering models and ECSS mission libraries for early-phase spacecraft design.",
+                new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
-            EsaOrganization = new Organization
-            {
-                Id = Guid.Parse("b2222222-2222-2222-2222-222222222222"),
-                Name = "European Space Agency",
-                ShortName = "esa",
-                Origin = "European Space Agency engineering libraries and flight dynamics models.",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            };
+            EsaOrganization = CreateOrganization(
+                "b2222222-2222-2222-2222-222222222222",
+                "European Space Agency",
+                "esa",
+                "European Space Agency engineering libraries and flight dynamics models.",
+                new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
-            OmgOrganization = new Organization
-            {
-                Id = Guid.Parse("b3333333-3333-3333-3333-333333333333"),
-                Name = "Object Management Group",
-                ShortName = "omg",
-                Origin = "Official SysML v2 and KerML specification standard libraries.",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            };
+            OmgOrganization = CreateOrganization(
+                "b3333333-3333-3333-3333-333333333333",
+                "Object Management Group",
+                "omg",
+                "Official SysML v2 and KerML specification standard libraries.",
+                new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
 
             StarionOrganizationModel = new OrganizationModel(
                 StarionOrganization,
@@ -169,30 +145,9 @@ namespace Mycelium.Forge.Data
 
             ApiKeys =
             [
-                new APIKey
-                {
-                    Id = Guid.Parse("c1111111-1111-1111-1111-111111111111"),
-                    Name = "ci-publish",
-                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                    ExpiresAt = new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc),
-                    LastUsedAt = DateTime.UtcNow.AddDays(-3)
-                },
-                new APIKey
-                {
-                    Id = Guid.Parse("c2222222-2222-2222-2222-222222222222"),
-                    Name = "release-bot",
-                    CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc),
-                    ExpiresAt = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc),
-                    LastUsedAt = DateTime.UtcNow.AddDays(-14)
-                },
-                new APIKey
-                {
-                    Id = Guid.Parse("c3333333-3333-3333-3333-333333333333"),
-                    Name = "local-dev",
-                    CreatedAt = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc),
-                    ExpiresAt = new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
-                    LastUsedAt = DateTime.UtcNow.AddDays(-30)
-                }
+                CreateApiKey("c1111111-1111-1111-1111-111111111111", "ci-publish", new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc), 3),
+                CreateApiKey("c2222222-2222-2222-2222-222222222222", "release-bot", new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc), 14),
+                CreateApiKey("c3333333-3333-3333-3333-333333333333", "local-dev", new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc), 30)
             ];
 
             StandardLibraryPackages =
@@ -225,72 +180,12 @@ namespace Mycelium.Forge.Data
 
             MyPackages =
             [
-                new PackageModel(
-                    EcssPowerSubsystemPackageModel.Package,
-                    StarionScope,
-                    "v1.2.0",
-                    SysmlV2Format,
-                    "ECSS mission model: Power subsystem.",
-                    importCount: "210")
-                {
-                    IsVerified = true,
-                    Role = PackageInvitationKind.OWNER
-                },
-                new PackageModel(
-                    SmallSatPlatformPackageModel.Package,
-                    StarionScope,
-                    "v0.8.2",
-                    SysmlV2Format,
-                    "Parametric smallsat platform model.",
-                    importCount: "145")
-                {
-                    IsVerified = true,
-                    Role = PackageInvitationKind.OWNER
-                },
-                new PackageModel(
-                    EcssRfCommsPackageModel.Package,
-                    StarionScope,
-                    "v0.3.0",
-                    SysmlV2Format,
-                    "RF telecommunication link budget.",
-                    importCount: "190")
-                {
-                    IsVerified = true,
-                    Role = PackageInvitationKind.OWNER
-                },
-                new PackageModel(
-                    EcssMechanicalPackageModel.Package,
-                    StarionScope,
-                    Version100,
-                    SysmlV2Format,
-                    "Structural and mechanical engineering domain metamodels.",
-                    importCount: "165")
-                {
-                    IsVerified = true,
-                    Role = PackageInvitationKind.OWNER
-                },
-                new PackageModel(
-                    Cdp4CometCorePackageModel.Package,
-                    StarionScope,
-                    "v10.25.1",
-                    "CDP4-COMET",
-                    "Core concurrent engineering data definitions.",
-                    importCount: "320")
-                {
-                    IsVerified = true,
-                    Role = PackageInvitationKind.MAINTAINER
-                },
-                new PackageModel(
-                    EcssEnvironmentPackageModel.Package,
-                    "@esa",
-                    Version100,
-                    SysmlV2Format,
-                    "Space environment definitions and planetary constants.",
-                    importCount: "860")
-                {
-                    IsVerified = true,
-                    Role = PackageInvitationKind.MAINTAINER
-                }
+                CreateMyPackage(EcssPowerSubsystemPackageModel.Package, StarionScope, "v1.2.0", SysmlV2Format, "ECSS mission model: Power subsystem.", "210"),
+                CreateMyPackage(SmallSatPlatformPackageModel.Package, StarionScope, "v0.8.2", SysmlV2Format, "Parametric smallsat platform model.", "145"),
+                CreateMyPackage(EcssRfCommsPackageModel.Package, StarionScope, "v0.3.0", SysmlV2Format, "RF telecommunication link budget.", "190"),
+                CreateMyPackage(EcssMechanicalPackageModel.Package, StarionScope, Version100, SysmlV2Format, "Structural and mechanical engineering domain metamodels.", "165"),
+                CreateMyPackage(Cdp4CometCorePackageModel.Package, StarionScope, "v10.25.1", "CDP4-COMET", "Core concurrent engineering data definitions.", "320", PackageInvitationKind.MAINTAINER),
+                CreateMyPackage(EcssEnvironmentPackageModel.Package, "@esa", Version100, SysmlV2Format, "Space environment definitions and planetary constants.", "860", PackageInvitationKind.MAINTAINER)
             ];
 
             CatalogPackages =
@@ -407,136 +302,273 @@ namespace Mycelium.Forge.Data
         /// <summary>
         /// Gets the mock model for the SysMLv2-ISQ-Quantities package.
         /// </summary>
-        public static PackageModel SysmlIsqQuantitiesPackageModel { get; } = new(
-            new Package { Name = "SysMLv2-ISQ-Quantities", ShortName = "sysmlv2-isq-quantities", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-30) },
+        public static PackageModel SysmlIsqQuantitiesPackageModel { get; } = CreateVerifiedPackage(
+            "SysMLv2-ISQ-Quantities",
+            "sysmlv2-isq-quantities",
+            30,
             "@omg",
             "v2025.2",
             SysmlV2Format,
             "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000.",
             "standard-library · units · quantities · isq",
-            "1.4k")
-        {
-            IsVerified = true
-        };
+            "1.4k");
 
         /// <summary>
         /// Gets the mock model for the SysMLv2-Kernel-Library package.
         /// </summary>
-        public static PackageModel SysmlKernelLibraryPackageModel { get; } = new(
-            new Package { Name = "SysMLv2-Kernel-Library", ShortName = "sysmlv2-kernel-library", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-30) },
+        public static PackageModel SysmlKernelLibraryPackageModel { get; } = CreateVerifiedPackage(
+            "SysMLv2-Kernel-Library",
+            "sysmlv2-kernel-library",
+            30,
             "@omg",
             "v2025.2",
             SysmlV2Format,
             "Fundamental KerML metamodel library containing base types, collections, and control functions.",
             "standard-library · kerml · kernel",
-            "2.1k")
-        {
-            IsVerified = true
-        };
+            "2.1k");
 
         /// <summary>
         /// Gets the mock model for the ECSS-E-ST-10-04C package.
         /// </summary>
-        public static PackageModel EcssEnvironmentPackageModel { get; } = new(
-            new Package { Name = "ECSS-E-ST-10-04C", ShortName = "ecss-e-st-10-04c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60) },
+        public static PackageModel EcssEnvironmentPackageModel { get; } = CreateVerifiedPackage(
+            "ECSS-E-ST-10-04C",
+            "ecss-e-st-10-04c",
+            60,
             "@esa",
             Version100,
             SysmlV2Format,
             "Space environment definitions and planetary constants for mission analysis and spacecraft design.",
             "standard-library · space-environment · ecss",
-            "860")
-        {
-            IsVerified = true
-        };
+            "860");
 
         /// <summary>
         /// Gets the mock model for the ECSS-MM-PWR package.
         /// </summary>
-        public static PackageModel EcssPowerSubsystemPackageModel { get; } = new(
-            new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-14) },
+        public static PackageModel EcssPowerSubsystemPackageModel { get; } = CreateVerifiedPackage(
+            "ECSS-MM-PWR",
+            "ecss-mm-pwr",
+            14,
             StarionScope,
             "v1.2.0",
             SysmlV2Format,
             "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and PCU.",
             "mission-model · power · ecss",
-            "210")
-        {
-            IsVerified = true
-        };
+            "210");
 
         /// <summary>
         /// Gets the mock model for the SmallSat-Platform-Model package.
         /// </summary>
-        public static PackageModel SmallSatPlatformPackageModel { get; } = new(
-            new Package { Name = "SmallSat-Platform-Model", ShortName = "smallsat-platform-model", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-21) },
+        public static PackageModel SmallSatPlatformPackageModel { get; } = CreateVerifiedPackage(
+            "SmallSat-Platform-Model",
+            "smallsat-platform-model",
+            21,
             StarionScope,
             "v0.8.2",
             SysmlV2Format,
             "Parametric smallsat platform model including propulsion and telemetry budget templates.",
             "mission-model · smallsat · platform",
-            "145")
-        {
-            IsVerified = true
-        };
+            "145");
 
         /// <summary>
         /// Gets the mock model for the ecss-e-st-32-10c package.
         /// </summary>
-        public static PackageModel EcssRfCommsPackageModel { get; } = new(
-            new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60) },
+        public static PackageModel EcssRfCommsPackageModel { get; } = CreateVerifiedPackage(
+            "ecss-e-st-32-10c",
+            "ecss-e-st-32-10c",
+            60,
             StarionScope,
             "v0.3.0",
             SysmlV2Format,
             "RF telecommunication link budget and space communication interfaces.",
             "comms · rf · telemetry · ecss",
-            "190")
-        {
-            IsVerified = true
-        };
+            "190");
 
         /// <summary>
         /// Gets the mock model for the CDP4-COMET-Core package.
         /// </summary>
-        public static PackageModel Cdp4CometCorePackageModel { get; } = new(
-            new Package { Name = "CDP4-COMET-Core", ShortName = "cdp4-comet-core", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-30) },
+        public static PackageModel Cdp4CometCorePackageModel { get; } = CreateVerifiedPackage(
+            "CDP4-COMET-Core",
+            "cdp4-comet-core",
+            30,
             StarionScope,
             "v10.25.1",
             "CDP4-COMET",
             "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25.",
             "concurrent-design · cdp4 · ecss-10-25",
-            "320")
-        {
-            IsVerified = true
-        };
+            "320");
 
         /// <summary>
         /// Gets the mock model for the Capella-System-Template package.
         /// </summary>
-        public static PackageModel CapellaSystemTemplatePackageModel { get; } = new(
-            new Package { Name = "Capella-System-Template", ShortName = "capella-system-template", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90) },
+        public static PackageModel CapellaSystemTemplatePackageModel { get; } = CreateVerifiedPackage(
+            "Capella-System-Template",
+            "capella-system-template",
+            90,
             "@esa",
             "v6.1.0",
             "Capella",
             "Arcadia methodology operational analysis and system architecture template for space instruments.",
             "arcadia · capella · operational-analysis",
-            "185")
-        {
-            IsVerified = true
-        };
+            "185");
 
         /// <summary>
         /// Gets the mock model for the ecss-e-st-31-01c package.
         /// </summary>
-        public static PackageModel EcssMechanicalPackageModel { get; } = new(
-            new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90) },
+        public static PackageModel EcssMechanicalPackageModel { get; } = CreateVerifiedPackage(
+            "ecss-e-st-31-01c",
+            "ecss-e-st-31-01c",
+            90,
             StarionScope,
             Version100,
             SysmlV2Format,
             "Structural and mechanical engineering domain metamodels and loads analysis.",
             "mechanical · structures · loads · ecss",
-            "165")
+            "165");
+
+        /// <summary>
+        /// Creates an active account entity.
+        /// </summary>
+        /// <param name="guid">The unique identifier string.</param>
+        /// <param name="name">The display name.</param>
+        /// <param name="shortName">The short name.</param>
+        /// <param name="email">The email address.</param>
+        /// <param name="createdAt">The creation date.</param>
+        /// <param name="website">The optional website.</param>
+        /// <param name="origin">The optional origin.</param>
+        /// <returns>A new <see cref="Account" />.</returns>
+        private static Account CreateAccount(
+            string guid,
+            string name,
+            string shortName,
+            string email,
+            DateTime createdAt,
+            string website = "",
+            string origin = "")
         {
-            IsVerified = true
-        };
+            return new Account
+            {
+                Id = Guid.Parse(guid),
+                Name = name,
+                ShortName = shortName,
+                Email = email,
+                Website = website,
+                Origin = origin,
+                Status = ScopeStatusKind.ACTIVE,
+                CreatedAt = createdAt
+            };
+        }
+
+        /// <summary>
+        /// Creates an active organization entity.
+        /// </summary>
+        /// <param name="guid">The unique identifier string.</param>
+        /// <param name="name">The organization name.</param>
+        /// <param name="shortName">The short name.</param>
+        /// <param name="origin">The origin or mission description.</param>
+        /// <param name="createdAt">The creation date.</param>
+        /// <returns>A new <see cref="Organization" />.</returns>
+        private static Organization CreateOrganization(string guid, string name, string shortName, string origin, DateTime createdAt)
+        {
+            return new Organization
+            {
+                Id = Guid.Parse(guid),
+                Name = name,
+                ShortName = shortName,
+                Origin = origin,
+                Status = ScopeStatusKind.ACTIVE,
+                CreatedAt = createdAt
+            };
+        }
+
+        /// <summary>
+        /// Creates an API key entity with specified properties.
+        /// </summary>
+        /// <param name="guid">The unique identifier string.</param>
+        /// <param name="name">The key name.</param>
+        /// <param name="createdAt">The creation date.</param>
+        /// <param name="expiresAt">The expiration date.</param>
+        /// <param name="lastUsedDaysAgo">The number of days since last use.</param>
+        /// <returns>A new <see cref="APIKey" />.</returns>
+        private static APIKey CreateApiKey(string guid, string name, DateTime createdAt, DateTime expiresAt, int lastUsedDaysAgo)
+        {
+            return new APIKey
+            {
+                Id = Guid.Parse(guid),
+                Name = name,
+                CreatedAt = createdAt,
+                ExpiresAt = expiresAt,
+                LastUsedAt = DateTime.UtcNow.AddDays(-lastUsedDaysAgo)
+            };
+        }
+
+        /// <summary>
+        /// Creates a verified package model with standard metadata.
+        /// </summary>
+        /// <param name="name">The name of the package.</param>
+        /// <param name="shortName">The short URL-friendly name.</param>
+        /// <param name="daysAgo">The creation age in days.</param>
+        /// <param name="scope">The publisher scope prefix.</param>
+        /// <param name="version">The package version string.</param>
+        /// <param name="format">The format descriptor.</param>
+        /// <param name="description">The summary description.</param>
+        /// <param name="tags">The associated tags.</param>
+        /// <param name="importCount">The import count display value.</param>
+        /// <returns>A new verified <see cref="PackageModel" />.</returns>
+        private static PackageModel CreateVerifiedPackage(
+            string name,
+            string shortName,
+            int daysAgo,
+            string scope,
+            string version,
+            string format,
+            string description,
+            string tags,
+            string importCount)
+        {
+            return new PackageModel(
+                new Package
+                {
+                    Name = name,
+                    ShortName = shortName,
+                    Visibility = VisibilityKind.PUBLIC,
+                    CreatedAt = DateTime.UtcNow.AddDays(-daysAgo)
+                },
+                scope,
+                version,
+                format,
+                description,
+                tags,
+                importCount)
+            {
+                IsVerified = true
+            };
+        }
+
+        /// <summary>
+        /// Creates a user package model with the specified role and import count.
+        /// </summary>
+        /// <param name="package">The underlying package entity.</param>
+        /// <param name="scope">The publisher scope prefix.</param>
+        /// <param name="version">The package version string.</param>
+        /// <param name="format">The format descriptor.</param>
+        /// <param name="description">The summary description.</param>
+        /// <param name="importCount">The import count display value.</param>
+        /// <param name="role">The user role for the package.</param>
+        /// <returns>A new <see cref="PackageModel" />.</returns>
+        private static PackageModel CreateMyPackage(
+            IPackage package,
+            string scope,
+            string version,
+            string format,
+            string description,
+            string importCount,
+            PackageInvitationKind role = PackageInvitationKind.OWNER)
+        {
+            return new PackageModel(package, scope, version, format, description, importCount: importCount)
+            {
+                IsVerified = true,
+                Role = role
+            };
+        }
     }
 }

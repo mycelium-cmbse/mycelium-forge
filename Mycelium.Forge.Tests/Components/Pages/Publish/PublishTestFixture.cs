@@ -47,7 +47,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
 
             this.viewModelMock = new Mock<IPublishViewModel>();
 
-            this.viewModelMock.SetupGet(x => x.Metadata).Returns(new PublishPackageMetadataModel
+            this.viewModelMock.Setup(x => x.Metadata).Returns(new PublishPackageMetadataModel
             {
                 Scope = "@starion",
                 PackageName = "ECSS-MM-PWR",
@@ -62,23 +62,23 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
                 Description = "ECSS mission model: Power subsystem."
             });
 
-            this.viewModelMock.SetupGet(x => x.Steps).Returns(
+            this.viewModelMock.Setup(x => x.Steps).Returns(
             [
                 new PublishStepModel(1, "Package metadata", true),
                 new PublishStepModel(2, "Validation"),
                 new PublishStepModel(3, "Review & publish")
             ]);
 
-            this.viewModelMock.SetupGet(x => x.ValidationChecks).Returns(
+            this.viewModelMock.Setup(x => x.ValidationChecks).Returns(
             [
                 new ValidationCheckModel("Schema validation"),
                 new ValidationCheckModel("License file", status: ValidationStatus.Warning)
             ]);
 
-            this.viewModelMock.SetupGet(x => x.ScopeOptions).Returns(["@starion", "@esa"]);
-            this.viewModelMock.SetupGet(x => x.LicenseOptions).Returns(["Apache-2.0", "MIT"]);
-            this.viewModelMock.SetupGet(x => x.VisibilityOptions).Returns([VisibilityKind.PUBLIC, VisibilityKind.PRIVATE]);
-            this.viewModelMock.SetupGet(x => x.MetamodelOptions).Returns(["SysML v2 (2025-02)"]);
+            this.viewModelMock.Setup(x => x.ScopeOptions).Returns(["@starion", "@esa"]);
+            this.viewModelMock.Setup(x => x.LicenseOptions).Returns(["Apache-2.0", "MIT"]);
+            this.viewModelMock.Setup(x => x.VisibilityOptions).Returns([VisibilityKind.PUBLIC, VisibilityKind.PRIVATE]);
+            this.viewModelMock.Setup(x => x.MetamodelOptions).Returns(["SysML v2 (2025-02)"]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
 

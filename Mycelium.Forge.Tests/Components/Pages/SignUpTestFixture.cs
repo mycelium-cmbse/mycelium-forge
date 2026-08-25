@@ -70,15 +70,15 @@ namespace Mycelium.Forge.Tests.Components.Pages
             var signUpPage = this.context.Render<SignUp>();
             var createAccountButton = signUpPage.Find("#signup-create-account-button");
 
-            this.viewModelMock.SetupGet(x => x.Username).Returns(string.Empty);
-            this.viewModelMock.SetupGet(x => x.Email).Returns(string.Empty);
-            this.viewModelMock.SetupGet(x => x.Password).Returns(string.Empty);
+            this.viewModelMock.Setup(x => x.Username).Returns(string.Empty);
+            this.viewModelMock.Setup(x => x.Email).Returns(string.Empty);
+            this.viewModelMock.Setup(x => x.Password).Returns(string.Empty);
             await signUpPage.InvokeAsync(() => createAccountButton.ClickAsync());
             this.viewModelMock.Verify(x => x.SignUp(), Times.Never);
 
-            this.viewModelMock.SetupGet(x => x.Username).Returns("j.doe");
-            this.viewModelMock.SetupGet(x => x.Email).Returns("j.doe@example.com");
-            this.viewModelMock.SetupGet(x => x.Password).Returns("Secret123!");
+            this.viewModelMock.Setup(x => x.Username).Returns("j.doe");
+            this.viewModelMock.Setup(x => x.Email).Returns("j.doe@example.com");
+            this.viewModelMock.Setup(x => x.Password).Returns("Secret123!");
             this.viewModelMock.Setup(x => x.SignUp()).Returns(Result.Ok());
 
             await signUpPage.InvokeAsync(() => createAccountButton.ClickAsync());
