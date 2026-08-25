@@ -30,8 +30,14 @@ namespace Mycelium.Forge.Tests
         {
             // UseHttpsRedirection/UseHsts only run outside Development (Program.cs), so the
             // redirect behaviour this fixture is guarding against only exists in Production.
+            // https_port is set explicitly because the in-memory test server has no HTTPS endpoint
+            // for UseHttpsRedirection to infer one from - without it, it can't redirect at all.
             this.factory = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(builder => builder.UseEnvironment("Production"));
+                .WithWebHostBuilder(builder =>
+                {
+                    builder.UseEnvironment("Production");
+                    builder.UseSetting("https_port", "443");
+                });
         }
 
         [TearDown]
