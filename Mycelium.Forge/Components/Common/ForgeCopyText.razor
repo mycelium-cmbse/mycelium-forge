@@ -1,4 +1,13 @@
-﻿<div class="w-full flex items-center justify-between gap-2 rounded-md @(this.GetContainerClass()) @(this.Class)">
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ForgeCopyText.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full flex items-center justify-between gap-2 rounded-md @(this.GetContainerClass()) @(this.Class)">
     <code class="font-mono text-sm leading-17 truncate flex-1 select-all @(this.GetTextClass()) @(this.TextClass)">
         @(this.Text)
     </code>

@@ -1,4 +1,13 @@
-﻿<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full @(this.Class)">
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="DocumentationPrevNext.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full @(this.Class)">
     @if (!string.IsNullOrWhiteSpace(this.PrevTitle))
     {
         <a href="@(this.PrevHref)"
