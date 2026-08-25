@@ -75,7 +75,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Handles search input query changes and triggers account filtering.
         /// </summary>
         /// <param name="query">The new search query value.</param>
-        private void OnSearchInputChanged(string query)
+        public void OnSearchInputChanged(string query)
         {
             this.SearchQuery = query ?? string.Empty;
             this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
@@ -85,7 +85,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Handles status filter dropdown selection changes.
         /// </summary>
         /// <param name="status">The selected status filter.</param>
-        private void OnStatusFilterChanged(string status)
+        public void OnStatusFilterChanged(string status)
         {
             this.SelectedStatusFilter = status ?? "All";
             this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
@@ -95,7 +95,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Handles verification status filter dropdown selection changes.
         /// </summary>
         /// <param name="verification">The selected verification status filter.</param>
-        private void OnVerificationFilterChanged(string verification)
+        public void OnVerificationFilterChanged(string verification)
         {
             this.SelectedVerificationFilter = verification ?? "All";
             this.ViewModel.ApplyFilters(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
@@ -104,7 +104,7 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Handles initiating an account ownership transfer action.
         /// </summary>
-        private void OnTransfer()
+        public void OnTransfer()
         {
             this.ViewModel.TransferOwnership();
         }
@@ -113,7 +113,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Handles opening the contextual options menu for the specified account.
         /// </summary>
         /// <param name="account">The <see cref="AdminAccountModel" /> instance whose menu was triggered.</param>
-        private static void OnAccountMenu(AdminAccountModel account)
+        public static void OnAccountMenu(AdminAccountModel account)
         {
             // Contextual menu action placeholder.
         }
@@ -122,7 +122,7 @@ namespace Mycelium.Forge.Components.Pages
         /// Computes the human-readable summary count text for the accounts list.
         /// </summary>
         /// <returns>A formatted string indicating the number of accounts.</returns>
-        private string GetAccountsCountText()
+        public string GetAccountsCountText()
         {
             var count = this.ViewModel.FilteredAccounts.Count;
             return count == 1 ? "1 account" : $"{count} accounts";

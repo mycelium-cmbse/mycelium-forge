@@ -303,9 +303,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the SysMLv2-ISQ-Quantities package.
         /// </summary>
         public static PackageModel SysmlIsqQuantitiesPackageModel { get; } = CreateVerifiedPackage(
-            "SysMLv2-ISQ-Quantities",
-            "sysmlv2-isq-quantities",
-            30,
+            CreatePackage("SysMLv2-ISQ-Quantities", "sysmlv2-isq-quantities", 30),
             "@omg",
             "v2025.2",
             SysmlV2Format,
@@ -317,9 +315,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the SysMLv2-Kernel-Library package.
         /// </summary>
         public static PackageModel SysmlKernelLibraryPackageModel { get; } = CreateVerifiedPackage(
-            "SysMLv2-Kernel-Library",
-            "sysmlv2-kernel-library",
-            30,
+            CreatePackage("SysMLv2-Kernel-Library", "sysmlv2-kernel-library", 30),
             "@omg",
             "v2025.2",
             SysmlV2Format,
@@ -331,9 +327,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the ECSS-E-ST-10-04C package.
         /// </summary>
         public static PackageModel EcssEnvironmentPackageModel { get; } = CreateVerifiedPackage(
-            "ECSS-E-ST-10-04C",
-            "ecss-e-st-10-04c",
-            60,
+            CreatePackage("ECSS-E-ST-10-04C", "ecss-e-st-10-04c", 60),
             "@esa",
             Version100,
             SysmlV2Format,
@@ -345,9 +339,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the ECSS-MM-PWR package.
         /// </summary>
         public static PackageModel EcssPowerSubsystemPackageModel { get; } = CreateVerifiedPackage(
-            "ECSS-MM-PWR",
-            "ecss-mm-pwr",
-            14,
+            CreatePackage("ECSS-MM-PWR", "ecss-mm-pwr", 14),
             StarionScope,
             "v1.2.0",
             SysmlV2Format,
@@ -359,9 +351,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the SmallSat-Platform-Model package.
         /// </summary>
         public static PackageModel SmallSatPlatformPackageModel { get; } = CreateVerifiedPackage(
-            "SmallSat-Platform-Model",
-            "smallsat-platform-model",
-            21,
+            CreatePackage("SmallSat-Platform-Model", "smallsat-platform-model", 21),
             StarionScope,
             "v0.8.2",
             SysmlV2Format,
@@ -373,9 +363,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the ecss-e-st-32-10c package.
         /// </summary>
         public static PackageModel EcssRfCommsPackageModel { get; } = CreateVerifiedPackage(
-            "ecss-e-st-32-10c",
-            "ecss-e-st-32-10c",
-            60,
+            CreatePackage("ecss-e-st-32-10c", "ecss-e-st-32-10c", 60),
             StarionScope,
             "v0.3.0",
             SysmlV2Format,
@@ -387,9 +375,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the CDP4-COMET-Core package.
         /// </summary>
         public static PackageModel Cdp4CometCorePackageModel { get; } = CreateVerifiedPackage(
-            "CDP4-COMET-Core",
-            "cdp4-comet-core",
-            30,
+            CreatePackage("CDP4-COMET-Core", "cdp4-comet-core", 30),
             StarionScope,
             "v10.25.1",
             "CDP4-COMET",
@@ -401,9 +387,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the Capella-System-Template package.
         /// </summary>
         public static PackageModel CapellaSystemTemplatePackageModel { get; } = CreateVerifiedPackage(
-            "Capella-System-Template",
-            "capella-system-template",
-            90,
+            CreatePackage("Capella-System-Template", "capella-system-template", 90),
             "@esa",
             "v6.1.0",
             "Capella",
@@ -415,9 +399,7 @@ namespace Mycelium.Forge.Data
         /// Gets the mock model for the ecss-e-st-31-01c package.
         /// </summary>
         public static PackageModel EcssMechanicalPackageModel { get; } = CreateVerifiedPackage(
-            "ecss-e-st-31-01c",
-            "ecss-e-st-31-01c",
-            90,
+            CreatePackage("ecss-e-st-31-01c", "ecss-e-st-31-01c", 90),
             StarionScope,
             Version100,
             SysmlV2Format,
@@ -502,11 +484,27 @@ namespace Mycelium.Forge.Data
         }
 
         /// <summary>
-        /// Creates a verified package model with standard metadata.
+        /// Creates a public package entity with standard metadata.
         /// </summary>
         /// <param name="name">The name of the package.</param>
         /// <param name="shortName">The short URL-friendly name.</param>
         /// <param name="daysAgo">The creation age in days.</param>
+        /// <returns>A new <see cref="Package" />.</returns>
+        private static Package CreatePackage(string name, string shortName, int daysAgo)
+        {
+            return new Package
+            {
+                Name = name,
+                ShortName = shortName,
+                Visibility = VisibilityKind.PUBLIC,
+                CreatedAt = DateTime.UtcNow.AddDays(-daysAgo)
+            };
+        }
+
+        /// <summary>
+        /// Creates a verified package model with standard metadata.
+        /// </summary>
+        /// <param name="package">The underlying package entity.</param>
         /// <param name="scope">The publisher scope prefix.</param>
         /// <param name="version">The package version string.</param>
         /// <param name="format">The format descriptor.</param>
@@ -515,9 +513,7 @@ namespace Mycelium.Forge.Data
         /// <param name="importCount">The import count display value.</param>
         /// <returns>A new verified <see cref="PackageModel" />.</returns>
         private static PackageModel CreateVerifiedPackage(
-            string name,
-            string shortName,
-            int daysAgo,
+            IPackage package,
             string scope,
             string version,
             string format,
@@ -526,13 +522,7 @@ namespace Mycelium.Forge.Data
             string importCount)
         {
             return new PackageModel(
-                new Package
-                {
-                    Name = name,
-                    ShortName = shortName,
-                    Visibility = VisibilityKind.PUBLIC,
-                    CreatedAt = DateTime.UtcNow.AddDays(-daysAgo)
-                },
+                package,
                 scope,
                 version,
                 format,

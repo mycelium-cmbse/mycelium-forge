@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ForgeSelectTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -83,7 +83,7 @@ namespace Mycelium.Forge.Tests.Components.Common
             var select = this.context.Render<ForgeSelect<string>>(parameters => { parameters.Add(x => x.Items, ["Option A"]); });
 
             // default(string) = null -> empty string
-            var nullResult = select.Instance.GetDisplayText(default);
+            var nullResult = select.Instance.GetDisplayText(null!);
 
             // Without DisplayTextSelector -> ToString()
             var toStringResult = select.Instance.GetDisplayText("Hello");

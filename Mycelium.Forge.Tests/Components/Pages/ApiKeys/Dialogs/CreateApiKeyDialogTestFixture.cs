@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="CreateApiKeyDialogTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -98,9 +98,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.ApiKeys.Dialogs
             dialog.Instance.OnScopeChanged("@starion");
             await dialog.InvokeAsync(() => dialog.Instance.OnCreateKeyClicked());
 
+            Assert.That(capturedResult, Is.Not.Null);
+
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(capturedResult, Is.Not.Null);
                 Assert.That(capturedResult.KeyName, Is.EqualTo("ci-publish"));
                 this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Once);
             }

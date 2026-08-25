@@ -117,6 +117,39 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         }
 
         [Test]
+        public void VerifyRenderingWhenNullOrDeprecatedOrInternal()
+        {
+            this.viewModelMock.Setup(x => x.Package).Returns((PackageModel)null!);
+            var nullPage = this.context.Render<PackageSettings>();
+
+            var deprecatedVersion = new PackageVersionModel { Version = "0.9.0", IsDeprecated = true, PublishedAgo = "2 months ago" };
+
+            var customPackage = new PackageModel(
+                new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.INTERNAL },
+                "Starion Group")
+            {
+                Maintainers =
+                [
+                    new PackageMaintainerModel("Alex Rivera", "AR") { IsVerified = true }
+                ],
+                Versions =
+                [
+                    deprecatedVersion
+                ]
+            };
+
+            this.viewModelMock.Setup(x => x.Package).Returns(customPackage);
+            var customPage = this.context.Render<PackageSettings>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(nullPage.Markup.Trim(), Has.Length.LessThan(5));
+                Assert.That(customPage.Markup, Does.Contain("Deprecated"));
+                Assert.That(customPage.Markup, Does.Contain("Organization"));
+            }
+        }
+
+        [Test]
         public void VerifyStubMethods()
         {
             var packageSettingsPage = this.context.Render<PackageSettings>();

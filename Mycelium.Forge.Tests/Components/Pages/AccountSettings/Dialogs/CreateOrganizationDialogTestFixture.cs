@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="CreateOrganizationDialogTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -111,9 +111,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             dialog.Instance.OnBillingEmailChanged("billing@starion.eu");
             await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
 
+            Assert.That(capturedResult, Is.Not.Null);
+
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(capturedResult, Is.Not.Null);
                 Assert.That(capturedResult.OrganizationName, Is.EqualTo("Starion Group"));
                 Assert.That(capturedResult.Scope, Is.EqualTo("@starion"));
                 Assert.That(capturedResult.BillingEmail, Is.EqualTo("billing@starion.eu"));

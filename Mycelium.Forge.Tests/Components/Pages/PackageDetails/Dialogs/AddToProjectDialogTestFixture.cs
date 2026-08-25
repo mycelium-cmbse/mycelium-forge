@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AddToProjectDialogTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -75,9 +75,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Dialogs
             dialog.Instance.OnVersionConstraintChanged("^1.3.0");
             await dialog.InvokeAsync(() => dialog.Instance.OnAddDependencyClicked());
 
+            Assert.That(capturedResult, Is.Not.Null);
+
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(capturedResult, Is.Not.Null);
                 Assert.That(capturedResult.ProjectName, Is.EqualTo("Spacecraft Mission"));
                 Assert.That(capturedResult.VersionConstraint, Is.EqualTo("^1.3.0"));
                 this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Once);

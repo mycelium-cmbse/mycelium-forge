@@ -204,6 +204,40 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         }
 
         [Test]
+        public void VerifyRenderingWhenNullOrNonAdminOrVerified()
+        {
+            this.viewModelMock.Setup(x => x.Package).Returns((PackageDetailsModel)null!);
+            var nullPage = this.context.Render<PackageDetails>();
+
+            var verifiedPackage = new PackageModel(
+                new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
+                "Starion Group",
+                "1.3.0",
+                description: "Power subsystem model.")
+            {
+                IsVerified = true,
+                License = "Apache-2.0",
+                Maintainers =
+                [
+                    new PackageMaintainerModel("Alex Rivera", "AR") { IsVerified = true }
+                ]
+            };
+
+            var verifiedDetails = new PackageDetailsModel(verifiedPackage);
+            this.viewModelMock.Setup(x => x.Package).Returns(verifiedDetails);
+            this.viewModelMock.Setup(x => x.IsUserAdmin).Returns(false);
+
+            var verifiedPage = this.context.Render<PackageDetails>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(nullPage.Markup.Trim(), Has.Length.LessThan(5));
+                Assert.That(verifiedPage.Markup, Does.Contain("ECSS-MM-PWR"));
+                Assert.That(verifiedPage.FindAll("#package-details-migrate-in-bloom-button"), Has.Count.EqualTo(0));
+            }
+        }
+
+        [Test]
         public void VerifySelectTabsAndClasses()
         {
             var packageDetailsPage = this.context.Render<PackageDetails>();
