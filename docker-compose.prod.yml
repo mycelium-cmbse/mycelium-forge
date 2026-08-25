@@ -1,0 +1,26 @@
+# Production deployment (current state): runs the published Mycelium.Forge image. The app is
+# web-UI-only right now - Program.cs's normal startup path doesn't touch PostgreSQL, Garage or
+# Keycloak at all (only the standalone `migrate` command reads ConnectionStrings:Default, and there's
+# nothing worth migrating yet) - so this is just the one stateless container.
+#
+# Add the migrator service back (see git history) once the app actually persists something, and add
+# Garage/Keycloak once it consumes them - docker/garage.toml and docker/keycloak/forge-realm.json are
+# dev-only (checked-in secrets, sslRequired "none", localhost redirect URIs) and must not be reused
+# as-is for a real deployment.
+#
+# Usage:
+#   cp .env.prod.example .env.prod   # fill in real values, never commit .env.prod
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+
+services:
+  app:
+    image: ${IMAGE:-ghcr.io/mycelium-cmbse/mycelium-forge}:${TAG:-latest}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      # Bound to localhost only - the image serves plain HTTP, so a reverse proxy on the same host
+      # terminates TLS and forwards here. Don't expose this port to the internet directly.
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
+    restart: unless-stopped
+    # DD-03: replicas are stateless and interchangeable - scale with `--scale app=N` behind your own
+    # load balancer/reverse proxy.
