@@ -1,0 +1,79 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="Footer.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<footer class="w-full bg-body-bg border-t border-border py-10 flex flex-col gap-7 select-none">
+    <div class="max-w-7xl w-full mx-auto px-6 flex flex-col md:flex-row justify-between gap-10">
+        <div class="flex flex-col gap-2.5 max-w-90">
+            <ForgeLogo/>
+            <p class="text-xs leading-2xs text-muted-foreground">
+                The MBSE model and package registry for Mycelium.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap gap-16">
+            <div class="flex flex-col gap-2.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    DOCS
+                </span>
+                <a href="@PageRoutes.Documentation.Overview"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    Registry
+                </a>
+                <a href="@PageRoutes.Documentation.Overview"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    CLI
+                </a>
+                <a href="@PageRoutes.Documentation.Overview"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    Publishing guide
+                </a>
+            </div>
+
+            <div class="flex flex-col gap-2.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    LEGAL
+                </span>
+                <a href="#"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    Terms
+                </a>
+                <a href="#"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    Privacy
+                </a>
+                <a href="#"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    Security
+                </a>
+            </div>
+
+            <div class="flex flex-col gap-2.5">
+                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    COMMUNITY
+                </span>
+                <a href="#"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    Forum
+                </a>
+                <a href="#"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    Support
+                </a>
+                <a href="#"
+                   class="text-sm leading-xs text-foreground hover:text-primary transition-colors">
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl w-full mx-auto px-6 text-2xs leading-3xs text-muted-foreground">
+        @(this.CopyrightText)
+    </div>
+</footer>

@@ -1,0 +1,70 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PackageContentsTab.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@if (this.Elements == null || this.Elements.Count == 0)
+{
+    return;
+}
+
+<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3">
+    <div class="flex items-center justify-between gap-2 w-full">
+        <h2 class="text-lg leading-lg font-semibold text-foreground">
+            Contents
+        </h2>
+        <div class="px-2 py-0.5 rounded-md bg-secondary flex items-center gap-1 text-2xs leading-3xs font-medium text-muted-foreground">
+            <LucideIcon Name="lock"
+                        Size="12"
+                        Class="text-muted-foreground shrink-0"/>
+            <span>Read-only</span>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+        @foreach (var kind in this.KindTabs)
+        {
+            <BbButton @key="kind"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(() => this.SelectKindTab(kind))"
+                      Class="@(this.GetKindButtonClass(kind))">
+                @(kind)
+            </BbButton>
+        }
+    </div>
+
+    <div class="w-full rounded-lg bg-card border border-border overflow-hidden mt-1">
+        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.GetFilteredElements())"
+                                                  class="w-full text-left text-sm leading-xs">
+            <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
+                @foreach (var element in this.GetFilteredElements())
+                {
+                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="element.Name"
+                                                                 Item="@element"
+                                                                 class="px-4 py-2.5 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
+                            <LucideIcon Name="box"
+                                        Size="16"
+                                        Class="text-muted-foreground shrink-0"/>
+                            <span class="font-medium text-foreground">
+                                @(element.Name)
+                            </span>
+                            <span class="text-2xs leading-3xs text-muted-foreground">
+                                @(element.Kind)
+                            </span>
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="text-xs leading-2xs text-muted-foreground shrink-0 p-0">
+                            @(element.AttributeSummary)
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                    </BlazorBlueprint.Primitives.Table.BbTableRow>
+                }
+            </BlazorBlueprint.Primitives.Table.BbTableBody>
+        </BlazorBlueprint.Primitives.Table.BbTable>
+    </div>
+</div>

@@ -1,0 +1,123 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="Header.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@inherits DisposableComponent
+<header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
+    <div class="flex items-center gap-2.5">
+        <ForgeLogo/>
+    </div>
+
+    <nav class="flex items-center gap-5">
+        <a href="@PageRoutes.Packages"
+           class="@(this.GetNavLinkClass(PageRoutes.Packages))">
+            Browse
+        </a>
+        <a href="@PageRoutes.Publish"
+           class="@(this.GetNavLinkClass(PageRoutes.Publish))">
+            Publish
+        </a>
+        <a href="@PageRoutes.Documentation.Overview"
+           class="@(this.GetNavLinkClass(PageRoutes.Documentation.Overview))">
+            Docs
+        </a>
+    </nav>
+
+    <div class="flex-1"></div>
+
+    <div class="flex items-center gap-3 shrink-0">
+        @if (this.IsDocumentationPage())
+        {
+            <ForgeSelect TValue="string"
+                         Value="@(this.SelectedLanguage)"
+                         ValueChanged="@(this.SelectLanguage)"
+                         Items="@(this.LanguageOptions)"
+                         FilterStyle="true"
+                         TriggerClass="!h-8 !px-2.5 !gap-1.5 !rounded-lg text-xs shrink-0"
+                         ContentClass="!w-32 text-xs shrink-0"
+                         ItemClass="text-xs shrink-0">
+                <TriggerContent>
+                    <LucideIcon Name="languages"
+                                Size="14"
+                                Class="text-muted-foreground shrink-0"/>
+                    <span class="text-foreground font-medium truncate">@(this.SelectedLanguage)</span>
+                    <LucideIcon Name="chevron-down"
+                                Size="14"
+                                Class="text-muted-foreground shrink-0 ml-1"/>
+                </TriggerContent>
+                <ItemTemplate Context="lang">
+                    <div class="flex items-center justify-between w-full">
+                        <span>@(this.SupportedLanguages.TryGetValue(lang, out var name) ? name : lang)</span>
+                        @if (this.SelectedLanguage == lang)
+                        {
+                            <LucideIcon Name="check"
+                                        Size="12"
+                                        Class="text-primary shrink-0"/>
+                        }
+                    </div>
+                </ItemTemplate>
+            </ForgeSelect>
+        }
+        <button type="button"
+                class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
+                title="@(this.ThemeService.IsDarkMode ? "Switch to light mode" : "Switch to dark mode")"
+                aria-label="Toggle visual theme"
+                @onclick="this.ToggleDarkMode">
+            <LucideIcon Name="@(this.ThemeService.IsDarkMode ? "sun" : "moon")"
+                        Size="18"
+                        Class="shrink-0"/>
+        </button>
+
+        @if (this.IsLoggedIn)
+        {
+            @if (!this.IsHomePage())
+            {
+                <SearchInput Value="@(this.SearchQuery)"
+                             ValueChanged="@(this.OnSearchInputChanged)"
+                             Placeholder="Search models and packages…"
+                             ShowShortcut="true"
+                             IconSize="16"
+                             InputClass="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground placeholder:truncate truncate text-ellipsis border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"
+                             KbdClass="hidden sm:inline-flex items-center px-1.5 py-0.5 text-3xs leading-4xs font-medium text-muted-foreground bg-card border border-border rounded shrink-0"
+                             Class="!w-[220px] !h-8 !px-2.5 !gap-2 shrink-0"/>
+            }
+
+            <BbButton Variant="ButtonVariant.Default"
+                      Size="ButtonSize.Small"
+                      Href="@PageRoutes.Publish"
+                      Class="h-8 px-3.5 gap-1.5 shrink-0">
+                <LucideIcon Name="plus"
+                            Size="14"/>
+                <span>Publish</span>
+            </BbButton>
+
+            <button type="button"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                    aria-label="Notifications">
+                <LucideIcon Name="bell"
+                            Size="20"
+                            Class="shrink-0"/>
+            </button>
+
+            <a href="@PageRoutes.AccountSettings"
+               class="w-8 h-8 rounded-full bg-avatar-bg flex items-center justify-center shrink-0 text-white text-xs leading-2xs font-semibold select-none hover:opacity-90 transition-opacity"
+               title="Account settings">
+                @(this.UserInitials)
+            </a>
+        }
+        else
+        {
+            <BbButton Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Href="@PageRoutes.Login"
+                      Class="h-8 px-3 text-xs shrink-0">
+                Sign in
+            </BbButton>
+        }
+    </div>
+</header>

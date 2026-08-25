@@ -1,0 +1,122 @@
+﻿/* Primitives Collection
+ * Raw design tokens (palette colors, typography, sizing, spacing, radiuses).
+ * Rule: Never apply a primitive token directly to a component — always alias it through a semantic token or theme utility.
+ */
+
+:root {
+  /* Brand Primitive Palette - Forge Terracotta */
+  --primitive-color-terracotta-50: #fdf8f5;
+  --primitive-color-terracotta-75: #faece3;
+  --primitive-color-terracotta-100: #fbede6;
+  --primitive-color-terracotta-200: #f6d8cc;
+  --primitive-color-terracotta-300: #eeb8a3;
+  --primitive-color-terracotta-400: #cb6b41;
+  --primitive-color-terracotta-500: #a34a24;
+  --primitive-color-terracotta-600: #8b3e1e;
+  --primitive-color-terracotta-700: #743419;
+  --primitive-color-terracotta-800: #5e2a14;
+  --primitive-color-terracotta-900: #492010;
+  --primitive-color-terracotta-950: oklch(27.9% 0.077 45.635);
+
+  /* Neutral Primitive Palette - Slate */
+  --primitive-color-slate-50: #f7fafc;
+  --primitive-color-slate-100: #edf2f7;
+  --primitive-color-slate-150: #e3e8ed;
+  --primitive-color-slate-200: #e2e8f0;
+  --primitive-color-slate-250: #dbe0e8;
+  --primitive-color-slate-300: #d1d6db;
+  --primitive-color-slate-400: #94a3b8;
+  --primitive-color-slate-450: #6b7a8c;
+  --primitive-color-slate-500: #738294;
+  --primitive-color-slate-600: #475569;
+  --primitive-color-slate-700: #334155;
+  --primitive-color-slate-800: #1e293b;
+  --primitive-color-slate-900: #293342;
+  --primitive-color-slate-950: #0f172a;
+
+  /* Base Primitive Colors */
+  --primitive-color-white: #ffffff;
+  --primitive-color-black: #000000;
+  --primitive-color-blue-700: #335999;
+
+  /* Semantic Feedback Primitives */
+  --primitive-color-red-500: #ef4444;
+  --primitive-color-red-600: #dc2626;
+  --primitive-color-amber-400: #fbbf24;
+  --primitive-color-amber-500: #f59e0b;
+  --primitive-color-amber-600: #d97706;
+  --primitive-color-amber-700: #b45309;
+  --primitive-color-green-400: #4ade80;
+  --primitive-color-green-500: #22c55e;
+  --primitive-color-green-600: #16a34a;
+  --primitive-color-emerald-50: #ecfdf5;
+  --primitive-color-emerald-200: #a7f3d0;
+  --primitive-color-emerald-300: #6ee7b7;
+  --primitive-color-emerald-400: #34d399;
+  --primitive-color-emerald-700: #047857;
+  --primitive-color-emerald-800: #065f46;
+  --primitive-color-emerald-900: #064e3b;
+  --primitive-color-emerald-950: #022c22;
+
+  /* Code Syntax Highlighting Primitives */
+  --primitive-color-code-bg: #252c37;
+  --primitive-color-code-import: #cce6db;
+  --primitive-color-code-body: #b3c7db;
+
+  /* Typography Primitives - Font Family */
+  --primitive-font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Typography Primitives - Font Size Scale */
+  --primitive-font-size-3xs: 0.625rem;  /* 10px */
+  --primitive-font-size-2xs: 0.6875rem; /* 11px */
+  --primitive-font-size-xs: 0.75rem;    /* 12px */
+  --primitive-font-size-sm: 0.8125rem;  /* 13px */
+  --primitive-font-size-base: 0.875rem; /* 14px */
+  --primitive-font-size-md: 0.9375rem;  /* 15px */
+  --primitive-font-size-lg: 1rem;       /* 16px */
+  --primitive-font-size-xl: 1.25rem;    /* 20px */
+  --primitive-font-size-2xl: 1.375rem;  /* 22px */
+  --primitive-font-size-3xl: 2.25rem;   /* 36px */
+
+  /* Typography Primitives - Line Height Scale */
+  --primitive-line-height-4xs: 0.75rem;   /* 12px */
+  --primitive-line-height-3xs: 0.8125rem; /* 13px */
+  --primitive-line-height-2xs: 0.9375rem; /* 15px */
+  --primitive-line-height-xs: 1rem;       /* 16px */
+  --primitive-line-height-17: 1.0625rem;  /* 17px */
+  --primitive-line-height-sm: 1.125rem;   /* 18px */
+  --primitive-line-height-base: 1.25rem;  /* 20px */
+  --primitive-line-height-lg: 1.5rem;     /* 24px */
+  --primitive-line-height-xl: 1.6875rem;  /* 27px */
+  --primitive-line-height-3xl: 2.75rem;   /* 44px */
+
+  /* Typography Primitives - Font Weight */
+  --primitive-font-weight-normal: 400;
+  --primitive-font-weight-medium: 500;
+  --primitive-font-weight-semibold: 600;
+  --primitive-font-weight-bold: 700;
+
+  /* Radius Primitives */
+  --primitive-radius-none: 0px;
+  --primitive-radius-xs: 2px;
+  --primitive-radius-sm: 4px;
+  --primitive-radius-md: 6px;
+  --primitive-radius-lg: 8px;
+  --primitive-radius-input: 10px;
+  --primitive-radius-xl: 12px;
+  --primitive-radius-full: 9999px;
+
+  /* Layout & Sizing Primitives */
+  --primitive-layout-container-max-width: 1200px;
+  --primitive-spacing-container-padding: 1.5rem;
+  --primitive-spacing-dialog-header-pt: 1.25rem;
+  --primitive-spacing-dialog-header-px: 1.5rem;
+  --primitive-spacing-dialog-header-pb: 1rem;
+  --primitive-spacing-dialog-padding-none: 0px;
+  --primitive-spacing-badge-py: 2px;
+  --primitive-spacing-badge-px: 6px;
+  --primitive-spacing-button-sm-h: 1.75rem;
+  --primitive-spacing-button-sm-px: 0.625rem;
+  --primitive-spacing-button-sm-gap: 0.375rem;
+  --primitive-border-width-default: 1px;
+}

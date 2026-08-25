@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -15,13 +15,16 @@ namespace Mycelium.Forge
 
     using Carter;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Components;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Orm;
 
     using OpenTelemetry.Resources;
     using OpenTelemetry.Trace;
 
     using Serilog;
+    using Serilog.Formatting.Compact;
 
     /// <summary>
     /// Provides the entry point for the Mycelium Forge package registry.
@@ -67,7 +70,7 @@ namespace Mycelium.Forge
                     .Build();
 
                 var connectionString = configuration.GetConnectionString("Default")
-                    ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
+                                       ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
 
                 return Migrator.Run(connectionString) ? 0 : 1;
             }
@@ -80,7 +83,7 @@ namespace Mycelium.Forge
             builder.Host.UseSerilog((context, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration)
                 .Enrich.FromLogContext()
-                .WriteTo.Console(new Serilog.Formatting.Compact.CompactJsonFormatter()));
+                .WriteTo.Console(new CompactJsonFormatter()));
 
             // SSS-FB-OBS-D2B: OpenTelemetry traces covering inbound HTTP requests.
             builder.Services.AddOpenTelemetry()
@@ -98,19 +101,22 @@ namespace Mycelium.Forge
             // Every component is statically server-rendered. No interactive render mode is
             // registered: InteractiveServer is ruled out by horizontal scaling, and no screen
             // requires a component runtime (docs/design.md DD-02, section 7.4).
-            builder.Services.AddRazorComponents();
+            builder.Services.AddRazorComponents()
+                .AddInteractiveServerComponents();
 
             builder.Services.AddBlazorBlueprintComponents();
+
+            builder.RegisterViewModels();
 
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/error", true);
+                app.UseExceptionHandler(PageRoutes.Error, true);
                 app.UseHsts();
             }
 
-            app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+            app.UseStatusCodePagesWithReExecute(PageRoutes.NotFound, createScopeForStatusCodePages: true);
 
             // SSS-CC-EXT-FG1: the Forge HTTP API is served over HTTPS.
             app.UseHttpsRedirection();
@@ -124,7 +130,8 @@ namespace Mycelium.Forge
 
             app.MapCarter();
 
-            app.MapRazorComponents<App>();
+            app.MapRazorComponents<App>()
+                .AddInteractiveServerRenderMode();
 
             app.Run();
 

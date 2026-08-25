@@ -1,0 +1,69 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="OrganizationDetails.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.Organization)]
+
+@if (this.ViewModel.Organization == null)
+{
+    return;
+}
+
+<PageTitle>@(this.ViewModel.Organization.Name) &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-10 select-none">
+    <div class="page-container flex flex-col gap-5.5">
+        <div class="w-full px-6 py-5.5 rounded-lg bg-card border border-border shadow-xs flex flex-row items-center gap-4.5">
+            <div class="w-16 h-16 rounded-xl bg-avatar-bg flex items-center justify-center shrink-0">
+                <span class="text-2xl leading-xl font-semibold text-white">
+                    @(this.ViewModel.Organization.Initials)
+                </span>
+            </div>
+
+            <div class="flex-1 flex flex-col items-start gap-1 min-w-0">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
+                        @(this.ViewModel.Organization.Name)
+                    </h1>
+                    @if (this.ViewModel.Organization.IsVerified)
+                    {
+                        <LucideIcon Name="badge-check"
+                                    Size="18"
+                                    Class="text-primary shrink-0"/>
+                    }
+                    <BbBadge Variant="BadgeVariant.Secondary"
+                             Class="badge-role">
+                        @(this.ViewModel.Organization.Scope)
+                    </BbBadge>
+                </div>
+
+                <p class="text-base leading-17 text-muted-foreground truncate w-full">
+                    @(this.ViewModel.Organization.Description)
+                </p>
+
+                <p class="text-xs leading-2xs text-muted-foreground truncate w-full">
+                    @(this.GetOrganizationMetaText())
+                </p>
+            </div>
+        </div>
+
+        <section class="w-full flex flex-col gap-3.5">
+            <h2 class="text-xl leading-lg font-semibold text-foreground">
+                Packages
+            </h2>
+
+            <div class="w-full flex flex-col gap-3">
+                @foreach (var package in this.ViewModel.Packages)
+                {
+                    <PackageRow @key="package.Href"
+                                Model="@package"/>
+                }
+            </div>
+        </section>
+    </div>
+</div>

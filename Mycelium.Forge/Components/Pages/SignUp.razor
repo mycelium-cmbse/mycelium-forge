@@ -1,0 +1,122 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="SignUp.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.SignUp)]
+@layout AuthLayout
+@rendermode InteractiveServer
+
+<PageTitle>Sign Up &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen flex flex-col items-center justify-center py-10 px-4 select-none">
+    <div class="auth-card">
+        <ForgeLogo/>
+
+        <div class="flex flex-col items-center gap-1 w-full text-center">
+            <h1 class="text-xl sm:text-2xl leading-xl font-semibold text-foreground tracking-tight">
+                Create your Forge account
+            </h1>
+            <p class="text-sm leading-xs font-normal text-muted-foreground">
+                Publish and reuse MBSE models and packages.
+            </p>
+        </div>
+
+        <BbField Class="flex flex-col gap-1.5 w-full"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Username)))">
+            <BbFieldLabel For="signup-username"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                USERNAME
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput id="signup-username"
+                         Type="InputType.Text"
+                         Value="@(this.ViewModel.Username)"
+                         ValueChanged="@(this.OnUsernameChanged)"
+                         Placeholder="e.g. r.andre"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                          Errors="@(this.ValidationManager[nameof(this.ViewModel.Username)])"/>
+        </BbField>
+
+        <BbField Class="flex flex-col gap-1.5 w-full"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Email)))">
+            <BbFieldLabel For="signup-email"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                EMAIL
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput id="signup-email"
+                         Type="InputType.Email"
+                         Value="@(this.ViewModel.Email)"
+                         ValueChanged="@(this.OnEmailChanged)"
+                         Placeholder="e.g. name@organisation.eu"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                          Errors="@(this.ValidationManager[nameof(this.ViewModel.Email)])"/>
+            @if (!this.ValidationManager.HasError(nameof(this.ViewModel.Email)))
+            {
+                <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
+                    Installation-unique username and a verified email address are required.
+                </BbFieldDescription>
+            }
+        </BbField>
+
+        <BbField Class="flex flex-col gap-1.5 w-full"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Password)))">
+            <BbFieldLabel For="signup-password"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                PASSWORD
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput id="signup-password"
+                         Type="InputType.Password"
+                         Value="@(this.ViewModel.Password)"
+                         ValueChanged="@(this.OnPasswordChanged)"
+                         Placeholder="••••••••"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+                          Errors="@(this.ValidationManager[nameof(this.ViewModel.Password)])"/>
+        </BbField>
+
+        <BbButton id="signup-create-account-button"
+                  Variant="ButtonVariant.Default"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCreateAccount)"
+                  Class="w-full">
+            Create account
+        </BbButton>
+
+        <ForgeAlert Variant="ForgeAlertVariant.Warning"
+                    Description="We will send a verification message. Publishing and package-role assignment stay disabled until your address is verified."/>
+
+        <div class="flex items-center gap-2.5 w-full">
+            <div class="flex-1 h-px bg-border"></div>
+            <span class="text-2xs leading-3xs font-normal text-muted-foreground">or</span>
+            <div class="flex-1 h-px bg-border"></div>
+        </div>
+
+        <BbButton id="signup-sso-button"
+                  Variant="ButtonVariant.Outline"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnContinueWithSso)"
+                  Class="w-full">
+            Continue with your organisation identity provider
+        </BbButton>
+
+        <div class="flex items-center gap-1.5 text-xs leading-2xs font-normal text-muted-foreground pt-0.5">
+            <span>Already have an account?</span>
+            <a href="@PageRoutes.Login"
+               class="text-primary font-medium hover:underline">
+                Sign in
+            </a>
+        </div>
+    </div>
+</div>

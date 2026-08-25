@@ -1,0 +1,63 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PackageValidationTab.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@if (this.Report?.Checks == null || this.Report.Checks.Count == 0)
+{
+    return;
+}
+
+<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3">
+    <div class="w-full p-3 px-4 rounded-lg bg-success border border-success-border flex items-center gap-2.5">
+        <LucideIcon Name="check-circle-2"
+                    Size="18"
+                    Class="text-success-icon shrink-0"/>
+        <div class="flex-1 flex flex-col gap-0.5">
+            <span class="text-base leading-17 font-semibold text-success-foreground">
+                @(this.Report.Title)
+            </span>
+            <span class="text-xs leading-2xs text-secondary-text">
+                @(this.Report.Description)
+            </span>
+        </div>
+        <span class="text-md leading-sm font-semibold text-success-icon shrink-0">
+            @(this.Report.Score)
+        </span>
+    </div>
+
+    <div class="w-full rounded-lg bg-card border border-border overflow-hidden mt-1">
+        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Report.Checks)"
+                                                  class="w-full text-left text-sm leading-xs">
+            <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
+                @foreach (var check in this.Report.Checks)
+                {
+                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="check.Title"
+                                                                 Item="@check"
+                                                                 class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
+                            <LucideIcon Name="check"
+                                        Size="16"
+                                        Class="text-validated shrink-0"/>
+                            <div class="flex-1 flex flex-col gap-0.5">
+                                <span class="text-sm leading-xs font-semibold text-foreground">
+                                    @(check.Title)
+                                </span>
+                                <span class="text-xs leading-2xs text-muted-foreground">
+                                    @(check.Detail)
+                                </span>
+                            </div>
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="text-xs leading-2xs font-medium text-validated shrink-0 p-0">
+                            @(check.Status)
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                    </BlazorBlueprint.Primitives.Table.BbTableRow>
+                }
+            </BlazorBlueprint.Primitives.Table.BbTableBody>
+        </BlazorBlueprint.Primitives.Table.BbTable>
+    </div>
+</div>

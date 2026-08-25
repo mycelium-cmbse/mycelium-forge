@@ -1,0 +1,119 @@
+﻿/* Semantics Collection
+ * Contextual design tokens aliasing raw primitives for theme surfaces and roles.
+ * Rule: Components consume semantic tokens via standard Tailwind utility classes.
+ */
+
+:root {
+  /* Core Design System Tokens - Light Mode */
+  --background: var(--primitive-color-white);
+  --foreground: var(--primitive-color-slate-900);
+  --body-bg: var(--primitive-color-slate-50);
+
+  --card: var(--primitive-color-white);
+  --card-foreground: var(--primitive-color-slate-900);
+  --card-border: var(--primitive-color-slate-150);
+
+  --popover: var(--primitive-color-white);
+  --popover-foreground: var(--primitive-color-slate-900);
+
+  --primary: var(--primitive-color-terracotta-500);
+  --primary-foreground: var(--primitive-color-white);
+  --primary-subtle: var(--primitive-color-terracotta-75);
+
+  --secondary: var(--primitive-color-slate-100);
+  --secondary-foreground: var(--primitive-color-slate-900);
+
+  --muted: var(--primitive-color-slate-50);
+  --muted-foreground: var(--primitive-color-slate-500);
+
+  --accent: var(--primitive-color-slate-100);
+  --accent-foreground: var(--primitive-color-slate-900);
+
+  --destructive: var(--primitive-color-red-600);
+  --destructive-foreground: var(--primitive-color-white);
+
+  --border: var(--primitive-color-slate-300);
+  --input: var(--primitive-color-slate-300);
+  --ring: var(--primitive-color-terracotta-500);
+  --badge-border: var(--primitive-color-slate-250);
+  --badge-foreground: var(--primitive-color-slate-450);
+  --secondary-text: var(--primitive-color-slate-700);
+  --avatar-bg: var(--primitive-color-slate-600);
+  --org-member-avatar-bg: var(--primitive-color-slate-700);
+  --org-member-alt-avatar-bg: var(--primitive-color-blue-700);
+  --inner-panel-bg: var(--primitive-color-slate-50);
+  --success: var(--primitive-color-emerald-50);
+  --success-foreground: var(--primitive-color-emerald-800);
+  --success-border: var(--primitive-color-emerald-200);
+  --success-icon: var(--primitive-color-emerald-700);
+  --validated: var(--primitive-color-green-600);
+  --warning: #fffbeb;
+  --warning-foreground: var(--primitive-color-amber-700);
+  --warning-border: #fde68a;
+  --warning-icon: var(--primitive-color-amber-700);
+  --info: #e8f2ff;
+  --info-foreground: #1c478c;
+  --info-border: #bfdbfe;
+  --info-icon: #2b66c9;
+  --code-bg: var(--primitive-color-code-bg);
+  --code-import: var(--primitive-color-code-import);
+  --code-body: var(--primitive-color-code-body);
+  --radius: var(--primitive-radius-lg);
+}
+
+.dark {
+  /* Core Design System Tokens - Dark Mode */
+  --background: var(--primitive-color-slate-950);
+  --foreground: var(--primitive-color-slate-100);
+  --body-bg: var(--primitive-color-slate-950);
+
+  --card: var(--primitive-color-slate-900);
+  --card-foreground: var(--primitive-color-slate-100);
+  --card-border: var(--primitive-color-slate-800);
+
+  --popover: var(--primitive-color-slate-950);
+  --popover-foreground: var(--primitive-color-slate-100);
+
+  --primary: var(--primitive-color-terracotta-400);
+  --primary-foreground: var(--primitive-color-white);
+  --primary-subtle: var(--primitive-color-terracotta-950);
+
+  --secondary: var(--primitive-color-slate-800);
+  --secondary-foreground: var(--primitive-color-slate-100);
+
+  --muted: var(--primitive-color-slate-900);
+  --muted-foreground: var(--primitive-color-slate-400);
+
+  --accent: var(--primitive-color-slate-800);
+  --accent-foreground: var(--primitive-color-slate-100);
+
+  --destructive: var(--primitive-color-red-500);
+  --destructive-foreground: var(--primitive-color-white);
+
+  --border: var(--primitive-color-slate-800);
+  --input: var(--primitive-color-slate-800);
+  --ring: var(--primitive-color-terracotta-400);
+  --badge-border: var(--primitive-color-slate-700);
+  --badge-foreground: var(--primitive-color-slate-450);
+  --secondary-text: var(--primitive-color-slate-300);
+  --avatar-bg: var(--primitive-color-slate-700);
+  --org-member-avatar-bg: var(--primitive-color-slate-700);
+  --org-member-alt-avatar-bg: var(--primitive-color-slate-800);
+  --inner-panel-bg: var(--primitive-color-slate-900);
+  --success: rgba(2, 44, 34, 0.4);
+  --success-foreground: var(--primitive-color-emerald-300);
+  --success-border: rgba(6, 78, 59, 0.6);
+  --success-icon: var(--primitive-color-emerald-400);
+  --validated: var(--primitive-color-green-400);
+  --warning: rgba(120, 53, 15, 0.4);
+  --warning-foreground: var(--primitive-color-amber-400);
+  --warning-border: rgba(180, 83, 9, 0.6);
+  --warning-icon: var(--primitive-color-amber-400);
+  --info: rgba(30, 58, 138, 0.25);
+  --info-foreground: #93c5fd;
+  --info-border: rgba(59, 130, 246, 0.4);
+  --info-icon: #60a5fa;
+  --code-bg: var(--primitive-color-slate-950);
+  --code-import: var(--primitive-color-code-import);
+  --code-body: var(--primitive-color-code-body);
+}

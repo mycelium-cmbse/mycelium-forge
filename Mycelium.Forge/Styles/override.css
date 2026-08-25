@@ -1,0 +1,97 @@
+﻿/* Overrides for BlazorBlueprint button and component properties.
+ * Imported into tailwind.css to provide unified styling across Forge components.
+ */
+
+/* Base button styling defaults */
+button[data-slot="button"],
+a[data-slot="button"] {
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+
+button[data-slot="button"]:disabled,
+a[data-slot="button"]:disabled {
+  cursor: not-allowed;
+}
+
+/* Link-styled button reset and hover behaviors */
+button[data-variant="link"],
+a[data-variant="link"] {
+  padding: 0;
+  height: auto;
+  min-height: 0;
+  text-underline-offset: 4px;
+}
+
+button[data-variant="link"]:hover,
+a[data-variant="link"]:hover {
+  text-decoration-line: underline;
+}
+
+/* Destructive outline button styling */
+.btn-destructive-outline,
+button[data-variant="outline"].btn-destructive,
+a[data-variant="outline"].btn-destructive {
+  border-color: var(--destructive);
+  color: var(--destructive);
+  background-color: var(--card);
+}
+
+.btn-destructive-outline:hover,
+button[data-variant="outline"].btn-destructive:hover,
+a[data-variant="outline"].btn-destructive:hover {
+  background-color: color-mix(in oklab, var(--destructive) 10%, transparent);
+}
+
+/* Action table button overrides */
+.btn-table-action {
+  font-size: var(--primitive-font-size-xs);
+  line-height: var(--primitive-line-height-2xs);
+  font-weight: var(--primitive-font-weight-medium);
+  padding: 0;
+  height: auto;
+  min-height: 0;
+  background-color: transparent;
+  border-width: 0;
+}
+
+/* Small button utility */
+.button-sm {
+  height: var(--primitive-spacing-button-sm-h);
+  font-size: var(--primitive-font-size-xs);
+  line-height: var(--primitive-line-height-2xs);
+  padding-left: var(--primitive-spacing-button-sm-px);
+  padding-right: var(--primitive-spacing-button-sm-px);
+  gap: var(--primitive-spacing-button-sm-gap);
+  flex-shrink: 0;
+}
+
+/* Input placeholder text truncation and ellipsis behavior */
+input::placeholder {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Dialog header override */
+[role="dialog"] > div:first-child {
+  display: none;
+}
+
+/* Hides dialog title if title is empty */
+[role="dialog"] > div:first-child:has([id*="bb-dialog"][id*="-title"]:not(:empty)) {
+  border-bottom: var(--primitive-border-width-default) solid var(--border);
+  background-color: var(--card);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  padding: var(--primitive-spacing-dialog-header-pt) var(--primitive-spacing-dialog-header-px) var(--primitive-spacing-dialog-header-pb) var(--primitive-spacing-dialog-header-px);
+}
+
+/* Dialog container padding override for BlazorBlueprint dialogs */
+div[role="dialog"][aria-labelledby*="bb-dialog"] {
+  padding: var(--primitive-spacing-dialog-padding-none);
+  overflow: hidden;
+}

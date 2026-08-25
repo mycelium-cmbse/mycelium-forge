@@ -1,0 +1,79 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="VerifyEmail.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.VerifyEmail)]
+@layout AuthLayout
+@rendermode InteractiveServer
+
+<PageTitle>Verify Email &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen flex flex-col items-center justify-center py-10 px-4 select-none">
+    <div class="auth-card">
+        <ForgeLogo/>
+
+        <div class="icon-circle-primary w-13 h-5.5">
+            <LucideIcon Name="mail"
+                        Size="14"
+                        Class="text-primary"/>
+        </div>
+
+        <div class="flex flex-col items-center gap-1 w-full text-center">
+            <h1 class="text-xl sm:text-2xl leading-xl font-semibold text-foreground tracking-tight">
+                Verify your email
+            </h1>
+            <p class="text-sm leading-xs font-normal text-muted-foreground">
+                We sent a verification link to <span class="font-medium text-foreground">@(this.ViewModel.Email)</span>. Open it to activate publishing on your account.
+            </p>
+        </div>
+
+        <div class="inner-panel">
+            <div class="flex items-center justify-between gap-2 w-full">
+                <span class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
+                    Account created
+                </span>
+                <span class="text-xs leading-2xs font-medium text-success-icon shrink-0">
+                    Done
+                </span>
+            </div>
+            <div class="flex items-center justify-between gap-2 w-full">
+                <span class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
+                    Email verified
+                </span>
+                <span class="text-xs leading-2xs font-medium text-warning-icon shrink-0">
+                    Pending
+                </span>
+            </div>
+            <div class="flex items-center justify-between gap-2 w-full">
+                <span class="text-xs leading-2xs font-normal text-muted-foreground flex-1 truncate">
+                    Publishing enabled
+                </span>
+                <span class="text-xs leading-2xs font-medium text-muted-foreground shrink-0">
+                    Locked
+                </span>
+            </div>
+        </div>
+
+        <BbButton id="verify-email-resend-button"
+                  Variant="ButtonVariant.Default"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnSendEmail)"
+                  Disabled="@(this.ViewModel.IsSending)"
+                  Class="w-full">
+            Resend verification email
+        </BbButton>
+
+        <div class="flex items-center gap-1.5 text-xs leading-2xs font-normal text-muted-foreground pt-0.5">
+            <span>Wrong address?</span>
+            <a href="@PageRoutes.AccountSettings"
+               class="text-primary font-medium hover:underline">
+                Change it
+            </a>
+        </div>
+    </div>
+</div>

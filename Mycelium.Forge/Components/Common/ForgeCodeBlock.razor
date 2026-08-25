@@ -1,0 +1,24 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ForgeCodeBlock.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full rounded-lg bg-card border border-border overflow-hidden flex flex-col select-none @(this.Class)">
+    <div class="w-full h-8 px-3.5 py-2 bg-muted border-b border-border flex items-center justify-between gap-2">
+        <span class="font-mono text-xs leading-4xs text-muted-foreground truncate">
+            @(this.FileName)
+        </span>
+
+        <ForgeCopyButton Text="@(this.Code)"
+                         AriaLabel="Copy code to clipboard"
+                         IconSize="15"
+                         IconClass="text-muted-foreground hover:text-foreground shrink-0"
+                         Class="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-card transition-colors cursor-pointer focus:outline-none shrink-0"/>
+    </div>
+
+    <pre class="w-full p-3.5 sm:px-4 font-mono text-sm leading-17 text-foreground overflow-x-auto whitespace-pre select-text"><code>@(this.Code)</code></pre>
+</div>

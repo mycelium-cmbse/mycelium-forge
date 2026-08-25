@@ -1,10 +1,82 @@
-@page "/"
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="Home.razor" company="Starion Group S.A.">
 
-<PageTitle>Mycelium Forge</PageTitle>
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
 
-<h1 class="text-3xl font-bold tracking-tight">Mycelium Forge</h1>
+</copyright>
+------------------------------------------------------------------------------------------------ *@
 
-<p class="text-muted-foreground mt-2 max-w-2xl">
-    The package registry for SysML v2 model libraries. Publish, discover, version and import
-    reusable KerML Project Archives.
-</p>
+@attribute [Route(PageRoutes.Home)]
+
+<PageTitle>Mycelium Forge &mdash; The MBSE model and package registry</PageTitle>
+
+<section class="w-full py-16 flex flex-col items-center gap-5 select-none">
+    <h1 class="text-3xl leading-3xl font-semibold text-center text-foreground tracking-tight max-w-2xl">
+        The MBSE model and package registry
+    </h1>
+
+    <p class="text-md leading-sm text-center text-muted-foreground max-w-2xl">
+        Publish, discover and reuse system models and libraries across SysML v2, CDP4-COMET and Capella.
+    </p>
+
+    <SearchInput Class="max-w-2xl"
+                 ShowShortcut="true"/>
+
+    <div class="flex flex-wrap items-center justify-center gap-12 pt-2">
+        <StatItem Value="@(this.ViewModel.PackageCount)"
+                  Label="packages"
+                  Class="min-w-14"/>
+        <StatItem Value="@(this.ViewModel.VersionCount)"
+                  Label="versions"
+                  Class="min-w-12"/>
+        <StatItem Value="@(this.ViewModel.PublisherCount)"
+                  Label="publishers"
+                  Class="min-w-15"/>
+        <StatItem Value="@(this.ViewModel.ImportCount)"
+                  Label="imports"
+                  Class="min-w-16"/>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+        <span class="text-sm leading-xs text-muted-foreground mr-1">Browse by format</span>
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=sysml-v2")"
+                  Class="rounded-full">
+            SysML v2 libraries
+        </BbButton>
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=cdp4-comet")"
+                  Class="rounded-full">
+            CDP4-COMET models
+        </BbButton>
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Href="@($"{PageRoutes.Packages}?{UrlParameterNames.Format}=capella")"
+                  Class="rounded-full">
+            Capella models
+        </BbButton>
+    </div>
+</section>
+
+<div class="w-full bg-body-bg border-t border-border/40 py-12 select-none">
+    <div class="page-container flex flex-col gap-12">
+        <PackageSection Title="Standard libraries"
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Category}=standard")"
+                        Packages="@(this.ViewModel.StandardLibraries)"/>
+
+        <PackageSection Title="Recently updated"
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Sort}=updated")"
+                        Packages="@(this.ViewModel.RecentlyUpdated)"/>
+
+        <PackageSection Title="Most used"
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Sort}=downloads")"
+                        Packages="@(this.ViewModel.MostUsed)"/>
+
+        <PackageSection Title="Models from other MBSE tools"
+                        ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Category}=mbse")"
+                        Packages="@(this.ViewModel.ModelsFromOtherMbseTools)"/>
+    </div>
+</div>

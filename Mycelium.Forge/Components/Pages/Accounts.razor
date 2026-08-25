@@ -1,0 +1,223 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="Accounts.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@using Mycelium.Forge.Models.Admin
+@attribute [Route(PageRoutes.Accounts)]
+@rendermode InteractiveServer
+
+<PageTitle>Accounts &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+    <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
+        <BbBreadcrumb Class="text-xs leading-2xs">
+            <BbBreadcrumbList>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@PageRoutes.Documentation.Overview"
+                                      Class="text-primary hover:underline font-normal">
+                        Installation
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                        Accounts
+                    </BbBreadcrumbPage>
+                </BbBreadcrumbItem>
+            </BbBreadcrumbList>
+        </BbBreadcrumb>
+
+        <div class="flex flex-row items-center justify-between gap-3 w-full h-8">
+            <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight flex-1 truncate">
+                Accounts
+            </h1>
+            <BbButton Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnTransfer)"
+                      Class="btn-destructive-outline shrink-0">
+                Transfer
+            </BbButton>
+        </div>
+
+        <p class="text-sm leading-xs font-normal text-muted-foreground w-full">
+            Installation administration. Registration and Organization creation are self-service; these controls exist for support and recovery, and every action here is audited.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full">
+            <SearchInput Value="@(this.SearchQuery)"
+                         ValueChanged="@(this.OnSearchInputChanged)"
+                         Placeholder="Filter by username or email…"
+                         IconSize="14"
+                         InputClass="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"
+                         Class="!w-full sm:!w-[340px] !h-[34px] !px-3 !gap-2 shrink-0"/>
+
+            <div class="flex items-center gap-2.5">
+                <ForgeSelect TValue="string"
+                             Value="@(this.SelectedStatusFilter)"
+                             ValueChanged="@(this.OnStatusFilterChanged)"
+                             Items="@(StatusFilterOptions)"
+                             FilterStyle="true"
+                             Label="Status:"
+                             TriggerClass="text-xs"
+                             ItemClass="text-xs !leading-2xs"/>
+
+                <ForgeSelect TValue="VerificationFilterOption"
+                             Value="@(this.SelectedVerificationFilter)"
+                             ValueChanged="@(this.OnVerificationFilterChanged)"
+                             Items="@(VerificationFilterOptions)"
+                             FilterStyle="true"
+                             Label="Verification:"
+                             TriggerClass="text-xs"
+                             ItemClass="!text-xs !leading-2xs"/>
+            </div>
+
+            <div class="hidden sm:flex flex-1"></div>
+
+            <span class="text-xs leading-2xs font-normal text-muted-foreground shrink-0 self-center">
+                @(this.GetAccountsCountText())
+            </span>
+        </div>
+
+        <div class="w-full rounded-lg bg-card border border-border overflow-hidden">
+            <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.ViewModel.FilteredAccounts)"
+                                                      class="w-full text-left">
+                <BlazorBlueprint.Primitives.Table.BbTableHeader Class="flex items-center px-4 py-2.5 bg-muted text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border gap-3">
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
+                        ACCOUNT
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
+                        EMAIL
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="w-[90px] shrink-0 p-0 text-left font-semibold">
+                        VERIFIED
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
+                        ORGANIZATIONS
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="w-[90px] shrink-0 p-0 text-left font-semibold">
+                        STATUS
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                    <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
+                                                                        Class="w-8 shrink-0 p-0">
+                    </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
+                </BlazorBlueprint.Primitives.Table.BbTableHeader>
+
+                <BlazorBlueprint.Primitives.Table.BbTableBody Class="divide-y divide-border">
+                    @if (this.ViewModel.FilteredAccounts.Count > 0)
+                    {
+                        @foreach (var account in this.ViewModel.FilteredAccounts)
+                        {
+                            <BlazorBlueprint.Primitives.Table.BbTableRow @key="account.Username"
+                                                                         Item="@account"
+                                                                         Class="flex items-center px-4 py-3 bg-card hover:bg-muted/50 transition-colors gap-3">
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 flex items-center gap-2.5 p-0">
+                                    <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
+                                        @(account.Initials)
+                                    </div>
+
+                                    <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="text-sm leading-xs font-medium text-foreground truncate">
+                                                @(account.Name)
+                                            </span>
+                                            @if (account.IsAdministrator)
+                                            {
+                                                <BbBadge Variant="BadgeVariant.Secondary"
+                                                         Class="badge-role text-primary shrink-0">
+                                                    Admin
+                                                </BbBadge>
+                                            }
+                                        </div>
+                                        <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
+                                            @(account.Username)
+                                        </span>
+                                    </div>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 p-0">
+                                    <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text truncate block">
+                                        @(account.Email)
+                                    </span>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[90px] shrink-0 flex items-center p-0">
+                                    @if (string.Equals(account.VerificationStatus, "Verified", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <BbBadge Variant="BadgeVariant.Secondary"
+                                                 Class="badge-role text-success-icon">
+                                            Verified
+                                        </BbBadge>
+                                    }
+                                    else
+                                    {
+                                        <BbBadge Variant="BadgeVariant.Secondary"
+                                                 Class="badge-role text-warning-icon">
+                                            Pending
+                                        </BbBadge>
+                                    }
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 p-0">
+                                    <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text truncate block">
+                                        @(account.Organizations)
+                                    </span>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[90px] shrink-0 flex items-center p-0">
+                                    @if (account.Status == ScopeStatusKind.ACTIVE)
+                                    {
+                                        <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <BbBadge Variant="BadgeVariant.Secondary"
+                                                 Class="badge-role text-muted-foreground">
+                                            @(account.Status)
+                                        </BbBadge>
+                                    }
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+
+                                <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-8 shrink-0 flex justify-end p-0">
+                                    <BbButton Variant="ButtonVariant.Ghost"
+                                              Size="ButtonSize.IconSmall"
+                                              OnClick="() => OnAccountMenu(account)"
+                                              AriaLabel="Options"
+                                              Class="shrink-0">
+                                        <LucideIcon Name="ellipsis"
+                                                    Size="16"
+                                                    Class="text-muted-foreground shrink-0"/>
+                                    </BbButton>
+                                </BlazorBlueprint.Primitives.Table.BbTableCell>
+                            </BlazorBlueprint.Primitives.Table.BbTableRow>
+                        }
+                    }
+                    else
+                    {
+                        <BbEmpty Title="No accounts match the current filter."
+                                 Size="EmptySize.Small"
+                                 Class="py-12 text-center"/>
+                    }
+                </BlazorBlueprint.Primitives.Table.BbTableBody>
+            </BlazorBlueprint.Primitives.Table.BbTable>
+        </div>
+
+        <p class="text-xs leading-2xs text-muted-foreground w-full">
+            The last Installation Administrator cannot have the role revoked, and an Account that is the last individual Owner of a package cannot be deleted until ownership is transferred.
+        </p>
+    </div>
+</div>

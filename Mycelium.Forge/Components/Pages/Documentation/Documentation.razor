@@ -1,0 +1,112 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="Documentation.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.Documentation.Overview)]
+@rendermode InteractiveServer
+
+<PageTitle>Documentation &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-background min-h-screen flex flex-col md:flex-row items-start select-none">
+    <DocumentationSidebar Groups="@(this.ViewModel.NavGroups)"/>
+
+    <div class="flex-1 min-w-0 flex flex-col items-center py-8 sm:py-12 px-4 sm:px-8 lg:px-16 overflow-y-auto">
+        <div class="max-w-[820px] w-full flex flex-col gap-4">
+            <div class="flex flex-row items-center justify-between gap-3 w-full">
+                <h1 class="text-3xl leading-3xl font-semibold text-foreground tracking-tight">
+                    Welcome to Forge Docs
+                </h1>
+
+                <ForgeCopyButton Text="@(this.NavigationManager.Uri)"
+                                 Label="Copy page"
+                                 ShowDropdownChevron="true"
+                                 IconSize="15"
+                                 IconClass="text-foreground shrink-0"/>
+            </div>
+
+            <p class="text-md leading-sm font-normal text-muted-foreground">
+                Learn how to publish, discover, version and import MBSE models and SysML v2 packages with Mycelium Forge, the model and package registry for the Mycelium platform.
+            </p>
+
+            <div class="w-full h-px bg-border my-1"></div>
+
+            <h2 id="what-is-mycelium-forge"
+                class="text-2xl leading-xl font-semibold text-foreground scroll-mt-6">
+                What is Mycelium Forge?
+            </h2>
+
+            <p class="text-md leading-sm font-normal text-secondary-text">
+                Forge is a public registry for MBSE models and packages. It lets systems engineers share and reuse SysML v2 libraries (quantity kinds and units, view definitions, and mission-model packages such as ECSS subsystem definitions) alongside whole models produced by other MBSE tools, including ECSS-E-TM-10-25 models from CDP4-COMET and Capella models. Forge is a sibling of the Bloom modelling app and the Fabric server: you publish from Bloom or the Forge CLI, and import packages into a project through Settings &gt; Dependencies.
+            </p>
+
+            <div class="flex flex-col gap-1.5 w-full">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
+                    <span class="text-md leading-sm font-normal text-secondary-text">
+                        Discover packages by scope, tag, category and metamodel version
+                    </span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
+                    <span class="text-md leading-sm font-normal text-secondary-text">
+                        Publish immutable, SemVer-tagged versions validated on release
+                    </span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
+                    <span class="text-md leading-sm font-normal text-secondary-text">
+                        Import a package into a project and insert its elements from the Library panel
+                    </span>
+                </div>
+            </div>
+
+            <div class="w-full h-2"></div>
+
+            <h2 id="key-sections"
+                class="text-2xl leading-xl font-semibold text-foreground scroll-mt-6">
+                Key sections
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                @foreach (var card in this.ViewModel.KeySections)
+                {
+                    <a @key="card.Title"
+                       href="@(card.Href)"
+                       class="p-4 sm:p-5 rounded-lg bg-card border border-border flex flex-col gap-2 hover:border-primary/50 transition-colors group">
+                        <div class="w-9 h-9 rounded-lg bg-primary-subtle flex items-center justify-center text-primary shrink-0">
+                            <LucideIcon Name="@(card.IconName)"
+                                        Size="20"
+                                        Class="shrink-0"/>
+                        </div>
+                        <span class="text-md leading-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                            @(card.Title)
+                        </span>
+                        <p class="text-sm leading-xs font-normal text-muted-foreground">
+                            @(card.Description)
+                        </p>
+                    </a>
+                }
+            </div>
+
+            <div class="w-full h-4"></div>
+
+            <DocumentationPrevNext PrevTitle="Back to the Forge registry"
+                                   PrevHref="@PageRoutes.Home"
+                                   NextTitle="Core concepts"
+                                   NextHref="@PageRoutes.Documentation.PackagesAndKparFormat"/>
+
+            <DocumentationPageMeta LastUpdated="@(this.ViewModel.LastUpdated)"
+                                   FeedbackGiven="@(this.ViewModel.FeedbackGiven)"
+                                   OnFeedback="@(this.SubmitFeedback)"/>
+
+            <div class="w-full h-18"></div>
+        </div>
+    </div>
+
+    <DocumentationToc Items="@(this.ViewModel.TableOfContents)"/>
+</div>

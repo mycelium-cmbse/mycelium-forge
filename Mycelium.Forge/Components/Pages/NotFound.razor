@@ -1,9 +1,18 @@
-@page "/not-found"
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="NotFound.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.NotFound)]
 
 <PageTitle>Not found - Mycelium Forge</PageTitle>
 
 <h1 class="text-3xl font-bold tracking-tight">404</h1>
 
 <p class="text-muted-foreground mt-2">
-    There is nothing at this address. <a href="/" class="text-primary underline">Go home</a>.
+    There is nothing at this address. <a href="@PageRoutes.Home" class="text-primary underline">Go home</a>.
 </p>

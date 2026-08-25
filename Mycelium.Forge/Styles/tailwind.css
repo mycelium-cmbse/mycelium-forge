@@ -2,33 +2,61 @@
  *
  * Compiled to wwwroot/css/app.css by the BuildTailwindCss target in Mycelium.Forge.csproj.
  * This file lives outside wwwroot deliberately: it is build input, not a served asset.
- *
- * Component styles come from blazorblueprint.css (shipped in the BlazorBlueprint.Components
- * NuGet package); this file only generates the utility classes used by the Forge pages.
  */
 
 @import 'tailwindcss';
+@import './tokens/primitives.css';
+@import './tokens/semantics.css';
+@import './override.css';
+@important;
 
-/* Scan the Razor components for utility classes. */
+/* Scan Razor components for utility classes. */
 @source "../Components";
 
-/* Class-based dark mode (toggle .dark on <html>). */
-@custom-variant dark (&:is(.dark *));
+/* Class-based dark mode (toggle .dark on <html> or container). */
+@custom-variant dark (&:where(.dark, .dark *));
 
-/* Theme extensions - map the shadcn CSS variables defined in wwwroot/styles/themes/default.css
- * to Tailwind colour, radius and font tokens so that utilities such as bg-primary,
- * text-foreground and rounded-md resolve against the theme. */
+/* Theme extensions mapping tokens to Tailwind v4 namespaces */
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Font Family namespace: --font-* -> font-* */
+  --font-sans: var(--primitive-font-sans);
 
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  /* Typography Scale namespace: --text-* -> text-* */
+  --text-3xs: var(--primitive-font-size-3xs); /* 10px */
+  --text-2xs: var(--primitive-font-size-2xs); /* 11px */
+  --text-xs: var(--primitive-font-size-xs);   /* 12px */
+  --text-sm: var(--primitive-font-size-sm);   /* 13px */
+  --text-base: var(--primitive-font-size-base); /* 14px */
+  --text-md: var(--primitive-font-size-md);   /* 15px */
+  --text-lg: var(--primitive-font-size-lg);   /* 16px */
+  --text-xl: var(--primitive-font-size-xl);   /* 20px */
+  --text-2xl: var(--primitive-font-size-2xl); /* 22px */
+  --text-3xl: var(--primitive-font-size-3xl); /* 36px */
+
+  /* Line Height namespace: --leading-* -> leading-* */
+  --leading-4xs: var(--primitive-line-height-4xs); /* 12px */
+  --leading-3xs: var(--primitive-line-height-3xs); /* 13px */
+  --leading-2xs: var(--primitive-line-height-2xs); /* 15px */
+  --leading-xs: var(--primitive-line-height-xs);   /* 16px */
+  --leading-17: var(--primitive-line-height-17);   /* 17px */
+  --leading-sm: var(--primitive-line-height-sm);   /* 18px */
+  --leading-base: var(--primitive-line-height-base); /* 20px */
+  --leading-lg: var(--primitive-line-height-lg);   /* 24px */
+  --leading-xl: var(--primitive-line-height-xl);   /* 27px */
+  --leading-3xl: var(--primitive-line-height-3xl); /* 44px */
+
+  /* Color namespace: --color-* -> bg-*, text-*, border-*, ring-*, fill-*, stroke-* */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-body-bg: var(--body-bg);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-destructive: var(--destructive);
@@ -39,13 +67,171 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-badge-border: var(--badge-border);
+  --color-badge-foreground: var(--badge-foreground);
+  --color-secondary-text: var(--secondary-text);
+  --color-avatar-bg: var(--avatar-bg);
+  --color-org-member-avatar-bg: var(--org-member-avatar-bg);
+  --color-org-member-alt-avatar-bg: var(--org-member-alt-avatar-bg);
+  --color-inner-panel-bg: var(--inner-panel-bg);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-border: var(--success-border);
+  --color-success-icon: var(--success-icon);
+  --color-validated: var(--validated);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-border: var(--warning-border);
+  --color-warning-icon: var(--warning-icon);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-border: var(--info-border);
+  --color-info-icon: var(--info-icon);
+
+  /* Code snippet surfaces and syntax highlighting */
+  --color-code-bg: var(--code-bg);
+  --color-code-import: var(--code-import);
+  --color-code-body: var(--code-body);
+
+  /* Specific palette helpers for badges & borders */
+  --color-slate-150: var(--primitive-color-slate-150);
+  --color-slate-250: var(--primitive-color-slate-250);
+  --color-slate-450: var(--primitive-color-slate-450);
+
+  /* Radius namespace: --radius-* -> rounded-* */
+  --radius-xs: var(--primitive-radius-xs);
+  --radius-sm: var(--primitive-radius-sm);
+  --radius-md: var(--primitive-radius-md);
+  --radius-lg: var(--primitive-radius-lg);
+  --radius-input: var(--primitive-radius-input);
+  --radius-xl: var(--primitive-radius-xl);
+  --radius-full: var(--primitive-radius-full);
 }
+
+/* Page container with standard width constraint */
+.page-container {
+  max-width: var(--primitive-layout-container-max-width);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--primitive-spacing-container-padding);
+  padding-right: var(--primitive-spacing-container-padding);
+}
+
+/* Package format badge referencing design primitives */
+.badge-format {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--primitive-spacing-badge-py) var(--primitive-spacing-badge-px);
+  border-radius: var(--primitive-radius-sm);
+  background-color: var(--card);
+  border-width: var(--primitive-border-width-default);
+  border-style: solid;
+  border-color: var(--badge-border);
+  flex-shrink: 0;
+  font-size: var(--primitive-font-size-3xs);
+  line-height: var(--primitive-line-height-4xs);
+  font-weight: var(--primitive-font-weight-medium);
+  color: var(--badge-foreground);
+}
+
+/* Version state badge (Latest / Unlisted / Deprecated / Validated) */
+.badge-version-state {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--primitive-radius-xs);
+  font-size: var(--primitive-font-size-3xs);
+  line-height: var(--primitive-line-height-4xs);
+  font-weight: var(--primitive-font-weight-medium);
+  background-color: var(--secondary);
+  flex-shrink: 0;
+}
+
+/* Role / status mini badge (Admin, Owner, Current, verification labels, invitation roles) */
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5625rem;
+  border-radius: var(--primitive-radius-md);
+  font-size: var(--primitive-font-size-2xs);
+  line-height: var(--primitive-line-height-3xs);
+  font-weight: var(--primitive-font-weight-medium);
+  background-color: var(--primary-subtle);
+  flex-shrink: 0;
+}
+
+/* Tag badge used in the package tags list */
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--primitive-radius-md);
+  font-size: var(--primitive-font-size-xs);
+  line-height: var(--primitive-line-height-2xs);
+  font-weight: var(--primitive-font-weight-medium);
+  background-color: var(--secondary);
+  color: var(--secondary-text);
+}
+
+/* Auth page card container (Login, SignUp, VerifyEmail) */
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 2rem;
+  border-radius: 14px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0px 6px 20px -4px rgba(15, 23, 41, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--spacing, 0.25rem) * 4.5);
+}
+
+.dark .auth-card {
+  box-shadow: none;
+}
+
+/* Warning callout banner (e.g. email verification notice on SignUp) */
+.callout-warning {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--primitive-radius-lg);
+  background-color: var(--primary-subtle);
+  color: var(--warning-foreground);
+  font-size: var(--primitive-font-size-2xs);
+  line-height: var(--primitive-line-height-3xs);
+  font-weight: var(--primitive-font-weight-normal);
+}
+
+/* Inner panel surface (VerifyEmail progress list, etc.) */
+.inner-panel {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--primitive-radius-lg);
+  background-color: var(--inner-panel-bg);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Primary-subtle icon circle (VerifyEmail mail icon, MyPackages/ApiKeys empty states) */
+.icon-circle-primary {
+  border-radius: var(--primitive-radius-full);
+  background-color: var(--primary-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+
 
 /* Container with responsive max-width. */
 .container {

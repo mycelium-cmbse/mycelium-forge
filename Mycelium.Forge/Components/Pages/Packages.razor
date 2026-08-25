@@ -1,0 +1,133 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="Packages.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@using Mycelium.Forge.Models.Package
+@attribute [Route(PageRoutes.Packages)]
+
+<PageTitle>Packages &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-8 select-none">
+    <div class="page-container flex flex-col gap-5">
+        <SearchInput Value="@(this.SearchQuery)"
+                     ValueChanged="@(this.OnSearchValueChanged)"/>
+
+        <div class="w-full flex items-center justify-between gap-3 h-8">
+            <span class="text-sm leading-xs font-medium text-secondary-text flex-1 truncate">
+                @(this.GetResultsCountText())
+            </span>
+
+            <div class="flex items-center gap-4 shrink-0">
+                <ForgeSelect TValue="PackageSortOption"
+                             Value="@(this.SelectedSortOption)"
+                             ValueChanged="@(this.OnSortOptionChanged)"
+                             Items="@(this.SortOptions)"
+                             FilterStyle="true"
+                             Label="Sort:"
+                             DisplayTextSelector="@(GetSortOptionLabel)"/>
+
+                <div class="flex items-center gap-2 h-4 select-none">
+                    <BbCheckbox Checked="@(this.IncludePrereleases)"
+                                CheckedChanged="@(this.OnIncludePrereleasesChanged)"
+                                id="include-prereleases"
+                                Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0"/>
+                    <BbLabel For="include-prereleases"
+                             Class="text-sm leading-xs font-normal text-secondary-text hover:text-foreground cursor-pointer transition-colors">
+                        Include prereleases
+                    </BbLabel>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full flex flex-col lg:flex-row items-start gap-8">
+            <aside class="w-full lg:w-72 shrink-0 p-4 rounded-lg bg-card border border-card-border shadow-xs flex flex-col gap-5.5">
+                @foreach (var group in this.ViewModel.Facets.GroupBy(x => x.Property))
+                {
+                    <div @key="group.Key"
+                         class="flex flex-col gap-2.5 w-full">
+                        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            @(group.Key)
+                        </span>
+                        <div class="flex flex-col gap-2.5 w-full">
+                            @foreach (var item in group)
+                            {
+                                var facetId = $"facet-{group.Key}-{item.Label}".ToLowerInvariant().Replace(" ", "-");
+                                <div @key="item.Key"
+                                     class="flex flex-row items-center gap-2 w-full select-none">
+                                    <BbCheckbox Checked="@(item.IsChecked)"
+                                                CheckedChanged="@(_ => ToggleFacet(item))"
+                                                id="@facetId"
+                                                Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0"/>
+                                    <BbLabel For="@facetId"
+                                             Class="@(GetFacetLabelClass(item))">
+                                        @(item.Label)
+                                    </BbLabel>
+                                    <span class="text-2xs leading-3xs text-muted-foreground shrink-0">
+                                        @(item.Count)
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="flex items-center gap-2 w-full pt-1">
+                    <BbButton id="packages-apply-filters-button"
+                              Variant="ButtonVariant.Default"
+                              Size="ButtonSize.Small"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.ApplyFilters)"
+                              Class="flex-1 font-semibold">
+                        Apply filters
+                    </BbButton>
+                    <BbButton id="packages-reset-filters-button"
+                              Variant="ButtonVariant.Outline"
+                              Size="ButtonSize.Small"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.ResetFilters)">
+                        Reset
+                    </BbButton>
+                </div>
+            </aside>
+
+            <main class="flex-1 w-full flex flex-col gap-3">
+                @if (this.ViewModel.PackageResults.Count > 0)
+                {
+                    @foreach (var package in this.ViewModel.PackageResults)
+                    {
+                        <PackageRow @key="package.Href"
+                                    Model="@package"/>
+                    }
+                }
+                else
+                {
+                    <div class="w-full py-20 flex flex-col items-center justify-center gap-2.5 select-none">
+                        <div class="w-14 h-14 rounded-full bg-secondary flex items-center justify-center shrink-0">
+                            <LucideIcon Name="box"
+                                        Size="26"
+                                        Class="text-muted-foreground shrink-0"/>
+                        </div>
+                        <h2 class="text-lg leading-17 font-semibold text-foreground text-center">
+                            No packages found
+                        </h2>
+                        <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-xl">
+                            Nothing matches your search. Try different keywords, or clear the filters and browse everything.
+                        </p>
+                        <BbButton id="packages-browse-all-button"
+                                  Variant="ButtonVariant.Default"
+                                  Type="ButtonType.Button"
+                                  OnClick="@(this.BrowseAllPackages)"
+                                  Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-17 font-semibold transition-colors mt-0.5">
+                            Browse all packages
+                        </BbButton>
+                    </div>
+                }
+            </main>
+        </div>
+    </div>
+</div>

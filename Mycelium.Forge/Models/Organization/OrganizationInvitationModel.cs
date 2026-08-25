@@ -1,0 +1,65 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="OrganizationInvitationModel.cs" company="Starion Group S.A.">
+// 
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+// 
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Models.Organization
+{
+    using Mycelium.Forge.Common;
+
+    /// <summary>
+    /// Represents a pending membership invitation sent to an external collaborator or member.
+    /// </summary>
+    public class OrganizationInvitationModel
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationInvitationModel" /> class.
+        /// </summary>
+        public OrganizationInvitationModel()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationInvitationModel" /> class with specified properties.
+        /// </summary>
+        /// <param name="email">The invitee email address.</param>
+        /// <param name="role">The assigned role upon accepting the invitation.</param>
+        /// <param name="statusText">The expiration or invitation status text.</param>
+        /// <param name="status">The invitation status kind.</param>
+        public OrganizationInvitationModel(
+            string email,
+            OrganizationInvitationKind role = OrganizationInvitationKind.MEMBER,
+            string statusText = "",
+            InvitationStatusKind status = InvitationStatusKind.PENDING)
+        {
+            this.Email = email;
+            this.Role = role;
+            this.StatusText = statusText;
+            this.Status = status;
+        }
+
+        /// <summary>
+        /// Gets or sets the invitee email address.
+        /// </summary>
+        public string Email { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the assigned role upon accepting the invitation.
+        /// </summary>
+        public OrganizationInvitationKind Role { get; set; } = OrganizationInvitationKind.MEMBER;
+
+        /// <summary>
+        /// Gets or sets the invitation status kind.
+        /// </summary>
+        public InvitationStatusKind Status { get; set; } = InvitationStatusKind.PENDING;
+
+        /// <summary>
+        /// Gets or sets the expiration or invitation status text.
+        /// </summary>
+        public string StatusText { get; set; } = string.Empty;
+    }
+}

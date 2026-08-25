@@ -1,0 +1,48 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ApiKeyCreatedDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent Class="flex flex-col gap-3.5 px-6 py-3"
+                 FooterClass="pt-2 flex items-center justify-end">
+    <ChildContent>
+        <ForgeAlert Variant="ForgeAlertVariant.Warning"
+                    Description="This secret is shown once. Store it in your CI secrets or a password manager."
+                    IconName="triangle-alert"
+                    IconSize="15"/>
+
+        <ForgeCopyText Text="@(this.CreatedKey?.SecretToken)"
+                       Dark="true"/>
+
+        <div class="w-full flex flex-col gap-1.5 text-xs leading-2xs pt-1">
+            <div class="flex items-center justify-between">
+                <span class="text-muted-foreground">Name</span>
+                <span class="font-medium text-foreground">@(this.CreatedKey?.Name)</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-muted-foreground">Scope</span>
+                <span class="font-medium text-foreground">@(this.CreatedKey?.Scope)</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-muted-foreground">Permissions</span>
+                <span class="font-medium text-foreground">@(this.CreatedKey?.PermissionsText)</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-muted-foreground">Expires</span>
+                <span class="font-medium text-foreground">@(this.CreatedKey?.ExpirationText)</span>
+            </div>
+        </div>
+    </ChildContent>
+    <Footer>
+        <BbButton Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnDoneClicked)">
+            Done
+        </BbButton>
+    </Footer>
+</DialogComponent>

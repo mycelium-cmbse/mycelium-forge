@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -16,7 +16,7 @@
         <!-- Opts this project into the Tailwind build defined in Directory.Build.targets. -->
         <UseTailwind>true</UseTailwind>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <IsPackable>false</IsPackable>
         <PreserveCompilationContext>true</PreserveCompilationContext>
         <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>

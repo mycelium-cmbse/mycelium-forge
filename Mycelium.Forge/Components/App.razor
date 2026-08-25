@@ -1,3 +1,12 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="App.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
 @*
     The HTML document shell for Mycelium Forge.
 
@@ -15,12 +24,13 @@
     <link href="styles/themes/default.css" rel="stylesheet"/>
     <link href="_content/BlazorBlueprint.Components/blazorblueprint.css" rel="stylesheet"/>
     <link href="css/app.css" rel="stylesheet"/>
+    <script src="js/forgeInterop.js"></script>
     <HeadOutlet/>
 </head>
 <body class="font-sans antialiased">
-    <Routes/>
+<Routes @rendermode="InteractiveServer"/>
 
-    @* Required for enhanced navigation and for components that opt in to a render mode. *@
-    <script src="_framework/blazor.web.js"></script>
+@* Required for enhanced navigation and for components that opt in to a render mode. *@
+<script src="_framework/blazor.web.js"></script>
 </body>
 </html>

@@ -1,0 +1,55 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PackageDependenciesTab.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@if (this.Dependencies == null || this.Dependencies.Count == 0)
+{
+    return;
+}
+
+<div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3">
+    <h2 class="text-lg leading-lg font-semibold text-foreground">
+        Dependencies
+    </h2>
+    <p class="text-xs leading-2xs text-muted-foreground">
+        @(this.Dependencies.Count) direct dependency, resolved against your project’s Forge index. No dev or build dependencies.
+    </p>
+
+    <div class="w-full rounded-lg bg-card border border-border overflow-hidden mt-1">
+        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Dependencies)"
+                                                  class="w-full text-left text-sm leading-xs">
+            <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
+                @foreach (var dep in this.Dependencies)
+                {
+                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="dep.Name"
+                                                                 Item="@dep"
+                                                                 class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
+                            <LucideIcon Name="box"
+                                        Size="16"
+                                        Class="text-muted-foreground shrink-0"/>
+                            <a href="@dep.Href"
+                               class="font-semibold text-primary hover:underline">
+                                @(dep.Name)
+                            </a>
+                            @if (dep.IsVerified)
+                            {
+                                <LucideIcon Name="badge-check"
+                                            Size="14"
+                                            Class="text-primary shrink-0"/>
+                            }
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="text-xs leading-2xs text-muted-foreground shrink-0 p-0">
+                            @(dep.Summary)
+                        </BlazorBlueprint.Primitives.Table.BbTableCell>
+                    </BlazorBlueprint.Primitives.Table.BbTableRow>
+                }
+            </BlazorBlueprint.Primitives.Table.BbTableBody>
+        </BlazorBlueprint.Primitives.Table.BbTable>
+    </div>
+</div>

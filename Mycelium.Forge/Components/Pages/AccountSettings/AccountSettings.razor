@@ -1,0 +1,270 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="AccountSettings.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.AccountSettings)]
+@rendermode InteractiveServer
+
+@if (this.ViewModel.Profile == null)
+{
+    return;
+}
+
+<PageTitle>Account Settings &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+<div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
+<BbBreadcrumb Class="text-xs leading-2xs">
+    <BbBreadcrumbList>
+        <BbBreadcrumbItem>
+            <BbBreadcrumbLink Class="text-muted-foreground font-normal">
+                Account
+            </BbBreadcrumbLink>
+        </BbBreadcrumbItem>
+        <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+            /
+        </BbBreadcrumbSeparator>
+        <BbBreadcrumbItem>
+            <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                Settings
+            </BbBreadcrumbPage>
+        </BbBreadcrumbItem>
+    </BbBreadcrumbList>
+</BbBreadcrumb>
+
+<h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
+    Account settings
+</h1>
+
+<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+    <div class="flex items-center gap-2.5 w-full">
+        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+            PROFILE
+        </span>
+    </div>
+
+    <div class="flex flex-col w-full divide-y divide-border">
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Username
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Username)
+            </span>
+            <BbButton id="account-settings-change-username-button"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnChangeUsername)"
+                      Class="button-sm">
+                Change
+            </BbButton>
+        </div>
+
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Email
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Email)
+            </span>
+            @if (this.ViewModel.Profile.IsEmailVerified)
+            {
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="badge-role text-success-icon">
+                    Verified
+                </BbBadge>
+            }
+            <BbButton id="account-settings-change-email-button"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnChangeEmail)"
+                      Class="button-sm">
+                Change
+            </BbButton>
+        </div>
+
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Display name
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.DisplayName)
+            </span>
+            <BbButton id="account-settings-edit-displayname-button"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnEditDisplayName)"
+                      Class="button-sm">
+                Edit
+            </BbButton>
+        </div>
+
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Company
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Company)
+            </span>
+            <BbButton id="account-settings-edit-company-button"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnEditCompany)"
+                      Class="button-sm">
+                Edit
+            </BbButton>
+        </div>
+
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Location
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Location)
+            </span>
+            <BbButton id="account-settings-edit-location-button"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                              TyForgeSelect.razor.cspe="ButtonType.Button"
+                      OnClick="@(this.OnEditLocation)"
+                      Class="button-sm">
+                Edit
+            </BbButton>
+        </div>
+
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Website
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Website)
+            </span>
+            <BbButton id="account-settings-edit-website-button"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnEditWebsite)"
+                      Class="button-sm">
+                Edit
+            </BbButton>
+        </div>
+
+        <div class="flex items-center gap-3 py-2.25 w-full">
+            <span class="w-[190px] shrink-0 text-sm leading-xs font-normal text-muted-foreground">
+                Biography
+            </span>
+            <span class="flex-1 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                @(this.ViewModel.Profile.Biography)
+            </span>
+            <BbButton id="account-settings-edit-biography-button"
+                      Variant="ButtonVariant.Outline"
+                      Size="ButtonSize.Small"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnEditBiography)"
+                      Class="button-sm">
+                Edit
+            </BbButton>
+        </div>
+    </div>
+</div>
+
+<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+    <div class="flex items-center justify-between gap-2 w-full h-8">
+        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
+            ORGANIZATIONS
+        </span>
+        <BbButton id="account-settings-transfer-org-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCreateOrganization)"
+                  Class="btn-destructive-outline h-7 text-xs px-2.5 shrink-0">
+            Transfer
+        </BbButton>
+    </div>
+
+    <div class="flex flex-col w-full divide-y divide-border">
+        @foreach (var organization in this.ViewModel.Organizations)
+        {
+            <div @key="organization.Scope"
+                 class="flex items-center gap-3 py-2.25 w-full">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-org-member-alt-avatar-bg")">
+                    @(organization.Initials)
+                </div>
+
+                <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
+                    @(organization.Scope)
+                </span>
+
+                <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
+                    @(organization.Name)
+                </span>
+
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="@($"badge-role {(organization.IsAdministrator ? "text-primary" : "text-muted-foreground")}")">
+                    @(organization.Role)
+                </BbBadge>
+            </div>
+        }
+    </div>
+
+    <ForgeAlert Variant="ForgeAlertVariant.Default"
+                Description="An Organization controls who belongs to it, not whether your Account exists. Leaving an Organization never deletes your Account."/>
+</div>
+
+<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+    <h2 class="text-md leading-sm font-semibold text-foreground">
+        Danger zone
+    </h2>
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 w-full border-t border-border">
+        <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+            <span class="text-sm leading-xs font-medium text-foreground">
+                Deactivate account
+            </span>
+            <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                Hides your profile and suspends publishing. Reversible.
+            </span>
+        </div>
+
+        <BbButton id="account-settings-deactivate-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnDeactivateAccount)"
+                  Class="button-sm">
+            Deactivate
+        </BbButton>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2 w-full border-t border-border">
+        <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+            <span class="text-sm leading-xs font-medium text-foreground">
+                Delete account
+            </span>
+            <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                Refused while you are the last individual Owner of a package. Transfer ownership first.
+            </span>
+        </div>
+
+        <BbButton id="account-settings-delete-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnDeleteAccount)"
+                  Class="btn-destructive-outline button-sm">
+            Delete
+        </BbButton>
+    </div>
+</div>
+</div>
+</div>

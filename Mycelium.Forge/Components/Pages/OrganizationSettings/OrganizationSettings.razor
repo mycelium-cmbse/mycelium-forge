@@ -1,0 +1,198 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="OrganizationSettings.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.OrganizationSettings)]
+@rendermode InteractiveServer
+
+@if (this.ViewModel.Organization == null)
+{
+    return;
+}
+
+<PageTitle>@(this.ViewModel.Organization.Scope) Settings &mdash; Mycelium Forge</PageTitle>
+
+<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+    <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
+        <BbBreadcrumb Class="text-xs leading-2xs">
+            <BbBreadcrumbList>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@PageRoutes.Packages"
+                                      Class="text-primary hover:underline font-normal">
+                        Browse
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbLink Href="@(PageRoutes.GetOrganizationRoute(this.ViewModel.Organization.Scope))"
+                                      Class="text-primary hover:underline font-normal">
+                        @(this.ViewModel.Organization.Scope)
+                    </BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+                <BbBreadcrumbItem>
+                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                        Settings
+                    </BbBreadcrumbPage>
+                </BbBreadcrumbItem>
+            </BbBreadcrumbList>
+        </BbBreadcrumb>
+
+        <div class="flex items-center gap-3 w-full">
+            <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
+                @(this.ViewModel.Organization.Initials)
+            </div>
+
+            <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight flex-1 truncate">
+                @(this.ViewModel.Organization.Scope)
+            </h1>
+
+            <BbBadge Variant="BadgeVariant.Secondary"
+                     Class="badge-role text-primary">
+                @(this.ViewModel.CurrentUserRole)
+            </BbBadge>
+        </div>
+
+        <p class="text-sm leading-xs font-normal text-muted-foreground w-full">
+            @(this.ViewModel.Organization.Name) &middot; @(this.ViewModel.Organization.Description)
+        </p>
+
+        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+            <div class="flex items-center justify-between gap-2 w-full h-8">
+                <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
+                    MEMBERS
+                </span>
+                <BbButton id="org-settings-transfer-button"
+                          Variant="ButtonVariant.Outline"
+                          Size="ButtonSize.Small"
+                          Type="ButtonType.Button"
+                          OnClick="@(this.OnTransferOrganization)"
+                          Class="btn-destructive-outline shrink-0">
+                    Transfer
+                </BbButton>
+            </div>
+
+            <div class="flex flex-col w-full divide-y divide-border">
+                @foreach (var member in this.ViewModel.Members)
+                {
+                    <div class="flex items-center gap-3 py-2.25 w-full" @key="member.Account.Id">
+                        <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
+                            @(member.Initials)
+                        </div>
+
+                        <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
+                            <span class="text-sm leading-xs font-medium text-foreground truncate">
+                                @(member.Name)
+                            </span>
+                            <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
+                                @(member.Username)
+                            </span>
+                        </div>
+
+                        <div class="w-[230px] shrink-0">
+                            <ForgeSelect TValue="OrganizationInvitationKind"
+                                         Value="@member.Role"
+                                         ValueChanged="@(role => this.OnChangeMemberRole(member, role))"
+                                         Items="@(this.ViewModel.RoleOptions)"
+                                         DisplayTextSelector="@(role => role.ToLowerCaseFirst())"
+                                         TriggerClass="!h-7 !px-2.5 !py-1 !text-xs !leading-2xs !gap-1.5"
+                                         ItemClass="!text-xs !leading-2xs"/>
+                        </div>
+
+                        <BbButton Variant="ButtonVariant.Outline"
+                                  Size="ButtonSize.Small"
+                                  Type="ButtonType.Button"
+                                  OnClick="() => this.OnRemoveMember(member)"
+                                  Class="org-remove-member-button shrink-0">
+                            Remove
+                        </BbButton>
+                    </div>
+                }
+            </div>
+
+            <p class="text-xs leading-2xs text-muted-foreground w-full">
+                An Organization must keep at least one Organization Administrator. The Organization Administrator role takes effect only once the recipient accepts it.
+            </p>
+        </div>
+
+        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+            <div class="flex items-center gap-2.5 w-full">
+                <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
+                    PENDING INVITATIONS
+                </span>
+            </div>
+
+            <div class="flex flex-col w-full divide-y divide-border">
+                @foreach (var invitation in this.ViewModel.PendingInvitations)
+                {
+                    <div @key="invitation.Email"
+                         class="flex flex-col sm:flex-row sm:items-center gap-3 py-2.25 w-full">
+                        <span class="w-[280px] shrink-0 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                            @(invitation.Email)
+                        </span>
+
+                        <BbBadge Variant="BadgeVariant.Secondary"
+                                 Class="badge-role text-muted-foreground">
+                            @(invitation.Role)
+                        </BbBadge>
+
+                        <span class="flex-1 text-xs leading-2xs font-normal text-muted-foreground truncate min-w-0">
+                            @(invitation.StatusText)
+                        </span>
+
+                        <BbButton Variant="ButtonVariant.Outline"
+                                  Size="ButtonSize.Small"
+                                  Type="ButtonType.Button"
+                                  OnClick="() => this.OnResendInvitation(invitation)"
+                                  Class="org-resend-invitation-button shrink-0">
+                            Resend
+                        </BbButton>
+
+                        <BbButton Variant="ButtonVariant.Outline"
+                                  Size="ButtonSize.Small"
+                                  Type="ButtonType.Button"
+                                  OnClick="() => this.OnRevokeInvitation(invitation)"
+                                  Class="org-revoke-invitation-button shrink-0">
+                            Revoke
+                        </BbButton>
+                    </div>
+                }
+            </div>
+
+            <ForgeAlert Variant="ForgeAlertVariant.Default"
+                        Description="An invitation admits an Account only after explicit acceptance, and expires automatically."/>
+        </div>
+
+        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+            <div class="flex items-center gap-2.5 w-full">
+                <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
+                    SCOPE
+                </span>
+            </div>
+
+            <div class="flex flex-col w-full divide-y divide-border">
+                <div class="flex items-center justify-between gap-3 py-2 w-full">
+                    <span class="text-sm leading-xs font-normal text-secondary-text truncate min-w-0">
+                        Packages published under @(this.ViewModel.Organization.Scope)
+                    </span>
+                    <span class="text-sm leading-xs font-medium text-foreground shrink-0">
+                        @(this.ViewModel.Organization.PackageCount)
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-xs leading-2xs text-muted-foreground w-full">
+                The organization cannot be deleted while its scope still holds packages.
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ForgeAlert.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full p-3.5 sm:px-4 rounded-lg border flex flex-row items-start gap-2.5 @(this.GetVariantClass()) @(this.Class)">
+    @if (!string.IsNullOrEmpty(this.IconName))
+    {
+        <div class="shrink-0 flex items-center justify-center mt-0.5">
+            <LucideIcon Name="@(this.IconName)"
+                        Size="@(this.IconSize)"
+                        Class="@(this.GetIconClass())"/>
+        </div>
+    }
+
+    <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+        @if (this.TitleTemplate != null)
+        {
+            @(this.TitleTemplate)
+        }
+        else if (!string.IsNullOrEmpty(this.Title))
+        {
+            <span class="text-sm leading-xs font-semibold">
+                @(this.Title)
+            </span>
+        }
+
+        @if (this.ChildContent != null)
+        {
+            @(this.ChildContent)
+        }
+        else if (!string.IsNullOrEmpty(this.Description))
+        {
+            <p class="text-xs leading-2xs font-normal opacity-90">
+                @(this.Description)
+            </p>
+        }
+    </div>
+
+    @if (this.Actions != null)
+    {
+        <div class="shrink-0 flex items-center gap-2">
+            @(this.Actions)
+        </div>
+    }
+</div>

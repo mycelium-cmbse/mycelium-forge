@@ -1,0 +1,17 @@
+﻿<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="26" height="26" rx="8" fill="#A34A24"/>
+  <g transform="translate(1, 1)">
+    <path d="M2 5L7 10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 4L22 12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M9 12V17" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M15 12V17" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M5 20H19" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2" cy="5" r="1.5" fill="#FFFFFF"/>
+    <circle cx="7" cy="4" r="1.5" fill="#FFFFFF"/>
+    <circle cx="22" cy="12" r="1.5" fill="#FFFFFF"/>
+    <circle cx="9" cy="17" r="1.5" fill="#FFFFFF"/>
+    <circle cx="15" cy="17" r="1.5" fill="#FFFFFF"/>
+    <circle cx="5" cy="20" r="1.5" fill="#FFFFFF"/>
+    <circle cx="19" cy="20" r="1.5" fill="#FFFFFF"/>
+  </g>
+</svg>

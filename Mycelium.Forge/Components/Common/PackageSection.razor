@@ -1,0 +1,34 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PackageSection.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<section class="flex flex-col gap-4 w-full @(this.Class)">
+    <div class="flex items-center justify-between gap-2 w-full h-6">
+        <h2 class="text-xl leading-lg font-semibold text-foreground flex-1">
+            @(this.Title)
+        </h2>
+        @if (!string.IsNullOrEmpty(this.ViewAllHref))
+        {
+            <BbButton Variant="ButtonVariant.Link"
+                      Href="@(this.ViewAllHref)">
+                <span>View all</span>
+                <LucideIcon Name="arrow-right"
+                            Size="14"
+                            Class="shrink-0"/>
+            </BbButton>
+        }
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        @foreach (var package in this.Packages)
+        {
+            <PackageCard @key="package.Href"
+                         Model="@package"/>
+        }
+    </div>
+</section>
