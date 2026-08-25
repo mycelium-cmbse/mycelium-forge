@@ -16,7 +16,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Bunit;
 
-    using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
@@ -31,7 +30,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
     {
         private BunitContext context;
         private Mock<IPackagesViewModel> viewModelMock;
-        private NavigationManager navigationManager;
 
         [SetUp]
         public void SetUp()
@@ -56,7 +54,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
             this.viewModelMock.SetupGet(x => x.PackageResults).Returns([packageModel]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
-            this.navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
         }
 
         [TearDown]
@@ -116,6 +113,19 @@ namespace Mycelium.Forge.Tests.Components.Pages
         }
 
         [Test]
+        public void VerifyOnIncludePrereleasesChanged()
+        {
+            var packagesPage = this.context.Render<Packages>();
+            packagesPage.Instance.OnIncludePrereleasesChanged(true);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(packagesPage.Instance.IncludePrereleases, Is.True);
+                this.viewModelMock.Verify(x => x.Search("ecss", PackageSortOption.Relevance, true), Times.Once);
+            }
+        }
+
+        [Test]
         public void VerifyOnInitialized()
         {
             var packagesPage = this.context.Render<Packages>();
@@ -124,6 +134,21 @@ namespace Mycelium.Forge.Tests.Components.Pages
             {
                 Assert.That(packagesPage.Instance, Is.Not.Null);
                 this.viewModelMock.Verify(x => x.InitializeViewModel("ecss", PackageSortOption.Relevance, false), Times.Once);
+            }
+        }
+
+        [Test]
+        public void VerifyOnSearchValueChanged()
+        {
+            var packagesPage = this.context.Render<Packages>();
+            packagesPage.Instance.OnSearchValueChanged("sysml");
+            packagesPage.Instance.OnSearchValueChanged(null);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(packagesPage.Instance.SearchQuery, Is.EqualTo(string.Empty));
+                this.viewModelMock.Verify(x => x.Search("sysml", PackageSortOption.Relevance, false), Times.Once);
+                this.viewModelMock.Verify(x => x.Search(string.Empty, PackageSortOption.Relevance, false), Times.AtLeastOnce);
             }
         }
 

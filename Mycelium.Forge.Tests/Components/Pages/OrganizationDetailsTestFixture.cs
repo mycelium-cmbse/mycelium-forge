@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Tests.Components.Pages
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -25,7 +24,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages;
     using Mycelium.Forge.Models.Organization;
-    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.OrganizationDetails;
 
     [TestFixture]
@@ -57,7 +55,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             };
 
             this.viewModelMock.SetupGet(x => x.Organization).Returns(organization);
-            this.viewModelMock.SetupGet(x => x.Packages).Returns(new List<PackageModel>());
+            this.viewModelMock.SetupGet(x => x.Packages).Returns([]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }

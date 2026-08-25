@@ -17,13 +17,6 @@ namespace Mycelium.Forge.Models.Package
     public class PackageDetailsModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PackageDetailsModel" /> class.
-        /// </summary>
-        public PackageDetailsModel()
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PackageDetailsModel" /> class with the specified package model.
         /// </summary>
         /// <param name="package">The underlying package model.</param>

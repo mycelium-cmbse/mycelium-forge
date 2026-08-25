@@ -18,7 +18,7 @@ namespace Mycelium.Forge.Components.Layout
     /// <summary>
     /// Represents the top application header navigation bar for Mycelium Forge.
     /// </summary>
-    public partial class Header : ComponentBase, IDisposable
+    public partial class Header : DisposableComponent
     {
         /// <summary>
         /// Gets or sets the navigation manager instance.
@@ -65,15 +65,6 @@ namespace Mycelium.Forge.Components.Layout
             { "EN", "English" },
             { "PT", "Português" }
         };
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
 
         /// <summary>
         /// Toggles between light and dark visual themes.
@@ -173,20 +164,17 @@ namespace Mycelium.Forge.Components.Layout
         /// <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
         /// unmanaged resources.
         /// </param>
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                if (this.NavigationManager != null)
-                {
-                    this.NavigationManager.LocationChanged -= this.OnLocationChanged;
-                }
+            base.Dispose(disposing);
 
-                if (this.ThemeService != null)
-                {
-                    this.ThemeService.OnChange -= this.StateHasChanged;
-                }
+            if (!disposing)
+            {
+                return;
             }
+
+            this.NavigationManager.LocationChanged -= this.OnLocationChanged;
+            this.ThemeService.OnChange -= this.StateHasChanged;
         }
 
         /// <summary>
@@ -195,6 +183,7 @@ namespace Mycelium.Forge.Components.Layout
         protected override void OnInitialized()
         {
             base.OnInitialized();
+
             this.NavigationManager.LocationChanged += this.OnLocationChanged;
             this.ThemeService.OnChange += this.StateHasChanged;
         }

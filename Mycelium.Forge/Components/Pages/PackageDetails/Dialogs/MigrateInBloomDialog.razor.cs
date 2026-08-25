@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="MigrateInBloomDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -73,21 +73,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         public string SelectedProject { get; set; } = string.Empty;
 
         /// <summary>
-        /// Initializes default values based on passed parameters when component parameters are initialized.
-        /// </summary>
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-
-            this.SelectedProject = this.Projects.Count > 0 ? this.Projects[0] : string.Empty;
-
-            if (this.Package != null)
-            {
-                this.VersionConstraint = this.Package.GetDefaultVersionConstraint();
-            }
-        }
-
-        /// <summary>
         /// Handles the open in Bloom action, validating and emitting the selected project and version constraint before closing.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -148,6 +133,21 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
             if (this.DialogReference != null)
             {
                 await this.DialogReference.CancelAsync();
+            }
+        }
+
+        /// <summary>
+        /// Initializes default values based on passed parameters when component parameters are initialized.
+        /// </summary>
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+
+            this.SelectedProject = this.Projects.Count > 0 ? this.Projects[0] : string.Empty;
+
+            if (this.Package != null)
+            {
+                this.VersionConstraint = this.Package.GetDefaultVersionConstraint();
             }
         }
     }

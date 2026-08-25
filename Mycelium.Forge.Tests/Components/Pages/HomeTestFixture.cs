@@ -71,6 +71,21 @@ namespace Mycelium.Forge.Tests.Components.Pages
         }
 
         [Test]
+        public void VerifyHomeRenders()
+        {
+            var homePage = this.context.Render<Home>();
+            var markup = homePage.Markup;
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(markup, Does.Contain("packages"));
+                Assert.That(markup, Does.Contain("versions"));
+                Assert.That(markup, Does.Contain("publishers"));
+                Assert.That(markup, Does.Contain("imports"));
+            }
+        }
+
+        [Test]
         public void VerifyOnInitialized()
         {
             var homePage = this.context.Render<Home>();
