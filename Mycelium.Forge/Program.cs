@@ -112,15 +112,10 @@ namespace Mycelium.Forge
 
             var app = builder.Build();
 
-            // The image only serves plain HTTP (see the Dockerfile); every deployment topology in
-            // §5.1 puts a reverse proxy in front to terminate TLS. Without this, UseHttpsRedirection
-            // and UseHsts below see every forwarded request as plain HTTP and redirect it straight
-            // back through the same proxy - an infinite redirect loop, not merely a missing header.
-            // KnownIPNetworks/KnownProxies are cleared rather than left at their loopback-only default:
-            // a proxy on the Docker host reaches the container through Docker's NAT, so the app sees
-            // the container network's gateway address, not 127.0.0.1. The trust boundary is instead
-            // the container's own port binding (127.0.0.1 only - see docker-compose.prod.yml), which
-            // already limits who can connect to the loopback-only reverse proxy in the first place.
+            // Without this, a request forwarded from a TLS-terminating reverse proxy looks like plain
+            // HTTP to UseHttpsRedirection/UseHsts below and gets redirect-looped. KnownIPNetworks/
+            // KnownProxies are cleared because the proxy reaches the container through Docker's NAT,
+            // not 127.0.0.1, so the default loopback-only trust wouldn't recognize it.
             var forwardedHeadersOptions = new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
