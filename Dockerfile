@@ -22,11 +22,14 @@ COPY Mycelium.Forge.Common/ ./Mycelium.Forge.Common/
 # build`/`publish` can race, silently shipping the image without it.
 RUN dotnet msbuild Mycelium.Forge/Mycelium.Forge.csproj -t:BuildTailwind -p:Configuration=Release
 
-RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish --no-restore /p:UseAppHost=false
+RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 RUN test -s /app/publish/wwwroot/css/app.css.gz \
     && grep -q "css/app.css" /app/publish/Mycelium.Forge.staticwebassets.endpoints.json \
     || (echo "app.css is missing from the published static web assets" && exit 1)
+
+RUN test -s /app/publish/wwwroot/_framework/blazor.web.js \
+    || (echo "blazor.web.js is missing from the publish output" && exit 1)
 
 
 # ---------- Runtime stage ----------
