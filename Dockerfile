@@ -17,7 +17,13 @@ RUN dotnet restore Mycelium.Forge/Mycelium.Forge.csproj
 COPY Mycelium.Forge/ ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/ ./Mycelium.Forge.Common/
 
-RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish /p:UseAppHost=false
+# GH113: on a fresh checkout, wwwroot/css/app.css doesn't exist yet, so a single `dotnet publish`
+# computes its static web assets manifest before BuildTailwind (Directory.Build.targets) has written
+# the file - the image then serves the app unstyled. `dotnet build` first gets the file onto disk, so
+# the separate `dotnet publish` afterwards is a fresh MSBuild evaluation that picks it up.
+RUN dotnet build Mycelium.Forge/Mycelium.Forge.csproj -c Release --no-restore
+
+RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish --no-restore --no-build /p:UseAppHost=false
 
 
 # ---------- Runtime stage ----------
