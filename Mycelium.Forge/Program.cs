@@ -15,6 +15,8 @@ namespace Mycelium.Forge
 
     using Carter;
 
+    using Microsoft.AspNetCore.HttpOverrides;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components;
     using Mycelium.Forge.Extensions;
@@ -109,6 +111,18 @@ namespace Mycelium.Forge
             builder.RegisterViewModels();
 
             var app = builder.Build();
+
+            // Without this, a request forwarded from a TLS-terminating reverse proxy looks like plain
+            // HTTP to UseHttpsRedirection/UseHsts below and gets redirect-looped. KnownIPNetworks/
+            // KnownProxies are cleared because the proxy reaches the container through Docker's NAT,
+            // not 127.0.0.1, so the default loopback-only trust wouldn't recognize it.
+            var forwardedHeadersOptions = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            };
+            forwardedHeadersOptions.KnownIPNetworks.Clear();
+            forwardedHeadersOptions.KnownProxies.Clear();
+            app.UseForwardedHeaders(forwardedHeadersOptions);
 
             if (!app.Environment.IsDevelopment())
             {
