@@ -59,6 +59,12 @@ namespace Mycelium.Forge.Orm.Helpers
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(comparer);
 
+            // If logging at the Information level is not enabled, skip the comparison and logging to avoid unnecessary computation.
+            if (!logger.IsEnabled(LogLevel.Information))
+            {
+                return;
+            }
+
             var changes = comparer.Compare(originalThing, updatedThing).ToList();
 
             if (changes.Count == 0)

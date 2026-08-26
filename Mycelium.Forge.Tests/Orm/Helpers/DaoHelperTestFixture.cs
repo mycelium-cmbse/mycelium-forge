@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DaoHelperTestFixture.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
 
         /// <summary>
         /// Verifies that <see cref="DaoHelper.LogChanges{T}" /> logs property changes when differences exist, does not log when
-        /// there are no differences, and validates arguments.
+        /// logging is disabled or there are no differences, and validates arguments.
         /// </summary>
         [Test]
         public void VerifyLogChanges()
@@ -71,6 +71,25 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
                 Assert.Throws<ArgumentNullException>(() => DaoHelper.LogChanges<IAPIKey>(this.loggerMock.Object, null!, originalApiKey, updatedApiKey));
             }
 
+            this.loggerMock.Setup(logger => logger.IsEnabled(LogLevel.Information)).Returns(false);
+
+            DaoHelper.LogChanges(this.loggerMock.Object, this.comparerMock.Object, originalApiKey, updatedApiKey);
+
+            using (Assert.EnterMultipleScope())
+            {
+                this.comparerMock.Verify(comparer => comparer.Compare(It.IsAny<IAPIKey>(), It.IsAny<IAPIKey>()), Times.Never);
+
+                this.loggerMock.Verify(
+                    logger => logger.Log(
+                        It.IsAny<LogLevel>(),
+                        It.IsAny<EventId>(),
+                        It.IsAny<It.IsAnyType>(),
+                        It.IsAny<Exception?>(),
+                        It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                    Times.Never);
+            }
+
+            this.loggerMock.Setup(logger => logger.IsEnabled(LogLevel.Information)).Returns(true);
             this.comparerMock.Setup(comparer => comparer.Compare(originalApiKey, updatedApiKey)).Returns(new List<PropertyChange>());
 
             DaoHelper.LogChanges(this.loggerMock.Object, this.comparerMock.Object, originalApiKey, updatedApiKey);
@@ -93,20 +112,39 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
 
             this.comparerMock.Setup(comparer => comparer.Compare(originalApiKey, updatedApiKey)).Returns(propertyChanges);
 
-            DaoHelper.LogChanges(this.loggerMock.Object, this.comparerMock.Object, originalApiKey, updatedApiKey);
+            var loggedMessage = string.Empty;
 
-            this.loggerMock.Verify(
-                logger => logger.Log(
+            this.loggerMock
+                .Setup(logger => logger.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((state, _) =>
-                        state.ToString()!.Contains($"Updating {nameof(IAPIKey)} {entityId} with 3 changes:") &&
-                        state.ToString()!.Contains($"   -> {nameof(IAPIKey.Name)} changed from \"OriginalKey\" to \"UpdatedKey\"") &&
-                        state.ToString()!.Contains($"   -> {nameof(IAPIKey.ExpiresAt)} changed from null to") &&
-                        state.ToString()!.Contains($"   -> {nameof(IAPIKey.SecretHash)} changed from [1, 2] to [3, 4]")),
+                    It.IsAny<It.IsAnyType>(),
                     It.IsAny<Exception?>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()))
+                .Callback(new InvocationAction(invocation =>
+                {
+                    var state = invocation.Arguments[2];
+                    loggedMessage = state.ToString()!;
+                }));
+
+            DaoHelper.LogChanges(this.loggerMock.Object, this.comparerMock.Object, originalApiKey, updatedApiKey);
+
+            using (Assert.EnterMultipleScope())
+            {
+                this.loggerMock.Verify(
+                    logger => logger.Log(
+                        LogLevel.Information,
+                        It.IsAny<EventId>(),
+                        It.IsAny<It.IsAnyType>(),
+                        It.IsAny<Exception?>(),
+                        It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                    Times.Once);
+
+                Assert.That(loggedMessage, Does.Contain($"Updating {nameof(IAPIKey)} {entityId} with 3 changes:"));
+                Assert.That(loggedMessage, Does.Contain($"   -> {nameof(IAPIKey.Name)} changed from \"OriginalKey\" to \"UpdatedKey\""));
+                Assert.That(loggedMessage, Does.Contain($"   -> {nameof(IAPIKey.ExpiresAt)} changed from null to"));
+                Assert.That(loggedMessage, Does.Contain($"   -> {nameof(IAPIKey.SecretHash)} changed from [1, 2] to [3, 4]"));
+            }
         }
     }
 }
