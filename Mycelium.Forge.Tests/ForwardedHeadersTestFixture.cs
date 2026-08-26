@@ -17,8 +17,8 @@ namespace Mycelium.Forge.Tests
     using Microsoft.AspNetCore.Mvc.Testing;
 
     /// <summary>
-    /// Verifies that a request forwarded from a TLS-terminating reverse proxy (GH111) is honoured
-    /// instead of being redirect-looped back to itself.
+    /// Verifies that a request forwarded from a TLS-terminating reverse proxy is honoured instead of
+    /// being redirect-looped back to itself.
     /// </summary>
     [TestFixture]
     public class ForwardedHeadersTestFixture

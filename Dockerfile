@@ -17,13 +17,16 @@ RUN dotnet restore Mycelium.Forge/Mycelium.Forge.csproj
 COPY Mycelium.Forge/ ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/ ./Mycelium.Forge.Common/
 
-# GH113: on a fresh checkout, wwwroot/css/app.css doesn't exist yet, so a single `dotnet publish`
-# computes its static web assets manifest before BuildTailwind (Directory.Build.targets) has written
-# the file - the image then serves the app unstyled. `dotnet build` first gets the file onto disk, so
-# the separate `dotnet publish` afterwards is a fresh MSBuild evaluation that picks it up.
-RUN dotnet build Mycelium.Forge/Mycelium.Forge.csproj -c Release --no-restore
+# Run BuildTailwind standalone so wwwroot/css/app.css exists on disk before any MSBuild invocation
+# that discovers static web assets - discovering the file and generating it in the same `dotnet
+# build`/`publish` can race, silently shipping the image without it.
+RUN dotnet msbuild Mycelium.Forge/Mycelium.Forge.csproj -t:BuildTailwind -p:Configuration=Release
 
-RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish --no-restore --no-build /p:UseAppHost=false
+RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish --no-restore /p:UseAppHost=false
+
+RUN test -s /app/publish/wwwroot/css/app.css.gz \
+    && grep -q "css/app.css" /app/publish/Mycelium.Forge.staticwebassets.endpoints.json \
+    || (echo "app.css is missing from the published static web assets" && exit 1)
 
 
 # ---------- Runtime stage ----------
