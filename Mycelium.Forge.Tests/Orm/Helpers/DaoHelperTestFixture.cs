@@ -1,0 +1,112 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="DaoHelperTestFixture.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Tests.Orm.Helpers
+{
+    using System;
+    using System.Collections.Generic;
+
+    using Microsoft.Extensions.Logging;
+
+    using Moq;
+
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Comparers;
+    using Mycelium.Forge.Orm.Helpers;
+
+    /// <summary>
+    /// Suite of tests for the <see cref="DaoHelper" /> class.
+    /// </summary>
+    [TestFixture]
+    public class DaoHelperTestFixture
+    {
+        private Mock<ILogger> loggerMock;
+        private Mock<IDtoComparer<IAPIKey>> comparerMock;
+
+        [SetUp]
+        public void SetUp()
+        {
+            this.loggerMock = new Mock<ILogger>();
+            this.comparerMock = new Mock<IDtoComparer<IAPIKey>>();
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="DaoHelper.FormatChangeValue" /> correctly formats different data types into string
+        /// representations for logging.
+        /// </summary>
+        [Test]
+        public void VerifyFormatChangeValue()
+        {
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(DaoHelper.FormatChangeValue(null), Is.EqualTo("null"));
+                Assert.That(DaoHelper.FormatChangeValue(string.Empty), Is.EqualTo("\"\""));
+                Assert.That(DaoHelper.FormatChangeValue("custom-string"), Is.EqualTo("\"custom-string\""));
+                Assert.That(DaoHelper.FormatChangeValue(42), Is.EqualTo("42"));
+                Assert.That(DaoHelper.FormatChangeValue(new List<string> { "first", "second" }), Is.EqualTo("[\"first\", \"second\"]"));
+                Assert.That(DaoHelper.FormatChangeValue(new List<object?> { null, string.Empty, "item", 100 }), Is.EqualTo("[null, \"\", \"item\", 100]"));
+            }
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="DaoHelper.LogChanges{T}" /> logs property changes when differences exist, does not log when
+        /// there are no differences, and validates arguments.
+        /// </summary>
+        [Test]
+        public void VerifyLogChanges()
+        {
+            var entityId = Guid.NewGuid();
+            var originalApiKey = new APIKey { Id = entityId, Name = "OriginalKey" };
+            var updatedApiKey = new APIKey { Id = entityId, Name = "UpdatedKey" };
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.Throws<ArgumentNullException>(() => DaoHelper.LogChanges(null!, this.comparerMock.Object, originalApiKey, updatedApiKey));
+                Assert.Throws<ArgumentNullException>(() => DaoHelper.LogChanges<IAPIKey>(this.loggerMock.Object, null!, originalApiKey, updatedApiKey));
+            }
+
+            this.comparerMock.Setup(comparer => comparer.Compare(originalApiKey, updatedApiKey)).Returns(new List<PropertyChange>());
+
+            DaoHelper.LogChanges(this.loggerMock.Object, this.comparerMock.Object, originalApiKey, updatedApiKey);
+
+            this.loggerMock.Verify(
+                logger => logger.Log(
+                    It.IsAny<LogLevel>(),
+                    It.IsAny<EventId>(),
+                    It.IsAny<It.IsAnyType>(),
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Never);
+
+            var propertyChanges = new List<PropertyChange>
+            {
+                new(nameof(IAPIKey.Name), "OriginalKey", "UpdatedKey"),
+                new(nameof(IAPIKey.ExpiresAt), null, new DateTime(2026, 12, 31, 0, 0, 0, DateTimeKind.Utc)),
+                new(nameof(IAPIKey.SecretHash), new List<byte> { 1, 2 }, new List<byte> { 3, 4 })
+            };
+
+            this.comparerMock.Setup(comparer => comparer.Compare(originalApiKey, updatedApiKey)).Returns(propertyChanges);
+
+            DaoHelper.LogChanges(this.loggerMock.Object, this.comparerMock.Object, originalApiKey, updatedApiKey);
+
+            this.loggerMock.Verify(
+                logger => logger.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((state, _) =>
+                        state.ToString()!.Contains($"Updating {nameof(IAPIKey)} {entityId} with 3 changes:") &&
+                        state.ToString()!.Contains($"   -> {nameof(IAPIKey.Name)} changed from \"OriginalKey\" to \"UpdatedKey\"") &&
+                        state.ToString()!.Contains($"   -> {nameof(IAPIKey.ExpiresAt)} changed from null to") &&
+                        state.ToString()!.Contains($"   -> {nameof(IAPIKey.SecretHash)} changed from [1, 2] to [3, 4]")),
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
+    }
+}

@@ -1,0 +1,59 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="{{this.Name}}Comparer.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Common.AutoGenDtoComparer
+{
+    using System.CodeDom.Compiler;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+
+    using Mycelium.Forge.Common.Comparers;
+
+    /// <summary>
+    /// Compares two instances of <see cref="I{{this.Name}}"/> and returns the property changes between them.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    public partial class {{this.Name}}Comparer : IDtoComparer<I{{this.Name}}>
+    {
+        /// <summary>
+        /// Compares the specified <paramref name="oldDto" /> with <paramref name="newDto" /> and returns the collection of
+        /// property differences.
+        /// </summary>
+        /// <param name="oldDto">The original <see cref="I{{this.Name}}" /> instance.</param>
+        /// <param name="newDto">The updated <see cref="I{{this.Name}}" /> instance.</param>
+        /// <returns>
+        /// An <see cref="IEnumerable{PropertyChange}" /> representing the property differences between
+        /// <paramref name="oldDto" /> and <paramref name="newDto" />.
+        /// </returns>
+        public IEnumerable<PropertyChange> Compare(I{{this.Name}} oldDto, I{{this.Name}} newDto)
+        {
+            var changes = new List<PropertyChange>();
+
+            if (oldDto == null || newDto == null)
+            {
+                return changes;
+            }
+
+            {{#each (Class.QueryAllProperties this) as | property |}}
+            {{#forge.DtoComparer.WriteComparisonIfApplicable property @root}}
+            {{/each}}
+            return changes;
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
