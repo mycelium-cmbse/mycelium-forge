@@ -66,8 +66,11 @@ namespace Mycelium.Forge.Tests
 
             var response = await client.GetAsync("/healthz");
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.TemporaryRedirect));
-            Assert.That(response.Headers.Location?.Scheme, Is.EqualTo("https"));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.TemporaryRedirect));
+                Assert.That(response.Headers.Location?.Scheme, Is.EqualTo("https"));
+            }
         }
     }
 }
