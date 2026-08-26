@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
     using Microsoft.Extensions.Logging;
 
@@ -59,6 +60,7 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
         /// logging is disabled or there are no differences, and validates arguments.
         /// </summary>
         [Test]
+        [SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging", Justification = "Moq expression tree in unit test.")]
         public void VerifyLogChanges()
         {
             var entityId = Guid.NewGuid();
