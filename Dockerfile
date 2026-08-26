@@ -18,12 +18,22 @@ COPY Mycelium.Forge/ ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/ ./Mycelium.Forge.Common/
 
 # GH113: on a fresh checkout, wwwroot/css/app.css doesn't exist yet, so a single `dotnet publish`
-# computes its static web assets manifest before BuildTailwind (Directory.Build.targets) has written
-# the file - the image then serves the app unstyled. `dotnet build` first gets the file onto disk, so
-# the separate `dotnet publish` afterwards is a fresh MSBuild evaluation that picks it up.
-RUN dotnet build Mycelium.Forge/Mycelium.Forge.csproj -c Release --no-restore
+# can compute its static web assets manifest before BuildTailwind (Directory.Build.targets) has
+# written the file - the image then serves the app unstyled. This reproduced consistently in CI even
+# though it built successfully; running `dotnet build` first (rather than just the narrow
+# BuildTailwind target) still let the SDK's own static-web-assets discovery run in that same
+# invocation. Targeting BuildTailwind directly writes the file with no `Build`-target machinery
+# involved at all, so the later `dotnet publish` is the first, and only, evaluation that ever needs
+# to discover it.
+RUN dotnet msbuild Mycelium.Forge/Mycelium.Forge.csproj -t:BuildTailwind -p:Configuration=Release
 
-RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish --no-restore --no-build /p:UseAppHost=false
+RUN dotnet publish Mycelium.Forge/Mycelium.Forge.csproj -c Release -o /app/publish --no-restore /p:UseAppHost=false
+
+# GH113: fail the build loudly rather than silently ship an unstyled image again if the static web
+# assets manifest ever ends up without app.css.
+RUN test -s /app/publish/wwwroot/css/app.css.gz \
+    && grep -q "css/app.css" /app/publish/Mycelium.Forge.staticwebassets.endpoints.json \
+    || (echo "app.css is missing from the published static web assets - see GH113" && exit 1)
 
 
 # ---------- Runtime stage ----------
