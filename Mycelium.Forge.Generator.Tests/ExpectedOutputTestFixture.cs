@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Generator.Tests
     using System.Threading.Tasks;
 
     using Mycelium.Forge.Generator.Generators;
+    using Mycelium.Forge.Generator.Tests.Extensions;
 
     using uml4net.Reporting.Generators;
 
@@ -86,7 +87,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDto", $"{className}.cs"));
 
-            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
 
         [TestCaseSource(nameof(ConcreteInterestingClasses))]
@@ -100,7 +101,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDto", $"I{className}.cs"));
 
-            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
 
         [TestCase("VisibilityKind")]
@@ -113,7 +114,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenEnum", $"{enumerationName}.cs"));
 
-            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
 
         [TestCase("VisibilityKind")]
@@ -129,7 +130,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenEnumProvider", $"{enumerationName}Provider.cs"));
 
-            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
 
         [TestCaseSource(nameof(ConcreteInterestingClasses))]
@@ -142,7 +143,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenSerializer", $"{className}Serializer.cs"));
 
-            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
 
         [TestCaseSource(nameof(ConcreteInterestingClasses))]
@@ -155,7 +156,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDeSerializer", $"{className}DeSerializer.cs"));
 
-            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
 
         /// <summary>
@@ -173,17 +174,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDtoComparer", $"{className}Comparer.cs"));
 
-            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
-        }
-
-        /// <summary>
-        /// Normalizes line endings to CRLF for cross-platform text assertions.
-        /// </summary>
-        /// <param name="content">The string content to normalize.</param>
-        /// <returns>The content with line endings normalized to CRLF.</returns>
-        private static string NormalizeLineEndings(string content)
-        {
-            return content.Replace("\r\n", "\n").Replace("\n", "\r\n");
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
     }
 }

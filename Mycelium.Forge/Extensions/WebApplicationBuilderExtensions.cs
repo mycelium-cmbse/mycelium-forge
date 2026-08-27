@@ -9,6 +9,9 @@
 
 namespace Mycelium.Forge.Extensions
 {
+    using Microsoft.Extensions.Options;
+
+    using Mycelium.Forge.Config;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.AccountSettings;
     using Mycelium.Forge.ViewModels.AdminAccounts;
@@ -31,6 +34,24 @@ namespace Mycelium.Forge.Extensions
     /// </summary>
     public static class WebApplicationBuilderExtensions
     {
+        /// <summary>
+        /// Registers database configuration and related dependencies in the application service collection.
+        /// </summary>
+        /// <param name="builder">The <see cref="WebApplicationBuilder" /> to configure.</param>
+        /// <returns>The configured <see cref="WebApplicationBuilder" /> instance.</returns>
+        public static WebApplicationBuilder RegisterDatabase(this WebApplicationBuilder builder)
+        {
+            builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConnection"));
+
+            builder.Services.AddSingleton(provider =>
+            {
+                var options = provider.GetRequiredService<IOptions<DatabaseConfig>>();
+                return options.Value;
+            });
+
+            return builder;
+        }
+
         /// <summary>
         /// Registers page view model dependencies in the application service collection.
         /// </summary>

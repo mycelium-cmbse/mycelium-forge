@@ -1,0 +1,26 @@
+﻿# Local development backing services for Mycelium Forge (DD-09, DD-18).
+# Extends service definitions from docker-compose.yml.
+# Run with: docker compose -f docker-compose.dev.yml up -d
+
+name: forge
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+
+  garage:
+    extends:
+      file: docker-compose.yml
+      service: garage
+
+  keycloak:
+    extends:
+      file: docker-compose.yml
+      service: keycloak
+
+volumes:
+  postgres-data:
+  garage-meta:
+  garage-data:
