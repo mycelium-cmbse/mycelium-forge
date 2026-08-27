@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class OrganizationDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="IOrganization"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="IOrganization"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="IOrganization"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="IOrganization"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,260 +39,353 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="IOrganization"/>
         /// </returns>
-        internal static IOrganization DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static IOrganization DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("OrganizationDeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
+            var dtoInstance = new Mycelium.Forge.Common.Organization();
+
+            var typeSeen = false;
+            var addressSeen = false;
+            var administratorSeen = false;
+            var billingEmailSeen = false;
+            var createdAtSeen = false;
+            var defaultPackageVisibilitySeen = false;
+            var emailSeen = false;
+            var LogoBlobReferenceSeen = false;
+            var memberSeen = false;
+            var modifiedAtSeen = false;
+            var nameSeen = false;
+            var originSeen = false;
+            var ownedPackageSeen = false;
+            var primaryAddressSeen = false;
+            var profileLinkSeen = false;
+            var shortNameSeen = false;
+            var statusSeen = false;
+            var websiteSeen = false;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@type"u8))
+                {
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "Organization")
+                    {
+                        throw new InvalidOperationException($"The OrganizationDeSerializer can only be used to deserialize objects of type IOrganization, a {typeValue} was provided");
+                    }
+
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the Organization cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("address"u8))
+                {
+                    addressSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var addressRefId))
+                        {
+                            dtoInstance.Address.Add(addressRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("administrator"u8))
+                {
+                    administratorSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var administratorRefId))
+                        {
+                            dtoInstance.Administrator.Add(administratorRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("billingEmail"u8))
+                {
+                    billingEmailSeen = true;
+                    reader.Read();
+
+                    dtoInstance.BillingEmail = reader.GetString();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("createdAt"u8))
+                {
+                    createdAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("defaultPackageVisibility"u8))
+                {
+                    defaultPackageVisibilitySeen = true;
+                    reader.Read();
+
+                    dtoInstance.DefaultPackageVisibility = VisibilityKindProvider.Parse(reader.GetString());
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("email"u8))
+                {
+                    emailSeen = true;
+                    reader.Read();
+
+                    var emailScalarValue = reader.GetString();
+
+                    if (emailScalarValue != null)
+                    {
+                        dtoInstance.Email = emailScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("logoBlobReference"u8))
+                {
+                    LogoBlobReferenceSeen = true;
+                    reader.Read();
+
+                    dtoInstance.LogoBlobReference = reader.GetString();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("member"u8))
+                {
+                    memberSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var memberRefId))
+                        {
+                            dtoInstance.Member.Add(memberRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("modifiedAt"u8))
+                {
+                    modifiedAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("name"u8))
+                {
+                    nameSeen = true;
+                    reader.Read();
+
+                    var nameScalarValue = reader.GetString();
+
+                    if (nameScalarValue != null)
+                    {
+                        dtoInstance.Name = nameScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("origin"u8))
+                {
+                    originSeen = true;
+                    reader.Read();
+
+                    var originScalarValue = reader.GetString();
+
+                    if (originScalarValue != null)
+                    {
+                        dtoInstance.Origin = originScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("ownedPackage"u8))
+                {
+                    ownedPackageSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownedPackageRefId))
+                        {
+                            dtoInstance.OwnedPackage.Add(ownedPackageRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("primaryAddress"u8))
+                {
+                    primaryAddressSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.PrimaryAddress = Guid.Empty;
+                        logger.LogDebug($"the Organization.PrimaryAddress property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var primaryAddressRefId))
+                        {
+                            dtoInstance.PrimaryAddress = primaryAddressRefId;
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("profileLink"u8))
+                {
+                    profileLinkSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var profileLinkRefId))
+                        {
+                            dtoInstance.ProfileLink.Add(profileLinkRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("shortName"u8))
+                {
+                    shortNameSeen = true;
+                    reader.Read();
+
+                    var shortNameScalarValue = reader.GetString();
+
+                    if (shortNameScalarValue != null)
+                    {
+                        dtoInstance.ShortName = shortNameScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("status"u8))
+                {
+                    statusSeen = true;
+                    reader.Read();
+
+                    dtoInstance.Status = ScopeStatusKindProvider.Parse(reader.GetString());
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("website"u8))
+                {
+                    websiteSeen = true;
+                    reader.Read();
+
+                    dtoInstance.Website = reader.GetString();
+
+                    continue;
+                }
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
             {
                 throw new InvalidOperationException("The @type property is not available, the OrganizationDeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            if (@type.GetString() != "Organization")
-            {
-                throw new InvalidOperationException($"The OrganizationDeSerializer can only be used to deserialize objects of type IOrganization, a {@type.GetString()} was provided");
-            }
-
-            var dtoInstance = new Mycelium.Forge.Common.Organization();
-
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
-
-                if (propertyValue == null)
-                {
-                    throw new JsonException("The @id property is not present, the Organization cannot be deserialized");
-                }
-                else
-                {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
-                }
-            }
-
-            if (jsonElement.TryGetProperty("address"u8, out var addressProperty))
-            {
-                foreach (var arrayItem in addressProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var addressExternalIdProperty))
-                    {
-                        var propertyValue = addressExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.Address.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!addressSeen)
             {
                 logger.LogDebug("the address Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("administrator"u8, out var administratorProperty))
-            {
-                foreach (var arrayItem in administratorProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var administratorExternalIdProperty))
-                    {
-                        var propertyValue = administratorExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.Administrator.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!administratorSeen)
             {
                 logger.LogDebug("the administrator Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("billingEmail"u8, out var billingEmailProperty))
-            {
-                dtoInstance.BillingEmail = billingEmailProperty.GetString();
-            }
-            else
+            if (!billingEmailSeen)
             {
                 logger.LogDebug("the billingEmail Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("createdAt"u8, out var createdAtProperty))
-            {
-                dtoInstance.CreatedAt = createdAtProperty.GetDateTime();
-            }
-            else
+            if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("defaultPackageVisibility"u8, out var defaultPackageVisibilityProperty))
-            {
-                dtoInstance.DefaultPackageVisibility = VisibilityKindProvider.Parse(defaultPackageVisibilityProperty.GetString());
-            }
-            else
+            if (!defaultPackageVisibilitySeen)
             {
                 logger.LogDebug("the defaultPackageVisibility Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("email"u8, out var emailProperty))
-            {
-                var propertyValue = emailProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Email = propertyValue;
-                }
-            }
-            else
+            if (!emailSeen)
             {
                 logger.LogDebug("the email Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("logoBlobReference"u8, out var LogoBlobReferenceProperty))
-            {
-                dtoInstance.LogoBlobReference = LogoBlobReferenceProperty.GetString();
-            }
-            else
+            if (!LogoBlobReferenceSeen)
             {
                 logger.LogDebug("the logoBlobReference Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("member"u8, out var memberProperty))
-            {
-                foreach (var arrayItem in memberProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var memberExternalIdProperty))
-                    {
-                        var propertyValue = memberExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.Member.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!memberSeen)
             {
                 logger.LogDebug("the member Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("modifiedAt"u8, out var modifiedAtProperty))
-            {
-                dtoInstance.ModifiedAt = modifiedAtProperty.GetDateTime();
-            }
-            else
+            if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("name"u8, out var nameProperty))
-            {
-                var propertyValue = nameProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Name = propertyValue;
-                }
-            }
-            else
+            if (!nameSeen)
             {
                 logger.LogDebug("the name Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("origin"u8, out var originProperty))
-            {
-                var propertyValue = originProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Origin = propertyValue;
-                }
-            }
-            else
+            if (!originSeen)
             {
                 logger.LogDebug("the origin Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("ownedPackage"u8, out var ownedPackageProperty))
-            {
-                foreach (var arrayItem in ownedPackageProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var ownedPackageExternalIdProperty))
-                    {
-                        var propertyValue = ownedPackageExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.OwnedPackage.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!ownedPackageSeen)
             {
                 logger.LogDebug("the ownedPackage Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("primaryAddress"u8, out var primaryAddressProperty))
-            {
-                if (primaryAddressProperty.ValueKind == JsonValueKind.Null)
-                {
-                    dtoInstance.PrimaryAddress = Guid.Empty;
-                    logger.LogDebug($"the Organization.PrimaryAddress property was not found in the Json. The value is set to Guid.Empty");
-                }
-                else
-                {
-                    if (primaryAddressProperty.TryGetProperty("@id"u8, out var primaryAddressExternalIdProperty))
-                    {
-                        var propertyValue = primaryAddressExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.PrimaryAddress = Guid.Parse(propertyValue);
-                        }
-                    }
-                }
-            }
-            else
+            if (!primaryAddressSeen)
             {
                 logger.LogDebug("the primaryAddress Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("profileLink"u8, out var profileLinkProperty))
-            {
-                foreach (var arrayItem in profileLinkProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var profileLinkExternalIdProperty))
-                    {
-                        var propertyValue = profileLinkExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.ProfileLink.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!profileLinkSeen)
             {
                 logger.LogDebug("the profileLink Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("shortName"u8, out var shortNameProperty))
-            {
-                var propertyValue = shortNameProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.ShortName = propertyValue;
-                }
-            }
-            else
+            if (!shortNameSeen)
             {
                 logger.LogDebug("the shortName Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("status"u8, out var statusProperty))
-            {
-                dtoInstance.Status = ScopeStatusKindProvider.Parse(statusProperty.GetString());
-            }
-            else
+            if (!statusSeen)
             {
                 logger.LogDebug("the status Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("website"u8, out var websiteProperty))
-            {
-                dtoInstance.Website = websiteProperty.GetString();
-            }
-            else
+            if (!websiteSeen)
             {
                 logger.LogDebug("the website Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }

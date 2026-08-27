@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DeSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Serializer.Json
 {
     using System;
+    using System.Buffers;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -20,13 +21,19 @@ namespace Mycelium.Forge.Serializer.Json
 
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
-    
+
     using Mycelium.Forge.Common;
-    
+
     /// <summary>
     /// The purpose of the <see cref="DeSerializer"/> is to deserialize a JSON <see cref="Stream"/> to
     /// an <see cref="IThing"/> and <see cref="IEnumerable{IThing}"/>
     /// </summary>
+    /// <remarks>
+    /// The stream is read once into an <see cref="ArrayPool{Byte}"/>-rented buffer and walked with a
+    /// single forward-only <see cref="Utf8JsonReader"/> pass. Unlike <see cref="JsonDocument"/>, this
+    /// never materializes a DOM node per JSON value, which is the dominant allocation/CPU cost of
+    /// deserializing large payloads.
+    /// </remarks>
     public class DeSerializer : IDeSerializer
     {
         /// <summary>
@@ -67,21 +74,15 @@ namespace Mycelium.Forge.Serializer.Json
 
             var result = new List<IThing>();
 
-            using (var document = JsonDocument.Parse(stream))
-            {
-                var root = document.RootElement;
+            var rentedBuffer = ReadToPooledBuffer(stream, out var length);
 
-                switch (root.ValueKind)
-                {
-                    case JsonValueKind.Object:
-                        result.Add(this.DeserializeObject(root));
-                        break;
-                    case JsonValueKind.Array:
-                        result.AddRange(this.DeserializeArray(root));
-                        break;
-                    default:
-                        throw new SerializationException();
-                }
+            try
+            {
+                this.DeserializeBuffer(rentedBuffer, length, result);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rentedBuffer);
             }
 
             if (this.logger.IsEnabled(LogLevel.Information))
@@ -110,23 +111,15 @@ namespace Mycelium.Forge.Serializer.Json
 
             var result = new List<IThing>();
 
-            var jsonDocumentOptions = default(JsonDocumentOptions);
+            var (rentedBuffer, length) = await ReadToPooledBufferAsync(stream, cancellationToken);
 
-            using (var document = await JsonDocument.ParseAsync(stream, jsonDocumentOptions, cancellationToken))
+            try
             {
-                var root = document.RootElement;
-
-                switch (root.ValueKind)
-                {
-                    case JsonValueKind.Object:
-                        result.Add(this.DeserializeObject(root));
-                        break;
-                    case JsonValueKind.Array:
-                        result.AddRange(this.DeserializeArray(root));
-                        break;
-                    default:
-                        throw new SerializationException();
-                }
+                this.DeserializeBuffer(rentedBuffer, length, result);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rentedBuffer);
             }
 
             if (this.logger.IsEnabled(LogLevel.Information))
@@ -138,57 +131,158 @@ namespace Mycelium.Forge.Serializer.Json
         }
 
         /// <summary>
-        /// Deserializes an <see cref="JsonElement"/> of type <see cref="JsonValueKind.Object"/> to an <see cref="IThing"/> object
+        /// Reads the entirety of the <paramref name="stream"/> into a rented buffer, growing it as needed
         /// </summary>
-        /// <param name="jsonObject">
-        /// the subject <see cref="JsonElement"/>
+        /// <param name="stream">
+        /// the JSON input stream
+        /// </param>
+        /// <param name="length">
+        /// the number of bytes read into the returned buffer
+        /// </param>
+        /// <returns>
+        /// a buffer rented from <see cref="ArrayPool{Byte}"/> that the caller must return
+        /// </returns>
+        private static byte[] ReadToPooledBuffer(Stream stream, out int length)
+        {
+            var buffer = ArrayPool<byte>.Shared.Rent(81920);
+            var totalRead = 0;
+
+            int bytesRead;
+            while ((bytesRead = stream.Read(buffer, totalRead, buffer.Length - totalRead)) > 0)
+            {
+                totalRead += bytesRead;
+
+                if (totalRead == buffer.Length)
+                {
+                    buffer = Grow(buffer, totalRead);
+                }
+            }
+
+            length = totalRead;
+            return buffer;
+        }
+
+        /// <summary>
+        /// Asynchronously reads the entirety of the <paramref name="stream"/> into a rented buffer, growing it as needed
+        /// </summary>
+        /// <param name="stream">
+        /// the JSON input stream
+        /// </param>
+        /// <param name="cancellationToken">
+        /// The <see cref="CancellationToken"/> used to cancel the operation
+        /// </param>
+        /// <returns>
+        /// a buffer rented from <see cref="ArrayPool{Byte}"/> that the caller must return, and the number of bytes read into it
+        /// </returns>
+        private static async Task<(byte[] Buffer, int Length)> ReadToPooledBufferAsync(Stream stream, CancellationToken cancellationToken)
+        {
+            var buffer = ArrayPool<byte>.Shared.Rent(81920);
+            var totalRead = 0;
+
+            int bytesRead;
+            while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(totalRead, buffer.Length - totalRead), cancellationToken)) > 0)
+            {
+                totalRead += bytesRead;
+
+                if (totalRead == buffer.Length)
+                {
+                    buffer = Grow(buffer, totalRead);
+                }
+            }
+
+            return (buffer, totalRead);
+        }
+
+        /// <summary>
+        /// Rents a larger buffer, copies the previously read bytes into it, and returns the old buffer to the pool
+        /// </summary>
+        private static byte[] Grow(byte[] buffer, int bytesToPreserve)
+        {
+            var newBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length * 2);
+            Buffer.BlockCopy(buffer, 0, newBuffer, 0, bytesToPreserve);
+            ArrayPool<byte>.Shared.Return(buffer);
+            return newBuffer;
+        }
+
+        /// <summary>
+        /// Drives a single <see cref="Utf8JsonReader"/> pass over the buffered JSON payload
+        /// </summary>
+        private void DeserializeBuffer(byte[] buffer, int length, List<IThing> result)
+        {
+            var span = new ReadOnlySpan<byte>(buffer, 0, length);
+
+            if (span.StartsWith(Utf8Bom))
+            {
+                span = span[Utf8Bom.Length..];
+            }
+
+            var reader = new Utf8JsonReader(span);
+
+            if (!reader.Read())
+            {
+                return;
+            }
+
+            switch (reader.TokenType)
+            {
+                case JsonTokenType.StartObject:
+                    result.Add(this.DeserializeObject(ref reader));
+                    break;
+                case JsonTokenType.StartArray:
+                    this.DeserializeArray(ref reader, result);
+                    break;
+                default:
+                    throw new SerializationException();
+            }
+        }
+
+        /// <summary>
+        /// The UTF-8 byte-order-mark, which <see cref="Utf8JsonReader"/> does not skip on its own
+        /// </summary>
+        private static ReadOnlySpan<byte> Utf8Bom => [0xEF, 0xBB, 0xBF];
+
+        /// <summary>
+        /// Deserializes a single JSON object off the <paramref name="reader"/> to an <see cref="IThing"/> object
+        /// </summary>
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <returns>
         /// an instance of <see cref="IThing"/>
         /// </returns>
-        private IThing DeserializeObject(JsonElement jsonObject)
+        private IThing DeserializeObject(ref Utf8JsonReader reader)
         {
-            if (jsonObject.ValueKind != JsonValueKind.Object)
+            if (reader.TokenType != JsonTokenType.StartObject)
             {
-                throw new ArgumentException($"The {nameof(jsonObject)} must be of type JsonValueKind.Object", nameof(jsonObject));
+                throw new ArgumentException($"The {nameof(reader)} must be positioned at a JSON object", nameof(reader));
             }
 
-            if (jsonObject.TryGetProperty("@type", out var typeElement))
-            {
-                var typeName = typeElement.GetString();
+            var typeName = Utf8JsonReaderHelper.PeekTypeName(reader);
 
-                var func = DeSerializationProvider.Provide(typeName);
-                return func(jsonObject, this.loggerFactory);
+            if (typeName == null)
+            {
+                throw new SerializationException("The @type Json property is not available, the DeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            throw new SerializationException("The @type Json property is not available, the DeSerializer cannot be used to deserialize this JsonElement");
+            var deSerialize = DeSerializationProvider.Provide(typeName);
+            return deSerialize(ref reader, this.loggerFactory);
         }
 
         /// <summary>
-        /// Deserializes an <see cref="JsonElement"/> of type <see cref="JsonValueKind.Array"/> to an <see cref="IEnumerable{IThing}"/> object
+        /// Deserializes a JSON array off the <paramref name="reader"/> to an <see cref="IEnumerable{IThing}"/> object
         /// </summary>
-        /// <param name="jsonArray">
-        /// the subject <see cref="JsonElement"/>
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the array's <see cref="JsonTokenType.StartArray"/> token
         /// </param>
-        /// <returns>
-        /// an <see cref="IEnumerable{IThing}"/>
-        /// </returns>
-        private List<IThing> DeserializeArray(JsonElement jsonArray)
+        /// <param name="result">
+        /// the <see cref="List{IThing}"/> to which the deserialized items are added
+        /// </param>
+        private void DeserializeArray(ref Utf8JsonReader reader, List<IThing> result)
         {
-            if (jsonArray.ValueKind != JsonValueKind.Array)
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
             {
-                throw new ArgumentException($"The {nameof(jsonArray)} must be of type JsonValueKind.Array", nameof(jsonArray));
+                result.Add(this.DeserializeObject(ref reader));
             }
-
-            var result = new List<IThing>();
-
-            foreach (var jsonElement in jsonArray.EnumerateArray())
-            {
-                var dataItem = this.DeserializeObject(jsonElement);
-                result.Add(dataItem);
-            }
-
-            return result;
         }
     }
 }

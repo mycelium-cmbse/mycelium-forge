@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class CountryDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="ICountry"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="ICountry"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="ICountry"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="ICountry"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,101 +39,158 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="ICountry"/>
         /// </returns>
-        internal static ICountry DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static ICountry DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("CountryDeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
+            var dtoInstance = new Mycelium.Forge.Common.Country();
+
+            var typeSeen = false;
+            var alpha2CodeSeen = false;
+            var Alpha3CodeSeen = false;
+            var createdAtSeen = false;
+            var modifiedAtSeen = false;
+            var NameSeen = false;
+            var NumericCodeSeen = false;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@type"u8))
+                {
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "Country")
+                    {
+                        throw new InvalidOperationException($"The CountryDeSerializer can only be used to deserialize objects of type ICountry, a {typeValue} was provided");
+                    }
+
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the Country cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("alpha2Code"u8))
+                {
+                    alpha2CodeSeen = true;
+                    reader.Read();
+
+                    var alpha2CodeScalarValue = reader.GetString();
+
+                    if (alpha2CodeScalarValue != null)
+                    {
+                        dtoInstance.Alpha2Code = alpha2CodeScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("alpha3Code"u8))
+                {
+                    Alpha3CodeSeen = true;
+                    reader.Read();
+
+                    var Alpha3CodeScalarValue = reader.GetString();
+
+                    if (Alpha3CodeScalarValue != null)
+                    {
+                        dtoInstance.Alpha3Code = Alpha3CodeScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("createdAt"u8))
+                {
+                    createdAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("modifiedAt"u8))
+                {
+                    modifiedAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("name"u8))
+                {
+                    NameSeen = true;
+                    reader.Read();
+
+                    var NameScalarValue = reader.GetString();
+
+                    if (NameScalarValue != null)
+                    {
+                        dtoInstance.Name = NameScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("numericCode"u8))
+                {
+                    NumericCodeSeen = true;
+                    reader.Read();
+
+                    var NumericCodeScalarValue = reader.GetString();
+
+                    if (NumericCodeScalarValue != null)
+                    {
+                        dtoInstance.NumericCode = NumericCodeScalarValue;
+                    }
+
+                    continue;
+                }
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
             {
                 throw new InvalidOperationException("The @type property is not available, the CountryDeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            if (@type.GetString() != "Country")
-            {
-                throw new InvalidOperationException($"The CountryDeSerializer can only be used to deserialize objects of type ICountry, a {@type.GetString()} was provided");
-            }
-
-            var dtoInstance = new Mycelium.Forge.Common.Country();
-
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
-
-                if (propertyValue == null)
-                {
-                    throw new JsonException("The @id property is not present, the Country cannot be deserialized");
-                }
-                else
-                {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
-                }
-            }
-
-            if (jsonElement.TryGetProperty("alpha2Code"u8, out var alpha2CodeProperty))
-            {
-                var propertyValue = alpha2CodeProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Alpha2Code = propertyValue;
-                }
-            }
-            else
+            if (!alpha2CodeSeen)
             {
                 logger.LogDebug("the alpha2Code Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("alpha3Code"u8, out var Alpha3CodeProperty))
-            {
-                var propertyValue = Alpha3CodeProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Alpha3Code = propertyValue;
-                }
-            }
-            else
+            if (!Alpha3CodeSeen)
             {
                 logger.LogDebug("the alpha3Code Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("createdAt"u8, out var createdAtProperty))
-            {
-                dtoInstance.CreatedAt = createdAtProperty.GetDateTime();
-            }
-            else
+            if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("modifiedAt"u8, out var modifiedAtProperty))
-            {
-                dtoInstance.ModifiedAt = modifiedAtProperty.GetDateTime();
-            }
-            else
+            if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("name"u8, out var NameProperty))
-            {
-                var propertyValue = NameProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Name = propertyValue;
-                }
-            }
-            else
+            if (!NameSeen)
             {
                 logger.LogDebug("the name Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("numericCode"u8, out var NumericCodeProperty))
-            {
-                var propertyValue = NumericCodeProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.NumericCode = propertyValue;
-                }
-            }
-            else
+            if (!NumericCodeSeen)
             {
                 logger.LogDebug("the numericCode Json property was not found in the Country: {Id}", dtoInstance.Id);
             }

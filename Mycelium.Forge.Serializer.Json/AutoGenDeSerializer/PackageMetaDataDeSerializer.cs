@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class PackageMetaDataDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="IPackageMetaData"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="IPackageMetaData"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="IPackageMetaData"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="IPackageMetaData"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,49 +39,82 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="IPackageMetaData"/>
         /// </returns>
-        internal static IPackageMetaData DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static IPackageMetaData DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("PackageMetaDataDeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
+            var dtoInstance = new Mycelium.Forge.Common.PackageMetaData();
+
+            var typeSeen = false;
+            var createdAtSeen = false;
+            var modifiedAtSeen = false;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@type"u8))
+                {
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "PackageMetaData")
+                    {
+                        throw new InvalidOperationException($"The PackageMetaDataDeSerializer can only be used to deserialize objects of type IPackageMetaData, a {typeValue} was provided");
+                    }
+
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the PackageMetaData cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("createdAt"u8))
+                {
+                    createdAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("modifiedAt"u8))
+                {
+                    modifiedAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
             {
                 throw new InvalidOperationException("The @type property is not available, the PackageMetaDataDeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            if (@type.GetString() != "PackageMetaData")
-            {
-                throw new InvalidOperationException($"The PackageMetaDataDeSerializer can only be used to deserialize objects of type IPackageMetaData, a {@type.GetString()} was provided");
-            }
-
-            var dtoInstance = new Mycelium.Forge.Common.PackageMetaData();
-
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
-
-                if (propertyValue == null)
-                {
-                    throw new JsonException("The @id property is not present, the PackageMetaData cannot be deserialized");
-                }
-                else
-                {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
-                }
-            }
-
-            if (jsonElement.TryGetProperty("createdAt"u8, out var createdAtProperty))
-            {
-                dtoInstance.CreatedAt = createdAtProperty.GetDateTime();
-            }
-            else
+            if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the PackageMetaData: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("modifiedAt"u8, out var modifiedAtProperty))
-            {
-                dtoInstance.ModifiedAt = modifiedAtProperty.GetDateTime();
-            }
-            else
+            if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the PackageMetaData: {Id}", dtoInstance.Id);
             }

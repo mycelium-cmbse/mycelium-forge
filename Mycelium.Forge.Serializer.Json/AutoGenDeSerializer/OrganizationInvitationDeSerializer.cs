@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class OrganizationInvitationDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="IOrganizationInvitation"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="IOrganizationInvitation"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="IOrganizationInvitation"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="IOrganizationInvitation"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,121 +39,174 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="IOrganizationInvitation"/>
         /// </returns>
-        internal static IOrganizationInvitation DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static IOrganizationInvitation DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("OrganizationInvitationDeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
+            var dtoInstance = new Mycelium.Forge.Common.OrganizationInvitation();
+
+            var typeSeen = false;
+            var createdAtSeen = false;
+            var experisAtSeen = false;
+            var modifiedAtSeen = false;
+            var organizationSeen = false;
+            var organizationInvitationKindSeen = false;
+            var statusSeen = false;
+            var targetSeen = false;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@type"u8))
+                {
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "OrganizationInvitation")
+                    {
+                        throw new InvalidOperationException($"The OrganizationInvitationDeSerializer can only be used to deserialize objects of type IOrganizationInvitation, a {typeValue} was provided");
+                    }
+
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the OrganizationInvitation cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("createdAt"u8))
+                {
+                    createdAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("experisAt"u8))
+                {
+                    experisAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ExperisAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("modifiedAt"u8))
+                {
+                    modifiedAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("organization"u8))
+                {
+                    organizationSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Organization = Guid.Empty;
+                        logger.LogDebug($"the OrganizationInvitation.Organization property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var organizationRefId))
+                        {
+                            dtoInstance.Organization = organizationRefId;
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("organizationInvitationKind"u8))
+                {
+                    organizationInvitationKindSeen = true;
+                    reader.Read();
+
+                    dtoInstance.OrganizationInvitationKind = OrganizationInvitationKindProvider.Parse(reader.GetString());
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("status"u8))
+                {
+                    statusSeen = true;
+                    reader.Read();
+
+                    dtoInstance.Status = InvitationStatusKindProvider.Parse(reader.GetString());
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("target"u8))
+                {
+                    targetSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Target = Guid.Empty;
+                        logger.LogDebug($"the OrganizationInvitation.Target property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var targetRefId))
+                        {
+                            dtoInstance.Target = targetRefId;
+                        }
+                    }
+
+                    continue;
+                }
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
             {
                 throw new InvalidOperationException("The @type property is not available, the OrganizationInvitationDeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            if (@type.GetString() != "OrganizationInvitation")
-            {
-                throw new InvalidOperationException($"The OrganizationInvitationDeSerializer can only be used to deserialize objects of type IOrganizationInvitation, a {@type.GetString()} was provided");
-            }
-
-            var dtoInstance = new Mycelium.Forge.Common.OrganizationInvitation();
-
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
-
-                if (propertyValue == null)
-                {
-                    throw new JsonException("The @id property is not present, the OrganizationInvitation cannot be deserialized");
-                }
-                else
-                {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
-                }
-            }
-
-            if (jsonElement.TryGetProperty("createdAt"u8, out var createdAtProperty))
-            {
-                dtoInstance.CreatedAt = createdAtProperty.GetDateTime();
-            }
-            else
+            if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("experisAt"u8, out var experisAtProperty))
-            {
-                dtoInstance.ExperisAt = experisAtProperty.GetDateTime();
-            }
-            else
+            if (!experisAtSeen)
             {
                 logger.LogDebug("the experisAt Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("modifiedAt"u8, out var modifiedAtProperty))
-            {
-                dtoInstance.ModifiedAt = modifiedAtProperty.GetDateTime();
-            }
-            else
+            if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("organization"u8, out var organizationProperty))
-            {
-                if (organizationProperty.ValueKind == JsonValueKind.Null)
-                {
-                    dtoInstance.Organization = Guid.Empty;
-                    logger.LogDebug($"the OrganizationInvitation.Organization property was not found in the Json. The value is set to Guid.Empty");
-                }
-                else
-                {
-                    if (organizationProperty.TryGetProperty("@id"u8, out var organizationExternalIdProperty))
-                    {
-                        var propertyValue = organizationExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.Organization = Guid.Parse(propertyValue);
-                        }
-                    }
-                }
-            }
-            else
+            if (!organizationSeen)
             {
                 logger.LogDebug("the organization Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("organizationInvitationKind"u8, out var organizationInvitationKindProperty))
-            {
-                dtoInstance.OrganizationInvitationKind = OrganizationInvitationKindProvider.Parse(organizationInvitationKindProperty.GetString());
-            }
-            else
+            if (!organizationInvitationKindSeen)
             {
                 logger.LogDebug("the organizationInvitationKind Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("status"u8, out var statusProperty))
-            {
-                dtoInstance.Status = InvitationStatusKindProvider.Parse(statusProperty.GetString());
-            }
-            else
+            if (!statusSeen)
             {
                 logger.LogDebug("the status Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("target"u8, out var targetProperty))
-            {
-                if (targetProperty.ValueKind == JsonValueKind.Null)
-                {
-                    dtoInstance.Target = Guid.Empty;
-                    logger.LogDebug($"the OrganizationInvitation.Target property was not found in the Json. The value is set to Guid.Empty");
-                }
-                else
-                {
-                    if (targetProperty.TryGetProperty("@id"u8, out var targetExternalIdProperty))
-                    {
-                        var propertyValue = targetExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.Target = Guid.Parse(propertyValue);
-                        }
-                    }
-                }
-            }
-            else
+            if (!targetSeen)
             {
                 logger.LogDebug("the target Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
