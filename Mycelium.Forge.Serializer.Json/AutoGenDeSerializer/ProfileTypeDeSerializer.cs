@@ -47,7 +47,7 @@ namespace Mycelium.Forge.Serializer.Json
 
             var typeSeen = false;
             var createdAtSeen = false;
-            var LogoBlobReferenceSeen = false;
+            var logoBlobReferenceSeen = false;
             var modifiedAtSeen = false;
             var nameSeen = false;
 
@@ -96,14 +96,14 @@ namespace Mycelium.Forge.Serializer.Json
                 }
                 if (reader.ValueTextEquals("logoBlobReference"u8))
                 {
-                    LogoBlobReferenceSeen = true;
+                    logoBlobReferenceSeen = true;
                     reader.Read();
 
-                    var LogoBlobReferenceScalarValue = reader.GetString();
+                    var logoBlobReferenceScalarValue = reader.GetString();
 
-                    if (LogoBlobReferenceScalarValue != null)
+                    if (logoBlobReferenceScalarValue != null)
                     {
-                        dtoInstance.LogoBlobReference = LogoBlobReferenceScalarValue;
+                        dtoInstance.LogoBlobReference = logoBlobReferenceScalarValue;
                     }
 
                     continue;
@@ -144,7 +144,7 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 logger.LogDebug("the createdAt Json property was not found in the ProfileType: {Id}", dtoInstance.Id);
             }
-            if (!LogoBlobReferenceSeen)
+            if (!logoBlobReferenceSeen)
             {
                 logger.LogDebug("the logoBlobReference Json property was not found in the ProfileType: {Id}", dtoInstance.Id);
             }

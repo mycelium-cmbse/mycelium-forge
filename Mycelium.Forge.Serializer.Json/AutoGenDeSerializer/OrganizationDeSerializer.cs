@@ -52,7 +52,7 @@ namespace Mycelium.Forge.Serializer.Json
             var createdAtSeen = false;
             var defaultPackageVisibilitySeen = false;
             var emailSeen = false;
-            var LogoBlobReferenceSeen = false;
+            var logoBlobReferenceSeen = false;
             var memberSeen = false;
             var modifiedAtSeen = false;
             var nameSeen = false;
@@ -171,7 +171,7 @@ namespace Mycelium.Forge.Serializer.Json
                 }
                 if (reader.ValueTextEquals("logoBlobReference"u8))
                 {
-                    LogoBlobReferenceSeen = true;
+                    logoBlobReferenceSeen = true;
                     reader.Read();
 
                     dtoInstance.LogoBlobReference = reader.GetString();
@@ -345,7 +345,7 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 logger.LogDebug("the email Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
-            if (!LogoBlobReferenceSeen)
+            if (!logoBlobReferenceSeen)
             {
                 logger.LogDebug("the logoBlobReference Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }

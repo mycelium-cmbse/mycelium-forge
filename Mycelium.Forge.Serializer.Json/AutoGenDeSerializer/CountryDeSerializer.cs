@@ -47,11 +47,11 @@ namespace Mycelium.Forge.Serializer.Json
 
             var typeSeen = false;
             var alpha2CodeSeen = false;
-            var Alpha3CodeSeen = false;
+            var alpha3CodeSeen = false;
             var createdAtSeen = false;
             var modifiedAtSeen = false;
-            var NameSeen = false;
-            var NumericCodeSeen = false;
+            var nameSeen = false;
+            var numericCodeSeen = false;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -103,14 +103,14 @@ namespace Mycelium.Forge.Serializer.Json
                 }
                 if (reader.ValueTextEquals("alpha3Code"u8))
                 {
-                    Alpha3CodeSeen = true;
+                    alpha3CodeSeen = true;
                     reader.Read();
 
-                    var Alpha3CodeScalarValue = reader.GetString();
+                    var alpha3CodeScalarValue = reader.GetString();
 
-                    if (Alpha3CodeScalarValue != null)
+                    if (alpha3CodeScalarValue != null)
                     {
-                        dtoInstance.Alpha3Code = Alpha3CodeScalarValue;
+                        dtoInstance.Alpha3Code = alpha3CodeScalarValue;
                     }
 
                     continue;
@@ -135,28 +135,28 @@ namespace Mycelium.Forge.Serializer.Json
                 }
                 if (reader.ValueTextEquals("name"u8))
                 {
-                    NameSeen = true;
+                    nameSeen = true;
                     reader.Read();
 
-                    var NameScalarValue = reader.GetString();
+                    var nameScalarValue = reader.GetString();
 
-                    if (NameScalarValue != null)
+                    if (nameScalarValue != null)
                     {
-                        dtoInstance.Name = NameScalarValue;
+                        dtoInstance.Name = nameScalarValue;
                     }
 
                     continue;
                 }
                 if (reader.ValueTextEquals("numericCode"u8))
                 {
-                    NumericCodeSeen = true;
+                    numericCodeSeen = true;
                     reader.Read();
 
-                    var NumericCodeScalarValue = reader.GetString();
+                    var numericCodeScalarValue = reader.GetString();
 
-                    if (NumericCodeScalarValue != null)
+                    if (numericCodeScalarValue != null)
                     {
-                        dtoInstance.NumericCode = NumericCodeScalarValue;
+                        dtoInstance.NumericCode = numericCodeScalarValue;
                     }
 
                     continue;
@@ -174,7 +174,7 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 logger.LogDebug("the alpha2Code Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (!Alpha3CodeSeen)
+            if (!alpha3CodeSeen)
             {
                 logger.LogDebug("the alpha3Code Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
@@ -186,11 +186,11 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (!NameSeen)
+            if (!nameSeen)
             {
                 logger.LogDebug("the name Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
-            if (!NumericCodeSeen)
+            if (!numericCodeSeen)
             {
                 logger.LogDebug("the numericCode Json property was not found in the Country: {Id}", dtoInstance.Id);
             }

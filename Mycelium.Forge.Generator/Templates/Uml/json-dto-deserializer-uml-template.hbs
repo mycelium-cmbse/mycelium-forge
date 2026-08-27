@@ -51,7 +51,7 @@ namespace Mycelium.Forge.Serializer.Json
                 {{#unless this.IsDerived}}
                     {{#unless (Property.IsThingId property)}}
                     {{#unless (Property.IsRedefined property class)}}
-            var {{ property.Name }}Seen = false;
+            var {{ String.LowerCaseFirstLetter property.Name }}Seen = false;
                     {{/unless}}
                     {{/unless}}
                 {{/unless}}
@@ -99,16 +99,16 @@ namespace Mycelium.Forge.Serializer.Json
                     {{#unless (Property.IsRedefined property class)}}
                 if (reader.ValueTextEquals("{{ String.LowerCaseFirstLetter property.Name }}"u8))
                 {
-                    {{ property.Name }}Seen = true;
+                    {{ String.LowerCaseFirstLetter property.Name }}Seen = true;
                     reader.Read();
 
                 {{#if (Property.QueryIsReferenceProperty property)}}
                     {{#if (Property.QueryIsEnumerable property)}}
                     while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
                     {
-                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var {{ property.Name }}RefId))
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var {{ String.LowerCaseFirstLetter property.Name }}RefId))
                         {
-                            dtoInstance.{{Property.WritePropertyName property}}.Add({{ property.Name }}RefId);
+                            dtoInstance.{{Property.WritePropertyName property}}.Add({{ String.LowerCaseFirstLetter property.Name }}RefId);
                         }
                     }
                     {{ else }}
@@ -123,9 +123,9 @@ namespace Mycelium.Forge.Serializer.Json
                     }
                     else
                     {
-                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var {{ property.Name }}RefId))
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var {{ String.LowerCaseFirstLetter property.Name }}RefId))
                         {
-                            dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}RefId;
+                            dtoInstance.{{Property.WritePropertyName property}} = {{ String.LowerCaseFirstLetter property.Name }}RefId;
                         }
                     }
                     {{/if}}
@@ -150,11 +150,11 @@ namespace Mycelium.Forge.Serializer.Json
                         throw new NotImplementedException("Enumerable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                         {{/if}}
                     {{else}}
-                        var {{ property.Name }}ArrayItem = reader.GetString();
+                        var {{ String.LowerCaseFirstLetter property.Name }}ArrayItem = reader.GetString();
 
-                        if ({{ property.Name }}ArrayItem != null)
+                        if ({{ String.LowerCaseFirstLetter property.Name }}ArrayItem != null)
                         {
-                            dtoInstance.{{Property.WritePropertyName property}}.Add({{ property.Name }}ArrayItem);
+                            dtoInstance.{{Property.WritePropertyName property}}.Add({{ String.LowerCaseFirstLetter property.Name }}ArrayItem);
                         }
                     {{/if}}
                     }
@@ -162,7 +162,7 @@ namespace Mycelium.Forge.Serializer.Json
                     {{#if (Property.QueryIsBool property )}}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetBoolean();
                     {{else if (Property.QueryIsEnum property )}}
-                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null || !{{Property.WriteTypeName property}}Provider.TryParse(reader.GetString(), out var {{ property.Name }}EnumValue) ? null : {{ property.Name }}EnumValue;
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null || !{{Property.WriteTypeName property}}Provider.TryParse(reader.GetString(), out var {{ String.LowerCaseFirstLetter property.Name }}EnumValue) ? null : {{ String.LowerCaseFirstLetter property.Name }}EnumValue;
                     {{else if (Property.QueryIsDateTime property )}}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetDateTime();
                     {{else if (Property.QueryIsNumeric property )}}
@@ -199,11 +199,11 @@ namespace Mycelium.Forge.Serializer.Json
                         throw new NotImplementedException("Scalar Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                         {{/if}}
                     {{else}}
-                        var {{property.Name }}ScalarValue = reader.GetString();
+                        var {{ String.LowerCaseFirstLetter property.Name }}ScalarValue = reader.GetString();
 
-                        if ({{property.Name }}ScalarValue != null)
+                        if ({{ String.LowerCaseFirstLetter property.Name }}ScalarValue != null)
                         {
-                            dtoInstance.{{Property.WritePropertyName property}} = {{property.Name }}ScalarValue;
+                            dtoInstance.{{Property.WritePropertyName property}} = {{ String.LowerCaseFirstLetter property.Name }}ScalarValue;
                         }
                     {{/if}}
                     {{/if}}
@@ -230,7 +230,7 @@ namespace Mycelium.Forge.Serializer.Json
                 {{#unless this.IsDerived}}
                     {{#unless (Property.IsThingId property)}}
                     {{#unless (Property.IsRedefined property class)}}
-            if (!{{ property.Name }}Seen)
+            if (!{{ String.LowerCaseFirstLetter property.Name }}Seen)
             {
                 logger.LogDebug("the {{ String.LowerCaseFirstLetter property.Name }} Json property was not found in the {{ class.Name }}: {Id}", dtoInstance.Id);
             }

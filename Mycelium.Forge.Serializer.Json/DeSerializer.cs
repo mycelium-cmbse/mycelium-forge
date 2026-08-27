@@ -37,6 +37,11 @@ namespace Mycelium.Forge.Serializer.Json
     public class DeSerializer : IDeSerializer
     {
         /// <summary>
+        /// The initial size, in bytes, of the buffer rented from <see cref="ArrayPool{Byte}"/> to read a JSON stream into
+        /// </summary>
+        private const int InitialBufferSize = 81920;
+
+        /// <summary>
         /// The (injected) <see cref="ILoggerFactory"/> used to setup logging
         /// </summary>
         private readonly ILoggerFactory loggerFactory;
@@ -144,7 +149,7 @@ namespace Mycelium.Forge.Serializer.Json
         /// </returns>
         private static byte[] ReadToPooledBuffer(Stream stream, out int length)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(81920);
+            var buffer = ArrayPool<byte>.Shared.Rent(InitialBufferSize);
             var totalRead = 0;
 
             int bytesRead;
@@ -176,7 +181,7 @@ namespace Mycelium.Forge.Serializer.Json
         /// </returns>
         private static async Task<(byte[] Buffer, int Length)> ReadToPooledBufferAsync(Stream stream, CancellationToken cancellationToken)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(81920);
+            var buffer = ArrayPool<byte>.Shared.Rent(InitialBufferSize);
             var totalRead = 0;
 
             int bytesRead;
