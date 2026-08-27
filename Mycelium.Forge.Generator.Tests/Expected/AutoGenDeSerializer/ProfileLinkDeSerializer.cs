@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class ProfileLinkDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="IProfileLink"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="IProfileLink"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="IProfileLink"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="IProfileLink"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,86 +39,126 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="IProfileLink"/>
         /// </returns>
-        internal static IProfileLink DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static IProfileLink DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("ProfileLinkDeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
+            var dtoInstance = new Mycelium.Forge.Common.ProfileLink();
+
+            var typeSeen = false;
+            var createdAtSeen = false;
+            var modifiedAtSeen = false;
+            var profileTypeSeen = false;
+            var uriSeen = false;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@type"u8))
+                {
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "ProfileLink")
+                    {
+                        throw new InvalidOperationException($"The ProfileLinkDeSerializer can only be used to deserialize objects of type IProfileLink, a {typeValue} was provided");
+                    }
+
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the ProfileLink cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("createdAt"u8))
+                {
+                    createdAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("modifiedAt"u8))
+                {
+                    modifiedAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("profileType"u8))
+                {
+                    profileTypeSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.ProfileType = Guid.Empty;
+                        logger.LogDebug($"the ProfileLink.ProfileType property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var profileTypeRefId))
+                        {
+                            dtoInstance.ProfileType = profileTypeRefId;
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("uri"u8))
+                {
+                    uriSeen = true;
+                    reader.Read();
+
+                    var uriScalarValue = reader.GetString();
+
+                    if (uriScalarValue != null)
+                    {
+                        dtoInstance.Uri = uriScalarValue;
+                    }
+
+                    continue;
+                }
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
             {
                 throw new InvalidOperationException("The @type property is not available, the ProfileLinkDeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            if (@type.GetString() != "ProfileLink")
-            {
-                throw new InvalidOperationException($"The ProfileLinkDeSerializer can only be used to deserialize objects of type IProfileLink, a {@type.GetString()} was provided");
-            }
-
-            var dtoInstance = new Mycelium.Forge.Common.ProfileLink();
-
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
-
-                if (propertyValue == null)
-                {
-                    throw new JsonException("The @id property is not present, the ProfileLink cannot be deserialized");
-                }
-                else
-                {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
-                }
-            }
-
-            if (jsonElement.TryGetProperty("createdAt"u8, out var createdAtProperty))
-            {
-                dtoInstance.CreatedAt = createdAtProperty.GetDateTime();
-            }
-            else
+            if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the ProfileLink: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("modifiedAt"u8, out var modifiedAtProperty))
-            {
-                dtoInstance.ModifiedAt = modifiedAtProperty.GetDateTime();
-            }
-            else
+            if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the ProfileLink: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("profileType"u8, out var profileTypeProperty))
-            {
-                if (profileTypeProperty.ValueKind == JsonValueKind.Null)
-                {
-                    dtoInstance.ProfileType = Guid.Empty;
-                    logger.LogDebug($"the ProfileLink.ProfileType property was not found in the Json. The value is set to Guid.Empty");
-                }
-                else
-                {
-                    if (profileTypeProperty.TryGetProperty("@id"u8, out var profileTypeExternalIdProperty))
-                    {
-                        var propertyValue = profileTypeExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.ProfileType = Guid.Parse(propertyValue);
-                        }
-                    }
-                }
-            }
-            else
+            if (!profileTypeSeen)
             {
                 logger.LogDebug("the profileType Json property was not found in the ProfileLink: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("uri"u8, out var uriProperty))
-            {
-                var propertyValue = uriProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Uri = propertyValue;
-                }
-            }
-            else
+            if (!uriSeen)
             {
                 logger.LogDebug("the uri Json property was not found in the ProfileLink: {Id}", dtoInstance.Id);
             }
