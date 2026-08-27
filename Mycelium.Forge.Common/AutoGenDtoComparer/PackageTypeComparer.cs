@@ -15,7 +15,6 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
 {
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     using Mycelium.Forge.Common.Comparers;
@@ -23,7 +22,6 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IPackageType"/> and returns the property changes between them.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
     public partial class PackageTypeComparer : IDtoComparer<IPackageType>
     {
