@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ExpectedOutputTestFixture.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -24,17 +24,17 @@ namespace Mycelium.Forge.Generator.Tests
     /// <c>Expected/</c> and freshly generated output is compared against it directly. This is an
     /// automated check that catches template regressions on every test run; regenerating the *full*
     /// set of DTOs/enums for review is instead a deliberate, manual step - see
-    /// <see cref="AutoGenDtoRegenerationTests"/>/<see cref="AutoGenEnumRegenerationTests"/>.
+    /// <see cref="AutoGenDtoRegenerationTests" />/<see cref="AutoGenEnumRegenerationTests" />.
     /// </summary>
     /// <remarks>
     /// The class names below are exactly the "interesting classes" the tutorial's step 2 calls for
     /// determining with <c>ModelInspector</c> - not a hand-picked sample. That determination isn't
     /// just a one-off, manually reproduced CLI run; it's enforced on every test run by
-    /// <see cref="Verify_that_the_interesting_class_selection_still_matches_ModelInspector"/>, which
-    /// calls the same <see cref="ModelInspector.QueryInterestingClasses"/> the <c>uml4nettools inspect</c>
+    /// <see cref="Verify_that_the_interesting_class_selection_still_matches_ModelInspector" />, which
+    /// calls the same <see cref="ModelInspector.QueryInterestingClasses" /> the <c>uml4nettools inspect</c>
     /// CLI is built on, directly against the live model, and fails - printing the current model's
-    /// actual class names - the moment its result diverges from <see cref="ConcreteInterestingClasses"/>/
-    /// <see cref="AbstractInterestingClasses"/> below. That divergence means the Forge model changed;
+    /// actual class names - the moment its result diverges from <see cref="ConcreteInterestingClasses" />/
+    /// <see cref="AbstractInterestingClasses" /> below. That divergence means the Forge model changed;
     /// update both arrays and the corresponding <c>Expected/</c> golden files to match.
     /// </remarks>
     [TestFixture]
@@ -42,7 +42,7 @@ namespace Mycelium.Forge.Generator.Tests
     {
         private static readonly string[] ConcreteInterestingClasses =
         [
-            "APIKey", "Forge", "Organization", "Package", "PackageInvitation", "PackageVersion", "ProfileLink",
+            "APIKey", "Forge", "Organization", "Package", "PackageInvitation", "PackageVersion", "ProfileLink"
         ];
 
         private static readonly string[] AbstractInterestingClasses = ["Invitation", "Scope", "Thing"];
@@ -63,13 +63,13 @@ namespace Mycelium.Forge.Generator.Tests
             var actualAbstract = interestingClasses
                 .Where(x => x.IsAbstract).Select(x => x.Name).OrderBy(x => x).ToArray();
 
-            Assert.That(actualConcrete, Is.EqualTo(ConcreteInterestingClasses.OrderBy(x => x).ToArray()),
+            Assert.That(actualConcrete, Is.EqualTo([.. ConcreteInterestingClasses.OrderBy(x => x)]),
                 $"ModelInspector.QueryInterestingClasses() no longer reports the same concrete classes as " +
                 $"{nameof(ConcreteInterestingClasses)} in this fixture (see 'actual'/'expected' above). The " +
                 $"Forge model most likely changed - update {nameof(ConcreteInterestingClasses)} and the " +
                 "corresponding Expected/AutoGenDto golden files to match.");
 
-            Assert.That(actualAbstract, Is.EqualTo(AbstractInterestingClasses.OrderBy(x => x).ToArray()),
+            Assert.That(actualAbstract, Is.EqualTo([.. AbstractInterestingClasses.OrderBy(x => x)]),
                 $"ModelInspector.QueryInterestingClasses() no longer reports the same abstract classes as " +
                 $"{nameof(AbstractInterestingClasses)} in this fixture (see 'actual'/'expected' above). The " +
                 $"Forge model most likely changed - update {nameof(AbstractInterestingClasses)} and the " +
@@ -86,7 +86,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDto", $"{className}.cs"));
 
-            Assert.That(generated, Is.EqualTo(expected));
+            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
         }
 
         [TestCaseSource(nameof(ConcreteInterestingClasses))]
@@ -100,7 +100,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDto", $"I{className}.cs"));
 
-            Assert.That(generated, Is.EqualTo(expected));
+            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
         }
 
         [TestCase("VisibilityKind")]
@@ -113,7 +113,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenEnum", $"{enumerationName}.cs"));
 
-            Assert.That(generated, Is.EqualTo(expected));
+            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
         }
 
         [TestCase("VisibilityKind")]
@@ -129,7 +129,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenEnumProvider", $"{enumerationName}Provider.cs"));
 
-            Assert.That(generated, Is.EqualTo(expected));
+            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
         }
 
         [TestCaseSource(nameof(ConcreteInterestingClasses))]
@@ -142,7 +142,7 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenSerializer", $"{className}Serializer.cs"));
 
-            Assert.That(generated, Is.EqualTo(expected));
+            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
         }
 
         [TestCaseSource(nameof(ConcreteInterestingClasses))]
@@ -155,7 +155,35 @@ namespace Mycelium.Forge.Generator.Tests
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDeSerializer", $"{className}DeSerializer.cs"));
 
-            Assert.That(generated, Is.EqualTo(expected));
+            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+        }
+
+        /// <summary>
+        /// Verifies that the generated DTO comparer class for each concrete interesting class matches the expected golden file.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCaseSource(nameof(ConcreteInterestingClasses))]
+        public async Task Verify_that_the_expected_dto_comparer_is_generated(string className)
+        {
+            var generator = new UmlCoreDtoComparerGenerator();
+
+            var generated = await generator.GenerateDtoComparerClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDtoComparer", $"{className}Comparer.cs"));
+
+            Assert.That(NormalizeLineEndings(generated), Is.EqualTo(NormalizeLineEndings(expected)));
+        }
+
+        /// <summary>
+        /// Normalizes line endings to CRLF for cross-platform text assertions.
+        /// </summary>
+        /// <param name="content">The string content to normalize.</param>
+        /// <returns>The content with line endings normalized to CRLF.</returns>
+        private static string NormalizeLineEndings(string content)
+        {
+            return content.Replace("\r\n", "\n").Replace("\n", "\r\n");
         }
     }
 }
