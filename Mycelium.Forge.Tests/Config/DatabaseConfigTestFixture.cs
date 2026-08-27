@@ -61,7 +61,7 @@ namespace Mycelium.Forge.Tests.Config
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.databaseConfig.Host, Is.Empty);
-                Assert.That(this.databaseConfig.Port, Is.EqualTo(0));
+                Assert.That(this.databaseConfig.Port, Is.Zero);
                 Assert.That(this.databaseConfig.Database, Is.Empty);
                 Assert.That(this.databaseConfig.Username, Is.Empty);
                 Assert.That(this.databaseConfig.Password, Is.Empty);

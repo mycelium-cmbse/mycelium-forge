@@ -18,7 +18,7 @@ CREATE SCHEMA IF NOT EXISTS "Forge";
 -- Root Thing table
 CREATE TABLE "Forge"."Thing" (
     "id" uuid NOT NULL,
-    "classKind" VARCHAR(100),
+    "classKind" text,
     "data" JSONB,
     PRIMARY KEY ("id")
 );
@@ -54,8 +54,7 @@ LANGUAGE plpgsql
 AS $$
     BEGIN
 
-        DELETE FROM "Forge"."Thing"
-        WHERE id = OLD.id;
+        EXECUTE 'DELETE FROM "Forge"."Thing" WHERE id = $1' USING OLD.id;
 
         RETURN OLD;
     END;

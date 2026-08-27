@@ -16,14 +16,14 @@ namespace Mycelium.Forge.Generator.Extensions
     using uml4net.Values;
 
     /// <summary>
-    /// Extension class for the <see cref="IProperty" /> interface.
+    /// Extension class for the <see cref="IProperty" /> interface for SQL schema generation.
     /// </summary>
     public static class PropertyExtension
     {
         /// <summary>
         /// A mapping of the known UML / SysML value types to PostgreSQL types.
         /// </summary>
-        private static readonly Dictionary<string, string> SqlTypeMapping = new()
+        public static readonly IReadOnlyDictionary<string, string> SqlTypeMapping = new Dictionary<string, string>
         {
             { "Boolean", "boolean" },
             { "Integer", "integer" },
@@ -90,62 +90,6 @@ namespace Mycelium.Forge.Generator.Extensions
         }
 
         /// <summary>
-        /// Queries whether the <see cref="IProperty" /> is a value property (i.e. its type is a data type or enumeration).
-        /// </summary>
-        /// <param name="property">The subject <see cref="IProperty" />.</param>
-        /// <returns>True if the property is a value property, false otherwise.</returns>
-        public static bool QueryIsValueProperty(this IProperty property)
-        {
-            ArgumentNullException.ThrowIfNull(property);
-
-            return property.Type is IDataType;
-        }
-
-        /// <summary>
-        /// Queries whether the <see cref="IProperty" /> is a reference property (i.e. its type is a class or structured
-        /// classifier).
-        /// </summary>
-        /// <param name="property">The subject <see cref="IProperty" />.</param>
-        /// <returns>True if the property is a reference property, false otherwise.</returns>
-        public static bool QueryIsReferenceProperty(this IProperty property)
-        {
-            ArgumentNullException.ThrowIfNull(property);
-
-            return property.Type is not null && property.Type is not IDataType;
-        }
-
-        /// <summary>
-        /// Queries whether the property takes part in a many-to-many relationship.
-        /// </summary>
-        /// <param name="property">The subject <see cref="IProperty" />.</param>
-        /// <returns>True if this is part of a many-to-many relationship, false otherwise.</returns>
-        public static bool QueryIsManyToMany(this IProperty property)
-        {
-            ArgumentNullException.ThrowIfNull(property);
-
-            if (property.QueryIsDataType())
-            {
-                return false;
-            }
-
-            var thisUpperValue = property.QueryUpperValue();
-
-            if (thisUpperValue > 1 && property.Opposite == null)
-            {
-                return true;
-            }
-
-            var oppositeUpperValue = property.Opposite?.QueryUpperValue();
-
-            if (thisUpperValue > 1 && oppositeUpperValue.HasValue && oppositeUpperValue.Value > 1)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Calculates whether the property needs an attribute on the owning class's SQL table.
         /// </summary>
         /// <param name="property">The subject <see cref="IProperty" />.</param>
@@ -154,37 +98,27 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (property.QueryIsManyToMany())
+            if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType())
             {
                 return false;
             }
 
-            if (property.QueryIsValueProperty())
+            if (property.QueryIsEnumerable())
             {
                 return false;
             }
 
-            if (property.QueryIsReferenceProperty())
+            if (property.Opposite?.QueryIsEnumerable() ?? true)
             {
-                if (property.QueryIsEnumerable())
-                {
-                    return false;
-                }
-
-                if (property.Opposite?.QueryIsEnumerable() ?? true)
-                {
-                    return true;
-                }
-
-                if (property.Lower == 1 && property.QueryUpperValue() == 1)
-                {
-                    return true;
-                }
-
-                return property.Opposite.Lower != 1 || property.QueryUpperValue() != 1;
+                return true;
             }
 
-            return false;
+            if (property.Lower == 1 && property.QueryUpperValue() == 1)
+            {
+                return true;
+            }
+
+            return property.Opposite.Lower != 1 || property.QueryUpperValue() != 1;
         }
 
         /// <summary>
@@ -196,47 +130,37 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (property.QueryIsManyToMany())
+            if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType())
             {
                 return false;
             }
 
-            if (property.QueryIsValueProperty())
+            if (property.QueryIsEnumerable())
             {
                 return false;
             }
 
-            if (property.QueryIsReferenceProperty())
+            if (property.Opposite == null)
             {
-                if (property.QueryIsEnumerable())
-                {
-                    return false;
-                }
-
-                if (property.Opposite == null)
-                {
-                    return false;
-                }
-
-                if (property.Opposite.QueryIsEnumerable())
-                {
-                    return true;
-                }
-
-                if (property.Opposite.IsComposite)
-                {
-                    return true;
-                }
-
-                if (property.Opposite.Lower == 1 && property.Opposite.QueryUpperValue() == 1)
-                {
-                    return false;
-                }
-
-                return property.Lower == 1 && property.QueryUpperValue() == 1;
+                return false;
             }
 
-            return false;
+            if (property.Opposite.QueryIsEnumerable())
+            {
+                return true;
+            }
+
+            if (property.Opposite.IsComposite)
+            {
+                return true;
+            }
+
+            if (property.Opposite.Lower == 1 && property.Opposite.QueryUpperValue() == 1)
+            {
+                return false;
+            }
+
+            return property.Lower == 1 && property.QueryUpperValue() == 1;
         }
 
         /// <summary>
@@ -248,7 +172,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
+            if (!property.QueryIsMemberOfManyToMany())
             {
                 throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
             }
@@ -268,7 +192,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
+            if (!property.QueryIsMemberOfManyToMany())
             {
                 throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
             }
@@ -285,7 +209,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
+            if (!property.QueryIsMemberOfManyToMany())
             {
                 throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
             }
@@ -302,7 +226,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
+            if (!property.QueryIsMemberOfManyToMany())
             {
                 throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
             }
@@ -320,7 +244,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
+            if (!property.QueryIsMemberOfManyToMany())
             {
                 throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
             }
@@ -337,27 +261,19 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (property.QueryIsValueProperty())
+            if (property.Type == null)
             {
-                if (property.Type is IEnumeration)
-                {
-                    return "text";
-                }
-
-                if (property.Type != null && SqlTypeMapping.TryGetValue(property.Type.Name, out var mappedType))
-                {
-                    return mappedType;
-                }
-
-                return "text";
+                return string.Empty;
             }
 
-            if (property.QueryIsReferenceProperty())
+            if (property.QueryIsDataType())
             {
-                return property.QueryIsEnumerable() ? "[uuid]" : "uuid";
+                return property.QueryIsEnum()
+                    ? "text"
+                    : SqlTypeMapping.GetValueOrDefault(property.Type.Name, "text");
             }
 
-            return string.Empty;
+            return property.QueryIsEnumerable() ? "[uuid]" : "uuid";
         }
 
         /// <summary>
@@ -369,34 +285,9 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (string.IsNullOrWhiteSpace(property.Name))
-            {
-                return string.Empty;
-            }
-
-            return property.Name.LowerCaseFirstLetter();
-        }
-
-        /// <summary>
-        /// Queries the type name of the referenced class for a reference property.
-        /// </summary>
-        /// <param name="property">The subject <see cref="IProperty" />.</param>
-        /// <returns>The capitalized reference type name.</returns>
-        public static string QueryReferencePropertyTypeName(this IProperty property)
-        {
-            ArgumentNullException.ThrowIfNull(property);
-
-            if (property.Type == null)
-            {
-                throw new ArgumentException("The property type cannot be null", nameof(property));
-            }
-
-            if (!property.QueryIsReferenceProperty())
-            {
-                throw new ArgumentException("The property type should be of reference type", nameof(property));
-            }
-
-            return property.Type.Name.CapitalizeFirstLetter();
+            return string.IsNullOrWhiteSpace(property.Name)
+                ? string.Empty
+                : property.Name.LowerCaseFirstLetter();
         }
     }
 }

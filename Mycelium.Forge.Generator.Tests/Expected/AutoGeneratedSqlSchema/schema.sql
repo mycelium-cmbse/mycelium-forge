@@ -18,7 +18,7 @@ CREATE SCHEMA IF NOT EXISTS "Forge";
 -- Root Thing table
 CREATE TABLE "Forge"."Thing" (
     "id" uuid NOT NULL,
-    "classKind" VARCHAR(100),
+    "classKind" text,
     "data" JSONB,
     PRIMARY KEY ("id")
 );
@@ -359,8 +359,7 @@ LANGUAGE plpgsql
 AS $$
     BEGIN
 
-        DELETE FROM "Forge"."Thing"
-        WHERE id = OLD.id;
+        EXECUTE 'DELETE FROM "Forge"."Thing" WHERE id = $1' USING OLD.id;
 
         RETURN OLD;
     END;
@@ -372,8 +371,7 @@ CREATE OR REPLACE FUNCTION "Forge".invitation_delete()
     LANGUAGE plpgsql
     AS $$
     BEGIN
-        DELETE FROM "Forge"."Invitation"
-        WHERE id = OLD.id;
+        EXECUTE 'DELETE FROM "Forge"."Invitation" WHERE id = $1' USING OLD.id;
         RETURN OLD;
     END;
 $$;
@@ -383,8 +381,7 @@ CREATE OR REPLACE FUNCTION "Forge".namespace_delete()
     LANGUAGE plpgsql
     AS $$
     BEGIN
-        DELETE FROM "Forge"."Namespace"
-        WHERE id = OLD.id;
+        EXECUTE 'DELETE FROM "Forge"."Namespace" WHERE id = $1' USING OLD.id;
         RETURN OLD;
     END;
 $$;
@@ -394,8 +391,7 @@ CREATE OR REPLACE FUNCTION "Forge".scope_delete()
     LANGUAGE plpgsql
     AS $$
     BEGIN
-        DELETE FROM "Forge"."Scope"
-        WHERE id = OLD.id;
+        EXECUTE 'DELETE FROM "Forge"."Scope" WHERE id = $1' USING OLD.id;
         RETURN OLD;
     END;
 $$;
