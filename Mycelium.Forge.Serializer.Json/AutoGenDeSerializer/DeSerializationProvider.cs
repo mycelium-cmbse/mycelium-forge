@@ -15,7 +15,6 @@ namespace Mycelium.Forge.Serializer.Json
 {
     using System;
     using System.Collections.Generic;
-    using System.Text.Json;
 
     using Microsoft.Extensions.Logging;
 
@@ -29,7 +28,7 @@ namespace Mycelium.Forge.Serializer.Json
         /// <summary>
         /// a dictionary that provides delegates for deserialization
         /// </summary>
-        private static readonly Dictionary<string, Func<JsonElement, ILoggerFactory, IThing>> DeSerializerActionMap = new Dictionary<string, Func<JsonElement, ILoggerFactory, IThing>>
+        private static readonly Dictionary<string, DeSerializeDelegate> DeSerializerActionMap = new Dictionary<string, DeSerializeDelegate>
         {
             { "Account", AccountDeSerializer.DeSerialize },
             { "Address", AddressDeSerializer.DeSerialize },
@@ -48,19 +47,19 @@ namespace Mycelium.Forge.Serializer.Json
         };
 
         /// <summary>
-        /// Provides the delegate <see cref="Func{JsonElement, ILoggerFactory, IThing}"/> for the
+        /// Provides the <see cref="DeSerializeDelegate"/> for the
         /// <see cref="System.Type"/> that is to be deserialized
         /// </summary>
         /// <param name="typeName">
         /// The name of the subject <see cref="System.Type"/> that is to be serialized
         /// </param>
         /// <returns>
-        /// A Delegate of <see cref="Func{JsonElement, ILoggerFactory, IThing}"/>
+        /// A <see cref="DeSerializeDelegate"/>
         /// </returns>
         /// <exception cref="NotSupportedException">
         /// Thrown when the <see cref="System.Type"/> is not supported.
         /// </exception>
-        internal static Func<JsonElement, ILoggerFactory, IThing> Provide(string typeName)
+        internal static DeSerializeDelegate Provide(string typeName)
         {
             if (!DeSerializerActionMap.TryGetValue(typeName, out var func))
             {

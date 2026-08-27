@@ -48,6 +48,14 @@ namespace Mycelium.Forge.Generator.Tests
 
         private static readonly string[] AbstractInterestingClasses = ["Invitation", "Scope", "Thing"];
 
+        /// <summary>
+        /// Normalizes line endings to <c>\n</c> so golden-file comparisons are independent of the checkout's
+        /// line-ending state (e.g. Windows <c>core.autocrlf=true</c> rewrites the checked-in, LF-normalized
+        /// <c>Expected/</c> fixtures to CRLF on disk) and of whichever mix of <c>\n</c>/<c>\r\n</c> the
+        /// Handlebars template engine happens to emit for freshly generated text.
+        /// </summary>
+        private static string NormalizeLineEndings(string value) => value.Replace("\r\n", "\n").Replace("\r", "\n");
+
         [Test]
         public void Verify_that_the_interesting_class_selection_still_matches_ModelInspector()
         {

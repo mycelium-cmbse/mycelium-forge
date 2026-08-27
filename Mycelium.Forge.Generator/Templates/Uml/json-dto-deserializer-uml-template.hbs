@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class {{ this.Name }}DeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="I{{ this.Name }}"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="I{{ this.Name }}"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="I{{ this.Name }}"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="I{{ this.Name }}"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,34 +39,190 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="I{{ this.Name }}"/>
         /// </returns>
-        internal static I{{ this.Name }} DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static I{{ this.Name }} DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("{{ this.Name }}DeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
-            {
-                throw new InvalidOperationException("The @type property is not available, the {{ this.Name }}DeSerializer cannot be used to deserialize this JsonElement");
-            }
-
-            if (@type.GetString() != "{{ this.Name }}")
-            {
-                throw new InvalidOperationException($"The {{ this.Name }}DeSerializer can only be used to deserialize objects of type I{{ this.Name }}, a {@type.GetString()} was provided");
-            }
-
             var dtoInstance = new Mycelium.Forge.Common.{{ this.Name }}();
 
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
+            var typeSeen = false;
+            {{#with this as |class| }}
+            {{ #each (Class.QueryAllProperties this) as | property | }}
+                {{#unless this.IsDerived}}
+                    {{#unless (Property.IsThingId property)}}
+                    {{#unless (Property.IsRedefined property class)}}
+            var {{ String.LowerCaseFirstLetter property.Name }}Seen = false;
+                    {{/unless}}
+                    {{/unless}}
+                {{/unless}}
+            {{/each}}
+            {{/with}}
 
-                if (propertyValue == null)
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
                 {
-                    throw new JsonException("The @id property is not present, the {{ this.Name }} cannot be deserialized");
+                    continue;
                 }
-                else
+
+                if (reader.ValueTextEquals("@type"u8))
                 {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "{{ this.Name }}")
+                    {
+                        throw new InvalidOperationException($"The {{ this.Name }}DeSerializer can only be used to deserialize objects of type I{{ this.Name }}, a {typeValue} was provided");
+                    }
+
+                    continue;
                 }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the {{ this.Name }} cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+            {{#with this as |class| }}
+            {{ #each (Class.QueryAllProperties this) as | property | }}
+                {{#unless this.IsDerived}}
+                    {{#unless (Property.IsThingId property)}}
+                    {{#unless (Property.IsRedefined property class)}}
+                if (reader.ValueTextEquals("{{ String.LowerCaseFirstLetter property.Name }}"u8))
+                {
+                    {{ String.LowerCaseFirstLetter property.Name }}Seen = true;
+                    reader.Read();
+
+                {{#if (Property.QueryIsReferenceProperty property)}}
+                    {{#if (Property.QueryIsEnumerable property)}}
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var {{ String.LowerCaseFirstLetter property.Name }}RefId))
+                        {
+                            dtoInstance.{{Property.WritePropertyName property}}.Add({{ String.LowerCaseFirstLetter property.Name }}RefId);
+                        }
+                    }
+                    {{ else }}
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                    {{#if (Property.QueryIsNullable property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = null;
+                    {{else}}
+                        dtoInstance.{{Property.WritePropertyName property}} = Guid.Empty;
+                        logger.LogDebug($"the {{ class.Name }}.{{Property.WritePropertyName property}} property was not found in the Json. The value is set to Guid.Empty");
+                    {{/if}}
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var {{ String.LowerCaseFirstLetter property.Name }}RefId))
+                        {
+                            dtoInstance.{{Property.WritePropertyName property}} = {{ String.LowerCaseFirstLetter property.Name }}RefId;
+                        }
+                    }
+                    {{/if}}
+                {{ else }}
+                    {{#if (Property.QueryIsEnumerable property)}}
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                    {{#if (Property.QueryIsBool property )}}
+                        dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetBoolean());
+                    {{else if (Property.QueryIsEnum property )}}
+                        throw new NotImplementedException("Enumerable Enum - {{ class.Name }}.{{property.Name}} is not yet supported");
+                    {{else if (Property.QueryIsDateTime property )}}
+                        dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetDateTime());
+                    {{else if (Property.QueryIsNumeric property )}}
+                        {{#if (Property.QueryIsInteger property) }}
+                        dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetInt32());
+                        {{else if (Property.QueryIsDouble property) }}
+                        dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetDouble());
+                        {{else if (Property.QueryIsByte property) }}
+                        dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetByte());
+                        {{ else }}
+                        throw new NotImplementedException("Enumerable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
+                        {{/if}}
+                    {{else}}
+                        var {{ String.LowerCaseFirstLetter property.Name }}ArrayItem = reader.GetString();
+
+                        if ({{ String.LowerCaseFirstLetter property.Name }}ArrayItem != null)
+                        {
+                            dtoInstance.{{Property.WritePropertyName property}}.Add({{ String.LowerCaseFirstLetter property.Name }}ArrayItem);
+                        }
+                    {{/if}}
+                    }
+                    {{ else if (Property.QueryIsNullable property) }}
+                    {{#if (Property.QueryIsBool property )}}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetBoolean();
+                    {{else if (Property.QueryIsEnum property )}}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null || !{{Property.WriteTypeName property}}Provider.TryParse(reader.GetString(), out var {{ String.LowerCaseFirstLetter property.Name }}EnumValue) ? null : {{ String.LowerCaseFirstLetter property.Name }}EnumValue;
+                    {{else if (Property.QueryIsDateTime property )}}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetDateTime();
+                    {{else if (Property.QueryIsNumeric property )}}
+                        {{#if (Property.QueryIsInteger property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetInt32();
+                        {{else if (Property.QueryIsDouble property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetDouble();
+                        {{else if (Property.QueryIsByte property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetByte();
+                        {{ else }}
+                        throw new NotImplementedException("Nullable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
+                        {{/if}}
+                    {{else}}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.GetString();
+                    {{/if}}
+                    {{ else if (Property.QueryIsScalar property) }}
+                    {{#if (Property.QueryIsBool property )}}
+                        if (reader.TokenType != JsonTokenType.Null)
+                        {
+                            dtoInstance.{{Property.WritePropertyName property}} = reader.GetBoolean();
+                        }
+                    {{else if (Property.QueryIsEnum property )}}
+                        dtoInstance.{{Property.WritePropertyName property}} = {{Property.WriteTypeName property}}Provider.Parse(reader.GetString());
+                    {{else if (Property.QueryIsDateTime property )}}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.GetDateTime();
+                    {{else if (Property.QueryIsNumeric property )}}
+                        {{#if (Property.QueryIsInteger property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.GetInt32();
+                        {{else if (Property.QueryIsDouble property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.GetDouble();
+                        {{else if (Property.QueryIsByte property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.GetByte();
+                        {{ else }}
+                        throw new NotImplementedException("Scalar Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
+                        {{/if}}
+                    {{else}}
+                        var {{ String.LowerCaseFirstLetter property.Name }}ScalarValue = reader.GetString();
+
+                        if ({{ String.LowerCaseFirstLetter property.Name }}ScalarValue != null)
+                        {
+                            dtoInstance.{{Property.WritePropertyName property}} = {{ String.LowerCaseFirstLetter property.Name }}ScalarValue;
+                        }
+                    {{/if}}
+                    {{/if}}
+                {{/if}}
+
+                    continue;
+                }
+                    {{/unless}}
+                    {{/unless}}
+                {{/unless}}
+            {{/each}}
+            {{/with}}
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
+            {
+                throw new InvalidOperationException("The @type property is not available, the {{ this.Name }}DeSerializer cannot be used to deserialize this JsonElement");
             }
 
             {{#with this as |class| }}
@@ -74,129 +230,10 @@ namespace Mycelium.Forge.Serializer.Json
                 {{#unless this.IsDerived}}
                     {{#unless (Property.IsThingId property)}}
                     {{#unless (Property.IsRedefined property class)}}
-                        if (jsonElement.TryGetProperty("{{ String.LowerCaseFirstLetter property.Name }}"u8, out var {{ property.Name }}Property))
-                        {
-                        {{#if (Property.QueryIsReferenceProperty property)}}
-                            {{#if (Property.QueryIsEnumerable property)}}
-                                foreach (var arrayItem in {{ property.Name }}Property.EnumerateArray())
-                                {
-                                if (arrayItem.TryGetProperty("@id"u8, out var {{ property.Name }}ExternalIdProperty))
-                                {
-                                var propertyValue = {{ property.Name }}ExternalIdProperty.GetString();
-
-                                if (propertyValue != null)
-                                {
-                                dtoInstance.{{Property.WritePropertyName property}}.Add(Guid.Parse(propertyValue));
-                                }
-                                }
-                                }
-                            {{ else }}
-                                if ({{ property.Name }}Property.ValueKind == JsonValueKind.Null)
-                                {
-                                {{#if (Property.QueryIsNullable property) }}
-                                    dtoInstance.{{Property.WritePropertyName property}} = null;
-                                {{else}}
-                                    dtoInstance.{{Property.WritePropertyName property}} = Guid.Empty;
-                                    logger.LogDebug($"the {{ class.Name }}.{{Property.WritePropertyName property}} property was not found in the Json. The value is set to Guid.Empty");
-                                {{/if}}
-                                }
-                                else
-                                {
-                                if ({{ property.Name }}Property.TryGetProperty("@id"u8, out var {{ property.Name }}ExternalIdProperty))
-                                {
-                                var propertyValue = {{ property.Name }}ExternalIdProperty.GetString();
-
-                                if (propertyValue != null)
-                                {
-                                dtoInstance.{{Property.WritePropertyName property}} = Guid.Parse(propertyValue);
-                                }
-                                }
-                                }
-                            {{/if}}
-                        {{ else }}
-                            {{#if (Property.QueryIsEnumerable property)}}
-                                foreach (var arrayItem in {{ property.Name }}Property.EnumerateArray())
-                                {
-                                {{#if (Property.QueryIsBool property )}}
-                                    dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetBoolean());
-                                {{else if (Property.QueryIsEnum property )}}
-                                    throw new NotImplementedException("Enumerable Enum - {{ class.Name }}.{{property.Name}} is not yet supported");
-                                {{else if (Property.QueryIsDateTime property )}}
-                                    dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetDateTime());
-                                {{else if (Property.QueryIsNumeric property )}}
-                                    {{#if (Property.QueryIsInteger property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetInt32());
-                                    {{else if (Property.QueryIsDouble property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetDouble());
-                                    {{else if (Property.QueryIsByte property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}}.Add(arrayItem.GetByte());
-                                    {{ else }}
-                                        throw new NotImplementedException("Enumerable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
-                                    {{/if}}
-                                {{else}}
-                                    var propertyValue = arrayItem.GetString();
-
-                                    if (propertyValue != null)
-                                    {
-                                    dtoInstance.{{Property.WritePropertyName property}}.Add(propertyValue);
-                                    }
-                                {{/if}}
-                                }
-                            {{ else if (Property.QueryIsNullable property) }}
-                                {{#if (Property.QueryIsBool property )}}
-                                    dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetBoolean();
-                                {{else if (Property.QueryIsEnum property )}}
-                                    dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null || !{{Property.WriteTypeName property}}Provider.TryParse({{ property.Name }}Property.GetString(), out var {{ property.Name }}EnumValue) ? null : {{ property.Name }}EnumValue;
-                                {{else if (Property.QueryIsDateTime property )}}
-                                    dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetDateTime();
-                                {{else if (Property.QueryIsNumeric property )}}
-                                    {{#if (Property.QueryIsInteger property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetInt32();
-                                    {{else if (Property.QueryIsDouble property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetDouble();
-                                    {{else if (Property.QueryIsByte property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.ValueKind == JsonValueKind.Null ? null : {{ property.Name }}Property.GetByte();
-                                    {{ else }}
-                                        throw new NotImplementedException("Nullable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
-                                    {{/if}}
-                                {{else}}
-                                    dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetString();
-                                {{/if}}
-                            {{ else if (Property.QueryIsScalar property) }}
-                                {{#if (Property.QueryIsBool property )}}
-                                    if ({{ property.Name }}Property.ValueKind != JsonValueKind.Null)
-                                    {
-                                    dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetBoolean();
-                                    }
-                                {{else if (Property.QueryIsEnum property )}}
-                                    dtoInstance.{{Property.WritePropertyName property}} = {{Property.WriteTypeName property}}Provider.Parse({{ property.Name }}Property.GetString());
-                                {{else if (Property.QueryIsDateTime property )}}
-                                    dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetDateTime();
-                                {{else if (Property.QueryIsNumeric property )}}
-                                    {{#if (Property.QueryIsInteger property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetInt32();
-                                    {{else if (Property.QueryIsDouble property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetDouble();
-                                    {{else if (Property.QueryIsByte property) }}
-                                        dtoInstance.{{Property.WritePropertyName property}} = {{ property.Name }}Property.GetByte();
-                                    {{ else }}
-                                        throw new NotImplementedException("Scalar Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
-                                    {{/if}}
-                                {{else}}
-                                    var propertyValue = {{property.Name }}Property.GetString();
-
-                                    if (propertyValue != null)
-                                    {
-                                    dtoInstance.{{Property.WritePropertyName property}} = propertyValue;
-                                    }
-                                {{/if}}
-                            {{/if}}
-                        {{/if}}
-                        }
-                        else
-                        {
-                        logger.LogDebug("the {{ String.LowerCaseFirstLetter property.Name }} Json property was not found in the {{ class.Name }}: {Id}", dtoInstance.Id);
-                        }
+            if (!{{ String.LowerCaseFirstLetter property.Name }}Seen)
+            {
+                logger.LogDebug("the {{ String.LowerCaseFirstLetter property.Name }} Json property was not found in the {{ class.Name }}: {Id}", dtoInstance.Id);
+            }
                     {{/unless}}
                     {{/unless}}
                 {{/unless}}

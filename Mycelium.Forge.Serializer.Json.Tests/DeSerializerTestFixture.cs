@@ -130,27 +130,6 @@ namespace Mycelium.Forge.Serializer.Json.Tests
         }
 
         /// <summary>
-        /// The private <c>DeserializeArray</c> guards against being called with a non-array
-        /// <see cref="JsonElement"/>, but every current call site already checks
-        /// <c>ValueKind == JsonValueKind.Array</c> before calling it, so that guard is unreachable
-        /// through the public API. Verified directly via reflection instead of removing a legitimate
-        /// defensive check on a private method that a future caller might not guarantee the same way.
-        /// </summary>
-        [Test]
-        public void Verify_that_DeserializeArray_rejects_a_non_array_JsonElement()
-        {
-            var method = typeof(DeSerializer).GetMethod("DeserializeArray", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            using var document = JsonDocument.Parse("{}");
-            var nonArrayElement = document.RootElement;
-
-            var exception = Assert.Throws<System.Reflection.TargetInvocationException>(
-                () => method!.Invoke(this.deSerializer, [nonArrayElement]));
-
-            Assert.That(exception!.InnerException, Is.TypeOf<ArgumentException>());
-        }
-
-        /// <summary>
         /// <see cref="DeSerializer.DeSerialize(Stream)"/>/<see cref="DeSerializer.DeSerializeAsync"/>
         /// only log their completion message when <c>ILogger.IsEnabled(LogLevel.Information)</c> is
         /// true - with the default (parameterless) <see cref="DeSerializer"/> constructor, the logger
