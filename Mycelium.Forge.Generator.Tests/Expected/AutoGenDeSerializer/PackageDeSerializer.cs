@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class PackageDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="IPackage"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="IPackage"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="IPackage"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="IPackage"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,175 +39,236 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="IPackage"/>
         /// </returns>
-        internal static IPackage DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static IPackage DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("PackageDeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
+            var dtoInstance = new Mycelium.Forge.Common.Package();
+
+            var typeSeen = false;
+            var createdAtSeen = false;
+            var listedSeen = false;
+            var modifiedAtSeen = false;
+            var nameSeen = false;
+            var packageMaintainerSeen = false;
+            var packageOwnerSeen = false;
+            var packageTypeSeen = false;
+            var shortNameSeen = false;
+            var versionSeen = false;
+            var visibilitySeen = false;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@type"u8))
+                {
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "Package")
+                    {
+                        throw new InvalidOperationException($"The PackageDeSerializer can only be used to deserialize objects of type IPackage, a {typeValue} was provided");
+                    }
+
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the Package cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("createdAt"u8))
+                {
+                    createdAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("listed"u8))
+                {
+                    listedSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType != JsonTokenType.Null)
+                    {
+                        dtoInstance.Listed = reader.GetBoolean();
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("modifiedAt"u8))
+                {
+                    modifiedAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("name"u8))
+                {
+                    nameSeen = true;
+                    reader.Read();
+
+                    var nameScalarValue = reader.GetString();
+
+                    if (nameScalarValue != null)
+                    {
+                        dtoInstance.Name = nameScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("packageMaintainer"u8))
+                {
+                    packageMaintainerSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var packageMaintainerRefId))
+                        {
+                            dtoInstance.PackageMaintainer.Add(packageMaintainerRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("packageOwner"u8))
+                {
+                    packageOwnerSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var packageOwnerRefId))
+                        {
+                            dtoInstance.PackageOwner.Add(packageOwnerRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("packageType"u8))
+                {
+                    packageTypeSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.PackageType = Guid.Empty;
+                        logger.LogDebug($"the Package.PackageType property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var packageTypeRefId))
+                        {
+                            dtoInstance.PackageType = packageTypeRefId;
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("shortName"u8))
+                {
+                    shortNameSeen = true;
+                    reader.Read();
+
+                    var shortNameScalarValue = reader.GetString();
+
+                    if (shortNameScalarValue != null)
+                    {
+                        dtoInstance.ShortName = shortNameScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("version"u8))
+                {
+                    versionSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var versionRefId))
+                        {
+                            dtoInstance.Version.Add(versionRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("visibility"u8))
+                {
+                    visibilitySeen = true;
+                    reader.Read();
+
+                    dtoInstance.Visibility = VisibilityKindProvider.Parse(reader.GetString());
+
+                    continue;
+                }
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
             {
                 throw new InvalidOperationException("The @type property is not available, the PackageDeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            if (@type.GetString() != "Package")
-            {
-                throw new InvalidOperationException($"The PackageDeSerializer can only be used to deserialize objects of type IPackage, a {@type.GetString()} was provided");
-            }
-
-            var dtoInstance = new Mycelium.Forge.Common.Package();
-
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
-
-                if (propertyValue == null)
-                {
-                    throw new JsonException("The @id property is not present, the Package cannot be deserialized");
-                }
-                else
-                {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
-                }
-            }
-
-            if (jsonElement.TryGetProperty("createdAt"u8, out var createdAtProperty))
-            {
-                dtoInstance.CreatedAt = createdAtProperty.GetDateTime();
-            }
-            else
+            if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("listed"u8, out var listedProperty))
-            {
-                if (listedProperty.ValueKind != JsonValueKind.Null)
-                {
-                    dtoInstance.Listed = listedProperty.GetBoolean();
-                }
-            }
-            else
+            if (!listedSeen)
             {
                 logger.LogDebug("the listed Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("modifiedAt"u8, out var modifiedAtProperty))
-            {
-                dtoInstance.ModifiedAt = modifiedAtProperty.GetDateTime();
-            }
-            else
+            if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("name"u8, out var nameProperty))
-            {
-                var propertyValue = nameProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Name = propertyValue;
-                }
-            }
-            else
+            if (!nameSeen)
             {
                 logger.LogDebug("the name Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("packageMaintainer"u8, out var packageMaintainerProperty))
-            {
-                foreach (var arrayItem in packageMaintainerProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var packageMaintainerExternalIdProperty))
-                    {
-                        var propertyValue = packageMaintainerExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.PackageMaintainer.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!packageMaintainerSeen)
             {
                 logger.LogDebug("the packageMaintainer Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("packageOwner"u8, out var packageOwnerProperty))
-            {
-                foreach (var arrayItem in packageOwnerProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var packageOwnerExternalIdProperty))
-                    {
-                        var propertyValue = packageOwnerExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.PackageOwner.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!packageOwnerSeen)
             {
                 logger.LogDebug("the packageOwner Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("packageType"u8, out var packageTypeProperty))
-            {
-                if (packageTypeProperty.ValueKind == JsonValueKind.Null)
-                {
-                    dtoInstance.PackageType = Guid.Empty;
-                    logger.LogDebug($"the Package.PackageType property was not found in the Json. The value is set to Guid.Empty");
-                }
-                else
-                {
-                    if (packageTypeProperty.TryGetProperty("@id"u8, out var packageTypeExternalIdProperty))
-                    {
-                        var propertyValue = packageTypeExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.PackageType = Guid.Parse(propertyValue);
-                        }
-                    }
-                }
-            }
-            else
+            if (!packageTypeSeen)
             {
                 logger.LogDebug("the packageType Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("shortName"u8, out var shortNameProperty))
-            {
-                var propertyValue = shortNameProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.ShortName = propertyValue;
-                }
-            }
-            else
+            if (!shortNameSeen)
             {
                 logger.LogDebug("the shortName Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("version"u8, out var versionProperty))
-            {
-                foreach (var arrayItem in versionProperty.EnumerateArray())
-                {
-                    if (arrayItem.TryGetProperty("@id"u8, out var versionExternalIdProperty))
-                    {
-                        var propertyValue = versionExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.Version.Add(Guid.Parse(propertyValue));
-                        }
-                    }
-                }
-            }
-            else
+            if (!versionSeen)
             {
                 logger.LogDebug("the version Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("visibility"u8, out var visibilityProperty))
-            {
-                dtoInstance.Visibility = VisibilityKindProvider.Parse(visibilityProperty.GetString());
-            }
-            else
+            if (!visibilitySeen)
             {
                 logger.LogDebug("the visibility Json property was not found in the Package: {Id}", dtoInstance.Id);
             }

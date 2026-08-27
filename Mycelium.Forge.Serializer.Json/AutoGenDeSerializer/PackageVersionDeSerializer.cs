@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Serializer.Json
     internal static class PackageVersionDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="IPackageVersion"/> from the provided <see cref="JsonElement"/>
+        /// Deserializes an instance of <see cref="IPackageVersion"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
-        /// <param name="jsonElement">
-        /// The <see cref="JsonElement"/> that contains the <see cref="IPackageVersion"/> json object
+        /// <param name="reader">
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="IPackageVersion"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
@@ -39,113 +39,171 @@ namespace Mycelium.Forge.Serializer.Json
         /// <returns>
         /// an instance of <see cref="IPackageVersion"/>
         /// </returns>
-        internal static IPackageVersion DeSerialize(JsonElement jsonElement, ILoggerFactory loggerFactory = null)
+        internal static IPackageVersion DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
             var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("PackageVersionDeSerializer");
 
-            if (!jsonElement.TryGetProperty("@type"u8, out var @type))
+            var dtoInstance = new Mycelium.Forge.Common.PackageVersion();
+
+            var typeSeen = false;
+            var createdAtSeen = false;
+            var downloadCountSeen = false;
+            var listedSeen = false;
+            var metaDataSeen = false;
+            var modifiedAtSeen = false;
+            var publicationDateSeen = false;
+            var versionSeen = false;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@type"u8))
+                {
+                    reader.Read();
+                    typeSeen = true;
+                    var typeValue = reader.GetString();
+
+                    if (typeValue != "PackageVersion")
+                    {
+                        throw new InvalidOperationException($"The PackageVersionDeSerializer can only be used to deserialize objects of type IPackageVersion, a {typeValue} was provided");
+                    }
+
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("@id"u8))
+                {
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        throw new JsonException("The @id property is not present, the PackageVersion cannot be deserialized");
+                    }
+
+                    dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
+                    continue;
+                }
+
+                if (reader.ValueTextEquals("createdAt"u8))
+                {
+                    createdAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("downloadCount"u8))
+                {
+                    downloadCountSeen = true;
+                    reader.Read();
+
+                    dtoInstance.DownloadCount = reader.GetInt32();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("listed"u8))
+                {
+                    listedSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType != JsonTokenType.Null)
+                    {
+                        dtoInstance.Listed = reader.GetBoolean();
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("metaData"u8))
+                {
+                    metaDataSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.MetaData = Guid.Empty;
+                        logger.LogDebug($"the PackageVersion.MetaData property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var metaDataRefId))
+                        {
+                            dtoInstance.MetaData = metaDataRefId;
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("modifiedAt"u8))
+                {
+                    modifiedAtSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("publicationDate"u8))
+                {
+                    publicationDateSeen = true;
+                    reader.Read();
+
+                    dtoInstance.PublicationDate = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("version"u8))
+                {
+                    versionSeen = true;
+                    reader.Read();
+
+                    var versionScalarValue = reader.GetString();
+
+                    if (versionScalarValue != null)
+                    {
+                        dtoInstance.Version = versionScalarValue;
+                    }
+
+                    continue;
+                }
+
+                reader.Skip();
+            }
+
+            if (!typeSeen)
             {
                 throw new InvalidOperationException("The @type property is not available, the PackageVersionDeSerializer cannot be used to deserialize this JsonElement");
             }
 
-            if (@type.GetString() != "PackageVersion")
-            {
-                throw new InvalidOperationException($"The PackageVersionDeSerializer can only be used to deserialize objects of type IPackageVersion, a {@type.GetString()} was provided");
-            }
-
-            var dtoInstance = new Mycelium.Forge.Common.PackageVersion();
-
-            if (jsonElement.TryGetProperty("@id"u8, out var idProperty))
-            {
-                var propertyValue = idProperty.GetString();
-
-                if (propertyValue == null)
-                {
-                    throw new JsonException("The @id property is not present, the PackageVersion cannot be deserialized");
-                }
-                else
-                {
-                    dtoInstance.Id = Guid.Parse(propertyValue);
-                }
-            }
-
-            if (jsonElement.TryGetProperty("createdAt"u8, out var createdAtProperty))
-            {
-                dtoInstance.CreatedAt = createdAtProperty.GetDateTime();
-            }
-            else
+            if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("downloadCount"u8, out var downloadCountProperty))
-            {
-                dtoInstance.DownloadCount = downloadCountProperty.GetInt32();
-            }
-            else
+            if (!downloadCountSeen)
             {
                 logger.LogDebug("the downloadCount Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("listed"u8, out var listedProperty))
-            {
-                if (listedProperty.ValueKind != JsonValueKind.Null)
-                {
-                    dtoInstance.Listed = listedProperty.GetBoolean();
-                }
-            }
-            else
+            if (!listedSeen)
             {
                 logger.LogDebug("the listed Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("metaData"u8, out var metaDataProperty))
-            {
-                if (metaDataProperty.ValueKind == JsonValueKind.Null)
-                {
-                    dtoInstance.MetaData = Guid.Empty;
-                    logger.LogDebug($"the PackageVersion.MetaData property was not found in the Json. The value is set to Guid.Empty");
-                }
-                else
-                {
-                    if (metaDataProperty.TryGetProperty("@id"u8, out var metaDataExternalIdProperty))
-                    {
-                        var propertyValue = metaDataExternalIdProperty.GetString();
-
-                        if (propertyValue != null)
-                        {
-                            dtoInstance.MetaData = Guid.Parse(propertyValue);
-                        }
-                    }
-                }
-            }
-            else
+            if (!metaDataSeen)
             {
                 logger.LogDebug("the metaData Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("modifiedAt"u8, out var modifiedAtProperty))
-            {
-                dtoInstance.ModifiedAt = modifiedAtProperty.GetDateTime();
-            }
-            else
+            if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("publicationDate"u8, out var publicationDateProperty))
-            {
-                dtoInstance.PublicationDate = publicationDateProperty.GetDateTime();
-            }
-            else
+            if (!publicationDateSeen)
             {
                 logger.LogDebug("the publicationDate Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
-            if (jsonElement.TryGetProperty("version"u8, out var versionProperty))
-            {
-                var propertyValue = versionProperty.GetString();
-
-                if (propertyValue != null)
-                {
-                    dtoInstance.Version = propertyValue;
-                }
-            }
-            else
+            if (!versionSeen)
             {
                 logger.LogDebug("the version Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
