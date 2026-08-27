@@ -1,0 +1,86 @@
+﻿------------------------------------------------------------------------------------------------
+-- <copyright file="schema.sql" company="Starion Group S.A.">
+--
+--   Copyright 2026 Starion Group S.A.
+--   SPDX-License-Identifier: Apache-2.0
+--
+-- </copyright>
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+--------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+------------------------------------------------------------------------------------------------
+
+-- Initialize database
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE SCHEMA IF NOT EXISTS "Forge";
+
+-- Root Thing table
+CREATE TABLE "Forge"."Thing" (
+    "id" uuid NOT NULL,
+    "classKind" text,
+    "data" JSONB,
+    PRIMARY KEY ("id")
+);
+
+ALTER TABLE "Forge"."Thing" SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE "Forge"."Thing" SET (autovacuum_vacuum_threshold = 2500);
+ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
+
+-- Table definitions
+{{#each this as | class |}}
+{{#Forge.SQL.WriteBasicTableDefinitions class}}
+{{/each}}
+
+-- Thing foreign key constraints
+{{#each this as | class |}}
+{{#Forge.SQL.WriteBasicTableThingConstraints class}}
+{{/each}}
+
+-- Many to Many link tables including Foreign Key Constraints
+{{#each this as | class |}}
+{{#Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints class}}
+{{/each}}
+
+-- Reference Properties that are not Many-to-Many
+{{#each this as | class |}}
+{{#Forge.SQL.WriteNormalReferenceConstraints class}}
+{{/each}}
+
+CREATE OR REPLACE FUNCTION "Forge".thing_delete()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+    BEGIN
+
+        EXECUTE 'DELETE FROM "Forge"."Thing" WHERE id = $1' USING OLD.id;
+
+        RETURN OLD;
+    END;
+$$;
+
+-- Delete Trigger Functions for Base Tables
+{{#Forge.SQL.DeleteBaseTableTriggerFunctions this}}
+
+-- Delete Triggers to the Thing Table
+{{#each this as | class |}}
+{{#Forge.SQL.WriteBasicTableThingDeleteTriggers class}}
+{{/each}}
+
+-- Delete Triggers to the Base Table Table
+{{#each this as | class |}}
+{{#Forge.SQL.WriteBaseTableDeleteTriggers class}}
+{{/each}}
+
+-- ModelVersion
+CREATE OR REPLACE FUNCTION "Forge".query_model_version()
+RETURNS text AS $$
+BEGIN
+    RETURN '{{#Forge.SQL.ModelVersion this}}';
+END;
+$$ LANGUAGE plpgsql;
+
+------------------------------------------------------------------------------------------------
+--------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+------------------------------------------------------------------------------------------------

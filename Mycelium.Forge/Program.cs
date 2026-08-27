@@ -9,6 +9,9 @@
 
 namespace Mycelium.Forge
 {
+    using System;
+    using System.IO;
+
     using Autofac.Extensions.DependencyInjection;
 
     using BlazorBlueprint.Components;
@@ -16,9 +19,11 @@ namespace Mycelium.Forge
     using Carter;
 
     using Microsoft.AspNetCore.HttpOverrides;
+    using Microsoft.Extensions.Configuration;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components;
+    using Mycelium.Forge.Config;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Orm;
 
@@ -67,12 +72,26 @@ namespace Mycelium.Forge
             // Serilog or the rest of the host.
             if (args is ["migrate"])
             {
+                var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
                 var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables()
                     .Build();
 
-                var connectionString = configuration.GetConnectionString("Default")
-                                       ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
+                var databaseConfig = configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>()
+                                     ?? configuration.GetSection("DatabaseConnection").Get<DatabaseConfig>();
+
+                var connectionString = databaseConfig != null && !string.IsNullOrWhiteSpace(databaseConfig.Host)
+                    ? databaseConfig.BuildConnectionString()
+                    : configuration.GetConnectionString("Default");
+
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    throw new InvalidOperationException("Database connection settings are not configured in DatabaseConnection or ConnectionStrings:Default.");
+                }
 
                 return Migrator.Run(connectionString) ? 0 : 1;
             }
@@ -108,6 +127,7 @@ namespace Mycelium.Forge
 
             builder.Services.AddBlazorBlueprintComponents();
 
+            builder.RegisterDatabase();
             builder.RegisterViewModels();
 
             var app = builder.Build();

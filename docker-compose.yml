@@ -1,6 +1,14 @@
-# Local development environment (F-07, DD-09): PostgreSQL, object storage and an identity provider,
+﻿# Local development environment (F-07, DD-09): PostgreSQL, object storage and an identity provider,
 # plus the one-shot migrator the app depends on (DD-18). See docs/getting-started.md for the seed
 # path. Every credential below is a fixed, checked-in, dev-only value - never used outside this file.
+
+# Define shared database environment variables
+x-database-environment: &database-environment
+  DatabaseConnection__Host: postgres
+  DatabaseConnection__Port: "5432"
+  DatabaseConnection__Database: forge
+  DatabaseConnection__Username: forge
+  DatabaseConnection__Password: forge-dev-password
 
 services:
   postgres:
@@ -83,7 +91,7 @@ services:
       dockerfile: Dockerfile
     command: ["migrate"]
     environment:
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=forge;Username=forge;Password=forge-dev-password"
+      <<: *database-environment
     depends_on:
       postgres:
         condition: service_healthy
@@ -94,7 +102,7 @@ services:
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=forge;Username=forge;Password=forge-dev-password"
+      <<: *database-environment
     ports:
       - "8080:8080"
     depends_on:
@@ -121,7 +129,7 @@ services:
     volumes:
       - .:/workspaces/mycelium-forge:cached
     environment:
-      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=forge;Username=forge;Password=forge-dev-password"
+      <<: *database-environment
 
 volumes:
   postgres-data:
