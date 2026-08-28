@@ -62,8 +62,8 @@ services:
     depends_on:
       migrator:
         condition: service_completed_successfully
-    # DD-03: replicas are stateless and interchangeable - scale with `--scale app=N` behind your own
-    # load balancer/reverse proxy.
+    # Replicas are stateless and interchangeable - scale with `--scale app=N` behind your own load
+    # balancer/reverse proxy.
 
 volumes:
   postgres-data:
