@@ -1,18 +1,55 @@
-# Production deployment (current state): runs the published Mycelium.Forge image. The app is
-# web-UI-only right now - Program.cs's normal startup path doesn't touch PostgreSQL, Garage or
-# Keycloak at all (only the standalone `migrate` command reads ConnectionStrings:Default, and there's
-# nothing worth migrating yet) - so this is just the one stateless container.
-#
-# Add the migrator service back (see git history) once the app actually persists something, and add
-# Garage/Keycloak once it consumes them - docker/garage.toml and docker/keycloak/forge-realm.json are
-# dev-only (checked-in secrets, sslRequired "none", localhost redirect URIs) and must not be reused
-# as-is for a real deployment.
+# Production deployment (current state): runs the published Mycelium.Forge image against a real
+# PostgreSQL instance. Program.cs's normal startup path still doesn't touch PostgreSQL, Garage or
+# Keycloak itself (only the standalone `migrate` command reads ConnectionStrings:Default) - but
+# schema.sql is worth applying now, so postgres + the one-shot migrator are wired up for real, the
+# same way docker-compose.yml already does for dev. Garage/Keycloak stay out until the
+# app actually consumes them - docker/garage.toml and docker/keycloak/forge-realm.json are dev-only
+# (checked-in secrets, sslRequired "none", localhost redirect URIs) and must not be reused as-is.
 #
 # Usage:
 #   cp .env.prod.example .env.prod   # fill in real values, never commit .env.prod
 #   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 
 services:
+  postgres:
+    # PostgreSQL 18 is the floor; this pins the compose file's image accordingly.
+    image: postgres:18
+    environment:
+      POSTGRES_DB: forge
+      POSTGRES_USER: forge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      # forge_runtime is the least-privileged role schema.sql's REVOKE/GRANT targets - created by
+      # docker/postgres/00-create-roles.sh below. Not consumed by the app yet (nothing on the app's
+      # own runtime path queries the database today), provisioned ahead of that landing.
+      FORGE_RUNTIME_PASSWORD: ${FORGE_RUNTIME_PASSWORD:?set FORGE_RUNTIME_PASSWORD in .env.prod}
+    volumes:
+      # PostgreSQL 18's image expects a single mount at /var/lib/postgresql, see docker-compose.yml.
+      - postgres-data:/var/lib/postgresql
+      - ./docker/postgres/00-create-roles.sh:/docker-entrypoint-initdb.d/00-create-roles.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forge -d forge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Migrations are an explicit, one-shot invocation - never something every replica runs at startup
+  # - so this runs the same published image as `app` with its `migrate` command, and `app` depends
+  # on it completing successfully rather than migrating itself.
+  migrator:
+    image: ${IMAGE:-ghcr.io/mycelium-cmbse/mycelium-forge}:${TAG:-latest}
+    command: ["migrate"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      DatabaseConnection__Host: postgres
+      DatabaseConnection__Port: "5432"
+      DatabaseConnection__Database: forge
+      DatabaseConnection__Username: forge
+      DatabaseConnection__Password: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   app:
     image: ${IMAGE:-ghcr.io/mycelium-cmbse/mycelium-forge}:${TAG:-latest}
     environment:
@@ -22,5 +59,11 @@ services:
       # terminates TLS and forwards here. Don't expose this port to the internet directly.
       - "127.0.0.1:${APP_PORT:-8080}:8080"
     restart: unless-stopped
-    # DD-03: replicas are stateless and interchangeable - scale with `--scale app=N` behind your own
-    # load balancer/reverse proxy.
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    # Replicas are stateless and interchangeable - scale with `--scale app=N` behind your own load
+    # balancer/reverse proxy.
+
+volumes:
+  postgres-data:
