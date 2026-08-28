@@ -18,8 +18,8 @@ services:
       POSTGRES_DB: forge
       POSTGRES_USER: forge
       POSTGRES_PASSWORD: forge-dev-password
-      # GH125/GH126: forge_runtime is the least-privileged role schema.sql's REVOKE/GRANT will
-      # target - created by docker/postgres/00-create-roles.sh below, not consumed by the app yet.
+      # forge_runtime is the least-privileged role schema.sql's REVOKE/GRANT will target - created
+      # by docker/postgres/00-create-roles.sh below, not consumed by the app yet.
       FORGE_RUNTIME_PASSWORD: forge-runtime-dev-password
     volumes:
       # PostgreSQL 18's image expects a single mount at /var/lib/postgresql (not .../data as with

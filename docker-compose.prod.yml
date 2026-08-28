@@ -1,8 +1,8 @@
 # Production deployment (current state): runs the published Mycelium.Forge image against a real
 # PostgreSQL instance. Program.cs's normal startup path still doesn't touch PostgreSQL, Garage or
 # Keycloak itself (only the standalone `migrate` command reads ConnectionStrings:Default) - but
-# schema.sql is worth applying now (GH125/GH126), so postgres + the one-shot migrator are wired up
-# for real, the same way docker-compose.yml already does for dev. Garage/Keycloak stay out until the
+# schema.sql is worth applying now, so postgres + the one-shot migrator are wired up for real, the
+# same way docker-compose.yml already does for dev. Garage/Keycloak stay out until the
 # app actually consumes them - docker/garage.toml and docker/keycloak/forge-realm.json are dev-only
 # (checked-in secrets, sslRequired "none", localhost redirect URIs) and must not be reused as-is.
 #
@@ -12,15 +12,15 @@
 
 services:
   postgres:
-    # DD-23: PostgreSQL 18 is the floor; this pins the compose file's image accordingly.
+    # PostgreSQL 18 is the floor; this pins the compose file's image accordingly.
     image: postgres:18
     environment:
       POSTGRES_DB: forge
       POSTGRES_USER: forge
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
-      # GH125/GH126: forge_runtime is the least-privileged role schema.sql's REVOKE/GRANT targets -
-      # created by docker/postgres/00-create-roles.sh below. Not consumed by the app yet (nothing on
-      # the app's own runtime path queries the database today), provisioned ahead of that landing.
+      # forge_runtime is the least-privileged role schema.sql's REVOKE/GRANT targets - created by
+      # docker/postgres/00-create-roles.sh below. Not consumed by the app yet (nothing on the app's
+      # own runtime path queries the database today), provisioned ahead of that landing.
       FORGE_RUNTIME_PASSWORD: ${FORGE_RUNTIME_PASSWORD:?set FORGE_RUNTIME_PASSWORD in .env.prod}
     volumes:
       # PostgreSQL 18's image expects a single mount at /var/lib/postgresql, see docker-compose.yml.
@@ -33,9 +33,9 @@ services:
       retries: 10
     restart: unless-stopped
 
-  # DD-18: migrations are an explicit, one-shot invocation - never something every replica runs at
-  # startup - so this runs the same published image as `app` with its `migrate` command, and `app`
-  # depends on it completing successfully rather than migrating itself.
+  # Migrations are an explicit, one-shot invocation - never something every replica runs at startup
+  # - so this runs the same published image as `app` with its `migrate` command, and `app` depends
+  # on it completing successfully rather than migrating itself.
   migrator:
     image: ${IMAGE:-ghcr.io/mycelium-cmbse/mycelium-forge}:${TAG:-latest}
     command: ["migrate"]
