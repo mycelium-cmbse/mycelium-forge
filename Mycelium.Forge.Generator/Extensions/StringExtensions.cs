@@ -7,10 +7,10 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Generator.Tests.Extensions
+namespace Mycelium.Forge.Generator.Extensions
 {
     /// <summary>
-    /// Extension methods for the <see cref="string" /> type in tests.
+    /// Extension methods for the <see cref="string" /> type.
     /// </summary>
     public static class StringExtensions
     {

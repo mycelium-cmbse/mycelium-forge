@@ -7,10 +7,8 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Tests.Orm.Helpers
+namespace Mycelium.Forge.Orm.Tests.Helpers
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     using Microsoft.Extensions.Logging;
@@ -21,6 +19,8 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
     using Mycelium.Forge.Common.Comparers;
     using Mycelium.Forge.Orm.Helpers;
 
+    using NUnit.Framework;
+
     /// <summary>
     /// Suite of tests for the <see cref="DaoHelper" /> class.
     /// </summary>
@@ -30,6 +30,9 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
         private Mock<ILogger> loggerMock;
         private Mock<IDtoComparer<IAPIKey>> comparerMock;
 
+        /// <summary>
+        /// Sets up the test context before each test.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -51,7 +54,7 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
                 Assert.That(DaoHelper.FormatChangeValue("custom-string"), Is.EqualTo("\"custom-string\""));
                 Assert.That(DaoHelper.FormatChangeValue(42), Is.EqualTo("42"));
                 Assert.That(DaoHelper.FormatChangeValue(new List<string> { "first", "second" }), Is.EqualTo("[\"first\", \"second\"]"));
-                Assert.That(DaoHelper.FormatChangeValue(new List<object?> { null, string.Empty, "item", 100 }), Is.EqualTo("[null, \"\", \"item\", 100]"));
+                Assert.That(DaoHelper.FormatChangeValue(new List<object> { null, string.Empty, "item", 100 }), Is.EqualTo("[null, \"\", \"item\", 100]"));
             }
         }
 
@@ -86,13 +89,13 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
                         It.IsAny<LogLevel>(),
                         It.IsAny<EventId>(),
                         It.IsAny<It.IsAnyType>(),
-                        It.IsAny<Exception?>(),
-                        It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                        It.IsAny<Exception>(),
+                        It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                     Times.Never);
             }
 
             this.loggerMock.Setup(logger => logger.IsEnabled(LogLevel.Information)).Returns(true);
-            this.comparerMock.Setup(comparer => comparer.Compare(originalApiKey, updatedApiKey)).Returns(new List<PropertyChange>());
+            this.comparerMock.Setup(comparer => comparer.Compare(originalApiKey, updatedApiKey)).Returns([]);
 
             DaoHelper.LogChanges(this.loggerMock.Object, this.comparerMock.Object, originalApiKey, updatedApiKey);
 
@@ -101,8 +104,8 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
                     It.IsAny<LogLevel>(),
                     It.IsAny<EventId>(),
                     It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception?>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                 Times.Never);
 
             var propertyChanges = new List<PropertyChange>
@@ -121,8 +124,8 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
                     LogLevel.Information,
                     It.IsAny<EventId>(),
                     It.IsAny<It.IsAnyType>(),
-                    It.IsAny<Exception?>(),
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()))
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()))
                 .Callback(new InvocationAction(invocation =>
                 {
                     var state = invocation.Arguments[2];
@@ -138,8 +141,8 @@ namespace Mycelium.Forge.Tests.Orm.Helpers
                         LogLevel.Information,
                         It.IsAny<EventId>(),
                         It.IsAny<It.IsAnyType>(),
-                        It.IsAny<Exception?>(),
-                        It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                        It.IsAny<Exception>(),
+                        It.IsAny<Func<It.IsAnyType, Exception, string>>()),
                     Times.Once);
 
                 Assert.That(loggedMessage, Does.Contain($"Updating {nameof(IAPIKey)} {entityId} with 3 changes:"));

@@ -98,17 +98,12 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType())
+            if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType() || property.QueryIsEnumerable())
             {
                 return false;
             }
 
-            if (property.QueryIsEnumerable())
-            {
-                return false;
-            }
-
-            if (property.Opposite?.QueryIsEnumerable() ?? true)
+            if (property.Opposite == null || property.Opposite.QueryIsEnumerable())
             {
                 return true;
             }
@@ -118,7 +113,7 @@ namespace Mycelium.Forge.Generator.Extensions
                 return true;
             }
 
-            return property.Opposite.Lower != 1 || property.QueryUpperValue() != 1;
+            return property.Opposite.Lower != 1;
         }
 
         /// <summary>
@@ -130,27 +125,12 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(property);
 
-            if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType())
+            if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType() || property.QueryIsEnumerable() || property.Opposite == null)
             {
                 return false;
             }
 
-            if (property.QueryIsEnumerable())
-            {
-                return false;
-            }
-
-            if (property.Opposite == null)
-            {
-                return false;
-            }
-
-            if (property.Opposite.QueryIsEnumerable())
-            {
-                return true;
-            }
-
-            if (property.Opposite.IsComposite)
+            if (property.Opposite.QueryIsEnumerable() || property.Opposite.IsComposite)
             {
                 return true;
             }
@@ -288,6 +268,19 @@ namespace Mycelium.Forge.Generator.Extensions
             return string.IsNullOrWhiteSpace(property.Name)
                 ? string.Empty
                 : property.Name.LowerCaseFirstLetter();
+        }
+
+        /// <summary>
+        /// Checks whether the property is a built-in Thing attribute (id or classKind).
+        /// </summary>
+        /// <param name="property">The property to check.</param>
+        /// <returns>True if the property is id or classKind, false otherwise.</returns>
+        public static bool IsThingAttribute(this IProperty property)
+        {
+            ArgumentNullException.ThrowIfNull(property);
+
+            return string.Equals(property.Name, "id", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(property.Name, "classKind", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

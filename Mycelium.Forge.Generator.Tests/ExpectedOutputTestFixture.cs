@@ -13,8 +13,8 @@ namespace Mycelium.Forge.Generator.Tests
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.Generators;
-    using Mycelium.Forge.Generator.Tests.Extensions;
 
     using uml4net.Reporting.Generators;
 

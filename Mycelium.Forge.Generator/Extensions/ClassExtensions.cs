@@ -48,10 +48,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(@class);
 
-            return @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(superClass => superClass != @class)
-                .Any(superClass => superClass.IsThingClass());
+            return @class.QueryDerivesFrom("Thing");
         }
 
         /// <summary>
@@ -79,6 +76,22 @@ namespace Mycelium.Forge.Generator.Extensions
         }
 
         /// <summary>
+        /// Returns all the properties that are owned single reference properties on this class.
+        /// </summary>
+        /// <param name="class">The class to query single reference properties for.</param>
+        /// <returns>A collection of owned single reference properties.</returns>
+        public static IEnumerable<IProperty> QueryOwnedSingleReferenceProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.OwnedAttribute
+                .Where(x => !x.IsComposite && x.QueryOwnedAttributeNeedsSqlAttribute())
+                .Distinct()
+                .OrderBy(x => x.Name)
+                .ToArray();
+        }
+
+        /// <summary>
         /// Returns all the properties that need a single foreign key reference column in a table based on ownership and/or
         /// cardinality.
         /// </summary>
@@ -88,10 +101,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(@class);
 
-            var ownedSingleReferenceProperties = @class.OwnedAttribute
-                .Where(x => x.Type != null && !x.QueryIsDataType())
-                .Where(x => !x.IsComposite)
-                .Where(x => x.QueryOwnedAttributeNeedsSqlAttribute());
+            var ownedSingleReferenceProperties = @class.QueryOwnedSingleReferenceProperties();
 
             var oppositeSingleReferenceProperties = @class.QueryAllOppositeReferencesToMe()
                 .Where(x => x.Opposite != null)
@@ -147,6 +157,34 @@ namespace Mycelium.Forge.Generator.Extensions
                 .ToList();
 
             return results;
+        }
+
+        /// <summary>
+        /// Queries all the <see cref="IProperty" /> instances that are owned by the current
+        /// <paramref name="class" /> or by a super-class that do not derive from a specific
+        /// named <see cref="IClass" /> that is typically at the root of the inheritance tree.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> for which the properties are queried.</param>
+        /// <param name="derivesFrom">The name of the root <see cref="IClass" />.</param>
+        /// <returns>A list of <see cref="IProperty" />.</returns>
+        public static IReadOnlyList<IProperty> QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(this IClass @class, string derivesFrom)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+            ArgumentException.ThrowIfNullOrWhiteSpace(derivesFrom);
+
+            List<IProperty> properties = [];
+
+            foreach (var superClass in @class.SuperClass)
+            {
+                if (!superClass.QueryDerivesFrom(derivesFrom))
+                {
+                    properties.AddRange(superClass.OwnedAttribute);
+                }
+            }
+
+            properties.AddRange(@class.OwnedAttribute);
+
+            return properties.OrderBy(x => x.Name).ToList();
         }
     }
 }

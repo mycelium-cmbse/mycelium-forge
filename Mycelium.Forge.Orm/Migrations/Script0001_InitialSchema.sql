@@ -1,5 +1,5 @@
-﻿------------------------------------------------------------------------------------------------
--- <copyright file="Script0001_InitialSchema.sql" company="Starion Group S.A.">
+------------------------------------------------------------------------------------------------
+-- <copyright file="schema.sql" company="Starion Group S.A.">
 --
 --   Copyright 2026 Starion Group S.A.
 --   SPDX-License-Identifier: Apache-2.0
@@ -31,8 +31,8 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
 -- Table definitions
 CREATE TABLE "Forge"."Account" (
     "id" uuid NOT NULL,
-    "forge" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "forge" uuid,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -44,7 +44,7 @@ ALTER TABLE "Forge"."Account" SET (autovacuum_analyze_threshold = 2500);
 CREATE TABLE "Forge"."Address" (
     "id" uuid NOT NULL,
     "country" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -55,7 +55,7 @@ ALTER TABLE "Forge"."Address" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."APIKey" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -66,7 +66,7 @@ ALTER TABLE "Forge"."APIKey" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."Country" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -107,7 +107,7 @@ ALTER TABLE "Forge"."Namespace" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."Organization" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -119,7 +119,7 @@ ALTER TABLE "Forge"."Organization" SET (autovacuum_analyze_threshold = 2500);
 CREATE TABLE "Forge"."OrganizationInvitation" (
     "id" uuid NOT NULL,
     "organization" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     "target" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -131,7 +131,7 @@ ALTER TABLE "Forge"."OrganizationInvitation" SET (autovacuum_analyze_threshold =
 
 CREATE TABLE "Forge"."Package" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     "packageType" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -143,7 +143,7 @@ ALTER TABLE "Forge"."Package" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."PackageInvitation" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     "package" uuid NOT NULL,
     "target" uuid NOT NULL,
     PRIMARY KEY ("id")
@@ -156,7 +156,7 @@ ALTER TABLE "Forge"."PackageInvitation" SET (autovacuum_analyze_threshold = 2500
 
 CREATE TABLE "Forge"."PackageMetaData" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -167,7 +167,7 @@ ALTER TABLE "Forge"."PackageMetaData" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."PackageType" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -178,7 +178,7 @@ ALTER TABLE "Forge"."PackageType" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."PackageVersion" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -189,7 +189,7 @@ ALTER TABLE "Forge"."PackageVersion" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."ProfileLink" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     "profileType" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -201,7 +201,7 @@ ALTER TABLE "Forge"."ProfileLink" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."ProfileType" (
     "id" uuid NOT NULL,
-    "owner" uuid NOT NULL,
+    "owner" uuid,
     PRIMARY KEY ("id")
 );
 

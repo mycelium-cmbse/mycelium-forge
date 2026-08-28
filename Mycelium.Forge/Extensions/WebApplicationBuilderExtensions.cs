@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Extensions
 {
     using Microsoft.Extensions.Options;
 
-    using Mycelium.Forge.Config;
+    using Mycelium.Forge.Orm;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.AccountSettings;
     using Mycelium.Forge.ViewModels.AdminAccounts;

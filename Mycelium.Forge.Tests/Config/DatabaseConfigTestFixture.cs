@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Config
 {
-    using Mycelium.Forge.Config;
+    using Mycelium.Forge.Orm;
 
     /// <summary>
     /// Suite of tests for the <see cref="DatabaseConfig" /> class.

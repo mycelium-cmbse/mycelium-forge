@@ -12,8 +12,11 @@ namespace Mycelium.Forge.Generator.Generators
     using System.Reflection;
     using System.Text;
 
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.Formatting;
+
+    using Mycelium.Forge.Generator.Extensions;
 
     /// <summary>
     /// Abstract class from which all generators derive
@@ -21,7 +24,7 @@ namespace Mycelium.Forge.Generator.Generators
     public abstract class Generator
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Generator"/> class.
+        /// Initializes a new instance of the <see cref="Generator" /> class.
         /// </summary>
         protected Generator()
         {
@@ -34,26 +37,10 @@ namespace Mycelium.Forge.Generator.Generators
         public string TemplateFolderPath { get; protected set; } = string.Empty;
 
         /// <summary>
-        /// Assigns the value of the <see cref="TemplateFolderPath"/>
-        /// </summary>
-        private void AssignTemplateFolderPath()
-        {
-            var assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
-            this.TemplateFolderPath = Path.Combine(assemblyFolder, "Templates");
-
-            var subfolderLocation = this.GetOptionalSubfolderTemplateLocation();
-
-            if (!string.IsNullOrWhiteSpace(subfolderLocation))
-            {
-                this.TemplateFolderPath = Path.Combine(this.TemplateFolderPath, subfolderLocation);
-            }
-        }
-
-        /// <summary>
         /// Gets an optional subfolder location path to locate templates
         /// </summary>
         /// <returns>An optional subfolder name</returns>
-        protected virtual string? GetOptionalSubfolderTemplateLocation()
+        protected virtual string GetOptionalSubfolderTemplateLocation()
         {
             return null;
         }
@@ -72,12 +59,12 @@ namespace Mycelium.Forge.Generator.Generators
         {
             generatedCode = generatedCode.Replace("&nbsp;", " ");
 
-            var workspace = new Microsoft.CodeAnalysis.AdhocWorkspace();
+            var workspace = new AdhocWorkspace();
             var syntaxTree = CSharpSyntaxTree.ParseText(generatedCode);
             var root = syntaxTree.GetRoot();
             var formattedSyntaxNode = Formatter.Format(root, workspace);
 
-            return formattedSyntaxNode.SyntaxTree.GetText().ToString();
+            return formattedSyntaxNode.SyntaxTree.GetText().ToString().NormalizeLineEndings();
         }
 
         /// <summary>
@@ -87,13 +74,13 @@ namespace Mycelium.Forge.Generator.Generators
         /// the generated code that needs to be written to disk
         /// </param>
         /// <param name="outputDirectory">
-        /// The target <see cref="DirectoryInfo"/>
+        /// The target <see cref="DirectoryInfo" />
         /// </param>
         /// <param name="fileName">
         /// The name of the file
         /// </param>
         /// <returns>
-        /// an awaitable <see cref="Task"/>
+        /// an awaitable <see cref="Task" />
         /// </returns>
         protected static async Task WriteAsync(string generatedCode, DirectoryInfo outputDirectory, string fileName)
         {
@@ -112,6 +99,22 @@ namespace Mycelium.Forge.Generator.Generators
             var filePath = Path.Combine(outputDirectory.FullName, fileName);
 
             await File.WriteAllTextAsync(filePath, generatedCode, Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Assigns the value of the <see cref="TemplateFolderPath" />
+        /// </summary>
+        private void AssignTemplateFolderPath()
+        {
+            var assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+            this.TemplateFolderPath = Path.Combine(assemblyFolder, "Templates");
+
+            var subfolderLocation = this.GetOptionalSubfolderTemplateLocation();
+
+            if (!string.IsNullOrWhiteSpace(subfolderLocation))
+            {
+                this.TemplateFolderPath = Path.Combine(this.TemplateFolderPath, subfolderLocation);
+            }
         }
     }
 }
