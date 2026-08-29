@@ -199,6 +199,31 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         }
 
         /// <summary>
+        /// Verifies that WriteClassMultiValuedAttributeIndexes renders one GIN containment index per
+        /// own-or-inherited multi-valued attribute, skips single-valued attributes, and guards invalid context.
+        /// </summary>
+        [Test]
+        public void VerifyWriteClassMultiValuedAttributeIndexes()
+        {
+            var template = this.handlebars.Compile("{{#Forge.SQL.WriteClassMultiValuedAttributeIndexes this}}");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+
+                var thingResult = template(this.thingClass);
+                Assert.That(thingResult, Is.Empty);
+
+                var accountResult = template(this.accountClass);
+                Assert.That(accountResult, Is.Empty, "Account has no multi-valued attributes of its own or inherited");
+
+                var apiKeyResult = template(GetClass("APIKey"));
+                Assert.That(apiKeyResult, Does.Contain("CREATE INDEX \"idx_Thing_APIKey_secretHash\" ON \"Forge\".\"Thing\" USING gin ((\"data\"->'secretHash') jsonb_path_ops) WHERE \"classKind\" = 'APIKey'"));
+                Assert.That(apiKeyResult, Does.Not.Contain("idx_Thing_APIKey_name"), "name is single-valued and belongs to WriteClassAttributeIndexes instead");
+            }
+        }
+
+        /// <summary>
         /// Retrieves a class from the model by name.
         /// </summary>
         /// <param name="className">The name of the class.</param>

@@ -354,10 +354,11 @@ ALTER TABLE "Forge"."Scope" ADD CONSTRAINT "Scope_primaryAddress_FK_Source" FORE
 CREATE INDEX "idx_Scope_primaryAddress" ON "Forge"."Scope" ("primaryAddress");
 
 -- Indexes for querying Thing.data's JSONB attributes: one shared composite index per universal
--- Thing attribute (createdAt, modifiedAt), and one partial expression index per class for every
--- other own-or-inherited scalar attribute. text::timestamp/date parsing is only ever STABLE in
--- Postgres, never IMMUTABLE, so it cannot be cast directly in an index expression - these two
--- wrapper functions exist solely to make that cast usable in one.
+-- Thing attribute (createdAt, modifiedAt), one partial expression index per class for every other
+-- own-or-inherited single-valued scalar attribute, and one partial GIN containment index per class
+-- for every own-or-inherited multi-valued (0..*/1..*) attribute. text::timestamp/date parsing is
+-- only ever STABLE in Postgres, never IMMUTABLE, so it cannot be cast directly in an index
+-- expression - these two wrapper functions exist solely to make that cast usable in one.
 CREATE OR REPLACE FUNCTION "Forge".jsonb_to_timestamp(value text)
 RETURNS timestamp
 LANGUAGE sql
@@ -425,6 +426,7 @@ CREATE INDEX "idx_Thing_PackageVersion_version" ON "Forge"."Thing" (("data"->>'v
 CREATE INDEX "idx_Thing_ProfileLink_uri" ON "Forge"."Thing" (("data"->>'uri')) WHERE "classKind" = 'ProfileLink';
 CREATE INDEX "idx_Thing_ProfileType_logoBlobReference" ON "Forge"."Thing" (("data"->>'logoBlobReference')) WHERE "classKind" = 'ProfileType';
 CREATE INDEX "idx_Thing_ProfileType_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'ProfileType';
+CREATE INDEX "idx_Thing_APIKey_secretHash" ON "Forge"."Thing" USING gin (("data"->'secretHash') jsonb_path_ops) WHERE "classKind" = 'APIKey';
 
 -- Runtime role delete privileges: every deletion goes through Thing, whose downward
 -- ..._Thing_FK_Source ON DELETE CASCADE constraints already clean up every table sharing that id.

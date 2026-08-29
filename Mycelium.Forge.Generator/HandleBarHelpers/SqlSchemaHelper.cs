@@ -39,6 +39,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.WriteNormalReferenceConstraints", WriteNormalReferenceConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteUniversalAttributeIndexes", WriteUniversalAttributeIndexes);
             handlebars.RegisterHelper("Forge.SQL.WriteClassAttributeIndexes", WriteClassAttributeIndexes);
+            handlebars.RegisterHelper("Forge.SQL.WriteClassMultiValuedAttributeIndexes", WriteClassMultiValuedAttributeIndexes);
             handlebars.RegisterHelper("Forge.SQL.ModelVersion", WriteModelVersion);
         }
 
@@ -254,6 +255,43 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 stringBuilder.AppendLine(
                     $"CREATE INDEX \"idx_Thing_{@class.QuerySqlTableName()}_{attributeName}\" ON \"Forge\".\"Thing\" ({property.QueryJsonbDataExpression()}) WHERE \"classKind\" = '{@class.QuerySqlTableName()}';");
+            }
+
+            writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Writes one GIN containment index per own-or-inherited indexable multi-valued attribute for an
+        /// <see cref="IClass" />, scoped to that class's own <c>classKind</c> value. A multi-valued attribute
+        /// serializes as a JSON array, so it needs <c>@&gt;</c> containment semantics via a GIN index rather than
+        /// the B-tree expression indexes <see cref="WriteClassAttributeIndexes" /> builds for single-valued ones -
+        /// there is no per-type cast to choose here, since <c>jsonb_path_ops</c> compares the raw JSON values
+        /// directly regardless of whether the array holds strings, numbers or booleans. Skips <c>Thing</c> itself
+        /// and abstract classes for the same reasons as <see cref="WriteClassAttributeIndexes" />.
+        /// </summary>
+        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        private static void WriteClassMultiValuedAttributeIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
+        {
+            if (context.Value is not IClass @class)
+            {
+                throw new ArgumentException("Forge.SQL.WriteClassMultiValuedAttributeIndexes - context is supposed to be IClass");
+            }
+
+            if (@class.IsThingClass() || @class.IsAbstract)
+            {
+                return;
+            }
+
+            var stringBuilder = new StringBuilder();
+
+            foreach (var property in @class.QuerySqlIndexableMultiValuedAttributes())
+            {
+                var attributeName = property.QuerySqlAttributeName();
+
+                stringBuilder.AppendLine(
+                    $"CREATE INDEX \"idx_Thing_{@class.QuerySqlTableName()}_{attributeName}\" ON \"Forge\".\"Thing\" USING gin ((\"data\"->'{attributeName}') jsonb_path_ops) WHERE \"classKind\" = '{@class.QuerySqlTableName()}';");
             }
 
             writer.WriteSafeString(stringBuilder);
