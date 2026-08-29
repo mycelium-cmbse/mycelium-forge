@@ -47,29 +47,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         }
 
         /// <summary>
-        /// Verifies that DeleteBaseTableTriggerFunctions renders trigger functions and guards invalid context.
-        /// </summary>
-        [Test]
-        public void VerifyDeleteBaseTableTriggerFunctions()
-        {
-            var template = this.handlebars.Compile("{{#Forge.SQL.DeleteBaseTableTriggerFunctions this}}");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => template("not-a-collection"), Throws.TypeOf<ArgumentException>());
-
-                var allClasses = GeneratorSetupFixture.XmiReaderResult.Packages
-                    .SelectMany(package => package.QueryPackages())
-                    .SelectMany(package => package.PackagedElement.OfType<IClass>())
-                    .ToList();
-
-                var result = template(allClasses);
-                Assert.That(result, Does.Contain("CREATE OR REPLACE FUNCTION \"Forge\".scope_delete()"));
-                Assert.That(result, Does.Contain("EXECUTE 'DELETE FROM \"Forge\".\"Scope\" WHERE id = $1' USING OLD.id;"));
-            }
-        }
-
-        /// <summary>
         /// Verifies that <see cref="SqlSchemaHelper.RegisterSqlSchemaHelpers" /> registers helpers and handles null argument.
         /// </summary>
         [Test]
@@ -81,28 +58,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
                 var versionTemplate = this.handlebars.Compile("{{Forge.SQL.ModelVersion}}");
                 Assert.That(versionTemplate(new { }), Is.EqualTo("0.1.0"));
-            }
-        }
-
-        /// <summary>
-        /// Verifies that WriteBaseTableDeleteTriggers renders base table triggers and guards invalid context.
-        /// </summary>
-        [Test]
-        public void VerifyWriteBaseTableDeleteTriggers()
-        {
-            var template = this.handlebars.Compile("{{#Forge.SQL.WriteBaseTableDeleteTriggers this}}");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
-
-                var thingResult = template(this.thingClass);
-                Assert.That(thingResult, Is.Empty);
-
-                var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_scope_on_account_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".scope_delete()"));
             }
         }
 
@@ -145,28 +100,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT \"Account_Thing_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Thing\" (\"id\")"));
-            }
-        }
-
-        /// <summary>
-        /// Verifies that WriteBasicTableThingDeleteTriggers renders thing delete triggers and guards invalid context.
-        /// </summary>
-        [Test]
-        public void VerifyWriteBasicTableThingDeleteTriggers()
-        {
-            var template = this.handlebars.Compile("{{#Forge.SQL.WriteBasicTableThingDeleteTriggers this}}");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
-
-                var thingResult = template(this.thingClass);
-                Assert.That(thingResult, Is.Empty);
-
-                var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_thing_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".thing_delete()"));
             }
         }
 

@@ -36,9 +36,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingConstraints", WriteBasicTableThingConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints", WriteManyToManyTableDefinitionsAndConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteNormalReferenceConstraints", WriteNormalReferenceConstraints);
-            handlebars.RegisterHelper("Forge.SQL.DeleteBaseTableTriggerFunctions", DeleteBaseTableTriggerFunctions);
-            handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingDeleteTriggers", WriteBasicTableThingDeleteTriggers);
-            handlebars.RegisterHelper("Forge.SQL.WriteBaseTableDeleteTriggers", WriteBaseTableDeleteTriggers);
             handlebars.RegisterHelper("Forge.SQL.ModelVersion", WriteModelVersion);
         }
 
@@ -188,105 +185,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             }
 
             writer.WriteSafeString(stringBuilder);
-        }
-
-        /// <summary>
-        /// Writes delete trigger functions for base tables.
-        /// </summary>
-        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" />.</param>
-        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
-        private static void DeleteBaseTableTriggerFunctions(EncodedTextWriter writer, Context context, Arguments arguments)
-        {
-            if (context.Value is not IEnumerable<IClass> classes)
-            {
-                throw new ArgumentException("Forge.SQL.DeleteBaseTableTriggerFunctions - context is supposed to be IEnumerable<IClass>");
-            }
-
-            var stringBuilder = new StringBuilder();
-
-            foreach (var className in classes.Where(x => x.QueryAllSpecializations().Count != 0 && x.QueryDerivesFrom("Thing")).Select(@class => @class.Name))
-            {
-                var sql = $$"""
-                            CREATE OR REPLACE FUNCTION "Forge".{{className.ToLower()}}_delete()
-                                RETURNS trigger
-                                LANGUAGE plpgsql
-                                AS $$
-                                BEGIN
-                                    EXECUTE 'DELETE FROM "Forge"."{{className}}" WHERE id = $1' USING OLD.id;
-                                    RETURN OLD;
-                                END;
-                            $$;
-                            """;
-
-                stringBuilder.AppendLine(sql);
-                stringBuilder.AppendLine();
-            }
-
-            writer.WriteSafeString(stringBuilder);
-        }
-
-        /// <summary>
-        /// Writes delete triggers to the Thing table for an <see cref="IClass" />.
-        /// </summary>
-        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" />.</param>
-        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
-        private static void WriteBasicTableThingDeleteTriggers(EncodedTextWriter writer, Context context, Arguments arguments)
-        {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteBasicTableThingDeleteTriggers - context is supposed to be IClass");
-            }
-
-            if (@class.IsThingClass())
-            {
-                return;
-            }
-
-            var txt = $$"""
-                        CREATE OR REPLACE TRIGGER trg_thing_delete
-                            AFTER DELETE ON "Forge"."{{@class.QuerySqlTableName()}}"
-                            FOR EACH ROW
-                                EXECUTE FUNCTION "Forge".thing_delete();
-
-
-                        """;
-
-            writer.WriteSafeString(txt);
-        }
-
-        /// <summary>
-        /// Writes delete triggers to base tables for an <see cref="IClass" />.
-        /// </summary>
-        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" />.</param>
-        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
-        private static void WriteBaseTableDeleteTriggers(EncodedTextWriter writer, Context context, Arguments arguments)
-        {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteBaseTableDeleteTriggers - context is supposed to be IClass");
-            }
-
-            if (@class.IsThingClass())
-            {
-                return;
-            }
-
-            foreach (var baseClassName in @class.Generalization.Select(x => x.General).OfType<IClass>().Where(x => x.QueryDerivesFrom("Thing")).Select(baseClass => baseClass.Name))
-            {
-                var txt = $$"""
-                            CREATE OR REPLACE TRIGGER trg_{{baseClassName.ToLower()}}_on_{{@class.QuerySqlTableName().ToLower()}}_delete
-                                AFTER DELETE ON "Forge"."{{@class.QuerySqlTableName()}}"
-                                FOR EACH ROW
-                                    EXECUTE FUNCTION "Forge".{{baseClassName.ToLower()}}_delete();
-
-
-                            """;
-
-                writer.WriteSafeString(txt);
-            }
         }
 
         /// <summary>
