@@ -353,6 +353,79 @@ CREATE INDEX "idx_ProfileType_owner" ON "Forge"."ProfileType" ("owner");
 ALTER TABLE "Forge"."Scope" ADD CONSTRAINT "Scope_primaryAddress_FK_Source" FOREIGN KEY ("primaryAddress") REFERENCES "Forge"."Address" ("id") ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX "idx_Scope_primaryAddress" ON "Forge"."Scope" ("primaryAddress");
 
+-- Indexes for querying Thing.data's JSONB attributes: one shared composite index per universal
+-- Thing attribute (createdAt, modifiedAt), and one partial expression index per class for every
+-- other own-or-inherited scalar attribute. text::timestamp/date parsing is only ever STABLE in
+-- Postgres, never IMMUTABLE, so it cannot be cast directly in an index expression - these two
+-- wrapper functions exist solely to make that cast usable in one.
+CREATE OR REPLACE FUNCTION "Forge".jsonb_to_timestamp(value text)
+RETURNS timestamp
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT value::timestamp $$;
+
+CREATE OR REPLACE FUNCTION "Forge".jsonb_to_date(value text)
+RETURNS date
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT value::date $$;
+
+CREATE INDEX "idx_Thing_classKind_createdAt" ON "Forge"."Thing" ("classKind", ("Forge".jsonb_to_timestamp("data"->>'createdAt')));
+CREATE INDEX "idx_Thing_classKind_modifiedAt" ON "Forge"."Thing" ("classKind", ("Forge".jsonb_to_timestamp("data"->>'modifiedAt')));
+CREATE INDEX "idx_Thing_Account_avatarBlobReference" ON "Forge"."Thing" (("data"->>'avatarBlobReference')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_billingEmail" ON "Forge"."Thing" (("data"->>'billingEmail')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_defaultPackageVisibility" ON "Forge"."Thing" (("data"->>'defaultPackageVisibility')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_email" ON "Forge"."Thing" (("data"->>'email')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_origin" ON "Forge"."Thing" (("data"->>'origin')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_shortName" ON "Forge"."Thing" (("data"->>'shortName')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_status" ON "Forge"."Thing" (("data"->>'status')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Account_website" ON "Forge"."Thing" (("data"->>'website')) WHERE "classKind" = 'Account';
+CREATE INDEX "idx_Thing_Address_addressLine1" ON "Forge"."Thing" (("data"->>'addressLine1')) WHERE "classKind" = 'Address';
+CREATE INDEX "idx_Thing_Address_addressLine2" ON "Forge"."Thing" (("data"->>'addressLine2')) WHERE "classKind" = 'Address';
+CREATE INDEX "idx_Thing_Address_locality" ON "Forge"."Thing" (("data"->>'locality')) WHERE "classKind" = 'Address';
+CREATE INDEX "idx_Thing_Address_postalCode" ON "Forge"."Thing" (("data"->>'postalCode')) WHERE "classKind" = 'Address';
+CREATE INDEX "idx_Thing_Address_region" ON "Forge"."Thing" (("data"->>'region')) WHERE "classKind" = 'Address';
+CREATE INDEX "idx_Thing_APIKey_expiresAt" ON "Forge"."Thing" (("Forge".jsonb_to_timestamp("data"->>'expiresAt'))) WHERE "classKind" = 'APIKey';
+CREATE INDEX "idx_Thing_APIKey_lastUsedAt" ON "Forge"."Thing" (("Forge".jsonb_to_timestamp("data"->>'lastUsedAt'))) WHERE "classKind" = 'APIKey';
+CREATE INDEX "idx_Thing_APIKey_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'APIKey';
+CREATE INDEX "idx_Thing_APIKey_revokedAt" ON "Forge"."Thing" (("Forge".jsonb_to_timestamp("data"->>'revokedAt'))) WHERE "classKind" = 'APIKey';
+CREATE INDEX "idx_Thing_Country_alpha2Code" ON "Forge"."Thing" (("data"->>'alpha2Code')) WHERE "classKind" = 'Country';
+CREATE INDEX "idx_Thing_Country_alpha3Code" ON "Forge"."Thing" (("data"->>'alpha3Code')) WHERE "classKind" = 'Country';
+CREATE INDEX "idx_Thing_Country_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'Country';
+CREATE INDEX "idx_Thing_Country_numericCode" ON "Forge"."Thing" (("data"->>'numericCode')) WHERE "classKind" = 'Country';
+CREATE INDEX "idx_Thing_Forge_description" ON "Forge"."Thing" (("data"->>'description')) WHERE "classKind" = 'Forge';
+CREATE INDEX "idx_Thing_Forge_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'Forge';
+CREATE INDEX "idx_Thing_Forge_shortName" ON "Forge"."Thing" (("data"->>'shortName')) WHERE "classKind" = 'Forge';
+CREATE INDEX "idx_Thing_Organization_billingEmail" ON "Forge"."Thing" (("data"->>'billingEmail')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_defaultPackageVisibility" ON "Forge"."Thing" (("data"->>'defaultPackageVisibility')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_email" ON "Forge"."Thing" (("data"->>'email')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_logoBlobReference" ON "Forge"."Thing" (("data"->>'logoBlobReference')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_origin" ON "Forge"."Thing" (("data"->>'origin')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_shortName" ON "Forge"."Thing" (("data"->>'shortName')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_status" ON "Forge"."Thing" (("data"->>'status')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_Organization_website" ON "Forge"."Thing" (("data"->>'website')) WHERE "classKind" = 'Organization';
+CREATE INDEX "idx_Thing_OrganizationInvitation_experisAt" ON "Forge"."Thing" (("Forge".jsonb_to_timestamp("data"->>'experisAt'))) WHERE "classKind" = 'OrganizationInvitation';
+CREATE INDEX "idx_Thing_OrganizationInvitation_organizationInvitationKind" ON "Forge"."Thing" (("data"->>'organizationInvitationKind')) WHERE "classKind" = 'OrganizationInvitation';
+CREATE INDEX "idx_Thing_OrganizationInvitation_status" ON "Forge"."Thing" (("data"->>'status')) WHERE "classKind" = 'OrganizationInvitation';
+CREATE INDEX "idx_Thing_Package_listed" ON "Forge"."Thing" ((("data"->>'listed')::boolean)) WHERE "classKind" = 'Package';
+CREATE INDEX "idx_Thing_Package_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'Package';
+CREATE INDEX "idx_Thing_Package_shortName" ON "Forge"."Thing" (("data"->>'shortName')) WHERE "classKind" = 'Package';
+CREATE INDEX "idx_Thing_Package_visibility" ON "Forge"."Thing" (("data"->>'visibility')) WHERE "classKind" = 'Package';
+CREATE INDEX "idx_Thing_PackageInvitation_experisAt" ON "Forge"."Thing" (("Forge".jsonb_to_timestamp("data"->>'experisAt'))) WHERE "classKind" = 'PackageInvitation';
+CREATE INDEX "idx_Thing_PackageInvitation_packageInvitationKind" ON "Forge"."Thing" (("data"->>'packageInvitationKind')) WHERE "classKind" = 'PackageInvitation';
+CREATE INDEX "idx_Thing_PackageInvitation_status" ON "Forge"."Thing" (("data"->>'status')) WHERE "classKind" = 'PackageInvitation';
+CREATE INDEX "idx_Thing_PackageType_description" ON "Forge"."Thing" (("data"->>'description')) WHERE "classKind" = 'PackageType';
+CREATE INDEX "idx_Thing_PackageType_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'PackageType';
+CREATE INDEX "idx_Thing_PackageVersion_downloadCount" ON "Forge"."Thing" ((("data"->>'downloadCount')::integer)) WHERE "classKind" = 'PackageVersion';
+CREATE INDEX "idx_Thing_PackageVersion_listed" ON "Forge"."Thing" ((("data"->>'listed')::boolean)) WHERE "classKind" = 'PackageVersion';
+CREATE INDEX "idx_Thing_PackageVersion_publicationDate" ON "Forge"."Thing" (("Forge".jsonb_to_timestamp("data"->>'publicationDate'))) WHERE "classKind" = 'PackageVersion';
+CREATE INDEX "idx_Thing_PackageVersion_version" ON "Forge"."Thing" (("data"->>'version')) WHERE "classKind" = 'PackageVersion';
+CREATE INDEX "idx_Thing_ProfileLink_uri" ON "Forge"."Thing" (("data"->>'uri')) WHERE "classKind" = 'ProfileLink';
+CREATE INDEX "idx_Thing_ProfileType_logoBlobReference" ON "Forge"."Thing" (("data"->>'logoBlobReference')) WHERE "classKind" = 'ProfileType';
+CREATE INDEX "idx_Thing_ProfileType_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'ProfileType';
+
 -- Runtime role delete privileges: every deletion goes through Thing, whose downward
 -- ..._Thing_FK_Source ON DELETE CASCADE constraints already clean up every table sharing that id.
 -- USAGE is required just to reach any object in the schema; SELECT ("id") is required because a

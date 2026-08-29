@@ -148,5 +148,43 @@ namespace Mycelium.Forge.Generator.Extensions
 
             return results;
         }
+
+        /// <summary>
+        /// Returns the single-valued, non-derived, non-identifying, primitive-typed attributes this class owns
+        /// directly - i.e. the scalar attributes that end up as keys in this class's row's <c>Thing.data</c> JSONB
+        /// document and can have an expression index built against them.
+        /// </summary>
+        /// <param name="class">The class to query owned indexable scalar attributes for.</param>
+        /// <returns>A collection of indexable scalar attributes owned directly by this class.</returns>
+        public static IEnumerable<IProperty> QuerySqlIndexableOwnAttributes(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.OwnedAttribute
+                .Where(x => x.Type != null && x.QueryIsDataType())
+                .Where(x => !x.IsID)
+                .Where(x => !x.IsDerived && !x.IsDerivedUnion)
+                .Where(x => !x.QueryIsEnumerable());
+        }
+
+        /// <summary>
+        /// Returns the single-valued, non-derived, non-identifying, primitive-typed attributes this class owns
+        /// or inherits from any non-<c>Thing</c> ancestor - the full set of scalar attributes present in this
+        /// class's row's <c>Thing.data</c> JSONB document, excluding the universal <c>Thing</c> attributes
+        /// (<c>createdAt</c>/<c>modifiedAt</c>), which get their own shared indexes instead of one per class.
+        /// </summary>
+        /// <param name="class">The class to query indexable scalar attributes for.</param>
+        /// <returns>A collection of indexable scalar attributes, own and inherited, ordered by name.</returns>
+        public static IEnumerable<IProperty> QuerySqlIndexableAttributes(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.QueryAllGeneralClassifiers()
+                .OfType<IClass>()
+                .Where(ancestor => !ancestor.IsThingClass())
+                .SelectMany(ancestor => ancestor.QuerySqlIndexableOwnAttributes())
+                .DistinctBy(property => property.Name)
+                .OrderBy(property => property.Name);
+        }
     }
 }

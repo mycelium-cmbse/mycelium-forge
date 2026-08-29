@@ -48,6 +48,28 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
 {{#Forge.SQL.WriteNormalReferenceConstraints class}}
 {{/each}}
 
+-- Indexes for querying Thing.data's JSONB attributes: one shared composite index per universal
+-- Thing attribute (createdAt, modifiedAt), and one partial expression index per class for every
+-- other own-or-inherited scalar attribute. text::timestamp/date parsing is only ever STABLE in
+-- Postgres, never IMMUTABLE, so it cannot be cast directly in an index expression - these two
+-- wrapper functions exist solely to make that cast usable in one.
+CREATE OR REPLACE FUNCTION "Forge".jsonb_to_timestamp(value text)
+RETURNS timestamp
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT value::timestamp $$;
+
+CREATE OR REPLACE FUNCTION "Forge".jsonb_to_date(value text)
+RETURNS date
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT value::date $$;
+
+{{#Forge.SQL.WriteUniversalAttributeIndexes this}}
+{{#each this as | class |}}
+{{#Forge.SQL.WriteClassAttributeIndexes class}}
+{{/each}}
+
 -- Runtime role delete privileges: every deletion goes through Thing, whose downward
 -- ..._Thing_FK_Source ON DELETE CASCADE constraints already clean up every table sharing that id.
 -- USAGE is required just to reach any object in the schema; SELECT ("id") is required because a

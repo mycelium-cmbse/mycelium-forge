@@ -149,6 +149,56 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         }
 
         /// <summary>
+        /// Verifies that WriteUniversalAttributeIndexes renders the shared createdAt/modifiedAt indexes and guards
+        /// invalid context.
+        /// </summary>
+        [Test]
+        public void VerifyWriteUniversalAttributeIndexes()
+        {
+            var template = this.handlebars.Compile("{{#Forge.SQL.WriteUniversalAttributeIndexes this}}");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-collection"), Throws.TypeOf<ArgumentException>());
+
+                var allClasses = GeneratorSetupFixture.XmiReaderResult.Packages
+                    .SelectMany(package => package.QueryPackages())
+                    .SelectMany(package => package.PackagedElement.OfType<IClass>())
+                    .ToList();
+
+                var result = template(allClasses);
+                Assert.That(result, Does.Contain("CREATE INDEX \"idx_Thing_classKind_createdAt\" ON \"Forge\".\"Thing\" (\"classKind\", (\"Forge\".jsonb_to_timestamp(\"data\"->>'createdAt')))"));
+                Assert.That(result, Does.Contain("CREATE INDEX \"idx_Thing_classKind_modifiedAt\" ON \"Forge\".\"Thing\" (\"classKind\", (\"Forge\".jsonb_to_timestamp(\"data\"->>'modifiedAt')))"));
+            }
+        }
+
+        /// <summary>
+        /// Verifies that WriteClassAttributeIndexes renders one partial index per own-or-inherited scalar
+        /// attribute, skips <c>Thing</c> and abstract classes, and guards invalid context.
+        /// </summary>
+        [Test]
+        public void VerifyWriteClassAttributeIndexes()
+        {
+            var template = this.handlebars.Compile("{{#Forge.SQL.WriteClassAttributeIndexes this}}");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+
+                var thingResult = template(this.thingClass);
+                Assert.That(thingResult, Is.Empty);
+
+                var namespaceResult = template(GetClass("Namespace"));
+                Assert.That(namespaceResult, Is.Empty, "an abstract class's classKind is never a real value, so it gets no indexes of its own");
+
+                var accountResult = template(this.accountClass);
+                Assert.That(accountResult, Does.Contain("CREATE INDEX \"idx_Thing_Account_status\" ON \"Forge\".\"Thing\" ((\"data\"->>'status')) WHERE \"classKind\" = 'Account'"));
+                Assert.That(accountResult, Does.Contain("idx_Thing_Account_shortName"), "shortName is inherited from Namespace, not owned by Account directly");
+                Assert.That(accountResult, Does.Not.Contain("idx_Thing_Account_owner"), "owner is a reference property with its own real FK column, not a JSONB attribute");
+            }
+        }
+
+        /// <summary>
         /// Retrieves a class from the model by name.
         /// </summary>
         /// <param name="className">The name of the class.</param>

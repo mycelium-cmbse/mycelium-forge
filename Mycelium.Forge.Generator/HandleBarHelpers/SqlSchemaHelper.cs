@@ -15,6 +15,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using Mycelium.Forge.Generator.Extensions;
 
+    using uml4net.Classification;
     using uml4net.CommonStructure;
     using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
@@ -36,6 +37,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingConstraints", WriteBasicTableThingConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints", WriteManyToManyTableDefinitionsAndConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteNormalReferenceConstraints", WriteNormalReferenceConstraints);
+            handlebars.RegisterHelper("Forge.SQL.WriteUniversalAttributeIndexes", WriteUniversalAttributeIndexes);
+            handlebars.RegisterHelper("Forge.SQL.WriteClassAttributeIndexes", WriteClassAttributeIndexes);
             handlebars.RegisterHelper("Forge.SQL.ModelVersion", WriteModelVersion);
         }
 
@@ -185,6 +188,102 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             }
 
             writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Writes the shared composite indexes for the universal <see cref="IClass">Thing</see> attributes
+        /// (<c>createdAt</c>, <c>modifiedAt</c>) - one index per attribute, covering every class, rather than one
+        /// per class, since these attributes are present on every entity regardless of its concrete type.
+        /// </summary>
+        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        private static void WriteUniversalAttributeIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
+        {
+            if (context.Value is not IEnumerable<IClass> classes)
+            {
+                throw new ArgumentException("Forge.SQL.WriteUniversalAttributeIndexes - context is supposed to be IEnumerable<IClass>");
+            }
+
+            var thingClass = classes.SingleOrDefault(x => x.IsThingClass());
+
+            if (thingClass == null)
+            {
+                return;
+            }
+
+            var stringBuilder = new StringBuilder();
+
+            foreach (var property in thingClass.QuerySqlIndexableOwnAttributes().OrderBy(x => x.Name))
+            {
+                var attributeName = property.QuerySqlAttributeName();
+
+                stringBuilder.AppendLine(
+                    $"CREATE INDEX \"idx_Thing_classKind_{attributeName}\" ON \"Forge\".\"Thing\" (\"classKind\", {property.QueryJsonbDataExpression()});");
+            }
+
+            writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Writes one partial expression index per own-or-inherited indexable scalar attribute for an
+        /// <see cref="IClass" />, scoped to that class's own <c>classKind</c> value. Skips <c>Thing</c> itself
+        /// (its own attributes get the shared indexes from <see cref="WriteUniversalAttributeIndexes" /> instead)
+        /// and abstract classes (no row's <c>classKind</c> is ever an abstract class's name).
+        /// </summary>
+        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        private static void WriteClassAttributeIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
+        {
+            if (context.Value is not IClass @class)
+            {
+                throw new ArgumentException("Forge.SQL.WriteClassAttributeIndexes - context is supposed to be IClass");
+            }
+
+            if (@class.IsThingClass() || @class.IsAbstract)
+            {
+                return;
+            }
+
+            var stringBuilder = new StringBuilder();
+
+            foreach (var property in @class.QuerySqlIndexableAttributes())
+            {
+                var attributeName = property.QuerySqlAttributeName();
+
+                stringBuilder.AppendLine(
+                    $"CREATE INDEX \"idx_Thing_{@class.QuerySqlTableName()}_{attributeName}\" ON \"Forge\".\"Thing\" ({property.QueryJsonbDataExpression()}) WHERE \"classKind\" = '{@class.QuerySqlTableName()}';");
+            }
+
+            writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Builds the parenthesized, type-cast JSONB expression identifying an indexable scalar attribute's value
+        /// inside <c>Thing.data</c>, e.g. <c>("data"->>'status')</c> or <c>(("data"->>'createdAt')::timestamp)</c>.
+        /// Reuses <see cref="PropertyExtension.QuerySqlTypeName" /> for the cast target, since a text-typed value
+        /// (the JSONB <c>-&gt;&gt;</c> operator's own return type) needs no cast at all.
+        /// </summary>
+        /// <param name="property">The scalar attribute to build the expression for.</param>
+        /// <returns>The parenthesized expression, ready to embed as a single index element.</returns>
+        private static string QueryJsonbDataExpression(this IProperty property)
+        {
+            var jsonAccess = $"\"data\"->>'{property.QuerySqlAttributeName()}'";
+            var sqlType = property.QuerySqlTypeName();
+
+            // text::timestamp/date parsing is only ever STABLE in Postgres (it can depend on the session's
+            // DateStyle/timezone), never IMMUTABLE, so it cannot be used directly in an index expression -
+            // confirmed against a live database (SQLSTATE 42P17). Route those two through a small wrapper
+            // function explicitly marked IMMUTABLE instead; every other cast target (integer, boolean, ...)
+            // already has an IMMUTABLE input function and needs no wrapper.
+            return sqlType switch
+            {
+                "text" => $"({jsonAccess})",
+                "timestamp" => $"(\"Forge\".jsonb_to_timestamp({jsonAccess}))",
+                "date" => $"(\"Forge\".jsonb_to_date({jsonAccess}))",
+                _ => $"(({jsonAccess})::{sqlType})"
+            };
         }
 
         /// <summary>
