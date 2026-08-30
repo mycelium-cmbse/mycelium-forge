@@ -1,0 +1,22 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Thing.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "logoBlobReference": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "logoBlobReference",
+        "name"
+      ]
+    }
+  ]
+}

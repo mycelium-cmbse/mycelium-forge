@@ -1,0 +1,23 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Thing.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "profileType": {
+          "$ref": "./ThingReference.schema.json"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "profileType",
+        "uri"
+      ]
+    }
+  ]
+}

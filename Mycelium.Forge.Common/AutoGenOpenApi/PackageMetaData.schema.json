@@ -1,0 +1,12 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Thing.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  ]
+}

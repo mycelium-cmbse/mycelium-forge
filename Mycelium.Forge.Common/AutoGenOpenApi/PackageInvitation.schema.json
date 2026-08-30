@@ -1,0 +1,30 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Invitation.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "package": {
+          "$ref": "./ThingReference.schema.json"
+        },
+        "packageInvitationKind": {
+          "type": "string",
+          "enum": [
+            "OWNER",
+            "MAINTAINER"
+          ]
+        },
+        "target": {
+          "$ref": "./ThingReference.schema.json"
+        }
+      },
+      "required": [
+        "package",
+        "packageInvitationKind",
+        "target"
+      ]
+    }
+  ]
+}

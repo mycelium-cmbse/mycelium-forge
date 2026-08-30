@@ -1,0 +1,43 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Scope.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "apiKey": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "avatarBlobReference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ownedOrganizationInvitation": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "ownedPackageInvitation": {
+          "$ref": "./ThingReference.schema.json"
+        }
+      },
+      "required": [
+        "apiKey",
+        "avatarBlobReference",
+        "ownedOrganizationInvitation",
+        "ownedPackageInvitation"
+      ]
+    }
+  ]
+}

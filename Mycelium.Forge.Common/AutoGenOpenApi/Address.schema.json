@@ -1,0 +1,59 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Thing.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "country": {
+          "$ref": "./ThingReference.schema.json"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "postalCode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "addressLine1",
+        "addressLine2",
+        "country",
+        "locality",
+        "postalCode",
+        "region"
+      ]
+    }
+  ]
+}

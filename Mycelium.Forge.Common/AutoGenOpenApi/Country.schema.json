@@ -1,0 +1,30 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Thing.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "alpha2Code": {
+          "type": "string"
+        },
+        "alpha3Code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "numericCode": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "alpha2Code",
+        "alpha3Code",
+        "name",
+        "numericCode"
+      ]
+    }
+  ]
+}

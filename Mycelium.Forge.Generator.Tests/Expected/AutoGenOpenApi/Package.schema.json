@@ -1,0 +1,52 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Namespace.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "listed": {
+          "type": "boolean"
+        },
+        "packageMaintainer": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "packageOwner": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "packageType": {
+          "$ref": "./ThingReference.schema.json"
+        },
+        "version": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "PUBLIC",
+            "INTERNAL",
+            "PRIVATE"
+          ]
+        }
+      },
+      "required": [
+        "listed",
+        "packageMaintainer",
+        "packageOwner",
+        "packageType",
+        "version",
+        "visibility"
+      ]
+    }
+  ]
+}

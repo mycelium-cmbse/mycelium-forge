@@ -1,0 +1,87 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Namespace.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "billingEmail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "defaultPackageVisibility": {
+          "type": "string",
+          "enum": [
+            "PUBLIC",
+            "INTERNAL",
+            "PRIVATE"
+          ]
+        },
+        "email": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "ownedPackage": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "primaryAddress": {
+          "$ref": "./ThingReference.schema.json"
+        },
+        "profileLink": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ACTIVE",
+            "DEACTIVATED"
+          ]
+        },
+        "website": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "address",
+        "billingEmail",
+        "defaultPackageVisibility",
+        "email",
+        "origin",
+        "ownedPackage",
+        "primaryAddress",
+        "profileLink",
+        "status",
+        "website"
+      ]
+    }
+  ]
+}

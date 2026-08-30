@@ -1,0 +1,35 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Thing.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "downloadCount": {
+          "type": "integer"
+        },
+        "listed": {
+          "type": "boolean"
+        },
+        "metaData": {
+          "$ref": "./ThingReference.schema.json"
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "downloadCount",
+        "listed",
+        "metaData",
+        "publicationDate",
+        "version"
+      ]
+    }
+  ]
+}

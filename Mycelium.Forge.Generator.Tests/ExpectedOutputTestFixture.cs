@@ -176,5 +176,67 @@ namespace Mycelium.Forge.Generator.Tests
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
+
+        /// <summary>
+        /// Verifies that the generated OpenAPI schema for each concrete and abstract interesting
+        /// class matches the expected golden file - abstract classes included, since a concrete
+        /// class's schema composes its ancestors' schemas via <c>allOf</c>.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCaseSource(nameof(ConcreteInterestingClasses))]
+        [TestCaseSource(nameof(AbstractInterestingClasses))]
+        public async Task Verify_that_the_expected_open_api_class_schema_is_generated(string className)
+        {
+            var generator = new UmlCoreOpenApiSchemaGenerator();
+
+            var generated = await generator.GenerateClassSchemaAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", $"{className}.schema.json"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the generated <c>oneOf</c>/<c>discriminator</c> union over every concrete
+        /// class matches the expected golden file.
+        /// </summary>
+        [Test]
+        public async Task Verify_that_the_expected_concrete_thing_union_schema_is_generated()
+        {
+            var generator = new UmlCoreOpenApiSchemaGenerator();
+
+            var generated = await generator.GenerateConcreteThingUnionSchemaAsync(GeneratorSetupFixture.XmiReaderResult);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", UmlCoreOpenApiSchemaGenerator.ConcreteThingUnionFileName));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the generated <c>ThingReference</c> schema - the single, generic
+        /// reference-stub schema every relationship property points at - matches the expected golden
+        /// file.
+        /// </summary>
+        [Test]
+        public async Task Verify_that_the_expected_thing_reference_schema_is_generated()
+        {
+            var outputDirectory = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.WorkDirectory, "_Forge.Common.AutoGenOpenApi.ThingReference"));
+            outputDirectory.Create();
+
+            var generator = new UmlCoreOpenApiSchemaGenerator();
+
+            await generator.GenerateAsync(GeneratorSetupFixture.XmiReaderResult, outputDirectory);
+
+            var generated = await File.ReadAllTextAsync(
+                Path.Combine(outputDirectory.FullName, UmlCoreOpenApiSchemaGenerator.ThingReferenceFileName));
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", UmlCoreOpenApiSchemaGenerator.ThingReferenceFileName));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
     }
 }

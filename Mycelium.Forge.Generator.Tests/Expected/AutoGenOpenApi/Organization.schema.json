@@ -1,0 +1,39 @@
+﻿{
+  "allOf": [
+    {
+      "$ref": "./Scope.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "administrator": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        },
+        "logoBlobReference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "member": {
+          "type": "array",
+          "items": {
+            "$ref": "./ThingReference.schema.json"
+          }
+        }
+      },
+      "required": [
+        "administrator",
+        "logoBlobReference",
+        "member"
+      ]
+    }
+  ]
+}
