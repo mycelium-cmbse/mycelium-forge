@@ -40,11 +40,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.WriteUniversalAttributeIndexes", WriteUniversalAttributeIndexes);
             handlebars.RegisterHelper("Forge.SQL.WriteClassAttributeIndexes", WriteClassAttributeIndexes);
             handlebars.RegisterHelper("Forge.SQL.WriteClassMultiValuedAttributeIndexes", WriteClassMultiValuedAttributeIndexes);
-
-            // Forge.SQL.ModelVersion is deliberately not registered here - it needs per-instance state
-            // (the model version passed into UmlCoreSqlSchemaGenerator's constructor), which this static
-            // helper class has no way to hold. UmlCoreSqlSchemaGenerator.RegisterHelpers() registers it
-            // directly as a closure instead.
+            handlebars.RegisterHelper("Forge.SQL.ModelVersion", WriteModelVersion);
         }
 
         /// <summary>
@@ -328,5 +324,15 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             };
         }
 
+        /// <summary>
+        /// Writes the model version.
+        /// </summary>
+        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        private static void WriteModelVersion(EncodedTextWriter writer, Context context, Arguments arguments)
+        {
+            writer.Write("0.1.0");
+        }
     }
 }
