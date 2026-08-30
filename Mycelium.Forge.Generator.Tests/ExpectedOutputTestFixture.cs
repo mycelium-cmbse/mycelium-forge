@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Generator.Tests
     using Mycelium.Forge.Generator.Generators;
     using Mycelium.Forge.Generator.Tests.Extensions;
 
+    using uml4net.Extensions;
     using uml4net.Reporting.Generators;
 
     /// <summary>
@@ -191,6 +192,80 @@ namespace Mycelium.Forge.Generator.Tests
 
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", UmlCoreOpenApiSchemaGenerator.SchemasFileName));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the generated OpenAPI <c>paths</c> document - derived from the model's own
+        /// containment structure, not REST convention - matches the expected golden file.
+        /// </summary>
+        [Test]
+        public async Task Verify_that_the_expected_open_api_paths_document_is_generated()
+        {
+            var generator = new UmlCoreOpenApiPathsGenerator();
+
+            var generated = await generator.GeneratePathsDocumentAsync(GeneratorSetupFixture.XmiReaderResult);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", UmlCoreOpenApiPathsGenerator.PathsFileName));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the generated Carter module for each routable class matches the expected
+        /// golden file - the same containment-driven classification
+        /// <see cref="UmlCoreOpenApiPathsGenerator"/> uses. Covers a class with a <c>shortName</c>
+        /// (<c>Account</c>, <c>Organization</c>, <c>Package</c>), a class without one
+        /// (<c>Country</c>, <c>PackageType</c>, <c>ProfileType</c>), and every class that is only
+        /// reachable at all because the "top-level only" gate was removed - a composite child one
+        /// level deep (<c>Address</c>, <c>APIKey</c>, <c>PackageInvitation</c>,
+        /// <c>OrganizationInvitation</c>, <c>ProfileLink</c>, all owned by <c>Account</c> or
+        /// <c>Organization</c> via <c>Scope</c>) and two levels deep (<c>PackageVersion</c>, owned by
+        /// <c>Package</c>; <c>PackageMetaData</c>, owned by <c>PackageVersion</c>).
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        [TestCase("Account")]
+        [TestCase("Organization")]
+        [TestCase("Country")]
+        [TestCase("PackageType")]
+        [TestCase("ProfileType")]
+        [TestCase("Package")]
+        [TestCase("PackageVersion")]
+        [TestCase("PackageMetaData")]
+        [TestCase("APIKey")]
+        [TestCase("PackageInvitation")]
+        [TestCase("OrganizationInvitation")]
+        [TestCase("Address")]
+        [TestCase("ProfileLink")]
+        public async Task Verify_that_the_expected_carter_module_is_generated(string className)
+        {
+            var generator = new UmlCoreCarterModuleGenerator();
+
+            var generated = await generator.GenerateCollectionModuleAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var fileName = $"{className.CapitalizeFirstLetter()}Module.cs";
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenApi", fileName));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the generated Carter module for the <c>Forge</c> singleton matches the
+        /// expected golden file.
+        /// </summary>
+        [Test]
+        public async Task Verify_that_the_expected_forge_carter_module_is_generated()
+        {
+            var generator = new UmlCoreCarterModuleGenerator();
+
+            var generated = await generator.GenerateForgeModuleAsync();
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenApi", "ForgeModule.cs"));
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }

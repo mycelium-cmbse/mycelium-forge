@@ -72,6 +72,10 @@ build/tools/
 # Tailwind build output - generated from Mycelium.Forge/Styles/tailwind.css
 Mycelium.Forge/wwwroot/css/app.css
 
+# OpenAPI bundle output - generated from Mycelium.Forge.Common/OpenApi/paths.json and
+# Mycelium.Forge.Common/AutoGenOpenApi/schemas.json
+Mycelium.Forge/wwwroot/openapi.json
+
 # Playwright
 test-results/
 playwright-report/

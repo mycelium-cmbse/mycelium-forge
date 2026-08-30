@@ -16,10 +16,10 @@ namespace Mycelium.Forge.Common.Tests
     using System.Text.Json.Nodes;
 
     /// <summary>
-    /// Verifies that the hand-authored <c>OpenApi/paths.json</c> is internally consistent with the
-    /// generated <c>AutoGenOpenApi/schemas.json</c>, since the two are only ever combined at bundle
-    /// time - a typo'd <c>$ref</c> in a 58-operation, hand-written document would otherwise go
-    /// unnoticed until someone opens the bundled <c>openapi.json</c> in a viewer.
+    /// Verifies that the hand-authored, shared <c>OpenApi/shared.json</c> is internally consistent
+    /// with the generated <c>AutoGenOpenApi/paths.json</c> and <c>AutoGenOpenApi/schemas.json</c>,
+    /// since the three are only ever combined at bundle time - a broken <c>$ref</c> anywhere would
+    /// otherwise go unnoticed until someone opened the bundled <c>openapi.json</c> in a viewer.
     /// </summary>
     [TestFixture]
     public class OpenApiPathsDocumentTestFixture
@@ -32,13 +32,15 @@ namespace Mycelium.Forge.Common.Tests
         {
             var repositoryRoot = FindRepositoryRoot();
 
-            var pathsJson = File.ReadAllText(Path.Combine(repositoryRoot, "Mycelium.Forge.Common", "OpenApi", "paths.json"));
+            var sharedJson = File.ReadAllText(Path.Combine(repositoryRoot, "Mycelium.Forge.Common", "OpenApi", "shared.json"));
+            var pathsJson = File.ReadAllText(Path.Combine(repositoryRoot, "Mycelium.Forge.Common", "AutoGenOpenApi", "paths.json"));
             var schemasJson = File.ReadAllText(Path.Combine(repositoryRoot, "Mycelium.Forge.Common", "AutoGenOpenApi", "schemas.json"));
 
+            var sharedDocument = JsonNode.Parse(sharedJson)!.AsObject();
             this.pathsDocument = JsonNode.Parse(pathsJson)!.AsObject();
             var schemasDocument = JsonNode.Parse(schemasJson)!.AsObject();
 
-            this.mergedComponents = this.pathsDocument["components"]!.DeepClone().AsObject();
+            this.mergedComponents = sharedDocument["components"]!.DeepClone().AsObject();
             var generatedSchemas = schemasDocument["components"]!["schemas"]!.AsObject();
 
             var handAuthoredSchemas = this.mergedComponents["schemas"]!.AsObject();
