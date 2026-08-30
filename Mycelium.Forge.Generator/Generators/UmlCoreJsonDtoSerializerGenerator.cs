@@ -75,6 +75,7 @@ namespace Mycelium.Forge.Generator.Generators
             this.Handlebars.RegisterNamedElementHelper();
 
             HandleBarHelpers.PropertyNameHelper.RegisterPropertyNameHelper(this.Handlebars);
+            HandleBarHelpers.ReferenceTypeNameHelper.RegisterReferenceTypeNameHelper(this.Handlebars);
         }
 
         /// <summary>

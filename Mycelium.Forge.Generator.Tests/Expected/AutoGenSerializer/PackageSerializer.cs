@@ -61,6 +61,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iPackage.PackageMaintainer)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("Account"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();
@@ -72,6 +74,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iPackage.PackageOwner)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("Account"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();
@@ -80,6 +84,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteEndArray();
             writer.WritePropertyName("packageType"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("PackageType"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackage.PackageType);
             writer.WriteEndObject();
@@ -90,6 +96,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iPackage.Version)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("PackageVersion"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();

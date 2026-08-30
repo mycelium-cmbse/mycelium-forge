@@ -253,6 +253,23 @@ namespace Mycelium.Forge.Generator.Extensions
         }
 
         /// <summary>
+        /// Queries the name of the class a reference property points to, capitalized, regardless of
+        /// whether that class is concrete or abstract. Some reference properties have no resolvable
+        /// <see cref="IProperty.Type" /> in the model at all (no <see cref="IProperty.Association" />,
+        /// no <see cref="IProperty.Opposite" /> - a model data-quality gap rather than an abstract
+        /// type); "unknown" is returned for those, so every reference stub still carries a uniform,
+        /// always-present <c>@type</c>.
+        /// </summary>
+        /// <param name="property">The subject <see cref="IProperty" />.</param>
+        /// <returns>The referenced class's name, or "unknown" if it cannot be resolved.</returns>
+        public static string QueryReferenceTypeName(this IProperty property)
+        {
+            ArgumentNullException.ThrowIfNull(property);
+
+            return property.Type?.Name.CapitalizeFirstLetter() ?? "unknown";
+        }
+
+        /// <summary>
         /// Queries the SQL type name of the <see cref="IProperty" />.
         /// </summary>
         /// <param name="property">The subject <see cref="IProperty" />.</param>

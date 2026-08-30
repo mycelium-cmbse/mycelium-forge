@@ -56,6 +56,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(iPackageInvitation.ModifiedAt);
             writer.WritePropertyName("package"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("Package"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackageInvitation.Package);
             writer.WriteEndObject();
@@ -65,6 +67,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(InvitationStatusKindProvider.ToUtf8LowerBytes(iPackageInvitation.Status));
             writer.WritePropertyName("target"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("Account"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackageInvitation.Target);
             writer.WriteEndObject();

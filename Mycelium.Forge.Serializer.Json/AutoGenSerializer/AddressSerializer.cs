@@ -54,6 +54,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(iAddress.AddressLine2);
             writer.WritePropertyName("country"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("Country"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iAddress.Country);
             writer.WriteEndObject();
