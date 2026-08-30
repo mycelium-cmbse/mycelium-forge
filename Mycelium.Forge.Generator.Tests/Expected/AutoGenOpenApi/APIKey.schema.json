@@ -1,7 +1,7 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Thing.schema.json"
+      "$ref": "#/components/schemas/Thing"
     },
     {
       "type": "object",
@@ -18,7 +18,7 @@
           "type": "string"
         },
         "permissions": {
-          "$ref": "./ThingReference.schema.json"
+          "$ref": "#/components/schemas/ThingReference"
         },
         "revokedAt": {
           "type": "string",

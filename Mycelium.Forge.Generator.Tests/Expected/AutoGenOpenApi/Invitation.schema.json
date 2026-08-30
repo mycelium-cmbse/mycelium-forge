@@ -1,7 +1,7 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Thing.schema.json"
+      "$ref": "#/components/schemas/Thing"
     },
     {
       "type": "object",

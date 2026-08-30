@@ -1,13 +1,13 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Invitation.schema.json"
+      "$ref": "#/components/schemas/Invitation"
     },
     {
       "type": "object",
       "properties": {
         "package": {
-          "$ref": "./ThingReference.schema.json"
+          "$ref": "#/components/schemas/ThingReference"
         },
         "packageInvitationKind": {
           "type": "string",
@@ -17,7 +17,7 @@
           ]
         },
         "target": {
-          "$ref": "./ThingReference.schema.json"
+          "$ref": "#/components/schemas/ThingReference"
         }
       },
       "required": [

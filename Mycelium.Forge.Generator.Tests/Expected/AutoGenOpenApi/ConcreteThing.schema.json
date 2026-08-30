@@ -1,65 +1,65 @@
-﻿{
+{
   "oneOf": [
     {
-      "$ref": "./Account.schema.json"
+      "$ref": "#/components/schemas/Account"
     },
     {
-      "$ref": "./Address.schema.json"
+      "$ref": "#/components/schemas/Address"
     },
     {
-      "$ref": "./APIKey.schema.json"
+      "$ref": "#/components/schemas/APIKey"
     },
     {
-      "$ref": "./Country.schema.json"
+      "$ref": "#/components/schemas/Country"
     },
     {
-      "$ref": "./Forge.schema.json"
+      "$ref": "#/components/schemas/Forge"
     },
     {
-      "$ref": "./Organization.schema.json"
+      "$ref": "#/components/schemas/Organization"
     },
     {
-      "$ref": "./OrganizationInvitation.schema.json"
+      "$ref": "#/components/schemas/OrganizationInvitation"
     },
     {
-      "$ref": "./Package.schema.json"
+      "$ref": "#/components/schemas/Package"
     },
     {
-      "$ref": "./PackageInvitation.schema.json"
+      "$ref": "#/components/schemas/PackageInvitation"
     },
     {
-      "$ref": "./PackageMetaData.schema.json"
+      "$ref": "#/components/schemas/PackageMetaData"
     },
     {
-      "$ref": "./PackageType.schema.json"
+      "$ref": "#/components/schemas/PackageType"
     },
     {
-      "$ref": "./PackageVersion.schema.json"
+      "$ref": "#/components/schemas/PackageVersion"
     },
     {
-      "$ref": "./ProfileLink.schema.json"
+      "$ref": "#/components/schemas/ProfileLink"
     },
     {
-      "$ref": "./ProfileType.schema.json"
+      "$ref": "#/components/schemas/ProfileType"
     }
   ],
   "discriminator": {
     "propertyName": "@type",
     "mapping": {
-      "Account": "./Account.schema.json",
-      "Address": "./Address.schema.json",
-      "APIKey": "./APIKey.schema.json",
-      "Country": "./Country.schema.json",
-      "Forge": "./Forge.schema.json",
-      "Organization": "./Organization.schema.json",
-      "OrganizationInvitation": "./OrganizationInvitation.schema.json",
-      "Package": "./Package.schema.json",
-      "PackageInvitation": "./PackageInvitation.schema.json",
-      "PackageMetaData": "./PackageMetaData.schema.json",
-      "PackageType": "./PackageType.schema.json",
-      "PackageVersion": "./PackageVersion.schema.json",
-      "ProfileLink": "./ProfileLink.schema.json",
-      "ProfileType": "./ProfileType.schema.json"
+      "Account": "#/components/schemas/Account",
+      "Address": "#/components/schemas/Address",
+      "APIKey": "#/components/schemas/APIKey",
+      "Country": "#/components/schemas/Country",
+      "Forge": "#/components/schemas/Forge",
+      "Organization": "#/components/schemas/Organization",
+      "OrganizationInvitation": "#/components/schemas/OrganizationInvitation",
+      "Package": "#/components/schemas/Package",
+      "PackageInvitation": "#/components/schemas/PackageInvitation",
+      "PackageMetaData": "#/components/schemas/PackageMetaData",
+      "PackageType": "#/components/schemas/PackageType",
+      "PackageVersion": "#/components/schemas/PackageVersion",
+      "ProfileLink": "#/components/schemas/ProfileLink",
+      "ProfileType": "#/components/schemas/ProfileType"
     }
   }
 }

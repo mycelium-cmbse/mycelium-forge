@@ -1,0 +1,752 @@
+{
+  "components": {
+    "schemas": {
+      "Account": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Scope"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "apiKey": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "avatarBlobReference": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ownedOrganizationInvitation": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "ownedPackageInvitation": {
+                "$ref": "#/components/schemas/ThingReference"
+              }
+            },
+            "required": [
+              "apiKey",
+              "avatarBlobReference",
+              "ownedOrganizationInvitation",
+              "ownedPackageInvitation"
+            ]
+          }
+        ]
+      },
+      "Address": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "country": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "locality": {
+                "type": "string"
+              },
+              "postalCode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "region": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "addressLine1",
+              "addressLine2",
+              "country",
+              "locality",
+              "postalCode",
+              "region"
+            ]
+          }
+        ]
+      },
+      "APIKey": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastUsedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "name": {
+                "type": "string"
+              },
+              "permissions": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "revokedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "secretHash": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            },
+            "required": [
+              "expiresAt",
+              "lastUsedAt",
+              "name",
+              "permissions",
+              "revokedAt",
+              "secretHash"
+            ]
+          }
+        ]
+      },
+      "Country": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "alpha2Code": {
+                "type": "string"
+              },
+              "alpha3Code": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "numericCode": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "alpha2Code",
+              "alpha3Code",
+              "name",
+              "numericCode"
+            ]
+          }
+        ]
+      },
+      "Forge": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Namespace"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "administrator": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "country": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "description": {
+                "type": "string"
+              },
+              "organization": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "packageType": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "profileType": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              }
+            },
+            "required": [
+              "account",
+              "administrator",
+              "country",
+              "description",
+              "organization",
+              "packageType",
+              "profileType"
+            ]
+          }
+        ]
+      },
+      "Invitation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "experisAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "ACCEPTED",
+                  "REJECTED",
+                  "REVOKED"
+                ]
+              }
+            },
+            "required": [
+              "experisAt",
+              "status"
+            ]
+          }
+        ]
+      },
+      "Namespace": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "shortName": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "shortName"
+            ]
+          }
+        ]
+      },
+      "Organization": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Scope"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "administrator": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "logoBlobReference": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "member": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              }
+            },
+            "required": [
+              "administrator",
+              "logoBlobReference",
+              "member"
+            ]
+          }
+        ]
+      },
+      "OrganizationInvitation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Invitation"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "organization": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "organizationInvitationKind": {
+                "type": "string",
+                "enum": [
+                  "MEMBER",
+                  "ADMINISTRATOR"
+                ]
+              },
+              "target": {
+                "$ref": "#/components/schemas/ThingReference"
+              }
+            },
+            "required": [
+              "organization",
+              "organizationInvitationKind",
+              "target"
+            ]
+          }
+        ]
+      },
+      "Package": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Namespace"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "listed": {
+                "type": "boolean"
+              },
+              "packageMaintainer": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "packageOwner": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "packageType": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "version": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "visibility": {
+                "type": "string",
+                "enum": [
+                  "PUBLIC",
+                  "INTERNAL",
+                  "PRIVATE"
+                ]
+              }
+            },
+            "required": [
+              "listed",
+              "packageMaintainer",
+              "packageOwner",
+              "packageType",
+              "version",
+              "visibility"
+            ]
+          }
+        ]
+      },
+      "PackageInvitation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Invitation"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "package": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "packageInvitationKind": {
+                "type": "string",
+                "enum": [
+                  "OWNER",
+                  "MAINTAINER"
+                ]
+              },
+              "target": {
+                "$ref": "#/components/schemas/ThingReference"
+              }
+            },
+            "required": [
+              "package",
+              "packageInvitationKind",
+              "target"
+            ]
+          }
+        ]
+      },
+      "PackageMetaData": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        ]
+      },
+      "PackageType": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "description",
+              "name"
+            ]
+          }
+        ]
+      },
+      "PackageVersion": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "downloadCount": {
+                "type": "integer"
+              },
+              "listed": {
+                "type": "boolean"
+              },
+              "metaData": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "publicationDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "downloadCount",
+              "listed",
+              "metaData",
+              "publicationDate",
+              "version"
+            ]
+          }
+        ]
+      },
+      "ProfileLink": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "profileType": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "uri": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "profileType",
+              "uri"
+            ]
+          }
+        ]
+      },
+      "ProfileType": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Thing"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "logoBlobReference": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "logoBlobReference",
+              "name"
+            ]
+          }
+        ]
+      },
+      "Scope": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Namespace"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "billingEmail": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "defaultPackageVisibility": {
+                "type": "string",
+                "enum": [
+                  "PUBLIC",
+                  "INTERNAL",
+                  "PRIVATE"
+                ]
+              },
+              "email": {
+                "type": "string"
+              },
+              "origin": {
+                "type": "string"
+              },
+              "ownedPackage": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "primaryAddress": {
+                "$ref": "#/components/schemas/ThingReference"
+              },
+              "profileLink": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ThingReference"
+                }
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ACTIVE",
+                  "DEACTIVATED"
+                ]
+              },
+              "website": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "address",
+              "billingEmail",
+              "defaultPackageVisibility",
+              "email",
+              "origin",
+              "ownedPackage",
+              "primaryAddress",
+              "profileLink",
+              "status",
+              "website"
+            ]
+          }
+        ]
+      },
+      "Thing": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "@type": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "@id",
+          "@type",
+          "createdAt",
+          "modifiedAt"
+        ]
+      },
+      "ThingReference": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "@type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "@id",
+          "@type"
+        ]
+      },
+      "ConcreteThing": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Account"
+          },
+          {
+            "$ref": "#/components/schemas/Address"
+          },
+          {
+            "$ref": "#/components/schemas/APIKey"
+          },
+          {
+            "$ref": "#/components/schemas/Country"
+          },
+          {
+            "$ref": "#/components/schemas/Forge"
+          },
+          {
+            "$ref": "#/components/schemas/Organization"
+          },
+          {
+            "$ref": "#/components/schemas/OrganizationInvitation"
+          },
+          {
+            "$ref": "#/components/schemas/Package"
+          },
+          {
+            "$ref": "#/components/schemas/PackageInvitation"
+          },
+          {
+            "$ref": "#/components/schemas/PackageMetaData"
+          },
+          {
+            "$ref": "#/components/schemas/PackageType"
+          },
+          {
+            "$ref": "#/components/schemas/PackageVersion"
+          },
+          {
+            "$ref": "#/components/schemas/ProfileLink"
+          },
+          {
+            "$ref": "#/components/schemas/ProfileType"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "@type",
+          "mapping": {
+            "Account": "#/components/schemas/Account",
+            "Address": "#/components/schemas/Address",
+            "APIKey": "#/components/schemas/APIKey",
+            "Country": "#/components/schemas/Country",
+            "Forge": "#/components/schemas/Forge",
+            "Organization": "#/components/schemas/Organization",
+            "OrganizationInvitation": "#/components/schemas/OrganizationInvitation",
+            "Package": "#/components/schemas/Package",
+            "PackageInvitation": "#/components/schemas/PackageInvitation",
+            "PackageMetaData": "#/components/schemas/PackageMetaData",
+            "PackageType": "#/components/schemas/PackageType",
+            "PackageVersion": "#/components/schemas/PackageVersion",
+            "ProfileLink": "#/components/schemas/ProfileLink",
+            "ProfileType": "#/components/schemas/ProfileType"
+          }
+        }
+      }
+    }
+  }
+}

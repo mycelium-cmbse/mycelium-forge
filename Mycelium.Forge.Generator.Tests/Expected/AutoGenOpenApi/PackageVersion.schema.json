@@ -1,7 +1,7 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Thing.schema.json"
+      "$ref": "#/components/schemas/Thing"
     },
     {
       "type": "object",
@@ -13,7 +13,7 @@
           "type": "boolean"
         },
         "metaData": {
-          "$ref": "./ThingReference.schema.json"
+          "$ref": "#/components/schemas/ThingReference"
         },
         "publicationDate": {
           "type": "string",

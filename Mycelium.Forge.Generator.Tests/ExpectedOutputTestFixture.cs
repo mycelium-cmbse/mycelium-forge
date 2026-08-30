@@ -210,7 +210,7 @@ namespace Mycelium.Forge.Generator.Tests
             var generated = await generator.GenerateConcreteThingUnionSchemaAsync(GeneratorSetupFixture.XmiReaderResult);
 
             var expected = await File.ReadAllTextAsync(
-                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", UmlCoreOpenApiSchemaGenerator.ConcreteThingUnionFileName));
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", $"{UmlCoreOpenApiSchemaGenerator.ConcreteThingUnionSchemaName}.schema.json"));
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
@@ -223,18 +223,12 @@ namespace Mycelium.Forge.Generator.Tests
         [Test]
         public async Task Verify_that_the_expected_thing_reference_schema_is_generated()
         {
-            var outputDirectory = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.WorkDirectory, "_Forge.Common.AutoGenOpenApi.ThingReference"));
-            outputDirectory.Create();
-
             var generator = new UmlCoreOpenApiSchemaGenerator();
 
-            await generator.GenerateAsync(GeneratorSetupFixture.XmiReaderResult, outputDirectory);
-
-            var generated = await File.ReadAllTextAsync(
-                Path.Combine(outputDirectory.FullName, UmlCoreOpenApiSchemaGenerator.ThingReferenceFileName));
+            var generated = await generator.GenerateThingReferenceSchemaAsync();
 
             var expected = await File.ReadAllTextAsync(
-                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", UmlCoreOpenApiSchemaGenerator.ThingReferenceFileName));
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenOpenApi", $"{UmlCoreOpenApiSchemaGenerator.ThingReferenceSchemaName}.schema.json"));
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }

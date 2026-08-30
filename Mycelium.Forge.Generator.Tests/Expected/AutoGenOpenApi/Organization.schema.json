@@ -1,7 +1,7 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Scope.schema.json"
+      "$ref": "#/components/schemas/Scope"
     },
     {
       "type": "object",
@@ -9,7 +9,7 @@
         "administrator": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         },
         "logoBlobReference": {
@@ -25,7 +25,7 @@
         "member": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         }
       },

@@ -27,29 +27,35 @@ namespace Mycelium.Forge.Generator.Generators
     /// OpenAPI spec's types the same way it already updates the DTOs.
     /// </summary>
     /// <remarks>
-    /// One schema file per <see cref="IClass"/> in the model (abstract classes included, since a
-    /// concrete class's schema composes its ancestors' schemas via <c>allOf</c>), plus
-    /// <see cref="ThingReferenceFileName"/> (the single, generic reference-stub schema every
-    /// relationship property points at) and <see cref="ConcreteThingUnionFileName"/> (the
-    /// <c>oneOf</c>/<c>discriminator</c> union over every concrete class, for describing "what can
-    /// appear in a response array"). Every generated file is a standalone JSON Schema document that
-    /// cross-references its siblings with plain relative <c>$ref</c>s - resolving those into
-    /// <c>#/components/schemas/...</c> refs inside one bundled <c>openapi.json</c> is a later,
-    /// separate step, not this generator's concern.
+    /// Everything lands in <see cref="SchemasFileName"/>, one <c>{"components": {"schemas": {...}}}</c>
+    /// document: a <c>#/components/schemas/&lt;Name&gt;</c> entry per <see cref="IClass"/> in the model
+    /// (abstract classes included, since a concrete class's schema composes its ancestors' schemas via
+    /// <c>allOf</c>), plus <see cref="ThingReferenceSchemaName"/> (the single, generic reference-stub
+    /// schema every relationship property points at) and <see cref="ConcreteThingUnionSchemaName"/>
+    /// (the <c>oneOf</c>/<c>discriminator</c> union over every concrete class, for describing "what can
+    /// appear in a response array"). A later, separate bundling step merges this document's
+    /// <c>components.schemas</c> with the hand-authored <c>paths</c> document(s) into one self-contained
+    /// <c>openapi.json</c> - not this generator's concern.
     /// </remarks>
     public class UmlCoreOpenApiSchemaGenerator : Generator
     {
         /// <summary>
-        /// The file name of the generic reference-stub schema (<c>{"@id": ..., "@type": ...}</c>)
-        /// every reference property points at, regardless of what it targets.
+        /// The name of the single file every generated schema is written to.
         /// </summary>
-        public const string ThingReferenceFileName = "ThingReference.schema.json";
+        public const string SchemasFileName = "schemas.json";
 
         /// <summary>
-        /// The file name of the <c>oneOf</c>/<c>discriminator</c> union over every concrete class in
-        /// the model.
+        /// The <c>components.schemas</c> key of the generic reference-stub schema
+        /// (<c>{"@id": ..., "@type": ...}</c>) every reference property points at, regardless of what
+        /// it targets.
         /// </summary>
-        public const string ConcreteThingUnionFileName = "ConcreteThing.schema.json";
+        public const string ThingReferenceSchemaName = "ThingReference";
+
+        /// <summary>
+        /// The <c>components.schemas</c> key of the <c>oneOf</c>/<c>discriminator</c> union over every
+        /// concrete class in the model.
+        /// </summary>
+        public const string ConcreteThingUnionSchemaName = "ConcreteThing";
 
         /// <summary>
         /// The UML/SysML primitive DataType names mapped to their JSON Schema representation.
@@ -77,8 +83,9 @@ namespace Mycelium.Forge.Generator.Generators
         };
 
         /// <summary>
-        /// Generates every class schema, <see cref="ThingReferenceFileName"/> and
-        /// <see cref="ConcreteThingUnionFileName"/>, and writes each to <paramref name="outputDirectory"/>.
+        /// Generates the single <see cref="SchemasFileName"/> document - every class schema,
+        /// <see cref="ThingReferenceSchemaName"/> and <see cref="ConcreteThingUnionSchemaName"/> - and
+        /// writes it to <paramref name="outputDirectory"/>.
         /// </summary>
         /// <param name="xmiReaderResult">
         /// the <see cref="XmiReaderResult"/> that contains the UML model to generate from
@@ -91,23 +98,27 @@ namespace Mycelium.Forge.Generator.Generators
             ArgumentNullException.ThrowIfNull(xmiReaderResult);
             ArgumentNullException.ThrowIfNull(outputDirectory);
 
-            var classes = QueryAllClasses(xmiReaderResult);
+            var document = this.BuildSchemasDocument(xmiReaderResult);
 
-            foreach (var @class in classes)
-            {
-                var schema = this.BuildClassSchema(@class);
-
-                await WriteAsync(Serialize(schema), outputDirectory, ClassSchemaFileName(@class));
-            }
-
-            await WriteAsync(Serialize(BuildThingReferenceSchema()), outputDirectory, ThingReferenceFileName);
-            await WriteAsync(Serialize(this.BuildConcreteThingUnionSchema(classes)), outputDirectory, ConcreteThingUnionFileName);
+            await WriteAsync(Serialize(document), outputDirectory, SchemasFileName);
         }
 
         /// <summary>
-        /// Generates the schema for a single, named <see cref="IClass"/>, without necessarily writing
+        /// Builds the <c>{"components": {"schemas": {...}}}</c> document, without necessarily writing
         /// it to disk; the rendered text is returned so it can be diffed against a committed golden
         /// file by <c>ExpectedOutputTestFixture</c>.
+        /// </summary>
+        public Task<string> GenerateSchemasDocumentAsync(XmiReaderResult xmiReaderResult)
+        {
+            ArgumentNullException.ThrowIfNull(xmiReaderResult);
+
+            return Task.FromResult(Serialize(this.BuildSchemasDocument(xmiReaderResult)));
+        }
+
+        /// <summary>
+        /// Builds the schema for a single, named <see cref="IClass"/>, without necessarily writing it
+        /// to disk; the rendered text is returned so it can be diffed against a committed golden file
+        /// by <c>ExpectedOutputTestFixture</c>.
         /// </summary>
         public Task<string> GenerateClassSchemaAsync(XmiReaderResult xmiReaderResult, string className)
         {
@@ -120,8 +131,8 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
-        /// Generates the <see cref="ConcreteThingUnionFileName"/> document, without necessarily
-        /// writing it to disk.
+        /// Builds the <see cref="ConcreteThingUnionSchemaName"/> schema, without necessarily writing
+        /// it to disk.
         /// </summary>
         public Task<string> GenerateConcreteThingUnionSchemaAsync(XmiReaderResult xmiReaderResult)
         {
@@ -131,13 +142,23 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
-        /// The file name a given <see cref="IClass"/>'s schema is written to / referenced by.
+        /// Builds the <see cref="ThingReferenceSchemaName"/> schema, without necessarily writing it
+        /// to disk.
         /// </summary>
-        public static string ClassSchemaFileName(IClass @class)
+        public Task<string> GenerateThingReferenceSchemaAsync()
         {
-            ArgumentNullException.ThrowIfNull(@class);
+            return Task.FromResult(Serialize(BuildThingReferenceSchema()));
+        }
 
-            return $"{@class.Name.CapitalizeFirstLetter()}.schema.json";
+        /// <summary>
+        /// The <c>$ref</c> a <c>components.schemas</c> entry named <paramref name="schemaName"/> is
+        /// addressed by from elsewhere in the same document.
+        /// </summary>
+        public static string ComponentRef(string schemaName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(schemaName);
+
+            return $"#/components/schemas/{schemaName}";
         }
 
         /// <summary>
@@ -165,6 +186,33 @@ namespace Mycelium.Forge.Generator.Generators
             }
 
             return classes.OrderBy(x => x.Name).ToList();
+        }
+
+        /// <summary>
+        /// Builds the full <c>{"components": {"schemas": {...}}}</c> document: one entry per class,
+        /// plus <see cref="ThingReferenceSchemaName"/> and <see cref="ConcreteThingUnionSchemaName"/>.
+        /// </summary>
+        private JsonObject BuildSchemasDocument(XmiReaderResult xmiReaderResult)
+        {
+            var classes = QueryAllClasses(xmiReaderResult);
+
+            var schemas = new JsonObject();
+
+            foreach (var @class in classes)
+            {
+                schemas[@class.Name.CapitalizeFirstLetter()] = this.BuildClassSchema(@class);
+            }
+
+            schemas[ThingReferenceSchemaName] = BuildThingReferenceSchema();
+            schemas[ConcreteThingUnionSchemaName] = this.BuildConcreteThingUnionSchema(classes);
+
+            return new JsonObject
+            {
+                ["components"] = new JsonObject
+                {
+                    ["schemas"] = schemas
+                }
+            };
         }
 
         /// <summary>
@@ -198,10 +246,10 @@ namespace Mycelium.Forge.Generator.Generators
 
             foreach (var @class in concreteClasses)
             {
-                var relativeRef = $"./{ClassSchemaFileName(@class)}";
+                var componentRef = ComponentRef(@class.Name);
 
-                oneOf.Add(new JsonObject { ["$ref"] = relativeRef });
-                mapping[@class.Name] = relativeRef;
+                oneOf.Add(new JsonObject { ["$ref"] = componentRef });
+                mapping[@class.Name] = componentRef;
             }
 
             return new JsonObject
@@ -240,7 +288,7 @@ namespace Mycelium.Forge.Generator.Generators
             return new JsonObject
             {
                 ["allOf"] = new JsonArray(
-                    new JsonObject { ["$ref"] = $"./{ClassSchemaFileName(parent)}" },
+                    new JsonObject { ["$ref"] = ComponentRef(parent.Name) },
                     ownFragment)
             };
         }
@@ -338,7 +386,7 @@ namespace Mycelium.Forge.Generator.Generators
 
         /// <summary>
         /// Builds the JSON Schema fragment for a single own property: a <c>$ref</c> to
-        /// <see cref="ThingReferenceFileName"/> for a relationship, the mapped primitive type for a
+        /// <see cref="ThingReferenceSchemaName"/> for a relationship, the mapped primitive type for a
         /// scalar, wrapped in <c>{"type": "array", "items": ...}</c> when multi-valued, and wrapped
         /// in <c>anyOf: [..., {"type": "null"}]</c> when the property's lower multiplicity bound is
         /// zero - the generated JSON serializer always writes every own property's key (a value or
@@ -348,7 +396,7 @@ namespace Mycelium.Forge.Generator.Generators
         private JsonObject BuildPropertySchema(IProperty property)
         {
             var itemSchema = property.QueryIsReferenceType()
-                ? new JsonObject { ["$ref"] = $"./{ThingReferenceFileName}" }
+                ? new JsonObject { ["$ref"] = ComponentRef(ThingReferenceSchemaName) }
                 : this.BuildScalarSchema(property);
 
             var schema = property.QueryIsEnumerable()

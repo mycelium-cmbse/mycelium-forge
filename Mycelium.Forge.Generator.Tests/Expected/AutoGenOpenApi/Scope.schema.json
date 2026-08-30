@@ -1,7 +1,7 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Namespace.schema.json"
+      "$ref": "#/components/schemas/Namespace"
     },
     {
       "type": "object",
@@ -9,7 +9,7 @@
         "address": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         },
         "billingEmail": {
@@ -39,16 +39,16 @@
         "ownedPackage": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         },
         "primaryAddress": {
-          "$ref": "./ThingReference.schema.json"
+          "$ref": "#/components/schemas/ThingReference"
         },
         "profileLink": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         },
         "status": {

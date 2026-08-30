@@ -1,7 +1,7 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Namespace.schema.json"
+      "$ref": "#/components/schemas/Namespace"
     },
     {
       "type": "object",
@@ -12,22 +12,22 @@
         "packageMaintainer": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         },
         "packageOwner": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         },
         "packageType": {
-          "$ref": "./ThingReference.schema.json"
+          "$ref": "#/components/schemas/ThingReference"
         },
         "version": {
           "type": "array",
           "items": {
-            "$ref": "./ThingReference.schema.json"
+            "$ref": "#/components/schemas/ThingReference"
           }
         },
         "visibility": {

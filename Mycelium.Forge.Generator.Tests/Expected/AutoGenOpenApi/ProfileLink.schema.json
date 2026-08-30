@@ -1,13 +1,13 @@
-﻿{
+{
   "allOf": [
     {
-      "$ref": "./Thing.schema.json"
+      "$ref": "#/components/schemas/Thing"
     },
     {
       "type": "object",
       "properties": {
         "profileType": {
-          "$ref": "./ThingReference.schema.json"
+          "$ref": "#/components/schemas/ThingReference"
         },
         "uri": {
           "type": "string",
