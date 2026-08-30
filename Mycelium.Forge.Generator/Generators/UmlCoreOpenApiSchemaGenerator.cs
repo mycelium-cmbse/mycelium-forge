@@ -116,41 +116,6 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
-        /// Builds the schema for a single, named <see cref="IClass"/>, without necessarily writing it
-        /// to disk; the rendered text is returned so it can be diffed against a committed golden file
-        /// by <c>ExpectedOutputTestFixture</c>.
-        /// </summary>
-        public Task<string> GenerateClassSchemaAsync(XmiReaderResult xmiReaderResult, string className)
-        {
-            ArgumentNullException.ThrowIfNull(xmiReaderResult);
-            ArgumentException.ThrowIfNullOrWhiteSpace(className);
-
-            var @class = QueryAllClasses(xmiReaderResult).Single(x => x.Name == className);
-
-            return Task.FromResult(Serialize(this.BuildClassSchema(@class)));
-        }
-
-        /// <summary>
-        /// Builds the <see cref="ConcreteThingUnionSchemaName"/> schema, without necessarily writing
-        /// it to disk.
-        /// </summary>
-        public Task<string> GenerateConcreteThingUnionSchemaAsync(XmiReaderResult xmiReaderResult)
-        {
-            ArgumentNullException.ThrowIfNull(xmiReaderResult);
-
-            return Task.FromResult(Serialize(this.BuildConcreteThingUnionSchema(QueryAllClasses(xmiReaderResult))));
-        }
-
-        /// <summary>
-        /// Builds the <see cref="ThingReferenceSchemaName"/> schema, without necessarily writing it
-        /// to disk.
-        /// </summary>
-        public Task<string> GenerateThingReferenceSchemaAsync()
-        {
-            return Task.FromResult(Serialize(BuildThingReferenceSchema()));
-        }
-
-        /// <summary>
         /// The <c>$ref</c> a <c>components.schemas</c> entry named <paramref name="schemaName"/> is
         /// addressed by from elsewhere in the same document.
         /// </summary>
