@@ -31,7 +31,7 @@ namespace Mycelium.Forge.Generator.Tests
         [SetUp]
         public void SetUp()
         {
-            this.generator = new UmlCoreSqlSchemaGenerator();
+            this.generator = new UmlCoreSqlSchemaGenerator(GeneratorSetupFixture.ModelVersion);
             this.outputDirectory = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.WorkDirectory, "TestSqlSchemaOutput"));
             this.outputDirectory.Create();
         }
@@ -46,6 +46,35 @@ namespace Mycelium.Forge.Generator.Tests
             {
                 this.outputDirectory.Delete(true);
             }
+        }
+
+        /// <summary>
+        /// Verifies that the constructor requires a non-empty model version.
+        /// </summary>
+        [Test]
+        public void VerifyConstructorRequiresModelVersion()
+        {
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => new UmlCoreSqlSchemaGenerator(null!), Throws.TypeOf<ArgumentNullException>());
+                Assert.That(() => new UmlCoreSqlSchemaGenerator(string.Empty), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => new UmlCoreSqlSchemaGenerator("   "), Throws.TypeOf<ArgumentException>());
+            }
+        }
+
+        /// <summary>
+        /// Verifies that <c>query_model_version()</c> in the generated schema reports the model version the
+        /// generator was constructed with, rather than a hardcoded string.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyGeneratedSchemaReportsTheConstructedModelVersion()
+        {
+            var generatorWithExplicitVersion = new UmlCoreSqlSchemaGenerator("9.9.9-test");
+
+            var actual = await generatorWithExplicitVersion.GenerateSqlSchemaAsync(GeneratorSetupFixture.XmiReaderResult);
+
+            Assert.That(actual, Does.Contain("RETURN '9.9.9-test';"));
         }
 
         /// <summary>

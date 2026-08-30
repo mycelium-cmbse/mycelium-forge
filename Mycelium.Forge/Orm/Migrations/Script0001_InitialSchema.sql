@@ -441,7 +441,7 @@ GRANT SELECT ("id") ON "Forge"."Thing" TO forge_runtime;
 CREATE OR REPLACE FUNCTION "Forge".query_model_version()
 RETURNS text AS $$
 BEGIN
-    RETURN '0.1.0';
+    RETURN '0.2.0';
 END;
 $$ LANGUAGE plpgsql;
 

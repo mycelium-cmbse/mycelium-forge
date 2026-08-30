@@ -23,8 +23,8 @@ namespace Mycelium.Forge.Generator.Tests
 
     /// <summary>
     /// Reads the Mycelium Forge XMI model once for the whole test run, via the
-    /// <c>Mycelium.Model.Forge</c> NuGet package (see <see cref="AssemblyMetadataXmiPath"/> for how the
-    /// package's MSBuild property reaches this running code).
+    /// <c>Mycelium.Model.Forge</c> NuGet package (see <see cref="AssemblyMetadataValue"/> for how the
+    /// package's MSBuild properties reach this running code).
     /// </summary>
     /// <remarks>
     /// Deliberately backed by <see cref="Lazy{T}"/> rather than an NUnit <c>[OneTimeSetUp]</c>: NUnit
@@ -37,7 +37,9 @@ namespace Mycelium.Forge.Generator.Tests
     /// </remarks>
     public static class GeneratorSetupFixture
     {
-        private static readonly Lazy<string> LazyXmiFilePath = new(() => AssemblyMetadataXmiPath("MyceliumModelForgeXmiPath"));
+        private static readonly Lazy<string> LazyXmiFilePath = new(() => AssemblyMetadataValue("MyceliumModelForgeXmiPath"));
+
+        private static readonly Lazy<string> LazyModelVersion = new(() => AssemblyMetadataValue("MyceliumModelForgeVersion"));
 
         private static readonly Lazy<XmiReaderResult> LazyXmiReaderResult = new(ReadModel);
 
@@ -52,6 +54,14 @@ namespace Mycelium.Forge.Generator.Tests
         /// the file itself rather than reuse <see cref="XmiReaderResult"/> (e.g. <see cref="HtmlReportGeneratorTestFixture"/>).
         /// </summary>
         public static string XmiFilePath => LazyXmiFilePath.Value;
+
+        /// <summary>
+        /// The version of the <c>Mycelium.Model.Forge</c> NuGet package the model was read from (e.g.
+        /// <c>0.2.0</c>), for generators that need to report the actual model version rather than a
+        /// hardcoded string (see <see cref="Mycelium.Forge.Generator.Generators.UmlCoreSqlSchemaGenerator"/>'s
+        /// <c>query_model_version()</c>).
+        /// </summary>
+        public static string ModelVersion => LazyModelVersion.Value;
 
         private static XmiReaderResult ReadModel()
         {
@@ -74,10 +84,11 @@ namespace Mycelium.Forge.Generator.Tests
 
         /// <summary>
         /// Reads an MSBuild property that was bridged into this assembly's metadata at build time (an
-        /// MSBuild property set by a NuGet package's <c>.props</c> file, such as
-        /// <c>$(MyceliumModelForgeXmiPath)</c>, is not otherwise visible to running code).
+        /// MSBuild property - whether set by a NuGet package's <c>.props</c> file, such as
+        /// <c>$(MyceliumModelForgeXmiPath)</c>, or read back from the package reference itself, such as
+        /// <c>$(MyceliumModelForgeVersion)</c> - is not otherwise visible to running code).
         /// </summary>
-        private static string AssemblyMetadataXmiPath(string key)
+        private static string AssemblyMetadataValue(string key)
         {
             var value = Assembly.GetExecutingAssembly()
                 .GetCustomAttributes<AssemblyMetadataAttribute>()

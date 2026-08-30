@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Generator.Generators
 {
+    using HandlebarsDotNet;
+
     using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.HandleBarHelpers;
 
@@ -31,6 +33,11 @@ namespace Mycelium.Forge.Generator.Generators
         private const string SqlSchemaTemplateName = "core-sql-schema-template";
 
         /// <summary>
+        /// The model version <c>query_model_version()</c> reports in the generated schema.
+        /// </summary>
+        private readonly string modelVersion;
+
+        /// <summary>
         /// Registers C# type mappings for custom primitive DataTypes.
         /// </summary>
         static UmlCoreSqlSchemaGenerator()
@@ -40,6 +47,20 @@ namespace Mycelium.Forge.Generator.Generators
                 ("URI", "string"),
                 ("SemVer", "string"),
                 ("Date", "DateOnly"));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmlCoreSqlSchemaGenerator" /> class.
+        /// </summary>
+        /// <param name="modelVersion">
+        /// The version of the model being generated from (e.g. the <c>Mycelium.Model.Forge</c> NuGet
+        /// package's version), reported by the generated schema's <c>query_model_version()</c> function.
+        /// </param>
+        public UmlCoreSqlSchemaGenerator(string modelVersion)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(modelVersion);
+
+            this.modelVersion = modelVersion;
         }
 
         /// <summary>
@@ -82,6 +103,13 @@ namespace Mycelium.Forge.Generator.Generators
             this.Handlebars.RegisterNamedElementHelper();
 
             this.Handlebars.RegisterSqlSchemaHelpers();
+
+            // Registered here rather than in SqlSchemaHelper: this is the one schema helper that needs
+            // per-instance state (this.modelVersion), which a static helper class has no way to hold.
+            // Reads the field lazily when the delegate is invoked, not when it's registered here, so it
+            // sees the value the constructor sets - registration happens mid-base-constructor, before
+            // this class's own constructor body has run.
+            this.Handlebars.RegisterHelper("Forge.SQL.ModelVersion", (writer, _, _) => writer.Write(this.modelVersion));
         }
 
         /// <summary>

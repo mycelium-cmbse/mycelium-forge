@@ -49,16 +49,15 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         /// <summary>
         /// Verifies that <see cref="SqlSchemaHelper.RegisterSqlSchemaHelpers" /> registers helpers and handles null argument.
         /// </summary>
+        /// <remarks>
+        /// <c>Forge.SQL.ModelVersion</c> is deliberately not covered here - <see cref="SqlSchemaHelper" />
+        /// no longer registers it, since it needs per-instance state (the model version); see
+        /// <see cref="UmlCoreSqlSchemaGeneratorTestFixture" /> for that helper's coverage instead.
+        /// </remarks>
         [Test]
         public void VerifyRegisterSqlSchemaHelpers()
         {
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => SqlSchemaHelper.RegisterSqlSchemaHelpers(null!), Throws.TypeOf<ArgumentNullException>());
-
-                var versionTemplate = this.handlebars.Compile("{{Forge.SQL.ModelVersion}}");
-                Assert.That(versionTemplate(new { }), Is.EqualTo("0.1.0"));
-            }
+            Assert.That(() => SqlSchemaHelper.RegisterSqlSchemaHelpers(null!), Throws.TypeOf<ArgumentNullException>());
         }
 
         /// <summary>

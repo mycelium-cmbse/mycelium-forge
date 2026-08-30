@@ -67,7 +67,16 @@
 
         <PackageReference Include="Mycelium.Model.CommonPrimitives" Version="0.2.0"/>
         <PackageReference Include="Mycelium.Model.Forge" Version="0.2.0"/>
-        
+    </ItemGroup>
+
+    <PropertyGroup>
+        <!-- The package's own Version item metadata, read back so query_model_version() in the
+             generated schema can report the actual model version instead of a hardcoded string.
+             Kept in sync with the PackageReference above by construction, not by hand. -->
+        <MyceliumModelForgeVersion>@(PackageReference->WithMetadataValue('Identity','Mycelium.Model.Forge')->'%(Version)')</MyceliumModelForgeVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
         <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
             <_Parameter1>MyceliumModelForgeXmiPath</_Parameter1>
             <_Parameter2>$(MyceliumModelForgeXmiPath)</_Parameter2>
@@ -75,6 +84,10 @@
         <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
             <_Parameter1>MyceliumModelCommonPrimitivesXmiPath</_Parameter1>
             <_Parameter2>$(MyceliumModelCommonPrimitivesXmiPath)</_Parameter2>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+            <_Parameter1>MyceliumModelForgeVersion</_Parameter1>
+            <_Parameter2>$(MyceliumModelForgeVersion)</_Parameter2>
         </AssemblyAttribute>
     </ItemGroup>
 
