@@ -1,0 +1,996 @@
+{
+  "info": {
+    "title": "Mycelium Forge HTTP API",
+    "version": "1.0.0",
+    "description": "The Forge registry's HTTP API. Every response body is a flat JSON array; every element is {\"@id\": ..., \"@type\": ..., ...own properties}; relationships are never inlined, only {\"@id\": ..., \"@type\": ...} stubs. Authorization is out of scope for this document - no operation below assumes or encodes an authorization rule; every route is shown as though the caller may do everything shown."
+  },
+  "servers": [
+    { "url": "/api/v1" }
+  ],
+  "tags": [
+    { "name": "Documentation" },
+    { "name": "Packages" },
+    { "name": "Accounts" },
+    { "name": "Organizations" },
+    { "name": "Reference Data" },
+    { "name": "Forge" }
+  ],
+  "paths": {
+    "/openapi.json": {
+      "get": {
+        "tags": ["Documentation"],
+        "operationId": "GetOpenApiDocument",
+        "summary": "The bundled OpenAPI document (this document merged with the generated component schemas).",
+        "responses": {
+          "200": {
+            "description": "The bundled OpenAPI 3.1 document.",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/packages": {
+      "get": {
+        "tags": ["Packages"],
+        "operationId": "SearchPackages",
+        "summary": "Search over package metadata.",
+        "description": "Free-text search, facets, sort and pagination are deliberately out of scope for this document - an intended move to Solr for search is tracked separately (design.md §12.1). This operation is listed for route-surface completeness only; its query parameters are not yet decided.",
+        "parameters": [
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "406": { "$ref": "#/components/responses/NotAcceptable" }
+        }
+      },
+      "put": {
+        "tags": ["Packages"],
+        "operationId": "PublishPackage",
+        "summary": "Publish a package version, atomically.",
+        "description": "The request body is a flat array of the Package/PackageVersion/PackageMetaData graph being published, mirroring the response wire format - the same {\"@id\", \"@type\"} objects, cross-referenced by @id rather than nested.",
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/packages/{scope}/{name}": {
+      "get": {
+        "tags": ["Packages"],
+        "operationId": "GetPackageMetadata",
+        "summary": "Manifest, version list, dependency graph and release notes for a package.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Scope" },
+          { "$ref": "#/components/parameters/PackageName" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "406": { "$ref": "#/components/responses/NotAcceptable" }
+        }
+      },
+      "patch": {
+        "tags": ["Packages"],
+        "operationId": "UpdatePackageMetadata",
+        "summary": "Partially update a package's own metadata.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Scope" },
+          { "$ref": "#/components/parameters/PackageName" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/packages/{scope}/{name}/{version}": {
+      "get": {
+        "tags": ["Packages"],
+        "operationId": "GetPackageVersionMetadata",
+        "summary": "Metadata for a single, explicit package version.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Scope" },
+          { "$ref": "#/components/parameters/PackageName" },
+          { "$ref": "#/components/parameters/Version" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "406": { "$ref": "#/components/responses/NotAcceptable" }
+        }
+      }
+    },
+    "/packages/{scope}/{name}/artifact": {
+      "get": {
+        "tags": ["Packages"],
+        "operationId": "DownloadLatestArtifact",
+        "summary": "The artefact content of the latest listed, non-prerelease version.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Scope" },
+          { "$ref": "#/components/parameters/PackageName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "The artefact's opaque bytes. Exempt from content negotiation (design.md §10.3) - served as application/octet-stream, or the format's own registered media type.",
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/packages/{scope}/{name}/{version}/artifact": {
+      "get": {
+        "tags": ["Packages"],
+        "operationId": "DownloadArtifact",
+        "summary": "The artefact content of a single, explicit package version.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Scope" },
+          { "$ref": "#/components/parameters/PackageName" },
+          { "$ref": "#/components/parameters/Version" }
+        ],
+        "responses": {
+          "200": {
+            "description": "The artefact's opaque bytes. Exempt from content negotiation (design.md §10.3) - served as application/octet-stream, or the format's own registered media type.",
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/packages/{scope}/{name}/{version}/unlist": {
+      "post": {
+        "tags": ["Packages"],
+        "operationId": "UnlistPackageVersion",
+        "summary": "Unlist a version without deleting its content.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Scope" },
+          { "$ref": "#/components/parameters/PackageName" },
+          { "$ref": "#/components/parameters/Version" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}": {
+      "get": {
+        "tags": ["Accounts"],
+        "operationId": "GetAccount",
+        "summary": "An account's profile.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Accounts"],
+        "operationId": "UpdateAccount",
+        "summary": "Partially update an account's own properties.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/packages": {
+      "get": {
+        "tags": ["Accounts"],
+        "operationId": "ListAccountPackages",
+        "summary": "The packages this account owns or maintains.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/address": {
+      "get": {
+        "tags": ["Accounts"],
+        "operationId": "GetAccountAddress",
+        "summary": "An account's billing/postal address.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["Accounts"],
+        "operationId": "SetAccountAddress",
+        "summary": "Set (replace) an account's address.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/profile-links": {
+      "get": {
+        "tags": ["Accounts"],
+        "operationId": "ListAccountProfileLinks",
+        "summary": "An account's profile links (external identities).",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "post": {
+        "tags": ["Accounts"],
+        "operationId": "CreateAccountProfileLink",
+        "summary": "Add a profile link to an account.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/profile-links/{id}": {
+      "patch": {
+        "tags": ["Accounts"],
+        "operationId": "UpdateAccountProfileLink",
+        "summary": "Partially update one of an account's profile links.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Accounts"],
+        "operationId": "DeleteAccountProfileLink",
+        "summary": "Remove a profile link from an account.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "204": { "description": "Deleted." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/keys": {
+      "get": {
+        "tags": ["Accounts"],
+        "operationId": "ListAccountKeys",
+        "summary": "An account's API keys.",
+        "description": "Never returns a usable secret - only the key's own metadata (name, expiry, last-used, revoked). The secret is shown once, on creation only.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "post": {
+        "tags": ["Accounts"],
+        "operationId": "CreateAccountKey",
+        "summary": "Issue a new API key for an account.",
+        "description": "Not yet decided: the generated APIKey schema's own secretHash property is the stored hash, not a usable credential - the plaintext secret this operation must return exactly once has no schema yet.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/keys/{id}": {
+      "delete": {
+        "tags": ["Accounts"],
+        "operationId": "DeleteAccountKey",
+        "summary": "Revoke an API key.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "204": { "description": "Revoked." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/invitations": {
+      "get": {
+        "tags": ["Accounts"],
+        "operationId": "ListSentInvitations",
+        "summary": "Invitations this account has sent (as the composite owner).",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "post": {
+        "tags": ["Accounts"],
+        "operationId": "CreateInvitation",
+        "summary": "Send an OrganizationInvitation or PackageInvitation.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/invitations/{id}": {
+      "delete": {
+        "tags": ["Accounts"],
+        "operationId": "RevokeInvitation",
+        "summary": "Revoke an invitation this account sent.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "204": { "description": "Revoked." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/received-invitations": {
+      "get": {
+        "tags": ["Accounts"],
+        "operationId": "ListReceivedInvitations",
+        "summary": "Invitations addressed to this account.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/accounts/{slug}/received-invitations/{id}/accept": {
+      "post": {
+        "tags": ["Accounts"],
+        "operationId": "AcceptInvitation",
+        "summary": "Accept an invitation addressed to this account.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/accounts/{slug}/received-invitations/{id}/decline": {
+      "post": {
+        "tags": ["Accounts"],
+        "operationId": "DeclineInvitation",
+        "summary": "Decline an invitation addressed to this account.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/organizations": {
+      "post": {
+        "tags": ["Organizations"],
+        "operationId": "CreateOrganization",
+        "summary": "Provision a new organization.",
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/organizations/{slug}": {
+      "get": {
+        "tags": ["Organizations"],
+        "operationId": "GetOrganization",
+        "summary": "An organization's profile.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Organizations"],
+        "operationId": "UpdateOrganization",
+        "summary": "Partially update an organization's own properties.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/organizations/{slug}/packages": {
+      "get": {
+        "tags": ["Organizations"],
+        "operationId": "ListOrganizationPackages",
+        "summary": "The packages this organization owns.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/organizations/{slug}/members": {
+      "get": {
+        "tags": ["Organizations"],
+        "operationId": "ListOrganizationMembers",
+        "summary": "The accounts that are members of this organization.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/organizations/{slug}/members/{accountId}": {
+      "put": {
+        "tags": ["Organizations"],
+        "operationId": "AddOrganizationMember",
+        "summary": "Add an account as a member of this organization.",
+        "description": "A pure relationship edge - fully specified by the path, no request body.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/AccountId" }
+        ],
+        "responses": {
+          "204": { "description": "Member added (idempotent)." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Organizations"],
+        "operationId": "RemoveOrganizationMember",
+        "summary": "Remove an account from this organization's membership.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/AccountId" }
+        ],
+        "responses": {
+          "204": { "description": "Member removed." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/organizations/{slug}/deprovision": {
+      "post": {
+        "tags": ["Organizations"],
+        "operationId": "DeprovisionOrganization",
+        "summary": "Deprovision an organization.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/organizations/{slug}/address": {
+      "get": {
+        "tags": ["Organizations"],
+        "operationId": "GetOrganizationAddress",
+        "summary": "An organization's billing/postal address.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["Organizations"],
+        "operationId": "SetOrganizationAddress",
+        "summary": "Set (replace) an organization's address.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/organizations/{slug}/profile-links": {
+      "get": {
+        "tags": ["Organizations"],
+        "operationId": "ListOrganizationProfileLinks",
+        "summary": "An organization's profile links (external identities).",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "post": {
+        "tags": ["Organizations"],
+        "operationId": "CreateOrganizationProfileLink",
+        "summary": "Add a profile link to an organization.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/organizations/{slug}/profile-links/{id}": {
+      "patch": {
+        "tags": ["Organizations"],
+        "operationId": "UpdateOrganizationProfileLink",
+        "summary": "Partially update one of an organization's profile links.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Organizations"],
+        "operationId": "DeleteOrganizationProfileLink",
+        "summary": "Remove a profile link from an organization.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Slug" },
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "204": { "description": "Deleted." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/countries": {
+      "get": {
+        "tags": ["Reference Data"],
+        "operationId": "ListCountries",
+        "summary": "The Country reference-data set.",
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" }
+        }
+      },
+      "post": {
+        "tags": ["Reference Data"],
+        "operationId": "CreateCountry",
+        "summary": "Add a Country.",
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/countries/{id}": {
+      "get": {
+        "tags": ["Reference Data"],
+        "operationId": "GetCountry",
+        "summary": "A single Country.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Reference Data"],
+        "operationId": "UpdateCountry",
+        "summary": "Partially update a Country.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Reference Data"],
+        "operationId": "DeleteCountry",
+        "summary": "Delete a Country.",
+        "description": "Address.country is a plain, non-cascading reference - Postgres rejects the delete with a foreign-key violation while any Address still points at this row, surfaced as 409 Conflict rather than a raw database error.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "204": { "description": "Deleted." },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/package-types": {
+      "get": {
+        "tags": ["Reference Data"],
+        "operationId": "ListPackageTypes",
+        "summary": "The PackageType reference-data set.",
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" }
+        }
+      },
+      "post": {
+        "tags": ["Reference Data"],
+        "operationId": "CreatePackageType",
+        "summary": "Add a PackageType.",
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/package-types/{id}": {
+      "get": {
+        "tags": ["Reference Data"],
+        "operationId": "GetPackageType",
+        "summary": "A single PackageType.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Reference Data"],
+        "operationId": "UpdatePackageType",
+        "summary": "Partially update a PackageType.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Reference Data"],
+        "operationId": "DeletePackageType",
+        "summary": "Delete a PackageType.",
+        "description": "Package.packageType is a plain, non-cascading reference - Postgres rejects the delete with a foreign-key violation while any Package still points at this row, surfaced as 409 Conflict rather than a raw database error.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "204": { "description": "Deleted." },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/profile-types": {
+      "get": {
+        "tags": ["Reference Data"],
+        "operationId": "ListProfileTypes",
+        "summary": "The ProfileType reference-data set.",
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" }
+        }
+      },
+      "post": {
+        "tags": ["Reference Data"],
+        "operationId": "CreateProfileType",
+        "summary": "Add a ProfileType.",
+        "requestBody": { "$ref": "#/components/requestBodies/ThingArray" },
+        "responses": {
+          "201": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/profile-types/{id}": {
+      "get": {
+        "tags": ["Reference Data"],
+        "operationId": "GetProfileType",
+        "summary": "A single ProfileType.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "tags": ["Reference Data"],
+        "operationId": "UpdateProfileType",
+        "summary": "Partially update a ProfileType.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Reference Data"],
+        "operationId": "DeleteProfileType",
+        "summary": "Delete a ProfileType.",
+        "description": "ProfileLink.profileType is a plain, non-cascading reference - Postgres rejects the delete with a foreign-key violation while any ProfileLink still points at this row, surfaced as 409 Conflict rather than a raw database error.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "204": { "description": "Deleted." },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/forge": {
+      "get": {
+        "tags": ["Forge"],
+        "operationId": "GetForge",
+        "summary": "The Forge singleton itself.",
+        "parameters": [
+          { "$ref": "#/components/parameters/IncludeContained" },
+          { "$ref": "#/components/parameters/IncludeReferenced" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" }
+        }
+      },
+      "patch": {
+        "tags": ["Forge"],
+        "operationId": "UpdateForge",
+        "summary": "Partially update the Forge singleton's own properties.",
+        "requestBody": { "$ref": "#/components/requestBodies/PartialThing" },
+        "responses": {
+          "200": { "$ref": "#/components/responses/ThingArray" },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "IncludeContained": {
+        "name": "include-contained",
+        "in": "query",
+        "description": "Depth of the breadth-first walk over composite/containment edges (IProperty.IsComposite) from the response's root entity/entities. Contained objects are added as additional sibling nodes in the response array, never inlined.",
+        "schema": { "type": "integer", "minimum": 0, "default": 0 }
+      },
+      "IncludeReferenced": {
+        "name": "include-referenced",
+        "in": "query",
+        "description": "Depth of the breadth-first walk over plain association edges from the response's root entity/entities. Referenced objects are added as additional sibling nodes in the response array, never inlined.",
+        "schema": { "type": "integer", "minimum": 0, "default": 0 }
+      },
+      "Scope": {
+        "name": "scope",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "The owning Account's or Organization's short name."
+      },
+      "PackageName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "The package's short name."
+      },
+      "Version": {
+        "name": "version",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "A SemVer version string."
+      },
+      "Slug": {
+        "name": "slug",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "An Account's or Organization's short name."
+      },
+      "ResourceId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "AccountId": {
+        "name": "accountId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      }
+    },
+    "requestBodies": {
+      "ThingArray": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ThingArray" }
+          }
+        }
+      },
+      "PartialThing": {
+        "description": "Not yet decided: JSON Merge Patch (RFC 7396) vs JSON Patch (RFC 6902), which properties are patchable, and how this reconciles with the generated schemas' own \"every property required\" shape (correct for a full GET representation, not for a partial update).",
+        "required": true,
+        "content": {
+          "application/merge-patch+json": {
+            "schema": { "type": "object" }
+          }
+        }
+      }
+    },
+    "responses": {
+      "ThingArray": {
+        "description": "A flat array of {\"@id\", \"@type\", ...own properties} objects - one element for a single-resource operation, many for anything that returns more.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ThingArray" }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "The request could not be understood or failed validation.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "No such resource - or, for a read of a package the caller isn't authorised to see, the same response as a package that doesn't exist (design.md §10.1).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "The request conflicts with the resource's current state (e.g. a reference-data delete blocked by a foreign-key reference still pointing at it).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      },
+      "NotAcceptable": {
+        "description": "The Accept header names a media type/schema version this Forge instance doesn't support (design.md §10.3). Never silently falls back to the latest version.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ThingArray": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/ConcreteThing" }
+      },
+      "ProblemDetails": {
+        "description": "RFC 9457 Problem Details, plus a correlationId extension member (design.md §10.1) so a user-facing error can quote it.",
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "format": "uri-reference", "description": "Defaults to \"about:blank\" when no more specific URI is registered." },
+          "title": { "type": "string" },
+          "status": { "type": "integer" },
+          "detail": { "type": "string" },
+          "instance": { "type": "string", "format": "uri-reference" },
+          "correlationId": { "type": "string" }
+        },
+        "required": ["type", "title", "status", "correlationId"]
+      }
+    }
+  }
+}
