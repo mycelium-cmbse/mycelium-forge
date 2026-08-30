@@ -15,6 +15,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using Mycelium.Forge.Generator.Extensions;
 
+    using uml4net.Classification;
     using uml4net.CommonStructure;
     using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
@@ -36,9 +37,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingConstraints", WriteBasicTableThingConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints", WriteManyToManyTableDefinitionsAndConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteNormalReferenceConstraints", WriteNormalReferenceConstraints);
-            handlebars.RegisterHelper("Forge.SQL.DeleteBaseTableTriggerFunctions", DeleteBaseTableTriggerFunctions);
-            handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingDeleteTriggers", WriteBasicTableThingDeleteTriggers);
-            handlebars.RegisterHelper("Forge.SQL.WriteBaseTableDeleteTriggers", WriteBaseTableDeleteTriggers);
+            handlebars.RegisterHelper("Forge.SQL.WriteUniversalAttributeIndexes", WriteUniversalAttributeIndexes);
+            handlebars.RegisterHelper("Forge.SQL.WriteClassAttributeIndexes", WriteClassAttributeIndexes);
+            handlebars.RegisterHelper("Forge.SQL.WriteClassMultiValuedAttributeIndexes", WriteClassMultiValuedAttributeIndexes);
             handlebars.RegisterHelper("Forge.SQL.ModelVersion", WriteModelVersion);
         }
 
@@ -191,102 +192,136 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         }
 
         /// <summary>
-        /// Writes delete trigger functions for base tables.
+        /// Writes the shared composite indexes for the universal <see cref="IClass">Thing</see> attributes
+        /// (<c>createdAt</c>, <c>modifiedAt</c>) - one index per attribute, covering every class, rather than one
+        /// per class, since these attributes are present on every entity regardless of its concrete type.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
         /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
-        private static void DeleteBaseTableTriggerFunctions(EncodedTextWriter writer, Context context, Arguments arguments)
+        private static void WriteUniversalAttributeIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
         {
             if (context.Value is not IEnumerable<IClass> classes)
             {
-                throw new ArgumentException("Forge.SQL.DeleteBaseTableTriggerFunctions - context is supposed to be IEnumerable<IClass>");
+                throw new ArgumentException("Forge.SQL.WriteUniversalAttributeIndexes - context is supposed to be IEnumerable<IClass>");
+            }
+
+            var thingClass = classes.SingleOrDefault(x => x.IsThingClass());
+
+            if (thingClass == null)
+            {
+                return;
             }
 
             var stringBuilder = new StringBuilder();
 
-            foreach (var className in classes.Where(x => x.QueryAllSpecializations().Count != 0 && x.QueryDerivesFrom("Thing")).Select(@class => @class.Name))
+            foreach (var property in thingClass.QuerySqlIndexableOwnAttributes().OrderBy(x => x.Name))
             {
-                var sql = $$"""
-                            CREATE OR REPLACE FUNCTION "Forge".{{className.ToLower()}}_delete()
-                                RETURNS trigger
-                                LANGUAGE plpgsql
-                                AS $$
-                                BEGIN
-                                    EXECUTE 'DELETE FROM "Forge"."{{className}}" WHERE id = $1' USING OLD.id;
-                                    RETURN OLD;
-                                END;
-                            $$;
-                            """;
+                var attributeName = property.QuerySqlAttributeName();
 
-                stringBuilder.AppendLine(sql);
-                stringBuilder.AppendLine();
+                stringBuilder.AppendLine(
+                    $"CREATE INDEX \"idx_Thing_classKind_{attributeName}\" ON \"Forge\".\"Thing\" (\"classKind\", {property.QueryJsonbDataExpression()});");
             }
 
             writer.WriteSafeString(stringBuilder);
         }
 
         /// <summary>
-        /// Writes delete triggers to the Thing table for an <see cref="IClass" />.
+        /// Writes one partial expression index per own-or-inherited indexable scalar attribute for an
+        /// <see cref="IClass" />, scoped to that class's own <c>classKind</c> value. Skips <c>Thing</c> itself
+        /// (its own attributes get the shared indexes from <see cref="WriteUniversalAttributeIndexes" /> instead)
+        /// and abstract classes (no row's <c>classKind</c> is ever an abstract class's name).
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
         /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
-        private static void WriteBasicTableThingDeleteTriggers(EncodedTextWriter writer, Context context, Arguments arguments)
+        private static void WriteClassAttributeIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("Forge.SQL.WriteBasicTableThingDeleteTriggers - context is supposed to be IClass");
+                throw new ArgumentException("Forge.SQL.WriteClassAttributeIndexes - context is supposed to be IClass");
             }
 
-            if (@class.IsThingClass())
+            if (@class.IsThingClass() || @class.IsAbstract)
             {
                 return;
             }
 
-            var txt = $$"""
-                        CREATE OR REPLACE TRIGGER trg_thing_delete
-                            AFTER DELETE ON "Forge"."{{@class.QuerySqlTableName()}}"
-                            FOR EACH ROW
-                                EXECUTE FUNCTION "Forge".thing_delete();
+            var stringBuilder = new StringBuilder();
 
+            foreach (var property in @class.QuerySqlIndexableAttributes())
+            {
+                var attributeName = property.QuerySqlAttributeName();
 
-                        """;
+                stringBuilder.AppendLine(
+                    $"CREATE INDEX \"idx_Thing_{@class.QuerySqlTableName()}_{attributeName}\" ON \"Forge\".\"Thing\" ({property.QueryJsonbDataExpression()}) WHERE \"classKind\" = '{@class.QuerySqlTableName()}';");
+            }
 
-            writer.WriteSafeString(txt);
+            writer.WriteSafeString(stringBuilder);
         }
 
         /// <summary>
-        /// Writes delete triggers to base tables for an <see cref="IClass" />.
+        /// Writes one GIN containment index per own-or-inherited indexable multi-valued attribute for an
+        /// <see cref="IClass" />, scoped to that class's own <c>classKind</c> value. A multi-valued attribute
+        /// serializes as a JSON array, so it needs <c>@&gt;</c> containment semantics via a GIN index rather than
+        /// the B-tree expression indexes <see cref="WriteClassAttributeIndexes" /> builds for single-valued ones -
+        /// there is no per-type cast to choose here, since <c>jsonb_path_ops</c> compares the raw JSON values
+        /// directly regardless of whether the array holds strings, numbers or booleans. Skips <c>Thing</c> itself
+        /// and abstract classes for the same reasons as <see cref="WriteClassAttributeIndexes" />.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
         /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
-        private static void WriteBaseTableDeleteTriggers(EncodedTextWriter writer, Context context, Arguments arguments)
+        private static void WriteClassMultiValuedAttributeIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("Forge.SQL.WriteBaseTableDeleteTriggers - context is supposed to be IClass");
+                throw new ArgumentException("Forge.SQL.WriteClassMultiValuedAttributeIndexes - context is supposed to be IClass");
             }
 
-            if (@class.IsThingClass())
+            if (@class.IsThingClass() || @class.IsAbstract)
             {
                 return;
             }
 
-            foreach (var baseClassName in @class.Generalization.Select(x => x.General).OfType<IClass>().Where(x => x.QueryDerivesFrom("Thing")).Select(baseClass => baseClass.Name))
+            var stringBuilder = new StringBuilder();
+
+            foreach (var property in @class.QuerySqlIndexableMultiValuedAttributes())
             {
-                var txt = $$"""
-                            CREATE OR REPLACE TRIGGER trg_{{baseClassName.ToLower()}}_on_{{@class.QuerySqlTableName().ToLower()}}_delete
-                                AFTER DELETE ON "Forge"."{{@class.QuerySqlTableName()}}"
-                                FOR EACH ROW
-                                    EXECUTE FUNCTION "Forge".{{baseClassName.ToLower()}}_delete();
+                var attributeName = property.QuerySqlAttributeName();
 
-
-                            """;
-
-                writer.WriteSafeString(txt);
+                stringBuilder.AppendLine(
+                    $"CREATE INDEX \"idx_Thing_{@class.QuerySqlTableName()}_{attributeName}\" ON \"Forge\".\"Thing\" USING gin ((\"data\"->'{attributeName}') jsonb_path_ops) WHERE \"classKind\" = '{@class.QuerySqlTableName()}';");
             }
+
+            writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Builds the parenthesized, type-cast JSONB expression identifying an indexable scalar attribute's value
+        /// inside <c>Thing.data</c>, e.g. <c>("data"->>'status')</c> or <c>(("data"->>'createdAt')::timestamp)</c>.
+        /// Reuses <see cref="PropertyExtension.QuerySqlTypeName" /> for the cast target, since a text-typed value
+        /// (the JSONB <c>-&gt;&gt;</c> operator's own return type) needs no cast at all.
+        /// </summary>
+        /// <param name="property">The scalar attribute to build the expression for.</param>
+        /// <returns>The parenthesized expression, ready to embed as a single index element.</returns>
+        private static string QueryJsonbDataExpression(this IProperty property)
+        {
+            var jsonAccess = $"\"data\"->>'{property.QuerySqlAttributeName()}'";
+            var sqlType = property.QuerySqlTypeName();
+
+            // text::timestamp/date parsing is only ever STABLE in Postgres (it can depend on the session's
+            // DateStyle/timezone), never IMMUTABLE, so it cannot be used directly in an index expression -
+            // confirmed against a live database (SQLSTATE 42P17). Route those two through a small wrapper
+            // function explicitly marked IMMUTABLE instead; every other cast target (integer, boolean, ...)
+            // already has an IMMUTABLE input function and needs no wrapper.
+            return sqlType switch
+            {
+                "text" => $"({jsonAccess})",
+                "timestamp" => $"(\"Forge\".jsonb_to_timestamp({jsonAccess}))",
+                "date" => $"(\"Forge\".jsonb_to_date({jsonAccess}))",
+                _ => $"(({jsonAccess})::{sqlType})"
+            };
         }
 
         /// <summary>

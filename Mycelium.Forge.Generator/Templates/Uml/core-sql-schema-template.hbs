@@ -48,30 +48,40 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
 {{#Forge.SQL.WriteNormalReferenceConstraints class}}
 {{/each}}
 
-CREATE OR REPLACE FUNCTION "Forge".thing_delete()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $$
-    BEGIN
+-- Indexes for querying Thing.data's JSONB attributes: one shared composite index per universal
+-- Thing attribute (createdAt, modifiedAt), one partial expression index per class for every other
+-- own-or-inherited single-valued scalar attribute, and one partial GIN containment index per class
+-- for every own-or-inherited multi-valued (0..*/1..*) attribute. text::timestamp/date parsing is
+-- only ever STABLE in Postgres, never IMMUTABLE, so it cannot be cast directly in an index
+-- expression - these two wrapper functions exist solely to make that cast usable in one.
+CREATE OR REPLACE FUNCTION "Forge".jsonb_to_timestamp(value text)
+RETURNS timestamp
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT value::timestamp $$;
 
-        EXECUTE 'DELETE FROM "Forge"."Thing" WHERE id = $1' USING OLD.id;
+CREATE OR REPLACE FUNCTION "Forge".jsonb_to_date(value text)
+RETURNS date
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT value::date $$;
 
-        RETURN OLD;
-    END;
-$$;
-
--- Delete Trigger Functions for Base Tables
-{{#Forge.SQL.DeleteBaseTableTriggerFunctions this}}
-
--- Delete Triggers to the Thing Table
+{{#Forge.SQL.WriteUniversalAttributeIndexes this}}
 {{#each this as | class |}}
-{{#Forge.SQL.WriteBasicTableThingDeleteTriggers class}}
+{{#Forge.SQL.WriteClassAttributeIndexes class}}
+{{/each}}
+{{#each this as | class |}}
+{{#Forge.SQL.WriteClassMultiValuedAttributeIndexes class}}
 {{/each}}
 
--- Delete Triggers to the Base Table Table
-{{#each this as | class |}}
-{{#Forge.SQL.WriteBaseTableDeleteTriggers class}}
-{{/each}}
+-- Runtime role delete privileges: every deletion goes through Thing, whose downward
+-- ..._Thing_FK_Source ON DELETE CASCADE constraints already clean up every table sharing that id.
+-- USAGE is required just to reach any object in the schema; SELECT ("id") is required because a
+-- DELETE ... WHERE id = $1 statement reads the id column to evaluate the WHERE clause.
+GRANT USAGE ON SCHEMA "Forge" TO forge_runtime;
+REVOKE DELETE ON ALL TABLES IN SCHEMA "Forge" FROM forge_runtime;
+GRANT DELETE ON "Forge"."Thing" TO forge_runtime;
+GRANT SELECT ("id") ON "Forge"."Thing" TO forge_runtime;
 
 -- ModelVersion
 CREATE OR REPLACE FUNCTION "Forge".query_model_version()

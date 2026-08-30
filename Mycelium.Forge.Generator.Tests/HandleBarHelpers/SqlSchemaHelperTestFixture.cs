@@ -47,29 +47,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         }
 
         /// <summary>
-        /// Verifies that DeleteBaseTableTriggerFunctions renders trigger functions and guards invalid context.
-        /// </summary>
-        [Test]
-        public void VerifyDeleteBaseTableTriggerFunctions()
-        {
-            var template = this.handlebars.Compile("{{#Forge.SQL.DeleteBaseTableTriggerFunctions this}}");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => template("not-a-collection"), Throws.TypeOf<ArgumentException>());
-
-                var allClasses = GeneratorSetupFixture.XmiReaderResult.Packages
-                    .SelectMany(package => package.QueryPackages())
-                    .SelectMany(package => package.PackagedElement.OfType<IClass>())
-                    .ToList();
-
-                var result = template(allClasses);
-                Assert.That(result, Does.Contain("CREATE OR REPLACE FUNCTION \"Forge\".scope_delete()"));
-                Assert.That(result, Does.Contain("EXECUTE 'DELETE FROM \"Forge\".\"Scope\" WHERE id = $1' USING OLD.id;"));
-            }
-        }
-
-        /// <summary>
         /// Verifies that <see cref="SqlSchemaHelper.RegisterSqlSchemaHelpers" /> registers helpers and handles null argument.
         /// </summary>
         [Test]
@@ -81,28 +58,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
                 var versionTemplate = this.handlebars.Compile("{{Forge.SQL.ModelVersion}}");
                 Assert.That(versionTemplate(new { }), Is.EqualTo("0.1.0"));
-            }
-        }
-
-        /// <summary>
-        /// Verifies that WriteBaseTableDeleteTriggers renders base table triggers and guards invalid context.
-        /// </summary>
-        [Test]
-        public void VerifyWriteBaseTableDeleteTriggers()
-        {
-            var template = this.handlebars.Compile("{{#Forge.SQL.WriteBaseTableDeleteTriggers this}}");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
-
-                var thingResult = template(this.thingClass);
-                Assert.That(thingResult, Is.Empty);
-
-                var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_scope_on_account_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".scope_delete()"));
             }
         }
 
@@ -149,28 +104,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         }
 
         /// <summary>
-        /// Verifies that WriteBasicTableThingDeleteTriggers renders thing delete triggers and guards invalid context.
-        /// </summary>
-        [Test]
-        public void VerifyWriteBasicTableThingDeleteTriggers()
-        {
-            var template = this.handlebars.Compile("{{#Forge.SQL.WriteBasicTableThingDeleteTriggers this}}");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
-
-                var thingResult = template(this.thingClass);
-                Assert.That(thingResult, Is.Empty);
-
-                var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_thing_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".thing_delete()"));
-            }
-        }
-
-        /// <summary>
         /// Verifies that WriteManyToManyTableDefinitionsAndConstraints renders junction tables and guards invalid context.
         /// </summary>
         [Test]
@@ -212,6 +145,81 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT"));
                 Assert.That(accountResult, Does.Contain("CREATE INDEX"));
+            }
+        }
+
+        /// <summary>
+        /// Verifies that WriteUniversalAttributeIndexes renders the shared createdAt/modifiedAt indexes and guards
+        /// invalid context.
+        /// </summary>
+        [Test]
+        public void VerifyWriteUniversalAttributeIndexes()
+        {
+            var template = this.handlebars.Compile("{{#Forge.SQL.WriteUniversalAttributeIndexes this}}");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-collection"), Throws.TypeOf<ArgumentException>());
+
+                var allClasses = GeneratorSetupFixture.XmiReaderResult.Packages
+                    .SelectMany(package => package.QueryPackages())
+                    .SelectMany(package => package.PackagedElement.OfType<IClass>())
+                    .ToList();
+
+                var result = template(allClasses);
+                Assert.That(result, Does.Contain("CREATE INDEX \"idx_Thing_classKind_createdAt\" ON \"Forge\".\"Thing\" (\"classKind\", (\"Forge\".jsonb_to_timestamp(\"data\"->>'createdAt')))"));
+                Assert.That(result, Does.Contain("CREATE INDEX \"idx_Thing_classKind_modifiedAt\" ON \"Forge\".\"Thing\" (\"classKind\", (\"Forge\".jsonb_to_timestamp(\"data\"->>'modifiedAt')))"));
+            }
+        }
+
+        /// <summary>
+        /// Verifies that WriteClassAttributeIndexes renders one partial index per own-or-inherited scalar
+        /// attribute, skips <c>Thing</c> and abstract classes, and guards invalid context.
+        /// </summary>
+        [Test]
+        public void VerifyWriteClassAttributeIndexes()
+        {
+            var template = this.handlebars.Compile("{{#Forge.SQL.WriteClassAttributeIndexes this}}");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+
+                var thingResult = template(this.thingClass);
+                Assert.That(thingResult, Is.Empty);
+
+                var namespaceResult = template(GetClass("Namespace"));
+                Assert.That(namespaceResult, Is.Empty, "an abstract class's classKind is never a real value, so it gets no indexes of its own");
+
+                var accountResult = template(this.accountClass);
+                Assert.That(accountResult, Does.Contain("CREATE INDEX \"idx_Thing_Account_status\" ON \"Forge\".\"Thing\" ((\"data\"->>'status')) WHERE \"classKind\" = 'Account'"));
+                Assert.That(accountResult, Does.Contain("idx_Thing_Account_shortName"), "shortName is inherited from Namespace, not owned by Account directly");
+                Assert.That(accountResult, Does.Not.Contain("idx_Thing_Account_owner"), "owner is a reference property with its own real FK column, not a JSONB attribute");
+            }
+        }
+
+        /// <summary>
+        /// Verifies that WriteClassMultiValuedAttributeIndexes renders one GIN containment index per
+        /// own-or-inherited multi-valued attribute, skips single-valued attributes, and guards invalid context.
+        /// </summary>
+        [Test]
+        public void VerifyWriteClassMultiValuedAttributeIndexes()
+        {
+            var template = this.handlebars.Compile("{{#Forge.SQL.WriteClassMultiValuedAttributeIndexes this}}");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+
+                var thingResult = template(this.thingClass);
+                Assert.That(thingResult, Is.Empty);
+
+                var accountResult = template(this.accountClass);
+                Assert.That(accountResult, Is.Empty, "Account has no multi-valued attributes of its own or inherited");
+
+                var apiKeyResult = template(GetClass("APIKey"));
+                Assert.That(apiKeyResult, Does.Contain("CREATE INDEX \"idx_Thing_APIKey_secretHash\" ON \"Forge\".\"Thing\" USING gin ((\"data\"->'secretHash') jsonb_path_ops) WHERE \"classKind\" = 'APIKey'"));
+                Assert.That(apiKeyResult, Does.Not.Contain("idx_Thing_APIKey_name"), "name is single-valued and belongs to WriteClassAttributeIndexes instead");
             }
         }
 
