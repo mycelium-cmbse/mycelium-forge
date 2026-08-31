@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDaoTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
     /// Suite of tests for the <see cref="PackageDao" /> class.
     /// </summary>
     [TestFixture]
-    [Category("Integration")]
+    [Category("Database")]
     public class PackageDaoTestFixture : BaseTestClassFixture
     {
         private PackageDao packageDao;
