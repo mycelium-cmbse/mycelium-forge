@@ -48,7 +48,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(@class);
 
-            return @class.QueryDerivesFrom("Thing");
+            return @class.QueryDerivesFrom(ModelConstants.ThingName);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(@class);
 
-            return @class.Name == "Thing";
+            return @class.Name == ModelConstants.ThingName;
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Mycelium.Forge.Generator.Extensions
 
             return @class.QueryAllGeneralClassifiers()
                 .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing"))
+                .Where(x => x.QueryDerivesFrom(ModelConstants.ThingName))
                 .Reverse()
                 .ToList();
         }
@@ -278,7 +278,7 @@ namespace Mycelium.Forge.Generator.Extensions
 
             return @class.QueryAllGeneralClassifiers()
                 .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing") || x.IsThingClass())
+                .Where(x => x.QueryDerivesFrom(ModelConstants.ThingName) || x.IsThingClass())
                 .Reverse()
                 .ToList();
         }
@@ -289,7 +289,7 @@ namespace Mycelium.Forge.Generator.Extensions
         /// <param name="class">The <see cref="IClass" /> to query many-to-many properties for.</param>
         /// <param name="derivesFrom">The root class name to exclude.</param>
         /// <returns>A list of many-to-many <see cref="IProperty" /> instances.</returns>
-        public static IReadOnlyList<IProperty> QueryManyToManyProperties(this IClass @class, string derivesFrom = "Thing")
+        public static IReadOnlyList<IProperty> QueryManyToManyProperties(this IClass @class, string derivesFrom = ModelConstants.ThingName)
         {
             ArgumentNullException.ThrowIfNull(@class);
             ArgumentException.ThrowIfNullOrWhiteSpace(derivesFrom);

@@ -31,11 +31,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         private const string ContextMustBeIClass = "context is supposed to be an IClass";
 
         /// <summary>
-        /// The name of the base class in the Thing hierarchy, used for generating SQL queries and commands.
-        /// </summary>
-        private const string ThingName = "Thing";
-
-        /// <summary>
         /// Registers the DAO Handlebars helpers with the specified Handlebars context.
         /// </summary>
         /// <param name="handlebars">The <see cref="IHandlebars" /> context.</param>
@@ -348,7 +343,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .ToList();
 
             var referenceProperties = hierarchyClasses
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName).Union(x.QueryOppositeCompositeProperties()))
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName).Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.QueryIsDataType())
                 .Where(x => !x.QueryIsMemberOfManyToMany())
@@ -356,7 +351,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .ToList();
 
             var manyToManyReferenceProperties = hierarchyClasses
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName))
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName))
                 .Distinct()
                 .Where(x => !x.QueryIsDataType())
                 .Where(x => x.QueryIsMemberOfManyToMany())
@@ -426,7 +421,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 var propertyName = property.Name.LowerCaseFirstLetter();
 
                 var ownerClass = hierarchyClassesList
-                    .FirstOrDefault(c => c.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName).Contains(property) || c.QueryOppositeCompositeProperties().Contains(property));
+                    .FirstOrDefault(c => c.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName).Contains(property) || c.QueryOppositeCompositeProperties().Contains(property));
 
                 var ownerName = ownerClass?.Name ?? (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
 
@@ -552,7 +547,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             var hierarchyClasses = @class.QueryThingHierarchyClasses();
 
             var allProperties = hierarchyClasses
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName).Union(x.QueryOppositeCompositeProperties()))
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName).Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.IsDerived && !x.IsDerivedUnion && !x.IsThingAttribute())
                 .OrderBy(x => x.Name)

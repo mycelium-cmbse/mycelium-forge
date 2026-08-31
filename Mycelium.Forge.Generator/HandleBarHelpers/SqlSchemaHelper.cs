@@ -207,7 +207,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             var stringBuilder = new StringBuilder();
 
-            foreach (var className in classes.Where(x => x.QueryAllSpecializations().Count != 0 && x.QueryDerivesFrom("Thing")).Select(@class => @class.Name))
+            foreach (var className in classes.Where(x => x.QueryAllSpecializations().Count != 0 && x.QueryDerivesFrom(ModelConstants.ThingName)).Select(@class => @class.Name))
             {
                 var sql = $$"""
                             CREATE OR REPLACE FUNCTION "Forge".{{className.ToLower()}}_delete()
@@ -276,7 +276,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return;
             }
 
-            foreach (var baseClassName in @class.Generalization.Select(x => x.General).OfType<IClass>().Where(x => x.QueryDerivesFrom("Thing")).Select(baseClass => baseClass.Name))
+            foreach (var baseClassName in @class.Generalization.Select(x => x.General).OfType<IClass>().Where(x => x.QueryDerivesFrom(ModelConstants.ThingName)).Select(baseClass => baseClass.Name))
             {
                 var txt = $$"""
                             CREATE OR REPLACE TRIGGER trg_{{baseClassName.ToLower()}}_on_{{@class.QuerySqlTableName().ToLower()}}_delete
