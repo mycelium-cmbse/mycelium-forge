@@ -8,6 +8,7 @@
     "modifiedAt": "2026-01-01T00:00:00Z",
     "name": "ci-publish-key",
     "permissions": {
+      "@type": "unknown",
       "@id": "00000000-0000-0000-0000-000000000002"
     },
     "revokedAt": "2028-01-01T00:00:00Z",
@@ -23,14 +24,17 @@
     "@id": "00000000-0000-0000-0000-000000000003",
     "address": [
       {
+        "@type": "Address",
         "@id": "00000000-0000-0000-0000-000000000004"
       },
       {
+        "@type": "Address",
         "@id": "00000000-0000-0000-0000-000000000005"
       }
     ],
     "apiKey": [
       {
+        "@type": "APIKey",
         "@id": "00000000-0000-0000-0000-000000000001"
       }
     ],
@@ -44,22 +48,27 @@
     "origin": "https://example.com/jane-doe",
     "ownedOrganizationInvitation": [
       {
+        "@type": "OrganizationInvitation",
         "@id": "00000000-0000-0000-0000-000000000006"
       }
     ],
     "ownedPackage": [
       {
+        "@type": "Package",
         "@id": "00000000-0000-0000-0000-000000000007"
       }
     ],
     "ownedPackageInvitation": {
+      "@type": "PackageInvitation",
       "@id": "00000000-0000-0000-0000-000000000008"
     },
     "primaryAddress": {
+      "@type": "Address",
       "@id": "00000000-0000-0000-0000-000000000004"
     },
     "profileLink": [
       {
+        "@type": "ProfileLink",
         "@id": "00000000-0000-0000-0000-000000000009"
       }
     ],
@@ -73,6 +82,7 @@
     "addressLine1": "1 Infinite Loop",
     "addressLine2": "Suite 100",
     "country": {
+      "@type": "Country",
       "@id": "00000000-0000-0000-0000-000000000010"
     },
     "createdAt": "2026-01-01T00:00:00Z",
@@ -96,16 +106,19 @@
     "@id": "00000000-0000-0000-0000-000000000011",
     "account": [
       {
+        "@type": "Account",
         "@id": "00000000-0000-0000-0000-000000000003"
       }
     ],
     "administrator": [
       {
+        "@type": "Account",
         "@id": "00000000-0000-0000-0000-000000000003"
       }
     ],
     "country": [
       {
+        "@type": "Country",
         "@id": "00000000-0000-0000-0000-000000000010"
       }
     ],
@@ -115,16 +128,19 @@
     "name": "mycelium-forge",
     "organization": [
       {
+        "@type": "Organization",
         "@id": "00000000-0000-0000-0000-000000000012"
       }
     ],
     "packageType": [
       {
+        "@type": "PackageType",
         "@id": "00000000-0000-0000-0000-000000000013"
       }
     ],
     "profileType": [
       {
+        "@type": "ProfileType",
         "@id": "00000000-0000-0000-0000-000000000014"
       }
     ],
@@ -135,11 +151,13 @@
     "@id": "00000000-0000-0000-0000-000000000012",
     "address": [
       {
+        "@type": "Address",
         "@id": "00000000-0000-0000-0000-000000000004"
       }
     ],
     "administrator": [
       {
+        "@type": "Account",
         "@id": "00000000-0000-0000-0000-000000000003"
       }
     ],
@@ -150,6 +168,7 @@
     "logoBlobReference": "blob://logos/organization-12",
     "member": [
       {
+        "@type": "Account",
         "@id": "00000000-0000-0000-0000-000000000003"
       }
     ],
@@ -158,14 +177,17 @@
     "origin": "https://example.com/starion-group",
     "ownedPackage": [
       {
+        "@type": "Package",
         "@id": "00000000-0000-0000-0000-000000000007"
       }
     ],
     "primaryAddress": {
+      "@type": "Address",
       "@id": "00000000-0000-0000-0000-000000000004"
     },
     "profileLink": [
       {
+        "@type": "ProfileLink",
         "@id": "00000000-0000-0000-0000-000000000009"
       }
     ],
@@ -180,11 +202,13 @@
     "experisAt": "2026-01-15T00:00:00Z",
     "modifiedAt": "2026-01-01T00:00:00Z",
     "organization": {
+      "@type": "Organization",
       "@id": "00000000-0000-0000-0000-000000000012"
     },
     "organizationInvitationKind": "MEMBER",
     "status": "PENDING",
     "target": {
+      "@type": "Account",
       "@id": "00000000-0000-0000-0000-000000000003"
     }
   },
@@ -195,11 +219,13 @@
     "experisAt": "2026-01-15T00:00:00Z",
     "modifiedAt": "2026-01-01T00:00:00Z",
     "organization": {
+      "@type": "Organization",
       "@id": "00000000-0000-0000-0000-000000000012"
     },
     "organizationInvitationKind": "ADMINISTRATOR",
     "status": "ACCEPTED",
     "target": {
+      "@type": "Account",
       "@id": "00000000-0000-0000-0000-000000000003"
     }
   },
@@ -212,20 +238,24 @@
     "name": "mycelium-forge-client",
     "packageMaintainer": [
       {
+        "@type": "Account",
         "@id": "00000000-0000-0000-0000-000000000003"
       }
     ],
     "packageOwner": [
       {
+        "@type": "Account",
         "@id": "00000000-0000-0000-0000-000000000003"
       }
     ],
     "packageType": {
+      "@type": "PackageType",
       "@id": "00000000-0000-0000-0000-000000000013"
     },
     "shortName": "mycelium-forge-client",
     "version": [
       {
+        "@type": "PackageVersion",
         "@id": "00000000-0000-0000-0000-000000000016"
       }
     ],
@@ -238,11 +268,13 @@
     "experisAt": "2026-01-08T00:00:00Z",
     "modifiedAt": "2026-01-01T00:00:00Z",
     "package": {
+      "@type": "Package",
       "@id": "00000000-0000-0000-0000-000000000007"
     },
     "packageInvitationKind": "OWNER",
     "status": "REJECTED",
     "target": {
+      "@type": "Account",
       "@id": "00000000-0000-0000-0000-000000000003"
     }
   },
@@ -253,11 +285,13 @@
     "experisAt": "2026-01-08T00:00:00Z",
     "modifiedAt": "2026-01-01T00:00:00Z",
     "package": {
+      "@type": "Package",
       "@id": "00000000-0000-0000-0000-000000000007"
     },
     "packageInvitationKind": "MAINTAINER",
     "status": "REVOKED",
     "target": {
+      "@type": "Account",
       "@id": "00000000-0000-0000-0000-000000000003"
     }
   },
@@ -282,6 +316,7 @@
     "downloadCount": 42,
     "listed": true,
     "metaData": {
+      "@type": "PackageMetaData",
       "@id": "00000000-0000-0000-0000-000000000018"
     },
     "modifiedAt": "2026-01-01T00:00:00Z",
@@ -294,6 +329,7 @@
     "createdAt": "2026-01-01T00:00:00Z",
     "modifiedAt": "2026-01-01T00:00:00Z",
     "profileType": {
+      "@type": "ProfileType",
       "@id": "00000000-0000-0000-0000-000000000014"
     },
     "uri": "https://github.com/jane-doe"

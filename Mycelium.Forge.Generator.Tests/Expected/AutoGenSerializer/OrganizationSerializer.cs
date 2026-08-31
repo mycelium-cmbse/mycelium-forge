@@ -53,6 +53,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iOrganization.Address)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("Address"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();
@@ -64,6 +66,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iOrganization.Administrator)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("Account"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();
@@ -85,6 +89,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iOrganization.Member)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("Account"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();
@@ -102,6 +108,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iOrganization.OwnedPackage)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("Package"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();
@@ -110,6 +118,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteEndArray();
             writer.WritePropertyName("primaryAddress"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("Address"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iOrganization.PrimaryAddress);
             writer.WriteEndObject();
@@ -118,6 +128,8 @@ namespace Mycelium.Forge.Serializer.Json
             foreach (var item in iOrganization.ProfileLink)
             {
                 writer.WriteStartObject();
+                writer.WritePropertyName("@type"u8);
+                writer.WriteStringValue("ProfileLink"u8);
                 writer.WritePropertyName("@id"u8);
                 writer.WriteStringValue(item);
                 writer.WriteEndObject();

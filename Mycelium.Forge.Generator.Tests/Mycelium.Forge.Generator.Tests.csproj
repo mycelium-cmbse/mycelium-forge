@@ -51,6 +51,9 @@
         <None Include="Expected\**\*.sql">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Include="Expected\**\*.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

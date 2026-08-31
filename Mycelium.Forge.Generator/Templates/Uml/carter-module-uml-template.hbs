@@ -1,0 +1,43 @@
+// ------------------------------------------------------------------------------------------------
+// <copyright file="{{this.ClassName}}Module.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Api
+{
+    using Carter;
+
+    /// <summary>
+    /// Routes the {{this.ClassName}} endpoints of the Forge HTTP API.
+    /// </summary>
+    public sealed class {{this.ClassName}}Module : ICarterModule
+    {
+        /// <summary>
+        /// Registers the {{this.ClassName}} endpoints on the supplied route builder.
+        /// </summary>
+        /// <param name="app">
+        /// The endpoint route builder the routes are registered on.
+        /// </param>
+        public void AddRoutes(IEndpointRouteBuilder app)
+        {
+            var api = app.MapGroup("/api/v1");
+            {{ #each this.Registrations as | registration | }}
+
+            api.Map{{ registration.HttpVerb }}("{{ registration.Path }}", ({{ registration.LambdaParameters }}) => Results.StatusCode(StatusCodes.Status501NotImplemented))
+                .WithName("{{ registration.EndpointName }}");
+            {{/each}}
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------

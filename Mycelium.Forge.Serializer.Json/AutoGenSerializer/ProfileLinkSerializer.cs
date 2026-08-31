@@ -54,6 +54,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(iProfileLink.ModifiedAt);
             writer.WritePropertyName("profileType"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("ProfileType"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iProfileLink.ProfileType);
             writer.WriteEndObject();

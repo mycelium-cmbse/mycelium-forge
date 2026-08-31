@@ -25,6 +25,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Serializer.J
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Serializer.Json.Tests", "Mycelium.Forge.Serializer.Json.Tests\Mycelium.Forge.Serializer.Json.Tests.csproj", "{08A853BD-E551-4544-A226-EBC20918C344}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.OpenApiBundler", "Mycelium.Forge.OpenApiBundler\Mycelium.Forge.OpenApiBundler.csproj", "{17A1A42C-544F-419C-B461-48FBDDB0B8CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.OpenApiBundler.Tests", "Mycelium.Forge.OpenApiBundler.Tests\Mycelium.Forge.OpenApiBundler.Tests.csproj", "{B30D8C80-5D85-43D4-B267-6C7083C167D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +171,30 @@ Global
 		{08A853BD-E551-4544-A226-EBC20918C344}.Release|x64.Build.0 = Release|Any CPU
 		{08A853BD-E551-4544-A226-EBC20918C344}.Release|x86.ActiveCfg = Release|Any CPU
 		{08A853BD-E551-4544-A226-EBC20918C344}.Release|x86.Build.0 = Release|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Debug|x64.Build.0 = Debug|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Debug|x86.Build.0 = Debug|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Release|x64.ActiveCfg = Release|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Release|x64.Build.0 = Release|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Release|x86.ActiveCfg = Release|Any CPU
+		{17A1A42C-544F-419C-B461-48FBDDB0B8CE}.Release|x86.Build.0 = Release|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Debug|x64.Build.0 = Debug|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Debug|x86.Build.0 = Debug|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Release|x64.ActiveCfg = Release|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Release|x64.Build.0 = Release|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Release|x86.ActiveCfg = Release|Any CPU
+		{B30D8C80-5D85-43D4-B267-6C7083C167D5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

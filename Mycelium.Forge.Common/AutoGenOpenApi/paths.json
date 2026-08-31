@@ -1,0 +1,3626 @@
+﻿{
+  "paths": {
+    "/forge": {
+      "get": {
+        "tags": [
+          "Forge"
+        ],
+        "operationId": "GetForge",
+        "summary": "The Forge singleton itself.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Forge"
+        ],
+        "operationId": "UpdateForge",
+        "summary": "Partially update the Forge singleton\u0027s own properties.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/account": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ListAccount",
+        "summary": "The Account collection.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "CreateAccount",
+        "summary": "Add an Account.",
+        "description": "The request body is a flat array of the Account and any composite children being created with it in the same call (e.g. its Address/APIKey/OrganizationInvitation/Package/PackageInvitation/ProfileLink), mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{identifier}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "GetAccount",
+        "summary": "A single Account. Its composite children (Address, APIKey, OrganizationInvitation, Package, PackageInvitation, ProfileLink) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "SetAccount",
+        "summary": "Create or replace an Account, atomically with any composite children in the same call (e.g. its Address/APIKey/OrganizationInvitation/Package/PackageInvitation/ProfileLink).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "UpdateAccount",
+        "summary": "Partially update an Account, or add/update one of its composite children (Address, APIKey, OrganizationInvitation, Package, PackageInvitation, ProfileLink) as an additional array element, cross-referenced by @id. Not yet decided: how to express removing a composite child this way (JSON Merge Patch has no per-element delete for a nested collection).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "DeleteAccount",
+        "summary": "Delete an Account.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{shortName}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "GetAccountByShortName",
+        "summary": "A single Account. Its composite children (Address, APIKey, OrganizationInvitation, Package, PackageInvitation, ProfileLink) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ShortName"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/address": {
+      "get": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "ListAccountAddress",
+        "summary": "The Address collection. Scoped to a single Account.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "CreateAccountAddress",
+        "summary": "Add an Address. Scoped to a single Account.",
+        "description": "The request body is a flat array containing the Address being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ]
+      }
+    },
+    "/account/{accountIdentifier}/address/{identifier}": {
+      "get": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "GetAccountAddress",
+        "summary": "A single Address.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "SetAccountAddress",
+        "summary": "Create or replace an Address.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "UpdateAccountAddress",
+        "summary": "Partially update an Address\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "DeleteAccountAddress",
+        "summary": "Delete an Address.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization/{organizationIdentifier}/address": {
+      "get": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "ListOrganizationAddress",
+        "summary": "The Address collection. Scoped to a single Organization.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "CreateOrganizationAddress",
+        "summary": "Add an Address. Scoped to a single Organization.",
+        "description": "The request body is a flat array containing the Address being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          }
+        ]
+      }
+    },
+    "/organization/{organizationIdentifier}/address/{identifier}": {
+      "get": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "GetOrganizationAddress",
+        "summary": "A single Address.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "SetOrganizationAddress",
+        "summary": "Create or replace an Address.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "UpdateOrganizationAddress",
+        "summary": "Partially update an Address\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Address"
+        ],
+        "operationId": "DeleteOrganizationAddress",
+        "summary": "Delete an Address.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/apiKey": {
+      "get": {
+        "tags": [
+          "APIKey"
+        ],
+        "operationId": "ListAccountApiKey",
+        "summary": "The APIKey collection. Scoped to a single Account.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "APIKey"
+        ],
+        "operationId": "CreateAccountAPIKey",
+        "summary": "Add an APIKey. Scoped to a single Account.",
+        "description": "The request body is a flat array containing the APIKey being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ]
+      }
+    },
+    "/account/{accountIdentifier}/apiKey/{identifier}": {
+      "get": {
+        "tags": [
+          "APIKey"
+        ],
+        "operationId": "GetAccountAPIKey",
+        "summary": "A single APIKey.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "APIKey"
+        ],
+        "operationId": "SetAccountAPIKey",
+        "summary": "Create or replace an APIKey.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "APIKey"
+        ],
+        "operationId": "UpdateAccountAPIKey",
+        "summary": "Partially update an APIKey\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "APIKey"
+        ],
+        "operationId": "DeleteAccountAPIKey",
+        "summary": "Delete an APIKey.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/country": {
+      "get": {
+        "tags": [
+          "Country"
+        ],
+        "operationId": "ListCountry",
+        "summary": "The Country collection.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Country"
+        ],
+        "operationId": "CreateCountry",
+        "summary": "Add a Country.",
+        "description": "The request body is a flat array containing the Country being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/country/{identifier}": {
+      "get": {
+        "tags": [
+          "Country"
+        ],
+        "operationId": "GetCountry",
+        "summary": "A single Country.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Country"
+        ],
+        "operationId": "SetCountry",
+        "summary": "Create or replace a Country.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Country"
+        ],
+        "operationId": "UpdateCountry",
+        "summary": "Partially update a Country\u0027s own properties.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Country"
+        ],
+        "operationId": "DeleteCountry",
+        "summary": "Delete a Country.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization": {
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "ListOrganization",
+        "summary": "The Organization collection.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "CreateOrganization",
+        "summary": "Add an Organization.",
+        "description": "The request body is a flat array of the Organization and any composite children being created with it in the same call (e.g. its Address/Package/ProfileLink), mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization/{identifier}": {
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "GetOrganization",
+        "summary": "A single Organization. Its composite children (Address, Package, ProfileLink) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "SetOrganization",
+        "summary": "Create or replace an Organization, atomically with any composite children in the same call (e.g. its Address/Package/ProfileLink).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "UpdateOrganization",
+        "summary": "Partially update an Organization, or add/update one of its composite children (Address, Package, ProfileLink) as an additional array element, cross-referenced by @id. Not yet decided: how to express removing a composite child this way (JSON Merge Patch has no per-element delete for a nested collection).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "DeleteOrganization",
+        "summary": "Delete an Organization.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization/{shortName}": {
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "GetOrganizationByShortName",
+        "summary": "A single Organization. Its composite children (Address, Package, ProfileLink) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ShortName"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/ownedOrganizationInvitation": {
+      "get": {
+        "tags": [
+          "OrganizationInvitation"
+        ],
+        "operationId": "ListAccountOwnedOrganizationInvitation",
+        "summary": "The OrganizationInvitation collection. Scoped to a single Account.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "OrganizationInvitation"
+        ],
+        "operationId": "CreateAccountOrganizationInvitation",
+        "summary": "Add an OrganizationInvitation. Scoped to a single Account.",
+        "description": "The request body is a flat array containing the OrganizationInvitation being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ]
+      }
+    },
+    "/account/{accountIdentifier}/ownedOrganizationInvitation/{identifier}": {
+      "get": {
+        "tags": [
+          "OrganizationInvitation"
+        ],
+        "operationId": "GetAccountOrganizationInvitation",
+        "summary": "A single OrganizationInvitation.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "OrganizationInvitation"
+        ],
+        "operationId": "SetAccountOrganizationInvitation",
+        "summary": "Create or replace an OrganizationInvitation.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "OrganizationInvitation"
+        ],
+        "operationId": "UpdateAccountOrganizationInvitation",
+        "summary": "Partially update an OrganizationInvitation\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "OrganizationInvitation"
+        ],
+        "operationId": "DeleteAccountOrganizationInvitation",
+        "summary": "Delete an OrganizationInvitation.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/ownedPackage": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "ListAccountOwnedPackage",
+        "summary": "The Package collection. Scoped to a single Account.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "CreateAccountPackage",
+        "summary": "Add a Package. Scoped to a single Account.",
+        "description": "The request body is a flat array of the Package and any composite children being created with it in the same call (e.g. its PackageVersion), mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ]
+      }
+    },
+    "/account/{accountIdentifier}/ownedPackage/{identifier}": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetAccountPackage",
+        "summary": "A single Package. Its composite children (PackageVersion) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "SetAccountPackage",
+        "summary": "Create or replace a Package, atomically with any composite children in the same call (e.g. its PackageVersion).",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "UpdateAccountPackage",
+        "summary": "Partially update a Package, or add/update one of its composite children (PackageVersion) as an additional array element, cross-referenced by @id. Not yet decided: how to express removing a composite child this way (JSON Merge Patch has no per-element delete for a nested collection).",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "DeleteAccountPackage",
+        "summary": "Delete a Package.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/ownedPackage/{shortName}": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetAccountPackageByShortName",
+        "summary": "A single Package. Its composite children (PackageVersion) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/ShortName"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/organization/{organizationIdentifier}/ownedPackage": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "ListOrganizationOwnedPackage",
+        "summary": "The Package collection. Scoped to a single Organization.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "CreateOrganizationPackage",
+        "summary": "Add a Package. Scoped to a single Organization.",
+        "description": "The request body is a flat array of the Package and any composite children being created with it in the same call (e.g. its PackageVersion), mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          }
+        ]
+      }
+    },
+    "/organization/{organizationIdentifier}/ownedPackage/{identifier}": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetOrganizationPackage",
+        "summary": "A single Package. Its composite children (PackageVersion) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "SetOrganizationPackage",
+        "summary": "Create or replace a Package, atomically with any composite children in the same call (e.g. its PackageVersion).",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "UpdateOrganizationPackage",
+        "summary": "Partially update a Package, or add/update one of its composite children (PackageVersion) as an additional array element, cross-referenced by @id. Not yet decided: how to express removing a composite child this way (JSON Merge Patch has no per-element delete for a nested collection).",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "DeleteOrganizationPackage",
+        "summary": "Delete a Package.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization/{organizationIdentifier}/ownedPackage/{shortName}": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetOrganizationPackageByShortName",
+        "summary": "A single Package. Its composite children (PackageVersion) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/ShortName"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/ownedPackageInvitation": {
+      "get": {
+        "tags": [
+          "PackageInvitation"
+        ],
+        "operationId": "GetAccountPackageInvitation",
+        "summary": "A single PackageInvitation.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PackageInvitation"
+        ],
+        "operationId": "SetAccountPackageInvitation",
+        "summary": "Create or replace a PackageInvitation.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PackageInvitation"
+        ],
+        "operationId": "UpdateAccountPackageInvitation",
+        "summary": "Partially update a PackageInvitation\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PackageInvitation"
+        ],
+        "operationId": "DeleteAccountPackageInvitation",
+        "summary": "Delete a PackageInvitation.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/ownedPackage/{packageIdentifier}/version/{packageVersionIdentifier}/metaData": {
+      "get": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "GetAccountPackagePackageVersionPackageMetaData",
+        "summary": "A single PackageMetaData.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "SetAccountPackagePackageVersionPackageMetaData",
+        "summary": "Create or replace a PackageMetaData.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "UpdateAccountPackagePackageVersionPackageMetaData",
+        "summary": "Partially update a PackageMetaData\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "DeleteAccountPackagePackageVersionPackageMetaData",
+        "summary": "Delete a PackageMetaData.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization/{organizationIdentifier}/ownedPackage/{packageIdentifier}/version/{packageVersionIdentifier}/metaData": {
+      "get": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "GetOrganizationPackagePackageVersionPackageMetaData",
+        "summary": "A single PackageMetaData.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "SetOrganizationPackagePackageVersionPackageMetaData",
+        "summary": "Create or replace a PackageMetaData.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "UpdateOrganizationPackagePackageVersionPackageMetaData",
+        "summary": "Partially update a PackageMetaData\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PackageMetaData"
+        ],
+        "operationId": "DeleteOrganizationPackagePackageVersionPackageMetaData",
+        "summary": "Delete a PackageMetaData.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "name": "packageVersionIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning PackageVersion\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the version owned by that PackageVersion."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/packageType": {
+      "get": {
+        "tags": [
+          "PackageType"
+        ],
+        "operationId": "ListPackageType",
+        "summary": "The PackageType collection.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "PackageType"
+        ],
+        "operationId": "CreatePackageType",
+        "summary": "Add a PackageType.",
+        "description": "The request body is a flat array containing the PackageType being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/packageType/{identifier}": {
+      "get": {
+        "tags": [
+          "PackageType"
+        ],
+        "operationId": "GetPackageType",
+        "summary": "A single PackageType.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PackageType"
+        ],
+        "operationId": "SetPackageType",
+        "summary": "Create or replace a PackageType.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PackageType"
+        ],
+        "operationId": "UpdatePackageType",
+        "summary": "Partially update a PackageType\u0027s own properties.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PackageType"
+        ],
+        "operationId": "DeletePackageType",
+        "summary": "Delete a PackageType.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/ownedPackage/{packageIdentifier}/version": {
+      "get": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "ListAccountPackageVersion",
+        "summary": "The PackageVersion collection. Scoped to a single Package.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "CreateAccountPackagePackageVersion",
+        "summary": "Add a PackageVersion. Scoped to a single Package.",
+        "description": "The request body is a flat array of the PackageVersion and any composite children being created with it in the same call (e.g. its PackageMetaData), mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          }
+        ]
+      }
+    },
+    "/account/{accountIdentifier}/ownedPackage/{packageIdentifier}/version/{identifier}": {
+      "get": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "GetAccountPackagePackageVersion",
+        "summary": "A single PackageVersion. Its composite children (PackageMetaData) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "SetAccountPackagePackageVersion",
+        "summary": "Create or replace a PackageVersion, atomically with any composite children in the same call (e.g. its PackageMetaData).",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "UpdateAccountPackagePackageVersion",
+        "summary": "Partially update a PackageVersion, or add/update one of its composite children (PackageMetaData) as an additional array element, cross-referenced by @id. Not yet decided: how to express removing a composite child this way (JSON Merge Patch has no per-element delete for a nested collection).",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "DeleteAccountPackagePackageVersion",
+        "summary": "Delete a PackageVersion.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization/{organizationIdentifier}/ownedPackage/{packageIdentifier}/version": {
+      "get": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "ListOrganizationPackageVersion",
+        "summary": "The PackageVersion collection. Scoped to a single Package.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "CreateOrganizationPackagePackageVersion",
+        "summary": "Add a PackageVersion. Scoped to a single Package.",
+        "description": "The request body is a flat array of the PackageVersion and any composite children being created with it in the same call (e.g. its PackageMetaData), mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          }
+        ]
+      }
+    },
+    "/organization/{organizationIdentifier}/ownedPackage/{packageIdentifier}/version/{identifier}": {
+      "get": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "GetOrganizationPackagePackageVersion",
+        "summary": "A single PackageVersion. Its composite children (PackageMetaData) are also reachable directly, in their own right - include-contained reaches them here too, as sibling nodes in the response array.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "SetOrganizationPackagePackageVersion",
+        "summary": "Create or replace a PackageVersion, atomically with any composite children in the same call (e.g. its PackageMetaData).",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "UpdateOrganizationPackagePackageVersion",
+        "summary": "Partially update a PackageVersion, or add/update one of its composite children (PackageMetaData) as an additional array element, cross-referenced by @id. Not yet decided: how to express removing a composite child this way (JSON Merge Patch has no per-element delete for a nested collection).",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PackageVersion"
+        ],
+        "operationId": "DeleteOrganizationPackagePackageVersion",
+        "summary": "Delete a PackageVersion.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "name": "packageIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Package\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the ownedPackage owned by that Package."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/account/{accountIdentifier}/profileLink": {
+      "get": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "ListAccountProfileLink",
+        "summary": "The ProfileLink collection. Scoped to a single Account.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "CreateAccountProfileLink",
+        "summary": "Add a ProfileLink. Scoped to a single Account.",
+        "description": "The request body is a flat array containing the ProfileLink being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          }
+        ]
+      }
+    },
+    "/account/{accountIdentifier}/profileLink/{identifier}": {
+      "get": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "GetAccountProfileLink",
+        "summary": "A single ProfileLink.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "SetAccountProfileLink",
+        "summary": "Create or replace a ProfileLink.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "UpdateAccountProfileLink",
+        "summary": "Partially update a ProfileLink\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "DeleteAccountProfileLink",
+        "summary": "Delete a ProfileLink.",
+        "parameters": [
+          {
+            "name": "accountIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Account\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the account owned by that Account."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/organization/{organizationIdentifier}/profileLink": {
+      "get": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "ListOrganizationProfileLink",
+        "summary": "The ProfileLink collection. Scoped to a single Organization.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "CreateOrganizationProfileLink",
+        "summary": "Add a ProfileLink. Scoped to a single Organization.",
+        "description": "The request body is a flat array containing the ProfileLink being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          }
+        ]
+      }
+    },
+    "/organization/{organizationIdentifier}/profileLink/{identifier}": {
+      "get": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "GetOrganizationProfileLink",
+        "summary": "A single ProfileLink.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "SetOrganizationProfileLink",
+        "summary": "Create or replace a ProfileLink.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "UpdateOrganizationProfileLink",
+        "summary": "Partially update a ProfileLink\u0027s own properties.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProfileLink"
+        ],
+        "operationId": "DeleteOrganizationProfileLink",
+        "summary": "Delete a ProfileLink.",
+        "parameters": [
+          {
+            "name": "organizationIdentifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The owning Organization\u0027s own identifier - a canonical GUID, or a ShortGuid encoding of it - never a batch list, never its shortName. Scopes this route to the organization owned by that Organization."
+          },
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/profileType": {
+      "get": {
+        "tags": [
+          "ProfileType"
+        ],
+        "operationId": "ListProfileType",
+        "summary": "The ProfileType collection.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ProfileType"
+        ],
+        "operationId": "CreateProfileType",
+        "summary": "Add a ProfileType.",
+        "description": "The request body is a flat array containing the ProfileType being created, mirroring the response wire format.",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/profileType/{identifier}": {
+      "get": {
+        "tags": [
+          "ProfileType"
+        ],
+        "operationId": "GetProfileType",
+        "summary": "A single ProfileType.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeContained"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeReferenced"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ProfileType"
+        ],
+        "operationId": "SetProfileType",
+        "summary": "Create or replace a ProfileType.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ThingArray"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "201": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ProfileType"
+        ],
+        "operationId": "UpdateProfileType",
+        "summary": "Partially update a ProfileType\u0027s own properties.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PartialThing"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ThingArray"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProfileType"
+        ],
+        "operationId": "DeleteProfileType",
+        "summary": "Delete a ProfileType.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Identifier"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    }
+  }
+}

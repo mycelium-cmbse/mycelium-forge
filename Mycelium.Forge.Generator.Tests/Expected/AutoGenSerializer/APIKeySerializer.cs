@@ -60,6 +60,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(iAPIKey.Name);
             writer.WritePropertyName("permissions"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("unknown"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iAPIKey.Permissions);
             writer.WriteEndObject();

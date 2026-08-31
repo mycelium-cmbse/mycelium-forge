@@ -88,4 +88,42 @@
               WorkingDirectory="$(MSBuildProjectDirectory)"/>
     </Target>
 
+    <!--
+        OpenAPI bundle build.
+
+        Opt in per project with <UseOpenApiBundle>true</UseOpenApiBundle>. Merges three documents into
+        one self-contained wwwroot/openapi.json, via the Mycelium.Forge.OpenApiBundler console tool -
+        the same shape as DD-08's Tailwind build above: a build-time step producing a gitignored
+        artefact, unlike every other generator in this codebase (DTOs, serialisers, the SQL schema,
+        schemas.json and paths.json themselves), which is a manually-run, by-hand-reviewed
+        regeneration test whose output is committed:
+          - Mycelium.Forge.Common/OpenApi/shared.json (hand-authored: info/servers/shared components -
+            ProblemDetails, ThingArray, include-contained/include-referenced, the standard error
+            responses - none of it derivable from the model)
+          - Mycelium.Forge.Common/AutoGenOpenApi/paths.json (generated from the model's containment
+            structure)
+          - Mycelium.Forge.Common/AutoGenOpenApi/schemas.json (generated component schemas)
+
+        Neither generated file is regenerated here - both are read as already-committed files, the
+        same way this target reads shared.json. Only the merge into openapi.json happens at build time.
+
+        Hooked to BeforeTargets="CoreCompile" rather than "Build" (unlike the Tailwind target above):
+        Build's BeforeTargets hooks run only after Build's own DependsOnTargets chain - which includes
+        CoreCompile - has already completed, so if compilation fails, a BeforeTargets="Build" hook
+        never runs at all. Nothing here depends on compiled output, so there is no reason to risk that.
+    -->
+    <PropertyGroup Condition="'$(UseOpenApiBundle)' == 'true'">
+        <OpenApiBundlerProject>$(MSBuildThisFileDirectory)Mycelium.Forge.OpenApiBundler\Mycelium.Forge.OpenApiBundler.csproj</OpenApiBundlerProject>
+        <OpenApiSharedDocument>$(MSBuildThisFileDirectory)Mycelium.Forge.Common\OpenApi\shared.json</OpenApiSharedDocument>
+        <OpenApiPathsDocument>$(MSBuildThisFileDirectory)Mycelium.Forge.Common\AutoGenOpenApi\paths.json</OpenApiPathsDocument>
+        <OpenApiSchemasDocument>$(MSBuildThisFileDirectory)Mycelium.Forge.Common\AutoGenOpenApi\schemas.json</OpenApiSchemasDocument>
+        <OpenApiBundleOutput>$(MSBuildProjectDirectory)/wwwroot/openapi.json</OpenApiBundleOutput>
+    </PropertyGroup>
+
+    <Target Name="BuildOpenApiBundle"
+            BeforeTargets="CoreCompile"
+            Condition="'$(UseOpenApiBundle)' == 'true'">
+        <Exec Command="dotnet run --project &quot;$(OpenApiBundlerProject)&quot; -c $(Configuration) -- &quot;$(OpenApiSharedDocument)&quot; &quot;$(OpenApiPathsDocument)&quot; &quot;$(OpenApiSchemasDocument)&quot; &quot;$(OpenApiBundleOutput)&quot;"/>
+    </Target>
+
 </Project>

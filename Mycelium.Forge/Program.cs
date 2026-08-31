@@ -19,13 +19,16 @@ namespace Mycelium.Forge
     using Carter;
 
     using Microsoft.AspNetCore.HttpOverrides;
+    using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components;
     using Mycelium.Forge.Config;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Orm;
+    using Mycelium.Forge.RouteConstraints;
 
     using OpenTelemetry.Resources;
     using OpenTelemetry.Trace;
@@ -115,6 +118,15 @@ namespace Mycelium.Forge
 
             // SSS-FB-OBS-H4D: liveness and readiness probes for the orchestrator.
             builder.Services.AddHealthChecks();
+
+            // Custom route constraints so a generated item route can disambiguate {identifier:guid}
+            // (the built-in constraint), {identifier:ShortGuid} and {identifier:EnumerableOfShortGuid}
+            // from one another - all three are otherwise the same single-segment route shape.
+            builder.Services.Configure<RouteOptions>(options =>
+            {
+                options.ConstraintMap.Add("ShortGuid", typeof(ShortGuidRouteConstraint));
+                options.ConstraintMap.Add("EnumerableOfShortGuid", typeof(EnumerableOfShortGuidRouteConstraint));
+            });
 
             // The Forge HTTP API (SSS-FG-REG-A5E, D6F, Q7G, M8H) is routed through Carter modules.
             builder.Services.AddCarter();

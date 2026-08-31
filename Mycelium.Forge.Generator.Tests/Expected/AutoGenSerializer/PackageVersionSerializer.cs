@@ -56,6 +56,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteBooleanValue(iPackageVersion.Listed);
             writer.WritePropertyName("metaData"u8);
             writer.WriteStartObject();
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("PackageMetaData"u8);
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackageVersion.MetaData);
             writer.WriteEndObject();

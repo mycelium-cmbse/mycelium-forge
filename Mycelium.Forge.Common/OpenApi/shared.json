@@ -1,0 +1,120 @@
+{
+  "info": {
+    "title": "Mycelium Forge HTTP API",
+    "version": "1.0.0",
+    "description": "The Forge registry's HTTP API. Every response body is a flat JSON array; every element is {\"@id\": ..., \"@type\": ..., ...own properties}; relationships are never inlined, only {\"@id\": ..., \"@type\": ...} stubs. The route surface follows the model's own containment structure (Mycelium.Forge.Generator.Generators.UmlCoreOpenApiPathsGenerator), not REST convention - this API is not meant for humans navigating URLs in a browser. Authorization is out of scope for this document - no operation assumes or encodes an authorization rule; every route is shown as though the caller may do everything shown."
+  },
+  "servers": [
+    { "url": "/api/v1" }
+  ],
+  "components": {
+    "parameters": {
+      "IncludeContained": {
+        "name": "include-contained",
+        "in": "query",
+        "description": "Depth of the breadth-first walk over composite/containment edges (IProperty.IsComposite) from the response's root entity/entities. Contained objects are added as additional sibling nodes in the response array, never inlined.",
+        "schema": { "type": "integer", "minimum": 0, "default": 0 }
+      },
+      "IncludeReferenced": {
+        "name": "include-referenced",
+        "in": "query",
+        "description": "Depth of the breadth-first walk over plain association edges from the response's root entity/entities. Referenced objects are added as additional sibling nodes in the response array, never inlined.",
+        "schema": { "type": "integer", "minimum": 0, "default": 0 }
+      },
+      "ShortName": {
+        "name": "shortName",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "The resource's own Namespace.shortName."
+      },
+      "Identifier": {
+        "name": "identifier",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "Every resource is addressed by this same {identifier} segment, in one of three forms - all resolving the same item(s), none more canonical than another. Accepted for GET, PATCH and DELETE unless noted: (1) the resource's own Thing.Id, a canonical GUID (e.g. \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"); (2) a ShortGuid - a reversible, URL-safe base64 encoding of that same GUID, 22 characters (e.g. \"ZF-oPxdXYkWz_CyWP2avpg\" for the GUID above); (3) GET only - a bracketed, comma-separated list of ShortGuids (e.g. \"[ZF-oPxdXYkWz_CyWP2avpg,...]\") for a batch lookup of more than one resource in a single request. The three forms are indistinguishable as OpenAPI path templates (same single-segment shape) - Mycelium.Forge.RouteConstraints disambiguates them at the actual ASP.NET routing layer, each form its own registered route. Not yet implemented: the encode/decode logic itself, and whether a batch PATCH/DELETE (one shared partial body, or removing more than one resource at once) will ever be supported - GET is the only verb the batch form is routed for today."
+      }
+    },
+    "requestBodies": {
+      "ThingArray": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ThingArray" }
+          }
+        }
+      },
+      "PartialThing": {
+        "description": "Not yet decided: JSON Merge Patch (RFC 7396) vs JSON Patch (RFC 6902), which properties are patchable, and how this reconciles with the generated schemas' own \"every property required\" shape (correct for a full GET representation, not for a partial update).",
+        "required": true,
+        "content": {
+          "application/merge-patch+json": {
+            "schema": { "type": "object" }
+          }
+        }
+      }
+    },
+    "responses": {
+      "ThingArray": {
+        "description": "A flat array of {\"@id\", \"@type\", ...own properties} objects - one element for a single-resource operation, many for anything that returns more.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ThingArray" }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "The request could not be understood or failed validation.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "No such resource - or, for a read of a resource the caller isn't authorised to see, the same response as one that doesn't exist (design.md §10.1).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "The request conflicts with the resource's current state (e.g. a delete blocked by a foreign-key reference still pointing at it).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      },
+      "NotAcceptable": {
+        "description": "The Accept header names a media type/schema version this Forge instance doesn't support (design.md §10.3). Never silently falls back to the latest version.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ThingArray": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/ConcreteThing" }
+      },
+      "ProblemDetails": {
+        "description": "RFC 9457 Problem Details, plus a correlationId extension member (design.md §10.1) so a user-facing error can quote it.",
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "format": "uri-reference", "description": "Defaults to \"about:blank\" when no more specific URI is registered." },
+          "title": { "type": "string" },
+          "status": { "type": "integer" },
+          "detail": { "type": "string" },
+          "instance": { "type": "string", "format": "uri-reference" },
+          "correlationId": { "type": "string" }
+        },
+        "required": ["type", "title", "status", "correlationId"]
+      }
+    }
+  }
+}
