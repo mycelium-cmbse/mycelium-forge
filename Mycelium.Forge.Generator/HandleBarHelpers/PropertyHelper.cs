@@ -71,7 +71,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new ArgumentException("supposed to be IProperty");
                 }
 
-                if (!property.OwnedComment.Any() && property.Name.Equals("owner", StringComparison.OrdinalIgnoreCase))
+                if (property.OwnedComment.Count == 0 && property.Name.Equals("owner", StringComparison.OrdinalIgnoreCase))
                 {
                     var ownerTypeName = property.Type?.Name
                                         ?? property.Opposite?.Class?.Name
@@ -153,8 +153,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new HandlebarsException("{{#Property.WriteForDTOClass}} helper must have exactly two arguments");
                 }
 
-                var property = (parameters[0] as IProperty)!;
-                var classContext = (parameters[1] as IClass)!;
+                var property = (IProperty)parameters[0];
+                var classContext = (IClass)parameters[1];
 
                 var sb = new StringBuilder();
                 var propertyName = property.Name.CapitalizeFirstLetter();

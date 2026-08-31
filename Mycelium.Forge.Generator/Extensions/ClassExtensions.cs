@@ -168,19 +168,14 @@ namespace Mycelium.Forge.Generator.Extensions
             ArgumentNullException.ThrowIfNull(@class);
             ArgumentException.ThrowIfNullOrWhiteSpace(derivesFrom);
 
-            List<IProperty> properties = [];
+            var properties = @class.SuperClass
+                .Where(superClass => !superClass.QueryDerivesFrom(derivesFrom))
+                .SelectMany(superClass => superClass.OwnedAttribute)
+                .Concat(@class.OwnedAttribute)
+                .OrderBy(x => x.Name)
+                .ToList();
 
-            foreach (var superClass in @class.SuperClass)
-            {
-                if (!superClass.QueryDerivesFrom(derivesFrom))
-                {
-                    properties.AddRange(superClass.OwnedAttribute);
-                }
-            }
-
-            properties.AddRange(@class.OwnedAttribute);
-
-            return properties.OrderBy(x => x.Name).ToList();
+            return properties;
         }
 
         /// <summary>
@@ -254,6 +249,55 @@ namespace Mycelium.Forge.Generator.Extensions
             opposite.AddRange(@class.QueryOppositeCompositeProperties());
 
             return all.Union(opposite).Distinct().OrderBy(property => property.Name);
+        }
+
+        /// <summary>
+        /// Queries all general classifiers (superclasses) that derive from the "Thing" root class in reverse hierarchy order.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> for which the superclasses are queried.</param>
+        /// <returns>A list of <see cref="IClass" /> superclasses deriving from Thing in reverse order.</returns>
+        public static IReadOnlyList<IClass> QuerySuperClassesDerivingFromThing(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.QueryAllGeneralClassifiers()
+                .OfType<IClass>()
+                .Where(x => x.QueryDerivesFrom("Thing"))
+                .Reverse()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Queries the class and all its superclasses that derive from "Thing" or is the "Thing" class in reverse hierarchy order.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> for which the hierarchy classes are queried.</param>
+        /// <returns>A list of <see cref="IClass" /> hierarchy classes in reverse order.</returns>
+        public static IReadOnlyList<IClass> QueryThingHierarchyClasses(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.QueryAllGeneralClassifiers()
+                .OfType<IClass>()
+                .Where(x => x.QueryDerivesFrom("Thing") || x.IsThingClass())
+                .Reverse()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Queries all many-to-many properties for a class.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> to query many-to-many properties for.</param>
+        /// <param name="derivesFrom">The root class name to exclude.</param>
+        /// <returns>A list of many-to-many <see cref="IProperty" /> instances.</returns>
+        public static IReadOnlyList<IProperty> QueryManyToManyProperties(this IClass @class, string derivesFrom = "Thing")
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+            ArgumentException.ThrowIfNullOrWhiteSpace(derivesFrom);
+
+            return @class
+                .QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(derivesFrom)
+                .Where(x => x.QueryIsMemberOfManyToMany())
+                .ToList();
         }
     }
 }

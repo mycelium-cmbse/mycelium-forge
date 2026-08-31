@@ -18,7 +18,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     using uml4net.Classification;
     using uml4net.CommonStructure;
     using uml4net.Extensions;
-    using uml4net.SimpleClassifiers;
     using uml4net.StructuredClassifiers;
 
     /// <summary>
@@ -26,6 +25,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     /// </summary>
     public static class DaoHelper
     {
+        /// <summary>
+        /// The error message used when the Handlebars context is not an <see cref="IClass" />.
+        /// </summary>
+        private const string ContextMustBeIClass = "context is supposed to be an IClass";
+
+        /// <summary>
+        /// The name of the base class in the Thing hierarchy, used for generating SQL queries and commands.
+        /// </summary>
+        private const string ThingName = "Thing";
+
         /// <summary>
         /// Registers the DAO Handlebars helpers with the specified Handlebars context.
         /// </summary>
@@ -53,7 +62,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("context is supposed to be an IClass", nameof(context));
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
             }
 
             var valueTypeAndSingleReferenceProperties = new StringBuilder();
@@ -62,16 +71,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             valueTypeAndSingleReferenceProperties.AppendLine("                INSERT INTO \"Forge\".\"Thing\" (\"id\", \"classKind\", \"data\")");
             valueTypeAndSingleReferenceProperties.AppendLine("                VALUES (@id, @classKind, @data);");
 
-            var allSuperClassesThatDeriveFromThing = @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing"))
-                .Reverse()
-                .ToList();
+            var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
 
             foreach (var thingDerivedClass in allSuperClassesThatDeriveFromThing)
             {
-                var sqlColumns = "\"id\"";
-                var sqlParameters = "@id";
+                var sqlColumns = new StringBuilder("\"id\"");
+                var sqlParameters = new StringBuilder("@id");
 
                 var singleReferenceProperties = thingDerivedClass
                     .QuerySqlSingleReferenceProperties()
@@ -80,8 +85,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 foreach (var singleReferenceProperty in singleReferenceProperties)
                 {
-                    sqlColumns += $", \"{singleReferenceProperty.QuerySqlAttributeName()}\"";
-                    sqlParameters += $", @{singleReferenceProperty.QuerySqlAttributeName()}";
+                    sqlColumns.Append($", \"{singleReferenceProperty.QuerySqlAttributeName()}\"");
+                    sqlParameters.Append($", @{singleReferenceProperty.QuerySqlAttributeName()}");
                 }
 
                 valueTypeAndSingleReferenceProperties.AppendLine();
@@ -103,15 +108,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("context is supposed to be an IClass", nameof(context));
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
             }
 
-            var allSuperClassesThatDeriveFromThing = @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing"))
-                .Reverse()
-                .ToList();
-
+            var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
             var commandParametersToWrite = new StringBuilder();
             var dtoName = @class.Name.LowerCaseFirstLetter();
 
@@ -157,24 +157,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("context is supposed to be an IClass", nameof(context));
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
             }
 
-            var allSuperClassesThatDeriveFromThing = @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing"))
-                .Reverse()
-                .ToList();
-
+            var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
             var result = new StringBuilder();
             var dtoName = @class.Name.LowerCaseFirstLetter();
 
             foreach (var thingDerivedClass in allSuperClassesThatDeriveFromThing)
             {
-                var properties = thingDerivedClass
-                    .QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing")
-                    .Where(x => x.QueryIsMemberOfManyToMany())
-                    .ToList();
+                var properties = thingDerivedClass.QueryManyToManyProperties();
 
                 if (properties.Count == 0)
                 {
@@ -223,7 +215,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("context is supposed to be an IClass", nameof(context));
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
             }
 
             var valueTypeAndSingleReferenceProperties = new StringBuilder();
@@ -231,11 +223,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             valueTypeAndSingleReferenceProperties.AppendLine("                -- Thing");
             valueTypeAndSingleReferenceProperties.AppendLine("                UPDATE \"Forge\".\"Thing\" SET \"data\" = @data WHERE \"id\" = @id;");
 
-            var allSuperClassesThatDeriveFromThing = @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing"))
-                .Reverse()
-                .ToList();
+            var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
 
             foreach (var thingDerivedClass in allSuperClassesThatDeriveFromThing)
             {
@@ -279,24 +267,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("context is supposed to be an IClass", nameof(context));
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
             }
 
-            var allSuperClassesThatDeriveFromThing = @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing"))
-                .Reverse()
-                .ToList();
-
+            var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
             var result = new StringBuilder();
             var dtoName = @class.Name.LowerCaseFirstLetter();
 
             foreach (var thingDerivedClass in allSuperClassesThatDeriveFromThing)
             {
-                var properties = thingDerivedClass
-                    .QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing")
-                    .Where(x => x.QueryIsMemberOfManyToMany())
-                    .ToList();
+                var properties = thingDerivedClass.QueryManyToManyProperties();
 
                 if (properties.Count == 0)
                 {
@@ -353,18 +333,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("context is supposed to be an IClass", nameof(context));
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
             }
 
-            var classAndAllItsSuperClassesThatDeriveFromThing = @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing") || x.IsThingClass())
-                .Reverse()
-                .ToList();
-
+            var hierarchyClasses = @class.QueryThingHierarchyClasses();
             var sql = new StringBuilder();
 
-            var valueProperties = classAndAllItsSuperClassesThatDeriveFromThing
+            var valueProperties = hierarchyClasses
                 .SelectMany(x => x.QueryAllProperties())
                 .Distinct()
                 .Where(x => x.QueryIsDataType())
@@ -372,16 +347,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .OrderBy(x => x.Name)
                 .ToList();
 
-            var referenceProperties = classAndAllItsSuperClassesThatDeriveFromThing
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing").Union(x.QueryOppositeCompositeProperties()))
+            var referenceProperties = hierarchyClasses
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName).Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.QueryIsDataType())
                 .Where(x => !x.QueryIsMemberOfManyToMany())
                 .OrderBy(x => x.Name)
                 .ToList();
 
-            var manyToManyReferenceProperties = classAndAllItsSuperClassesThatDeriveFromThing
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing"))
+            var manyToManyReferenceProperties = hierarchyClasses
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName))
                 .Distinct()
                 .Where(x => !x.QueryIsDataType())
                 .Where(x => x.QueryIsMemberOfManyToMany())
@@ -393,6 +368,35 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             sql.AppendLine("                       \"Thing\".\"id\" AS \"id\",");
             sql.AppendLine("                       \"Thing\".\"classKind\" AS \"classKind\",");
 
+            AppendValueColumns(sql, valueProperties);
+            AppendReferenceColumns(sql, referenceProperties, hierarchyClasses);
+            AppendManyToManyColumns(sql, manyToManyReferenceProperties);
+
+            var lastCommaIndex = sql.ToString().LastIndexOf(',');
+
+            if (lastCommaIndex >= 0)
+            {
+                sql.Remove(lastCommaIndex, 1);
+            }
+
+            sql.AppendLine("                    FROM \"Forge\".\"Thing\" AS \"Thing\"");
+
+            AppendJoins(sql, hierarchyClasses);
+            AppendLateralJoins(sql, referenceProperties, manyToManyReferenceProperties, @class);
+
+            sql.AppendLine();
+            sql.AppendLine($"                    WHERE \"{@class.Name}\".\"id\" = ANY(@include);");
+
+            writer.WriteSafeString(sql);
+        }
+
+        /// <summary>
+        /// Appends value column selections from JSONB data to the SQL SELECT statement.
+        /// </summary>
+        /// <param name="sql">The <see cref="StringBuilder" /> for SQL generation.</param>
+        /// <param name="valueProperties">The list of value type properties.</param>
+        private static void AppendValueColumns(StringBuilder sql, IEnumerable<IProperty> valueProperties)
+        {
             foreach (var property in valueProperties)
             {
                 var suffix = property.QueryJsonbSelectDataTypeSuffix();
@@ -405,13 +409,24 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 sql.AppendLine($"                       (\"Thing\".\"data\"->>'{property.Name}'){suffix} AS \"{propertyName}\",");
             }
+        }
+
+        /// <summary>
+        /// Appends single and composite reference column selections to the SQL SELECT statement.
+        /// </summary>
+        /// <param name="sql">The <see cref="StringBuilder" /> for SQL generation.</param>
+        /// <param name="referenceProperties">The list of reference properties.</param>
+        /// <param name="hierarchyClasses">The list of classes in the Thing hierarchy.</param>
+        private static void AppendReferenceColumns(StringBuilder sql, IEnumerable<IProperty> referenceProperties, IEnumerable<IClass> hierarchyClasses)
+        {
+            var hierarchyClassesList = hierarchyClasses.ToList();
 
             foreach (var property in referenceProperties)
             {
                 var propertyName = property.Name.LowerCaseFirstLetter();
 
-                var ownerClass = classAndAllItsSuperClassesThatDeriveFromThing
-                    .FirstOrDefault(c => c.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing").Contains(property) || c.QueryOppositeCompositeProperties().Contains(property));
+                var ownerClass = hierarchyClassesList
+                    .FirstOrDefault(c => c.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName).Contains(property) || c.QueryOppositeCompositeProperties().Contains(property));
 
                 var ownerName = ownerClass?.Name ?? (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
 
@@ -428,30 +443,49 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     sql.AppendLine($"                       \"{ownerName.CapitalizeFirstLetter()}\".\"{propertyName}\" AS \"{propertyName}\",");
                 }
             }
+        }
 
+        /// <summary>
+        /// Appends many-to-many reference column selections to the SQL SELECT statement.
+        /// </summary>
+        /// <param name="sql">The <see cref="StringBuilder" /> for SQL generation.</param>
+        /// <param name="manyToManyReferenceProperties">The list of many-to-many reference properties.</param>
+        private static void AppendManyToManyColumns(StringBuilder sql, IEnumerable<IProperty> manyToManyReferenceProperties)
+        {
             foreach (var property in manyToManyReferenceProperties)
             {
                 var propertyName = property.Name.LowerCaseFirstLetter();
                 sql.AppendLine($"                       COALESCE(\"{property.QueryManyToManyTableName()}\".\"{propertyName}\",'{{}}'::uuid[]) AS \"{propertyName}\",");
             }
+        }
 
-            var lastCommaIndex = sql.ToString().LastIndexOf(',');
-
-            if (lastCommaIndex >= 0)
-            {
-                sql.Remove(lastCommaIndex, 1);
-            }
-
-            sql.AppendLine("                    FROM \"Forge\".\"Thing\" AS \"Thing\"");
-
-            foreach (var usedClass in classAndAllItsSuperClassesThatDeriveFromThing.Where(x => !x.IsThingClass()))
+        /// <summary>
+        /// Appends INNER JOIN statements for superclasses in the Thing hierarchy to the SQL query.
+        /// </summary>
+        /// <param name="sql">The <see cref="StringBuilder" /> for SQL generation.</param>
+        /// <param name="hierarchyClasses">The list of classes in the Thing hierarchy.</param>
+        private static void AppendJoins(StringBuilder sql, IEnumerable<IClass> hierarchyClasses)
+        {
+            foreach (var usedClassName in hierarchyClasses
+                         .Where(x => !x.IsThingClass())
+                         .Select(x => x.Name.CapitalizeFirstLetter()))
             {
                 sql.AppendLine();
-                sql.AppendLine($"                    -- READ {usedClass.Name.CapitalizeFirstLetter()}");
-                sql.AppendLine($"                    INNER JOIN \"Forge\".\"{usedClass.Name.CapitalizeFirstLetter()}\" AS \"{usedClass.Name.CapitalizeFirstLetter()}\"");
-                sql.AppendLine($"                            ON \"{usedClass.Name.CapitalizeFirstLetter()}\".\"id\" = \"Thing\".\"id\"");
+                sql.AppendLine($"                    -- READ {usedClassName}");
+                sql.AppendLine($"                    INNER JOIN \"Forge\".\"{usedClassName}\" AS \"{usedClassName}\"");
+                sql.AppendLine($"                            ON \"{usedClassName}\".\"id\" = \"Thing\".\"id\"");
             }
+        }
 
+        /// <summary>
+        /// Appends LEFT JOIN LATERAL subqueries for reference collections and many-to-many tables.
+        /// </summary>
+        /// <param name="sql">The <see cref="StringBuilder" /> for SQL generation.</param>
+        /// <param name="referenceProperties">The list of reference properties.</param>
+        /// <param name="manyToManyReferenceProperties">The list of many-to-many properties.</param>
+        /// <param name="class">The current subject class.</param>
+        private static void AppendLateralJoins(StringBuilder sql, IEnumerable<IProperty> referenceProperties, IEnumerable<IProperty> manyToManyReferenceProperties, IClass @class)
+        {
             foreach (var property in referenceProperties)
             {
                 var propName = property.Name.LowerCaseFirstLetter();
@@ -500,11 +534,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 sql.AppendLine("                       GROUP BY 1");
                 sql.AppendLine($"                    ) AS \"{manyToManyTableName}\" ON true");
             }
-
-            sql.AppendLine();
-            sql.AppendLine($"                    WHERE \"{@class.Name}\".\"id\" = ANY(@include);");
-
-            writer.WriteSafeString(sql);
         }
 
         /// <summary>
@@ -517,17 +546,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (context.Value is not IClass @class)
             {
-                throw new ArgumentException("context is supposed to be an IClass", nameof(context));
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
             }
 
-            var classAndAllItsSuperClassesThatDeriveFromThing = @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(x => x.QueryDerivesFrom("Thing") || x.IsThingClass())
-                .Reverse()
-                .ToList();
+            var hierarchyClasses = @class.QueryThingHierarchyClasses();
 
-            var allProperties = classAndAllItsSuperClassesThatDeriveFromThing
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing").Union(x.QueryOppositeCompositeProperties()))
+            var allProperties = hierarchyClasses
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ThingName).Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.IsDerived && !x.IsDerivedUnion && !x.IsThingAttribute())
                 .OrderBy(x => x.Name)
@@ -543,40 +568,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             for (var i = 0; i < allProperties.Count; i++)
             {
                 var property = allProperties[i];
-                var propName = property.Name.LowerCaseFirstLetter();
-                var propCSharpName = property.Name.CapitalizeFirstLetter();
                 var isLast = i == allProperties.Count - 1;
                 var comma = isLast ? string.Empty : ",";
 
-                if (!property.QueryIsDataType())
-                {
-                    if (property.QueryIsEnumerable())
-                    {
-                        mapBuilder.Append($"                {propCSharpName} = [.. (Guid[])reader[\"{propName}\"]]{comma}");
-                    }
-                    else
-                    {
-                        if (property.QueryIsNullable())
-                        {
-                            mapBuilder.Append($"                {propCSharpName} = reader[\"{propName}\"] is DBNull ? null : (Guid)reader[\"{propName}\"]{comma}");
-                        }
-                        else
-                        {
-                            mapBuilder.Append($"                {propCSharpName} = (Guid)reader[\"{propName}\"]{comma}");
-                        }
-                    }
-                }
-                else
-                {
-                    if (property.QueryIsNullable())
-                    {
-                        mapBuilder.Append($"                {propCSharpName} = reader[\"{propName}\"] is DBNull ? null : {property.GetReadConversion()}{comma}");
-                    }
-                    else
-                    {
-                        mapBuilder.Append($"                {propCSharpName} = {property.GetReadConversion()}{comma}");
-                    }
-                }
+                mapBuilder.Append(FormatDtoPropertyMapping(property, comma));
 
                 if (!isLast)
                 {
@@ -588,72 +583,63 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         }
 
         /// <summary>
-        /// Returns a JSONB select data type suffix that can be used in a SQL select query.
+        /// Formats the mapping line for a single DTO property from the data reader.
         /// </summary>
-        /// <param name="property">The property to get the suffix for.</param>
-        /// <returns>The data type suffix string.</returns>
-        private static string QueryJsonbSelectDataTypeSuffix(this IProperty property)
+        /// <param name="property">The property to map.</param>
+        /// <param name="comma">The trailing comma if not the last property.</param>
+        /// <returns>The formatted mapping code string.</returns>
+        private static string FormatDtoPropertyMapping(IProperty property, string comma)
         {
-            ArgumentNullException.ThrowIfNull(property);
+            var propName = property.Name.LowerCaseFirstLetter();
+            var propCSharpName = property.Name.CapitalizeFirstLetter();
 
-            var typeName = property.QuerySqlTypeName();
-
-            if (typeName is "text" or "timestamp" or "")
+            if (!property.QueryIsDataType())
             {
-                return string.Empty;
+                return FormatReferencePropertyMapping(property, propName, propCSharpName, comma);
             }
 
-            if (property.QueryIsEnumerable() && !property.IsComposite)
-            {
-                return string.Empty;
-            }
-
-            return $"::{typeName}";
+            return FormatDataTypePropertyMapping(property, propName, propCSharpName, comma);
         }
 
         /// <summary>
-        /// Returns a string representation of a type conversion expression for reading a property from an NpgsqlDataReader.
+        /// Formats the mapping line for an entity reference property.
         /// </summary>
-        /// <param name="property">The property to get the conversion expression for.</param>
-        /// <returns>The conversion expression string.</returns>
-        private static string GetReadConversion(this IProperty property)
+        /// <param name="property">The reference property.</param>
+        /// <param name="propName">The lowerCamelCase property name.</param>
+        /// <param name="propCSharpName">The PascalCase property name.</param>
+        /// <param name="comma">The trailing comma if not the last property.</param>
+        /// <returns>The formatted mapping code string.</returns>
+        private static string FormatReferencePropertyMapping(IProperty property, string propName, string propCSharpName, string comma)
         {
-            ArgumentNullException.ThrowIfNull(property);
-
-            var propName = property.Name.LowerCaseFirstLetter();
-            var typeName = property.QuerySqlTypeName();
-
-            if (typeName == "timestamp")
+            if (property.QueryIsEnumerable())
             {
-                return property.QueryIsNullable()
-                    ? $"reader[\"{propName}\"] is DBNull ? null : DateTime.Parse(reader[\"{propName}\"].ToString())"
-                    : $"DateTime.Parse((string)reader[\"{propName}\"])";
+                return $"                {propCSharpName} = [.. (Guid[])reader[\"{propName}\"]]{comma}";
             }
 
-            if (typeName == "date")
+            if (property.QueryIsNullable())
             {
-                return property.QueryIsNullable()
-                    ? $"reader[\"{propName}\"] is DBNull ? null : DateOnly.Parse(reader[\"{propName}\"].ToString())"
-                    : $"DateOnly.Parse((string)reader[\"{propName}\"])";
+                return $"                {propCSharpName} = reader[\"{propName}\"] is DBNull ? null : (Guid)reader[\"{propName}\"]{comma}";
             }
 
-            if (property.Type is IEnumeration enumerationType)
-            {
-                if (property.QueryIsEnumerable())
-                {
-                    return $"JsonSerializer.Deserialize<List<{enumerationType.Name}>>((string)reader[\"{propName}\"])";
-                }
+            return $"                {propCSharpName} = (Guid)reader[\"{propName}\"]{comma}";
+        }
 
-                return $"{enumerationType.Name}Provider.Parse((string)reader[\"{propName}\"])";
+        /// <summary>
+        /// Formats the mapping line for a value/data type property.
+        /// </summary>
+        /// <param name="property">The data type property.</param>
+        /// <param name="propName">The lowerCamelCase property name.</param>
+        /// <param name="propCSharpName">The PascalCase property name.</param>
+        /// <param name="comma">The trailing comma if not the last property.</param>
+        /// <returns>The formatted mapping code string.</returns>
+        private static string FormatDataTypePropertyMapping(IProperty property, string propName, string propCSharpName, string comma)
+        {
+            if (property.QueryIsNullable())
+            {
+                return $"                {propCSharpName} = reader[\"{propName}\"] is DBNull ? null : {property.QueryReadConversion()}{comma}";
             }
 
-            if (property.QueryIsEnumerable() && !property.IsComposite)
-            {
-                return $"JsonSerializer.Deserialize<List<{property.QueryCSharpTypeName()}>>((string)reader[\"{propName}\"])";
-            }
-
-            var csharpType = property.QueryCSharpTypeName();
-            return $"({csharpType})reader[\"{propName}\"]";
+            return $"                {propCSharpName} = {property.QueryReadConversion()}{comma}";
         }
     }
 }

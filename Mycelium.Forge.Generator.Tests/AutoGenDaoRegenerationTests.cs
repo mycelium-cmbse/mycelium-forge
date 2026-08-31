@@ -55,6 +55,8 @@ namespace Mycelium.Forge.Generator.Tests
             {
                 await File.WriteAllTextAsync(migrationPath, sql);
             }
+
+            Assert.That(sql, Is.Not.Null.And.Not.Empty);
         }
     }
 }

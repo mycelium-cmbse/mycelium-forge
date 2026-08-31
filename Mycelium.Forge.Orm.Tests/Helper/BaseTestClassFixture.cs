@@ -28,14 +28,12 @@ namespace Mycelium.Forge.Orm.Tests.Helper
     /// </summary>
     public abstract class BaseTestClassFixture
     {
-        private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder()
-            .WithImage("postgres:18.0-alpine3.22")
+        private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder("postgres:18.0-alpine3.22")
             .Build();
 
         /// <summary>
         /// Gets the serializer.
         /// </summary>
-        /// 
         protected ISerializer Serializer;
 
         /// <summary>

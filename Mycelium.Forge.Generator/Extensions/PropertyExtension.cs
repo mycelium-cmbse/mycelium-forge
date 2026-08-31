@@ -282,5 +282,66 @@ namespace Mycelium.Forge.Generator.Extensions
             return string.Equals(property.Name, "id", StringComparison.OrdinalIgnoreCase)
                    || string.Equals(property.Name, "classKind", StringComparison.OrdinalIgnoreCase);
         }
+
+        /// <summary>
+        /// Returns a JSONB select data type suffix that can be used in a SQL select query.
+        /// </summary>
+        /// <param name="property">The property to get the suffix for.</param>
+        /// <returns>The data type suffix string.</returns>
+        public static string QueryJsonbSelectDataTypeSuffix(this IProperty property)
+        {
+            ArgumentNullException.ThrowIfNull(property);
+
+            var typeName = property.QuerySqlTypeName();
+
+            if (typeName is "text" or "timestamp" or "" || (property.QueryIsEnumerable() && !property.IsComposite))
+            {
+                return string.Empty;
+            }
+
+            return $"::{typeName}";
+        }
+
+        /// <summary>
+        /// Returns a string representation of a type conversion expression for reading a property from an NpgsqlDataReader.
+        /// </summary>
+        /// <param name="property">The property to get the conversion expression for.</param>
+        /// <returns>The conversion expression string.</returns>
+        public static string QueryReadConversion(this IProperty property)
+        {
+            ArgumentNullException.ThrowIfNull(property);
+
+            var propName = property.Name.LowerCaseFirstLetter();
+            var typeName = property.QuerySqlTypeName();
+
+            if (typeName == "timestamp")
+            {
+                return property.QueryIsNullable()
+                    ? $"reader[\"{propName}\"] is DBNull ? null : DateTime.Parse((string)reader[\"{propName}\"], CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)"
+                    : $"DateTime.Parse((string)reader[\"{propName}\"], CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)";
+            }
+
+            if (typeName == "date")
+            {
+                return property.QueryIsNullable()
+                    ? $"reader[\"{propName}\"] is DBNull ? null : DateOnly.Parse((string)reader[\"{propName}\"], CultureInfo.InvariantCulture)"
+                    : $"DateOnly.Parse((string)reader[\"{propName}\"], CultureInfo.InvariantCulture)";
+            }
+
+            if (property.Type is IEnumeration enumerationType)
+            {
+                return property.QueryIsEnumerable()
+                    ? $"JsonSerializer.Deserialize<List<{enumerationType.Name}>>((string)reader[\"{propName}\"])"
+                    : $"{enumerationType.Name}Provider.Parse((string)reader[\"{propName}\"])";
+            }
+
+            if (property.QueryIsEnumerable() && !property.IsComposite)
+            {
+                return $"JsonSerializer.Deserialize<List<{property.QueryCSharpTypeName()}>>((string)reader[\"{propName}\"])";
+            }
+
+            var csharpType = property.QueryCSharpTypeName();
+            return $"({csharpType})reader[\"{propName}\"]";
+        }
     }
 }
