@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="{{this.Name}}.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -22,16 +22,15 @@ namespace Mycelium.Forge.Common
     {{ #Decorator.WriteClassAttribute this }}
     {{ Enum.ToString this.Visibility }} partial class {{this.Name}} : I{{this.Name}}
     {
-        {{ #each (Class.QueryAllProperties this) as | property | }}
-        {{ #Documentation property }}
+        {{ #each (Class.QueryDtoClassProperties this) as | property | }}
+        {{ #Property.WriteDocumentation property }}
         {{ #Decorator.WritePropertyAttribute property }}
         {{ #Decorator.WriteSubsettedPropertyAttribute property }}
         {{ #Decorator.WriteRedefinedPropertyAttribute property }}
         {{ #Decorator.WriteRedefinedByPropertyAttribute property ../ }}
         {{ #Decorator.WriteImplementsAttribute property }}
-        {{ #Property.WriteForDTOClass property ../ }}
-
-        {{/each}}
+        {{ #Property.WriteForDTOClass property ../ }}{{#unless @last}}
+{{/unless}}{{/each~}}
     }
 }
 

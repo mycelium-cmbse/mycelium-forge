@@ -113,6 +113,11 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iAccount.OwnedPackageInvitation);
             writer.WriteEndObject();
+            writer.WritePropertyName("owner"u8);
+            writer.WriteStartObject();
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(iAccount.Owner);
+            writer.WriteEndObject();
             writer.WritePropertyName("primaryAddress"u8);
             writer.WriteStartObject();
             writer.WritePropertyName("@id"u8);

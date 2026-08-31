@@ -102,11 +102,7 @@ namespace Mycelium.Forge.Generator.Extensions
             ArgumentNullException.ThrowIfNull(@class);
 
             var ownedSingleReferenceProperties = @class.QueryOwnedSingleReferenceProperties();
-
-            var oppositeSingleReferenceProperties = @class.QueryAllOppositeReferencesToMe()
-                .Where(x => x.Opposite != null)
-                .Select(x => x.Opposite!)
-                .Where(x => x.QueryOppositeAttributeNeedsSqlAttribute());
+            var oppositeSingleReferenceProperties = @class.QueryOppositeCompositeProperties();
 
             var results = ownedSingleReferenceProperties
                 .Union(oppositeSingleReferenceProperties)
@@ -185,6 +181,79 @@ namespace Mycelium.Forge.Generator.Extensions
             properties.AddRange(@class.OwnedAttribute);
 
             return properties.OrderBy(x => x.Name).ToList();
+        }
+
+        /// <summary>
+        /// This returns the opposite composite properties for this class.
+        /// </summary>
+        /// <param name="class">The class to start with.</param>
+        /// <returns>The collection of opposite composite properties.</returns>
+        /// <remarks>
+        /// Resolves reverse composite aggregation relationships across all packages so the child class knows its container owner.
+        /// </remarks>
+        public static IEnumerable<IProperty> QueryOppositeCompositeProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            var references = @class.QueryAllOppositeReferencesToMe().ToList();
+
+            var results = references
+                .Where(x => x.IsComposite)
+                .Select(x => x.Opposite)
+                .Distinct()
+                .ToArray();
+
+            if (results.Contains(null))
+            {
+                throw new InvalidOperationException("Unexpected null value as opposite property");
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Gets the properties for a DTO interface.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> to look for properties on or associations with.</param>
+        /// <returns>A collection of properties.</returns>
+        /// <remarks>
+        /// Combines owned attributes with reverse composite owner properties so DTO interfaces declare container ownership.
+        /// </remarks>
+        public static IEnumerable<IProperty> QueryDtoInterfaceProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            var owned = @class.OwnedAttribute;
+            var opposite = @class.QueryOppositeCompositeProperties();
+
+            return owned.Union(opposite).Distinct().OrderBy(property => property.Name);
+        }
+
+        /// <summary>
+        /// Gets the properties for a DTO class, including all properties from superclasses.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> to look for properties on or associations with.</param>
+        /// <returns>A collection of properties.</returns>
+        /// <remarks>
+        /// Combines full inheritance hierarchy properties with reverse composite owner properties across superclasses for concrete
+        /// DTO classes.
+        /// </remarks>
+        public static IEnumerable<IProperty> QueryDtoClassProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            var all = @class.QueryAllProperties().ToList();
+
+            List<IProperty> opposite = [];
+
+            foreach (var superClass in @class.QueryAllGeneralClassifiers().OfType<IClass>())
+            {
+                opposite.AddRange(superClass.QueryOppositeCompositeProperties());
+            }
+
+            opposite.AddRange(@class.QueryOppositeCompositeProperties());
+
+            return all.Union(opposite).Distinct().OrderBy(property => property.Name);
         }
     }
 }

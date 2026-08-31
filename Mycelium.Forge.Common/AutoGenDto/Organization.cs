@@ -125,6 +125,13 @@ namespace Mycelium.Forge.Common
         public List<Guid> OwnedPackage { get; set; } = [];
 
         /// <summary>
+        /// The unique identifier of the owning Forge.
+        /// </summary>
+        [Property(xmiId: "EAID_src092B28_2C7D_440f_96DA_76C3459D0736", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Implements(implementation: "IOrganization.Owner")]
+        public Guid Owner { get; set; }
+
+        /// <summary>
         /// The primary address of the Scope
         /// </summary>
         [Property(xmiId: "EAID_dst26755C_2E18_40f0_ABC3_15487E120A45", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
@@ -165,7 +172,6 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_2F9A52BC_EA1F_4af4_B07C_0FA5005BCF26", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         [Implements(implementation: "IScope.Website")]
         public string Website { get; set; }
-
     }
 }
 

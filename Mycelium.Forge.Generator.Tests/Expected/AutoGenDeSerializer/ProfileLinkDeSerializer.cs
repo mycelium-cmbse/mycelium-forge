@@ -48,6 +48,7 @@ namespace Mycelium.Forge.Serializer.Json
             var typeSeen = false;
             var createdAtSeen = false;
             var modifiedAtSeen = false;
+            var ownerSeen = false;
             var profileTypeSeen = false;
             var uriSeen = false;
 
@@ -103,6 +104,26 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the ProfileLink.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("profileType"u8))
                 {
                     profileTypeSeen = true;
@@ -153,6 +174,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the ProfileLink: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the ProfileLink: {Id}", dtoInstance.Id);
             }
             if (!profileTypeSeen)
             {

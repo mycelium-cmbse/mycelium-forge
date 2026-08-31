@@ -1,4 +1,4 @@
-------------------------------------------------------------------------------------------------
+﻿------------------------------------------------------------------------------------------------
 -- <copyright file="schema.sql" company="Starion Group S.A.">
 --
 --   Copyright 2026 Starion Group S.A.
@@ -31,8 +31,7 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
 -- Table definitions
 CREATE TABLE "Forge"."Account" (
     "id" uuid NOT NULL,
-    "forge" uuid,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -44,7 +43,7 @@ ALTER TABLE "Forge"."Account" SET (autovacuum_analyze_threshold = 2500);
 CREATE TABLE "Forge"."Address" (
     "id" uuid NOT NULL,
     "country" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -55,7 +54,7 @@ ALTER TABLE "Forge"."Address" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."APIKey" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -66,7 +65,7 @@ ALTER TABLE "Forge"."APIKey" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."Country" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -107,7 +106,7 @@ ALTER TABLE "Forge"."Namespace" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."Organization" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -119,7 +118,7 @@ ALTER TABLE "Forge"."Organization" SET (autovacuum_analyze_threshold = 2500);
 CREATE TABLE "Forge"."OrganizationInvitation" (
     "id" uuid NOT NULL,
     "organization" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     "target" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -131,7 +130,7 @@ ALTER TABLE "Forge"."OrganizationInvitation" SET (autovacuum_analyze_threshold =
 
 CREATE TABLE "Forge"."Package" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     "packageType" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -143,7 +142,7 @@ ALTER TABLE "Forge"."Package" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."PackageInvitation" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     "package" uuid NOT NULL,
     "target" uuid NOT NULL,
     PRIMARY KEY ("id")
@@ -156,7 +155,7 @@ ALTER TABLE "Forge"."PackageInvitation" SET (autovacuum_analyze_threshold = 2500
 
 CREATE TABLE "Forge"."PackageMetaData" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -167,7 +166,7 @@ ALTER TABLE "Forge"."PackageMetaData" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."PackageType" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -178,7 +177,7 @@ ALTER TABLE "Forge"."PackageType" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."PackageVersion" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -189,7 +188,7 @@ ALTER TABLE "Forge"."PackageVersion" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."ProfileLink" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     "profileType" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -201,7 +200,7 @@ ALTER TABLE "Forge"."ProfileLink" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."ProfileType" (
     "id" uuid NOT NULL,
-    "owner" uuid,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -308,8 +307,6 @@ CREATE INDEX "idx_Package_packageOwner_targetAccount" ON "Forge"."Package_packag
 
 
 -- Reference Properties that are not Many-to-Many
-ALTER TABLE "Forge"."Account" ADD CONSTRAINT "Account_forge_FK_Source" FOREIGN KEY ("forge") REFERENCES "Forge"."Forge" ("id") ON UPDATE CASCADE DEFERRABLE;
-CREATE INDEX "idx_Account_forge" ON "Forge"."Account" ("forge");
 ALTER TABLE "Forge"."Account" ADD CONSTRAINT "Account_owner_FK_Source" FOREIGN KEY ("owner") REFERENCES "Forge"."Forge" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX "idx_Account_owner" ON "Forge"."Account" ("owner");
 ALTER TABLE "Forge"."Address" ADD CONSTRAINT "Address_country_FK_Source" FOREIGN KEY ("country") REFERENCES "Forge"."Country" ("id") ON UPDATE CASCADE DEFERRABLE;

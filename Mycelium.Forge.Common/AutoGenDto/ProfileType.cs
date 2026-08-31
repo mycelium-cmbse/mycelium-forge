@@ -62,6 +62,12 @@ namespace Mycelium.Forge.Common
         [Implements(implementation: "IProfileType.Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// The unique identifier of the owning Forge.
+        /// </summary>
+        [Property(xmiId: "EAID_src10489B_3E2E_4795_AA63_0F70D1AB3F3A", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Implements(implementation: "IProfileType.Owner")]
+        public Guid Owner { get; set; }
     }
 }
 

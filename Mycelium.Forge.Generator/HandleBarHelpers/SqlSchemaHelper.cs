@@ -67,7 +67,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             foreach (var property in @class.QuerySqlSingleReferenceProperties())
             {
-                stringBuilder.AppendLine($"    \"{property.QuerySqlAttributeName()}\" {property.QuerySqlTypeName()}{(property.QueryIsNullable() ? "" : " NOT NULL")},");
+                // Preserves property UML multiplicity nullability without overriding non-owned composite properties
+                var isNullable = property.QueryIsNullable();
+                stringBuilder.AppendLine($"    \"{property.QuerySqlAttributeName()}\" {property.QuerySqlTypeName()}{(isNullable ? "" : " NOT NULL")},");
             }
 
             stringBuilder.AppendLine("    PRIMARY KEY (\"id\")");

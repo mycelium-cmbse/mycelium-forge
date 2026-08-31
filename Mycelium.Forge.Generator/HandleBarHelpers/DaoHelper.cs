@@ -74,7 +74,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 var sqlParameters = "@id";
 
                 var singleReferenceProperties = thingDerivedClass
-                    .QueryOwnedSingleReferenceProperties()
+                    .QuerySqlSingleReferenceProperties()
                     .Distinct()
                     .ToList();
 
@@ -118,7 +118,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             foreach (var thingDerivedClass in allSuperClassesThatDeriveFromThing)
             {
                 var singleReferenceProperties = thingDerivedClass
-                    .QueryOwnedSingleReferenceProperties()
+                    .QuerySqlSingleReferenceProperties()
                     .Distinct()
                     .ToList();
 
@@ -240,7 +240,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             foreach (var thingDerivedClass in allSuperClassesThatDeriveFromThing)
             {
                 var singleReferenceProperties = thingDerivedClass
-                    .QueryOwnedSingleReferenceProperties()
+                    .QuerySqlSingleReferenceProperties()
                     .Distinct()
                     .ToList();
 
@@ -373,7 +373,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .ToList();
 
             var referenceProperties = classAndAllItsSuperClassesThatDeriveFromThing
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing"))
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing").Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.QueryIsDataType())
                 .Where(x => !x.QueryIsMemberOfManyToMany())
@@ -396,39 +396,43 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             foreach (var property in valueProperties)
             {
                 var suffix = property.QueryJsonbSelectDataTypeSuffix();
-                var propName = property.Name.LowerCaseFirstLetter();
+                var propertyName = property.Name.LowerCaseFirstLetter();
 
                 if (property.Type?.Name is "UnlimitedNatural" or "String")
                 {
                     suffix = string.Empty;
                 }
 
-                sql.AppendLine($"                       (\"Thing\".\"data\"->>'{property.Name}'){suffix} AS \"{propName}\",");
+                sql.AppendLine($"                       (\"Thing\".\"data\"->>'{property.Name}'){suffix} AS \"{propertyName}\",");
             }
 
             foreach (var property in referenceProperties)
             {
-                var propName = property.Name.LowerCaseFirstLetter();
-                var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
+                var propertyName = property.Name.LowerCaseFirstLetter();
+
+                var ownerClass = classAndAllItsSuperClassesThatDeriveFromThing
+                    .FirstOrDefault(c => c.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing").Contains(property) || c.QueryOppositeCompositeProperties().Contains(property));
+
+                var ownerName = ownerClass?.Name ?? (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
 
                 if (property.QueryIsEnumerable())
                 {
-                    sql.AppendLine($"                       COALESCE(\"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\".\"{propName}\",'{{}}'::uuid[]) AS \"{propName}\",");
+                    sql.AppendLine($"                       COALESCE(\"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\".\"{propertyName}\",'{{}}'::uuid[]) AS \"{propertyName}\",");
                 }
                 else if (property.IsComposite)
                 {
-                    sql.AppendLine($"                       \"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\".\"{propName}\"::uuid AS \"{propName}\",");
+                    sql.AppendLine($"                       \"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\".\"{propertyName}\"::uuid AS \"{propertyName}\",");
                 }
                 else
                 {
-                    sql.AppendLine($"                       \"{ownerName.CapitalizeFirstLetter()}\".\"{propName}\" AS \"{propName}\",");
+                    sql.AppendLine($"                       \"{ownerName.CapitalizeFirstLetter()}\".\"{propertyName}\" AS \"{propertyName}\",");
                 }
             }
 
             foreach (var property in manyToManyReferenceProperties)
             {
-                var propName = property.Name.LowerCaseFirstLetter();
-                sql.AppendLine($"                       COALESCE(\"{property.QueryManyToManyTableName()}\".\"{propName}\",'{{}}'::uuid[]) AS \"{propName}\",");
+                var propertyName = property.Name.LowerCaseFirstLetter();
+                sql.AppendLine($"                       COALESCE(\"{property.QueryManyToManyTableName()}\".\"{propertyName}\",'{{}}'::uuid[]) AS \"{propertyName}\",");
             }
 
             var lastCommaIndex = sql.ToString().LastIndexOf(',');
@@ -523,7 +527,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .ToList();
 
             var allProperties = classAndAllItsSuperClassesThatDeriveFromThing
-                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing"))
+                .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses("Thing").Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.IsDerived && !x.IsDerivedUnion && !x.IsThingAttribute())
                 .OrderBy(x => x.Name)

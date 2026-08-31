@@ -63,6 +63,11 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(iAddress.Locality);
             writer.WritePropertyName("modifiedAt"u8);
             writer.WriteStringValue(iAddress.ModifiedAt);
+            writer.WritePropertyName("owner"u8);
+            writer.WriteStartObject();
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(iAddress.Owner);
+            writer.WriteEndObject();
             writer.WritePropertyName("postalCode"u8);
             writer.WriteStringValue(iAddress.PostalCode);
             writer.WritePropertyName("region"u8);

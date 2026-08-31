@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="{{ this.Name }}Serializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -49,7 +49,7 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(i{{this.Name }}.Id);
 
             {{#with this as |class| }}
-                {{ #each (Class.QueryAllProperties this) as | property | }}
+                {{ #each (Class.QueryDtoClassProperties this) as | property | }}
                     {{#unless this.IsDerived}}
                         {{#unless (Property.IsThingId property)}}
                         {{#unless (Property.IsRedefined property class)}}

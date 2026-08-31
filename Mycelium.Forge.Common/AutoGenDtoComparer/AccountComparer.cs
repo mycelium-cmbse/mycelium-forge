@@ -121,6 +121,11 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(IAccount.OwnedPackageInvitation), oldDto.OwnedPackageInvitation, newDto.OwnedPackageInvitation));
             }
 
+            if (oldDto.Owner != newDto.Owner)
+            {
+                changes.Add(new PropertyChange(nameof(IAccount.Owner), oldDto.Owner, newDto.Owner));
+            }
+
             if (oldDto.PrimaryAddress != newDto.PrimaryAddress)
             {
                 changes.Add(new PropertyChange(nameof(IAccount.PrimaryAddress), oldDto.PrimaryAddress, newDto.PrimaryAddress));

@@ -50,6 +50,7 @@ namespace Mycelium.Forge.Serializer.Json
             var listedSeen = false;
             var modifiedAtSeen = false;
             var nameSeen = false;
+            var ownerSeen = false;
             var packageMaintainerSeen = false;
             var packageOwnerSeen = false;
             var packageTypeSeen = false;
@@ -131,6 +132,26 @@ namespace Mycelium.Forge.Serializer.Json
                     if (nameScalarValue != null)
                     {
                         dtoInstance.Name = nameScalarValue;
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the Package.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
                     }
 
                     continue;
@@ -247,6 +268,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!nameSeen)
             {
                 logger.LogDebug("the name Json property was not found in the Package: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
             if (!packageMaintainerSeen)
             {

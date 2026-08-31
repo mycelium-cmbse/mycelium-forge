@@ -99,7 +99,7 @@ namespace Mycelium.Forge.Generator.Generators
         /// <returns>The cleaned up SQL code.</returns>
         protected override string CodeCleanup(string generatedCode)
         {
-            return generatedCode.Replace("&nbsp;", " ");
+            return generatedCode.Replace("&nbsp;", " ").NormalizeLineEndings();
         }
 
         /// <summary>
