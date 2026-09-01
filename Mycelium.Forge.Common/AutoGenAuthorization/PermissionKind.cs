@@ -167,6 +167,16 @@ namespace Mycelium.Forge.Common
         AcceptOrganizationInvitation,
 
         /// <summary>
+        /// Permission: DeclineOrganizationInvitation.
+        /// </summary>
+        DeclineOrganizationInvitation,
+
+        /// <summary>
+        /// Permission: RevokeOrganizationInvitation.
+        /// </summary>
+        RevokeOrganizationInvitation,
+
+        /// <summary>
         /// Permission: PublishPackageToPersonalScope.
         /// </summary>
         PublishPackageToPersonalScope,
@@ -180,6 +190,11 @@ namespace Mycelium.Forge.Common
         /// Permission: PublishPackageVersion.
         /// </summary>
         PublishPackageVersion,
+
+        /// <summary>
+        /// Permission: UpdatePackageVersion.
+        /// </summary>
+        UpdatePackageVersion,
 
         /// <summary>
         /// Permission: UnlistPackageVersion.
@@ -217,9 +232,9 @@ namespace Mycelium.Forge.Common
         ReadPublicPackage,
 
         /// <summary>
-        /// Permission: ReadOrganizationVisiblePackage.
+        /// Permission: ReadInternalPackage.
         /// </summary>
-        ReadOrganizationVisiblePackage,
+        ReadInternalPackage,
 
         /// <summary>
         /// Permission: ReadPrivatePackage.
@@ -230,6 +245,16 @@ namespace Mycelium.Forge.Common
         /// Permission: AcceptPackageInvitation.
         /// </summary>
         AcceptPackageInvitation,
+
+        /// <summary>
+        /// Permission: DeclinePackageInvitation.
+        /// </summary>
+        DeclinePackageInvitation,
+
+        /// <summary>
+        /// Permission: RevokePackageInvitation.
+        /// </summary>
+        RevokePackageInvitation,
 
         /// <summary>
         /// Permission: ManageOwnProfile.
@@ -254,7 +279,62 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Permission: ListOwnApiKeys.
         /// </summary>
-        ListOwnApiKeys
+        ListOwnApiKeys,
+
+        /// <summary>
+        /// Permission: CreateAddress.
+        /// </summary>
+        CreateAddress,
+
+        /// <summary>
+        /// Permission: ReadAddress.
+        /// </summary>
+        ReadAddress,
+
+        /// <summary>
+        /// Permission: UpdateAddress.
+        /// </summary>
+        UpdateAddress,
+
+        /// <summary>
+        /// Permission: DeleteAddress.
+        /// </summary>
+        DeleteAddress,
+
+        /// <summary>
+        /// Permission: CreateProfileLink.
+        /// </summary>
+        CreateProfileLink,
+
+        /// <summary>
+        /// Permission: ReadProfileLink.
+        /// </summary>
+        ReadProfileLink,
+
+        /// <summary>
+        /// Permission: UpdateProfileLink.
+        /// </summary>
+        UpdateProfileLink,
+
+        /// <summary>
+        /// Permission: DeleteProfileLink.
+        /// </summary>
+        DeleteProfileLink,
+
+        /// <summary>
+        /// Permission: ReadCountry.
+        /// </summary>
+        ReadCountry,
+
+        /// <summary>
+        /// Permission: ReadPackageType.
+        /// </summary>
+        ReadPackageType,
+
+        /// <summary>
+        /// Permission: ReadProfileType.
+        /// </summary>
+        ReadProfileType
     }
 }
 

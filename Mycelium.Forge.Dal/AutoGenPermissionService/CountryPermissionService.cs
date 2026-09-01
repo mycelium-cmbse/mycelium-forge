@@ -52,7 +52,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override Task<Result> IsAllowedToReadImplementation(IUserContext userContext, ICountry thing)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ReadPublicPackage));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ReadCountry));
         }
 
         /// <summary>

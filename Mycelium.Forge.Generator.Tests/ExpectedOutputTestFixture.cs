@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ExpectedOutputTestFixture.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -209,6 +209,24 @@ namespace Mycelium.Forge.Generator.Tests
 
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDtoValidator", $"{className}Validator.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the expected service class is generated.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCase("Package")]
+        public async Task Verify_that_the_expected_service_is_generated(string className)
+        {
+            var generator = new UmlCoreServiceGenerator();
+
+            var generated = await generator.GenerateServiceClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenService", $"{className}Service.cs"));
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }

@@ -41,7 +41,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IProfileLink toCreate)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.CreateProfileLink));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Task.FromResult(Result.Ok());
             }
 
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ReadProfileLink));
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Task.FromResult(Result.Ok());
             }
 
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.UpdateProfileLink));
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether deletion is permitted.</returns>
         protected override Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, Guid id)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.DeleteProfileLink));
         }
     }
 }

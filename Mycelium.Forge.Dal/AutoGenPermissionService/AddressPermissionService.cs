@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AddressPermissionService.cs" company="Starion Group S.A.">
-// 
+//
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-// 
+//
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -21,35 +21,35 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
     using Mycelium.Forge.Dal.PermissionService;
 
     /// <summary>
-    /// Default permission service for <see cref="IAddress" />.
+    /// Default permission service for <see cref="IAddress"/>.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
     public partial class AddressPermissionService : PermissionServiceBase<IAddress>, IAddressPermissionService
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AddressPermissionService" /> class.
+        /// Initializes a new instance of the <see cref="AddressPermissionService"/> class.
         /// </summary>
         public AddressPermissionService()
         {
         }
 
         /// <summary>
-        /// Core implementation hook for verifying create permissions on <paramref name="toCreate" />.
+        /// Core implementation hook for verifying create permissions on <paramref name="toCreate"/>.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="toCreate">The entity to create.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether creation is permitted.</returns>
+        /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IAddress toCreate)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.CreateAddress));
         }
 
         /// <summary>
-        /// Core implementation hook for verifying read permissions on <paramref name="thing" />.
+        /// Core implementation hook for verifying read permissions on <paramref name="thing"/>.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to read.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether reading is permitted.</returns>
+        /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IAddress thing)
         {
             if (userContext.AccountId.HasValue && thing.Owner == userContext.AccountId.Value)
@@ -57,17 +57,16 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Task.FromResult(Result.Ok());
             }
 
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ReadAddress));
         }
 
         /// <summary>
-        /// Core implementation hook for verifying update permissions comparing <paramref name="existingThing" /> and
-        /// <paramref name="updatedThing" />.
+        /// Core implementation hook for verifying update permissions comparing <paramref name="existingThing"/> and <paramref name="updatedThing"/>.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="existingThing">The existing persisted entity state.</param>
         /// <param name="updatedThing">The updated entity state.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether updating is permitted.</returns>
+        /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IAddress existingThing, IAddress updatedThing)
         {
             if (userContext.AccountId.HasValue && existingThing.Owner == userContext.AccountId.Value)
@@ -75,18 +74,18 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Task.FromResult(Result.Ok());
             }
 
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.UpdateAddress));
         }
 
         /// <summary>
-        /// Core implementation hook for verifying delete permissions on an entity by its <paramref name="id" />.
+        /// Core implementation hook for verifying delete permissions on an entity by its <paramref name="id"/>.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="id">The unique identifier of the entity to delete.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
+        /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether deletion is permitted.</returns>
         protected override Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, Guid id)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOwnProfile));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.DeleteAddress));
         }
     }
 }

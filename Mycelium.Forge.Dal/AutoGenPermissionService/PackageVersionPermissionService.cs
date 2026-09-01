@@ -64,7 +64,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IPackageVersion existingThing, IPackageVersion updatedThing)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.UnlistPackageVersion));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.UpdatePackageVersion));
         }
 
         /// <summary>

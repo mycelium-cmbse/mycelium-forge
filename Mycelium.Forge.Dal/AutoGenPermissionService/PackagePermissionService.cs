@@ -69,7 +69,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             if (thing.Visibility == VisibilityKind.INTERNAL)
             {
-                return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ReadOrganizationVisiblePackage));
+                return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ReadInternalPackage));
             }
 
             if (thing.Visibility == VisibilityKind.PRIVATE)

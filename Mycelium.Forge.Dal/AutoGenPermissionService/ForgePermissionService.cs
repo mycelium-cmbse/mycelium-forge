@@ -41,7 +41,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IForge toCreate)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ViewInstallationMetrics));
+            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ConfigurePlatformDefaults));
         }
 
         /// <summary>

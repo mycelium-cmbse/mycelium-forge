@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -39,6 +39,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
+        <ProjectReference Include="..\Mycelium.Forge.Dal\Mycelium.Forge.Dal.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Orm\Mycelium.Forge.Orm.csproj" />
     </ItemGroup>
 
