@@ -194,5 +194,23 @@ namespace Mycelium.Forge.Generator.Tests
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }
+
+        /// <summary>
+        /// Verifies that the expected DTO validator class for each concrete interesting class matches the expected golden file.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCaseSource(nameof(ConcreteInterestingClasses))]
+        public async Task Verify_that_the_expected_dto_validator_is_generated(string className)
+        {
+            var generator = new UmlCoreDtoValidatorGenerator();
+
+            var generated = await generator.GenerateDtoValidatorClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDtoValidator", $"{className}Validator.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
     }
 }
