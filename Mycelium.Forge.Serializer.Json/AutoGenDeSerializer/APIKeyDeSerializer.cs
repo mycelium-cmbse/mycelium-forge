@@ -51,6 +51,7 @@ namespace Mycelium.Forge.Serializer.Json
             var lastUsedAtSeen = false;
             var modifiedAtSeen = false;
             var nameSeen = false;
+            var ownerSeen = false;
             var permissionsSeen = false;
             var revokedAtSeen = false;
             var secretHashSeen = false;
@@ -139,6 +140,26 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the APIKey.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("permissions"u8))
                 {
                     permissionsSeen = true;
@@ -208,6 +229,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!nameSeen)
             {
                 logger.LogDebug("the name Json property was not found in the APIKey: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the APIKey: {Id}", dtoInstance.Id);
             }
             if (!permissionsSeen)
             {

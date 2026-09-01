@@ -79,6 +79,13 @@ namespace Mycelium.Forge.Common
         public OrganizationInvitationKind OrganizationInvitationKind { get; set; }
 
         /// <summary>
+        /// The unique identifier of the owning Account.
+        /// </summary>
+        [Property(xmiId: "EAID_srcA7266E_3349_4e94_A354_31A96E27C26C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Implements(implementation: "IOrganizationInvitation.Owner")]
+        public Guid Owner { get; set; }
+
+        /// <summary>
         /// The current state of an Invitation in its lifecycle, typed as InvitationStatusKind. Governs whether
         /// the invitation can still be acted on (accepted, declined) or has already been resolved or expired
         /// </summary>
@@ -92,7 +99,6 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_dst018175_11F9_4022_84DE_4FA17FC3D3B2", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         [Implements(implementation: "IOrganizationInvitation.Target")]
         public Guid Target { get; set; }
-
     }
 }
 

@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Mycelium.Forge.Orm.Tests</AssemblyName>
+        <RootNamespace>Mycelium.Forge.Orm.Tests</RootNamespace>
+        <LangVersion>14.0</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.4">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
+        <PackageReference Include="Moq" Version="4.20.72" />
+        <PackageReference Include="Npgsql" Version="10.0.3" />
+        <PackageReference Include="NUnit" Version="4.3.2" />
+        <PackageReference Include="NUnit.Analyzers" Version="4.6.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Testcontainers.PostgreSql" Version="4.14.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
+        <ProjectReference Include="..\Mycelium.Forge.Orm\Mycelium.Forge.Orm.csproj" />
+        <ProjectReference Include="..\Mycelium.Forge.Serializer.Json\Mycelium.Forge.Serializer.Json.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\Mycelium.Forge.Orm\Migrations\Script0001_InitialSchema.sql" Link="Data\Script0001_InitialSchema.sql">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AutoGenDtoRegenerationTests.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Generator.Tests
 {
     using System.IO;
-    using System.Threading.Tasks;
 
     using Mycelium.Forge.Generator.Generators;
 
@@ -25,19 +24,22 @@ namespace Mycelium.Forge.Generator.Tests
     [TestFixture]
     public class AutoGenDtoRegenerationTests
     {
+        /// <summary>
+        /// Regenerates the DTO interfaces and classes.
+        /// </summary>
         [Test]
-        public async Task Regenerate_AutoGenDto()
+        public void Regenerate_AutoGenDto()
         {
             var outputDirectory = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.WorkDirectory, "_Forge.Common.AutoGenDto"));
             outputDirectory.Create();
 
             var generator = new UmlCoreDtoGenerator();
-            
-            await Assert.MultipleAsync(async () =>
+
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(async () => await generator.GenerateDataTransferObjectInterfacesAsync(GeneratorSetupFixture.XmiReaderResult, outputDirectory), Throws.Nothing);
                 Assert.That(async () => await generator.GenerateDataTransferObjectClassesAsync(GeneratorSetupFixture.XmiReaderResult, outputDirectory), Throws.Nothing);
-            });
+            }
         }
     }
 }

@@ -27,6 +27,12 @@ namespace Mycelium.Forge.Common
     public partial interface IPackageInvitation : IInvitation
     {
         /// <summary>
+        /// The unique identifier of the owning Account.
+        /// </summary>
+        [Property(xmiId: "EAID_srcF552D7_FD16_4883_8758_17E13BC36BCC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        Guid Owner { get; set; }
+
+        /// <summary>
         /// The Package this is an invitation for
         /// </summary>
         [Property(xmiId: "EAID_dstDCE16A_F7BE_4be8_85B0_765D2E6348AF", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
@@ -43,7 +49,6 @@ namespace Mycelium.Forge.Common
         /// </summary>
         [Property(xmiId: "EAID_dst987416_2AAB_4120_9898_1EEA35FA0EF9", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         Guid Target { get; set; }
-
     }
 }
 

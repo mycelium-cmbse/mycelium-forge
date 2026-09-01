@@ -9,9 +9,6 @@
 
 namespace Mycelium.Forge
 {
-    using System;
-    using System.IO;
-
     using Autofac.Extensions.DependencyInjection;
 
     using BlazorBlueprint.Components;
@@ -19,11 +16,9 @@ namespace Mycelium.Forge
     using Carter;
 
     using Microsoft.AspNetCore.HttpOverrides;
-    using Microsoft.Extensions.Configuration;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components;
-    using Mycelium.Forge.Config;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Orm;
 
@@ -76,8 +71,8 @@ namespace Mycelium.Forge
 
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-                    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile("appsettings.json", true, false)
+                    .AddJsonFile($"appsettings.{environment}.json", true, false)
                     .AddEnvironmentVariables()
                     .Build();
 
@@ -140,6 +135,7 @@ namespace Mycelium.Forge
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             };
+
             forwardedHeadersOptions.KnownIPNetworks.Clear();
             forwardedHeadersOptions.KnownProxies.Clear();
             app.UseForwardedHeaders(forwardedHeadersOptions);

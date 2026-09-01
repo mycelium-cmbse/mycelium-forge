@@ -68,7 +68,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="classContext">The optional class context.</param>
         /// <param name="property">The property being compared.</param>
         /// <returns>The formatted target interface name, or an empty string if unknown.</returns>
-        public static string DetermineTargetType(IClass? classContext, IProperty property)
+        public static string DetermineTargetType(IClass classContext, IProperty property)
         {
             if (classContext != null)
             {

@@ -79,6 +79,12 @@ namespace Mycelium.Forge.Common
         [Implements(implementation: "ICountry.NumericCode")]
         public string NumericCode { get; set; }
 
+        /// <summary>
+        /// The unique identifier of the owning Forge.
+        /// </summary>
+        [Property(xmiId: "EAID_src695154_E9D7_48d8_887D_FAFCDDA173E1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Implements(implementation: "ICountry.Owner")]
+        public Guid Owner { get; set; }
     }
 }
 

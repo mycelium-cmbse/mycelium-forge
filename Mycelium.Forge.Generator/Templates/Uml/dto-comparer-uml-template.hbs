@@ -44,7 +44,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 return changes;
             }
 
-            {{#each (Class.QueryAllProperties this) as | property |}}
+            {{#each (Class.QueryDtoClassProperties this) as | property |}}
             {{#forge.DtoComparer.WriteComparisonIfApplicable property @root}}
             {{/each}}
             return changes;

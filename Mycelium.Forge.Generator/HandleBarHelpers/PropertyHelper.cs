@@ -1,21 +1,20 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PropertyHelper.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
 namespace Mycelium.Forge.Generator.HandleBarHelpers
 {
-    using System;
     using System.Globalization;
     using System.Text;
 
-    using Mycelium.Forge.Generator.Extensions;
-    
     using HandlebarsDotNet;
+
+    using Mycelium.Forge.Generator.Extensions;
 
     using uml4net.Classification;
     using uml4net.CommonStructure;
@@ -24,7 +23,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     using uml4net.StructuredClassifiers;
 
     /// <summary>
-    /// A Handlebars block helper for the <see cref="IProperty"/> interface, adapted from
+    /// A Handlebars block helper for the <see cref="IProperty" /> interface, adapted from
     /// SysML2.NET.CodeGenerator's own local PropertyHelper: DTO reference properties render as the
     /// referenced type's unique identifier (<c>Guid</c>/<c>Guid?</c>/<c>List&lt;Guid&gt;</c>), not as
     /// an embedded object or interface, per the reference-property conventions documented at
@@ -33,13 +32,81 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     public static class PropertyHelper
     {
         /// <summary>
-        /// Registers the <see cref="PropertyHelper"/>
+        /// Registers the <see cref="PropertyHelper" />
         /// </summary>
         /// <param name="handlebars">
-        /// The <see cref="IHandlebars"/> context with which the helper needs to be registered
+        /// The <see cref="IHandlebars" /> context with which the helper needs to be registered
         /// </param>
         public static void RegisterPropertyHelper(this IHandlebars handlebars)
         {
+            ArgumentNullException.ThrowIfNull(handlebars);
+
+            // uml4net's QueryOwnedAttributeOrdered misses reverse composite association ends; unions owned attributes with owner properties
+            handlebars.RegisterHelper("Class.QueryDtoInterfaceProperties", (context, _) =>
+            {
+                if (context.Value is not IClass @class)
+                {
+                    throw new ArgumentException("supposed to be IClass");
+                }
+
+                return @class.QueryDtoInterfaceProperties();
+            });
+
+            // uml4net's QueryAllProperties misses reverse composite association ends; unions full hierarchy properties with superclass owner properties
+            handlebars.RegisterHelper("Class.QueryDtoClassProperties", (context, _) =>
+            {
+                if (context.Value is not IClass @class)
+                {
+                    throw new ArgumentException("supposed to be IClass");
+                }
+
+                return @class.QueryDtoClassProperties();
+            });
+
+            // Writes XML documentation for a property, providing a default summary for owner properties
+            handlebars.RegisterHelper("Property.WriteDocumentation", (in writer, in options, in context, in arguments) =>
+            {
+                if (context.Value is not IProperty property)
+                {
+                    throw new ArgumentException("supposed to be IProperty");
+                }
+
+                if (property.OwnedComment.Count == 0 && property.Name.Equals("owner", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ownerTypeName = property.Type?.Name
+                                        ?? property.Opposite?.Class?.Name
+                                        ?? property.Opposite?.Type?.Name
+                                        ?? "container";
+
+                    writer.WriteSafeString($"        /// <summary>{Environment.NewLine}        /// The unique identifier of the owning {ownerTypeName}.{Environment.NewLine}        /// </summary>{Environment.NewLine}");
+                    return;
+                }
+
+                if (handlebars.Configuration.Helpers.TryGetValue("Documentation", out var docHelper))
+                {
+                    docHelper.Invoke(writer, options, context, arguments);
+                }
+            });
+
+            // Writes [Implements] attribute on DTO class properties referencing the declaring interface
+            handlebars.RegisterHelper("Decorator.WriteImplementsAttribute", (writer, context, _) =>
+            {
+                if (context.Value is not IProperty property)
+                {
+                    throw new ArgumentException("supposed to be IProperty");
+                }
+
+                var propertyName = property.Name.CapitalizeFirstLetter();
+
+                // Computes the declaring interface name from the property's class, owner, or opposite type
+                var className = property.Class?.Name
+                                ?? (property.Owner as IClass)?.Name
+                                ?? (property.Opposite?.Type as IClass)?.Name
+                                ?? (property.Owner as INamedElement)?.Name;
+
+                writer.WriteSafeString($"[Implements(implementation: \"I{className}.{propertyName}\")]{Environment.NewLine}");
+            });
+
             handlebars.RegisterHelper("Property.WriteForDTOInterface", (writer, context, _) =>
             {
                 if (context.Value is not IProperty property)
@@ -54,44 +121,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     sb.Append("new ");
                 }
 
-                if (property.Type is IDataType)
-                {
-                    if (property.QueryIsEnumerable())
-                    {
-                        sb.Append($"List<{property.QueryCSharpTypeName()}>");
-                        sb.Append(' ');
-                    }
-                    else
-                    {
-                        sb.Append($"{property.QueryCSharpTypeName()}");
-
-                        if (uml4net.Extensions.PropertyExtensions.QueryIsNullableAndNotString(property))
-                        {
-                            sb.Append('?');
-                        }
-
-                        sb.Append(' ');
-                    }
-                }
-                else
-                {
-                    if (property.QueryIsEnumerable())
-                    {
-                        sb.Append("List<Guid>");
-                        sb.Append(' ');
-                    }
-                    else
-                    {
-                        sb.Append("Guid");
-
-                        if (uml4net.Extensions.PropertyExtensions.QueryIsNullableAndNotString(property))
-                        {
-                            sb.Append('?');
-                        }
-
-                        sb.Append(' ');
-                    }
-                }
+                sb.Append(QueryDtoPropertyTypeName(property));
+                sb.Append(' ');
 
                 var propertyName = property.Name.CapitalizeFirstLetter();
 
@@ -122,8 +153,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new HandlebarsException("{{#Property.WriteForDTOClass}} helper must have exactly two arguments");
                 }
 
-                var property = (parameters[0] as IProperty)!;
-                var classContext = (parameters[1] as IClass)!;
+                var property = (IProperty)parameters[0];
+                var classContext = (IClass)parameters[1];
 
                 var sb = new StringBuilder();
                 var propertyName = property.Name.CapitalizeFirstLetter();
@@ -135,44 +166,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     sb.Append(' ');
                 }
 
-                if (property.Type is IDataType)
-                {
-                    if (property.QueryIsEnumerable())
-                    {
-                        sb.Append($"List<{property.QueryCSharpTypeName()}>");
-                        sb.Append(' ');
-                    }
-                    else
-                    {
-                        sb.Append($"{property.QueryCSharpTypeName()}");
-
-                        if (uml4net.Extensions.PropertyExtensions.QueryIsNullableAndNotString(property))
-                        {
-                            sb.Append('?');
-                        }
-
-                        sb.Append(' ');
-                    }
-                }
-                else
-                {
-                    if (property.QueryIsEnumerable())
-                    {
-                        sb.Append("List<Guid>");
-                        sb.Append(' ');
-                    }
-                    else
-                    {
-                        sb.Append("Guid");
-
-                        if (uml4net.Extensions.PropertyExtensions.QueryIsNullableAndNotString(property))
-                        {
-                            sb.Append('?');
-                        }
-
-                        sb.Append(' ');
-                    }
-                }
+                sb.Append(QueryDtoPropertyTypeName(property));
+                sb.Append(' ');
 
                 if (property.IsDerived || property.IsDerivedUnion)
                 {
@@ -264,26 +259,60 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             });
         }
 
-       /// <summary>
-        /// Gets the getter implementation for an <see cref="IProperty"/> that has been redefined, for DTO generation
+        /// <summary>
+        /// Computes the C# type name for a DTO property, mapping DataTypes and entity references to C# types or GUIDs.
         /// </summary>
-        /// <param name="redefinedProperty">The redefined property</param>
-        /// <param name="redefinition">The property that redefines <paramref name="redefinedProperty"/></param>
-        /// <param name="context">Gets the <see cref="IClass"/> context</param>
-        /// <returns>The getter implementation</returns>
-        private static string GetRedefinedPropertyGetterImplementationForDto(IProperty redefinedProperty, IProperty redefinition, IClass context)
+        /// <param name="property">The <see cref="IProperty" /> to compute the type name for.</param>
+        /// <returns>The C# type name string.</returns>
+        private static string QueryDtoPropertyTypeName(IProperty property)
         {
-            string redefinitionPropertyName;
+            if (property.Type is IDataType)
+            {
+                if (property.QueryIsEnumerable())
+                {
+                    return $"List<{property.QueryCSharpTypeName()}>";
+                }
 
+                var nullable = property.QueryIsNullableAndNotString() ? "?" : string.Empty;
+                return $"{property.QueryCSharpTypeName()}{nullable}";
+            }
+
+            if (property.QueryIsEnumerable())
+            {
+                return "List<Guid>";
+            }
+
+            var guidNullable = property.QueryIsNullableAndNotString() ? "?" : string.Empty;
+            return $"Guid{guidNullable}";
+        }
+
+        /// <summary>
+        /// Resolves the property name expression for a redefinition in the specified class context.
+        /// </summary>
+        /// <param name="redefinition">The redefinition <see cref="IProperty" />.</param>
+        /// <param name="context">The <see cref="IClass" /> context.</param>
+        /// <returns>The property name expression string.</returns>
+        private static string GetRedefinitionPropertyName(IProperty redefinition, IClass context)
+        {
             if (redefinition.TryQueryRedefinedByProperty(context, out _))
             {
                 var owner = (INamedElement)redefinition.Owner;
-                redefinitionPropertyName = $"((I{owner.Name})this).{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
+                return $"((I{owner.Name})this).{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
             }
-            else
-            {
-                redefinitionPropertyName = $"this.{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
-            }
+
+            return $"this.{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
+        }
+
+        /// <summary>
+        /// Gets the getter implementation for an <see cref="IProperty" /> that has been redefined, for DTO generation
+        /// </summary>
+        /// <param name="redefinedProperty">The redefined property</param>
+        /// <param name="redefinition">The property that redefines <paramref name="redefinedProperty" /></param>
+        /// <param name="context">Gets the <see cref="IClass" /> context</param>
+        /// <returns>The getter implementation</returns>
+        private static string GetRedefinedPropertyGetterImplementationForDto(IProperty redefinedProperty, IProperty redefinition, IClass context)
+        {
+            var redefinitionPropertyName = GetRedefinitionPropertyName(redefinition, context);
 
             if (redefinedProperty.QueryIsEnumerable() && redefinition.QueryIsEnumerable())
             {
@@ -292,22 +321,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             if (redefinedProperty.QueryIsEnumerable() && !redefinition.QueryIsEnumerable())
             {
-                return uml4net.Extensions.PropertyExtensions.QueryIsNullableAndNotString(redefinition)
+                return redefinition.QueryIsNullableAndNotString()
                     ? $"{redefinitionPropertyName}.HasValue ? [{redefinitionPropertyName}.Value] : [];"
                     : $"[{redefinitionPropertyName}];";
             }
 
-            return uml4net.Extensions.PropertyExtensions.QueryIsNullableAndNotString(redefinition)
+            return redefinition.QueryIsNullableAndNotString()
                 ? $"{redefinitionPropertyName}.HasValue ? {redefinitionPropertyName}.Value : {(redefinedProperty.QueryIsReferenceType() ? "Guid.Empty" : "default")};"
                 : $"{redefinitionPropertyName};";
         }
 
         /// <summary>
-        /// Gets the setter implementation for an <see cref="IProperty"/> that has been redefined, for DTO generation
+        /// Gets the setter implementation for an <see cref="IProperty" /> that has been redefined, for DTO generation
         /// </summary>
         /// <param name="redefinedProperty">The redefined property</param>
-        /// <param name="redefinition">The property that redefines <paramref name="redefinedProperty"/></param>
-        /// <param name="context">Gets the <see cref="IClass"/> context</param>
+        /// <param name="redefinition">The property that redefines <paramref name="redefinedProperty" /></param>
+        /// <param name="context">Gets the <see cref="IClass" /> context</param>
         /// <returns>The setter implementation</returns>
         private static string GetRedefinedPropertySetterImplementationForDto(IProperty redefinedProperty, IProperty redefinition, IClass context)
         {
@@ -316,17 +345,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return string.Empty;
             }
 
-            string redefinitionPropertyName;
-
-            if (redefinition.TryQueryRedefinedByProperty(context, out _))
-            {
-                var owner = (INamedElement)redefinition.Owner;
-                redefinitionPropertyName = $"((I{owner.Name})this).{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
-            }
-            else
-            {
-                redefinitionPropertyName = $"this.{redefinition.QueryPropertyNameBasedOnUmlProperties()}";
-            }
+            var redefinitionPropertyName = GetRedefinitionPropertyName(redefinition, context);
 
             if (redefinedProperty.QueryIsEnumerable() == redefinition.QueryIsEnumerable())
             {

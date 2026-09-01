@@ -59,6 +59,7 @@ namespace Mycelium.Forge.Serializer.Json
             var ownedOrganizationInvitationSeen = false;
             var ownedPackageSeen = false;
             var ownedPackageInvitationSeen = false;
+            var ownerSeen = false;
             var primaryAddressSeen = false;
             var profileLinkSeen = false;
             var shortNameSeen = false;
@@ -266,6 +267,26 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the Account.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("primaryAddress"u8))
                 {
                     primaryAddressSeen = true;
@@ -393,6 +414,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!ownedPackageInvitationSeen)
             {
                 logger.LogDebug("the ownedPackageInvitation Json property was not found in the Account: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the Account: {Id}", dtoInstance.Id);
             }
             if (!primaryAddressSeen)
             {

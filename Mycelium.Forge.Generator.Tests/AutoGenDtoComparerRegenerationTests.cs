@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Generator.Tests
 {
     using System.IO;
-    using System.Threading.Tasks;
 
     using Mycelium.Forge.Generator.Generators;
 
@@ -24,7 +23,6 @@ namespace Mycelium.Forge.Generator.Tests
         /// <summary>
         /// Regenerates the DTO comparer classes.
         /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public void Regenerate_AutoGenDtoComparer()
         {

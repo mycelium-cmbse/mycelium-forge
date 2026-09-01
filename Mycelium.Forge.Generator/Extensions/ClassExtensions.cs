@@ -48,10 +48,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(@class);
 
-            return @class.QueryAllGeneralClassifiers()
-                .OfType<IClass>()
-                .Where(superClass => superClass != @class)
-                .Any(superClass => superClass.IsThingClass());
+            return @class.QueryDerivesFrom(ModelConstants.ThingName);
         }
 
         /// <summary>
@@ -63,7 +60,7 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(@class);
 
-            return @class.Name == "Thing";
+            return @class.Name == ModelConstants.ThingName;
         }
 
         /// <summary>
@@ -79,6 +76,22 @@ namespace Mycelium.Forge.Generator.Extensions
         }
 
         /// <summary>
+        /// Returns all the properties that are owned single reference properties on this class.
+        /// </summary>
+        /// <param name="class">The class to query single reference properties for.</param>
+        /// <returns>A collection of owned single reference properties.</returns>
+        public static IEnumerable<IProperty> QueryOwnedSingleReferenceProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.OwnedAttribute
+                .Where(x => !x.IsComposite && x.QueryOwnedAttributeNeedsSqlAttribute())
+                .Distinct()
+                .OrderBy(x => x.Name)
+                .ToArray();
+        }
+
+        /// <summary>
         /// Returns all the properties that need a single foreign key reference column in a table based on ownership and/or
         /// cardinality.
         /// </summary>
@@ -88,15 +101,8 @@ namespace Mycelium.Forge.Generator.Extensions
         {
             ArgumentNullException.ThrowIfNull(@class);
 
-            var ownedSingleReferenceProperties = @class.OwnedAttribute
-                .Where(x => x.Type != null && !x.QueryIsDataType())
-                .Where(x => !x.IsComposite)
-                .Where(x => x.QueryOwnedAttributeNeedsSqlAttribute());
-
-            var oppositeSingleReferenceProperties = @class.QueryAllOppositeReferencesToMe()
-                .Where(x => x.Opposite != null)
-                .Select(x => x.Opposite!)
-                .Where(x => x.QueryOppositeAttributeNeedsSqlAttribute());
+            var ownedSingleReferenceProperties = @class.QueryOwnedSingleReferenceProperties();
+            var oppositeSingleReferenceProperties = @class.QueryOppositeCompositeProperties();
 
             var results = ownedSingleReferenceProperties
                 .Union(oppositeSingleReferenceProperties)
@@ -147,6 +153,151 @@ namespace Mycelium.Forge.Generator.Extensions
                 .ToList();
 
             return results;
+        }
+
+        /// <summary>
+        /// Queries all the <see cref="IProperty" /> instances that are owned by the current
+        /// <paramref name="class" /> or by a super-class that do not derive from a specific
+        /// named <see cref="IClass" /> that is typically at the root of the inheritance tree.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> for which the properties are queried.</param>
+        /// <param name="derivesFrom">The name of the root <see cref="IClass" />.</param>
+        /// <returns>A list of <see cref="IProperty" />.</returns>
+        public static IReadOnlyList<IProperty> QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(this IClass @class, string derivesFrom)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+            ArgumentException.ThrowIfNullOrWhiteSpace(derivesFrom);
+
+            var properties = @class.SuperClass
+                .Where(superClass => !superClass.QueryDerivesFrom(derivesFrom))
+                .SelectMany(superClass => superClass.OwnedAttribute)
+                .Concat(@class.OwnedAttribute)
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            return properties;
+        }
+
+        /// <summary>
+        /// This returns the opposite composite properties for this class.
+        /// </summary>
+        /// <param name="class">The class to start with.</param>
+        /// <returns>The collection of opposite composite properties.</returns>
+        /// <remarks>
+        /// Resolves reverse composite aggregation relationships across all packages so the child class knows its container owner.
+        /// </remarks>
+        public static IEnumerable<IProperty> QueryOppositeCompositeProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            var references = @class.QueryAllOppositeReferencesToMe().ToList();
+
+            var results = references
+                .Where(x => x.IsComposite)
+                .Select(x => x.Opposite)
+                .Distinct()
+                .ToArray();
+
+            if (results.Contains(null))
+            {
+                throw new InvalidOperationException("Unexpected null value as opposite property");
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Gets the properties for a DTO interface.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> to look for properties on or associations with.</param>
+        /// <returns>A collection of properties.</returns>
+        /// <remarks>
+        /// Combines owned attributes with reverse composite owner properties so DTO interfaces declare container ownership.
+        /// </remarks>
+        public static IEnumerable<IProperty> QueryDtoInterfaceProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            var owned = @class.OwnedAttribute;
+            var opposite = @class.QueryOppositeCompositeProperties();
+
+            return owned.Union(opposite).Distinct().OrderBy(property => property.Name);
+        }
+
+        /// <summary>
+        /// Gets the properties for a DTO class, including all properties from superclasses.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> to look for properties on or associations with.</param>
+        /// <returns>A collection of properties.</returns>
+        /// <remarks>
+        /// Combines full inheritance hierarchy properties with reverse composite owner properties across superclasses for concrete
+        /// DTO classes.
+        /// </remarks>
+        public static IEnumerable<IProperty> QueryDtoClassProperties(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            var all = @class.QueryAllProperties().ToList();
+
+            List<IProperty> opposite = [];
+
+            foreach (var superClass in @class.QueryAllGeneralClassifiers().OfType<IClass>())
+            {
+                opposite.AddRange(superClass.QueryOppositeCompositeProperties());
+            }
+
+            opposite.AddRange(@class.QueryOppositeCompositeProperties());
+
+            return all.Union(opposite).Distinct().OrderBy(property => property.Name);
+        }
+
+        /// <summary>
+        /// Queries all general classifiers (superclasses) that derive from the "Thing" root class in reverse hierarchy order.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> for which the superclasses are queried.</param>
+        /// <returns>A list of <see cref="IClass" /> superclasses deriving from Thing in reverse order.</returns>
+        public static IReadOnlyList<IClass> QuerySuperClassesDerivingFromThing(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.QueryAllGeneralClassifiers()
+                .OfType<IClass>()
+                .Where(x => x.QueryDerivesFrom(ModelConstants.ThingName))
+                .Reverse()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Queries the class and all its superclasses that derive from "Thing" or is the "Thing" class in reverse hierarchy order.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> for which the hierarchy classes are queried.</param>
+        /// <returns>A list of <see cref="IClass" /> hierarchy classes in reverse order.</returns>
+        public static IReadOnlyList<IClass> QueryThingHierarchyClasses(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return @class.QueryAllGeneralClassifiers()
+                .OfType<IClass>()
+                .Where(x => x.QueryDerivesFrom(ModelConstants.ThingName) || x.IsThingClass())
+                .Reverse()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Queries all many-to-many properties for a class.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> to query many-to-many properties for.</param>
+        /// <param name="derivesFrom">The root class name to exclude.</param>
+        /// <returns>A list of many-to-many <see cref="IProperty" /> instances.</returns>
+        public static IReadOnlyList<IProperty> QueryManyToManyProperties(this IClass @class, string derivesFrom = ModelConstants.ThingName)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+            ArgumentException.ThrowIfNullOrWhiteSpace(derivesFrom);
+
+            return @class
+                .QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(derivesFrom)
+                .Where(x => x.QueryIsMemberOfManyToMany())
+                .ToList();
         }
     }
 }

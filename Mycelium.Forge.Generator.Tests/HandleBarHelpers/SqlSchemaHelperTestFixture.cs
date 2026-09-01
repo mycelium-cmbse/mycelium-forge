@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SqlSchemaHelperTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -124,6 +124,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Does.Contain("CREATE TABLE \"Forge\".\"Account\""));
                 Assert.That(accountResult, Does.Contain("\"id\" uuid NOT NULL"));
+                Assert.That(accountResult, Does.Contain("\"owner\" uuid NOT NULL"));
                 Assert.That(accountResult, Does.Contain("PRIMARY KEY (\"id\")"));
             }
         }

@@ -97,6 +97,8 @@ namespace Mycelium.Forge.Generator.Generators
             this.Handlebars.RegisterDecoratorHelper();
             this.Handlebars.RegisterNamedElementHelper();
 
+            // Registers custom generator property helpers such as Class.QueryDtoClassProperties and Class.QueryDtoInterfaceProperties
+            HandleBarHelpers.PropertyHelper.RegisterPropertyHelper(this.Handlebars);
             this.Handlebars.RegisterDtoComparerHelper();
         }
 

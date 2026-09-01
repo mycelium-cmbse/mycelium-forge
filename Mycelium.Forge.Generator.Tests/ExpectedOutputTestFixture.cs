@@ -13,8 +13,8 @@ namespace Mycelium.Forge.Generator.Tests
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.Generators;
-    using Mycelium.Forge.Generator.Tests.Extensions;
 
     using uml4net.Reporting.Generators;
 
@@ -173,6 +173,24 @@ namespace Mycelium.Forge.Generator.Tests
 
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDtoComparer", $"{className}Comparer.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the expected DAO class is generated.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCase("Package")]
+        public async Task Verify_that_the_expected_dao_is_generated(string className)
+        {
+            var generator = new UmlCoreDaoGenerator();
+
+            var generated = await generator.GenerateDaoClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDao", $"{className}Dao.cs"));
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }

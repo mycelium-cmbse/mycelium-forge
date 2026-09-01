@@ -118,7 +118,6 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_89C8F800_EE59_4169_853B_B38E6B1857AC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         [Implements(implementation: "INamespace.ShortName")]
         public string ShortName { get; set; }
-
     }
 }
 

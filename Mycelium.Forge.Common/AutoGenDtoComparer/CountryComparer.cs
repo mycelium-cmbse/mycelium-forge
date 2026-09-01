@@ -74,6 +74,11 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(ICountry.NumericCode), oldDto.NumericCode, newDto.NumericCode));
             }
 
+            if (oldDto.Owner != newDto.Owner)
+            {
+                changes.Add(new PropertyChange(nameof(ICountry.Owner), oldDto.Owner, newDto.Owner));
+            }
+
             return changes;
         }
     }
