@@ -1,0 +1,45 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="RolePermissionMap.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Common
+{
+    using System.CodeDom.Compiler;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Static mapping of <see cref="RoleKind"/> to their granted <see cref="PermissionKind"/> sets.
+    /// </summary>
+    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    public static class RolePermissionMap
+    {
+        /// <summary>
+        /// Gets the dictionary mapping each <see cref="RoleKind"/> to its list of granted <see cref="PermissionKind"/> values.
+        /// </summary>
+        public static IReadOnlyDictionary<RoleKind, IReadOnlyList<PermissionKind>> RoleToPermissions { get; } = new Dictionary<RoleKind, IReadOnlyList<PermissionKind>>
+        {
+            {{#each this.Roles as | role |}}
+            {
+                RoleKind.{{role.Name}}, [
+                    {{#each role.GrantedPermissions as | permission |}}
+                    PermissionKind.{{permission}},
+                    {{/each}}
+                ]
+            },
+            {{/each}}
+        };
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------

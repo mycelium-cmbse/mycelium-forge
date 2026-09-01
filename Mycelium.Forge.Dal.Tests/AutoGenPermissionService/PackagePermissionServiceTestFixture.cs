@@ -1,0 +1,260 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="PackagePermissionServiceTestFixture.cs" company="Starion Group S.A.">
+// 
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+// 
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
+{
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Dal.AutoGenPermissionService;
+
+    using NUnit.Framework;
+
+    /// <summary>
+    /// Test fixture for <see cref="PackagePermissionService" />.
+    /// </summary>
+    [TestFixture]
+    public class PackagePermissionServiceTestFixture
+    {
+        private PackagePermissionService permissionService;
+        private Guid userId;
+        private Guid otherUserId;
+        private UserContext ownerUserContext;
+        private UserContext maintainerUserContext;
+        private UserContext readerUserContext;
+        private UserContext accountUserContext;
+        private UserContext adminUserContext;
+        private UserContext anonymousUserContext;
+
+        /// <summary>
+        /// Sets up the test fixture before each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            this.permissionService = new PackagePermissionService();
+            this.userId = Guid.NewGuid();
+            this.otherUserId = Guid.NewGuid();
+
+            this.ownerUserContext = new UserContext
+            {
+                AccountId = this.userId,
+                Username = "ownerUser",
+                CurrentRoles = [RoleKind.Account, RoleKind.PackageOwner]
+            };
+
+            this.maintainerUserContext = new UserContext
+            {
+                AccountId = this.userId,
+                Username = "maintainerUser",
+                CurrentRoles = [RoleKind.Account, RoleKind.PackageMaintainer]
+            };
+
+            this.readerUserContext = new UserContext
+            {
+                AccountId = this.userId,
+                Username = "readerUser",
+                CurrentRoles = [RoleKind.Account, RoleKind.PackageReader]
+            };
+
+            this.accountUserContext = new UserContext
+            {
+                AccountId = this.userId,
+                Username = "regularUser",
+                CurrentRoles = [RoleKind.Account]
+            };
+
+            this.adminUserContext = new UserContext
+            {
+                AccountId = this.userId,
+                Username = "adminUser",
+                CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator]
+            };
+
+            this.anonymousUserContext = new UserContext
+            {
+                AccountId = null,
+                Username = string.Empty,
+                CurrentRoles = [RoleKind.Anonymous]
+            };
+        }
+
+        /// <summary>
+        /// Verifies the <see cref="PackagePermissionService.IsAllowedToCreate" /> method.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyIsAllowedToCreate()
+        {
+            var package = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.userId,
+                PackageOwner = [this.userId],
+                Visibility = VisibilityKind.PUBLIC
+            };
+
+            var ownerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, package);
+            var accountResult = await this.permissionService.IsAllowedToCreate(this.accountUserContext, package);
+            var anonymousResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, package);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(ownerResult.IsSuccess, Is.True);
+                Assert.That(accountResult.IsSuccess, Is.True);
+                Assert.That(anonymousResult.IsFailed, Is.True);
+            }
+        }
+
+        /// <summary>
+        /// Verifies the IsAllowedToDelete method.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyIsAllowedToDelete()
+        {
+            var packageId = Guid.NewGuid();
+
+            var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, packageId);
+            var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, packageId);
+            var accountResult = await this.permissionService.IsAllowedToDelete(this.accountUserContext, packageId);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(adminResult.IsSuccess, Is.True);
+                Assert.That(ownerResult.IsFailed, Is.True);
+                Assert.That(accountResult.IsFailed, Is.True);
+            }
+        }
+
+        /// <summary>
+        /// Verifies the <see cref="PackagePermissionService.IsAllowedToRead" /> method across all visibility tiers.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyIsAllowedToRead()
+        {
+            var publicPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.otherUserId,
+                PackageOwner = [this.otherUserId],
+                Visibility = VisibilityKind.PUBLIC
+            };
+
+            var internalPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.otherUserId,
+                PackageOwner = [this.otherUserId],
+                Visibility = VisibilityKind.INTERNAL
+            };
+
+            var privatePackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.otherUserId,
+                PackageOwner = [this.otherUserId],
+                PackageMaintainer = [],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
+            var ownedPrivatePackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.userId,
+                PackageOwner = [this.userId],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
+            var publicAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, publicPackage);
+            var publicAccountResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, publicPackage);
+
+            var internalAccountResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, internalPackage);
+            var internalOwnerResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, internalPackage);
+
+            var privateAccountResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, privatePackage);
+            var privateReaderResult = await this.permissionService.IsAllowedToRead(this.readerUserContext, privatePackage);
+            var privateOwnedResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, ownedPrivatePackage);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(publicAnonResult.IsSuccess, Is.True);
+                Assert.That(publicAccountResult.IsSuccess, Is.True);
+                Assert.That(internalAccountResult.IsFailed, Is.True);
+                Assert.That(internalOwnerResult.IsSuccess, Is.True);
+                Assert.That(privateAccountResult.IsFailed, Is.True);
+                Assert.That(privateReaderResult.IsSuccess, Is.True);
+                Assert.That(privateOwnedResult.IsSuccess, Is.True);
+            }
+        }
+
+        /// <summary>
+        /// Verifies the <see cref="PackagePermissionService.IsAllowedToUpdate" /> method.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyIsAllowedToUpdate()
+        {
+            var existingPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.userId,
+                PackageOwner = [this.userId],
+                PackageMaintainer = [this.otherUserId],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
+            var updatedSettingsPackage = new Package
+            {
+                Id = existingPackage.Id,
+                Owner = this.userId,
+                PackageOwner = [this.userId],
+                PackageMaintainer = [this.otherUserId],
+                Visibility = VisibilityKind.PRIVATE,
+                Name = "UpdatedName"
+            };
+
+            var updatedOwnershipPackage = new Package
+            {
+                Id = existingPackage.Id,
+                Owner = this.otherUserId,
+                PackageOwner = [this.userId],
+                PackageMaintainer = [this.otherUserId],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
+            var updatedVisibilityPackage = new Package
+            {
+                Id = existingPackage.Id,
+                Owner = this.userId,
+                PackageOwner = [this.userId],
+                PackageMaintainer = [this.otherUserId],
+                Visibility = VisibilityKind.PUBLIC
+            };
+
+            var settingsOwnerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingPackage, updatedSettingsPackage);
+            var settingsMaintainerResult = await this.permissionService.IsAllowedToUpdate(this.maintainerUserContext, existingPackage, updatedSettingsPackage);
+
+            var ownershipOwnerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingPackage, updatedOwnershipPackage);
+            var ownershipMaintainerResult = await this.permissionService.IsAllowedToUpdate(this.maintainerUserContext, existingPackage, updatedOwnershipPackage);
+
+            var visibilityOwnerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingPackage, updatedVisibilityPackage);
+            var visibilityMaintainerResult = await this.permissionService.IsAllowedToUpdate(this.maintainerUserContext, existingPackage, updatedVisibilityPackage);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(settingsOwnerResult.IsSuccess, Is.True);
+                Assert.That(settingsMaintainerResult.IsFailed, Is.True);
+                Assert.That(ownershipOwnerResult.IsSuccess, Is.True);
+                Assert.That(ownershipMaintainerResult.IsFailed, Is.True);
+                Assert.That(visibilityOwnerResult.IsSuccess, Is.True);
+                Assert.That(visibilityMaintainerResult.IsFailed, Is.True);
+            }
+        }
+    }
+}
