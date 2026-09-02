@@ -69,6 +69,11 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(IPackageVersion.ModifiedAt), oldDto.ModifiedAt, newDto.ModifiedAt));
             }
 
+            if (oldDto.Owner != newDto.Owner)
+            {
+                changes.Add(new PropertyChange(nameof(IPackageVersion.Owner), oldDto.Owner, newDto.Owner));
+            }
+
             if (oldDto.PublicationDate != newDto.PublicationDate)
             {
                 changes.Add(new PropertyChange(nameof(IPackageVersion.PublicationDate), oldDto.PublicationDate, newDto.PublicationDate));

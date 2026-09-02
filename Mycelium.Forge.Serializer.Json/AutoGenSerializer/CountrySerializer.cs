@@ -60,6 +60,11 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(iCountry.Name);
             writer.WritePropertyName("numericCode"u8);
             writer.WriteStringValue(iCountry.NumericCode);
+            writer.WritePropertyName("owner"u8);
+            writer.WriteStartObject();
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(iCountry.Owner);
+            writer.WriteEndObject();
 
             writer.WriteEndObject();
         }

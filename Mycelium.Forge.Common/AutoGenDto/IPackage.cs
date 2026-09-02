@@ -40,6 +40,12 @@ namespace Mycelium.Forge.Common
         bool Listed { get; set; }
 
         /// <summary>
+        /// The unique identifier of the owning Scope.
+        /// </summary>
+        [Property(xmiId: "EAID_srcAF0422_E33E_4c34_AA14_D530733FFD0B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        Guid Owner { get; set; }
+
+        /// <summary>
         /// The accounts that represent the Package maintainers
         /// </summary>
         [Property(xmiId: "EAID_dst10BE38_3F02_4f31_AB54_D3C754FAC7FE", aggregation: AggregationKind.None, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
@@ -70,7 +76,6 @@ namespace Mycelium.Forge.Common
         /// </summary>
         [Property(xmiId: "EAID_84CB2554_8FEB_49ee_ADC4_8AEAECB7D2D1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         VisibilityKind Visibility { get; set; }
-
     }
 }
 

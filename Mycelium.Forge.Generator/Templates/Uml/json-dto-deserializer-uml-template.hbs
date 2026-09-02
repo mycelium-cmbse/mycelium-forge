@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="{{ this.Name }}DeSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -47,7 +47,7 @@ namespace Mycelium.Forge.Serializer.Json
 
             var typeSeen = false;
             {{#with this as |class| }}
-            {{ #each (Class.QueryAllProperties this) as | property | }}
+            {{ #each (Class.QueryDtoClassProperties this) as | property | }}
                 {{#unless this.IsDerived}}
                     {{#unless (Property.IsThingId property)}}
                     {{#unless (Property.IsRedefined property class)}}
@@ -93,7 +93,7 @@ namespace Mycelium.Forge.Serializer.Json
                 }
 
             {{#with this as |class| }}
-            {{ #each (Class.QueryAllProperties this) as | property | }}
+            {{ #each (Class.QueryDtoClassProperties this) as | property | }}
                 {{#unless this.IsDerived}}
                     {{#unless (Property.IsThingId property)}}
                     {{#unless (Property.IsRedefined property class)}}
@@ -226,7 +226,7 @@ namespace Mycelium.Forge.Serializer.Json
             }
 
             {{#with this as |class| }}
-            {{ #each (Class.QueryAllProperties this) as | property | }}
+            {{ #each (Class.QueryDtoClassProperties this) as | property | }}
                 {{#unless this.IsDerived}}
                     {{#unless (Property.IsThingId property)}}
                     {{#unless (Property.IsRedefined property class)}}

@@ -48,6 +48,12 @@ namespace Mycelium.Forge.Common
         Guid MetaData { get; set; }
 
         /// <summary>
+        /// The unique identifier of the owning Package.
+        /// </summary>
+        [Property(xmiId: "EAID_srcEAA194_978B_4aa5_BEBC_DC3C38829711", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        Guid Owner { get; set; }
+
+        /// <summary>
         /// The date at which the version was uploaded or published to Forge
         /// </summary>
         [Property(xmiId: "EAID_DFF03201_3242_41f9_B6C9_64ED075102AD", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
@@ -57,7 +63,6 @@ namespace Mycelium.Forge.Common
         /// </summary>
         [Property(xmiId: "EAID_5E3DB552_5872_48f8_BDA3_4CB2ECE6BC69", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         string Version { get; set; }
-
     }
 }
 

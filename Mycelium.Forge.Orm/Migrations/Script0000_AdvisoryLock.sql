@@ -1,4 +1,4 @@
--- Takes a transaction-scoped advisory lock (DD-18) so that two concurrent migrator invocations
+﻿-- Takes a transaction-scoped advisory lock (DD-18) so that two concurrent migrator invocations
 -- serialise rather than race: the lock is held for the lifetime of this whole migration batch
 -- (DbUp runs every script in one transaction - see Orm/Migrator.cs's WithTransaction()) and is
 -- released automatically at commit/rollback, so it cannot leak the way a session-scoped lock could

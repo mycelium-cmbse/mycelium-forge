@@ -18,8 +18,8 @@ namespace Mycelium.Forge.Tests.Extensions
 
     using Moq;
 
-    using Mycelium.Forge.Config;
     using Mycelium.Forge.Extensions;
+    using Mycelium.Forge.Orm;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Home;
 

@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Config
+namespace Mycelium.Forge.Orm
 {
     using Npgsql;
 

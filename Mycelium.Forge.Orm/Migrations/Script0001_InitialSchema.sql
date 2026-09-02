@@ -1,5 +1,5 @@
 ﻿------------------------------------------------------------------------------------------------
--- <copyright file="Script0001_InitialSchema.sql" company="Starion Group S.A.">
+-- <copyright file="schema.sql" company="Starion Group S.A.">
 --
 --   Copyright 2026 Starion Group S.A.
 --   SPDX-License-Identifier: Apache-2.0
@@ -31,7 +31,6 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
 -- Table definitions
 CREATE TABLE "Forge"."Account" (
     "id" uuid NOT NULL,
-    "forge" uuid NOT NULL,
     "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -308,8 +307,6 @@ CREATE INDEX "idx_Package_packageOwner_targetAccount" ON "Forge"."Package_packag
 
 
 -- Reference Properties that are not Many-to-Many
-ALTER TABLE "Forge"."Account" ADD CONSTRAINT "Account_forge_FK_Source" FOREIGN KEY ("forge") REFERENCES "Forge"."Forge" ("id") ON UPDATE CASCADE DEFERRABLE;
-CREATE INDEX "idx_Account_forge" ON "Forge"."Account" ("forge");
 ALTER TABLE "Forge"."Account" ADD CONSTRAINT "Account_owner_FK_Source" FOREIGN KEY ("owner") REFERENCES "Forge"."Forge" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX "idx_Account_owner" ON "Forge"."Account" ("owner");
 ALTER TABLE "Forge"."Address" ADD CONSTRAINT "Address_country_FK_Source" FOREIGN KEY ("country") REFERENCES "Forge"."Country" ("id") ON UPDATE CASCADE DEFERRABLE;

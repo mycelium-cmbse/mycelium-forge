@@ -77,6 +77,13 @@ namespace Mycelium.Forge.Common
         public DateTime ModifiedAt { get; set; }
 
         /// <summary>
+        /// The unique identifier of the owning Scope.
+        /// </summary>
+        [Property(xmiId: "EAID_src71ABB8_0FA0_4c8c_BB03_2A1FCAD7F07E", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Implements(implementation: "IAddress.Owner")]
+        public Guid Owner { get; set; }
+
+        /// <summary>
         /// The postal or ZIP code. Optional, since some countries don't use postal codes at all.
         /// </summary>
         [Property(xmiId: "EAID_A77832B4_3C0A_4b88_86D5_B5814925CC2E", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
@@ -90,7 +97,6 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_1958E6AE_4997_452b_A3C0_E8B4B04792D0", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         [Implements(implementation: "IAddress.Region")]
         public string Region { get; set; }
-
     }
 }
 

@@ -74,6 +74,11 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(IAddress.ModifiedAt), oldDto.ModifiedAt, newDto.ModifiedAt));
             }
 
+            if (oldDto.Owner != newDto.Owner)
+            {
+                changes.Add(new PropertyChange(nameof(IAddress.Owner), oldDto.Owner, newDto.Owner));
+            }
+
             if (oldDto.PostalCode != newDto.PostalCode)
             {
                 changes.Add(new PropertyChange(nameof(IAddress.PostalCode), oldDto.PostalCode, newDto.PostalCode));

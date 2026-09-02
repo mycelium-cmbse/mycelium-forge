@@ -1,9 +1,9 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Migrator.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace Mycelium.Forge.Orm
     /// Runs the embedded SQL migrations under <c>Orm/Migrations/</c> against the configured
     /// PostgreSQL database (DD-18). Invoked as an explicit, one-shot command
     /// (<c>dotnet Mycelium.Forge.dll migrate</c>) rather than at every replica's startup, per DD-03's
-    /// interchangeable-replica model - see <see cref="Program"/>.
+    /// interchangeable-replica model - see Program.cs
     /// </summary>
     public static class Migrator
     {
@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Orm
         /// The PostgreSQL connection string to migrate.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if every pending script applied successfully; otherwise <see langword="false"/>.
+        /// <see langword="true" /> if every pending script applied successfully; otherwise <see langword="false" />.
         /// </returns>
         public static bool Run(string connectionString)
         {

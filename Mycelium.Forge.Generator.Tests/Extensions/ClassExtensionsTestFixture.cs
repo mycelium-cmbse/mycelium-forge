@@ -111,6 +111,27 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         }
 
         /// <summary>
+        /// Verifies that <see cref="GeneratorClassExtensions.QueryOppositeCompositeProperties" /> returns opposite composite
+        /// properties and handles invalid arguments.
+        /// </summary>
+        [Test]
+        public void VerifyQueryOppositeCompositeProperties()
+        {
+            var accountProperties = GeneratorClassExtensions.QueryOppositeCompositeProperties(this.accountClass).ToList();
+            var thingProperties = GeneratorClassExtensions.QueryOppositeCompositeProperties(this.thingClass).ToList();
+            var scopeProperties = GeneratorClassExtensions.QueryOppositeCompositeProperties(this.scopeClass).ToList();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => GeneratorClassExtensions.QueryOppositeCompositeProperties(null!), Throws.TypeOf<ArgumentNullException>());
+                Assert.That(accountProperties, Has.Count.EqualTo(1));
+                Assert.That(accountProperties[0].Name, Is.EqualTo("owner"));
+                Assert.That(thingProperties, Has.Count.EqualTo(0));
+                Assert.That(scopeProperties, Has.Count.EqualTo(0));
+            }
+        }
+
+        /// <summary>
         /// Verifies that <see cref="GeneratorClassExtensions.QueryOwnedManyToManyProperties" /> returns many-to-many properties.
         /// </summary>
         [Test]

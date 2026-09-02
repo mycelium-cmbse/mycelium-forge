@@ -51,6 +51,7 @@ namespace Mycelium.Forge.Serializer.Json
             var listedSeen = false;
             var metaDataSeen = false;
             var modifiedAtSeen = false;
+            var ownerSeen = false;
             var publicationDateSeen = false;
             var versionSeen = false;
 
@@ -147,6 +148,26 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the PackageVersion.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("publicationDate"u8))
                 {
                     publicationDateSeen = true;
@@ -198,6 +219,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
             if (!publicationDateSeen)
             {

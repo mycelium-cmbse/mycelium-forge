@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -13,7 +13,7 @@
         <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <IsPackable>false</IsPackable>
         <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
     </PropertyGroup>

@@ -45,6 +45,11 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_dstB7D7E0_93F9_4e97_A343_767C3B6CBC21", aggregation: AggregationKind.None, lowerValue: 1, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         List<Guid> Member { get; set; }
 
+        /// <summary>
+        /// The unique identifier of the owning Forge.
+        /// </summary>
+        [Property(xmiId: "EAID_src092B28_2C7D_440f_96DA_76C3459D0736", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        Guid Owner { get; set; }
     }
 }
 

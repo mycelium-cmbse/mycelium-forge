@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AutoGenEnumProviderRegenerationTests.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Generator.Tests
     public class AutoGenEnumProviderRegenerationTests
     {
         [Test]
-        public async Task Regenerate_AutoGenEnumProvider()
+        public void Regenerate_AutoGenEnumProvider()
         {
             var outputDirectory = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.WorkDirectory, "_Forge.Common.AutoGenEnumProvider"));
             outputDirectory.Create();

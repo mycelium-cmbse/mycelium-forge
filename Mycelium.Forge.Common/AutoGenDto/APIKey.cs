@@ -69,6 +69,13 @@ namespace Mycelium.Forge.Common
         public string Name { get; set; }
 
         /// <summary>
+        /// The unique identifier of the owning Account.
+        /// </summary>
+        [Property(xmiId: "EAID_src9C4D7E_699A_49fc_BE86_9A2E5D20D293", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Implements(implementation: "IAPIKey.Owner")]
+        public Guid Owner { get; set; }
+
+        /// <summary>
         /// the set of permissions that define what can be done with the API key on behalf of the Account that
         /// owns the API key.
         /// </summary>
@@ -88,7 +95,6 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_796BF175_5F57_4cf9_A60D_AA7936A12A6C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         [Implements(implementation: "IAPIKey.SecretHash")]
         public List<byte> SecretHash { get; set; } = [];
-
     }
 }
 

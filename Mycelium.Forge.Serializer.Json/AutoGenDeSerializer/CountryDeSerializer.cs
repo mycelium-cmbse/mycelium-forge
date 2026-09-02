@@ -52,6 +52,7 @@ namespace Mycelium.Forge.Serializer.Json
             var modifiedAtSeen = false;
             var nameSeen = false;
             var numericCodeSeen = false;
+            var ownerSeen = false;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -161,6 +162,26 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the Country.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
+
+                    continue;
+                }
 
                 reader.Skip();
             }
@@ -193,6 +214,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!numericCodeSeen)
             {
                 logger.LogDebug("the numericCode Json property was not found in the Country: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the Country: {Id}", dtoInstance.Id);
             }
 
             return dtoInstance;

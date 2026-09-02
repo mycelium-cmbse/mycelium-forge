@@ -45,7 +45,6 @@ namespace Mycelium.Forge.Common
         /// </summary>
         [Property(xmiId: "EAID_1F5D5916_4806_4a92_A0C3_95CBD1DA1595", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         InvitationStatusKind Status { get; set; }
-
     }
 }
 

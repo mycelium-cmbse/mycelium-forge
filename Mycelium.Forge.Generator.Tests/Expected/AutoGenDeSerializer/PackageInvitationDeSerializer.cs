@@ -49,6 +49,7 @@ namespace Mycelium.Forge.Serializer.Json
             var createdAtSeen = false;
             var experisAtSeen = false;
             var modifiedAtSeen = false;
+            var ownerSeen = false;
             var packageSeen = false;
             var packageInvitationKindSeen = false;
             var statusSeen = false;
@@ -112,6 +113,26 @@ namespace Mycelium.Forge.Serializer.Json
                     reader.Read();
 
                     dtoInstance.ModifiedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the PackageInvitation.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
 
                     continue;
                 }
@@ -193,6 +214,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the PackageInvitation: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the PackageInvitation: {Id}", dtoInstance.Id);
             }
             if (!packageSeen)
             {

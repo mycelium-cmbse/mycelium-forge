@@ -61,6 +61,11 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteEndObject();
             writer.WritePropertyName("modifiedAt"u8);
             writer.WriteStringValue(iPackageVersion.ModifiedAt);
+            writer.WritePropertyName("owner"u8);
+            writer.WriteStartObject();
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(iPackageVersion.Owner);
+            writer.WriteEndObject();
             writer.WritePropertyName("publicationDate"u8);
             writer.WriteStringValue(iPackageVersion.PublicationDate);
             writer.WritePropertyName("version"u8);

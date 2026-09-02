@@ -48,6 +48,7 @@ namespace Mycelium.Forge.Serializer.Json
             var typeSeen = false;
             var createdAtSeen = false;
             var modifiedAtSeen = false;
+            var ownerSeen = false;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -101,6 +102,26 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the PackageMetaData.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
+
+                    continue;
+                }
 
                 reader.Skip();
             }
@@ -117,6 +138,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!modifiedAtSeen)
             {
                 logger.LogDebug("the modifiedAt Json property was not found in the PackageMetaData: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the PackageMetaData: {Id}", dtoInstance.Id);
             }
 
             return dtoInstance;

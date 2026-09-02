@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Mycelium.Forge.Orm</AssemblyName>
+        <RootNamespace>Mycelium.Forge.Orm</RootNamespace>
+        <LangVersion>14.0</LangVersion>
+        <Company>Starion Group S.A.</Company>
+        <Authors>Sam Gerene</Authors>
+        <Description>A .NET implementation of the Mycelium Forge Object Relational Mapper.</Description>
+        <Copyright>Copyright © Starion Group S.A.</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Microsoft.Extensions.Logging" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="dbup-postgresql" Version="7.0.1" />
+        <PackageReference Include="FluentResults" Version="4.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
+        <PackageReference Include="Npgsql" Version="10.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
+        <ProjectReference Include="..\Mycelium.Forge.Serializer.Json\Mycelium.Forge.Serializer.Json.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+	    <!-- DD-18: migrations are numbered, forward-only SQL scripts embedded in the assembly and
+             journalled by DbUp - see Migrations/Migrator.cs. -->
+		<EmbeddedResource Include="Migrations\*.sql" />
+    </ItemGroup>
+
+</Project>

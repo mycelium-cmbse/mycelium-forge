@@ -58,6 +58,7 @@ namespace Mycelium.Forge.Serializer.Json
             var nameSeen = false;
             var originSeen = false;
             var ownedPackageSeen = false;
+            var ownerSeen = false;
             var primaryAddressSeen = false;
             var profileLinkSeen = false;
             var shortNameSeen = false;
@@ -245,6 +246,26 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("owner"u8))
+                {
+                    ownerSeen = true;
+                    reader.Read();
+
+                    if (reader.TokenType == JsonTokenType.Null)
+                    {
+                        dtoInstance.Owner = Guid.Empty;
+                        logger.LogDebug($"the Organization.Owner property was not found in the Json. The value is set to Guid.Empty");
+                    }
+                    else
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
+                        {
+                            dtoInstance.Owner = ownerRefId;
+                        }
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("primaryAddress"u8))
                 {
                     primaryAddressSeen = true;
@@ -368,6 +389,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!ownedPackageSeen)
             {
                 logger.LogDebug("the ownedPackage Json property was not found in the Organization: {Id}", dtoInstance.Id);
+            }
+            if (!ownerSeen)
+            {
+                logger.LogDebug("the owner Json property was not found in the Organization: {Id}", dtoInstance.Id);
             }
             if (!primaryAddressSeen)
             {

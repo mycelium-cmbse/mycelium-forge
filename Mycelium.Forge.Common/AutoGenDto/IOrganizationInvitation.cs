@@ -39,11 +39,16 @@ namespace Mycelium.Forge.Common
         OrganizationInvitationKind OrganizationInvitationKind { get; set; }
 
         /// <summary>
+        /// The unique identifier of the owning Account.
+        /// </summary>
+        [Property(xmiId: "EAID_srcA7266E_3349_4e94_A354_31A96E27C26C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        Guid Owner { get; set; }
+
+        /// <summary>
         /// The Account that is being invitited to become a member of the Organization
         /// </summary>
         [Property(xmiId: "EAID_dst018175_11F9_4022_84DE_4FA17FC3D3B2", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         Guid Target { get; set; }
-
     }
 }
 

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AutoGenDeSerializerRegenerationTests.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -10,21 +10,23 @@
 namespace Mycelium.Forge.Generator.Tests
 {
     using System.IO;
-    using System.Threading.Tasks;
 
     using Mycelium.Forge.Generator.Generators;
 
     /// <summary>
     /// Writes freshly generated JSON deserialisers to <c>_Forge.Serializer.Json.AutoGenDeSerializer/</c>
     /// under this test project's own build output, for visual inspection. Excluded from the default
-    /// <c>dotnet test</c> run — see <see cref="AutoGenDtoRegenerationTests"/> for the same pattern
+    /// <c>dotnet test</c> run — see <see cref="AutoGenDtoRegenerationTests" /> for the same pattern
     /// applied to DTOs.
     /// </summary>
     [TestFixture]
     public class AutoGenDeSerializerRegenerationTests
     {
+        /// <summary>
+        /// Regenerates the JSON deserializers.
+        /// </summary>
         [Test]
-        public async Task Regenerate_AutoGenDeSerializer()
+        public void Regenerate_AutoGenDeSerializer()
         {
             var outputDirectory = new DirectoryInfo(Path.Combine(TestContext.CurrentContext.WorkDirectory, "_Forge.Serializer.Json.AutoGenDeSerializer"));
             outputDirectory.Create();

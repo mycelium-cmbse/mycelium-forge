@@ -69,7 +69,6 @@ namespace Mycelium.Forge.Common
         /// </summary>
         [Property(xmiId: "EAID_dst10489B_3E2E_4795_AA63_0F70D1AB3F3A", aggregation: AggregationKind.Composite, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         List<Guid> ProfileType { get; set; }
-
     }
 }
 
