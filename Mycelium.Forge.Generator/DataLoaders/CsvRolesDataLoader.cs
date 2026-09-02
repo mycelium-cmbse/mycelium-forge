@@ -50,8 +50,11 @@ namespace Mycelium.Forge.Generator.DataLoaders
 
             var headerFields = ParseCsvLine(lines[0]);
 
-            // The first two columns are "Role" and "Summary"; the rest are permission headers
-            var permissionHeaders = headerFields.Skip(2).ToList();
+            var hasInherits = headerFields.Count > 1 && string.Equals(headerFields[1].Trim(), nameof(RoleDefinition.Inherits), StringComparison.OrdinalIgnoreCase);
+            var skipCount = hasInherits ? 3 : 2;
+
+            // Columns after role metadata (Role, [Inherits], Summary) are permission headers
+            var permissionHeaders = headerFields.Skip(skipCount).ToList();
 
             var permissions = permissionHeaders
                 .Select(header => new PermissionDefinition
@@ -74,12 +77,19 @@ namespace Mycelium.Forge.Generator.DataLoaders
                     continue;
                 }
 
-                var summary = fields.Count > 1 ? fields[1].Trim() : string.Empty;
+                var inherits = hasInherits && fields.Count > 1 ? fields[1].Trim() : string.Empty;
+
+                var summary = hasInherits
+                    ? fields.Count > 2 ? fields[2].Trim() : string.Empty
+                    : fields.Count > 1
+                        ? fields[1].Trim()
+                        : string.Empty;
+
                 var granted = new List<string>();
 
                 for (var j = 0; j < permissionHeaders.Count; j++)
                 {
-                    var cellIndex = j + 2;
+                    var cellIndex = j + skipCount;
                     var cellValue = cellIndex < fields.Count ? fields[cellIndex].Trim() : string.Empty;
 
                     if (string.Equals(cellValue, "X", StringComparison.OrdinalIgnoreCase))
@@ -91,9 +101,26 @@ namespace Mycelium.Forge.Generator.DataLoaders
                 roles.Add(new RoleDefinition
                 {
                     Name = roleName,
+                    Inherits = inherits,
                     Summary = summary,
                     GrantedPermissions = granted
                 });
+            }
+
+            var roleByName = roles.ToDictionary(r => r.Name, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var role in roles)
+            {
+                if (!string.IsNullOrWhiteSpace(role.Inherits) && roleByName.TryGetValue(role.Inherits, out var parentRole))
+                {
+                    foreach (var parentPermission in parentRole.GrantedPermissions)
+                    {
+                        if (!role.GrantedPermissions.Contains(parentPermission))
+                        {
+                            role.GrantedPermissions.Add(parentPermission);
+                        }
+                    }
+                }
             }
 
             var policies = permissions.Select(p => new PolicyMapping

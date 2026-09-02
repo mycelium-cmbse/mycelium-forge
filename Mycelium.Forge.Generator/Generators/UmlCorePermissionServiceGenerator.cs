@@ -61,6 +61,21 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
+        /// Gets the dictionary of entity permission definitions loaded from CSV.
+        /// </summary>
+        public Dictionary<string, EntityPermissionDefinition> EntityPermissions { get; private set; } = [];
+
+        /// <summary>
+        /// Gets the dictionary of property permission definitions loaded from CSV, grouped by entity name.
+        /// </summary>
+        public Dictionary<string, List<PropertyPermissionDefinition>> PropertyPermissions { get; private set; } = [];
+
+        /// <summary>
+        /// Gets the dictionary of entity behavior definitions loaded from CSV.
+        /// </summary>
+        public Dictionary<string, EntityBehaviorDefinition> EntityBehaviors { get; private set; } = [];
+
+        /// <summary>
         /// Generates the permission services for the model and writes them to <paramref name="outputDirectory" />.
         /// </summary>
         /// <param name="xmiReaderResult">The <see cref="XmiReaderResult" /> that contains the UML model to generate from.</param>
@@ -72,14 +87,123 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
-        /// Loads the entity permissions from the specified CSV file and configures the helper.
+        /// Loads all configuration CSVs: entity permissions, property permissions, and entity behaviors.
+        /// </summary>
+        /// <param name="entityCsvPath">The path to the entity permissions CSV file.</param>
+        /// <param name="propertyCsvPath">The optional path to the property permissions CSV file.</param>
+        /// <param name="behaviorCsvPath">The optional path to the entity behaviors CSV file.</param>
+        public void LoadConfigurations(string entityCsvPath, string propertyCsvPath = null, string behaviorCsvPath = null)
+        {
+            var entityLoader = new CsvEntityPermissionsDataLoader();
+            this.EntityPermissions = entityLoader.Load(entityCsvPath);
+
+            if (!string.IsNullOrWhiteSpace(propertyCsvPath) && File.Exists(propertyCsvPath))
+            {
+                var propertyLoader = new CsvPropertyPermissionsDataLoader();
+                this.PropertyPermissions = propertyLoader.Load(propertyCsvPath);
+            }
+
+            if (!string.IsNullOrWhiteSpace(behaviorCsvPath) && File.Exists(behaviorCsvPath))
+            {
+                var behaviorLoader = new CsvEntityBehaviorsDataLoader();
+                this.EntityBehaviors = behaviorLoader.Load(behaviorCsvPath);
+            }
+
+            PermissionHelper.SetConfigurations(this.EntityPermissions, this.PropertyPermissions, this.EntityBehaviors);
+        }
+
+        /// <summary>
+        /// Loads the entity permissions from the specified CSV file, and automatically discovers companion property and behavior
+        /// CSVs.
         /// </summary>
         /// <param name="csvPath">The path to the entity permissions CSV file.</param>
         public void LoadEntityPermissions(string csvPath)
         {
-            var loader = new CsvEntityPermissionsDataLoader();
-            var definitions = loader.Load(csvPath);
-            PermissionHelper.SetEntityPermissions(definitions);
+            var directory = Path.GetDirectoryName(csvPath);
+            var propertyCsv = !string.IsNullOrWhiteSpace(directory) ? Path.Combine(directory, "forge-property-permissions.csv") : null;
+            var behaviorCsv = !string.IsNullOrWhiteSpace(directory) ? Path.Combine(directory, "forge-entity-behaviors.csv") : null;
+
+            this.LoadConfigurations(csvPath, propertyCsv, behaviorCsv);
+        }
+
+        /// <summary>
+        /// Validates that all permissions referenced in the entity permissions configuration exist in the role-permission model,
+        /// and optionally checks that referenced entity properties exist on the UML classes in <paramref name="xmiReaderResult" />
+        /// .
+        /// </summary>
+        /// <param name="model">The parsed role-permission model.</param>
+        /// <param name="xmiReaderResult">The parsed UML model, or null if UML validation is not required.</param>
+        public void ValidateConfiguration(RolePermissionModel model, XmiReaderResult xmiReaderResult = null)
+        {
+            ArgumentNullException.ThrowIfNull(model);
+
+            var validPermissions = model.Permissions.Select(p => p.EnumName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            List<string> errors = [];
+
+            foreach (var keyValuePair in this.EntityPermissions)
+            {
+                var entityName = keyValuePair.Key;
+                var definition = keyValuePair.Value;
+
+                CheckPermissionExists(validPermissions, definition.CreatePermission, entityName, "Create", errors);
+                CheckPermissionExists(validPermissions, definition.ReadPermission, entityName, "Read", errors);
+                CheckPermissionExists(validPermissions, definition.UpdatePermission, entityName, "Update", errors);
+                CheckPermissionExists(validPermissions, definition.DeletePermission, entityName, "Delete", errors);
+            }
+
+            foreach (var keyValuePair in this.PropertyPermissions)
+            {
+                var entityName = keyValuePair.Key;
+
+                foreach (var propDef in keyValuePair.Value)
+                {
+                    CheckPermissionExists(validPermissions, propDef.RequiredPermission, entityName, $"Property '{propDef.Property}'", errors);
+                }
+            }
+
+            if (xmiReaderResult != null)
+            {
+                var classes = QueryPermissionServiceClasses(xmiReaderResult).ToDictionary(c => c.Name, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var keyValuePair in this.EntityPermissions)
+                {
+                    var entityName = keyValuePair.Key;
+                    var definition = keyValuePair.Value;
+
+                    if (!classes.TryGetValue(entityName, out var @class))
+                    {
+                        continue;
+                    }
+
+                    var allProperties = @class.QueryDtoClassProperties().Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                    CheckPropertyExists(allProperties, definition.OwnerProperty, entityName, nameof(definition.OwnerProperty), errors);
+                    CheckPropertyExists(allProperties, definition.MaintainerProperty, entityName, nameof(definition.MaintainerProperty), errors);
+                    CheckPropertyExists(allProperties, definition.VisibilityProperty, entityName, nameof(definition.VisibilityProperty), errors);
+                }
+
+                foreach (var keyValuePair in this.PropertyPermissions)
+                {
+                    var entityName = keyValuePair.Key;
+
+                    if (!classes.TryGetValue(entityName, out var @class))
+                    {
+                        continue;
+                    }
+
+                    var allProperties = @class.QueryDtoClassProperties().Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var propDef in keyValuePair.Value)
+                    {
+                        CheckPropertyExists(allProperties, propDef.Property, entityName, nameof(PropertyPermissionDefinition.Property), errors);
+                    }
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                throw new InvalidOperationException($"Entity permission validation failed with {errors.Count} error(s):{Environment.NewLine}{string.Join(Environment.NewLine, errors)}");
+            }
         }
 
         /// <summary>
@@ -93,6 +217,8 @@ namespace Mycelium.Forge.Generator.Generators
         {
             ArgumentNullException.ThrowIfNull(model);
             ArgumentNullException.ThrowIfNull(outputDirectory);
+
+            this.ValidateConfiguration(model);
 
             var roleTemplate = this.Templates[RoleEnumTemplateName];
             var generatedRole = this.CodeCleanup(roleTemplate(model));
@@ -181,6 +307,48 @@ namespace Mycelium.Forge.Generator.Generators
             this.RegisterTemplate(RolePermissionMapTemplateName);
             this.RegisterTemplate(PermissionServiceInterfaceTemplateName);
             this.RegisterTemplate(PermissionServiceClassTemplateName);
+        }
+
+        /// <summary>
+        /// Verifies that the specified permission name exists in the set of valid permission enum names.
+        /// </summary>
+        /// <param name="validPermissions">The set of valid permission names.</param>
+        /// <param name="permissionName">The permission name to verify.</param>
+        /// <param name="entityName">The entity name associated with the permission check.</param>
+        /// <param name="operation">The operation or property role being checked.</param>
+        /// <param name="errors">The list of error messages to collect.</param>
+        private static void CheckPermissionExists(HashSet<string> validPermissions, string permissionName, string entityName, string operation, List<string> errors)
+        {
+            if (string.IsNullOrWhiteSpace(permissionName))
+            {
+                return;
+            }
+
+            var parts = permissionName.Split(['|', '&'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var part in parts)
+            {
+                if (!validPermissions.Contains(part))
+                {
+                    errors.Add($"Entity '{entityName}' references unknown {operation} permission '{part}'.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies that the specified property name exists in the set of valid class properties.
+        /// </summary>
+        /// <param name="allProperties">The set of valid class property names.</param>
+        /// <param name="propertyName">The property name to verify.</param>
+        /// <param name="entityName">The entity name associated with the property check.</param>
+        /// <param name="role">The role or setting of the property being checked.</param>
+        /// <param name="errors">The list of error messages to collect.</param>
+        private static void CheckPropertyExists(HashSet<string> allProperties, string propertyName, string entityName, string role, List<string> errors)
+        {
+            if (!string.IsNullOrWhiteSpace(propertyName) && !allProperties.Contains(propertyName))
+            {
+                errors.Add($"Entity '{entityName}' references property '{propertyName}' for {role}, but property does not exist on UML class.");
+            }
         }
 
         /// <summary>

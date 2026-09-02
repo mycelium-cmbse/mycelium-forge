@@ -42,29 +42,9 @@ namespace Mycelium.Forge.Common
         ManageAccounts,
 
         /// <summary>
-        /// Permission: AssignOrganizationMemberships.
-        /// </summary>
-        AssignOrganizationMemberships,
-
-        /// <summary>
-        /// Permission: ReserveScopeSlug.
-        /// </summary>
-        ReserveScopeSlug,
-
-        /// <summary>
-        /// Permission: ConfigureMirroring.
-        /// </summary>
-        ConfigureMirroring,
-
-        /// <summary>
         /// Permission: ViewInstallationMetrics.
         /// </summary>
         ViewInstallationMetrics,
-
-        /// <summary>
-        /// Permission: ViewAuditLog.
-        /// </summary>
-        ViewAuditLog,
 
         /// <summary>
         /// Permission: DeletePackage.
@@ -82,24 +62,9 @@ namespace Mycelium.Forge.Common
         RevokeAnyApiKey,
 
         /// <summary>
-        /// Permission: MonitorPlatformHealth.
-        /// </summary>
-        MonitorPlatformHealth,
-
-        /// <summary>
-        /// Permission: PerformPlatformMaintenance.
-        /// </summary>
-        PerformPlatformMaintenance,
-
-        /// <summary>
         /// Permission: ConfigurePlatformDefaults.
         /// </summary>
         ConfigurePlatformDefaults,
-
-        /// <summary>
-        /// Permission: ManageBillingAndQuotas.
-        /// </summary>
-        ManageBillingAndQuotas,
 
         /// <summary>
         /// Permission: SuspendOrganizations.
@@ -127,11 +92,6 @@ namespace Mycelium.Forge.Common
         RemoveOrganizationMembers,
 
         /// <summary>
-        /// Permission: ManageOrganizationRoles.
-        /// </summary>
-        ManageOrganizationRoles,
-
-        /// <summary>
         /// Permission: ConfigurePublishingPolicy.
         /// </summary>
         ConfigurePublishingPolicy,
@@ -157,19 +117,9 @@ namespace Mycelium.Forge.Common
         ViewOrganizationMemberList,
 
         /// <summary>
-        /// Permission: LeaveOrganization.
-        /// </summary>
-        LeaveOrganization,
-
-        /// <summary>
         /// Permission: AcceptOrganizationInvitation.
         /// </summary>
         AcceptOrganizationInvitation,
-
-        /// <summary>
-        /// Permission: DeclineOrganizationInvitation.
-        /// </summary>
-        DeclineOrganizationInvitation,
 
         /// <summary>
         /// Permission: RevokeOrganizationInvitation.
@@ -190,11 +140,6 @@ namespace Mycelium.Forge.Common
         /// Permission: PublishPackageVersion.
         /// </summary>
         PublishPackageVersion,
-
-        /// <summary>
-        /// Permission: UpdatePackageVersion.
-        /// </summary>
-        UpdatePackageVersion,
 
         /// <summary>
         /// Permission: UnlistPackageVersion.
@@ -247,11 +192,6 @@ namespace Mycelium.Forge.Common
         AcceptPackageInvitation,
 
         /// <summary>
-        /// Permission: DeclinePackageInvitation.
-        /// </summary>
-        DeclinePackageInvitation,
-
-        /// <summary>
         /// Permission: RevokePackageInvitation.
         /// </summary>
         RevokePackageInvitation,
@@ -260,11 +200,6 @@ namespace Mycelium.Forge.Common
         /// Permission: ManageOwnProfile.
         /// </summary>
         ManageOwnProfile,
-
-        /// <summary>
-        /// Permission: ViewOwnMemberships.
-        /// </summary>
-        ViewOwnMemberships,
 
         /// <summary>
         /// Permission: IssueApiKey.

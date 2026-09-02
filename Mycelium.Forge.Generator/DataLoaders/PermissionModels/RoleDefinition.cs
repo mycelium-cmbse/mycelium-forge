@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Generator.DataLoaders.PermissionModels
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Represents a role parsed from a CSV row, including its human-readable summary
     /// and the list of permission enum names granted to it.
@@ -21,6 +19,11 @@ namespace Mycelium.Forge.Generator.DataLoaders.PermissionModels
         /// Gets or sets the name of the role in PascalCase.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the role this role inherits permissions from, if any.
+        /// </summary>
+        public string Inherits { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the human-readable summary description of the role.
