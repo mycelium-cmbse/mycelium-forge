@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -77,7 +77,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (entityBehaviors.TryGetValue(@class.Name, out var behavior) &&
                 behavior != null &&
-                BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper))
+                BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) &&
+                helper.HandlesOperation(operation))
             {
                 return helper.IsAsyncMethod(operation);
             }
@@ -164,11 +165,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 var isAsync = IsAsyncMethod(@class, "Create");
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null &&
-                    BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) &&
-                    helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior, isAsync))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Create"))
                 {
-                    // Handled by behavior helper
+                    helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior, isAsync);
                 }
                 else if (definition != null && !string.IsNullOrWhiteSpace(definition.CreatePermission))
                 {
@@ -195,11 +194,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 var isAsync = IsAsyncMethod(@class, "Read");
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null &&
-                    BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) &&
-                    helper.WriteIsAllowedToRead(stringBuilder, @class, definition, behavior, isAsync))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Read"))
                 {
-                    // Handled by behavior helper
+                    helper.WriteIsAllowedToRead(stringBuilder, @class, definition, behavior, isAsync);
                 }
                 else if (definition != null)
                 {
@@ -254,11 +251,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 var isAsync = IsAsyncMethod(@class, "Update");
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null &&
-                    BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) &&
-                    helper.WriteIsAllowedToUpdate(stringBuilder, @class, definition, behavior, propertyDefs, isAsync))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Update"))
                 {
-                    // Handled by behavior helper
+                    helper.WriteIsAllowedToUpdate(stringBuilder, @class, definition, behavior, propertyDefs, isAsync);
                 }
                 else if (definition != null)
                 {
@@ -325,11 +320,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 var isAsync = IsAsyncMethod(@class, "Delete");
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null &&
-                    BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) &&
-                    helper.WriteIsAllowedToDelete(stringBuilder, @class, definition, behavior, isAsync))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Delete"))
                 {
-                    // Handled by behavior helper
+                    helper.WriteIsAllowedToDelete(stringBuilder, @class, definition, behavior, isAsync);
                 }
                 else if (definition != null)
                 {

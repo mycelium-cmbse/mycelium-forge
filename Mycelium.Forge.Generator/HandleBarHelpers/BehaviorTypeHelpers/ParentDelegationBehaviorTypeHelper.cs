@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ParentDelegationBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,9 +9,6 @@
 
 namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
 
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
@@ -33,6 +30,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// Gets the behavior type name handled by this helper.
         /// </summary>
         public string BehaviorType => "ParentDelegation";
+
+        /// <summary>
+        /// Determines whether this behavior helper handles the specified operation.
+        /// </summary>
+        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
+        public bool HandlesOperation(string operation)
+        {
+            return true;
+        }
 
         /// <summary>
         /// Determines whether the specified operation requires an asynchronous implementation hook.
@@ -95,14 +102,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
         {
             var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
             var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
             var parentServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}Service";
             var parentVar = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}";
             var createPerm = behavior.Configuration.TryGetValue("CreatePermission", out var cp) ? cp : definition?.CreatePermission;
+
             var parentOwnerProps = behavior.Configuration.TryGetValue("ParentOwnerProperties", out var pop)
                 ? pop.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 : ["Owner"];
@@ -138,6 +145,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine();
 
             var ownershipChecks = new List<string> { $"{parentVar}.Owner == accountId" };
+
             foreach (var prop in parentOwnerProps)
             {
                 if (!prop.Equals("Owner", StringComparison.OrdinalIgnoreCase))
@@ -155,7 +163,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine("            }");
             stringBuilder.AppendLine();
             stringBuilder.Append("            return Result.Ok();");
-            return true;
         }
 
         /// <summary>
@@ -166,8 +173,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
         {
             var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
             var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
@@ -187,7 +193,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine("            }");
             stringBuilder.AppendLine();
             stringBuilder.Append("            return Result.Ok();");
-            return true;
         }
 
         /// <summary>
@@ -199,8 +204,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync)
+        public void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync)
         {
             var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
             var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
@@ -209,6 +213,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var stateProp = behavior.Configuration.GetValueOrDefault("StateProperty", "Listed");
             var stateActivePerm = behavior.Configuration.GetValueOrDefault("StateActivePermission", "RelistPackageVersion");
             var stateInactivePerm = behavior.Configuration.GetValueOrDefault("StateInactivePermission", "UnlistPackageVersion");
+
             var parentOwnerProps = behavior.Configuration.TryGetValue("ParentOwnerProperties", out var pop)
                 ? pop.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 : ["Owner"];
@@ -266,6 +271,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine();
 
             var ownershipChecks = new List<string> { $"{parentVar}.Owner == accountId" };
+
             foreach (var prop in parentOwnerProps)
             {
                 if (!prop.Equals("Owner", StringComparison.OrdinalIgnoreCase))
@@ -283,7 +289,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine("            }");
             stringBuilder.AppendLine();
             stringBuilder.Append("            return Result.Ok();");
-            return true;
         }
 
         /// <summary>
@@ -294,14 +299,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
         {
             var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
             var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
             var parentServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}Service";
             var parentVar = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}";
             var deletePerm = behavior.Configuration.TryGetValue("DeletePermission", out var dp) ? dp : definition?.DeletePermission;
+
             var parentOwnerProps = behavior.Configuration.TryGetValue("ParentOwnerProperties", out var pop)
                 ? pop.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 : ["Owner"];
@@ -337,6 +342,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine();
 
             var ownershipChecks = new List<string> { $"{parentVar}.Owner == accountId" };
+
             foreach (var prop in parentOwnerProps)
             {
                 if (!prop.Equals("Owner", StringComparison.OrdinalIgnoreCase))
@@ -354,7 +360,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine("            }");
             stringBuilder.AppendLine();
             stringBuilder.Append("            return Result.Ok();");
-            return true;
         }
     }
 }

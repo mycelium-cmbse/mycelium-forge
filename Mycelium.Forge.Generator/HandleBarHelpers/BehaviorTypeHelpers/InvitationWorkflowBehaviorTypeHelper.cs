@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="InvitationWorkflowBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 {
-    using System;
-    using System.Collections.Generic;
     using System.Text;
 
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
@@ -34,15 +32,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public string BehaviorType => "InvitationWorkflow";
 
         /// <summary>
-        /// Validates that the specified class is a supported invitation entity.
+        /// Determines whether this behavior helper handles the specified operation.
         /// </summary>
-        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
-        private static void ValidateSupportedClass(IClass @class)
+        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
+        public bool HandlesOperation(string operation)
         {
-            if (!SupportedInvitations.Contains(@class.Name))
-            {
-                throw new NotSupportedException($"InvitationWorkflow behavior does not support entity '{@class.Name}'. Supported entities are: {string.Join(", ", SupportedInvitations)}.");
-            }
+            return true;
         }
 
         /// <summary>
@@ -121,8 +117,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
         {
             ValidateSupportedClass(@class);
 
@@ -193,8 +188,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 stringBuilder.AppendLine();
                 stringBuilder.Append("            return Result.Ok();");
             }
-
-            return true;
         }
 
         /// <summary>
@@ -205,8 +198,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
         {
             ValidateSupportedClass(@class);
 
@@ -278,8 +270,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 stringBuilder.AppendLine();
                 stringBuilder.Append("            return Result.Fail(\"Access denied: user cannot view this invitation.\");");
             }
-
-            return true;
         }
 
         /// <summary>
@@ -291,8 +281,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync)
+        public void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync)
         {
             ValidateSupportedClass(@class);
 
@@ -341,7 +330,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine("            }");
             stringBuilder.AppendLine();
             stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
-            return true;
         }
 
         /// <summary>
@@ -352,8 +340,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        public bool WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
         {
             ValidateSupportedClass(@class);
 
@@ -424,8 +411,18 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 stringBuilder.AppendLine();
                 stringBuilder.Append("            return Result.Fail(\"Access denied: only package owners or maintainers can revoke invitations.\");");
             }
+        }
 
-            return true;
+        /// <summary>
+        /// Validates that the specified class is a supported invitation entity.
+        /// </summary>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        private static void ValidateSupportedClass(IClass @class)
+        {
+            if (!SupportedInvitations.Contains(@class.Name))
+            {
+                throw new NotSupportedException($"InvitationWorkflow behavior does not support entity '{@class.Name}'. Supported entities are: {string.Join(", ", SupportedInvitations)}.");
+            }
         }
     }
 }

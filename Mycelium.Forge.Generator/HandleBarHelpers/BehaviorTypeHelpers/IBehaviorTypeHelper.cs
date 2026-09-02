@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,6 @@
 
 namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 {
-    using System.Collections.Generic;
     using System.Text;
 
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
@@ -25,6 +24,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// Gets the behavior type name handled by this helper.
         /// </summary>
         string BehaviorType { get; }
+
+        /// <summary>
+        /// Determines whether this behavior helper handles the specified operation.
+        /// </summary>
+        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
+        bool HandlesOperation(string operation);
 
         /// <summary>
         /// Determines whether the specified operation requires an asynchronous implementation hook.
@@ -49,8 +55,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        bool WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync);
+        void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync);
 
         /// <summary>
         /// Writes the read permission verification implementation body.
@@ -60,8 +65,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        bool WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync);
+        void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync);
 
         /// <summary>
         /// Writes the update permission verification implementation body.
@@ -72,8 +76,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        bool WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync);
+        void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync);
 
         /// <summary>
         /// Writes the delete permission verification implementation body.
@@ -83,7 +86,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        /// <returns><c>true</c> if the behavior handled the operation; otherwise <c>false</c>.</returns>
-        bool WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync);
+        void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync);
     }
 }
