@@ -280,6 +280,25 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
+        /// Generates the permission service class for a single, named <see cref="IClass" />, without necessarily
+        /// writing it to disk; the rendered text is returned so it can be verified in tests.
+        /// </summary>
+        /// <param name="xmiReaderResult">The <see cref="XmiReaderResult" /> that contains the UML model to generate from.</param>
+        /// <param name="className">The name of the class to generate.</param>
+        /// <returns>An awaitable <see cref="Task{String}" /> with the generated code.</returns>
+        public Task<string> GeneratePermissionServiceClassAsync(XmiReaderResult xmiReaderResult, string className)
+        {
+            ArgumentNullException.ThrowIfNull(xmiReaderResult);
+            ArgumentException.ThrowIfNullOrWhiteSpace(className);
+
+            var template = this.Templates[PermissionServiceClassTemplateName];
+            var classToGenerate = QueryPermissionServiceClasses(xmiReaderResult).Single(x => x.Name == className);
+            var generated = this.CodeCleanup(template(classToGenerate));
+
+            return Task.FromResult(generated);
+        }
+
+        /// <summary>
         /// Register the custom helpers used by the permission service templates.
         /// </summary>
         protected override void RegisterHelpers()

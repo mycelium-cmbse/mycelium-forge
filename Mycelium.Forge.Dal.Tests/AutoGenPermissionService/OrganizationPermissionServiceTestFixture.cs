@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationPermissionServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,6 +23,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         private OrganizationPermissionService permissionService;
         private Guid userId;
         private Guid otherUserId;
+        private Guid thirdPartyUserId;
         private UserContext orgAdminUserContext;
         private UserContext orgMemberUserContext;
         private UserContext accountUserContext;
@@ -38,6 +39,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             this.permissionService = new OrganizationPermissionService();
             this.userId = Guid.NewGuid();
             this.otherUserId = Guid.NewGuid();
+            this.thirdPartyUserId = Guid.NewGuid();
 
             this.orgAdminUserContext = new UserContext
             {
@@ -48,14 +50,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             this.orgMemberUserContext = new UserContext
             {
-                AccountId = this.userId,
+                AccountId = this.otherUserId,
                 Username = "orgMember",
                 CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
             };
 
             this.accountUserContext = new UserContext
             {
-                AccountId = this.userId,
+                AccountId = this.thirdPartyUserId,
                 Username = "regularUser",
                 CurrentRoles = [RoleKind.Account]
             };
@@ -110,11 +112,16 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         [Test]
         public async Task VerifyIsAllowedToDelete()
         {
-            var orgId = Guid.NewGuid();
+            var organization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Administrator = [this.otherUserId],
+                Member = [this.otherUserId]
+            };
 
-            var superAdminResult = await this.permissionService.IsAllowedToDelete(this.installationAdminUserContext, orgId);
-            var orgAdminResult = await this.permissionService.IsAllowedToDelete(this.orgAdminUserContext, orgId);
-            var accountResult = await this.permissionService.IsAllowedToDelete(this.accountUserContext, orgId);
+            var superAdminResult = await this.permissionService.IsAllowedToDelete(this.installationAdminUserContext, organization);
+            var orgAdminResult = await this.permissionService.IsAllowedToDelete(this.orgAdminUserContext, organization);
+            var accountResult = await this.permissionService.IsAllowedToDelete(this.accountUserContext, organization);
 
             using (Assert.EnterMultipleScope())
             {
@@ -137,7 +144,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Name = "StarionOrg",
                 ShortName = "starion",
                 Administrator = [this.userId],
-                Member = [this.userId]
+                Member = [this.userId, this.otherUserId]
             };
 
             var nonMemberOrg = new Organization
@@ -149,11 +156,56 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Member = [this.otherUserId]
             };
 
+            var publicOrg = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Name = "PublicOrg",
+                ShortName = "public-org",
+                DefaultPackageVisibility = VisibilityKind.PUBLIC,
+                Administrator = [this.otherUserId],
+                Member = [this.otherUserId]
+            };
+
+            var internalOrg = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Name = "InternalOrg",
+                ShortName = "internal-org",
+                DefaultPackageVisibility = VisibilityKind.INTERNAL,
+                Administrator = [this.userId],
+                Member = [this.userId, this.otherUserId]
+            };
+
+            var privateOrg = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Name = "PrivateOrg",
+                ShortName = "private-org",
+                DefaultPackageVisibility = VisibilityKind.PRIVATE,
+                Administrator = [this.userId],
+                Member = [this.userId, this.otherUserId]
+            };
+
             var adminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, organization);
             var memberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, organization);
 
             var nonMemberAccountResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, nonMemberOrg);
             var nonMemberSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, nonMemberOrg);
+
+            var anonymousPublicResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, publicOrg);
+            var nonMemberPublicResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, publicOrg);
+
+            var internalAdminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, internalOrg);
+            var internalMemberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, internalOrg);
+            var internalNonMemberResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, internalOrg);
+            var internalSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, internalOrg);
+            var internalAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, internalOrg);
+
+            var privateAdminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, privateOrg);
+            var privateMemberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, privateOrg);
+            var privateNonMemberResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, privateOrg);
+            var privateSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, privateOrg);
+            var privateAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, privateOrg);
 
             using (Assert.EnterMultipleScope())
             {
@@ -161,6 +213,18 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(memberResult.IsSuccess, Is.True);
                 Assert.That(nonMemberAccountResult.IsFailed, Is.True);
                 Assert.That(nonMemberSuperAdminResult.IsSuccess, Is.True);
+                Assert.That(anonymousPublicResult.IsSuccess, Is.True);
+                Assert.That(nonMemberPublicResult.IsSuccess, Is.True);
+                Assert.That(internalAdminResult.IsSuccess, Is.True);
+                Assert.That(internalMemberResult.IsSuccess, Is.True);
+                Assert.That(internalNonMemberResult.IsFailed, Is.True);
+                Assert.That(internalSuperAdminResult.IsSuccess, Is.True);
+                Assert.That(internalAnonResult.IsFailed, Is.True);
+                Assert.That(privateAdminResult.IsSuccess, Is.True);
+                Assert.That(privateMemberResult.IsSuccess, Is.True);
+                Assert.That(privateNonMemberResult.IsFailed, Is.True);
+                Assert.That(privateSuperAdminResult.IsSuccess, Is.True);
+                Assert.That(privateAnonResult.IsFailed, Is.True);
             }
         }
 

@@ -58,7 +58,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Task.FromResult(Result.Ok());
             }
 
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ViewAllAccounts));
+            return Task.FromResult(PermissionGuard.GuardAnyPermission(userContext, PermissionKind.ViewAllAccounts, PermissionKind.ManageAccounts));
         }
 
         /// <summary>

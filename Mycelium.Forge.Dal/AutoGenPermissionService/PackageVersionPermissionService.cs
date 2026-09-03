@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionPermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -63,14 +63,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override async Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IPackageVersion toCreate)
         {
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot publish a packageversion.");
-            }
-
-            if (toCreate == null)
-            {
-                return Result.Fail("PackageVersion cannot be null.");
             }
 
             var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.PublishPackageVersion);
@@ -106,11 +101,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override async Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IPackageVersion thing)
         {
-            if (thing == null)
-            {
-                return Result.Fail("PackageVersion cannot be null.");
-            }
-
             var parentResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
 
             if (parentResult.IsSuccess && parentResult.Value.Count > 0)
@@ -130,14 +120,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override async Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IPackageVersion existingThing, IPackageVersion updatedThing)
         {
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot update packageversion.");
-            }
-
-            if (existingThing == null || updatedThing == null)
-            {
-                return Result.Fail("PackageVersion cannot be null.");
             }
 
             if (existingThing.CreatedAt != updatedThing.CreatedAt ||
@@ -153,12 +138,13 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             if (existingThing.Listed != updatedThing.Listed)
             {
-                var permission = updatedThing.Listed ? PermissionKind.RelistPackageVersion : PermissionKind.UnlistPackageVersion;
-                var guard = PermissionGuard.GuardPermission(userContext, permission);
+                var stateGuard = updatedThing.Listed
+                    ? PermissionGuard.GuardPermission(userContext, PermissionKind.RelistPackageVersion)
+                    : PermissionGuard.GuardPermission(userContext, PermissionKind.UnlistPackageVersion);
 
-                if (guard.IsFailed)
+                if (stateGuard.IsFailed)
                 {
-                    return guard;
+                    return stateGuard;
                 }
             }
 
@@ -188,14 +174,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether deletion is permitted.</returns>
         protected override async Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, IPackageVersion thing)
         {
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot erase a packageversion.");
-            }
-
-            if (thing == null)
-            {
-                return Result.Fail("PackageVersion cannot be null.");
             }
 
             var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.ErasePackageVersion);

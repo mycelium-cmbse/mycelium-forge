@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionPermissionServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -63,11 +63,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         private UserContext ownerUserContext;
 
         /// <summary>
-        /// The user context for the package maintainer.
-        /// </summary>
-        private UserContext maintainerUserContext;
-
-        /// <summary>
         /// The user context for another account user.
         /// </summary>
         private UserContext otherUserContext;
@@ -104,13 +99,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 AccountId = this.userId,
                 Username = "ownerUser",
                 CurrentRoles = [RoleKind.Account, RoleKind.PackageOwner]
-            };
-
-            this.maintainerUserContext = new UserContext
-            {
-                AccountId = this.userId,
-                Username = "maintainerUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.PackageMaintainer]
             };
 
             this.otherUserContext = new UserContext
@@ -185,10 +173,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         [Test]
         public async Task VerifyIsAllowedToDelete()
         {
-            var versionId = Guid.NewGuid();
+            var version = new PackageVersion
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.packageId
+            };
 
-            var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, versionId);
-            var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, versionId);
+            var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, version);
+            var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, version);
 
             using (Assert.EnterMultipleScope())
             {

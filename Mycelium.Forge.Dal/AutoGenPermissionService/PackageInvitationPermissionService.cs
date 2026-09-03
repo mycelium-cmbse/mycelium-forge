@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageInvitationPermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -56,14 +56,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override async Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IPackageInvitation toCreate)
         {
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot create an invitation.");
-            }
-
-            if (toCreate == null)
-            {
-                return Result.Fail("Invitation cannot be null.");
             }
 
             var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
@@ -73,16 +68,15 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return guard;
             }
 
-            var packageResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);
+            var scopeResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [toCreate.Package]);
 
-            if (packageResult.IsSuccess && packageResult.Value.Count > 0)
+            if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
             {
-                var package = packageResult.Value[0];
-                var accountId = userContext.AccountId.Value;
+                var package = scopeResult.Value[0];
 
-                if (!package.PackageOwner.Contains(accountId) && !package.PackageMaintainer.Contains(accountId))
+                if (!package.PackageOwner.Contains(userContext.AccountId.Value) && !package.PackageMaintainer.Contains(userContext.AccountId.Value))
                 {
-                    return Result.Fail("Access denied: only package owners or maintainers can invite members.");
+                    return Result.Fail("Access denied: only packageOwner or packageMaintainers can invite members.");
                 }
             }
 
@@ -97,12 +91,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override async Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IPackageInvitation thing)
         {
-            if (thing == null)
-            {
-                return Result.Fail("Invitation cannot be null.");
-            }
-
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot view an invitation.");
             }
@@ -114,11 +103,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Ok();
             }
 
-            var packageResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
+            var scopeResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [thing.Package]);
 
-            if (packageResult.IsSuccess && packageResult.Value.Count > 0)
+            if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
             {
-                var package = packageResult.Value[0];
+                var package = scopeResult.Value[0];
 
                 if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
                 {
@@ -126,7 +115,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return Result.Fail("Access denied: user cannot view this invitation.");
+            return PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
         }
 
         /// <summary>
@@ -138,14 +127,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IPackageInvitation existingThing, IPackageInvitation updatedThing)
         {
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Task.FromResult(Result.Fail("Unauthenticated user cannot respond to an invitation."));
-            }
-
-            if (existingThing == null || updatedThing == null)
-            {
-                return Task.FromResult(Result.Fail("Invitation cannot be null."));
             }
 
             if (existingThing.Status != updatedThing.Status)
@@ -157,7 +141,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (updatedThing.Status == InvitationStatusKind.ACCEPTED)
                 {
-                    if (existingThing.Target != userContext.AccountId.Value)
+                    if (existingThing.Target != userContext.AccountId.Value && !PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
                     {
                         return Task.FromResult(Result.Fail("Access denied: only the invited target account can accept the invitation."));
                     }
@@ -167,7 +151,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (updatedThing.Status == InvitationStatusKind.REVOKED)
                 {
-                    if (existingThing.Owner != userContext.AccountId.Value)
+                    if (existingThing.Owner != userContext.AccountId.Value && !PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
                     {
                         return Task.FromResult(Result.Fail("Access denied: only the invitation creator can revoke the invitation."));
                     }
@@ -178,7 +162,17 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Task.FromResult(Result.Fail($"Unsupported invitation status transition to {updatedThing.Status}."));
             }
 
-            return Task.FromResult(Result.Ok());
+            if (existingThing.Owner == userContext.AccountId.Value || existingThing.Target == userContext.AccountId.Value)
+            {
+                return Task.FromResult(Result.Ok());
+            }
+
+            if (PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
+            {
+                return Task.FromResult(Result.Ok());
+            }
+
+            return Task.FromResult(Result.Fail("Access denied: you are not a party to this invitation."));
         }
 
         /// <summary>
@@ -189,14 +183,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether deletion is permitted.</returns>
         protected override async Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, IPackageInvitation thing)
         {
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot revoke an invitation.");
-            }
-
-            if (thing == null)
-            {
-                return Result.Fail("Invitation cannot be null.");
             }
 
             var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
@@ -206,11 +195,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return guard;
             }
 
-            var packageResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
+            var scopeResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [thing.Package]);
 
-            if (packageResult.IsSuccess && packageResult.Value.Count > 0)
+            if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
             {
-                var package = packageResult.Value[0];
+                var package = scopeResult.Value[0];
                 var accountId = userContext.AccountId.Value;
 
                 if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
@@ -219,7 +208,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return Result.Fail("Access denied: only package owners or maintainers can revoke invitations.");
+            return Result.Fail("Access denied: only packageOwner or packageMaintainers can revoke invitations.");
         }
     }
 }

@@ -55,18 +55,6 @@ namespace Mycelium.Forge.Dal.PermissionService
         }
 
         /// <summary>
-        /// Determines whether the user described by <paramref name="userContext" /> is allowed to delete the entity with the
-        /// specified identifier.
-        /// </summary>
-        /// <param name="userContext">The contextual user information and assigned roles.</param>
-        /// <param name="id">The unique identifier of the entity to delete.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
-        public virtual Task<Result> IsAllowedToDelete(IUserContext userContext, Guid id)
-        {
-            return this.IsAllowedToDeleteImplementation(userContext, id);
-        }
-
-        /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to delete the specified entity.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
@@ -74,11 +62,6 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
         public virtual Task<Result> IsAllowedToDelete(IUserContext userContext, TThing thing)
         {
-            if (thing == null)
-            {
-                return Task.FromResult(Result.Fail("Entity to delete cannot be null."));
-            }
-
             return this.IsAllowedToDeleteImplementation(userContext, thing);
         }
 
@@ -118,17 +101,6 @@ namespace Mycelium.Forge.Dal.PermissionService
         }
 
         /// <summary>
-        /// Core implementation hook for verifying delete permissions on an entity by its <paramref name="id" />.
-        /// </summary>
-        /// <param name="userContext">The contextual user information and assigned roles.</param>
-        /// <param name="id">The unique identifier of the entity to delete.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
-        protected virtual Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, Guid id)
-        {
-            return Task.FromResult(Result.Ok());
-        }
-
-        /// <summary>
         /// Core implementation hook for verifying delete permissions on <paramref name="thing" />.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
@@ -136,7 +108,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
         protected virtual Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, TThing thing)
         {
-            return this.IsAllowedToDeleteImplementation(userContext, thing.Id);
+            return Task.FromResult(Result.Ok());
         }
     }
 }

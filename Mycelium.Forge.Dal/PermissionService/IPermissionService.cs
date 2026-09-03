@@ -46,15 +46,6 @@ namespace Mycelium.Forge.Dal.PermissionService
         Task<Result> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing);
 
         /// <summary>
-        /// Determines whether the user described by <paramref name="userContext" /> is allowed to delete the entity with the
-        /// specified identifier.
-        /// </summary>
-        /// <param name="userContext">The contextual user information and assigned roles.</param>
-        /// <param name="id">The unique identifier of the entity to delete.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
-        Task<Result> IsAllowedToDelete(IUserContext userContext, Guid id);
-
-        /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to delete the specified entity.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>

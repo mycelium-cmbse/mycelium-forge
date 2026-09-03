@@ -36,7 +36,7 @@ namespace Mycelium.Forge.Dal.PermissionService
             string itemName)
         {
             // Verify that the user is authenticated and possesses a valid account identifier
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail($"Unauthenticated user cannot manage a {itemName}.");
             }
@@ -90,7 +90,7 @@ namespace Mycelium.Forge.Dal.PermissionService
             Guid ownerScopeId,
             IOrganizationService organizationService)
         {
-            if (userContext is { AccountId: not null } && ownerScopeId == userContext.AccountId.Value)
+            if (userContext.AccountId != null && ownerScopeId == userContext.AccountId.Value)
             {
                 return Result.Ok();
             }
@@ -102,7 +102,7 @@ namespace Mycelium.Forge.Dal.PermissionService
                 return Result.Ok();
             }
 
-            if (organizationService != null && userContext is { AccountId: not null })
+            if (userContext.AccountId != null)
             {
                 var organizationResult = await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId]);
 

@@ -17,13 +17,13 @@ namespace Mycelium.Forge.Common
     using System.Collections.Generic;
 
     /// <summary>
-    /// Static mapping of <see cref="RoleKind" /> to their granted <see cref="PermissionKind" /> sets.
+    /// Static mapping of <see cref="RoleKind"/> to their granted <see cref="PermissionKind"/> sets.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
     public static class RolePermissionMap
     {
         /// <summary>
-        /// Gets the dictionary mapping each <see cref="RoleKind" /> to its list of granted <see cref="PermissionKind" /> values.
+        /// Gets the dictionary mapping each <see cref="RoleKind"/> to its list of granted <see cref="PermissionKind"/> values.
         /// </summary>
         public static IReadOnlyDictionary<RoleKind, IReadOnlyList<PermissionKind>> RoleToPermissions { get; } = new Dictionary<RoleKind, IReadOnlyList<PermissionKind>>
         {
@@ -39,6 +39,26 @@ namespace Mycelium.Forge.Common
                     PermissionKind.RevokeAnyApiKey,
                     PermissionKind.ConfigurePlatformDefaults,
                     PermissionKind.SuspendOrganizations,
+                    PermissionKind.ManageOrganizationSettings,
+                    PermissionKind.InviteOrganizationMembers,
+                    PermissionKind.RemoveOrganizationMembers,
+                    PermissionKind.ConfigurePublishingPolicy,
+                    PermissionKind.TransferOrganizationAdministration,
+                    PermissionKind.ConfigureDefaultPackageVisibility,
+                    PermissionKind.ViewOrganizationPackageList,
+                    PermissionKind.ViewOrganizationMemberList,
+                    PermissionKind.RevokeOrganizationInvitation,
+                    PermissionKind.PublishPackageToOrganizationScope,
+                    PermissionKind.PublishPackageVersion,
+                    PermissionKind.UnlistPackageVersion,
+                    PermissionKind.RelistPackageVersion,
+                    PermissionKind.SetPackageVisibility,
+                    PermissionKind.ManagePackageTeam,
+                    PermissionKind.TransferPackageOwnership,
+                    PermissionKind.ManagePackageSettings,
+                    PermissionKind.ReadInternalPackage,
+                    PermissionKind.ReadPrivatePackage,
+                    PermissionKind.RevokePackageInvitation,
                     PermissionKind.CreateOrganization,
                     PermissionKind.AcceptOrganizationInvitation,
                     PermissionKind.PublishPackageToPersonalScope,
@@ -58,7 +78,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.DeleteProfileLink,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -67,7 +87,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.SuspendOrganizations,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -102,7 +122,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.DeleteProfileLink,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -130,7 +150,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.DeleteProfileLink,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -148,7 +168,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.RevokePackageInvitation,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -161,7 +181,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.ReadPrivatePackage,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -171,7 +191,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.ReadPrivatePackage,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -195,7 +215,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.DeleteProfileLink,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
             },
             {
@@ -203,9 +223,9 @@ namespace Mycelium.Forge.Common
                     PermissionKind.ReadPublicPackage,
                     PermissionKind.ReadCountry,
                     PermissionKind.ReadPackageType,
-                    PermissionKind.ReadProfileType
+                    PermissionKind.ReadProfileType,
                 ]
-            }
+            },
         };
     }
 }

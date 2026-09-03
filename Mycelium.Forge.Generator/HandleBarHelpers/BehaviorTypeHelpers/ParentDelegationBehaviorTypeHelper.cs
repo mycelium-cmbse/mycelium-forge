@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParentDelegationBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,8 +11,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 {
     using System.Text;
 
+    using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
     using Mycelium.Forge.Generator.Extensions;
+    using Mycelium.Forge.Generator.Models;
 
     using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
@@ -27,16 +29,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     public class ParentDelegationBehaviorTypeHelper : IBehaviorTypeHelper
     {
         /// <summary>
-        /// Gets the behavior type name handled by this helper.
-        /// </summary>
-        public string BehaviorType => "ParentDelegation";
-
-        /// <summary>
         /// Determines whether this behavior helper handles the specified operation.
         /// </summary>
-        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <param name="operation">The permission operation.</param>
         /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
-        public bool HandlesOperation(string operation)
+        public bool HandlesOperation(Operations operation)
         {
             return true;
         }
@@ -44,9 +41,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <summary>
         /// Determines whether the specified operation requires an asynchronous implementation hook.
         /// </summary>
-        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <param name="operation">The permission operation.</param>
         /// <returns><c>true</c> if the operation is asynchronous; otherwise <c>false</c>.</returns>
-        public bool IsAsyncMethod(string operation)
+        public bool IsAsyncMethod(Operations operation)
         {
             return true;
         }
@@ -56,42 +53,41 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// </summary>
         /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        public void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityBehaviorDefinition behavior)
+        public void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
-            var parentServiceType = $"I{parentEntity}Service";
-            var parentServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}Service";
-            var parentPermServiceType = $"I{parentEntity}PermissionService";
-            var parentPermServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}PermissionService";
+            var config = new ParentDelegationConfiguration(definition, behavior);
 
-            stringBuilder.AppendLine("        /// <summary>");
-            stringBuilder.AppendLine($"        /// The (injected) <see cref=\"{parentServiceType}\" /> domain service.");
-            stringBuilder.AppendLine("        /// </summary>");
-            stringBuilder.AppendLine($"        private readonly {parentServiceType} {parentServiceField};");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("        /// <summary>");
-            stringBuilder.AppendLine($"        /// The (injected) <see cref=\"{parentPermServiceType}\" /> domain service.");
-            stringBuilder.AppendLine("        /// </summary>");
-            stringBuilder.AppendLine($"        private readonly {parentPermServiceType} {parentPermServiceField};");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("        /// <summary>");
-            stringBuilder.AppendLine($"        /// Initializes a new instance of the <see cref=\"{@class.Name}PermissionService\"/> class.");
-            stringBuilder.AppendLine("        /// </summary>");
-            stringBuilder.AppendLine($"        public {@class.Name}PermissionService()");
-            stringBuilder.AppendLine("        {");
-            stringBuilder.AppendLine("        }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("        /// <summary>");
-            stringBuilder.AppendLine($"        /// Initializes a new instance of the <see cref=\"{@class.Name}PermissionService\"/> class.");
-            stringBuilder.AppendLine("        /// </summary>");
-            stringBuilder.AppendLine($"        /// <param name=\"{parentServiceField}\">The (injected) <see cref=\"{parentServiceType}\" /> domain service.</param>");
-            stringBuilder.AppendLine($"        /// <param name=\"{parentPermServiceField}\">The (injected) <see cref=\"{parentPermServiceType}\" /> domain service.</param>");
-            stringBuilder.AppendLine($"        public {@class.Name}PermissionService({parentServiceType} {parentServiceField}, {parentPermServiceType} {parentPermServiceField})");
-            stringBuilder.AppendLine("        {");
-            stringBuilder.AppendLine($"            this.{parentServiceField} = {parentServiceField};");
-            stringBuilder.AppendLine($"            this.{parentPermServiceField} = {parentPermServiceField};");
-            stringBuilder.AppendLine("        }");
+            stringBuilder.AppendLine($$"""
+                                               /// <summary>
+                                               /// The (injected) <see cref="{{config.ParentServiceType}}" /> domain service.
+                                               /// </summary>
+                                               private readonly {{config.ParentServiceType}} {{config.ParentServiceField}};
+
+                                               /// <summary>
+                                               /// The (injected) <see cref="{{config.ParentPermServiceType}}" /> domain service.
+                                               /// </summary>
+                                               private readonly {{config.ParentPermServiceType}} {{config.ParentPermServiceField}};
+
+                                               /// <summary>
+                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
+                                               /// </summary>
+                                               public {{@class.Name}}PermissionService()
+                                               {
+                                               }
+
+                                               /// <summary>
+                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
+                                               /// </summary>
+                                               /// <param name="{{config.ParentServiceField}}">The (injected) <see cref="{{config.ParentServiceType}}" /> domain service.</param>
+                                               /// <param name="{{config.ParentPermServiceField}}">The (injected) <see cref="{{config.ParentPermServiceType}}" /> domain service.</param>
+                                               public {{@class.Name}}PermissionService({{config.ParentServiceType}} {{config.ParentServiceField}}, {{config.ParentPermServiceType}} {{config.ParentPermServiceField}})
+                                               {
+                                                   this.{{config.ParentServiceField}} = {{config.ParentServiceField}};
+                                                   this.{{config.ParentPermServiceField}} = {{config.ParentPermServiceField}};
+                                               }
+                                       """);
         }
 
         /// <summary>
@@ -101,68 +97,55 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
-            var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
-            var parentServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}Service";
-            var parentVar = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}";
-            var createPerm = behavior.Configuration.TryGetValue("CreatePermission", out var cp) ? cp : definition?.CreatePermission;
+            var config = new ParentDelegationConfiguration(definition, behavior);
 
-            var parentOwnerProps = behavior.Configuration.TryGetValue("ParentOwnerProperties", out var pop)
-                ? pop.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                : ["Owner"];
+            var guardCheck = !string.IsNullOrWhiteSpace(config.CreatePermission)
+                ? $$"""
+                                var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
 
-            stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return Result.Fail(\"Unauthenticated user cannot publish a {@class.Name.ToLowerInvariant()}.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (toCreate == null)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return Result.Fail(\"{@class.Name} cannot be null.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
+                                if (guard.IsFailed)
+                                {
+                                    return guard;
+                                }
 
-            if (!string.IsNullOrWhiteSpace(createPerm))
-            {
-                stringBuilder.AppendLine($"            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{createPerm});");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (guard.IsFailed)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return guard;");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-            }
+                    """
+                : string.Empty;
 
-            stringBuilder.AppendLine($"            var parentResult = await this.{parentServiceField}.ReadAsync(userContext, CancellationToken.None, [toCreate.{parentKey}]);");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (parentResult.IsSuccess && parentResult.Value.Count > 0)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                var {parentVar} = parentResult.Value[0];");
-            stringBuilder.AppendLine("                var accountId = userContext.AccountId.Value;");
-            stringBuilder.AppendLine();
+            var ownershipChecks = new List<string> { $"{config.ParentVar}.Owner == accountId" };
 
-            var ownershipChecks = new List<string> { $"{parentVar}.Owner == accountId" };
-
-            foreach (var prop in parentOwnerProps)
+            foreach (var prop in config.ParentOwnerProperties)
             {
                 if (!prop.Equals("Owner", StringComparison.OrdinalIgnoreCase))
                 {
-                    ownershipChecks.Add($"{parentVar}.{prop}.Contains(accountId)");
+                    ownershipChecks.Add($"{config.ParentVar}.{prop}.Contains(accountId)");
                 }
             }
 
-            stringBuilder.AppendLine($"                if ({string.Join(" || ", ownershipChecks)})");
-            stringBuilder.AppendLine("                {");
-            stringBuilder.AppendLine("                    return Result.Ok();");
-            stringBuilder.AppendLine("                }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"                return Result.Fail(\"Access denied: user is not an owner or maintainer of the {parentEntity.ToLowerInvariant()}.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.Append("            return Result.Ok();");
+            stringBuilder.Append($$""""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Result.Fail("""Unauthenticated user cannot publish a {{@class.Name.ToLowerInvariant()}}.""");
+                                               }
+
+                                   {{guardCheck}}            var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                                   var {{config.ParentVar}} = parentResult.Value[0];
+                                                   var accountId = userContext.AccountId.Value;
+
+                                                   if ({{string.Join(" || ", ownershipChecks)}})
+                                                   {
+                                                       return Result.Ok();
+                                                   }
+
+                                                   return Result.Fail("""Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.""");
+                                               }
+
+                                               return Result.Ok();
+                                   """");
         }
 
         /// <summary>
@@ -172,27 +155,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
-            var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
-            var parentServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}Service";
-            var parentPermServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}PermissionService";
+            var config = new ParentDelegationConfiguration(definition, behavior);
 
-            stringBuilder.AppendLine("            if (thing == null)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return Result.Fail(\"{@class.Name} cannot be null.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"            var parentResult = await this.{parentServiceField}.ReadAsync(userContext, CancellationToken.None, [thing.{parentKey}]);");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (parentResult.IsSuccess && parentResult.Value.Count > 0)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return await this.{parentPermServiceField}.IsAllowedToRead(userContext, parentResult.Value[0]);");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.Append("            return Result.Ok();");
+            stringBuilder.Append($$""""
+                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToRead(userContext, parentResult.Value[0]);
+                                               }
+
+                                               return Result.Ok();
+                                   """");
         }
 
         /// <summary>
@@ -203,92 +179,76 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync)
+        public void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
         {
-            var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
-            var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
-            var parentServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}Service";
-            var parentVar = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}";
-            var stateProp = behavior.Configuration.GetValueOrDefault("StateProperty", "Listed");
-            var stateActivePerm = behavior.Configuration.GetValueOrDefault("StateActivePermission", "RelistPackageVersion");
-            var stateInactivePerm = behavior.Configuration.GetValueOrDefault("StateInactivePermission", "UnlistPackageVersion");
+            var config = new ParentDelegationConfiguration(definition, behavior);
 
-            var parentOwnerProps = behavior.Configuration.TryGetValue("ParentOwnerProperties", out var pop)
-                ? pop.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                : ["Owner"];
+            var immutableProperties = @class.QueryDtoClassProperties()
+                .Select(p => p.Name.CapitalizeFirstLetter())
+                .Where(p => !p.Equals("Id", StringComparison.OrdinalIgnoreCase) && !p.Equals(config.StateProperty, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return Result.Fail(\"Unauthenticated user cannot update {@class.Name.ToLowerInvariant()}.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (existingThing == null || updatedThing == null)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return Result.Fail(\"{@class.Name} cannot be null.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
+            var immutableBlock = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(stateProp))
+            if (immutableProperties.Count > 0)
             {
-                var immutableProperties = @class.QueryDtoClassProperties()
-                    .Select(p => p.Name.CapitalizeFirstLetter())
-                    .Where(p => !p.Equals("Id", StringComparison.OrdinalIgnoreCase) && !p.Equals(stateProp, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                var diffChecks = immutableProperties.Select(p => $"existingThing.{p} != updatedThing.{p}");
 
-                if (immutableProperties.Count > 0)
-                {
-                    var diffChecks = immutableProperties.Select(p => $"existingThing.{p} != updatedThing.{p}");
-                    stringBuilder.AppendLine($"            if ({string.Join(" ||\r\n                ", diffChecks)})");
-                    stringBuilder.AppendLine("            {");
-                    stringBuilder.AppendLine($"                return Result.Fail(\"{@class.Name}s are immutable; only the {stateProp.ToLowerInvariant()} status may be modified.\");");
-                    stringBuilder.AppendLine("            }");
-                    stringBuilder.AppendLine();
-                }
+                immutableBlock = $$""""
+                                               if ({{string.Join(" ||\r\n                    ", diffChecks)}})
+                                               {
+                                                   return Result.Fail("""{{@class.Name}}s are immutable; only the {{config.StateProperty.ToLowerInvariant()}} status may be modified.""");
+                                               }
 
-                if (!string.IsNullOrWhiteSpace(stateActivePerm) && !string.IsNullOrWhiteSpace(stateInactivePerm))
-                {
-                    stringBuilder.AppendLine($"            if (existingThing.{stateProp} != updatedThing.{stateProp})");
-                    stringBuilder.AppendLine("            {");
-                    stringBuilder.AppendLine($"                var permission = updatedThing.{stateProp} ? PermissionKind.{stateActivePerm} : PermissionKind.{stateInactivePerm};");
-                    stringBuilder.AppendLine("                var guard = PermissionGuard.GuardPermission(userContext, permission);");
-                    stringBuilder.AppendLine();
-                    stringBuilder.AppendLine("                if (guard.IsFailed)");
-                    stringBuilder.AppendLine("                {");
-                    stringBuilder.AppendLine("                    return guard;");
-                    stringBuilder.AppendLine("                }");
-                    stringBuilder.AppendLine("            }");
-                    stringBuilder.AppendLine();
-                }
+
+                                   """";
             }
 
-            stringBuilder.AppendLine($"            var parentResult = await this.{parentServiceField}.ReadAsync(userContext, CancellationToken.None, [existingThing.{parentKey}]);");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (parentResult.IsSuccess && parentResult.Value.Count > 0)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                var {parentVar} = parentResult.Value[0];");
-            stringBuilder.AppendLine("                var accountId = userContext.AccountId.Value;");
-            stringBuilder.AppendLine();
+            var ownershipChecks = new List<string> { $"{config.ParentVar}.Owner == accountId" };
 
-            var ownershipChecks = new List<string> { $"{parentVar}.Owner == accountId" };
-
-            foreach (var prop in parentOwnerProps)
+            foreach (var prop in config.ParentOwnerProperties)
             {
                 if (!prop.Equals("Owner", StringComparison.OrdinalIgnoreCase))
                 {
-                    ownershipChecks.Add($"{parentVar}.{prop}.Contains(accountId)");
+                    ownershipChecks.Add($"{config.ParentVar}.{prop}.Contains(accountId)");
                 }
             }
 
-            stringBuilder.AppendLine($"                if ({string.Join(" || ", ownershipChecks)})");
-            stringBuilder.AppendLine("                {");
-            stringBuilder.AppendLine("                    return Result.Ok();");
-            stringBuilder.AppendLine("                }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"                return Result.Fail(\"Access denied: user is not an owner or maintainer of the {parentEntity.ToLowerInvariant()}.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.Append("            return Result.Ok();");
+            stringBuilder.Append($$""""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Result.Fail("""Unauthenticated user cannot update {{@class.Name.ToLowerInvariant()}}.""");
+                                               }
+
+                                   {{immutableBlock}}            if (existingThing.{{config.StateProperty}} != updatedThing.{{config.StateProperty}})
+                                               {
+                                                   var stateGuard = updatedThing.{{config.StateProperty}}
+                                                       ? PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateActivePermission}})
+                                                       : PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateInactivePermission}});
+
+                                                   if (stateGuard.IsFailed)
+                                                   {
+                                                       return stateGuard;
+                                                   }
+                                               }
+
+                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [existingThing.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                                   var {{config.ParentVar}} = parentResult.Value[0];
+                                                   var accountId = userContext.AccountId.Value;
+
+                                                   if ({{string.Join(" || ", ownershipChecks)}})
+                                                   {
+                                                       return Result.Ok();
+                                                   }
+
+                                                   return Result.Fail("""Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.""");
+                                               }
+
+                                               return Result.Ok();
+                                   """");
         }
 
         /// <summary>
@@ -298,68 +258,96 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            var parentEntity = behavior.Configuration.GetValueOrDefault("ParentEntity", "Package");
-            var parentKey = behavior.Configuration.GetValueOrDefault("ParentKey", "Owner");
-            var parentServiceField = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}Service";
-            var parentVar = $"{char.ToLowerInvariant(parentEntity[0])}{parentEntity[1..]}";
-            var deletePerm = behavior.Configuration.TryGetValue("DeletePermission", out var dp) ? dp : definition?.DeletePermission;
+            var config = new ParentDelegationConfiguration(definition, behavior);
 
-            var parentOwnerProps = behavior.Configuration.TryGetValue("ParentOwnerProperties", out var pop)
-                ? pop.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                : ["Owner"];
+            var eraseGuardBlock = !string.IsNullOrWhiteSpace(config.DeletePermission)
+                ? $$"""
+                                var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.DeletePermission}});
 
-            stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return Result.Fail(\"Unauthenticated user cannot erase a {@class.Name.ToLowerInvariant()}.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (thing == null)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                return Result.Fail(\"{@class.Name} cannot be null.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
+                                if (eraseGuard.IsFailed)
+                                {
+                                    return eraseGuard;
+                                }
 
-            if (!string.IsNullOrWhiteSpace(deletePerm))
-            {
-                stringBuilder.AppendLine($"            var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{deletePerm});");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (eraseGuard.IsFailed)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return eraseGuard;");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-            }
+                    """
+                : string.Empty;
 
-            stringBuilder.AppendLine($"            var parentResult = await this.{parentServiceField}.ReadAsync(userContext, CancellationToken.None, [thing.{parentKey}]);");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (parentResult.IsSuccess && parentResult.Value.Count > 0)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine($"                var {parentVar} = parentResult.Value[0];");
-            stringBuilder.AppendLine("                var accountId = userContext.AccountId.Value;");
-            stringBuilder.AppendLine();
+            var ownershipChecks = new List<string> { $"{config.ParentVar}.Owner == accountId" };
 
-            var ownershipChecks = new List<string> { $"{parentVar}.Owner == accountId" };
-
-            foreach (var prop in parentOwnerProps)
+            foreach (var prop in config.ParentOwnerProperties)
             {
                 if (!prop.Equals("Owner", StringComparison.OrdinalIgnoreCase))
                 {
-                    ownershipChecks.Add($"{parentVar}.{prop}.Contains(accountId)");
+                    ownershipChecks.Add($"{config.ParentVar}.{prop}.Contains(accountId)");
                 }
             }
 
-            stringBuilder.AppendLine($"                if ({string.Join(" || ", ownershipChecks)})");
-            stringBuilder.AppendLine("                {");
-            stringBuilder.AppendLine("                    return Result.Ok();");
-            stringBuilder.AppendLine("                }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"                return Result.Fail(\"Access denied: only {parentEntity.ToLowerInvariant()} owners can delete {parentEntity.ToLowerInvariant()} versions.\");");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.Append("            return Result.Ok();");
+            stringBuilder.Append($$""""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Result.Fail("""Unauthenticated user cannot erase a {{@class.Name.ToLowerInvariant()}}.""");
+                                               }
+
+                                   {{eraseGuardBlock}}            var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                                   var {{config.ParentVar}} = parentResult.Value[0];
+                                                   var accountId = userContext.AccountId.Value;
+
+                                                   if ({{string.Join(" || ", ownershipChecks)}})
+                                                   {
+                                                       return Result.Ok();
+                                                   }
+
+                                                   return Result.Fail("""Access denied: only {{config.ParentEntity.ToLowerInvariant()}} owners can delete {{config.ParentEntity.ToLowerInvariant()}} versions.""");
+                                               }
+
+                                               return Result.Ok();
+                                   """");
+        }
+
+        /// <summary>
+        /// Builds the SQL read filter predicate for an entity configured with this behavior.
+        /// </summary>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        /// <param name="resolveEntityPredicate">A delegate to resolve the SQL read filter predicate of another entity by name.</param>
+        /// <returns>The SQL predicate string, or empty string if unrestricted.</returns>
+        public string BuildReadFilterPredicate(IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, Func<string, string> resolveEntityPredicate)
+        {
+            var entityName = behavior.EntityName;
+            var config = new ParentDelegationConfiguration(definition, behavior);
+
+            var parentPredicate = resolveEntityPredicate?.Invoke(config.ParentEntity);
+
+            if (string.IsNullOrWhiteSpace(parentPredicate))
+            {
+                throw new InvalidOperationException($"Could not resolve visibility predicate for parent entity '{config.ParentEntity}' referenced by '{entityName}'.");
+            }
+
+            var replaced = parentPredicate
+                .Replace($"\"{config.ParentEntity}\"", $"\"Parent{config.ParentEntity}\"")
+                .Replace("\"Thing\"", "\"ParentThing\"");
+
+            var lines = replaced.Split(["\r\n", "\n"], StringSplitOptions.None);
+            var indentedLines = lines.Select(line => string.IsNullOrWhiteSpace(line) ? line : $"          {line}");
+            var indentedPredicate = string.Join("\r\n", indentedLines);
+
+            return $$"""
+                                 EXISTS (
+                                     SELECT 1
+                                     FROM "Forge"."{{config.ParentEntity}}" AS "Parent{{config.ParentEntity}}"
+                                     INNER JOIN "Forge"."Thing" AS "ParentThing" ON "ParentThing"."id" = "Parent{{config.ParentEntity}}"."id"
+                                     WHERE "Parent{{config.ParentEntity}}"."id" = "{{entityName}}"."{{config.ParentKeyColumn}}"
+                                       AND (
+                             {{indentedPredicate}}
+                                       )
+                                 )
+                     """;
         }
     }
 }

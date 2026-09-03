@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagePermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -56,14 +56,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override async Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IPackage toCreate)
         {
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot create a package.");
-            }
-
-            if (toCreate == null)
-            {
-                return Result.Fail("Package cannot be null.");
             }
 
             if (toCreate.Owner == userContext.AccountId.Value)
@@ -106,17 +101,12 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override async Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IPackage thing)
         {
-            if (thing == null)
-            {
-                return Result.Fail("Package cannot be null.");
-            }
-
             if (thing.Visibility == VisibilityKind.PUBLIC)
             {
                 return Result.Ok();
             }
 
-            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Result.Fail("Unauthenticated user cannot access non-public package.");
             }

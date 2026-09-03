@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -13,6 +13,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using HandlebarsDotNet;
 
+    using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
     using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers;
@@ -30,10 +31,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// </summary>
         private static readonly Dictionary<string, IBehaviorTypeHelper> BehaviorTypeHelpers = new()
         {
-            { "ScopeItem", new ScopeItemBehaviorTypeHelper() },
-            { "ParentDelegation", new ParentDelegationBehaviorTypeHelper() },
-            { "OrganizationScope", new OrganizationScopeBehaviorTypeHelper() },
-            { "InvitationWorkflow", new InvitationWorkflowBehaviorTypeHelper() }
+            { BehaviorTypes.ScopeItem, new ScopeItemBehaviorTypeHelper() },
+            { BehaviorTypes.ParentDelegation, new ParentDelegationBehaviorTypeHelper() },
+            { BehaviorTypes.OrganizationScope, new OrganizationScopeBehaviorTypeHelper() },
+            { BehaviorTypes.InvitationWorkflow, new InvitationWorkflowBehaviorTypeHelper() }
         };
 
         /// <summary>
@@ -71,9 +72,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Determines whether the specified class and operation require an asynchronous implementation hook.
         /// </summary>
         /// <param name="class">The <see cref="IClass" /> being generated.</param>
-        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <param name="operation">The permission operation.</param>
         /// <returns>True if the operation requires async; otherwise false.</returns>
-        public static bool IsAsyncMethod(IClass @class, string operation)
+        public static bool IsAsyncMethod(IClass @class, Operations operation)
         {
             if (entityBehaviors.TryGetValue(@class.Name, out var behavior) &&
                 behavior != null &&
@@ -94,37 +95,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             ArgumentNullException.ThrowIfNull(handlebars);
 
-            handlebars.RegisterHelper("Permission.WriteAsyncModifierCreate", (writer, context, _) =>
-            {
-                if (context.Value is IClass @class && IsAsyncMethod(@class, "Create"))
-                {
-                    writer.WriteSafeString("async ");
-                }
-            });
-
-            handlebars.RegisterHelper("Permission.WriteAsyncModifierRead", (writer, context, _) =>
-            {
-                if (context.Value is IClass @class && IsAsyncMethod(@class, "Read"))
-                {
-                    writer.WriteSafeString("async ");
-                }
-            });
-
-            handlebars.RegisterHelper("Permission.WriteAsyncModifierUpdate", (writer, context, _) =>
-            {
-                if (context.Value is IClass @class && IsAsyncMethod(@class, "Update"))
-                {
-                    writer.WriteSafeString("async ");
-                }
-            });
-
-            handlebars.RegisterHelper("Permission.WriteAsyncModifierDelete", (writer, context, _) =>
-            {
-                if (context.Value is IClass @class && IsAsyncMethod(@class, "Delete"))
-                {
-                    writer.WriteSafeString("async ");
-                }
-            });
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierCreate", Operations.Create);
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierRead", Operations.Read);
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierUpdate", Operations.Update);
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierDelete", Operations.Delete);
 
             handlebars.RegisterHelper("Permission.WriteFieldsAndConstructors", (writer, context, _) =>
             {
@@ -133,21 +107,24 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new ArgumentException("Context must be an IClass", nameof(context));
                 }
 
+                entityPermissions.TryGetValue(@class.Name, out var definition);
                 entityBehaviors.TryGetValue(@class.Name, out var behavior);
                 var stringBuilder = new StringBuilder();
 
                 if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper))
                 {
-                    helper.WriteFieldsAndConstructors(stringBuilder, @class, behavior);
+                    helper.WriteFieldsAndConstructors(stringBuilder, @class, definition, behavior);
                 }
                 else
                 {
-                    stringBuilder.AppendLine("        /// <summary>");
-                    stringBuilder.AppendLine($"        /// Initializes a new instance of the <see cref=\"{@class.Name}PermissionService\"/> class.");
-                    stringBuilder.AppendLine("        /// </summary>");
-                    stringBuilder.AppendLine($"        public {@class.Name}PermissionService()");
-                    stringBuilder.AppendLine("        {");
-                    stringBuilder.AppendLine("        }");
+                    stringBuilder.AppendLine($$"""
+                                                       /// <summary>
+                                                       /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
+                                                       /// </summary>
+                                                       public {{@class.Name}}PermissionService()
+                                                       {
+                                                       }
+                                               """);
                 }
 
                 writer.WriteSafeString(stringBuilder.ToString());
@@ -162,21 +139,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 entityPermissions.TryGetValue(@class.Name, out var definition);
                 entityBehaviors.TryGetValue(@class.Name, out var behavior);
-                var isAsync = IsAsyncMethod(@class, "Create");
+                var isAsync = IsAsyncMethod(@class, Operations.Create);
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Create"))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Create))
                 {
-                    helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior, isAsync);
+                    helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior);
                 }
-                else if (definition != null && !string.IsNullOrWhiteSpace(definition.CreatePermission))
+                else if (definition != null)
                 {
-                    var guardExpr = EmitPermissionGuard(definition.CreatePermission);
-                    stringBuilder.Append(isAsync ? $"            return {guardExpr};" : $"            return Task.FromResult({guardExpr});");
+                    AppendPermissionGuardOrOk(stringBuilder, definition.CreatePermission, isAsync);
                 }
                 else
                 {
-                    stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
+                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
                 }
 
                 writer.WriteSafeString(stringBuilder.ToString());
@@ -191,48 +167,48 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 entityPermissions.TryGetValue(@class.Name, out var definition);
                 entityBehaviors.TryGetValue(@class.Name, out var behavior);
-                var isAsync = IsAsyncMethod(@class, "Read");
+                var isAsync = IsAsyncMethod(@class, Operations.Read);
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Read"))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Read))
                 {
-                    helper.WriteIsAllowedToRead(stringBuilder, @class, definition, behavior, isAsync);
+                    helper.WriteIsAllowedToRead(stringBuilder, @class, definition, behavior);
                 }
                 else if (definition != null)
                 {
                     if (!string.IsNullOrWhiteSpace(definition.VisibilityProperty))
                     {
-                        stringBuilder.AppendLine($"            if (thing.{definition.VisibilityProperty} == VisibilityKind.PUBLIC)");
-                        stringBuilder.AppendLine("            {");
-                        stringBuilder.AppendLine(isAsync ? "                return Result.Ok();" : "                return Task.FromResult(Result.Ok());");
-                        stringBuilder.AppendLine("            }");
-                        stringBuilder.AppendLine();
+                        var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
+
+                        stringBuilder.AppendLine($$"""
+                                                               if (thing.{{definition.VisibilityProperty}} == VisibilityKind.PUBLIC)
+                                                               {
+                                                                   {{okReturn}}
+                                                               }
+
+                                                   """);
                     }
 
                     WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", isAsync);
 
                     if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
                     {
-                        stringBuilder.AppendLine($"            if (userContext.AccountId.HasValue && thing.{definition.MaintainerProperty}.Contains(userContext.AccountId.Value))");
-                        stringBuilder.AppendLine("            {");
-                        stringBuilder.AppendLine(isAsync ? "                return Result.Ok();" : "                return Task.FromResult(Result.Ok());");
-                        stringBuilder.AppendLine("            }");
-                        stringBuilder.AppendLine();
+                        var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
+
+                        stringBuilder.AppendLine($$"""
+                                                               if (userContext.AccountId.HasValue && thing.{{definition.MaintainerProperty}}.Contains(userContext.AccountId.Value))
+                                                               {
+                                                                   {{okReturn}}
+                                                               }
+
+                                                   """);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(definition.ReadPermission))
-                    {
-                        var guardExpr = EmitPermissionGuard(definition.ReadPermission);
-                        stringBuilder.Append(isAsync ? $"            return {guardExpr};" : $"            return Task.FromResult({guardExpr});");
-                    }
-                    else
-                    {
-                        stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
-                    }
+                    AppendPermissionGuardOrOk(stringBuilder, definition.ReadPermission, isAsync);
                 }
                 else
                 {
-                    stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
+                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
                 }
 
                 writer.WriteSafeString(stringBuilder.ToString());
@@ -248,12 +224,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 entityPermissions.TryGetValue(@class.Name, out var definition);
                 entityBehaviors.TryGetValue(@class.Name, out var behavior);
                 propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
-                var isAsync = IsAsyncMethod(@class, "Update");
+                var isAsync = IsAsyncMethod(@class, Operations.Update);
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Update"))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Update))
                 {
-                    helper.WriteIsAllowedToUpdate(stringBuilder, @class, definition, behavior, propertyDefs, isAsync);
+                    helper.WriteIsAllowedToUpdate(stringBuilder, @class, definition, behavior, propertyDefs);
                 }
                 else if (definition != null)
                 {
@@ -263,10 +239,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                         foreach (var propDef in propertyDefs)
                         {
-                            var prop = allProperties.FirstOrDefault(p => p.Name.Equals(propDef.Property, StringComparison.OrdinalIgnoreCase));
-                            var isEnumerable = prop != null && prop.QueryIsEnumerable();
+                            var matchingProp = allProperties.FirstOrDefault(p => p.Name.Equals(propDef.Property, StringComparison.OrdinalIgnoreCase));
+                            var isEnum = matchingProp != null && matchingProp.QueryIsEnumerable();
 
-                            if (isEnumerable)
+                            if (isEnum)
                             {
                                 stringBuilder.AppendLine($"            if (!existingThing.{propDef.Property}.SequenceEqual(updatedThing.{propDef.Property}))");
                             }
@@ -281,7 +257,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                             stringBuilder.AppendLine();
                             stringBuilder.AppendLine("                if (guard.IsFailed)");
                             stringBuilder.AppendLine("                {");
-                            stringBuilder.AppendLine(isAsync ? "                    return guard;" : "                    return Task.FromResult(guard);");
+                            stringBuilder.AppendLine($"                    {PermissionStatementHelper.GetReturnStatement("guard", isAsync)}");
                             stringBuilder.AppendLine("                }");
                             stringBuilder.AppendLine("            }");
                             stringBuilder.AppendLine();
@@ -290,19 +266,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                     WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", isAsync);
 
-                    if (!string.IsNullOrWhiteSpace(definition.UpdatePermission))
-                    {
-                        var guardExpr = EmitPermissionGuard(definition.UpdatePermission);
-                        stringBuilder.Append(isAsync ? $"            return {guardExpr};" : $"            return Task.FromResult({guardExpr});");
-                    }
-                    else
-                    {
-                        stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
-                    }
+                    AppendPermissionGuardOrOk(stringBuilder, definition.UpdatePermission, isAsync);
                 }
                 else
                 {
-                    stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
+                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
                 }
 
                 writer.WriteSafeString(stringBuilder.ToString());
@@ -317,30 +285,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 entityPermissions.TryGetValue(@class.Name, out var definition);
                 entityBehaviors.TryGetValue(@class.Name, out var behavior);
-                var isAsync = IsAsyncMethod(@class, "Delete");
+                var isAsync = IsAsyncMethod(@class, Operations.Delete);
                 var stringBuilder = new StringBuilder();
 
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation("Delete"))
+                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Delete))
                 {
-                    helper.WriteIsAllowedToDelete(stringBuilder, @class, definition, behavior, isAsync);
+                    helper.WriteIsAllowedToDelete(stringBuilder, @class, definition, behavior);
                 }
                 else if (definition != null)
                 {
                     WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", isAsync);
 
-                    if (!string.IsNullOrWhiteSpace(definition.DeletePermission))
-                    {
-                        var guardExpr = EmitPermissionGuard(definition.DeletePermission);
-                        stringBuilder.Append(isAsync ? $"            return {guardExpr};" : $"            return Task.FromResult({guardExpr});");
-                    }
-                    else
-                    {
-                        stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
-                    }
+                    AppendPermissionGuardOrOk(stringBuilder, definition.DeletePermission, isAsync);
                 }
                 else
                 {
-                    stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
+                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
                 }
 
                 writer.WriteSafeString(stringBuilder.ToString());
@@ -398,19 +358,55 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             var isEnumerable = property != null && property.QueryIsEnumerable();
 
-            if (isEnumerable)
+            var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
+
+            var condition = isEnumerable
+                ? $"userContext.AccountId.HasValue && {targetEntityName}.{propertyName}.Contains(userContext.AccountId.Value)"
+                : $"userContext.AccountId.HasValue && {targetEntityName}.{propertyName} == userContext.AccountId.Value";
+
+            stringBuilder.AppendLine($$"""
+                                                   if ({{condition}})
+                                                   {
+                                                       {{okReturn}}
+                                                   }
+
+                                       """);
+        }
+
+        /// <summary>
+        /// Registers a Handlebars helper for the async modifier on a CRUD operation.
+        /// </summary>
+        /// <param name="handlebars">The Handlebars instance.</param>
+        /// <param name="helperName">The name of the helper.</param>
+        /// <param name="operation">The permission operation.</param>
+        private static void RegisterAsyncModifier(IHandlebars handlebars, string helperName, Operations operation)
+        {
+            handlebars.RegisterHelper(helperName, (writer, context, _) =>
             {
-                stringBuilder.AppendLine($"            if (userContext.AccountId.HasValue && {targetEntityName}.{propertyName}.Contains(userContext.AccountId.Value))");
+                if (context.Value is IClass @class && IsAsyncMethod(@class, operation))
+                {
+                    writer.WriteSafeString("async ");
+                }
+            });
+        }
+
+        /// <summary>
+        /// Appends a permission guard statement or Result.Ok() to the string builder.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to append to.</param>
+        /// <param name="permission">The required permission expression.</param>
+        /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
+        private static void AppendPermissionGuardOrOk(StringBuilder stringBuilder, string permission, bool isAsync)
+        {
+            if (!string.IsNullOrWhiteSpace(permission))
+            {
+                var guardExpr = EmitPermissionGuard(permission);
+                stringBuilder.Append($"            {PermissionStatementHelper.GetReturnStatement(guardExpr, isAsync)}");
             }
             else
             {
-                stringBuilder.AppendLine($"            if (userContext.AccountId.HasValue && {targetEntityName}.{propertyName} == userContext.AccountId.Value)");
+                stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
             }
-
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine(isAsync ? "                return Result.Ok();" : "                return Task.FromResult(Result.Ok());");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
         }
     }
 }

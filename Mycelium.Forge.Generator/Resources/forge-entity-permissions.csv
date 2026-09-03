@@ -1,8 +1,8 @@
 ﻿Entity,CreatePermission,ReadPermission,UpdatePermission,DeletePermission,OwnerProperty,MaintainerProperty,VisibilityProperty
 Package,PublishPackageToPersonalScope,ReadPublicPackage,ManagePackageSettings,DeletePackage,PackageOwner,PackageMaintainer,Visibility
-Organization,CreateOrganization,ViewAllOrganizations | ManageOrganizations,ManageOrganizationSettings | ManageOrganizations,ManageOrganizations,Administrator,Member,
-APIKey,IssueApiKey,ListOwnApiKeys,RevokeAnyApiKey,RevokeAnyApiKey,Owner,,
-Account,ManageAccounts,ViewAllAccounts,ManageAccounts,ManageAccounts,Id,,
+Organization,CreateOrganization,ViewAllOrganizations | ManageOrganizations,ManageOrganizationSettings | ManageOrganizations,ManageOrganizations,Administrator,Member,DefaultPackageVisibility
+APIKey,IssueApiKey,RevokeAnyApiKey,RevokeAnyApiKey,RevokeAnyApiKey,Owner,,
+Account,ManageAccounts,ViewAllAccounts | ManageAccounts,ManageAccounts,ManageAccounts,Id,,
 OrganizationInvitation,InviteOrganizationMembers,ViewOrganizationMemberList,,,Owner,,
 PackageInvitation,ManagePackageTeam,ManagePackageTeam,,,Owner,,
 PackageVersion,PublishPackageVersion,ReadPublicPackage,,ErasePackageVersion,,,

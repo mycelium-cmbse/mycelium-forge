@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="InvitationWorkflowBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,7 +11,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 {
     using System.Text;
 
+    using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Models;
 
     using uml4net.StructuredClassifiers;
 
@@ -22,21 +24,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     public class InvitationWorkflowBehaviorTypeHelper : IBehaviorTypeHelper
     {
         /// <summary>
-        /// Set of invitation entity class names supported by this behavior helper.
-        /// </summary>
-        private static readonly HashSet<string> SupportedInvitations = ["OrganizationInvitation", "PackageInvitation"];
-
-        /// <summary>
-        /// Gets the behavior type name handled by this helper.
-        /// </summary>
-        public string BehaviorType => "InvitationWorkflow";
-
-        /// <summary>
         /// Determines whether this behavior helper handles the specified operation.
         /// </summary>
-        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <param name="operation">The permission operation.</param>
         /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
-        public bool HandlesOperation(string operation)
+        public bool HandlesOperation(Operations operation)
         {
             return true;
         }
@@ -44,11 +36,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <summary>
         /// Determines whether the specified operation requires an asynchronous implementation hook.
         /// </summary>
-        /// <param name="operation">The operation name ("Create", "Read", "Update", "Delete").</param>
+        /// <param name="operation">The permission operation.</param>
         /// <returns><c>true</c> if the operation is asynchronous; otherwise <c>false</c>.</returns>
-        public bool IsAsyncMethod(string operation)
+        public bool IsAsyncMethod(Operations operation)
         {
-            return operation is "Create" or "Read" or "Delete";
+            return operation is Operations.Create or Operations.Read or Operations.Delete;
         }
 
         /// <summary>
@@ -56,57 +48,35 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// </summary>
         /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        public void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityBehaviorDefinition behavior)
+        public void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            ValidateSupportedClass(@class);
+            var config = new InvitationWorkflowConfiguration(definition, behavior);
+            var scopeService = $"I{config.ScopeEntity}Service";
 
-            if (@class.Name == "PackageInvitation")
-            {
-                stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine("        /// The (injected) <see cref=\"IPackageService\" /> domain service.");
-                stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendLine("        private readonly IPackageService packageService;");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine($"        /// Initializes a new instance of the <see cref=\"{@class.Name}PermissionService\"/> class.");
-                stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendLine($"        public {@class.Name}PermissionService()");
-                stringBuilder.AppendLine("        {");
-                stringBuilder.AppendLine("        }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine($"        /// Initializes a new instance of the <see cref=\"{@class.Name}PermissionService\"/> class.");
-                stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendLine("        /// <param name=\"packageService\">The (injected) <see cref=\"IPackageService\" /> domain service.</param>");
-                stringBuilder.AppendLine($"        public {@class.Name}PermissionService(IPackageService packageService)");
-                stringBuilder.AppendLine("        {");
-                stringBuilder.AppendLine("            this.packageService = packageService;");
-                stringBuilder.AppendLine("        }");
-            }
-            else
-            {
-                stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine("        /// The (injected) <see cref=\"IOrganizationService\" /> domain service.");
-                stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendLine("        private readonly IOrganizationService organizationService;");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine($"        /// Initializes a new instance of the <see cref=\"{@class.Name}PermissionService\"/> class.");
-                stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendLine($"        public {@class.Name}PermissionService()");
-                stringBuilder.AppendLine("        {");
-                stringBuilder.AppendLine("        }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendLine($"        /// Initializes a new instance of the <see cref=\"{@class.Name}PermissionService\"/> class.");
-                stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendLine("        /// <param name=\"organizationService\">The (injected) <see cref=\"IOrganizationService\" /> domain service.</param>");
-                stringBuilder.AppendLine($"        public {@class.Name}PermissionService(IOrganizationService organizationService)");
-                stringBuilder.AppendLine("        {");
-                stringBuilder.AppendLine("            this.organizationService = organizationService;");
-                stringBuilder.AppendLine("        }");
-            }
+            stringBuilder.AppendLine($$"""
+                                               /// <summary>
+                                               /// The (injected) <see cref="{{scopeService}}" /> domain service.
+                                               /// </summary>
+                                               private readonly {{scopeService}} {{config.ScopeServiceField}};
+
+                                               /// <summary>
+                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
+                                               /// </summary>
+                                               public {{@class.Name}}PermissionService()
+                                               {
+                                               }
+
+                                               /// <summary>
+                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
+                                               /// </summary>
+                                               /// <param name="{{config.ScopeServiceField}}">The (injected) <see cref="{{scopeService}}" /> domain service.</param>
+                                               public {{@class.Name}}PermissionService({{scopeService}} {{config.ScopeServiceField}})
+                                               {
+                                                   this.{{config.ScopeServiceField}} = {{config.ScopeServiceField}};
+                                               }
+                                       """);
         }
 
         /// <summary>
@@ -116,78 +86,38 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            ValidateSupportedClass(@class);
+            var config = new InvitationWorkflowConfiguration(definition, behavior);
+            var scopeRoleChecks = config.ScopeRoles.Select(role => $"!{config.ScopeVar}.{role}.Contains(userContext.AccountId.Value)");
 
-            if (@class.Name == "OrganizationInvitation")
-            {
-                stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Unauthenticated user cannot create an invitation.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (toCreate == null)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Invitation cannot be null.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.InviteOrganizationMembers);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (guard.IsFailed)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return guard;");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var orgResult = await this.organizationService.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (orgResult.IsSuccess && orgResult.Value.Count > 0)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                var organization = orgResult.Value[0];");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("                if (!organization.Administrator.Contains(userContext.AccountId.Value))");
-                stringBuilder.AppendLine("                {");
-                stringBuilder.AppendLine("                    return Result.Fail(\"Access denied: only organization administrators can create invitations.\");");
-                stringBuilder.AppendLine("                }");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.Append("            return Result.Ok();");
-            }
-            else
-            {
-                stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Unauthenticated user cannot create an invitation.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (toCreate == null)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Invitation cannot be null.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (guard.IsFailed)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return guard;");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var packageResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (packageResult.IsSuccess && packageResult.Value.Count > 0)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                var package = packageResult.Value[0];");
-                stringBuilder.AppendLine("                var accountId = userContext.AccountId.Value;");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("                if (!package.PackageOwner.Contains(accountId) && !package.PackageMaintainer.Contains(accountId))");
-                stringBuilder.AppendLine("                {");
-                stringBuilder.AppendLine("                    return Result.Fail(\"Access denied: only package owners or maintainers can invite members.\");");
-                stringBuilder.AppendLine("                }");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.Append("            return Result.Ok();");
-            }
+            stringBuilder.Append($$""""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Result.Fail("""Unauthenticated user cannot create an invitation.""");
+                                               }
+
+                                               var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
+
+                                               if (guard.IsFailed)
+                                               {
+                                                   return guard;
+                                               }
+
+                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ScopeProperty}}]);
+
+                                               if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
+                                               {
+                                                   var {{config.ScopeVar}} = scopeResult.Value[0];
+
+                                                   if ({{string.Join(" && ", scopeRoleChecks)}})
+                                                   {
+                                                       return Result.Fail("""Access denied: only {{config.ScopeRoleDescription}}s can invite members.""");
+                                                   }
+                                               }
+
+                                               return Result.Ok();
+                                   """");
         }
 
         /// <summary>
@@ -197,79 +127,38 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            ValidateSupportedClass(@class);
+            var config = new InvitationWorkflowConfiguration(definition, behavior);
+            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
 
-            var inviteeProp = behavior.Configuration.GetValueOrDefault("InviteeProperty", "Target");
+            stringBuilder.Append($$""""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Result.Fail("""Unauthenticated user cannot view an invitation.""");
+                                               }
 
-            if (@class.Name == "OrganizationInvitation")
-            {
-                stringBuilder.AppendLine("            if (thing == null)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Invitation cannot be null.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Unauthenticated user cannot view an invitation.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var accountId = userContext.AccountId.Value;");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"            if (thing.Owner == accountId || thing.{inviteeProp} == accountId)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Ok();");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var orgResult = await this.organizationService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (orgResult.IsSuccess && orgResult.Value.Count > 0)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                var organization = orgResult.Value[0];");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("                if (organization.Administrator.Contains(accountId))");
-                stringBuilder.AppendLine("                {");
-                stringBuilder.AppendLine("                    return Result.Ok();");
-                stringBuilder.AppendLine("                }");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.Append("            return PermissionGuard.GuardPermission(userContext, PermissionKind.ViewOrganizationMemberList);");
-            }
-            else
-            {
-                stringBuilder.AppendLine("            if (thing == null)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Invitation cannot be null.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Unauthenticated user cannot view an invitation.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var accountId = userContext.AccountId.Value;");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"            if (thing.Owner == accountId || thing.{inviteeProp} == accountId)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Ok();");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var packageResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (packageResult.IsSuccess && packageResult.Value.Count > 0)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                var package = packageResult.Value[0];");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("                if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))");
-                stringBuilder.AppendLine("                {");
-                stringBuilder.AppendLine("                    return Result.Ok();");
-                stringBuilder.AppendLine("                }");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.Append("            return Result.Fail(\"Access denied: user cannot view this invitation.\");");
-            }
+                                               var accountId = userContext.AccountId.Value;
+
+                                               if (thing.Owner == accountId || thing.{{config.InviteeProperty}} == accountId)
+                                               {
+                                                   return Result.Ok();
+                                               }
+
+                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
+
+                                               if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
+                                               {
+                                                   var {{config.ScopeVar}} = scopeResult.Value[0];
+
+                                                   if ({{string.Join(" || ", scopeRoleChecks)}})
+                                                   {
+                                                       return Result.Ok();
+                                                   }
+                                               }
+
+                                               return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.ReadPermission}});
+                                   """");
         }
 
         /// <summary>
@@ -280,56 +169,70 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions, bool isAsync)
+        public void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
         {
-            ValidateSupportedClass(@class);
+            var config = new InvitationWorkflowConfiguration(definition, behavior);
+            var isAsync = this.IsAsyncMethod(Operations.Update);
 
-            var inviteeProp = behavior.Configuration.GetValueOrDefault("InviteeProperty", "Target");
-            var acceptPerm = behavior.Configuration.GetValueOrDefault("AcceptPermission", "AcceptOrganizationInvitation");
-            var revokePerm = behavior.Configuration.GetValueOrDefault("RevokePermission", "RevokeOrganizationInvitation");
+            var failUnauth = PermissionStatementHelper.GetFailReturn("\"\"\"Unauthenticated user cannot respond to an invitation.\"\"\"", isAsync);
+            var failAlready = PermissionStatementHelper.GetFailReturn("$\"\"\"Cannot change status of invitation that is already {existingThing.Status}.\"\"\"", isAsync);
+            var failNotInvitee = PermissionStatementHelper.GetFailReturn("\"\"\"Access denied: only the invited target account can accept the invitation.\"\"\"", isAsync);
+            var acceptGuard = PermissionStatementHelper.GetReturnStatement($"PermissionGuard.GuardPermission(userContext, PermissionKind.{config.AcceptPermission})", isAsync);
+            var failNotOwner = PermissionStatementHelper.GetFailReturn("\"\"\"Access denied: only the invitation creator can revoke the invitation.\"\"\"", isAsync);
+            var revokeGuard = PermissionStatementHelper.GetReturnStatement($"PermissionGuard.GuardPermission(userContext, PermissionKind.{config.RevokePermission})", isAsync);
+            var failUnsupported = PermissionStatementHelper.GetFailReturn("$\"\"\"Unsupported invitation status transition to {updatedThing.Status}.\"\"\"", isAsync);
+            var okParty = PermissionStatementHelper.GetOkReturn(isAsync);
+            var okAdmin = PermissionStatementHelper.GetOkReturn(isAsync);
+            var failNotParty = PermissionStatementHelper.GetFailReturn("\"\"\"Access denied: you are not a party to this invitation.\"\"\"", isAsync);
 
-            stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine(isAsync ? "                return Result.Fail(\"Unauthenticated user cannot respond to an invitation.\");" : "                return Task.FromResult(Result.Fail(\"Unauthenticated user cannot respond to an invitation.\"));");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (existingThing == null || updatedThing == null)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine(isAsync ? "                return Result.Fail(\"Invitation cannot be null.\");" : "                return Task.FromResult(Result.Fail(\"Invitation cannot be null.\"));");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("            if (existingThing.Status != updatedThing.Status)");
-            stringBuilder.AppendLine("            {");
-            stringBuilder.AppendLine("                if (existingThing.Status != InvitationStatusKind.PENDING)");
-            stringBuilder.AppendLine("                {");
-            stringBuilder.AppendLine(isAsync ? "                    return Result.Fail($\"Cannot change status of invitation that is already {existingThing.Status}.\");" : "                    return Task.FromResult(Result.Fail($\"Cannot change status of invitation that is already {existingThing.Status}.\"));");
-            stringBuilder.AppendLine("                }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("                if (updatedThing.Status == InvitationStatusKind.ACCEPTED)");
-            stringBuilder.AppendLine("                {");
-            stringBuilder.AppendLine($"                    if (existingThing.{inviteeProp} != userContext.AccountId.Value)");
-            stringBuilder.AppendLine("                    {");
-            stringBuilder.AppendLine(isAsync ? "                        return Result.Fail(\"Access denied: only the invited target account can accept the invitation.\");" : "                        return Task.FromResult(Result.Fail(\"Access denied: only the invited target account can accept the invitation.\"));");
-            stringBuilder.AppendLine("                    }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine(isAsync ? $"                    return PermissionGuard.GuardPermission(userContext, PermissionKind.{acceptPerm});" : $"                    return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.{acceptPerm}));");
-            stringBuilder.AppendLine("                }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("                if (updatedThing.Status == InvitationStatusKind.REVOKED)");
-            stringBuilder.AppendLine("                {");
-            stringBuilder.AppendLine("                    if (existingThing.Owner != userContext.AccountId.Value)");
-            stringBuilder.AppendLine("                    {");
-            stringBuilder.AppendLine(isAsync ? "                        return Result.Fail(\"Access denied: only the invitation creator can revoke the invitation.\");" : "                        return Task.FromResult(Result.Fail(\"Access denied: only the invitation creator can revoke the invitation.\"));");
-            stringBuilder.AppendLine("                    }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine(isAsync ? $"                    return PermissionGuard.GuardPermission(userContext, PermissionKind.{revokePerm});" : $"                    return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.{revokePerm}));");
-            stringBuilder.AppendLine("                }");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine(isAsync ? "                return Result.Fail($\"Unsupported invitation status transition to {updatedThing.Status}.\");" : "                return Task.FromResult(Result.Fail($\"Unsupported invitation status transition to {updatedThing.Status}.\"));");
-            stringBuilder.AppendLine("            }");
-            stringBuilder.AppendLine();
-            stringBuilder.Append(isAsync ? "            return Result.Ok();" : "            return Task.FromResult(Result.Ok());");
+            stringBuilder.Append($$""""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   {{failUnauth}}
+                                               }
+
+                                               if (existingThing.Status != updatedThing.Status)
+                                               {
+                                                   if (existingThing.Status != InvitationStatusKind.PENDING)
+                                                   {
+                                                       {{failAlready}}
+                                                   }
+
+                                                   if (updatedThing.Status == InvitationStatusKind.ACCEPTED)
+                                                   {
+                                                       if (existingThing.{{config.InviteeProperty}} != userContext.AccountId.Value && !PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                                       {
+                                                           {{failNotInvitee}}
+                                                       }
+
+                                                       {{acceptGuard}}
+                                                   }
+
+                                                   if (updatedThing.Status == InvitationStatusKind.REVOKED)
+                                                   {
+                                                       if (existingThing.Owner != userContext.AccountId.Value && !PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                                       {
+                                                           {{failNotOwner}}
+                                                       }
+
+                                                       {{revokeGuard}}
+                                                   }
+
+                                                   {{failUnsupported}}
+                                               }
+
+                                               if (existingThing.Owner == userContext.AccountId.Value || existingThing.{{config.InviteeProperty}} == userContext.AccountId.Value)
+                                               {
+                                                   {{okParty}}
+                                               }
+
+                                               if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                               {
+                                                   {{okAdmin}}
+                                               }
+
+                                               {{failNotParty}}
+                                   """");
         }
 
         /// <summary>
@@ -339,90 +242,82 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, bool isAsync)
+        public void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            ValidateSupportedClass(@class);
+            var config = new InvitationWorkflowConfiguration(definition, behavior);
+            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
 
-            if (@class.Name == "OrganizationInvitation")
-            {
-                stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Unauthenticated user cannot revoke an invitation.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (thing == null)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Invitation cannot be null.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.InviteOrganizationMembers);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (guard.IsFailed)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return guard;");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var orgResult = await this.organizationService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (orgResult.IsSuccess && orgResult.Value.Count > 0)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                var organization = orgResult.Value[0];");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("                if (organization.Administrator.Contains(userContext.AccountId.Value))");
-                stringBuilder.AppendLine("                {");
-                stringBuilder.AppendLine("                    return Result.Ok();");
-                stringBuilder.AppendLine("                }");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.Append("            return Result.Fail(\"Access denied: only organization administrators can revoke invitations.\");");
-            }
-            else
-            {
-                stringBuilder.AppendLine("            if (userContext is not { IsAuthenticated: true } || !userContext.AccountId.HasValue)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Unauthenticated user cannot revoke an invitation.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (thing == null)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return Result.Fail(\"Invitation cannot be null.\");");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (guard.IsFailed)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                return guard;");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            var packageResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("            if (packageResult.IsSuccess && packageResult.Value.Count > 0)");
-                stringBuilder.AppendLine("            {");
-                stringBuilder.AppendLine("                var package = packageResult.Value[0];");
-                stringBuilder.AppendLine("                var accountId = userContext.AccountId.Value;");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("                if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))");
-                stringBuilder.AppendLine("                {");
-                stringBuilder.AppendLine("                    return Result.Ok();");
-                stringBuilder.AppendLine("                }");
-                stringBuilder.AppendLine("            }");
-                stringBuilder.AppendLine();
-                stringBuilder.Append("            return Result.Fail(\"Access denied: only package owners or maintainers can revoke invitations.\");");
-            }
+            stringBuilder.Append($$""""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Result.Fail("""Unauthenticated user cannot revoke an invitation.""");
+                                               }
+
+                                               var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
+
+                                               if (guard.IsFailed)
+                                               {
+                                                   return guard;
+                                               }
+
+                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
+
+                                               if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
+                                               {
+                                                   var {{config.ScopeVar}} = scopeResult.Value[0];
+                                                   var accountId = userContext.AccountId.Value;
+
+                                                   if ({{string.Join(" || ", scopeRoleChecks)}})
+                                                   {
+                                                       return Result.Ok();
+                                                   }
+                                               }
+
+                                               return Result.Fail("""Access denied: only {{config.ScopeRoleDescription}}s can revoke invitations.""");
+                                   """");
         }
 
         /// <summary>
-        /// Validates that the specified class is a supported invitation entity.
+        /// Builds the SQL read filter predicate for an entity configured with this behavior.
         /// </summary>
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
-        private static void ValidateSupportedClass(IClass @class)
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        /// <param name="resolveEntityPredicate">A delegate to resolve the SQL read filter predicate of another entity by name.</param>
+        /// <returns>The SQL predicate string, or empty string if unrestricted.</returns>
+        public string BuildReadFilterPredicate(IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, Func<string, string> resolveEntityPredicate)
         {
-            if (!SupportedInvitations.Contains(@class.Name))
+            var entityName = behavior.EntityName;
+            var config = new InvitationWorkflowConfiguration(definition, behavior);
+
+            string bypassCondition;
+
+            if (behavior.Configuration.TryGetValue("BypassPermissions", out var bp) && !string.IsNullOrWhiteSpace(bp))
             {
-                throw new NotSupportedException($"InvitationWorkflow behavior does not support entity '{@class.Name}'. Supported entities are: {string.Join(", ", SupportedInvitations)}.");
+                var perms = bp.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                bypassCondition = string.Join(" OR ", perms.Select(p => $"@can{p} = true"));
             }
+            else
+            {
+                var readPermParts = config.ReadPermission.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                bypassCondition = string.Join(" OR ", readPermParts.Select(p => $"@can{p} = true"));
+            }
+
+            var roleChecks = config.ScopeRoles.Select(role =>
+            {
+                var rolePropCamel = char.ToLowerInvariant(role[0]) + role[1..];
+                return $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{rolePropCamel}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"{config.ScopeProperty.ToLowerInvariant()}\" AND \"targetAccount\" = @callerAccountId)";
+            });
+
+            var roleChecksSql = "\r\n                        OR " + string.Join("\r\n                        OR ", roleChecks);
+
+            return $"""
+                                {bypassCondition}
+                                OR (@callerAccountId IS NOT NULL AND (
+                                    "{entityName}"."{config.OwnerColumn}" = @callerAccountId
+                                    OR "{entityName}"."{config.InviteeColumn}" = @callerAccountId{roleChecksSql}
+                                 ))
+                    """;
         }
     }
 }

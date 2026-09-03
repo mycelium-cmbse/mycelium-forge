@@ -56,11 +56,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override async Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IProfileLink toCreate)
         {
-            if (toCreate == null)
-            {
-                return Result.Fail("ProfileLink cannot be null.");
-            }
-
             return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.Owner, this.organizationService, "profilelink");
         }
 
@@ -72,11 +67,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override async Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IProfileLink thing)
         {
-            if (thing == null)
-            {
-                return Result.Fail("ProfileLink cannot be null.");
-            }
-
             return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.Owner, this.organizationService);
         }
 
@@ -89,11 +79,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override async Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IProfileLink existingThing, IProfileLink updatedThing)
         {
-            if (existingThing == null || updatedThing == null)
-            {
-                return Result.Fail("ProfileLink cannot be null.");
-            }
-
             return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "profilelink");
         }
 
@@ -105,11 +90,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether deletion is permitted.</returns>
         protected override async Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, IProfileLink thing)
         {
-            if (thing == null)
-            {
-                return Result.Fail("ProfileLink cannot be null.");
-            }
-
             return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.Owner, this.organizationService, "profilelink");
         }
     }
