@@ -9,6 +9,7 @@ WORKDIR /src
 # never generated and the image serves the interface unstyled.
 COPY Mycelium.Forge/Mycelium.Forge.csproj ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/Mycelium.Forge.Common.csproj ./Mycelium.Forge.Common/
+COPY Mycelium.Forge.Dal/Mycelium.Forge.Dal.csproj ./Mycelium.Forge.Dal/
 COPY Mycelium.Forge.Orm/Mycelium.Forge.Orm.csproj ./Mycelium.Forge.Orm/
 COPY Mycelium.Forge.Serializer.Json/Mycelium.Forge.Serializer.Json.csproj ./Mycelium.Forge.Serializer.Json/
 COPY Directory.Build.targets Nuget.Config ./
@@ -18,6 +19,7 @@ RUN dotnet restore Mycelium.Forge/Mycelium.Forge.csproj
 # Copy the rest of the source
 COPY Mycelium.Forge/ ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/ ./Mycelium.Forge.Common/
+COPY Mycelium.Forge.Dal/ ./Mycelium.Forge.Dal/
 COPY Mycelium.Forge.Orm/ ./Mycelium.Forge.Orm/
 COPY Mycelium.Forge.Serializer.Json/ ./Mycelium.Forge.Serializer.Json/
 
