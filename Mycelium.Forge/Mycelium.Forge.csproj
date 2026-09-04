@@ -43,4 +43,10 @@
         <ProjectReference Include="..\Mycelium.Forge.Orm\Mycelium.Forge.Orm.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- DD-18: migrations are numbered, forward-only SQL scripts embedded in the assembly and
+             journalled by DbUp - see Orm/Migrator.cs. -->
+        <EmbeddedResource Include="Orm\Migrations\*.sql" />
+    </ItemGroup>
+
 </Project>
