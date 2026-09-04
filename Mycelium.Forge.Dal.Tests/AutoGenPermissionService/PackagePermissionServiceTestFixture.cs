@@ -45,6 +45,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         public void SetUp()
         {
             this.organizationServiceMock = new Mock<IOrganizationService>();
+            this.organizationServiceMock.Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(Result.Fail<ImmutableList<IOrganization>>("Organization not found"));
             this.permissionService = new PackagePermissionService(this.organizationServiceMock.Object);
             this.userId = Guid.NewGuid();
             this.otherUserId = Guid.NewGuid();
@@ -53,21 +54,21 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 AccountId = this.userId,
                 Username = "ownerUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.PackageOwner]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.maintainerUserContext = new UserContext
             {
                 AccountId = this.otherUserId,
                 Username = "maintainerUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.PackageMaintainer]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.readerUserContext = new UserContext
             {
-                AccountId = this.otherUserId,
+                AccountId = Guid.NewGuid(),
                 Username = "readerUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.PackageReader]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.accountUserContext = new UserContext
@@ -202,6 +203,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var privateAccountResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, privatePackage);
             var privateReaderResult = await this.permissionService.IsAllowedToRead(this.readerUserContext, privatePackage);
             var privateOwnedResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, ownedPrivatePackage);
+            var privateAdminResult = await this.permissionService.IsAllowedToRead(this.adminUserContext, privatePackage);
 
             var orgAId = Guid.NewGuid();
             var orgBId = Guid.NewGuid();
@@ -225,11 +227,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             };
 
             this.organizationServiceMock
-                .Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Contains(orgAId))))
+                .Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgAId))))
                 .ReturnsAsync(Result.Ok(ImmutableList.Create<IOrganization>(organizationA)));
 
             this.organizationServiceMock
-                .Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Contains(orgBId))))
+                .Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgBId))))
                 .ReturnsAsync(Result.Ok(ImmutableList.Create<IOrganization>(organizationB)));
 
             var orgAInternalPackage = new Package
@@ -264,8 +266,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(internalAccountResult.IsFailed, Is.True);
                 Assert.That(internalOwnerResult.IsSuccess, Is.True);
                 Assert.That(privateAccountResult.IsFailed, Is.True);
-                Assert.That(privateReaderResult.IsSuccess, Is.True);
+                Assert.That(privateReaderResult.IsFailed, Is.True);
                 Assert.That(privateOwnedResult.IsSuccess, Is.True);
+                Assert.That(privateAdminResult.IsSuccess, Is.True);
                 Assert.That(otherOrgMemberResult.IsFailed, Is.True);
                 Assert.That(owningOrgMemberResult.IsSuccess, Is.True);
             }

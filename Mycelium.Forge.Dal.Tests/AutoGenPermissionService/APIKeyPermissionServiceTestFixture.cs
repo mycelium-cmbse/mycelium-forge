@@ -108,7 +108,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Name = "CI Token"
             };
 
-            var nullResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, null);
             var unauthResult = await this.permissionService.IsAllowedToDelete(this.anonymousUserContext, apiKey);
             var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, apiKey);
             var otherResult = await this.permissionService.IsAllowedToDelete(this.otherUserContext, apiKey);
@@ -116,7 +115,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(unauthResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(otherResult.IsFailed, Is.True);

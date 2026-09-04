@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageDaoTestFixture.cs" company="Starion Group S.A.">
+// <copyright file="PackageDaoIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -25,7 +25,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
     /// </summary>
     [TestFixture]
     [Category("Database")]
-    public class PackageDaoTestFixture : BaseTestClassFixture
+    public class PackageDaoIntegrationTestFixture : BaseIntegrationTestClassFixture
     {
         private PackageDao packageDao;
         private PackageTypeDao packageTypeDao;

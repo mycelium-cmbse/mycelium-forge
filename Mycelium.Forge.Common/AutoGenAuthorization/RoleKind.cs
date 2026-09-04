@@ -42,21 +42,6 @@ namespace Mycelium.Forge.Common
         OrganizationMember,
 
         /// <summary>
-        /// Owner of a Package artefact container.
-        /// </summary>
-        PackageOwner,
-
-        /// <summary>
-        /// Maintainer of a Package with publishing and unlisting rights.
-        /// </summary>
-        PackageMaintainer,
-
-        /// <summary>
-        /// Explicit read access grant on a restricted package.
-        /// </summary>
-        PackageReader,
-
-        /// <summary>
         /// Authenticated user account with personal scope and self-service capabilities.
         /// </summary>
         Account,

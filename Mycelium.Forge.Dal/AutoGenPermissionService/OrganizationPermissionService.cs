@@ -80,6 +80,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IOrganization existingThing, IOrganization updatedThing)
         {
+            if (userContext.AccountId.HasValue && existingThing.Administrator.Contains(userContext.AccountId.Value))
+            {
+                return Task.FromResult(Result.Ok());
+            }
+
             if (!existingThing.Administrator.SequenceEqual(updatedThing.Administrator))
             {
                 var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.TransferOrganizationAdministration);
@@ -108,11 +113,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 {
                     return Task.FromResult(guard);
                 }
-            }
-
-            if (userContext.AccountId.HasValue && existingThing.Administrator.Contains(userContext.AccountId.Value))
-            {
-                return Task.FromResult(Result.Ok());
             }
 
             return Task.FromResult(PermissionGuard.GuardAnyPermission(userContext, PermissionKind.ManageOrganizationSettings, PermissionKind.ManageOrganizations));

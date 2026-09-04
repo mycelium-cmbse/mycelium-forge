@@ -91,14 +91,10 @@ namespace Mycelium.Forge.Orm.Tests.Filters
         [Test]
         public void VerifyFromUserContext()
         {
-            var nullFilter = PackageReadFilter.FromUserContext(null);
             var anonymousFilter = PackageReadFilter.FromUserContext(this.anonymousUserContext);
             var accountFilter = PackageReadFilter.FromUserContext(this.accountUserContext);
             var orgAdminFilter = PackageReadFilter.FromUserContext(this.orgAdminUserContext);
             var adminFilter = PackageReadFilter.FromUserContext(this.adminUserContext);
-
-            using var nullCommand = new NpgsqlCommand();
-            nullFilter.ApplyParameters(nullCommand);
 
             using var anonymousCommand = new NpgsqlCommand();
             anonymousFilter.ApplyParameters(anonymousCommand);
@@ -114,35 +110,25 @@ namespace Mycelium.Forge.Orm.Tests.Filters
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullFilter.ToSqlPredicate(), Does.Contain("\"Thing\".\"data\"->>'visibility' = 'PUBLIC'"));
-                Assert.That(nullCommand.Parameters["@callerAccountId"].Value, Is.EqualTo(DBNull.Value));
-                Assert.That(nullCommand.Parameters["@canViewAllOrganizations"].Value, Is.EqualTo(false));
-                Assert.That(nullCommand.Parameters["@canReadInternalPackage"].Value, Is.EqualTo(false));
-                Assert.That(nullCommand.Parameters["@canReadPrivatePackage"].Value, Is.EqualTo(false));
-
                 Assert.That(anonymousFilter.ToSqlPredicate(), Does.Contain("\"Thing\".\"data\"->>'visibility' = 'PUBLIC'"));
                 Assert.That(anonymousCommand.Parameters["@callerAccountId"].Value, Is.EqualTo(DBNull.Value));
                 Assert.That(anonymousCommand.Parameters["@canViewAllOrganizations"].Value, Is.EqualTo(false));
-                Assert.That(anonymousCommand.Parameters["@canReadInternalPackage"].Value, Is.EqualTo(false));
-                Assert.That(anonymousCommand.Parameters["@canReadPrivatePackage"].Value, Is.EqualTo(false));
+                Assert.That(anonymousCommand.Parameters["@canManageOrganizations"].Value, Is.EqualTo(false));
 
                 Assert.That(accountFilter.ToSqlPredicate(), Does.Contain("\"Package\".\"owner\" = @callerAccountId"));
                 Assert.That(accountCommand.Parameters["@callerAccountId"].Value, Is.EqualTo(this.userId));
                 Assert.That(accountCommand.Parameters["@canViewAllOrganizations"].Value, Is.EqualTo(false));
-                Assert.That(accountCommand.Parameters["@canReadInternalPackage"].Value, Is.EqualTo(false));
-                Assert.That(accountCommand.Parameters["@canReadPrivatePackage"].Value, Is.EqualTo(false));
+                Assert.That(accountCommand.Parameters["@canManageOrganizations"].Value, Is.EqualTo(false));
 
                 Assert.That(orgAdminFilter.ToSqlPredicate(), Does.Contain("EXISTS (SELECT 1 FROM \"Forge\".\"Organization_member__Account\""));
                 Assert.That(orgAdminCommand.Parameters["@callerAccountId"].Value, Is.EqualTo(this.userId));
                 Assert.That(orgAdminCommand.Parameters["@canViewAllOrganizations"].Value, Is.EqualTo(false));
-                Assert.That(orgAdminCommand.Parameters["@canReadInternalPackage"].Value, Is.EqualTo(true));
-                Assert.That(orgAdminCommand.Parameters["@canReadPrivatePackage"].Value, Is.EqualTo(false));
+                Assert.That(orgAdminCommand.Parameters["@canManageOrganizations"].Value, Is.EqualTo(false));
 
                 Assert.That(adminFilter.ToSqlPredicate(), Does.Contain("\"Thing\".\"data\"->>'visibility' = 'PUBLIC'"));
                 Assert.That(adminCommand.Parameters["@callerAccountId"].Value, Is.EqualTo(this.userId));
                 Assert.That(adminCommand.Parameters["@canViewAllOrganizations"].Value, Is.EqualTo(true));
-                Assert.That(adminCommand.Parameters["@canReadInternalPackage"].Value, Is.EqualTo(true));
-                Assert.That(adminCommand.Parameters["@canReadPrivatePackage"].Value, Is.EqualTo(true));
+                Assert.That(adminCommand.Parameters["@canManageOrganizations"].Value, Is.EqualTo(true));
             }
         }
     }

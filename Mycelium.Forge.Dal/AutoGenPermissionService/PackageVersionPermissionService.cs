@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionPermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -126,12 +126,12 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             }
 
             if (existingThing.CreatedAt != updatedThing.CreatedAt ||
-                existingThing.DownloadCount != updatedThing.DownloadCount ||
-                existingThing.MetaData != updatedThing.MetaData ||
-                existingThing.ModifiedAt != updatedThing.ModifiedAt ||
-                existingThing.Owner != updatedThing.Owner ||
-                existingThing.PublicationDate != updatedThing.PublicationDate ||
-                existingThing.Version != updatedThing.Version)
+                    existingThing.DownloadCount != updatedThing.DownloadCount ||
+                    existingThing.MetaData != updatedThing.MetaData ||
+                    existingThing.ModifiedAt != updatedThing.ModifiedAt ||
+                    existingThing.Owner != updatedThing.Owner ||
+                    existingThing.PublicationDate != updatedThing.PublicationDate ||
+                    existingThing.Version != updatedThing.Version)
             {
                 return Result.Fail("PackageVersions are immutable; only the listed status may be modified.");
             }

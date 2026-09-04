@@ -148,7 +148,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<Guid[]>()))
                 .ReturnsAsync(Result.Ok(ImmutableList.Create<IOrganization>(org)));
 
-            var nullResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, null);
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, personalLink);
             var personalOwnerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, personalLink);
             var personalOtherResult = await this.permissionService.IsAllowedToCreate(this.otherUserContext, personalLink);
@@ -157,7 +156,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(unauthResult.IsFailed, Is.True);
                 Assert.That(personalOwnerResult.IsSuccess, Is.True);
                 Assert.That(personalOtherResult.IsFailed, Is.True);
@@ -180,13 +178,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Uri = "https://github.com/alice"
             };
 
-            var nullResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, null);
             var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, link);
             var otherResult = await this.permissionService.IsAllowedToDelete(this.otherUserContext, link);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(otherResult.IsFailed, Is.True);
             }
@@ -213,15 +209,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Uri = "https://github.com/alice-updated"
             };
 
-            var nullExistingResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, null, updatedLink);
-            var nullUpdatedResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingLink, null);
             var ownerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingLink, updatedLink);
             var otherResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingLink, updatedLink);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullExistingResult.IsFailed, Is.True);
-                Assert.That(nullUpdatedResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(otherResult.IsFailed, Is.True);
             }

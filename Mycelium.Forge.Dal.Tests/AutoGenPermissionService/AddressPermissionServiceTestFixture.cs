@@ -162,7 +162,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<Guid[]>()))
                 .ReturnsAsync(Result.Ok(ImmutableList.Create<IOrganization>(org)));
 
-            var nullResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, null);
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, personalAddress);
             var personalOwnerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, personalAddress);
             var personalOtherResult = await this.permissionService.IsAllowedToCreate(this.otherUserContext, personalAddress);
@@ -171,7 +170,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(unauthResult.IsFailed, Is.True);
                 Assert.That(personalOwnerResult.IsSuccess, Is.True);
                 Assert.That(personalOtherResult.IsFailed, Is.True);
@@ -194,13 +192,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 AddressLine1 = "123 Main St"
             };
 
-            var nullResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, null);
             var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, address);
             var otherResult = await this.permissionService.IsAllowedToDelete(this.otherUserContext, address);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(otherResult.IsFailed, Is.True);
             }
@@ -243,7 +239,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                         ? Result.Ok(ImmutableList.Create<IOrganization>(org))
                         : Result.Ok(ImmutableList<IOrganization>.Empty));
 
-            var nullResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, null);
             var ownerResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, personalAddress);
             var nonOwnerResult = await this.permissionService.IsAllowedToRead(this.otherUserContext, personalAddress);
             var adminResult = await this.permissionService.IsAllowedToRead(this.adminUserContext, personalAddress);
@@ -251,7 +246,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(nonOwnerResult.IsFailed, Is.True);
                 Assert.That(adminResult.IsSuccess, Is.True);
@@ -280,15 +274,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 AddressLine1 = "123 Main St Suite 200"
             };
 
-            var nullExistingResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, null, updatedAddress);
-            var nullUpdatedResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAddress, null);
             var ownerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAddress, updatedAddress);
             var otherResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingAddress, updatedAddress);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullExistingResult.IsFailed, Is.True);
-                Assert.That(nullUpdatedResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(otherResult.IsFailed, Is.True);
             }

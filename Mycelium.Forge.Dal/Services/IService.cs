@@ -90,17 +90,17 @@ namespace Mycelium.Forge.Dal.Services
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
         /// <param name="token">The <see cref="CancellationToken"/> used to cancel the operation.</param>
-        /// <param name="dtos">The collection of <typeparamref name="T"/> instances to delete.</param>
+        /// <param name="iids">The collection of unique identifiers of instances to delete.</param>
         /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
-        Task<Result> DeleteAsync(IUserContext userContext, NpgsqlTransaction transaction, CancellationToken token, IEnumerable<T> dtos);
+        Task<Result> DeleteAsync(IUserContext userContext, NpgsqlTransaction transaction, CancellationToken token, IEnumerable<Guid> iids);
 
         /// <summary>
         /// Asynchronously deletes instances of <typeparamref name="T"/> managing its own connection and transaction.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="token">The <see cref="CancellationToken"/> used to cancel the operation.</param>
-        /// <param name="dtos">The collection of <typeparamref name="T"/> instances to delete.</param>
+        /// <param name="iids">The collection of unique identifiers of instances to delete.</param>
         /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
-        Task<Result> DeleteAsync(IUserContext userContext, CancellationToken token, IEnumerable<T> dtos);
+        Task<Result> DeleteAsync(IUserContext userContext, CancellationToken token, IEnumerable<Guid> iids);
     }
 }

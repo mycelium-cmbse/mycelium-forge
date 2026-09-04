@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagePermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -118,20 +118,13 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Ok();
             }
 
+            if (PermissionGuard.HasPermission(userContext, PermissionKind.ViewAllOrganizations) || PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+            {
+                return Result.Ok();
+            }
+
             if (thing.Visibility == VisibilityKind.INTERNAL)
             {
-                if (PermissionGuard.HasPermission(userContext, PermissionKind.ViewAllOrganizations) || PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
-                {
-                    return Result.Ok();
-                }
-
-                var internalPermissionResult = PermissionGuard.GuardPermission(userContext, PermissionKind.ReadInternalPackage);
-
-                if (internalPermissionResult.IsFailed)
-                {
-                    return internalPermissionResult;
-                }
-
                 var orgResult = await this.organizationService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
 
                 if (orgResult.IsSuccess && orgResult.Value.Count > 0)
@@ -147,11 +140,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Fail("Access denied: user is not a member of the owning organization.");
             }
 
-            if (thing.Visibility == VisibilityKind.PRIVATE)
-            {
-                return PermissionGuard.GuardPermission(userContext, PermissionKind.ReadPrivatePackage);
-            }
-
             return Result.Fail("Access denied: cannot view this package.");
         }
 
@@ -164,6 +152,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IPackage existingThing, IPackage updatedThing)
         {
+            if (userContext.AccountId.HasValue && existingThing.PackageOwner.Contains(userContext.AccountId.Value))
+            {
+                return Task.FromResult(Result.Ok());
+            }
+
             if (existingThing.Visibility != updatedThing.Visibility)
             {
                 var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.SetPackageVisibility);
@@ -202,11 +195,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 {
                     return Task.FromResult(guard);
                 }
-            }
-
-            if (userContext.AccountId.HasValue && existingThing.PackageOwner.Contains(userContext.AccountId.Value))
-            {
-                return Task.FromResult(Result.Ok());
             }
 
             return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageSettings));

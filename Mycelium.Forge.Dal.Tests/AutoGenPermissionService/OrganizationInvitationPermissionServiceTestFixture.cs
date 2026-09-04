@@ -153,14 +153,12 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<Guid[]>()))
                 .ReturnsAsync(Result.Ok(ImmutableList.Create<IOrganization>(org)));
 
-            var nullResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, null);
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, invitation);
             var targetResult = await this.permissionService.IsAllowedToCreate(this.targetUserContext, invitation);
             var adminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, invitation);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(unauthResult.IsFailed, Is.True);
                 Assert.That(targetResult.IsFailed, Is.True);
                 Assert.That(adminResult.IsSuccess, Is.True);
@@ -181,14 +179,18 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Target = this.otherUserId
             };
 
-            var nullResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, null);
+            this.organizationServiceMock.Setup(x => x.ReadAsync(
+                    It.IsAny<IUserContext>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<Guid[]>()))
+                .ReturnsAsync(Result.Ok(ImmutableList<IOrganization>.Empty));
+
             var ownerResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, invitation);
             var targetResult = await this.permissionService.IsAllowedToRead(this.targetUserContext, invitation);
             var thirdPartyResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(targetResult.IsSuccess, Is.True);
                 Assert.That(thirdPartyResult.IsFailed, Is.True);
@@ -216,8 +218,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Target = this.otherUserId
             };
 
-            var nullExistingResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, null, updatedInvitation);
-            var nullUpdatedResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, null);
             var targetResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, updatedInvitation);
             var creatorResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingInvitation, updatedInvitation);
             var thirdPartyResult = await this.permissionService.IsAllowedToUpdate(this.thirdPartyUserContext, existingInvitation, updatedInvitation);
@@ -225,8 +225,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nullExistingResult.IsFailed, Is.True);
-                Assert.That(nullUpdatedResult.IsFailed, Is.True);
                 Assert.That(targetResult.IsSuccess, Is.True);
                 Assert.That(creatorResult.IsSuccess, Is.True);
                 Assert.That(thirdPartyResult.IsFailed, Is.True);

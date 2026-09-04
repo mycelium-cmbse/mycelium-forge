@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ExpectedOutputTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -245,6 +245,24 @@ namespace Mycelium.Forge.Generator.Tests
 
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenReadFilter", $"{className}ReadFilter.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the expected permission service class is generated.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCase("Package")]
+        public async Task Verify_that_the_expected_permission_service_is_generated(string className)
+        {
+            var generator = new UmlCorePermissionServiceGenerator();
+
+            var generated = await generator.GeneratePermissionServiceClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenPermissionService", $"{className}PermissionService.cs"));
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }

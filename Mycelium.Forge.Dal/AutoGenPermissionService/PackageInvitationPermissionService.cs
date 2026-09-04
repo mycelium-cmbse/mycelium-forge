@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageInvitationPermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -63,9 +63,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
 
-            if (guard.IsFailed)
+            if (guard.IsSuccess)
             {
-                return guard;
+                return Result.Ok();
             }
 
             var scopeResult = await this.packageService.ReadAsync(userContext, CancellationToken.None, [toCreate.Package]);
@@ -74,13 +74,13 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             {
                 var package = scopeResult.Value[0];
 
-                if (!package.PackageOwner.Contains(userContext.AccountId.Value) && !package.PackageMaintainer.Contains(userContext.AccountId.Value))
+                if (package.PackageOwner.Contains(userContext.AccountId.Value) || package.PackageMaintainer.Contains(userContext.AccountId.Value))
                 {
-                    return Result.Fail("Access denied: only packageOwner or packageMaintainers can invite members.");
+                    return Result.Ok();
                 }
             }
 
-            return Result.Ok();
+            return Result.Fail("Access denied: only packageOwner or packageMaintainers can invite members.");
         }
 
         /// <summary>

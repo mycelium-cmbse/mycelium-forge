@@ -85,16 +85,6 @@ namespace Mycelium.Forge.Generator.Constants
         public const string OrgCreatePermission = "OrgCreatePermission";
 
         /// <summary>
-        /// Configuration key for InternalReadPermission.
-        /// </summary>
-        public const string InternalReadPermission = "InternalReadPermission";
-
-        /// <summary>
-        /// Configuration key for PrivateReadPermission.
-        /// </summary>
-        public const string PrivateReadPermission = "PrivateReadPermission";
-
-        /// <summary>
         /// Configuration key for ParentEntity.
         /// </summary>
         public const string ParentEntity = "ParentEntity";
@@ -133,5 +123,10 @@ namespace Mycelium.Forge.Generator.Constants
         /// Configuration key for ReadBypassPermissions.
         /// </summary>
         public const string ReadBypassPermissions = "ReadBypassPermissions";
+
+        /// <summary>
+        /// Configuration key for AdminPermission.
+        /// </summary>
+        public const string AdminPermission = "AdminPermission";
     }
 }

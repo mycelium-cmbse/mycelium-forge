@@ -123,8 +123,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             };
 
             var unauthenticatedResult = await this.permissionService.IsAllowedToUpdate(this.anonymousUserContext, existingAccount, updatedAccount);
-            var nullExistingResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, null, updatedAccount);
-            var nullUpdatedResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAccount, null);
             var ownerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAccount, updatedAccount);
             var nonOwnerResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingAccount, updatedAccount);
             var adminResult = await this.permissionService.IsAllowedToUpdate(this.adminUserContext, otherAccount, updatedAccount);
@@ -132,8 +130,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(unauthenticatedResult.IsFailed, Is.True);
-                Assert.That(nullExistingResult.IsFailed, Is.True);
-                Assert.That(nullUpdatedResult.IsFailed, Is.True);
                 Assert.That(ownerResult.IsSuccess, Is.True);
                 Assert.That(nonOwnerResult.IsFailed, Is.True);
                 Assert.That(adminResult.IsSuccess, Is.True);

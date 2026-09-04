@@ -172,21 +172,6 @@ namespace Mycelium.Forge.Common
         ManagePackageSettings,
 
         /// <summary>
-        /// Permission: ReadPublicPackage.
-        /// </summary>
-        ReadPublicPackage,
-
-        /// <summary>
-        /// Permission: ReadInternalPackage.
-        /// </summary>
-        ReadInternalPackage,
-
-        /// <summary>
-        /// Permission: ReadPrivatePackage.
-        /// </summary>
-        ReadPrivatePackage,
-
-        /// <summary>
         /// Permission: AcceptPackageInvitation.
         /// </summary>
         AcceptPackageInvitation,

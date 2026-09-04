@@ -10,7 +10,7 @@
 namespace Mycelium.Forge.Generator.DataLoaders.PermissionModels
 {
     /// <summary>
-    /// Represents a specialized domain permission behavior configuration parsed from CSV.
+    /// Represents a specialized domain permission behavior configuration parsed from configuration.
     /// </summary>
     public class EntityBehaviorDefinition
     {
@@ -27,6 +27,6 @@ namespace Mycelium.Forge.Generator.DataLoaders.PermissionModels
         /// <summary>
         /// Gets or sets the key-value dictionary of configuration settings for this behavior.
         /// </summary>
-        public Dictionary<string, string> Configuration { get; set; } = [];
+        public Dictionary<string, string> Configuration { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 }

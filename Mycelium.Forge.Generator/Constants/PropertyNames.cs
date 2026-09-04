@@ -28,5 +28,10 @@ namespace Mycelium.Forge.Generator.Constants
         /// The IsActive property name.
         /// </summary>
         public const string IsActive = "IsActive";
+
+        /// <summary>
+        /// The Id property name.
+        /// </summary>
+        public const string Id = "Id";
     }
 }

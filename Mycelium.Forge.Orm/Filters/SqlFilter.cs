@@ -55,10 +55,7 @@ namespace Mycelium.Forge.Orm.Filters
         {
             foreach (var parameter in this.parameters)
             {
-                command.Parameters.Add(new NpgsqlParameter(parameter.ParameterName, parameter.NpgsqlDbType)
-                {
-                    Value = parameter.Value
-                });
+                command.Parameters.Add(parameter.Clone());
             }
         }
 

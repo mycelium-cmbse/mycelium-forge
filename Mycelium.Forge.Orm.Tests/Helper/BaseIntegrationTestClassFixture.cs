@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="BaseTestClassFixture.cs" company="Starion Group S.A.">
+// <copyright file="BaseIntegrationTestClassFixture.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -26,7 +26,7 @@ namespace Mycelium.Forge.Orm.Tests.Helper
     /// <summary>
     /// Base test fixture providing a PostgreSQL test container, schema initialization, and logger factory.
     /// </summary>
-    public abstract class BaseTestClassFixture
+    public abstract class BaseIntegrationTestClassFixture
     {
         private readonly PostgreSqlContainer postgres = new PostgreSqlBuilder("postgres:18.0-alpine3.22")
             .Build();

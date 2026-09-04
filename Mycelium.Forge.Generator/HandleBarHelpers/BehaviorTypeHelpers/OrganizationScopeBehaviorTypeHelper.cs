@@ -21,14 +21,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     /// Generates permission verification hooks and dependency injection for entities that can be owned by either
     /// an account (personal scope) or an organization, evaluating scope boundaries and organization membership.
     /// </summary>
-    public class OrganizationScopeBehaviorTypeHelper : IBehaviorTypeHelper
+    public class OrganizationScopeBehaviorTypeHelper : BehaviorTypeHelperBase<OrganizationScopeConfiguration>
     {
         /// <summary>
         /// Determines whether this behavior helper handles the specified operation.
         /// </summary>
         /// <param name="operation">The permission operation.</param>
         /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
-        public bool HandlesOperation(Operations operation)
+        public override bool HandlesOperation(Operations operation)
         {
             return operation is Operations.Create or Operations.Read;
         }
@@ -38,7 +38,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// </summary>
         /// <param name="operation">The permission operation.</param>
         /// <returns><c>true</c> if the operation is asynchronous; otherwise <c>false</c>.</returns>
-        public bool IsAsyncMethod(Operations operation)
+        public override bool IsAsyncMethod(Operations operation)
         {
             return operation is Operations.Create or Operations.Read;
         }
@@ -50,9 +50,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        public void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        public override void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            var config = new OrganizationScopeConfiguration(definition, behavior);
+            var config = this.GetConfiguration(definition, behavior);
             var scopeService = $"I{config.ScopeEntity}Service";
 
             stringBuilder.AppendLine($$"""
@@ -86,16 +86,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        public void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        public override void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            var config = new OrganizationScopeConfiguration(definition, behavior);
+            var config = this.GetConfiguration(definition, behavior);
             var entityLower = @class.Name.ToLowerInvariant();
             var membershipChecks = config.ScopeMemberProperties.Select(prop => $"!organization.{prop}.Contains(userContext.AccountId.Value)");
 
-            stringBuilder.Append($$""""
+            stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
-                                                   return Result.Fail("""Unauthenticated user cannot create a {{entityLower}}.""");
+                                                   return Result.Fail("Unauthenticated user cannot create a {{entityLower}}.");
                                                }
 
                                                if (toCreate.Owner == userContext.AccountId.Value)
@@ -123,12 +123,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                    if ({{string.Join(" && ", membershipChecks)}})
                                                    {
-                                                       return Result.Fail("""Access denied: user is not a member of the target {{config.ScopeEntity.ToLowerInvariant()}}.""");
+                                                       return Result.Fail("Access denied: user is not a member of the target {{config.ScopeEntity.ToLowerInvariant()}}.");
                                                    }
                                                }
 
                                                return Result.Ok();
-                                   """");
+                                   """);
         }
 
         /// <summary>
@@ -138,26 +138,26 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        public void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        public override void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            var config = new OrganizationScopeConfiguration(definition, behavior);
+            var config = this.GetConfiguration(definition, behavior);
             var entityLower = @class.Name.ToLowerInvariant();
             var bypassChecks = config.BypassPermissions.Select(p => $"PermissionGuard.HasPermission(userContext, PermissionKind.{p})");
             var scopeRoleChecks = config.ScopeMemberProperties.Select(prop => $"organization.{prop}.Contains(accountId)");
 
-            var ownershipChecks = new List<string> { "thing.Owner == accountId" };
+            var ownershipChecks = new List<string> { $"thing.{PropertyNames.Owner} == accountId" };
 
-            if (!string.IsNullOrWhiteSpace(config.OwnerProperty) && !config.OwnerProperty.Equals("Owner", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(config.OwnerProperty) && !config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
             {
                 ownershipChecks.Add($"thing.{config.OwnerProperty}.Contains(accountId)");
             }
 
-            if (!string.IsNullOrWhiteSpace(definition?.MaintainerProperty))
+            if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
             {
                 ownershipChecks.Add($"thing.{definition.MaintainerProperty}.Contains(accountId)");
             }
 
-            stringBuilder.Append($$""""
+            stringBuilder.Append($$"""
                                                if (thing.{{config.VisibilityProperty}} == VisibilityKind.PUBLIC)
                                                {
                                                    return Result.Ok();
@@ -165,7 +165,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
-                                                   return Result.Fail("""Unauthenticated user cannot access non-public {{entityLower}}.""");
+                                                   return Result.Fail("Unauthenticated user cannot access non-public {{entityLower}}.");
                                                }
 
                                                var accountId = userContext.AccountId.Value;
@@ -175,20 +175,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return Result.Ok();
                                                }
 
+                                               if ({{string.Join(" || ", bypassChecks)}})
+                                               {
+                                                   return Result.Ok();
+                                               }
+
                                                if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
                                                {
-                                                   if ({{string.Join(" || ", bypassChecks)}})
-                                                   {
-                                                       return Result.Ok();
-                                                   }
-
-                                                   var internalPermissionResult = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.InternalReadPermission}});
-
-                                                   if (internalPermissionResult.IsFailed)
-                                                   {
-                                                       return internalPermissionResult;
-                                                   }
-
                                                    var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
 
                                                    if (orgResult.IsSuccess && orgResult.Value.Count > 0)
@@ -201,16 +194,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                        }
                                                    }
 
-                                                   return Result.Fail("""Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.""");
+                                                   return Result.Fail("Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.");
                                                }
 
-                                               if (thing.{{config.VisibilityProperty}} == VisibilityKind.PRIVATE)
-                                               {
-                                                   return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.PrivateReadPermission}});
-                                               }
-
-                                               return Result.Fail("""Access denied: cannot view this {{entityLower}}.""");
-                                   """");
+                                               return Result.Fail("Access denied: cannot view this {{entityLower}}.");
+                                   """);
         }
 
         /// <summary>
@@ -221,7 +209,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
-        public void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
+        public override void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
         {
             // Empty because OrganizationScope entities do not require custom behavior logic for updates;
             // update permissions are handled by standard entity ownership, property-level permissions, and UpdatePermission in PermissionHelper.
@@ -234,7 +222,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
         /// <param name="definition">The entity permission definition.</param>
         /// <param name="behavior">The behavior definition.</param>
-        public void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             // Empty because OrganizationScope entities do not require custom behavior logic for deletion;
             // delete permissions are handled by standard entity ownership checks and DeletePermission in PermissionHelper.
@@ -248,24 +236,24 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="behavior">The behavior definition.</param>
         /// <param name="resolveEntityPredicate">A delegate to resolve the SQL read filter predicate of another entity by name.</param>
         /// <returns>The SQL predicate string, or empty string if unrestricted.</returns>
-        public string BuildReadFilterPredicate(IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, Func<string, string> resolveEntityPredicate)
+        public override string BuildReadFilterPredicate(IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, Func<string, string> resolveEntityPredicate)
         {
             var entityName = behavior.EntityName;
-            var config = new OrganizationScopeConfiguration(definition, behavior);
+            var config = this.GetConfiguration(definition, behavior);
 
             var ownerChecks = new List<string>
             {
                 $"\"{entityName}\".\"owner\" = @callerAccountId"
             };
 
-            if (!config.OwnerProperty.Equals("Owner", StringComparison.OrdinalIgnoreCase) &&
-                !config.OwnerProperty.Equals("Id", StringComparison.OrdinalIgnoreCase))
+            if (!config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase) &&
+                !config.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
             {
                 var ownerPropCamel = char.ToLowerInvariant(config.OwnerProperty[0]) + config.OwnerProperty[1..];
                 ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{ownerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
             }
 
-            if (!string.IsNullOrWhiteSpace(definition?.MaintainerProperty))
+            if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
             {
                 var maintainerPropCamel = char.ToLowerInvariant(definition.MaintainerProperty[0]) + definition.MaintainerProperty[1..];
                 ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{maintainerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
@@ -286,23 +274,26 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                          ("Thing"."data"->>'{{config.VisibilityPropertyLower}}' = 'PUBLIC')
                                          OR (@callerAccountId IS NOT NULL AND (
                                              {{ownerChecksSql}}
+                                             OR {{bypassSql}}
                                              OR (
                                                  "Thing"."data"->>'{{config.VisibilityPropertyLower}}' = 'INTERNAL'
                                                  AND (
-                                                     {{bypassSql}}
-                                                     OR (
-                                                         @can{{config.InternalReadPermission}} = true AND (
-                                                             {{scopeLinksSql}}
-                                                         )
-                                                     )
+                                                     {{scopeLinksSql}}
                                                  )
-                                             )
-                                             OR (
-                                                 "Thing"."data"->>'{{config.VisibilityPropertyLower}}' = 'PRIVATE'
-                                                 AND @can{{config.PrivateReadPermission}} = true
                                              )
                                          ))
                      """;
+        }
+
+        /// <summary>
+        /// Factory method to create a new <see cref="OrganizationScopeConfiguration" /> instance.
+        /// </summary>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The entity behavior definition.</param>
+        /// <returns>A new <see cref="OrganizationScopeConfiguration" /> instance.</returns>
+        protected override OrganizationScopeConfiguration CreateConfiguration(EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        {
+            return new OrganizationScopeConfiguration(definition, behavior);
         }
     }
 }

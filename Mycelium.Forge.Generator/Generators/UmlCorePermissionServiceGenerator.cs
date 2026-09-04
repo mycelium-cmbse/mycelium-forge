@@ -87,12 +87,12 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
-        /// Loads all configuration CSVs: entity permissions, property permissions, and entity behaviors.
+        /// Loads all configuration files: entity permissions, property permissions, and entity behaviors.
         /// </summary>
         /// <param name="entityCsvPath">The path to the entity permissions CSV file.</param>
         /// <param name="propertyCsvPath">The optional path to the property permissions CSV file.</param>
-        /// <param name="behaviorCsvPath">The optional path to the entity behaviors CSV file.</param>
-        public void LoadConfigurations(string entityCsvPath, string propertyCsvPath = null, string behaviorCsvPath = null)
+        /// <param name="behaviorJsonPath">The optional path to the entity behaviors JSON file.</param>
+        public void LoadConfigurations(string entityCsvPath, string propertyCsvPath = null, string behaviorJsonPath = null)
         {
             var entityLoader = new CsvEntityPermissionsDataLoader();
             this.EntityPermissions = entityLoader.Load(entityCsvPath);
@@ -103,27 +103,27 @@ namespace Mycelium.Forge.Generator.Generators
                 this.PropertyPermissions = propertyLoader.Load(propertyCsvPath);
             }
 
-            if (!string.IsNullOrWhiteSpace(behaviorCsvPath) && File.Exists(behaviorCsvPath))
+            if (!string.IsNullOrWhiteSpace(behaviorJsonPath) && File.Exists(behaviorJsonPath))
             {
-                var behaviorLoader = new CsvEntityBehaviorsDataLoader();
-                this.EntityBehaviors = behaviorLoader.Load(behaviorCsvPath);
+                var behaviorLoader = new JsonEntityBehaviorsDataLoader();
+                this.EntityBehaviors = behaviorLoader.Load(behaviorJsonPath);
             }
 
             PermissionHelper.SetConfigurations(this.EntityPermissions, this.PropertyPermissions, this.EntityBehaviors);
         }
 
         /// <summary>
-        /// Loads the entity permissions from the specified CSV file, and automatically discovers companion property and behavior
-        /// CSVs.
+        /// Loads the entity permissions from the specified CSV file, and automatically discovers companion property CSV and behavior
+        /// JSON file.
         /// </summary>
         /// <param name="csvPath">The path to the entity permissions CSV file.</param>
         public void LoadEntityPermissions(string csvPath)
         {
             var directory = Path.GetDirectoryName(csvPath);
             var propertyCsv = !string.IsNullOrWhiteSpace(directory) ? Path.Combine(directory, "forge-property-permissions.csv") : null;
-            var behaviorCsv = !string.IsNullOrWhiteSpace(directory) ? Path.Combine(directory, "forge-entity-behaviors.csv") : null;
+            var behaviorJson = !string.IsNullOrWhiteSpace(directory) ? Path.Combine(directory, "forge-entity-behaviors.json") : null;
 
-            this.LoadConfigurations(csvPath, propertyCsv, behaviorCsv);
+            this.LoadConfigurations(csvPath, propertyCsv, behaviorJson);
         }
 
         /// <summary>

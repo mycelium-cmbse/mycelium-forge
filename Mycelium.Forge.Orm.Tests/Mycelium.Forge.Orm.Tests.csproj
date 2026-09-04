@@ -33,6 +33,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
+        <ProjectReference Include="..\Mycelium.Forge.Dal\Mycelium.Forge.Dal.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Orm\Mycelium.Forge.Orm.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Serializer.Json\Mycelium.Forge.Serializer.Json.csproj" />
     </ItemGroup>

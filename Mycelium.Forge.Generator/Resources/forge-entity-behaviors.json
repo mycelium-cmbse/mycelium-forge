@@ -1,0 +1,98 @@
+﻿{
+  "$schema": "./forge-entity-behaviors.schema.json",
+  "behaviors": [
+    {
+      "entity": "Address",
+      "behaviorType": "ScopeItem",
+      "configuration": {
+        "OwnerProperty": "Owner",
+        "ScopeEntity": "Organization",
+        "PersonalManagePermission": "ManageOwnProfile",
+        "PlatformManagePermission": "ManageOrganizations",
+        "OrgManagePermission": "ManageOrganizationSettings",
+        "ReadBypassPermissions": [
+          "ViewOrganizationMemberList",
+          "ViewAllOrganizations",
+          "ViewAllAccounts"
+        ]
+      }
+    },
+    {
+      "entity": "ProfileLink",
+      "behaviorType": "ScopeItem",
+      "configuration": {
+        "OwnerProperty": "Owner",
+        "ScopeEntity": "Organization",
+        "PersonalManagePermission": "ManageOwnProfile",
+        "PlatformManagePermission": "ManageOrganizations",
+        "OrgManagePermission": "ManageOrganizationSettings",
+        "ReadBypassPermissions": [
+          "ViewOrganizationMemberList",
+          "ViewAllOrganizations",
+          "ViewAllAccounts"
+        ]
+      }
+    },
+    {
+      "entity": "PackageVersion",
+      "behaviorType": "ParentDelegation",
+      "configuration": {
+        "ParentEntity": "Package",
+        "ParentKey": "Owner",
+        "ParentOwnerProperties": [
+          "PackageOwner",
+          "PackageMaintainer"
+        ],
+        "CreatePermission": "PublishPackageVersion",
+        "DeletePermission": "ErasePackageVersion",
+        "StateProperty": "Listed",
+        "StateActivePermission": "RelistPackageVersion",
+        "StateInactivePermission": "UnlistPackageVersion"
+      }
+    },
+    {
+      "entity": "OrganizationInvitation",
+      "behaviorType": "InvitationWorkflow",
+      "configuration": {
+        "ScopeEntity": "Organization",
+        "ScopeRoles": [
+          "Administrator"
+        ],
+        "InviteeProperty": "Target",
+        "AcceptPermission": "AcceptOrganizationInvitation",
+        "RevokePermission": "RevokeOrganizationInvitation"
+      }
+    },
+    {
+      "entity": "PackageInvitation",
+      "behaviorType": "InvitationWorkflow",
+      "configuration": {
+        "ScopeEntity": "Package",
+        "ScopeRoles": [
+          "PackageOwner",
+          "PackageMaintainer"
+        ],
+        "InviteeProperty": "Target",
+        "AcceptPermission": "AcceptPackageInvitation",
+        "RevokePermission": "RevokePackageInvitation"
+      }
+    },
+    {
+      "entity": "Package",
+      "behaviorType": "OrganizationScope",
+      "configuration": {
+        "PersonalCreatePermission": "PublishPackageToPersonalScope",
+        "OrgCreatePermission": "PublishPackageToOrganizationScope",
+        "BypassPermissions": [
+          "ViewAllOrganizations",
+          "ManageOrganizations"
+        ],
+        "ScopeEntity": "Organization",
+        "ScopeMemberProperties": [
+          "Member",
+          "Administrator"
+        ]
+      }
+    }
+  ]
+}

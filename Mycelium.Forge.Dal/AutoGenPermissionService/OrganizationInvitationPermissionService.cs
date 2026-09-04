@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationInvitationPermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -63,9 +63,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.InviteOrganizationMembers);
 
-            if (guard.IsFailed)
+            if (guard.IsSuccess)
             {
-                return guard;
+                return Result.Ok();
             }
 
             var scopeResult = await this.organizationService.ReadAsync(userContext, CancellationToken.None, [toCreate.Organization]);
@@ -74,13 +74,13 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             {
                 var organization = scopeResult.Value[0];
 
-                if (!organization.Administrator.Contains(userContext.AccountId.Value))
+                if (organization.Administrator.Contains(userContext.AccountId.Value))
                 {
-                    return Result.Fail("Access denied: only administrators can invite members.");
+                    return Result.Ok();
                 }
             }
 
-            return Result.Ok();
+            return Result.Fail("Access denied: only administrators can invite members.");
         }
 
         /// <summary>

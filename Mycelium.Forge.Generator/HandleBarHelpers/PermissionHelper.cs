@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -60,8 +60,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="behaviorDefinitions">The dictionary of entity behavior definitions.</param>
         public static void SetConfigurations(
             Dictionary<string, EntityPermissionDefinition> entityDefinitions,
-            Dictionary<string, List<PropertyPermissionDefinition>> propertyDefinitions = null,
-            Dictionary<string, EntityBehaviorDefinition> behaviorDefinitions = null)
+            Dictionary<string, List<PropertyPermissionDefinition>> propertyDefinitions,
+            Dictionary<string, EntityBehaviorDefinition> behaviorDefinitions)
         {
             entityPermissions = entityDefinitions ?? [];
             propertyPermissions = propertyDefinitions ?? [];
@@ -74,7 +74,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="class">The <see cref="IClass" /> being generated.</param>
         /// <param name="operation">The permission operation.</param>
         /// <returns>True if the operation requires async; otherwise false.</returns>
-        public static bool IsAsyncMethod(IClass @class, Operations operation)
+        private static bool IsAsyncMethod(IClass @class, Operations operation)
         {
             if (entityBehaviors.TryGetValue(@class.Name, out var behavior) &&
                 behavior != null &&
@@ -130,52 +130,30 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 writer.WriteSafeString(stringBuilder.ToString());
             });
 
-            handlebars.RegisterHelper("Permission.WriteIsAllowedToCreate", (writer, context, _) =>
-            {
-                if (context.Value is not IClass @class)
+            RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToCreate", Operations.Create,
+                (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior); },
+                (stringBuilder, _, definition, isAsync) =>
                 {
-                    throw new ArgumentException("Context must be an IClass", nameof(context));
-                }
+                    if (definition != null)
+                    {
+                        AppendPermissionGuardOrOk(stringBuilder, definition.CreatePermission, isAsync);
+                    }
+                    else
+                    {
+                        stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
+                    }
+                });
 
-                entityPermissions.TryGetValue(@class.Name, out var definition);
-                entityBehaviors.TryGetValue(@class.Name, out var behavior);
-                var isAsync = IsAsyncMethod(@class, Operations.Create);
-                var stringBuilder = new StringBuilder();
+            RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToRead", Operations.Read,
+                (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToRead(stringBuilder, @class, definition, behavior); },
+                (stringBuilder, @class, definition, isAsync) =>
+                {
+                    if (definition == null)
+                    {
+                        stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
+                        return;
+                    }
 
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Create))
-                {
-                    helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior);
-                }
-                else if (definition != null)
-                {
-                    AppendPermissionGuardOrOk(stringBuilder, definition.CreatePermission, isAsync);
-                }
-                else
-                {
-                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
-                }
-
-                writer.WriteSafeString(stringBuilder.ToString());
-            });
-
-            handlebars.RegisterHelper("Permission.WriteIsAllowedToRead", (writer, context, _) =>
-            {
-                if (context.Value is not IClass @class)
-                {
-                    throw new ArgumentException("Context must be an IClass", nameof(context));
-                }
-
-                entityPermissions.TryGetValue(@class.Name, out var definition);
-                entityBehaviors.TryGetValue(@class.Name, out var behavior);
-                var isAsync = IsAsyncMethod(@class, Operations.Read);
-                var stringBuilder = new StringBuilder();
-
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Read))
-                {
-                    helper.WriteIsAllowedToRead(stringBuilder, @class, definition, behavior);
-                }
-                else if (definition != null)
-                {
                     if (!string.IsNullOrWhiteSpace(definition.VisibilityProperty))
                     {
                         var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
@@ -205,35 +183,27 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     }
 
                     AppendPermissionGuardOrOk(stringBuilder, definition.ReadPermission, isAsync);
-                }
-                else
+                });
+
+            RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToUpdate", Operations.Update,
+                (stringBuilder, @class, definition, behavior, helper, _) =>
                 {
-                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
-                }
-
-                writer.WriteSafeString(stringBuilder.ToString());
-            });
-
-            handlebars.RegisterHelper("Permission.WriteIsAllowedToUpdate", (writer, context, _) =>
-            {
-                if (context.Value is not IClass @class)
-                {
-                    throw new ArgumentException("Context must be an IClass", nameof(context));
-                }
-
-                entityPermissions.TryGetValue(@class.Name, out var definition);
-                entityBehaviors.TryGetValue(@class.Name, out var behavior);
-                propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
-                var isAsync = IsAsyncMethod(@class, Operations.Update);
-                var stringBuilder = new StringBuilder();
-
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Update))
-                {
+                    propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
                     helper.WriteIsAllowedToUpdate(stringBuilder, @class, definition, behavior, propertyDefs);
-                }
-                else if (definition != null)
+                },
+                (stringBuilder, @class, definition, isAsync) =>
                 {
-                    if (propertyDefs is { Count: > 0 })
+                    if (definition == null)
+                    {
+                        stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
+                        return;
+                    }
+
+                    WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", isAsync);
+
+                    propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
+
+                    if (propertyDefs != null)
                     {
                         var allProperties = @class.QueryDtoClassProperties().ToList();
 
@@ -264,52 +234,28 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                         }
                     }
 
-                    WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", isAsync);
-
                     AppendPermissionGuardOrOk(stringBuilder, definition.UpdatePermission, isAsync);
-                }
-                else
-                {
-                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
-                }
+                });
 
-                writer.WriteSafeString(stringBuilder.ToString());
-            });
-
-            handlebars.RegisterHelper("Permission.WriteIsAllowedToDelete", (writer, context, _) =>
-            {
-                if (context.Value is not IClass @class)
+            RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToDelete", Operations.Delete,
+                (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToDelete(stringBuilder, @class, definition, behavior); },
+                (stringBuilder, @class, definition, isAsync) =>
                 {
-                    throw new ArgumentException("Context must be an IClass", nameof(context));
-                }
+                    if (definition == null)
+                    {
+                        stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
+                        return;
+                    }
 
-                entityPermissions.TryGetValue(@class.Name, out var definition);
-                entityBehaviors.TryGetValue(@class.Name, out var behavior);
-                var isAsync = IsAsyncMethod(@class, Operations.Delete);
-                var stringBuilder = new StringBuilder();
-
-                if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) && helper.HandlesOperation(Operations.Delete))
-                {
-                    helper.WriteIsAllowedToDelete(stringBuilder, @class, definition, behavior);
-                }
-                else if (definition != null)
-                {
                     WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", isAsync);
-
                     AppendPermissionGuardOrOk(stringBuilder, definition.DeletePermission, isAsync);
-                }
-                else
-                {
-                    stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
-                }
-
-                writer.WriteSafeString(stringBuilder.ToString());
-            });
+                });
         }
 
         /// <summary>
         /// Emits a C# permission guard expression, handling single permissions, OR expressions ('|'), and AND expressions ('&amp;
         /// ').
+        /// Mixed expressions containing both '|' and '&amp;' are not supported and will throw.
         /// </summary>
         /// <param name="permissionExpression">The permission expression.</param>
         /// <param name="userContextName">The parameter name for the user context.</param>
@@ -321,14 +267,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return "Result.Ok()";
             }
 
-            if (permissionExpression.Contains('|'))
+            var hasOr = permissionExpression.Contains('|');
+            var hasAnd = permissionExpression.Contains('&');
+
+            if (hasOr && hasAnd)
+            {
+                throw new InvalidOperationException($"Permission expression '{permissionExpression}' mixes '|' and '&' operators, which is not supported. Use one operator type per expression.");
+            }
+
+            if (hasOr)
             {
                 var parts = permissionExpression.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 var enumList = string.Join(", ", parts.Select(p => $"PermissionKind.{p}"));
                 return $"PermissionGuard.GuardAnyPermission({userContextName}, {enumList})";
             }
 
-            if (permissionExpression.Contains('&'))
+            if (hasAnd)
             {
                 var parts = permissionExpression.Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 var enumList = string.Join(", ", parts.Select(p => $"PermissionKind.{p}"));
@@ -371,6 +325,50 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                                                    }
 
                                        """);
+        }
+
+        /// <summary>
+        /// Registers a Handlebars helper for a CRUD permission operation, handling the common setup boilerplate
+        /// of resolving the entity class, permission definition, behavior, and async flag.
+        /// </summary>
+        /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
+        /// <param name="helperName">The name of the Handlebars helper to register.</param>
+        /// <param name="operation">The CRUD operation this helper targets.</param>
+        /// <param name="behaviorAction">
+        /// The action to execute when a matching behavior helper is found. Receives the string builder, class,
+        /// definition, behavior, resolved helper, and async flag.
+        /// </param>
+        /// <param name="fallbackAction">
+        /// The action to execute when no behavior helper matches. Receives the string builder, class,
+        /// definition (may be null), and async flag.
+        /// </param>
+        private static void RegisterOperationHelper(IHandlebars handlebars, string helperName, Operations operation, Action<StringBuilder, IClass, EntityPermissionDefinition, EntityBehaviorDefinition, IBehaviorTypeHelper, bool> behaviorAction, Action<StringBuilder, IClass, EntityPermissionDefinition, bool> fallbackAction)
+        {
+            handlebars.RegisterHelper(helperName, (writer, context, _) =>
+            {
+                if (context.Value is not IClass @class)
+                {
+                    throw new ArgumentException("Context must be an IClass", nameof(context));
+                }
+
+                entityPermissions.TryGetValue(@class.Name, out var definition);
+                entityBehaviors.TryGetValue(@class.Name, out var behavior);
+                var isAsync = IsAsyncMethod(@class, operation);
+                var stringBuilder = new StringBuilder();
+
+                if (behavior != null &&
+                    BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper) &&
+                    helper.HandlesOperation(operation))
+                {
+                    behaviorAction.Invoke(stringBuilder, @class, definition, behavior, helper, isAsync);
+                }
+                else
+                {
+                    fallbackAction.Invoke(stringBuilder, @class, definition, isAsync);
+                }
+
+                writer.WriteSafeString(stringBuilder.ToString());
+            });
         }
 
         /// <summary>

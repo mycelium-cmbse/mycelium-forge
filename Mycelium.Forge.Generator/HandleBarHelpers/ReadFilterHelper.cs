@@ -143,7 +143,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             builder.AppendLine("                    \"\"\"");
             builder.AppendLine(predicate);
             builder.AppendLine("                    \"\"\")");
-            builder.AppendLine("                .AddParameter(\"@callerAccountId\", NpgsqlDbType.Uuid, userContext?.AccountId)");
+            builder.AppendLine("                .AddParameter(\"@callerAccountId\", NpgsqlDbType.Uuid, userContext.AccountId)");
 
             AppendParameters(builder, predicate);
 
@@ -183,11 +183,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             if (!string.IsNullOrWhiteSpace(permission.OwnerProperty))
             {
-                if (permission.OwnerProperty.Equals("Id", StringComparison.OrdinalIgnoreCase))
+                if (permission.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
                 {
                     ownershipChecks.Add($"\"{className}\".\"id\" = @callerAccountId");
                 }
-                else if (permission.OwnerProperty.Equals("Owner", StringComparison.OrdinalIgnoreCase))
+                else if (permission.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
                 {
                     ownershipChecks.Add($"\"{className}\".\"owner\" = @callerAccountId");
                 }
