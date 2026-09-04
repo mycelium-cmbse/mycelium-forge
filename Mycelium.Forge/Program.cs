@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -123,6 +123,7 @@ namespace Mycelium.Forge
             builder.Services.AddBlazorBlueprintComponents();
 
             builder.RegisterDatabase();
+            builder.RegisterServices();
             builder.RegisterViewModels();
 
             var app = builder.Build();

@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="DaoHelper.cs" company="Starion Group S.A.">
+// <copyright file="ServiceHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -7,18 +7,20 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Orm.Helpers
+namespace Mycelium.Forge.Dal
 {
     using System.Collections;
     using System.Text;
+
+    using Microsoft.Extensions.Logging;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Common.Comparers;
 
     /// <summary>
-    /// Provides helper methods for Data Access Object operations, such as logging property changes.
+    /// Provides helper methods for domain service operations, such as logging property changes.
     /// </summary>
-    public static class DaoHelper
+    public static class ServiceHelper
     {
         /// <summary>
         /// Formats a property change value for logging representation.

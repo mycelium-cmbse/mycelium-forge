@@ -1,0 +1,8 @@
+﻿Entity,Property,RequiredPermission,Operation
+Package,Visibility,SetPackageVisibility,Update
+Package,PackageOwner,ManagePackageTeam,Update
+Package,PackageMaintainer,ManagePackageTeam,Update
+Package,Owner,TransferPackageOwnership,Update
+Organization,Administrator,TransferOrganizationAdministration,Update
+Organization,Member,InviteOrganizationMembers | ManageOrganizations,Update
+Organization,DefaultPackageVisibility,ConfigureDefaultPackageVisibility | ManageOrganizations,Update
