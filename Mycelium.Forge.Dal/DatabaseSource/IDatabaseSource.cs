@@ -9,9 +9,6 @@
 
 namespace Mycelium.Forge.Dal.DatabaseSource
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-
     using Npgsql;
 
     /// <summary>
@@ -23,7 +20,7 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         /// Asynchronously opens a new database connection.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A new open <see cref="NpgsqlConnection"/>.</returns>
+        /// <returns>A new open <see cref="NpgsqlConnection" />.</returns>
         Task<NpgsqlConnection> OpenNewConnectionAsync(CancellationToken cancellationToken = default);
     }
 }
