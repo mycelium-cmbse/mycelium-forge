@@ -45,60 +45,58 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             var anonymousContext = UserContext.CreateAnonymous();
             var anonymousFilter = OrganizationReadFilter.FromUserContext(anonymousContext);
 
-            var adminUserContext = new UserContext
+            var memberUserContext = new UserContext
             {
                 AccountId = this.adminAccountId,
                 Username = "adminUser",
                 CurrentRoles = [RoleKind.Account]
             };
 
-            var adminFilter = OrganizationReadFilter.FromUserContext(adminUserContext);
-
-            var superAdminUserContext = new UserContext
-            {
-                AccountId = this.adminAccountId,
-                Username = "superAdmin",
-                CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator]
-            };
-
-            var superAdminFilter = OrganizationReadFilter.FromUserContext(superAdminUserContext);
+            var memberFilter = OrganizationReadFilter.FromUserContext(memberUserContext);
 
             await using var transaction = await this.Connection.BeginTransactionAsync();
 
             var anonResult = await this.organizationDao.ReadAsync(transaction, CancellationToken.None, filter: anonymousFilter);
-            var memberResult = await this.organizationDao.ReadAsync(transaction, CancellationToken.None, filter: adminFilter);
-            var superAdminResult = await this.organizationDao.ReadAsync(transaction, CancellationToken.None, filter: superAdminFilter);
+            var memberResult = await this.organizationDao.ReadAsync(transaction, CancellationToken.None, filter: memberFilter);
+
+            var byIdResult = await this.organizationDao.ReadAsync(transaction, CancellationToken.None, [this.org1Id], filter: anonymousFilter);
 
             var anonIdentifiers = await this.organizationDao.ReadIdentifiersAsync(transaction, CancellationToken.None, anonymousFilter);
-            var memberIdentifiers = await this.organizationDao.ReadIdentifiersAsync(transaction, CancellationToken.None, adminFilter);
-            var superAdminIdentifiers = await this.organizationDao.ReadIdentifiersAsync(transaction, CancellationToken.None, superAdminFilter);
 
             await transaction.CommitAsync();
 
+            var org1 = anonResult.Value.FirstOrDefault(o => o.Id == this.org1Id);
+            var org2 = anonResult.Value.FirstOrDefault(o => o.Id == this.org2Id);
+
             using (Assert.EnterMultipleScope())
             {
+                // Organizations are public — all contexts see all organizations
                 Assert.That(anonResult.IsSuccess, Is.True);
-                Assert.That(anonResult.Value, Has.Count.EqualTo(1));
-                Assert.That(anonResult.Value[0].Id, Is.EqualTo(this.org1Id));
+                Assert.That(anonResult.Value, Has.Count.EqualTo(2));
 
                 Assert.That(memberResult.IsSuccess, Is.True);
-                Assert.That(memberResult.Value, Has.Count.EqualTo(1));
-                Assert.That(memberResult.Value[0].Id, Is.EqualTo(this.org1Id));
+                Assert.That(memberResult.Value, Has.Count.EqualTo(2));
 
-                Assert.That(superAdminResult.IsSuccess, Is.True);
-                Assert.That(superAdminResult.Value, Has.Count.EqualTo(2));
+                // Targeted read by ID returns only the requested organization
+                Assert.That(byIdResult.IsSuccess, Is.True);
+                Assert.That(byIdResult.Value, Has.Count.EqualTo(1));
+                Assert.That(byIdResult.Value[0].Id, Is.EqualTo(this.org1Id));
 
-                Assert.That(anonIdentifiers, Has.Count.EqualTo(1));
+                // Entity shape — verify membership is persisted and retrieved correctly
+                Assert.That(org1, Is.Not.Null);
+                Assert.That(org1.Name, Is.EqualTo("AdminOrg"));
+                Assert.That(org1.Administrator, Does.Contain(this.adminAccountId));
+                Assert.That(org1.Member, Does.Contain(this.adminAccountId));
+
+                Assert.That(org2, Is.Not.Null);
+                Assert.That(org2.Name, Is.EqualTo("OtherOrg"));
+                Assert.That(org2.Administrator, Does.Contain(this.otherAccountId));
+                Assert.That(org2.Member, Does.Contain(this.otherAccountId));
+
+                // Identifiers
+                Assert.That(anonIdentifiers, Has.Count.EqualTo(2));
                 Assert.That(anonIdentifiers, Does.Contain(this.org1Id));
-                Assert.That(anonIdentifiers, Does.Not.Contain(this.org2Id));
-
-                Assert.That(memberIdentifiers, Has.Count.EqualTo(1));
-                Assert.That(memberIdentifiers, Does.Contain(this.org1Id));
-                Assert.That(memberIdentifiers, Does.Not.Contain(this.org2Id));
-
-                Assert.That(superAdminIdentifiers, Has.Count.EqualTo(2));
-                Assert.That(superAdminIdentifiers, Does.Contain(this.org1Id));
-                Assert.That(superAdminIdentifiers, Does.Contain(this.org2Id));
+                Assert.That(anonIdentifiers, Does.Contain(this.org2Id));
             }
         }
 
