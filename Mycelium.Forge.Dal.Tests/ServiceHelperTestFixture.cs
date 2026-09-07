@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Dal.Tests
 {
+    using System.Diagnostics.CodeAnalysis;
+
     using Microsoft.Extensions.Logging;
 
     using Moq;
@@ -68,6 +70,7 @@ namespace Mycelium.Forge.Dal.Tests
         /// differences are empty, ignores logging when log level is disabled, and throws when null arguments are passed.
         /// </summary>
         [Test]
+        [SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging", Justification = "Moq expression tree in unit tests.")]
         public void VerifyLogChanges()
         {
             var originalApiKey = new APIKey { Id = Guid.NewGuid(), Name = "OriginalName" };

@@ -27,38 +27,20 @@ namespace Mycelium.Forge.Generator.Models
         {
             var config = behavior.Configuration;
 
-            if (!config.TryGetValue(ConfigurationKeys.ParentEntity, out var parentEntity) || string.IsNullOrWhiteSpace(parentEntity))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.ParentEntity}'.");
-            }
+            var parentEntity = GetRequiredValue(config, this.EntityName, "ParentDelegation", ConfigurationKeys.ParentEntity);
 
-            var createPerm = config.TryGetValue(ConfigurationKeys.CreatePermission, out var cp) && !string.IsNullOrWhiteSpace(cp) ? cp : definition.CreatePermission;
+            var createPerm = GetRequiredValueWithFallback(config, ConfigurationKeys.CreatePermission, definition.CreatePermission,
+                $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
 
-            if (string.IsNullOrWhiteSpace(createPerm))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
-            }
+            var deletePerm = GetRequiredValueWithFallback(config, ConfigurationKeys.DeletePermission, definition.DeletePermission,
+                $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.DeletePermission}' or have a DeletePermission in entity permissions.");
 
-            var deletePerm = config.TryGetValue(ConfigurationKeys.DeletePermission, out var dp) && !string.IsNullOrWhiteSpace(dp) ? dp : definition.DeletePermission;
+            var stateActivePerm = GetRequiredValue(config, this.EntityName, "ParentDelegation", ConfigurationKeys.StateActivePermission);
+            var stateInactivePerm = GetRequiredValue(config, this.EntityName, "ParentDelegation", ConfigurationKeys.StateInactivePermission);
 
-            if (string.IsNullOrWhiteSpace(deletePerm))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.DeletePermission}' or have a DeletePermission in entity permissions.");
-            }
-
-            if (!config.TryGetValue(ConfigurationKeys.StateActivePermission, out var stateActivePerm) || string.IsNullOrWhiteSpace(stateActivePerm))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.StateActivePermission}'.");
-            }
-
-            if (!config.TryGetValue(ConfigurationKeys.StateInactivePermission, out var stateInactivePerm) || string.IsNullOrWhiteSpace(stateInactivePerm))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.StateInactivePermission}'.");
-            }
-
-            var parentKey = config.TryGetValue(ConfigurationKeys.ParentKey, out var pk) && !string.IsNullOrWhiteSpace(pk) ? pk : parentEntity;
-            var parentOwnerProps = config.TryGetValue(ConfigurationKeys.ParentOwnerProperties, out var pop) && !string.IsNullOrWhiteSpace(pop) ? pop : "Owner,Maintainer";
-            var stateProp = config.TryGetValue(ConfigurationKeys.StateProperty, out var sp) && !string.IsNullOrWhiteSpace(sp) ? sp : PropertyNames.IsActive;
+            var parentKey = GetOptionalValue(config, ConfigurationKeys.ParentKey, parentEntity);
+            var parentOwnerProps = GetOptionalValue(config, ConfigurationKeys.ParentOwnerProperties, "Owner,Maintainer");
+            var stateProp = GetOptionalValue(config, ConfigurationKeys.StateProperty, PropertyNames.IsActive);
 
             this.ParentEntity = parentEntity;
             this.ParentKey = parentKey;

@@ -28,56 +28,26 @@ namespace Mycelium.Forge.Generator.Models
             var entityName = behavior.EntityName;
             var config = behavior.Configuration;
 
-            if (!config.TryGetValue(ConfigurationKeys.ScopeEntity, out var scopeEntity) || string.IsNullOrWhiteSpace(scopeEntity))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ScopeEntity}'.");
-            }
+            var scopeEntity = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.ScopeEntity);
+            var inviteeProp = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.InviteeProperty);
+            var acceptPerm = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.AcceptPermission);
+            var revokePerm = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.RevokePermission);
+            var sr = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.ScopeRoles);
 
-            if (!config.TryGetValue(ConfigurationKeys.InviteeProperty, out var inviteeProp) || string.IsNullOrWhiteSpace(inviteeProp))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.InviteeProperty}'.");
-            }
+            var ownerProp = GetRequiredValueWithFallback(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
+                $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
 
-            if (!config.TryGetValue(ConfigurationKeys.AcceptPermission, out var acceptPerm) || string.IsNullOrWhiteSpace(acceptPerm))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.AcceptPermission}'.");
-            }
+            var createPerm = GetRequiredValueWithFallback(config, ConfigurationKeys.CreatePermission, definition.CreatePermission,
+                $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
 
-            if (!config.TryGetValue(ConfigurationKeys.RevokePermission, out var revokePerm) || string.IsNullOrWhiteSpace(revokePerm))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.RevokePermission}'.");
-            }
+            var readPerm = GetRequiredValueWithFallback(config, ConfigurationKeys.ReadPermission, definition.ReadPermission,
+                $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ReadPermission}' or have a ReadPermission in entity permissions.");
 
-            if (!config.TryGetValue(ConfigurationKeys.ScopeRoles, out var sr) || string.IsNullOrWhiteSpace(sr))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ScopeRoles}'.");
-            }
-
-            var ownerProp = config.TryGetValue(ConfigurationKeys.OwnerProperty, out var op) && !string.IsNullOrWhiteSpace(op) ? op : definition.OwnerProperty;
-
-            if (string.IsNullOrWhiteSpace(ownerProp))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
-            }
-
-            var createPerm = config.TryGetValue(ConfigurationKeys.CreatePermission, out var cp) && !string.IsNullOrWhiteSpace(cp) ? cp : definition.CreatePermission;
-
-            if (string.IsNullOrWhiteSpace(createPerm))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
-            }
-
-            var readPerm = config.TryGetValue(ConfigurationKeys.ReadPermission, out var rp) && !string.IsNullOrWhiteSpace(rp) ? rp : definition.ReadPermission;
-
-            if (string.IsNullOrWhiteSpace(readPerm))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ReadPermission}' or have a ReadPermission in entity permissions.");
-            }
-
-            var adminPerm = config.TryGetValue(ConfigurationKeys.AdminPermission, out var ap) && !string.IsNullOrWhiteSpace(ap) ? ap : entityName == "PackageInvitation" ? "ManagePackageTeam" : "ManageOrganizations";
+            var defaultAdminPerm = entityName == "PackageInvitation" ? "ManagePackageTeam" : "ManageOrganizations";
+            var adminPerm = GetOptionalValue(config, ConfigurationKeys.AdminPermission, defaultAdminPerm);
 
             this.ScopeEntity = scopeEntity;
-            this.ScopeProperty = config.TryGetValue(ConfigurationKeys.ScopeProperty, out var sp) && !string.IsNullOrWhiteSpace(sp) ? sp : scopeEntity;
+            this.ScopeProperty = GetOptionalValue(config, ConfigurationKeys.ScopeProperty, scopeEntity);
             this.ScopeServiceField = FormatServiceField(scopeEntity);
             this.ScopeVar = FormatVariableName(scopeEntity);
             this.InviteeProperty = inviteeProp;

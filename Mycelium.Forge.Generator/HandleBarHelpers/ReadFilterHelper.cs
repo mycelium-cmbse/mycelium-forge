@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ReadFilterHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     /// <summary>
     /// A Handlebars helper that generates the SQL read visibility filter factories for entities.
     /// </summary>
-    public static class ReadFilterHelper
+    public static partial class ReadFilterHelper
     {
         /// <summary>
         /// The error message used when the Handlebars context is not an <see cref="IClass" />.
@@ -232,7 +232,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="predicate">The SQL predicate string containing parameter names.</param>
         private static void AppendParameters(StringBuilder builder, string predicate)
         {
-            var matches = Regex.Matches(predicate, "@(can[A-Za-z0-9_]+)");
+            var matches = ParameterRegex().Matches(predicate);
             var handled = new HashSet<string>();
 
             foreach (Match match in matches)
@@ -246,5 +246,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the compiled regular expression used to match SQL filter parameter names.
+        /// </summary>
+        /// <returns>A compiled <see cref="Regex" /> instance.</returns>
+        [GeneratedRegex("@(can[A-Za-z0-9_]+)", RegexOptions.None, 1000)]
+        private static partial Regex ParameterRegex();
     }
 }

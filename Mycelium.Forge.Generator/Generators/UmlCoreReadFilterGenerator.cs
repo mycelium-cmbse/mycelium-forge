@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreReadFilterGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -58,8 +58,7 @@ namespace Mycelium.Forge.Generator.Generators
 
             if (!string.IsNullOrWhiteSpace(behaviorJsonPath) && File.Exists(behaviorJsonPath))
             {
-                var behaviorLoader = new JsonEntityBehaviorsDataLoader();
-                this.EntityBehaviors = behaviorLoader.Load(behaviorJsonPath);
+                this.EntityBehaviors = JsonEntityBehaviorsDataLoader.Load(behaviorJsonPath);
             }
 
             ReadFilterHelper.SetConfigurations(this.EntityPermissions, this.EntityBehaviors);
@@ -171,13 +170,10 @@ namespace Mycelium.Forge.Generator.Generators
                 Path.GetFullPath(Path.Combine(baseDirectory, "../../../Mycelium.Forge.Generator/Resources/forge-entity-permissions.csv"))
             };
 
-            foreach (var candidate in candidates)
+            foreach (var candidate in candidates.Where(File.Exists))
             {
-                if (File.Exists(candidate))
-                {
-                    this.LoadEntityPermissions(candidate);
-                    return;
-                }
+                this.LoadEntityPermissions(candidate);
+                return;
             }
         }
 

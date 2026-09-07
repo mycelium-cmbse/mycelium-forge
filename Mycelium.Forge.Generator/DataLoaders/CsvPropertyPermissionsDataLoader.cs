@@ -21,7 +21,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
         /// </summary>
         /// <param name="csvPath">The path to the property permissions CSV file.</param>
         /// <returns>A dictionary mapping entity names to their list of property permission definitions.</returns>
-        public Dictionary<string, List<PropertyPermissionDefinition>> Load(string csvPath)
+        public static Dictionary<string, List<PropertyPermissionDefinition>> Load(string csvPath)
         {
             if (string.IsNullOrWhiteSpace(csvPath))
             {

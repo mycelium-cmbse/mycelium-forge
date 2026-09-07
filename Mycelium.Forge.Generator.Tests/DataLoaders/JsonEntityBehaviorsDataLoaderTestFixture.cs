@@ -20,14 +20,6 @@ namespace Mycelium.Forge.Generator.Tests.DataLoaders
     [TestFixture]
     public class JsonEntityBehaviorsDataLoaderTestFixture
     {
-        private JsonEntityBehaviorsDataLoader loader;
-
-        [SetUp]
-        public void SetUp()
-        {
-            this.loader = new JsonEntityBehaviorsDataLoader();
-        }
-
         /// <summary>
         /// Verifies the <see cref="JsonEntityBehaviorsDataLoader.Load" /> method.
         /// </summary>
@@ -38,11 +30,11 @@ namespace Mycelium.Forge.Generator.Tests.DataLoaders
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => this.loader.Load(null), Throws.TypeOf<ArgumentException>());
-                Assert.That(() => this.loader.Load(string.Empty), Throws.TypeOf<ArgumentException>());
-                Assert.That(() => this.loader.Load("non-existent-path.json"), Throws.TypeOf<FileNotFoundException>());
+                Assert.That(() => JsonEntityBehaviorsDataLoader.Load(null), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => JsonEntityBehaviorsDataLoader.Load(string.Empty), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => JsonEntityBehaviorsDataLoader.Load("non-existent-path.json"), Throws.TypeOf<FileNotFoundException>());
 
-                var result = this.loader.Load(jsonPath);
+                var result = JsonEntityBehaviorsDataLoader.Load(jsonPath);
 
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result, Has.Count.EqualTo(6));

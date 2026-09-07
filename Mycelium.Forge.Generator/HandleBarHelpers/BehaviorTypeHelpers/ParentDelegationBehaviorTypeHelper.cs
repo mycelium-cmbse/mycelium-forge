@@ -113,15 +113,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                     """
                 : string.Empty;
 
-            var ownershipChecks = new List<string> { $"{config.ParentVar}.{PropertyNames.Owner} == accountId" };
-
-            foreach (var prop in config.ParentOwnerProperties)
-            {
-                if (!prop.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
-                {
-                    ownershipChecks.Add($"{config.ParentVar}.{prop}.Contains(accountId)");
-                }
-            }
+            var ownershipChecks = BuildOwnershipChecks(config);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -222,15 +214,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                     """
                 : string.Empty;
 
-            var ownershipChecks = new List<string> { $"{config.ParentVar}.{PropertyNames.Owner} == accountId" };
-
-            foreach (var prop in config.ParentOwnerProperties)
-            {
-                if (!prop.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
-                {
-                    ownershipChecks.Add($"{config.ParentVar}.{prop}.Contains(accountId)");
-                }
-            }
+            var ownershipChecks = BuildOwnershipChecks(config);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -281,15 +265,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                     """
                 : string.Empty;
 
-            var ownershipChecks = new List<string> { $"{config.ParentVar}.{PropertyNames.Owner} == accountId" };
-
-            foreach (var prop in config.ParentOwnerProperties)
-            {
-                if (!prop.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
-                {
-                    ownershipChecks.Add($"{config.ParentVar}.{prop}.Contains(accountId)");
-                }
-            }
+            var ownershipChecks = BuildOwnershipChecks(config);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -367,6 +343,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         protected override ParentDelegationConfiguration CreateConfiguration(EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             return new ParentDelegationConfiguration(definition, behavior);
+        }
+
+        /// <summary>
+        /// Builds the list of ownership check expressions for a parent entity.
+        /// </summary>
+        /// <param name="config">The parent delegation configuration.</param>
+        /// <returns>A list of boolean expression strings representing ownership checks.</returns>
+        private static List<string> BuildOwnershipChecks(ParentDelegationConfiguration config)
+        {
+            var ownershipChecks = new List<string> { $"{config.ParentVar}.{PropertyNames.Owner} == accountId" };
+
+            ownershipChecks.AddRange(config.ParentOwnerProperties
+                .Where(prop => !prop.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
+                .Select(prop => $"{config.ParentVar}.{prop}.Contains(accountId)"));
+
+            return ownershipChecks;
         }
     }
 }

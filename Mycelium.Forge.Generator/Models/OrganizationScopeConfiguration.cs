@@ -27,39 +27,20 @@ namespace Mycelium.Forge.Generator.Models
         {
             var config = behavior.Configuration;
 
-            if (!config.TryGetValue(ConfigurationKeys.ScopeEntity, out var scopeEntity) || string.IsNullOrWhiteSpace(scopeEntity))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.ScopeEntity}'.");
-            }
+            var scopeEntity = GetRequiredValue(config, this.EntityName, "OrganizationScope", ConfigurationKeys.ScopeEntity);
+            var ocp = GetRequiredValue(config, this.EntityName, "OrganizationScope", ConfigurationKeys.OrgCreatePermission);
 
-            if (!config.TryGetValue(ConfigurationKeys.OrgCreatePermission, out var ocp) || string.IsNullOrWhiteSpace(ocp))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OrgCreatePermission}'.");
-            }
+            var visProp = GetRequiredValueWithFallback(config, ConfigurationKeys.VisibilityProperty, definition.VisibilityProperty,
+                $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.VisibilityProperty}' or have a VisibilityProperty in entity permissions.");
 
-            var visProp = config.TryGetValue(ConfigurationKeys.VisibilityProperty, out var vp) && !string.IsNullOrWhiteSpace(vp) ? vp : definition.VisibilityProperty;
+            var ownerProp = GetRequiredValueWithFallback(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
+                $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
 
-            if (string.IsNullOrWhiteSpace(visProp))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.VisibilityProperty}' or have a VisibilityProperty in entity permissions.");
-            }
+            var personalCreatePerm = GetRequiredValueWithFallback(config, ConfigurationKeys.PersonalCreatePermission, definition.CreatePermission,
+                $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.PersonalCreatePermission}' or have a '{ConfigurationKeys.CreatePermission}'.");
 
-            var ownerProp = config.TryGetValue(ConfigurationKeys.OwnerProperty, out var op) && !string.IsNullOrWhiteSpace(op) ? op : definition.OwnerProperty;
-
-            if (string.IsNullOrWhiteSpace(ownerProp))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
-            }
-
-            var personalCreatePerm = config.TryGetValue(ConfigurationKeys.PersonalCreatePermission, out var pcp) && !string.IsNullOrWhiteSpace(pcp) ? pcp : definition.CreatePermission;
-
-            if (string.IsNullOrWhiteSpace(personalCreatePerm))
-            {
-                throw new InvalidOperationException($"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.PersonalCreatePermission}' or have a '{ConfigurationKeys.CreatePermission}'.");
-            }
-
-            var scopeMembers = config.TryGetValue(ConfigurationKeys.ScopeMemberProperties, out var sm) && !string.IsNullOrWhiteSpace(sm) ? sm : "Member,Administrator";
-            var bypassPerms = config.TryGetValue(ConfigurationKeys.BypassPermissions, out var bp) && !string.IsNullOrWhiteSpace(bp) ? bp : "ManageOrganizations";
+            var scopeMembers = GetOptionalValue(config, ConfigurationKeys.ScopeMemberProperties, "Member,Administrator");
+            var bypassPerms = GetOptionalValue(config, ConfigurationKeys.BypassPermissions, "ManageOrganizations");
 
             this.ScopeEntity = scopeEntity;
             this.ScopeServiceField = FormatServiceField(scopeEntity);

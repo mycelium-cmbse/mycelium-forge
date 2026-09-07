@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
         /// </summary>
         /// <param name="jsonPath">The path to the entity behaviors JSON file.</param>
         /// <returns>A dictionary mapping entity names to their behavior definitions.</returns>
-        public Dictionary<string, EntityBehaviorDefinition> Load(string jsonPath)
+        public static Dictionary<string, EntityBehaviorDefinition> Load(string jsonPath)
         {
             if (string.IsNullOrWhiteSpace(jsonPath))
             {
@@ -43,7 +43,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
             var jsonText = File.ReadAllText(jsonPath);
             List<EntityBehaviorItem> behaviorItems;
 
-            if (jsonText.TrimStart().StartsWith("["))
+            if (jsonText.TrimStart().StartsWith('['))
             {
                 behaviorItems = JsonSerializer.Deserialize<List<EntityBehaviorItem>>(jsonText) ?? [];
             }

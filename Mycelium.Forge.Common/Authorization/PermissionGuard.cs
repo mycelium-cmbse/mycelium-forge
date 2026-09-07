@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionGuard.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -82,15 +82,7 @@ namespace Mycelium.Forge.Common
                 return true;
             }
 
-            foreach (var permission in permissions)
-            {
-                if (HasPermission(userContext, permission))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return permissions.Any(permission => HasPermission(userContext, permission));
         }
 
         /// <summary>
@@ -107,15 +99,7 @@ namespace Mycelium.Forge.Common
                 return true;
             }
 
-            foreach (var permission in permissions)
-            {
-                if (!HasPermission(userContext, permission))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return permissions.All(permission => HasPermission(userContext, permission));
         }
 
         /// <summary>

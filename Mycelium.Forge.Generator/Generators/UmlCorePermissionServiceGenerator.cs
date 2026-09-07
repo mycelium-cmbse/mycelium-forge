@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCorePermissionServiceGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Generator.Generators
 {
+    using System.Linq;
+
     using Mycelium.Forge.Generator.DataLoaders;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
     using Mycelium.Forge.Generator.Extensions;
@@ -99,14 +101,12 @@ namespace Mycelium.Forge.Generator.Generators
 
             if (!string.IsNullOrWhiteSpace(propertyCsvPath) && File.Exists(propertyCsvPath))
             {
-                var propertyLoader = new CsvPropertyPermissionsDataLoader();
-                this.PropertyPermissions = propertyLoader.Load(propertyCsvPath);
+                this.PropertyPermissions = CsvPropertyPermissionsDataLoader.Load(propertyCsvPath);
             }
 
             if (!string.IsNullOrWhiteSpace(behaviorJsonPath) && File.Exists(behaviorJsonPath))
             {
-                var behaviorLoader = new JsonEntityBehaviorsDataLoader();
-                this.EntityBehaviors = behaviorLoader.Load(behaviorJsonPath);
+                this.EntityBehaviors = JsonEntityBehaviorsDataLoader.Load(behaviorJsonPath);
             }
 
             PermissionHelper.SetConfigurations(this.EntityPermissions, this.PropertyPermissions, this.EntityBehaviors);
@@ -140,6 +140,26 @@ namespace Mycelium.Forge.Generator.Generators
             var validPermissions = model.Permissions.Select(p => p.EnumName).ToHashSet(StringComparer.OrdinalIgnoreCase);
             List<string> errors = [];
 
+            this.ValidatePermissions(validPermissions, errors);
+
+            if (xmiReaderResult != null)
+            {
+                this.ValidateUmlProperties(xmiReaderResult, errors);
+            }
+
+            if (errors.Count > 0)
+            {
+                throw new InvalidOperationException($"Entity permission validation failed with {errors.Count} error(s):{Environment.NewLine}{string.Join(Environment.NewLine, errors)}");
+            }
+        }
+
+        /// <summary>
+        /// Validates that entity and property permissions match valid permissions from the model.
+        /// </summary>
+        /// <param name="validPermissions">The set of valid permission enum names.</param>
+        /// <param name="errors">The list of error messages to collect.</param>
+        private void ValidatePermissions(HashSet<string> validPermissions, List<string> errors)
+        {
             foreach (var keyValuePair in this.EntityPermissions)
             {
                 var entityName = keyValuePair.Key;
@@ -160,49 +180,49 @@ namespace Mycelium.Forge.Generator.Generators
                     CheckPermissionExists(validPermissions, propDef.RequiredPermission, entityName, $"Property '{propDef.Property}'", errors);
                 }
             }
+        }
 
-            if (xmiReaderResult != null)
+        /// <summary>
+        /// Validates that referenced entity and property permissions match existing UML class properties.
+        /// </summary>
+        /// <param name="xmiReaderResult">The parsed UML model.</param>
+        /// <param name="errors">The list of error messages to collect.</param>
+        private void ValidateUmlProperties(XmiReaderResult xmiReaderResult, List<string> errors)
+        {
+            var classes = QueryPermissionServiceClasses(xmiReaderResult).ToDictionary(c => c.Name, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var keyValuePair in this.EntityPermissions)
             {
-                var classes = QueryPermissionServiceClasses(xmiReaderResult).ToDictionary(c => c.Name, StringComparer.OrdinalIgnoreCase);
+                var entityName = keyValuePair.Key;
+                var definition = keyValuePair.Value;
 
-                foreach (var keyValuePair in this.EntityPermissions)
+                if (!classes.TryGetValue(entityName, out var @class))
                 {
-                    var entityName = keyValuePair.Key;
-                    var definition = keyValuePair.Value;
-
-                    if (!classes.TryGetValue(entityName, out var @class))
-                    {
-                        continue;
-                    }
-
-                    var allProperties = @class.QueryDtoClassProperties().Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-                    CheckPropertyExists(allProperties, definition.OwnerProperty, entityName, nameof(definition.OwnerProperty), errors);
-                    CheckPropertyExists(allProperties, definition.MaintainerProperty, entityName, nameof(definition.MaintainerProperty), errors);
-                    CheckPropertyExists(allProperties, definition.VisibilityProperty, entityName, nameof(definition.VisibilityProperty), errors);
+                    continue;
                 }
 
-                foreach (var keyValuePair in this.PropertyPermissions)
-                {
-                    var entityName = keyValuePair.Key;
+                var allProperties = @class.QueryDtoClassProperties().Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-                    if (!classes.TryGetValue(entityName, out var @class))
-                    {
-                        continue;
-                    }
-
-                    var allProperties = @class.QueryDtoClassProperties().Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-                    foreach (var propDef in keyValuePair.Value)
-                    {
-                        CheckPropertyExists(allProperties, propDef.Property, entityName, nameof(PropertyPermissionDefinition.Property), errors);
-                    }
-                }
+                CheckPropertyExists(allProperties, definition.OwnerProperty, entityName, nameof(definition.OwnerProperty), errors);
+                CheckPropertyExists(allProperties, definition.MaintainerProperty, entityName, nameof(definition.MaintainerProperty), errors);
+                CheckPropertyExists(allProperties, definition.VisibilityProperty, entityName, nameof(definition.VisibilityProperty), errors);
             }
 
-            if (errors.Count > 0)
+            foreach (var keyValuePair in this.PropertyPermissions)
             {
-                throw new InvalidOperationException($"Entity permission validation failed with {errors.Count} error(s):{Environment.NewLine}{string.Join(Environment.NewLine, errors)}");
+                var entityName = keyValuePair.Key;
+
+                if (!classes.TryGetValue(entityName, out var @class))
+                {
+                    continue;
+                }
+
+                var allProperties = @class.QueryDtoClassProperties().Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var propDef in keyValuePair.Value)
+                {
+                    CheckPropertyExists(allProperties, propDef.Property, entityName, nameof(PropertyPermissionDefinition.Property), errors);
+                }
             }
         }
 
@@ -345,12 +365,9 @@ namespace Mycelium.Forge.Generator.Generators
 
             var parts = permissionName.Split(['|', '&'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            foreach (var part in parts)
+            foreach (var part in parts.Where(part => !validPermissions.Contains(part)))
             {
-                if (!validPermissions.Contains(part))
-                {
-                    errors.Add($"Entity '{entityName}' references unknown {operation} permission '{part}'.");
-                }
+                errors.Add($"Entity '{entityName}' references unknown {operation} permission '{part}'.");
             }
         }
 
@@ -385,13 +402,10 @@ namespace Mycelium.Forge.Generator.Generators
                 Path.GetFullPath(Path.Combine(baseDirectory, "../../../Mycelium.Forge.Generator/Resources/forge-entity-permissions.csv"))
             };
 
-            foreach (var candidate in candidates)
+            foreach (var candidate in candidates.Where(File.Exists))
             {
-                if (File.Exists(candidate))
-                {
-                    this.LoadEntityPermissions(candidate);
-                    return;
-                }
+                this.LoadEntityPermissions(candidate);
+                return;
             }
         }
 

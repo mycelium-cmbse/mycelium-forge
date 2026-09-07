@@ -69,6 +69,26 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         }
 
         /// <summary>
+        /// Registers the permission helpers with the given <see cref="IHandlebars" /> instance.
+        /// </summary>
+        /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
+        public static void RegisterPermissionHelper(this IHandlebars handlebars)
+        {
+            ArgumentNullException.ThrowIfNull(handlebars);
+
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierCreate", Operations.Create);
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierRead", Operations.Read);
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierUpdate", Operations.Update);
+            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierDelete", Operations.Delete);
+
+            RegisterFieldsAndConstructors(handlebars);
+            RegisterIsAllowedToCreate(handlebars);
+            RegisterIsAllowedToRead(handlebars);
+            RegisterIsAllowedToUpdate(handlebars);
+            RegisterIsAllowedToDelete(handlebars);
+        }
+
+        /// <summary>
         /// Determines whether the specified class and operation require an asynchronous implementation hook.
         /// </summary>
         /// <param name="class">The <see cref="IClass" /> being generated.</param>
@@ -88,18 +108,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         }
 
         /// <summary>
-        /// Registers the permission helpers with the given <see cref="IHandlebars" /> instance.
+        /// Registers the Permission.WriteFieldsAndConstructors helper.
         /// </summary>
         /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
-        public static void RegisterPermissionHelper(this IHandlebars handlebars)
+        private static void RegisterFieldsAndConstructors(IHandlebars handlebars)
         {
-            ArgumentNullException.ThrowIfNull(handlebars);
-
-            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierCreate", Operations.Create);
-            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierRead", Operations.Read);
-            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierUpdate", Operations.Update);
-            RegisterAsyncModifier(handlebars, "Permission.WriteAsyncModifierDelete", Operations.Delete);
-
             handlebars.RegisterHelper("Permission.WriteFieldsAndConstructors", (writer, context, _) =>
             {
                 if (context.Value is not IClass @class)
@@ -129,7 +142,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 writer.WriteSafeString(stringBuilder.ToString());
             });
+        }
 
+        /// <summary>
+        /// Registers the Permission.WriteIsAllowedToCreate helper.
+        /// </summary>
+        /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
+        private static void RegisterIsAllowedToCreate(IHandlebars handlebars)
+        {
             RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToCreate", Operations.Create,
                 (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior); },
                 (stringBuilder, _, definition, isAsync) =>
@@ -143,100 +163,151 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                         stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
                     }
                 });
+        }
 
+        /// <summary>
+        /// Registers the Permission.WriteIsAllowedToRead helper.
+        /// </summary>
+        /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
+        private static void RegisterIsAllowedToRead(IHandlebars handlebars)
+        {
             RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToRead", Operations.Read,
                 (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToRead(stringBuilder, @class, definition, behavior); },
-                (stringBuilder, @class, definition, isAsync) =>
-                {
-                    if (definition == null)
-                    {
-                        stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
-                        return;
-                    }
+                WriteDefaultAllowedToRead);
+        }
 
-                    if (!string.IsNullOrWhiteSpace(definition.VisibilityProperty))
-                    {
-                        var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
+        /// <summary>
+        /// Writes the default read permission check when no custom behavior is configured.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to append to.</param>
+        /// <param name="class">The <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
+        private static void WriteDefaultAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, bool isAsync)
+        {
+            if (definition == null)
+            {
+                stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
+                return;
+            }
 
-                        stringBuilder.AppendLine($$"""
-                                                               if (thing.{{definition.VisibilityProperty}} == VisibilityKind.PUBLIC)
-                                                               {
-                                                                   {{okReturn}}
-                                                               }
+            if (!string.IsNullOrWhiteSpace(definition.VisibilityProperty))
+            {
+                var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
 
-                                                   """);
-                    }
+                stringBuilder.AppendLine($$"""
+                                                       if (thing.{{definition.VisibilityProperty}} == VisibilityKind.PUBLIC)
+                                                       {
+                                                           {{okReturn}}
+                                                       }
 
-                    WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", isAsync);
+                                           """);
+            }
 
-                    if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
-                    {
-                        var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
+            WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", isAsync);
 
-                        stringBuilder.AppendLine($$"""
-                                                               if (userContext.AccountId.HasValue && thing.{{definition.MaintainerProperty}}.Contains(userContext.AccountId.Value))
-                                                               {
-                                                                   {{okReturn}}
-                                                               }
+            if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
+            {
+                var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
 
-                                                   """);
-                    }
+                stringBuilder.AppendLine($$"""
+                                                       if (userContext.AccountId.HasValue && thing.{{definition.MaintainerProperty}}.Contains(userContext.AccountId.Value))
+                                                       {
+                                                           {{okReturn}}
+                                                       }
 
-                    AppendPermissionGuardOrOk(stringBuilder, definition.ReadPermission, isAsync);
-                });
+                                           """);
+            }
 
+            AppendPermissionGuardOrOk(stringBuilder, definition.ReadPermission, isAsync);
+        }
+
+        /// <summary>
+        /// Registers the Permission.WriteIsAllowedToUpdate helper.
+        /// </summary>
+        /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
+        private static void RegisterIsAllowedToUpdate(IHandlebars handlebars)
+        {
             RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToUpdate", Operations.Update,
                 (stringBuilder, @class, definition, behavior, helper, _) =>
                 {
                     propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
                     helper.WriteIsAllowedToUpdate(stringBuilder, @class, definition, behavior, propertyDefs);
                 },
-                (stringBuilder, @class, definition, isAsync) =>
+                WriteDefaultAllowedToUpdate);
+        }
+
+        /// <summary>
+        /// Writes the default update permission check when no custom behavior is configured.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to append to.</param>
+        /// <param name="class">The <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
+        private static void WriteDefaultAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, bool isAsync)
+        {
+            if (definition == null)
+            {
+                stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
+                return;
+            }
+
+            WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", isAsync);
+
+            propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
+
+            if (propertyDefs != null)
+            {
+                WritePropertyChangePermissionChecks(stringBuilder, @class, propertyDefs, isAsync);
+            }
+
+            AppendPermissionGuardOrOk(stringBuilder, definition.UpdatePermission, isAsync);
+        }
+
+        /// <summary>
+        /// Writes property change guard checks for updated properties requiring specific permissions.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to append to.</param>
+        /// <param name="class">The <see cref="IClass" /> being generated.</param>
+        /// <param name="propertyDefs">The list of property permission definitions.</param>
+        /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
+        private static void WritePropertyChangePermissionChecks(StringBuilder stringBuilder, IClass @class, List<PropertyPermissionDefinition> propertyDefs, bool isAsync)
+        {
+            var allProperties = @class.QueryDtoClassProperties().ToList();
+
+            foreach (var propDef in propertyDefs)
+            {
+                var matchingProp = allProperties.FirstOrDefault(p => p.Name.Equals(propDef.Property, StringComparison.OrdinalIgnoreCase));
+                var isEnum = matchingProp != null && matchingProp.QueryIsEnumerable();
+
+                if (isEnum)
                 {
-                    if (definition == null)
-                    {
-                        stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
-                        return;
-                    }
+                    stringBuilder.AppendLine($"            if (!existingThing.{propDef.Property}.SequenceEqual(updatedThing.{propDef.Property}))");
+                }
+                else
+                {
+                    stringBuilder.AppendLine($"            if (existingThing.{propDef.Property} != updatedThing.{propDef.Property})");
+                }
 
-                    WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", isAsync);
+                stringBuilder.AppendLine("            {");
+                var propGuardExpr = EmitPermissionGuard(propDef.RequiredPermission);
+                stringBuilder.AppendLine($"                var guard = {propGuardExpr};");
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine("                if (guard.IsFailed)");
+                stringBuilder.AppendLine("                {");
+                stringBuilder.AppendLine($"                    {PermissionStatementHelper.GetReturnStatement("guard", isAsync)}");
+                stringBuilder.AppendLine("                }");
+                stringBuilder.AppendLine("            }");
+                stringBuilder.AppendLine();
+            }
+        }
 
-                    propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
-
-                    if (propertyDefs != null)
-                    {
-                        var allProperties = @class.QueryDtoClassProperties().ToList();
-
-                        foreach (var propDef in propertyDefs)
-                        {
-                            var matchingProp = allProperties.FirstOrDefault(p => p.Name.Equals(propDef.Property, StringComparison.OrdinalIgnoreCase));
-                            var isEnum = matchingProp != null && matchingProp.QueryIsEnumerable();
-
-                            if (isEnum)
-                            {
-                                stringBuilder.AppendLine($"            if (!existingThing.{propDef.Property}.SequenceEqual(updatedThing.{propDef.Property}))");
-                            }
-                            else
-                            {
-                                stringBuilder.AppendLine($"            if (existingThing.{propDef.Property} != updatedThing.{propDef.Property})");
-                            }
-
-                            stringBuilder.AppendLine("            {");
-                            var propGuardExpr = EmitPermissionGuard(propDef.RequiredPermission);
-                            stringBuilder.AppendLine($"                var guard = {propGuardExpr};");
-                            stringBuilder.AppendLine();
-                            stringBuilder.AppendLine("                if (guard.IsFailed)");
-                            stringBuilder.AppendLine("                {");
-                            stringBuilder.AppendLine($"                    {PermissionStatementHelper.GetReturnStatement("guard", isAsync)}");
-                            stringBuilder.AppendLine("                }");
-                            stringBuilder.AppendLine("            }");
-                            stringBuilder.AppendLine();
-                        }
-                    }
-
-                    AppendPermissionGuardOrOk(stringBuilder, definition.UpdatePermission, isAsync);
-                });
-
+        /// <summary>
+        /// Registers the Permission.WriteIsAllowedToDelete helper.
+        /// </summary>
+        /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
+        private static void RegisterIsAllowedToDelete(IHandlebars handlebars)
+        {
             RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToDelete", Operations.Delete,
                 (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToDelete(stringBuilder, @class, definition, behavior); },
                 (stringBuilder, @class, definition, isAsync) =>
