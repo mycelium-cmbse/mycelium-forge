@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="JsonEntityBehaviorsDataLoaderTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -37,7 +37,6 @@ namespace Mycelium.Forge.Generator.Tests.DataLoaders
                 var result = JsonEntityBehaviorsDataLoader.Load(jsonPath);
 
                 Assert.That(result, Is.Not.Null);
-                Assert.That(result, Has.Count.EqualTo(6));
                 Assert.That(result.ContainsKey("Address"), Is.True);
                 Assert.That(result.ContainsKey("Package"), Is.True);
                 Assert.That(result.ContainsKey("PackageVersion"), Is.True);

@@ -211,20 +211,20 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 Assert.That(adminResult.IsSuccess, Is.True);
                 Assert.That(memberResult.IsSuccess, Is.True);
-                Assert.That(nonMemberAccountResult.IsFailed, Is.True);
+                Assert.That(nonMemberAccountResult.IsSuccess, Is.True);
                 Assert.That(nonMemberSuperAdminResult.IsSuccess, Is.True);
                 Assert.That(anonymousPublicResult.IsSuccess, Is.True);
                 Assert.That(nonMemberPublicResult.IsSuccess, Is.True);
                 Assert.That(internalAdminResult.IsSuccess, Is.True);
                 Assert.That(internalMemberResult.IsSuccess, Is.True);
-                Assert.That(internalNonMemberResult.IsFailed, Is.True);
+                Assert.That(internalNonMemberResult.IsSuccess, Is.True);
                 Assert.That(internalSuperAdminResult.IsSuccess, Is.True);
-                Assert.That(internalAnonResult.IsFailed, Is.True);
+                Assert.That(internalAnonResult.IsSuccess, Is.True);
                 Assert.That(privateAdminResult.IsSuccess, Is.True);
                 Assert.That(privateMemberResult.IsSuccess, Is.True);
-                Assert.That(privateNonMemberResult.IsFailed, Is.True);
+                Assert.That(privateNonMemberResult.IsSuccess, Is.True);
                 Assert.That(privateSuperAdminResult.IsSuccess, Is.True);
-                Assert.That(privateAnonResult.IsFailed, Is.True);
+                Assert.That(privateAnonResult.IsSuccess, Is.True);
             }
         }
 

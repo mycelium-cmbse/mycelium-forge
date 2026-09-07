@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionPermissionServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -138,19 +138,28 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Owner = this.packageId
             };
 
+            var package = new Package
+            {
+                Id = this.packageId,
+                Owner = this.userId,
+                PackageOwner = [this.userId]
+            };
+
             this.packageServiceMock.Setup(x => x.ReadAsync(
                     It.IsAny<IUserContext>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<Guid[]>()))
-                .ReturnsAsync(Result.Ok(ImmutableList<IPackage>.Empty));
+                .ReturnsAsync(Result.Ok(ImmutableList.Create<IPackage>(package)));
 
             var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, version);
             var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, version);
+            var otherResult = await this.permissionService.IsAllowedToDelete(this.otherUserContext, version);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(adminResult.IsSuccess, Is.True);
-                Assert.That(ownerResult.IsFailed, Is.True);
+                Assert.That(ownerResult.IsSuccess, Is.True);
+                Assert.That(otherResult.IsFailed, Is.True);
             }
         }
 
@@ -181,14 +190,25 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<Guid[]>()))
                 .ReturnsAsync(Result.Ok(ImmutableList.Create<IPackage>(package)));
 
-            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToRead(
-                    It.IsAny<IUserContext>(),
-                    It.IsAny<IPackage>()))
-                .ReturnsAsync(Result.Ok());
-
             var readResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, version);
 
-            Assert.That(readResult.IsSuccess, Is.True);
+            this.packageServiceMock.Setup(x => x.ReadAsync(
+                    It.IsAny<IUserContext>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<Guid[]>()))
+                .ReturnsAsync(Result.Ok(ImmutableList<IPackage>.Empty));
+
+            var notFoundResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, version);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(readResult.IsSuccess, Is.True);
+                Assert.That(notFoundResult.IsFailed, Is.True);
+            }
+
+            this.packagePermissionServiceMock.Verify(
+                x => x.IsAllowedToRead(It.IsAny<IUserContext>(), It.IsAny<IPackage>()),
+                Times.Never());
         }
 
         /// <summary>

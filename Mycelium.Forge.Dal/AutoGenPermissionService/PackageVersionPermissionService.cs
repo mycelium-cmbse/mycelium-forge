@@ -105,7 +105,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             if (parentResult.IsSuccess && parentResult.Value.Count > 0)
             {
-                return await this.packagePermissionService.IsAllowedToRead(userContext, parentResult.Value[0]);
+                return Result.Ok();
             }
 
             return Result.Fail("Access denied: parent package was not found or is not accessible.");

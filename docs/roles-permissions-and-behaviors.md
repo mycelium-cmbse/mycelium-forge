@@ -209,10 +209,10 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   - `StateActivePermission`: Permission required to activate state (e.g., `RelistPackageVersion`).
   - `StateInactivePermission`: Permission required to deactivate state (e.g., `UnlistPackageVersion`).
 - **Enforcement Logic:**
-  - Loads the parent entity via `IParentService` and invokes `IParentPermissionService.IsAllowedToRead(...)`.
+  - **Read:** Loads the parent entity via `IParentService.ReadAsync`. Since the service already filters results through `IParentPermissionService.IsAllowedToRead` internally, a non-empty result implies read access is granted — no additional permission check is performed.
   - State changes (such as listing/unlisting) verify `StateActivePermission` or `StateInactivePermission` against the parent maintainer list.
 - **SQL Read Filter:**
-  None (`SqlFilter.Empty`). Read filtering delegates to the parent entity via `IParentPermissionService.IsAllowedToRead` in the service layer, avoiding complex nested subqueries.
+  None (`SqlFilter.Empty`). Read filtering is implicitly delegated to the parent entity by calling `IParentService.ReadAsync`, which internally enforces `IParentPermissionService.IsAllowedToRead`, avoiding complex nested subqueries.
 
 ---
 
