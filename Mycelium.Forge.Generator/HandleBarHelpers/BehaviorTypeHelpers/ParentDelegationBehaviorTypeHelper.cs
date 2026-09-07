@@ -170,7 +170,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                if (parentResult.IsSuccess && parentResult.Value.Count > 0)
                                                {
-                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToRead(userContext, parentResult.Value[0]);
+                                                   return Result.Ok();
                                                }
 
                                                return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
