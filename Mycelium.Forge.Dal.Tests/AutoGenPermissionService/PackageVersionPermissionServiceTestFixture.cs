@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionPermissionServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -27,54 +27,15 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     [TestFixture]
     public class PackageVersionPermissionServiceTestFixture
     {
-        /// <summary>
-        /// The mock package service.
-        /// </summary>
         private Mock<IPackageService> packageServiceMock;
-
-        /// <summary>
-        /// The mock package permission service.
-        /// </summary>
         private Mock<IPackagePermissionService> packagePermissionServiceMock;
-
-        /// <summary>
-        /// The permission service under test.
-        /// </summary>
         private PackageVersionPermissionService permissionService;
-
-        /// <summary>
-        /// The test account identifier.
-        /// </summary>
         private Guid userId;
-
-        /// <summary>
-        /// A second test account identifier.
-        /// </summary>
         private Guid otherUserId;
-
-        /// <summary>
-        /// The test package identifier.
-        /// </summary>
         private Guid packageId;
-
-        /// <summary>
-        /// The user context for the package owner.
-        /// </summary>
         private UserContext ownerUserContext;
-
-        /// <summary>
-        /// The user context for another account user.
-        /// </summary>
         private UserContext otherUserContext;
-
-        /// <summary>
-        /// The user context for an installation administrator.
-        /// </summary>
         private UserContext adminUserContext;
-
-        /// <summary>
-        /// The user context for an unauthenticated user.
-        /// </summary>
         private UserContext anonymousUserContext;
 
         /// <summary>

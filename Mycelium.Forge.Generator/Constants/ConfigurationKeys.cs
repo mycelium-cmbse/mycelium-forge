@@ -128,5 +128,20 @@ namespace Mycelium.Forge.Generator.Constants
         /// Configuration key for AdminPermission.
         /// </summary>
         public const string AdminPermission = "AdminPermission";
+
+        /// <summary>
+        /// Configuration key for PersonalManagePermission.
+        /// </summary>
+        public const string PersonalManagePermission = "PersonalManagePermission";
+
+        /// <summary>
+        /// Configuration key for PlatformManagePermission.
+        /// </summary>
+        public const string PlatformManagePermission = "PlatformManagePermission";
+
+        /// <summary>
+        /// Configuration key for OrgManagePermission.
+        /// </summary>
+        public const string OrgManagePermission = "OrgManagePermission";
     }
 }

@@ -28,12 +28,18 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="ownerScopeId">The unique identifier of the owning scope.</param>
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" /> domain service.</param>
         /// <param name="itemName">The friendly name of the managed entity type.</param>
+        /// <param name="personalManagePermission">The optional permission required for personal scope management.</param>
+        /// <param name="platformManagePermission">The optional permission required for platform administrator management.</param>
+        /// <param name="orgManagePermission">The optional permission required for organization management.</param>
         /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether management is permitted.</returns>
         public static async Task<Result> IsAllowedToManageScopeItem(
             IUserContext userContext,
             Guid ownerScopeId,
             IOrganizationService organizationService,
-            string itemName)
+            string itemName,
+            PermissionKind? personalManagePermission = null,
+            PermissionKind? platformManagePermission = null,
+            PermissionKind? orgManagePermission = null)
         {
             // Verify that the user is authenticated and possesses a valid account identifier
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -41,21 +47,24 @@ namespace Mycelium.Forge.Dal.PermissionService
                 return Result.Fail($"Unauthenticated user cannot manage a {itemName}.");
             }
 
-            // Allow personal scope owners who possess the manage own profile permission
-            if (ownerScopeId == userContext.AccountId.Value &&
-                PermissionGuard.HasPermission(userContext, PermissionKind.ManageOwnProfile))
+            // Allow personal scope owners who possess the personal manage permission
+            if (personalManagePermission.HasValue &&
+                ownerScopeId == userContext.AccountId.Value &&
+                PermissionGuard.HasPermission(userContext, personalManagePermission.Value))
             {
                 return Result.Ok();
             }
 
-            // Allow platform administrators who possess organization management authority
-            if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+            // Allow platform administrators who possess platform management authority
+            if (platformManagePermission.HasValue &&
+                PermissionGuard.HasPermission(userContext, platformManagePermission.Value))
             {
                 return Result.Ok();
             }
 
             // Verify organization administration permissions when managing an organization-scoped item
-            if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizationSettings))
+            if (orgManagePermission.HasValue &&
+                PermissionGuard.HasPermission(userContext, orgManagePermission.Value))
             {
                 var organizationResult = await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId]);
 
@@ -84,20 +93,22 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="ownerScopeId">The unique identifier of the owning scope.</param>
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" /> domain service.</param>
+        /// <param name="readBypassPermissions">The optional permissions that bypass membership checks for read access.</param>
         /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether reading is permitted.</returns>
         public static async Task<Result> IsAllowedToReadScopeItem(
             IUserContext userContext,
             Guid ownerScopeId,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IEnumerable<PermissionKind> readBypassPermissions = null)
         {
             if (userContext.AccountId != null && ownerScopeId == userContext.AccountId.Value)
             {
                 return Result.Ok();
             }
 
-            if (PermissionGuard.HasPermission(userContext, PermissionKind.ViewOrganizationMemberList) ||
-                PermissionGuard.HasPermission(userContext, PermissionKind.ViewAllOrganizations) ||
-                PermissionGuard.HasPermission(userContext, PermissionKind.ViewAllAccounts))
+            var bypassArray = readBypassPermissions?.ToArray() ?? [];
+
+            if (bypassArray.Length > 0 && PermissionGuard.HasAnyPermission(userContext, bypassArray))
             {
                 return Result.Ok();
             }

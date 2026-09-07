@@ -27,54 +27,15 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     [TestFixture]
     public class OrganizationInvitationPermissionServiceTestFixture
     {
-        /// <summary>
-        /// The mock organization service.
-        /// </summary>
         private Mock<IOrganizationService> organizationServiceMock;
-
-        /// <summary>
-        /// The permission service under test.
-        /// </summary>
         private OrganizationInvitationPermissionService permissionService;
-
-        /// <summary>
-        /// The test account identifier.
-        /// </summary>
         private Guid userId;
-
-        /// <summary>
-        /// A second test account identifier.
-        /// </summary>
         private Guid otherUserId;
-
-        /// <summary>
-        /// The test organization identifier.
-        /// </summary>
         private Guid organizationId;
-
-        /// <summary>
-        /// The user context for the organization administrator.
-        /// </summary>
         private UserContext orgAdminUserContext;
-
-        /// <summary>
-        /// The user context for an invited account user.
-        /// </summary>
         private UserContext targetUserContext;
-
-        /// <summary>
-        /// The user context for a third-party account user.
-        /// </summary>
         private UserContext thirdPartyUserContext;
-
-        /// <summary>
-        /// The user context for an installation administrator.
-        /// </summary>
         private UserContext adminUserContext;
-
-        /// <summary>
-        /// The user context for an unauthenticated user.
-        /// </summary>
         private UserContext anonymousUserContext;
 
         /// <summary>

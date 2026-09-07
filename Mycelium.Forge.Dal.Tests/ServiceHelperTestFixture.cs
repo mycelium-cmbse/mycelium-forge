@@ -26,14 +26,7 @@ namespace Mycelium.Forge.Dal.Tests
     [TestFixture]
     public class ServiceHelperTestFixture
     {
-        /// <summary>
-        /// The mock logger used in tests.
-        /// </summary>
         private Mock<ILogger> loggerMock;
-
-        /// <summary>
-        /// The mock DTO comparer used in tests.
-        /// </summary>
         private Mock<IDtoComparer<IAPIKey>> comparerMock;
 
         /// <summary>

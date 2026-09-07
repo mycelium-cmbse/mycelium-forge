@@ -20,39 +20,12 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     [TestFixture]
     public class AccountPermissionServiceTestFixture
     {
-        /// <summary>
-        /// The permission service under test.
-        /// </summary>
         private AccountPermissionService permissionService;
-
-        /// <summary>
-        /// The test account identifier.
-        /// </summary>
         private Guid userId;
-
-        /// <summary>
-        /// A second test account identifier.
-        /// </summary>
         private Guid otherUserId;
-
-        /// <summary>
-        /// The user context for the account owner.
-        /// </summary>
         private UserContext ownerUserContext;
-
-        /// <summary>
-        /// The user context for another account user.
-        /// </summary>
         private UserContext otherUserContext;
-
-        /// <summary>
-        /// The user context for an installation administrator.
-        /// </summary>
         private UserContext adminUserContext;
-
-        /// <summary>
-        /// The user context for an unauthenticated user.
-        /// </summary>
         private UserContext anonymousUserContext;
 
         /// <summary>

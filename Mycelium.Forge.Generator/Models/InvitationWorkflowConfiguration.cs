@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="InvitationWorkflowConfiguration.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -43,11 +43,10 @@ namespace Mycelium.Forge.Generator.Models
             var readPerm = GetValue(config, ConfigurationKeys.ReadPermission, definition.ReadPermission,
                 errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ReadPermission}' or have a ReadPermission in entity permissions.");
 
-            var defaultAdminPerm = entityName == "PackageInvitation" ? "ManagePackageTeam" : "ManageOrganizations";
-            var adminPerm = GetValue(config, ConfigurationKeys.AdminPermission, defaultAdminPerm, isOptional: true);
+            var adminPerm = GetValue(config, ConfigurationKeys.AdminPermission, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.AdminPermission}'.");
 
             this.ScopeEntity = scopeEntity;
-            this.ScopeProperty = GetValue(config, ConfigurationKeys.ScopeProperty, scopeEntity, isOptional: true);
+            this.ScopeProperty = GetValue(config, ConfigurationKeys.ScopeProperty, scopeEntity, true);
             this.ScopeServiceField = FormatServiceField(scopeEntity);
             this.ScopeVar = FormatVariableName(scopeEntity);
             this.InviteeProperty = inviteeProp;

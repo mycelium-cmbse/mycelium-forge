@@ -66,12 +66,25 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                {
                                                    return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.PersonalCreatePermission}});
                                                }
+                                   """);
 
-                                               if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+            if (!string.IsNullOrWhiteSpace(config.AdminPermission))
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine();
+
+                stringBuilder.Append($$"""
+                                               if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
                                                {
                                                    return Result.Ok();
                                                }
+                                       """);
+            }
 
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine();
+
+            stringBuilder.Append($$"""
                                                var orgGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.OrgCreatePermission}});
 
                                                if (orgGuard.IsFailed)
@@ -108,7 +121,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var entityLower = @class.Name.ToLowerInvariant();
-            var bypassChecks = config.BypassPermissions.Select(p => $"PermissionGuard.HasPermission(userContext, PermissionKind.{p})");
+            var bypassChecks = config.BypassPermissions.Select(p => $"PermissionGuard.HasPermission(userContext, PermissionKind.{p})").ToList();
             var scopeRoleChecks = config.ScopeMemberProperties.Select(prop => $"organization.{prop}.Contains(accountId)");
 
             var ownershipChecks = new List<string> { $"thing.{PropertyNames.Owner} == accountId" };
@@ -140,12 +153,25 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                {
                                                    return Result.Ok();
                                                }
+                                   """);
 
+            if (bypassChecks.Count > 0)
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine();
+
+                stringBuilder.Append($$"""
                                                if ({{string.Join(" || ", bypassChecks)}})
                                                {
                                                    return Result.Ok();
                                                }
+                                       """);
+            }
 
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine();
+
+            stringBuilder.Append($$"""
                                                if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
                                                {
                                                    var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationScopeConfiguration.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -39,8 +39,9 @@ namespace Mycelium.Forge.Generator.Models
             var personalCreatePerm = GetValue(config, ConfigurationKeys.PersonalCreatePermission, definition.CreatePermission,
                 errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.PersonalCreatePermission}' or have a '{ConfigurationKeys.CreatePermission}'.");
 
-            var scopeMembers = GetValue(config, ConfigurationKeys.ScopeMemberProperties, "Member,Administrator", isOptional: true);
-            var bypassPerms = GetValue(config, ConfigurationKeys.BypassPermissions, "ManageOrganizations", isOptional: true);
+            var scopeMembers = GetValue(config, ConfigurationKeys.ScopeMemberProperties, "Member,Administrator", true);
+            var bypassPerms = GetValue(config, ConfigurationKeys.BypassPermissions, string.Empty, true);
+            var adminPerm = GetValue(config, ConfigurationKeys.AdminPermission, string.Empty, true);
 
             this.ScopeEntity = scopeEntity;
             this.ScopeServiceField = FormatServiceField(scopeEntity);
@@ -49,6 +50,7 @@ namespace Mycelium.Forge.Generator.Models
             this.OwnerProperty = ownerProp;
             this.PersonalCreatePermission = personalCreatePerm;
             this.OrgCreatePermission = ocp;
+            this.AdminPermission = adminPerm;
             this.ScopeMemberProperties = SplitValues(scopeMembers);
             this.BypassPermissions = SplitValues(bypassPerms);
         }
@@ -92,6 +94,11 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the property names on the organization entity representing membership.
         /// </summary>
         public string[] ScopeMemberProperties { get; }
+
+        /// <summary>
+        /// Gets the optional administrative permission that allows creating entities in any organization scope.
+        /// </summary>
+        public string AdminPermission { get; }
 
         /// <summary>
         /// Gets the permissions that bypass membership checks for internal visibility.

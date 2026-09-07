@@ -56,7 +56,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
         protected override async Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IProfileLink toCreate)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.Owner, this.organizationService, "profilelink");
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.Owner, this.organizationService, "profilelink", PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override async Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IProfileLink thing)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.Owner, this.organizationService);
+            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.Owner, this.organizationService, [PermissionKind.ViewOrganizationMemberList, PermissionKind.ViewAllOrganizations, PermissionKind.ViewAllAccounts]);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
         protected override async Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IProfileLink existingThing, IProfileLink updatedThing)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "profilelink");
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "profilelink", PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether deletion is permitted.</returns>
         protected override async Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, IProfileLink thing)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.Owner, this.organizationService, "profilelink");
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.Owner, this.organizationService, "profilelink", PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -36,61 +36,49 @@ namespace Mycelium.Forge.Orm.Tests.Services
     [Category("Database")]
     public class OrganizationServiceIntegrationTestFixture : BaseIntegrationTestClassFixture
     {
-        /// <summary>
-        /// The <see cref="OrganizationService" /> under test.
-        /// </summary>
         private OrganizationService service;
-
-        /// <summary>
-        /// The user context representing an organization member.
-        /// </summary>
+        private IUserContext adminUserContext;
         private IUserContext memberUserContext;
-
-        /// <summary>
-        /// The user context representing an anonymous visitor.
-        /// </summary>
         private IUserContext anonymousUserContext;
-
-        /// <summary>
-        /// The ID of the public organization seeded in the database.
-        /// </summary>
         private Guid publicOrgId;
-
-        /// <summary>
-        /// The ID of the private organization seeded in the database.
-        /// </summary>
         private Guid privateOrgId;
-
-        /// <summary>
-        /// The ID of the member account seeded in the database.
-        /// </summary>
+        private Guid adminAccountId;
         private Guid memberAccountId;
 
         /// <summary>
-        /// Verifies that <see cref="OrganizationService.ReadAsync(IUserContext, NpgsqlTransaction, CancellationToken, Guid[])" />
-        /// returns only organizations visible to each user context, applying the read filter correctly.
+        /// Verifies that
+        /// <see
+        ///     cref="OrganizationService.UpdateAsync(IUserContext, NpgsqlTransaction, IEnumerable{IOrganization}, CancellationToken)" />
+        /// correctly updates an existing organization in the database for an administrator and rejects unauthorized updates from anonymous or non-administrator users.
         /// </summary>
         /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
-        public async Task VerifyReadAsync()
+        public async Task VerifyUpdateAsync()
         {
             await using var transaction = await this.Connection.BeginTransactionAsync();
 
-            var anonymousResult = await this.service.ReadAsync(this.anonymousUserContext, transaction, CancellationToken.None);
-            var memberResult = await this.service.ReadAsync(this.memberUserContext, transaction, CancellationToken.None);
+            var readResult = await this.service.ReadAsync(this.adminUserContext, transaction, CancellationToken.None, [this.publicOrgId]);
+            var organization = readResult.Value.Single();
+            organization.Email = "updated-org@example.com";
+            organization.BillingEmail = "updated-billing@example.com";
+            organization.ModifiedAt = DateTime.UtcNow;
+
+            var anonymousUpdateResult = await this.service.UpdateAsync(this.anonymousUserContext, transaction, [organization], CancellationToken.None);
+            var nonAdminUpdateResult = await this.service.UpdateAsync(this.memberUserContext, transaction, [organization], CancellationToken.None);
+            var adminUpdateResult = await this.service.UpdateAsync(this.adminUserContext, transaction, [organization], CancellationToken.None);
+
+            var updatedReadResult = await this.service.ReadAsync(this.adminUserContext, transaction, CancellationToken.None, [this.publicOrgId]);
 
             await transaction.CommitAsync();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(anonymousResult.IsSuccess, Is.True);
-                Assert.That(anonymousResult.Value, Has.Count.EqualTo(1));
-                Assert.That(anonymousResult.Value[0].Id, Is.EqualTo(this.publicOrgId));
-
-                Assert.That(memberResult.IsSuccess, Is.True);
-                Assert.That(memberResult.Value, Has.Count.EqualTo(2));
-                Assert.That(memberResult.Value.Select(x => x.Id), Does.Contain(this.publicOrgId));
-                Assert.That(memberResult.Value.Select(x => x.Id), Does.Contain(this.privateOrgId));
+                Assert.That(anonymousUpdateResult.IsFailed, Is.True);
+                Assert.That(nonAdminUpdateResult.IsFailed, Is.True);
+                Assert.That(adminUpdateResult.IsSuccess, Is.True);
+                Assert.That(updatedReadResult.IsSuccess, Is.True);
+                Assert.That(updatedReadResult.Value.Single().Email, Is.EqualTo("updated-org@example.com"));
+                Assert.That(updatedReadResult.Value.Single().BillingEmail, Is.EqualTo("updated-billing@example.com"));
             }
         }
 
@@ -104,24 +92,27 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
                 this.Serializer);
 
-            var permissionServiceMock = new Mock<IOrganizationPermissionService>();
-
-            permissionServiceMock
-                .Setup(x => x.IsAllowedToRead(It.IsAny<IUserContext>(), It.IsAny<IOrganization>()))
-                .ReturnsAsync(Result.Ok());
+            var orgPermissionService = new OrganizationPermissionService();
 
             var databaseSourceMock = new Mock<IDatabaseSource>();
 
             this.service = new OrganizationService(
                 organizationDao,
                 new OrganizationValidator(),
-                permissionServiceMock.Object,
+                orgPermissionService,
                 new OrganizationComparer(),
                 this.TestLoggerFactory.CreateLogger<OrganizationService>(),
                 databaseSourceMock.Object);
 
+            this.adminAccountId = Guid.NewGuid();
             this.memberAccountId = Guid.NewGuid();
-            var otherAccountId = Guid.NewGuid();
+
+            this.adminUserContext = new UserContext
+            {
+                AccountId = this.adminAccountId,
+                Username = "adminUser",
+                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator, RoleKind.OrganizationMember]
+            };
 
             this.memberUserContext = new UserContext
             {
@@ -132,16 +123,16 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             this.anonymousUserContext = UserContext.CreateAnonymous();
 
-            await this.SeedDatabaseAsync(organizationDao, otherAccountId);
+            await this.SeedDatabaseAsync(organizationDao, this.adminAccountId);
         }
 
         /// <summary>
         /// Seeds the database with prerequisite records required by the tests.
         /// </summary>
         /// <param name="organizationDao">The <see cref="OrganizationDao" /> used to insert organizations.</param>
-        /// <param name="otherAccountId">The ID of the secondary account.</param>
+        /// <param name="adminAccount">The ID of the administrator account.</param>
         /// <returns>An awaitable <see cref="Task" />.</returns>
-        private async Task SeedDatabaseAsync(OrganizationDao organizationDao, Guid otherAccountId)
+        private async Task SeedDatabaseAsync(OrganizationDao organizationDao, Guid adminAccount)
         {
             var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);
             var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer);
@@ -197,9 +188,9 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 var r2 = await addressDao.CreateAsync(transaction, CancellationToken.None, new Address
                 {
                     Id = addressId2,
-                    Owner = otherAccountId,
+                    Owner = adminAccount,
                     Country = countryId,
-                    AddressLine1 = "2 Other Street",
+                    AddressLine1 = "2 Admin Street",
                     Locality = "Porto",
                     PostalCode = "4000-001",
                     Region = "PT"
@@ -231,13 +222,13 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
                 return await accountDao.CreateAsync(transaction, CancellationToken.None, new Account
                 {
-                    Id = otherAccountId,
+                    Id = adminAccount,
                     Owner = forgeId,
                     PrimaryAddress = addressId2,
-                    Name = "OtherUser",
-                    ShortName = "other-user",
-                    Email = "other@example.com",
-                    BillingEmail = "other-billing@example.com",
+                    Name = "AdminUser",
+                    ShortName = "admin-user",
+                    Email = "admin@example.com",
+                    BillingEmail = "admin-billing@example.com",
                     DefaultPackageVisibility = VisibilityKind.PUBLIC,
                     Status = ScopeStatusKind.ACTIVE,
                     Origin = "https://example.com"
@@ -246,6 +237,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             this.publicOrgId = Guid.NewGuid();
             this.privateOrgId = Guid.NewGuid();
+            var now = DateTime.UtcNow;
 
             await this.Insert(transaction => organizationDao.CreateAsync(transaction, CancellationToken.None, new Organization
             {
@@ -259,8 +251,10 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 DefaultPackageVisibility = VisibilityKind.PUBLIC,
                 Status = ScopeStatusKind.ACTIVE,
                 Origin = "https://example.com",
-                Administrator = [otherAccountId],
-                Member = [otherAccountId]
+                Administrator = [adminAccount],
+                Member = [adminAccount],
+                CreatedAt = now,
+                ModifiedAt = now
             }));
 
             await this.Insert(transaction => organizationDao.CreateAsync(transaction, CancellationToken.None, new Organization
@@ -275,8 +269,10 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 DefaultPackageVisibility = VisibilityKind.PRIVATE,
                 Status = ScopeStatusKind.ACTIVE,
                 Origin = "https://example.com",
-                Administrator = [otherAccountId],
-                Member = [otherAccountId, this.memberAccountId]
+                Administrator = [adminAccount],
+                Member = [adminAccount, this.memberAccountId],
+                CreatedAt = now,
+                ModifiedAt = now
             }));
         }
     }

@@ -53,7 +53,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\");");
+            var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", {personalArg}, {platformArg}, {orgArg});");
         }
 
         /// <summary>
@@ -66,7 +67,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField});");
+
+            var bypassArg = config.ReadBypassPermissions.Length > 0
+                ? $"[{string.Join(", ", config.ReadBypassPermissions.Select(p => $"PermissionKind.{p}"))}]"
+                : "null";
+
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, {bypassArg});");
         }
 
         /// <summary>
@@ -80,7 +86,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
         {
             var config = this.GetConfiguration(definition, behavior);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\");");
+            var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", {personalArg}, {platformArg}, {orgArg});");
         }
 
         /// <summary>
@@ -93,7 +100,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\");");
+            var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", {personalArg}, {platformArg}, {orgArg});");
         }
 
         /// <summary>
@@ -129,6 +137,28 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         protected override ScopeItemConfiguration CreateConfiguration(EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             return new ScopeItemConfiguration(definition, behavior);
+        }
+
+        /// <summary>
+        /// Formats the permission arguments for calling IsAllowedToManageScopeItem
+        /// </summary>
+        /// <param name="config">The scope item configuration.</param>
+        /// <returns>A tuple containing the personal, platform, and organization permission argument expressions.</returns>
+        private static (string PersonalArg, string PlatformArg, string OrgArg) FormatManageArguments(ScopeItemConfiguration config)
+        {
+            var personalArg = !string.IsNullOrWhiteSpace(config.PersonalManagePermission)
+                ? $"PermissionKind.{config.PersonalManagePermission}"
+                : "null";
+
+            var platformArg = !string.IsNullOrWhiteSpace(config.PlatformManagePermission)
+                ? $"PermissionKind.{config.PlatformManagePermission}"
+                : "null";
+
+            var orgArg = !string.IsNullOrWhiteSpace(config.OrgManagePermission)
+                ? $"PermissionKind.{config.OrgManagePermission}"
+                : "null";
+
+            return (personalArg, platformArg, orgArg);
         }
     }
 }

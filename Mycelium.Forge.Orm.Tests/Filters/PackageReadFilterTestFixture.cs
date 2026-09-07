@@ -22,29 +22,10 @@ namespace Mycelium.Forge.Orm.Tests.Filters
     [TestFixture]
     public class PackageReadFilterTestFixture
     {
-        /// <summary>
-        /// The test account identifier.
-        /// </summary>
         private Guid userId;
-
-        /// <summary>
-        /// The user context for an anonymous caller.
-        /// </summary>
         private UserContext anonymousUserContext;
-
-        /// <summary>
-        /// The user context for an authenticated regular account.
-        /// </summary>
         private UserContext accountUserContext;
-
-        /// <summary>
-        /// The user context for an organization administrator.
-        /// </summary>
         private UserContext orgAdminUserContext;
-
-        /// <summary>
-        /// The user context for an installation administrator.
-        /// </summary>
         private UserContext adminUserContext;
 
         /// <summary>

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ScopeItemConfiguration.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -39,12 +39,18 @@ namespace Mycelium.Forge.Generator.Models
                 throw new InvalidOperationException($"Entity '{this.EntityName}' with ScopeItem behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
             }
 
-            var readBypassRaw = config.TryGetValue(ConfigurationKeys.ReadBypassPermissions, out var rbp) && !string.IsNullOrWhiteSpace(rbp) ? rbp : "ManageOrganizations";
+            var personalManage = GetValue(config, ConfigurationKeys.PersonalManagePermission, string.Empty, true);
+            var platformManage = GetValue(config, ConfigurationKeys.PlatformManagePermission, string.Empty, true);
+            var orgManage = GetValue(config, ConfigurationKeys.OrgManagePermission, string.Empty, true);
+            var readBypassRaw = config.TryGetValue(ConfigurationKeys.ReadBypassPermissions, out var rbp) && !string.IsNullOrWhiteSpace(rbp) ? rbp : string.Empty;
 
             this.ScopeEntity = scopeEntity;
             this.ScopeServiceField = FormatServiceField(scopeEntity);
             this.OwnerProperty = ownerProp;
             this.OwnerColumn = ownerProp.ToLowerInvariant();
+            this.PersonalManagePermission = personalManage;
+            this.PlatformManagePermission = platformManage;
+            this.OrgManagePermission = orgManage;
             this.ReadBypassPermissions = SplitValues(readBypassRaw);
         }
 
@@ -67,6 +73,21 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the lower-case database column name for the owner property.
         /// </summary>
         public string OwnerColumn { get; }
+
+        /// <summary>
+        /// Gets the permission required to manage personal scope items.
+        /// </summary>
+        public string PersonalManagePermission { get; }
+
+        /// <summary>
+        /// Gets the permission required to manage items as a platform administrator.
+        /// </summary>
+        public string PlatformManagePermission { get; }
+
+        /// <summary>
+        /// Gets the permission required to manage organization scope items.
+        /// </summary>
+        public string OrgManagePermission { get; }
 
         /// <summary>
         /// Gets the permissions that bypass membership checks for read access.

@@ -70,7 +70,8 @@
         ],
         "InviteeProperty": "Target",
         "AcceptPermission": "AcceptOrganizationInvitation",
-        "RevokePermission": "RevokeOrganizationInvitation"
+        "RevokePermission": "RevokeOrganizationInvitation",
+        "AdminPermission": "ManageOrganizations"
       }
     },
     {
@@ -84,7 +85,8 @@
         ],
         "InviteeProperty": "Target",
         "AcceptPermission": "AcceptPackageInvitation",
-        "RevokePermission": "RevokePackageInvitation"
+        "RevokePermission": "RevokePackageInvitation",
+        "AdminPermission": "ManagePackageTeam"
       }
     },
     {
@@ -93,6 +95,7 @@
       "configuration": {
         "PersonalCreatePermission": "PublishPackageToPersonalScope",
         "OrgCreatePermission": "PublishPackageToOrganizationScope",
+        "AdminPermission": "ManageOrganizations",
         "BypassPermissions": [
           "ViewAllOrganizations",
           "ManageOrganizations"
