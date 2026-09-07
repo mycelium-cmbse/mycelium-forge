@@ -33,7 +33,7 @@ namespace Mycelium.Forge.Generator.Generators
         /// </summary>
         public UmlCoreReadFilterGenerator()
         {
-            this.TryLoadDefaultEntityPermissions();
+            DefaultResourceLocator.TryLoadDefaultEntityPermissions(this.LoadEntityPermissions);
         }
 
         /// <summary>
@@ -155,27 +155,6 @@ namespace Mycelium.Forge.Generator.Generators
             this.RegisterTemplate(ReadFilterClassTemplateName);
         }
 
-        /// <summary>
-        /// Attempts to locate and load the default <c>forge-entity-permissions.csv</c> resource.
-        /// </summary>
-        private void TryLoadDefaultEntityPermissions()
-        {
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            var candidates = new[]
-            {
-                Path.Combine(baseDirectory, "Resources", "forge-entity-permissions.csv"),
-                Path.Combine(baseDirectory, "forge-entity-permissions.csv"),
-                Path.GetFullPath(Path.Combine(baseDirectory, "../../../../Mycelium.Forge.Generator/Resources/forge-entity-permissions.csv")),
-                Path.GetFullPath(Path.Combine(baseDirectory, "../../../Mycelium.Forge.Generator/Resources/forge-entity-permissions.csv"))
-            };
-
-            foreach (var candidate in candidates.Where(File.Exists))
-            {
-                this.LoadEntityPermissions(candidate);
-                return;
-            }
-        }
 
         /// <summary>
         /// Queries all concrete classes deriving from Thing from the UML model.

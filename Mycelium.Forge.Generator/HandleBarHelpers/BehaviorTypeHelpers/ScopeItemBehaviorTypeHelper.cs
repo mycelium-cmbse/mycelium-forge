@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ScopeItemBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -21,7 +21,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     /// Generates permission verification hooks and dependency injection for scope-owned child entities
     /// such as addresses and profile links that delegate management to <c>ScopeItemPermissionHelper</c>.
     /// </summary>
-    public class ScopeItemBehaviorTypeHelper : BehaviorTypeHelperBase<ScopeItemConfiguration>
+    public class ScopeItemBehaviorTypeHelper : ScopedBehaviorTypeHelperBase<ScopeItemConfiguration>
     {
         /// <summary>
         /// Determines whether this behavior helper handles the specified operation.
@@ -41,42 +41,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override bool IsAsyncMethod(Operations operation)
         {
             return true;
-        }
-
-        /// <summary>
-        /// Writes fields, constructors, and dependency injection parameters for the entity class.
-        /// </summary>
-        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
-        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
-        /// <param name="definition">The entity permission definition.</param>
-        /// <param name="behavior">The behavior definition.</param>
-        public override void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
-        {
-            var config = this.GetConfiguration(definition, behavior);
-            var scopeService = $"I{config.ScopeEntity}Service";
-
-            stringBuilder.AppendLine($$"""
-                                               /// <summary>
-                                               /// The (injected) <see cref="{{scopeService}}" /> domain service.
-                                               /// </summary>
-                                               private readonly {{scopeService}} {{config.ScopeServiceField}};
-
-                                               /// <summary>
-                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
-                                               /// </summary>
-                                               public {{@class.Name}}PermissionService()
-                                               {
-                                               }
-
-                                               /// <summary>
-                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
-                                               /// </summary>
-                                               /// <param name="{{config.ScopeServiceField}}">The (injected) <see cref="{{scopeService}}" /> domain service.</param>
-                                               public {{@class.Name}}PermissionService({{scopeService}} {{config.ScopeServiceField}})
-                                               {
-                                                   this.{{config.ScopeServiceField}} = {{config.ScopeServiceField}};
-                                               }
-                                       """);
         }
 
         /// <summary>

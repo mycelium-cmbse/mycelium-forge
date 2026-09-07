@@ -59,7 +59,7 @@ namespace Mycelium.Forge.Generator.Generators
         /// </summary>
         public UmlCorePermissionServiceGenerator()
         {
-            this.TryLoadDefaultEntityPermissions();
+            DefaultResourceLocator.TryLoadDefaultEntityPermissions(this.LoadEntityPermissions);
         }
 
         /// <summary>
@@ -384,28 +384,6 @@ namespace Mycelium.Forge.Generator.Generators
             if (!string.IsNullOrWhiteSpace(propertyName) && !allProperties.Contains(propertyName))
             {
                 errors.Add($"Entity '{entityName}' references property '{propertyName}' for {role}, but property does not exist on UML class.");
-            }
-        }
-
-        /// <summary>
-        /// Attempts to locate and load the default <c>forge-entity-permissions.csv</c> resource.
-        /// </summary>
-        private void TryLoadDefaultEntityPermissions()
-        {
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            var candidates = new[]
-            {
-                Path.Combine(baseDirectory, "Resources", "forge-entity-permissions.csv"),
-                Path.Combine(baseDirectory, "forge-entity-permissions.csv"),
-                Path.GetFullPath(Path.Combine(baseDirectory, "../../../../Mycelium.Forge.Generator/Resources/forge-entity-permissions.csv")),
-                Path.GetFullPath(Path.Combine(baseDirectory, "../../../Mycelium.Forge.Generator/Resources/forge-entity-permissions.csv"))
-            };
-
-            foreach (var candidate in candidates.Where(File.Exists))
-            {
-                this.LoadEntityPermissions(candidate);
-                return;
             }
         }
 

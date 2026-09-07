@@ -15,7 +15,7 @@ namespace Mycelium.Forge.Generator.Models
     /// <summary>
     /// Configuration class holding resolved values for invitation workflow permission behavior.
     /// </summary>
-    public class InvitationWorkflowConfiguration : BehaviorConfigurationBase
+    public class InvitationWorkflowConfiguration : BehaviorConfigurationBase, IScopeConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="InvitationWorkflowConfiguration" /> class.
@@ -28,26 +28,26 @@ namespace Mycelium.Forge.Generator.Models
             var entityName = behavior.EntityName;
             var config = behavior.Configuration;
 
-            var scopeEntity = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.ScopeEntity);
-            var inviteeProp = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.InviteeProperty);
-            var acceptPerm = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.AcceptPermission);
-            var revokePerm = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.RevokePermission);
-            var sr = GetRequiredValue(config, entityName, "InvitationWorkflow", ConfigurationKeys.ScopeRoles);
+            var scopeEntity = GetValue(config, ConfigurationKeys.ScopeEntity, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ScopeEntity}'.");
+            var inviteeProp = GetValue(config, ConfigurationKeys.InviteeProperty, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.InviteeProperty}'.");
+            var acceptPerm = GetValue(config, ConfigurationKeys.AcceptPermission, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.AcceptPermission}'.");
+            var revokePerm = GetValue(config, ConfigurationKeys.RevokePermission, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.RevokePermission}'.");
+            var sr = GetValue(config, ConfigurationKeys.ScopeRoles, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ScopeRoles}'.");
 
-            var ownerProp = GetRequiredValueWithFallback(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
-                $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
+            var ownerProp = GetValue(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
+                errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
 
-            var createPerm = GetRequiredValueWithFallback(config, ConfigurationKeys.CreatePermission, definition.CreatePermission,
-                $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
+            var createPerm = GetValue(config, ConfigurationKeys.CreatePermission, definition.CreatePermission,
+                errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
 
-            var readPerm = GetRequiredValueWithFallback(config, ConfigurationKeys.ReadPermission, definition.ReadPermission,
-                $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ReadPermission}' or have a ReadPermission in entity permissions.");
+            var readPerm = GetValue(config, ConfigurationKeys.ReadPermission, definition.ReadPermission,
+                errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ReadPermission}' or have a ReadPermission in entity permissions.");
 
             var defaultAdminPerm = entityName == "PackageInvitation" ? "ManagePackageTeam" : "ManageOrganizations";
-            var adminPerm = GetOptionalValue(config, ConfigurationKeys.AdminPermission, defaultAdminPerm);
+            var adminPerm = GetValue(config, ConfigurationKeys.AdminPermission, defaultAdminPerm, isOptional: true);
 
             this.ScopeEntity = scopeEntity;
-            this.ScopeProperty = GetOptionalValue(config, ConfigurationKeys.ScopeProperty, scopeEntity);
+            this.ScopeProperty = GetValue(config, ConfigurationKeys.ScopeProperty, scopeEntity, isOptional: true);
             this.ScopeServiceField = FormatServiceField(scopeEntity);
             this.ScopeVar = FormatVariableName(scopeEntity);
             this.InviteeProperty = inviteeProp;

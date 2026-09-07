@@ -15,7 +15,7 @@ namespace Mycelium.Forge.Generator.Models
     /// <summary>
     /// Configuration class holding resolved values for organization scope permission behavior.
     /// </summary>
-    public class OrganizationScopeConfiguration : BehaviorConfigurationBase
+    public class OrganizationScopeConfiguration : BehaviorConfigurationBase, IScopeConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizationScopeConfiguration" /> class.
@@ -27,20 +27,20 @@ namespace Mycelium.Forge.Generator.Models
         {
             var config = behavior.Configuration;
 
-            var scopeEntity = GetRequiredValue(config, this.EntityName, "OrganizationScope", ConfigurationKeys.ScopeEntity);
-            var ocp = GetRequiredValue(config, this.EntityName, "OrganizationScope", ConfigurationKeys.OrgCreatePermission);
+            var scopeEntity = GetValue(config, ConfigurationKeys.ScopeEntity, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.ScopeEntity}'.");
+            var ocp = GetValue(config, ConfigurationKeys.OrgCreatePermission, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OrgCreatePermission}'.");
 
-            var visProp = GetRequiredValueWithFallback(config, ConfigurationKeys.VisibilityProperty, definition.VisibilityProperty,
-                $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.VisibilityProperty}' or have a VisibilityProperty in entity permissions.");
+            var visProp = GetValue(config, ConfigurationKeys.VisibilityProperty, definition.VisibilityProperty,
+                errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.VisibilityProperty}' or have a VisibilityProperty in entity permissions.");
 
-            var ownerProp = GetRequiredValueWithFallback(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
-                $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
+            var ownerProp = GetValue(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
+                errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
 
-            var personalCreatePerm = GetRequiredValueWithFallback(config, ConfigurationKeys.PersonalCreatePermission, definition.CreatePermission,
-                $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.PersonalCreatePermission}' or have a '{ConfigurationKeys.CreatePermission}'.");
+            var personalCreatePerm = GetValue(config, ConfigurationKeys.PersonalCreatePermission, definition.CreatePermission,
+                errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.PersonalCreatePermission}' or have a '{ConfigurationKeys.CreatePermission}'.");
 
-            var scopeMembers = GetOptionalValue(config, ConfigurationKeys.ScopeMemberProperties, "Member,Administrator");
-            var bypassPerms = GetOptionalValue(config, ConfigurationKeys.BypassPermissions, "ManageOrganizations");
+            var scopeMembers = GetValue(config, ConfigurationKeys.ScopeMemberProperties, "Member,Administrator", isOptional: true);
+            var bypassPerms = GetValue(config, ConfigurationKeys.BypassPermissions, "ManageOrganizations", isOptional: true);
 
             this.ScopeEntity = scopeEntity;
             this.ScopeServiceField = FormatServiceField(scopeEntity);

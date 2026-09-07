@@ -80,55 +80,29 @@ namespace Mycelium.Forge.Generator.Models
         }
 
         /// <summary>
-        /// Gets a required configuration value or throws an <see cref="InvalidOperationException" />.
-        /// </summary>
-        /// <param name="config">The configuration dictionary.</param>
-        /// <param name="entityName">The entity name.</param>
-        /// <param name="behaviorName">The behavior name.</param>
-        /// <param name="key">The configuration key.</param>
-        /// <returns>The resolved configuration value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the required key is missing or empty.</exception>
-        protected static string GetRequiredValue(Dictionary<string, string> config, string entityName, string behaviorName, string key)
-        {
-            if (!config.TryGetValue(key, out var value) || string.IsNullOrWhiteSpace(value))
-            {
-                throw new InvalidOperationException($"Entity '{entityName}' with {behaviorName} behavior must configure '{key}'.");
-            }
-
-            return value;
-        }
-
-        /// <summary>
-        /// Gets a configuration value with a fallback, or throws an <see cref="InvalidOperationException" /> if both are missing.
+        /// Gets a configuration value from the configuration dictionary, falling back to a default value, and optionally throwing if required and missing.
         /// </summary>
         /// <param name="config">The configuration dictionary.</param>
         /// <param name="key">The configuration key.</param>
-        /// <param name="fallback">The fallback value.</param>
+        /// <param name="fallback">The fallback or default value.</param>
+        /// <param name="isOptional">A value indicating whether the configuration value is optional.</param>
         /// <param name="errorMessage">The error message to use when throwing <see cref="InvalidOperationException" />.</param>
         /// <returns>The resolved configuration value.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when both the configuration value and fallback are missing or empty.</exception>
-        protected static string GetRequiredValueWithFallback(Dictionary<string, string> config, string key, string fallback, string errorMessage)
+        /// <exception cref="InvalidOperationException">Thrown when the value is required and both the key and fallback are missing or empty.</exception>
+        protected static string GetValue(Dictionary<string, string> config, string key, string fallback = "", bool isOptional = false, string errorMessage = "")
         {
             var value = config.TryGetValue(key, out var val) && !string.IsNullOrWhiteSpace(val) ? val : fallback;
 
-            if (string.IsNullOrWhiteSpace(value))
+            if (isOptional || !string.IsNullOrWhiteSpace(value))
             {
-                throw new InvalidOperationException(errorMessage);
+                return value;
             }
 
-            return value;
-        }
+            var message = !string.IsNullOrWhiteSpace(errorMessage)
+                ? errorMessage
+                : $"Configuration key '{key}' is required.";
 
-        /// <summary>
-        /// Gets an optional configuration value with a default fallback if missing or empty.
-        /// </summary>
-        /// <param name="config">The configuration dictionary.</param>
-        /// <param name="key">The configuration key.</param>
-        /// <param name="defaultValue">The default fallback value.</param>
-        /// <returns>The resolved configuration value or default.</returns>
-        protected static string GetOptionalValue(Dictionary<string, string> config, string key, string defaultValue)
-        {
-            return config.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value) ? value : defaultValue;
+            throw new InvalidOperationException(message);
         }
     }
 }

@@ -27,20 +27,20 @@ namespace Mycelium.Forge.Generator.Models
         {
             var config = behavior.Configuration;
 
-            var parentEntity = GetRequiredValue(config, this.EntityName, "ParentDelegation", ConfigurationKeys.ParentEntity);
+            var parentEntity = GetValue(config, ConfigurationKeys.ParentEntity, errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.ParentEntity}'.");
 
-            var createPerm = GetRequiredValueWithFallback(config, ConfigurationKeys.CreatePermission, definition.CreatePermission,
-                $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
+            var createPerm = GetValue(config, ConfigurationKeys.CreatePermission, definition.CreatePermission,
+                errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.CreatePermission}' or have a CreatePermission in entity permissions.");
 
-            var deletePerm = GetRequiredValueWithFallback(config, ConfigurationKeys.DeletePermission, definition.DeletePermission,
-                $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.DeletePermission}' or have a DeletePermission in entity permissions.");
+            var deletePerm = GetValue(config, ConfigurationKeys.DeletePermission, definition.DeletePermission,
+                errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.DeletePermission}' or have a DeletePermission in entity permissions.");
 
-            var stateActivePerm = GetRequiredValue(config, this.EntityName, "ParentDelegation", ConfigurationKeys.StateActivePermission);
-            var stateInactivePerm = GetRequiredValue(config, this.EntityName, "ParentDelegation", ConfigurationKeys.StateInactivePermission);
+            var stateActivePerm = GetValue(config, ConfigurationKeys.StateActivePermission, errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.StateActivePermission}'.");
+            var stateInactivePerm = GetValue(config, ConfigurationKeys.StateInactivePermission, errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.StateInactivePermission}'.");
 
-            var parentKey = GetOptionalValue(config, ConfigurationKeys.ParentKey, parentEntity);
-            var parentOwnerProps = GetOptionalValue(config, ConfigurationKeys.ParentOwnerProperties, "Owner,Maintainer");
-            var stateProp = GetOptionalValue(config, ConfigurationKeys.StateProperty, PropertyNames.IsActive);
+            var parentKey = GetValue(config, ConfigurationKeys.ParentKey, parentEntity, isOptional: true);
+            var parentOwnerProps = GetValue(config, ConfigurationKeys.ParentOwnerProperties, "Owner,Maintainer", isOptional: true);
+            var stateProp = GetValue(config, ConfigurationKeys.StateProperty, PropertyNames.IsActive, isOptional: true);
 
             this.ParentEntity = parentEntity;
             this.ParentKey = parentKey;

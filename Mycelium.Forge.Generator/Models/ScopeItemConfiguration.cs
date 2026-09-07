@@ -15,7 +15,7 @@ namespace Mycelium.Forge.Generator.Models
     /// <summary>
     /// Configuration class holding resolved values for scope item permission behavior.
     /// </summary>
-    public class ScopeItemConfiguration : BehaviorConfigurationBase
+    public class ScopeItemConfiguration : BehaviorConfigurationBase, IScopeConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ScopeItemConfiguration" /> class.
