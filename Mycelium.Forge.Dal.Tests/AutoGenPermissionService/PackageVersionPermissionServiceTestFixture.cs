@@ -157,8 +157,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
+                // Only admins (InstallationAdministrator) can delete package versions.
+                // This is part of the package management policy - regular owners cannot delete their own versions
+                // to maintain package integrity and prevent accidental deletions.
                 Assert.That(adminResult.IsSuccess, Is.True);
-                Assert.That(ownerResult.IsSuccess, Is.True);
+                Assert.That(ownerResult.IsFailed, Is.True);
                 Assert.That(otherResult.IsFailed, Is.True);
             }
         }
