@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -185,7 +185,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
         private static void WriteDefaultAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, bool isAsync)
         {
-            if (definition == null)
+            if (definition == null || (string.IsNullOrWhiteSpace(definition.ReadPermission) && string.IsNullOrWhiteSpace(definition.VisibilityProperty)))
             {
                 stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
                 return;

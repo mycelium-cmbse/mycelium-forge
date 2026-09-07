@@ -80,14 +80,16 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var orgResult = await this.organizationService.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);
 
-            if (orgResult.IsSuccess && orgResult.Value.Count > 0)
+            if (!orgResult.IsSuccess || orgResult.Value.Count == 0)
             {
-                var organization = orgResult.Value[0];
+                return Result.Fail("Access denied: target organization was not found or is not accessible.");
+            }
 
-                if (!organization.Member.Contains(userContext.AccountId.Value) && !organization.Administrator.Contains(userContext.AccountId.Value))
-                {
-                    return Result.Fail("Access denied: user is not a member of the target organization.");
-                }
+            var organization = orgResult.Value[0];
+
+            if (!organization.Member.Contains(userContext.AccountId.Value) && !organization.Administrator.Contains(userContext.AccountId.Value))
+            {
+                return Result.Fail("Access denied: user is not a member of the target organization.");
             }
 
             return Result.Ok();

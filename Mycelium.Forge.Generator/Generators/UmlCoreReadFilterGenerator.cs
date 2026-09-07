@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreReadFilterGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -53,8 +53,7 @@ namespace Mycelium.Forge.Generator.Generators
         /// <param name="behaviorJsonPath">The optional path to the entity behaviors JSON file.</param>
         public void LoadConfigurations(string entityCsvPath, string behaviorJsonPath = null)
         {
-            var entityLoader = new CsvEntityPermissionsDataLoader();
-            this.EntityPermissions = entityLoader.Load(entityCsvPath);
+            this.EntityPermissions = CsvEntityPermissionsDataLoader.Load(entityCsvPath);
 
             if (!string.IsNullOrWhiteSpace(behaviorJsonPath) && File.Exists(behaviorJsonPath))
             {

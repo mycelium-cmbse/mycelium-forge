@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParentDelegationConfiguration.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -35,16 +35,15 @@ namespace Mycelium.Forge.Generator.Models
             var deletePerm = GetValue(config, ConfigurationKeys.DeletePermission, definition.DeletePermission,
                 errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.DeletePermission}' or have a DeletePermission in entity permissions.");
 
-            var stateActivePerm = GetValue(config, ConfigurationKeys.StateActivePermission, errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.StateActivePermission}'.");
-            var stateInactivePerm = GetValue(config, ConfigurationKeys.StateInactivePermission, errorMessage: $"Entity '{this.EntityName}' with ParentDelegation behavior must configure '{ConfigurationKeys.StateInactivePermission}'.");
+            var stateActivePerm = GetValue(config, ConfigurationKeys.StateActivePermission, isOptional: true);
+            var stateInactivePerm = GetValue(config, ConfigurationKeys.StateInactivePermission, isOptional: true);
 
             var parentKey = GetValue(config, ConfigurationKeys.ParentKey, parentEntity, isOptional: true);
-            var parentOwnerProps = GetValue(config, ConfigurationKeys.ParentOwnerProperties, "Owner,Maintainer", isOptional: true);
-            var stateProp = GetValue(config, ConfigurationKeys.StateProperty, PropertyNames.IsActive, isOptional: true);
+            var parentOwnerProps = GetValue(config, ConfigurationKeys.ParentOwnerProperties, isOptional: true);
+            var stateProp = GetValue(config, ConfigurationKeys.StateProperty, isOptional: true);
 
             this.ParentEntity = parentEntity;
             this.ParentKey = parentKey;
-            this.ParentKeyColumn = parentKey.ToLowerInvariant();
             this.ParentServiceType = $"I{parentEntity}Service";
             this.ParentServiceField = FormatServiceField(parentEntity);
             this.ParentPermServiceType = $"I{parentEntity}PermissionService";
@@ -67,11 +66,6 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the foreign key property name pointing to the parent entity.
         /// </summary>
         public string ParentKey { get; }
-
-        /// <summary>
-        /// Gets the lower-case database column name for the foreign key.
-        /// </summary>
-        public string ParentKeyColumn { get; }
 
         /// <summary>
         /// Gets the parent entity domain service interface type name.

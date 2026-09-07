@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="CsvRolesDataLoader.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -27,7 +27,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
         /// <exception cref="ArgumentException">Thrown when <paramref name="csvPath" /> is null or whitespace.</exception>
         /// <exception cref="FileNotFoundException">Thrown when the CSV file does not exist.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the CSV format is invalid.</exception>
-        public RolePermissionModel Load(string csvPath)
+        public static RolePermissionModel Load(string csvPath)
         {
             var lines = ReadAndValidateLines(csvPath);
 

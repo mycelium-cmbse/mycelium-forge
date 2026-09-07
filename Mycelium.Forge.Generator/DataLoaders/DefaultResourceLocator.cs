@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DefaultResourceLocator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -35,14 +35,8 @@ namespace Mycelium.Forge.Generator.DataLoaders
                 Path.GetFullPath(Path.Combine(baseDirectory, "../../../Mycelium.Forge.Generator/Resources", resourceFileName))
             };
 
-            foreach (var candidate in candidates.Where(File.Exists))
-            {
-                resolvedPath = candidate;
-                return true;
-            }
-
-            resolvedPath = string.Empty;
-            return false;
+            resolvedPath = candidates.FirstOrDefault(File.Exists) ?? string.Empty;
+            return !string.IsNullOrEmpty(resolvedPath);
         }
 
         /// <summary>

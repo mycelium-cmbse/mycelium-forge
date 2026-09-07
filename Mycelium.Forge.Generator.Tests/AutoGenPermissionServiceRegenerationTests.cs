@@ -32,8 +32,7 @@ namespace Mycelium.Forge.Generator.Tests
             outputDirectory.Create();
 
             var csvPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Resources", "forge-roles-and-permissions.csv");
-            var loader = new CsvRolesDataLoader();
-            var model = loader.Load(csvPath);
+            var model = CsvRolesDataLoader.Load(csvPath);
 
             var generator = new UmlCorePermissionServiceGenerator();
 

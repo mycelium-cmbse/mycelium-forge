@@ -14,7 +14,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
     /// <summary>
     /// Loads property-level permission definitions from a CSV file.
     /// </summary>
-    public class CsvPropertyPermissionsDataLoader
+    public static class CsvPropertyPermissionsDataLoader
     {
         /// <summary>
         /// Loads the property permission definitions from the specified CSV file, grouped by entity name.

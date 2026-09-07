@@ -51,6 +51,16 @@
       }
     },
     {
+      "entity": "PackageMetaData",
+      "behaviorType": "ParentDelegation",
+      "configuration": {
+        "ParentEntity": "PackageVersion",
+        "ParentKey": "Owner",
+        "CreatePermission": "PublishPackageVersion",
+        "DeletePermission": "DeletePackage"
+      }
+    },
+    {
       "entity": "OrganizationInvitation",
       "behaviorType": "InvitationWorkflow",
       "configuration": {

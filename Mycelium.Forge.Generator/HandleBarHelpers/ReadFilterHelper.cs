@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ReadFilterHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -105,12 +105,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             if (behavior != null && BehaviorTypeHelpers.TryGetValue(behavior.BehaviorType, out var helper))
             {
-                var predicate = helper.BuildReadFilterPredicate(@class, permission, behavior, name => BuildVisibilityPredicate(name));
-
-                if (!string.IsNullOrWhiteSpace(predicate))
-                {
-                    return predicate;
-                }
+                return helper.BuildReadFilterPredicate(@class, permission, behavior, name => BuildVisibilityPredicate(name));
             }
 
             return BuildDefaultVisibilityPredicate(className, permission);
@@ -159,7 +154,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <returns>The SQL predicate string, or empty if unrestricted.</returns>
         private static string BuildDefaultVisibilityPredicate(string className, EntityPermissionDefinition permission)
         {
-            if (permission == null)
+            if (permission == null || (string.IsNullOrWhiteSpace(permission.ReadPermission) && string.IsNullOrWhiteSpace(permission.VisibilityProperty)))
             {
                 return string.Empty;
             }

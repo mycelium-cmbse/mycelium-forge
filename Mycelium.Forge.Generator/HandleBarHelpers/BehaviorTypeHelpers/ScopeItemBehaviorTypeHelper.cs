@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ScopeItemBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -111,9 +111,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var bypassSql = string.Join(" OR ", config.ReadBypassPermissions.Select(p => $"@can{p} = true"));
 
             return $"""
-                                       {bypassSql}
-                                       OR (@callerAccountId IS NOT NULL AND (
-                                           "{entityName}"."{config.OwnerColumn}" = @callerAccountId
+                                        {bypassSql}
+                                        OR (@callerAccountId IS NOT NULL AND (
+                                            "{entityName}"."{config.OwnerColumn}" = @callerAccountId
                                             OR EXISTS (SELECT 1 FROM "Forge"."{config.ScopeEntity}_member__Account" WHERE "source{config.ScopeEntity}" = "{entityName}"."{config.OwnerColumn}" AND "targetAccount" = @callerAccountId)
                                             OR EXISTS (SELECT 1 FROM "Forge"."{config.ScopeEntity}_administrator__Account" WHERE "source{config.ScopeEntity}" = "{entityName}"."{config.OwnerColumn}" AND "targetAccount" = @callerAccountId)
                                         ))

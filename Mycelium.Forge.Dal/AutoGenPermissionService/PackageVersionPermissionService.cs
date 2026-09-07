@@ -90,7 +90,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Fail("Access denied: user is not an owner or maintainer of the package.");
             }
 
-            return Result.Ok();
+            return Result.Fail("Access denied: parent package was not found or is not accessible.");
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return await this.packagePermissionService.IsAllowedToRead(userContext, parentResult.Value[0]);
             }
 
-            return Result.Ok();
+            return Result.Fail("Access denied: parent package was not found or is not accessible.");
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Fail("Access denied: user is not an owner or maintainer of the package.");
             }
 
-            return Result.Ok();
+            return Result.Fail("Access denied: parent package was not found or is not accessible.");
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Fail("Access denied: only package owners can delete package versions.");
             }
 
-            return Result.Ok();
+            return Result.Fail("Access denied: parent package was not found or is not accessible.");
         }
     }
 }

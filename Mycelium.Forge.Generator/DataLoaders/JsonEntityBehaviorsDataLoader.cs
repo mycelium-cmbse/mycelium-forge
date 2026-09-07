@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
     /// <summary>
     /// Loads specialized entity permission behavior configurations from a JSON file.
     /// </summary>
-    public class JsonEntityBehaviorsDataLoader
+    public static class JsonEntityBehaviorsDataLoader
     {
         /// <summary>
         /// The delimiter used to join list values.

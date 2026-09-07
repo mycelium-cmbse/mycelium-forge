@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="CsvEntityPermissionsDataLoader.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -14,7 +14,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
     /// <summary>
     /// Loads the declarative entity CRUD permissions and ownership properties CSV.
     /// </summary>
-    public class CsvEntityPermissionsDataLoader
+    public static class CsvEntityPermissionsDataLoader
     {
         /// <summary>
         /// Loads the specified CSV file and returns a dictionary of <see cref="EntityPermissionDefinition" /> keyed by entity
@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
         /// </summary>
         /// <param name="csvPath">The path to the entity permissions CSV file.</param>
         /// <returns>A dictionary of entity permission definitions.</returns>
-        public Dictionary<string, EntityPermissionDefinition> Load(string csvPath)
+        public static Dictionary<string, EntityPermissionDefinition> Load(string csvPath)
         {
             var lines = ReadLines(csvPath);
             var result = new Dictionary<string, EntityPermissionDefinition>();

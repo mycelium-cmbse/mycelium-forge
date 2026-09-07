@@ -1,4 +1,4 @@
-# Mycelium Forge — Roles, Permissions, and Behaviors Specification
+﻿# Mycelium Forge — Roles, Permissions, and Behaviors Specification
 
 **Applies to:** `mycelium-forge`  
 **Component:** `Mycelium.Forge.Generator`, `Mycelium.Forge.Dal`, `Mycelium.Forge`  
@@ -134,7 +134,7 @@ Configured in `forge-entity-permissions.csv` and `forge-property-permissions.csv
 | Entity | Create Permission | Read Permission | Update Permission | Delete Permission | Owner Property | Maintainer Property | Visibility Property |
 |---|---|---|---|---|---|---|---|
 | `Package` | `PublishPackageToPersonalScope` | *(Handled by OrganizationScope)* | `ManagePackageSettings` | `DeletePackage` | `PackageOwner` | `PackageMaintainer` | `Visibility` |
-| `Organization` | `CreateOrganization` | `ViewAllOrganizations \| ManageOrganizations` | `ManageOrganizationSettings \| ManageOrganizations` | `ManageOrganizations` | `Administrator` | `Member` | `DefaultPackageVisibility` |
+| `Organization` | `CreateOrganization` | *(Public)* | `ManageOrganizationSettings \| ManageOrganizations` | `ManageOrganizations` | `Administrator` | `Member` | |
 | `APIKey` | `IssueApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `Owner` | | |
 | `Account` | `ManageAccounts` | `ViewAllAccounts \| ManageAccounts` | `ManageAccounts` | `ManageAccounts` | `Id` | | |
 | `OrganizationInvitation` | `InviteOrganizationMembers` | `ViewOrganizationMemberList` | | | `Owner` | | |
@@ -212,7 +212,7 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   - Loads the parent entity via `IParentService` and invokes `IParentPermissionService.IsAllowedToRead(...)`.
   - State changes (such as listing/unlisting) verify `StateActivePermission` or `StateInactivePermission` against the parent maintainer list.
 - **SQL Read Filter:**
-  Inherits and joins the SQL read filter predicate of the parent entity using the foreign key column (`"parentkey" = "ParentEntity"."id"`).
+  None (`SqlFilter.Empty`). Read filtering delegates to the parent entity via `IParentPermissionService.IsAllowedToRead` in the service layer, avoiding complex nested subqueries.
 
 ---
 

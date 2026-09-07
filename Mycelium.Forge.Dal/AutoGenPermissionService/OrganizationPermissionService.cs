@@ -53,22 +53,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
         protected override Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IOrganization thing)
         {
-            if (thing.DefaultPackageVisibility == VisibilityKind.PUBLIC)
-            {
-                return Task.FromResult(Result.Ok());
-            }
-
-            if (userContext.AccountId.HasValue && thing.Administrator.Contains(userContext.AccountId.Value))
-            {
-                return Task.FromResult(Result.Ok());
-            }
-
-            if (userContext.AccountId.HasValue && thing.Member.Contains(userContext.AccountId.Value))
-            {
-                return Task.FromResult(Result.Ok());
-            }
-
-            return Task.FromResult(PermissionGuard.GuardAnyPermission(userContext, PermissionKind.ViewAllOrganizations, PermissionKind.ManageOrganizations));
+            return Task.FromResult(Result.Ok());
         }
 
         /// <summary>

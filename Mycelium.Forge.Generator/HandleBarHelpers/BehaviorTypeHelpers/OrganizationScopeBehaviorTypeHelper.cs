@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationScopeBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -81,14 +81,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);
 
-                                               if (orgResult.IsSuccess && orgResult.Value.Count > 0)
+                                               if (!orgResult.IsSuccess || orgResult.Value.Count == 0)
                                                {
-                                                   var organization = orgResult.Value[0];
+                                                   return Result.Fail("Access denied: target {{config.ScopeEntity.ToLowerInvariant()}} was not found or is not accessible.");
+                                               }
 
-                                                   if ({{string.Join(" && ", membershipChecks)}})
-                                                   {
-                                                       return Result.Fail("Access denied: user is not a member of the target {{config.ScopeEntity.ToLowerInvariant()}}.");
-                                                   }
+                                               var organization = orgResult.Value[0];
+
+                                               if ({{string.Join(" && ", membershipChecks)}})
+                                               {
+                                                   return Result.Fail("Access denied: user is not a member of the target {{config.ScopeEntity.ToLowerInvariant()}}.");
                                                }
 
                                                return Result.Ok();

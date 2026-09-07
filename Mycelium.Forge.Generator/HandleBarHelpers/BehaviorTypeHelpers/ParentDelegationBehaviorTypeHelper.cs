@@ -101,31 +101,31 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
 
-            var guardCheck = !string.IsNullOrWhiteSpace(config.CreatePermission)
-                ? $$"""
-                                var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
-
-                                if (guard.IsFailed)
-                                {
-                                    return guard;
-                                }
-
-                    """
-                : string.Empty;
-
-            var ownershipChecks = BuildOwnershipChecks(config);
-
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
                                                    return Result.Fail("Unauthenticated user cannot publish a {{@class.Name.ToLowerInvariant()}}.");
                                                }
+                                   """);
 
-                                   {{guardCheck}}
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ParentKey}}]);
+            if (!string.IsNullOrWhiteSpace(config.CreatePermission))
+            {
+                stringBuilder.Append("\r\n\r\n");
 
-                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
-                                               {
+                stringBuilder.Append($$"""
+                                                   var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
+
+                                                   if (guard.IsFailed)
+                                                   {
+                                                       return guard;
+                                                   }
+                                       """);
+            }
+
+            var ownershipChecks = BuildOwnershipChecks(config);
+
+            var ownershipBlock = ownershipChecks.Count > 0
+                ? $$"""
                                                    var {{config.ParentVar}} = parentResult.Value[0];
                                                    var accountId = userContext.AccountId.Value;
 
@@ -135,9 +135,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    }
 
                                                    return Result.Fail("Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.");
+                    """
+                : $$"""
+                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);
+                    """;
+
+            stringBuilder.Append("\r\n\r\n");
+
+            stringBuilder.Append($$"""
+                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                   {{ownershipBlock}}
                                                }
 
-                                               return Result.Ok();
+                                               return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
                                    """);
         }
 
@@ -160,7 +173,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return await this.{{config.ParentPermServiceField}}.IsAllowedToRead(userContext, parentResult.Value[0]);
                                                }
 
-                                               return Result.Ok();
+                                               return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
                                    """);
         }
 
@@ -181,52 +194,50 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 .Where(p => !p.Equals("Id", StringComparison.OrdinalIgnoreCase) && (string.IsNullOrWhiteSpace(config.StateProperty) || !p.Equals(config.StateProperty, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
-            var immutableBlock = string.Empty;
-
-            if (immutableProperties.Count > 0 && !string.IsNullOrWhiteSpace(config.StateProperty))
-            {
-                var diffChecks = immutableProperties.Select(p => $"existingThing.{p} != updatedThing.{p}");
-
-                immutableBlock = $$"""
-                                               if ({{string.Join(" ||\r\n                    ", diffChecks)}})
-                                               {
-                                                   return Result.Fail("{{@class.Name}}s are immutable; only the {{config.StateProperty.ToLowerInvariant()}} status may be modified.");
-                                               }
-
-
-                                   """;
-            }
-
-            var stateCheckBlock = !string.IsNullOrWhiteSpace(config.StateProperty) && !string.IsNullOrWhiteSpace(config.StateActivePermission)
-                ? $$"""
-                                            if (existingThing.{{config.StateProperty}} != updatedThing.{{config.StateProperty}})
-                                            {
-                                                var stateGuard = updatedThing.{{config.StateProperty}}
-                                                    ? PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateActivePermission}})
-                                                    : PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateInactivePermission}});
-
-                                                if (stateGuard.IsFailed)
-                                                {
-                                                    return stateGuard;
-                                                }
-                                            }
-
-                    """
-                : string.Empty;
-
-            var ownershipChecks = BuildOwnershipChecks(config);
-
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
                                                    return Result.Fail("Unauthenticated user cannot update {{@class.Name.ToLowerInvariant()}}.");
                                                }
+                                   """);
 
-                                   {{immutableBlock}}{{stateCheckBlock}}
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [existingThing.{{config.ParentKey}}]);
+            if (immutableProperties.Count > 0 && !string.IsNullOrWhiteSpace(config.StateProperty))
+            {
+                var diffChecks = immutableProperties.Select(p => $"existingThing.{p} != updatedThing.{p}");
 
-                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
-                                               {
+                stringBuilder.Append("\r\n\r\n");
+
+                stringBuilder.Append($$"""
+                                                   if ({{string.Join(" ||\r\n                    ", diffChecks)}})
+                                                   {
+                                                       return Result.Fail("{{@class.Name}}s are immutable; only the {{config.StateProperty.ToLowerInvariant()}} status may be modified.");
+                                                   }
+                                       """);
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.StateProperty) && !string.IsNullOrWhiteSpace(config.StateActivePermission))
+            {
+                stringBuilder.Append("\r\n\r\n");
+
+                stringBuilder.Append($$"""
+                                                   if (existingThing.{{config.StateProperty}} != updatedThing.{{config.StateProperty}})
+                                                   {
+                                                       var stateGuard = updatedThing.{{config.StateProperty}}
+                                                           ? PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateActivePermission}})
+                                                           : PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateInactivePermission}});
+
+                                                       if (stateGuard.IsFailed)
+                                                       {
+                                                           return stateGuard;
+                                                       }
+                                                   }
+                                       """);
+            }
+
+            var ownershipChecks = BuildOwnershipChecks(config);
+
+            var ownershipBlock = ownershipChecks.Count > 0
+                ? $$"""
                                                    var {{config.ParentVar}} = parentResult.Value[0];
                                                    var accountId = userContext.AccountId.Value;
 
@@ -236,9 +247,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    }
 
                                                    return Result.Fail("Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.");
+                    """
+                : $$"""
+                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);
+                    """;
+
+            stringBuilder.Append("\r\n\r\n");
+
+            stringBuilder.Append($$"""
+                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [existingThing.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                   {{ownershipBlock}}
                                                }
 
-                                               return Result.Ok();
+                                               return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
                                    """);
         }
 
@@ -253,31 +277,31 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
 
-            var eraseGuardBlock = !string.IsNullOrWhiteSpace(config.DeletePermission)
-                ? $$"""
-                                var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.DeletePermission}});
-
-                                if (eraseGuard.IsFailed)
-                                {
-                                    return eraseGuard;
-                                }
-
-                    """
-                : string.Empty;
-
-            var ownershipChecks = BuildOwnershipChecks(config);
-
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
                                                    return Result.Fail("Unauthenticated user cannot erase a {{@class.Name.ToLowerInvariant()}}.");
                                                }
+                                   """);
 
-                                   {{eraseGuardBlock}}
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}]);
+            if (!string.IsNullOrWhiteSpace(config.DeletePermission))
+            {
+                stringBuilder.Append("\r\n\r\n");
 
-                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
-                                               {
+                stringBuilder.Append($$"""
+                                                   var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.DeletePermission}});
+
+                                                   if (eraseGuard.IsFailed)
+                                                   {
+                                                       return eraseGuard;
+                                                   }
+                                       """);
+            }
+
+            var ownershipChecks = BuildOwnershipChecks(config);
+
+            var ownershipBlock = ownershipChecks.Count > 0
+                ? $$"""
                                                    var {{config.ParentVar}} = parentResult.Value[0];
                                                    var accountId = userContext.AccountId.Value;
 
@@ -287,9 +311,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    }
 
                                                    return Result.Fail("Access denied: only {{config.ParentEntity.ToLowerInvariant()}} owners can delete {{config.ParentEntity.ToLowerInvariant()}} versions.");
+                    """
+                : $$"""
+                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToDelete(userContext, parentResult.Value[0]);
+                    """;
+
+            stringBuilder.Append("\r\n\r\n");
+
+            stringBuilder.Append($$"""
+                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                   {{ownershipBlock}}
                                                }
 
-                                               return Result.Ok();
+                                               return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
                                    """);
         }
 
@@ -303,35 +340,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <returns>The SQL predicate string, or empty string if unrestricted.</returns>
         public override string BuildReadFilterPredicate(IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, Func<string, string> resolveEntityPredicate)
         {
-            var entityName = behavior.EntityName;
-            var config = this.GetConfiguration(definition, behavior);
-
-            var parentPredicate = resolveEntityPredicate?.Invoke(config.ParentEntity);
-
-            if (string.IsNullOrWhiteSpace(parentPredicate))
-            {
-                throw new InvalidOperationException($"Could not resolve visibility predicate for parent entity '{config.ParentEntity}' referenced by '{entityName}'.");
-            }
-
-            var replaced = parentPredicate
-                .Replace($"\"{config.ParentEntity}\"", $"\"Parent{config.ParentEntity}\"")
-                .Replace("\"Thing\"", "\"ParentThing\"");
-
-            var lines = replaced.Split(["\r\n", "\n"], StringSplitOptions.None);
-            var indentedLines = lines.Select(line => string.IsNullOrWhiteSpace(line) ? line : $"          {line}");
-            var indentedPredicate = string.Join("\r\n", indentedLines);
-
-            return $"""
-                                        EXISTS (
-                                            SELECT 1
-                                            FROM "Forge"."{config.ParentEntity}" AS "Parent{config.ParentEntity}"
-                                            INNER JOIN "Forge"."Thing" AS "ParentThing" ON "ParentThing"."id" = "Parent{config.ParentEntity}"."id"
-                                            WHERE "Parent{config.ParentEntity}"."id" = "{entityName}"."{config.ParentKeyColumn}"
-                                              AND (
-                                    {indentedPredicate}
-                                              )
-                                        )
-                    """;
+            return string.Empty;
         }
 
         /// <summary>
@@ -352,6 +361,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <returns>A list of boolean expression strings representing ownership checks.</returns>
         private static List<string> BuildOwnershipChecks(ParentDelegationConfiguration config)
         {
+            if (config.ParentOwnerProperties.Length == 0)
+            {
+                return [];
+            }
+
             var ownershipChecks = new List<string> { $"{config.ParentVar}.{PropertyNames.Owner} == accountId" };
 
             ownershipChecks.AddRange(config.ParentOwnerProperties

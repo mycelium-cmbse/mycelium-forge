@@ -106,15 +106,17 @@ namespace Mycelium.Forge.Dal.PermissionService
             {
                 var organizationResult = await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId]);
 
-                if (organizationResult.IsSuccess && organizationResult.Value.Count > 0)
+                if (!organizationResult.IsSuccess || organizationResult.Value.Count == 0)
                 {
-                    var organization = organizationResult.Value[0];
+                    return Result.Fail("Access denied: cannot read this item.");
+                }
 
-                    if (organization.Member.Contains(userContext.AccountId.Value) ||
-                        organization.Administrator.Contains(userContext.AccountId.Value))
-                    {
-                        return Result.Ok();
-                    }
+                var organization = organizationResult.Value[0];
+
+                if (organization.Member.Contains(userContext.AccountId.Value) ||
+                    organization.Administrator.Contains(userContext.AccountId.Value))
+                {
+                    return Result.Ok();
                 }
             }
 

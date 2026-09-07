@@ -28,10 +28,31 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
     public partial class PackageMetaDataPermissionService : PermissionServiceBase<IPackageMetaData>, IPackageMetaDataPermissionService
     {
         /// <summary>
+        /// The (injected) <see cref="IPackageVersionService" /> domain service.
+        /// </summary>
+        private readonly IPackageVersionService packageVersionService;
+
+        /// <summary>
+        /// The (injected) <see cref="IPackageVersionPermissionService" /> domain service.
+        /// </summary>
+        private readonly IPackageVersionPermissionService packageVersionPermissionService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PackageMetaDataPermissionService"/> class.
         /// </summary>
         public PackageMetaDataPermissionService()
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageMetaDataPermissionService"/> class.
+        /// </summary>
+        /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" /> domain service.</param>
+        /// <param name="packageVersionPermissionService">The (injected) <see cref="IPackageVersionPermissionService" /> domain service.</param>
+        public PackageMetaDataPermissionService(IPackageVersionService packageVersionService, IPackageVersionPermissionService packageVersionPermissionService)
+        {
+            this.packageVersionService = packageVersionService;
+            this.packageVersionPermissionService = packageVersionPermissionService;
         }
 
         /// <summary>
@@ -40,9 +61,28 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="toCreate">The entity to create.</param>
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether creation is permitted.</returns>
-        protected override Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IPackageMetaData toCreate)
+        protected override async Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, IPackageMetaData toCreate)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.PublishPackageVersion));
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+            {
+                return Result.Fail("Unauthenticated user cannot publish a packagemetadata.");
+            }
+
+            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.PublishPackageVersion);
+
+            if (guard.IsFailed)
+            {
+                return guard;
+            }
+
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);
+
+            if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+            {
+                return await this.packageVersionPermissionService.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);
+            }
+
+            return Result.Fail("Access denied: parent packageversion was not found or is not accessible.");
         }
 
         /// <summary>
@@ -51,9 +91,16 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to read.</param>
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether reading is permitted.</returns>
-        protected override Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IPackageMetaData thing)
+        protected override async Task<Result> IsAllowedToReadImplementation(IUserContext userContext, IPackageMetaData thing)
         {
-            return Task.FromResult(Result.Ok());
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
+
+            if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+            {
+                return await this.packageVersionPermissionService.IsAllowedToRead(userContext, parentResult.Value[0]);
+            }
+
+            return Result.Fail("Access denied: parent packageversion was not found or is not accessible.");
         }
 
         /// <summary>
@@ -63,9 +110,21 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="existingThing">The existing persisted entity state.</param>
         /// <param name="updatedThing">The updated entity state.</param>
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether updating is permitted.</returns>
-        protected override Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IPackageMetaData existingThing, IPackageMetaData updatedThing)
+        protected override async Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, IPackageMetaData existingThing, IPackageMetaData updatedThing)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageSettings));
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+            {
+                return Result.Fail("Unauthenticated user cannot update packagemetadata.");
+            }
+
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [existingThing.Owner]);
+
+            if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+            {
+                return await this.packageVersionPermissionService.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);
+            }
+
+            return Result.Fail("Access denied: parent packageversion was not found or is not accessible.");
         }
 
         /// <summary>
@@ -74,9 +133,28 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to delete.</param>
         /// <returns>An awaitable <see cref="Task{Result}"/> indicating whether deletion is permitted.</returns>
-        protected override Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, IPackageMetaData thing)
+        protected override async Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, IPackageMetaData thing)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.DeletePackage));
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+            {
+                return Result.Fail("Unauthenticated user cannot erase a packagemetadata.");
+            }
+
+            var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.DeletePackage);
+
+            if (eraseGuard.IsFailed)
+            {
+                return eraseGuard;
+            }
+
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
+
+            if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+            {
+                return await this.packageVersionPermissionService.IsAllowedToDelete(userContext, parentResult.Value[0]);
+            }
+
+            return Result.Fail("Access denied: parent packageversion was not found or is not accessible.");
         }
     }
 }
