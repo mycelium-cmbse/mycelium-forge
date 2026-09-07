@@ -174,50 +174,60 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 parts.Add(string.Join(" OR ", permChecks));
             }
 
-            var ownershipChecks = new List<string>();
+            var ownershipChecks = GetOwnershipChecks(permission, className);
+
+            if (ownershipChecks.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (ownershipChecks.Count == 1 && !ownershipChecks[0].StartsWith("EXISTS"))
+            {
+                parts.Add($"(@callerAccountId IS NOT NULL AND {ownershipChecks[0]})");
+            }
+            else
+            {
+                var checkLines = string.Join("\r\n                        OR ", ownershipChecks);
+                parts.Add($"(@callerAccountId IS NOT NULL AND (\r\n                        {checkLines}\r\n                    ))");
+            }
+
+            return "                    " + string.Join("\r\n                    OR ", parts);
+        }
+
+        /// <summary>
+        /// Builds the SQL ownership checks for the specified entity permission definition and class name.
+        /// </summary>
+        /// <param name="permission">The entity permission definition.</param>
+        /// <param name="className">The name of the entity class.</param>
+        /// <returns>A list of SQL ownership check strings.</returns>
+        private static List<string> GetOwnershipChecks(EntityPermissionDefinition permission, string className)
+        {
+            var checks = new List<string>();
 
             if (!string.IsNullOrWhiteSpace(permission.OwnerProperty))
             {
                 if (permission.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
                 {
-                    ownershipChecks.Add($"\"{className}\".\"id\" = @callerAccountId");
+                    checks.Add($"\"{className}\".\"id\" = @callerAccountId");
                 }
                 else if (permission.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
                 {
-                    ownershipChecks.Add($"\"{className}\".\"owner\" = @callerAccountId");
+                    checks.Add($"\"{className}\".\"owner\" = @callerAccountId");
                 }
                 else
                 {
                     var ownerPropCamel = char.ToLowerInvariant(permission.OwnerProperty[0]) + permission.OwnerProperty[1..];
-                    ownershipChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{ownerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+                    checks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{ownerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(permission.MaintainerProperty))
             {
                 var maintainerPropCamel = char.ToLowerInvariant(permission.MaintainerProperty[0]) + permission.MaintainerProperty[1..];
-                ownershipChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{maintainerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+                checks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{maintainerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
             }
 
-            if (ownershipChecks.Count > 0)
-            {
-                if (ownershipChecks.Count == 1 && !ownershipChecks[0].StartsWith("EXISTS"))
-                {
-                    parts.Add($"(@callerAccountId IS NOT NULL AND {ownershipChecks[0]})");
-                }
-                else
-                {
-                    var checkLines = string.Join("\r\n                        OR ", ownershipChecks);
-                    parts.Add($"(@callerAccountId IS NOT NULL AND (\r\n                        {checkLines}\r\n                    ))");
-                }
-            }
-
-            if (parts.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            return "                    " + string.Join("\r\n                    OR ", parts);
+            return checks;
         }
 
         /// <summary>
@@ -234,11 +244,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             {
                 var paramName = match.Groups[1].Value;
 
-                if (handled.Add(paramName))
+                if (!handled.Add(paramName))
                 {
-                    var permName = paramName[3..];
-                    builder.AppendLine($"                .AddParameter(\"@{paramName}\", NpgsqlDbType.Boolean, PermissionGuard.HasPermission(userContext, PermissionKind.{permName}))");
+                    continue;
                 }
+
+                var permName = paramName[3..];
+                builder.AppendLine($"                .AddParameter(\"@{paramName}\", NpgsqlDbType.Boolean, PermissionGuard.HasPermission(userContext, PermissionKind.{permName}))");
             }
         }
 

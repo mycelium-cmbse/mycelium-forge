@@ -122,36 +122,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                        """);
             }
 
-            var ownershipChecks = BuildOwnershipChecks(config);
-
-            var ownershipBlock = ownershipChecks.Count > 0
-                ? $$"""
-                                                   var {{config.ParentVar}} = parentResult.Value[0];
-                                                   var accountId = userContext.AccountId.Value;
-
-                                                   if ({{string.Join(" || ", ownershipChecks)}})
-                                                   {
-                                                       return Result.Ok();
-                                                   }
-
-                                                   return Result.Fail("Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.");
-                    """
-                : $$"""
-                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);
-                    """;
-
-            stringBuilder.Append("\r\n\r\n");
-
-            stringBuilder.Append($$"""
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ParentKey}}]);
-
-                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
-                                               {
-                                   {{ownershipBlock}}
-                                               }
-
-                                               return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
-                                   """);
+            stringBuilder.Append(GetOwnershipBlock(config, Operations.Create));
         }
 
         /// <summary>
@@ -234,36 +205,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                        """);
             }
 
-            var ownershipChecks = BuildOwnershipChecks(config);
-
-            var ownershipBlock = ownershipChecks.Count > 0
-                ? $$"""
-                                                   var {{config.ParentVar}} = parentResult.Value[0];
-                                                   var accountId = userContext.AccountId.Value;
-
-                                                   if ({{string.Join(" || ", ownershipChecks)}})
-                                                   {
-                                                       return Result.Ok();
-                                                   }
-
-                                                   return Result.Fail("Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.");
-                    """
-                : $$"""
-                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);
-                    """;
-
-            stringBuilder.Append("\r\n\r\n");
-
-            stringBuilder.Append($$"""
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [existingThing.{{config.ParentKey}}]);
-
-                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
-                                               {
-                                   {{ownershipBlock}}
-                                               }
-
-                                               return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
-                                   """);
+            stringBuilder.Append(GetOwnershipBlock(config, Operations.Update));
         }
 
         /// <summary>
@@ -352,6 +294,47 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         protected override ParentDelegationConfiguration CreateConfiguration(EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             return new ParentDelegationConfiguration(definition, behavior);
+        }
+
+        /// <summary>
+        /// Builds the ownership verification block for create and update operations.
+        /// </summary>
+        /// <param name="config">The parent delegation configuration.</param>
+        /// <param name="operation">The operation being performed.</param>
+        /// <returns>The ownership verification block string.</returns>
+        private static string GetOwnershipBlock(ParentDelegationConfiguration config, Operations operation)
+        {
+            var stringBuilder = new StringBuilder();
+            var ownershipChecks = BuildOwnershipChecks(config);
+
+            var ownershipBlock = ownershipChecks.Count > 0
+                ? $$"""
+                                                   var {{config.ParentVar}} = parentResult.Value[0];
+                                                   var accountId = userContext.AccountId.Value;
+
+                                                   if ({{string.Join(" || ", ownershipChecks)}})
+                                                   {
+                                                       return Result.Ok();
+                                                   }
+
+                                                   return Result.Fail("Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.");
+                    """
+                : $"                               return await this.{config.ParentPermServiceField}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);";
+
+            stringBuilder.Append("\r\n\r\n");
+
+            stringBuilder.Append($$"""
+                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}]);
+
+                                               if (parentResult.IsSuccess && parentResult.Value.Count > 0)
+                                               {
+                                   {{ownershipBlock}}
+                                               }
+
+                                               return Result.Fail("Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
+                                   """);
+
+            return stringBuilder.ToString();
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace Mycelium.Forge.Generator.DataLoaders
     /// <summary>
     /// Loads a CSV file containing role and permission definitions and produces a <see cref="RolePermissionModel" />.
     /// </summary>
-    public partial class CsvRolesDataLoader
+    public static partial class CsvRolesDataLoader
     {
         /// <summary>
         /// Loads and parses the specified CSV file into a <see cref="RolePermissionModel" />.

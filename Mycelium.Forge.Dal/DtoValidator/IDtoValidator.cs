@@ -41,12 +41,5 @@ namespace Mycelium.Forge.Dal.DtoValidator
         /// A new <see cref="Result" /> indicating whether validation was successful.
         /// </returns>
         Task<Result> ValidateFields(T dto, params Expression<Func<T, object>>[] fields);
-
-        /// <summary>
-        /// Adds possibilities for custom validation rules.
-        /// </summary>
-        void AddCustomValidation()
-        {
-        }
     }
 }
