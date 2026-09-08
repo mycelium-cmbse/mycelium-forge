@@ -1,0 +1,3898 @@
+{
+  "typography": {
+    "typography": {
+      "display": {
+        "2xl": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 40,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": -1,
+              "unit": "px"
+            },
+            "lineHeight": 3
+          },
+          "$description": "Hero display. Rarely used in product UI.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:ae34aca381289114008e5e30750da0c7b45fa1cd,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "xl": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 32,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": -0.5,
+              "unit": "px"
+            },
+            "lineHeight": 2.5
+          },
+          "$description": "Large display.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:e878907de16f3010b1e31655fe703193309a243f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "lg": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 24,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": -0.25,
+              "unit": "px"
+            },
+            "lineHeight": 2
+          },
+          "$description": "Page title on a marketing or docs surface.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:46e7a664928eb0d3b017f2ec8028fbbf000bc987,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        }
+      },
+      "heading": {
+        "md": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 20,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.75
+          },
+          "$description": "Section title inside a page body.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8f3cc8d549757c6d3e5d38a36b000a8ff6318bdc,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "sm": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 18,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.625
+          },
+          "$description": "Card or panel title.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2845813fe67e772eb3310b2dbabedd8514e2b87a,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "xs": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 16,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.5
+          },
+          "$description": "Group header inside a list.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:91d7a6eebb07d6dadaa25a6e9f30bd4c610f6a64,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        }
+      },
+      "body": {
+        "lg": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 16,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.5
+          },
+          "$description": "Lead paragraph.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:a133f86c9e9715872bf729bca0a6825d0b94f632,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "md": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.25
+          },
+          "$description": "Default body text and input values.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f85833508a036647e69969078ddb05f7db2cb0cd,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "md-medium": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.25
+          },
+          "$description": "Body text with emphasis.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8a268794846cf1e9395c80e40616826217e4425b,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "sm": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.125
+          },
+          "$description": "Row primary text, table cells.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3e0a4a04642ad62798a25a1fe49785830e43fd42,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "sm-medium": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1.125
+          },
+          "$description": "Row text with emphasis.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:901fc24ccaeea17bb80d87aa1fbb82a5186479cf,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "xs": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.2,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Helper text under an input, stereotypes.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:a011d63137d84b16694613c9539bd3c10b378f6f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "prose-13": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.313
+          },
+          "$description": "Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c960649b3d5bcaac830bcd4555866b4df1f7869c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        }
+      },
+      "label": {
+        "md": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.25
+          },
+          "$description": "Form label.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:5b97aa97c25c2d9a6b6fb85dd908e1563823f5b2,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "sm": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Compact label, chip text.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:49b7e8ed252944d8545ba93412cc3d6e621c9718,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "xs": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.5,
+              "unit": "px"
+            },
+            "lineHeight": 0.875
+          },
+          "$description": "ALL CAPS section label, count pill.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:35ffec2b86ee438212037be0caf240833e7415e4,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        }
+      },
+      "mono": {
+        "md": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.25
+          },
+          "$description": "Code and identifiers, default size.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:30df4ee614514150b2ce98e4ac11b33664afc7fc,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "sm": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.125
+          },
+          "$description": "Numeric table cells, versions.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:03b6f7c5105fbcf48431190595c63a713105468e,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "xs": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Compact mono, badges and hashes.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:5289b98c0da0c13b6a639725aa7ccc4e7e4cf7db,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "code-11-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.188
+          },
+          "$description": "Code preview inside the kpar archive browser and the forum code blocks.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:7448924d52698e36cd64fd1cad61056a0f2a361c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        }
+      },
+      "raw": {
+        "inter-regular-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:90cd00572bc6ebb0dd68e0077616e0d18269b533,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-11": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:a948c750ea644f4ce7f16e44e04c4a66283b9afa,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-13": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:89d21b2f00388f07bba5e421cc781d1651e3acfb,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:ca4917d385c1b201b0742e4db63b82f342a28767,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8c1fea55938bbd6af8ca0183aac9596f9bbeba00,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-bold-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6114228549f47a8353297d90f2bfa3559e060f86,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-13": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:4775816d80c9ef8427315fad3905436017702f26,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-13": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:ebc8a218de1ee0fa24d2dab4e8e9ddb60184a1e7,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2acb8ab90d7e8fb557b543e1e650e623a156cc65,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-11": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:30c3a30bef35c07b43f839f4236918853b683efc,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:dc121a4526754637f2150b2e853bc52b2e1206ec,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-9": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:0cb1d813536188f65d0f8afdf3a5c39d43e59656,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:a899d71f98f7b35746d2170a61d2105d861ae6a1,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:d913fa783af2691acace00eb9676ceb665a880a0,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:a3898970b3b93c8d5ad9e411e0ffee500dc7eafa,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-11": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:ed9cb9ce4d19caa1a702e16b127f720bd90ea194,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-9-lh16-ls0-1": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:d4daf8343183ace2687e8fa20b352536247a031c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 15,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:28f2f0e6beecb1092e4b762cb9f7a1ff6bce1fd4,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8498f91ef4d045f7b0c5640326e9ccea859b8858,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6c54f2040089ba3489366393cfbb4f3a40c1c190,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-12-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:91e43ed4e7e4ca868c1dc7a675baa932157df036,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-22": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 22,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:0928135977524fc26b8b3a62555be8f65ac46347,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 15,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:aa4263bf81d9690c3673bab2c59a2ab0fa6b19a6,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c5d957fdb8311a844b2432755c65bc2a849d9a16,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 16,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2773c25cdaadf49093a482f314cda53f830969c2,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:d044bea6a11df815b7a41ba69c639f821bd68fd8,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-10-lh16-ls0-1": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3e8c21e884d569f6ca55276994108ea1cbf1c581,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-9": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:df489e57eb51b12cdbdea47b28412f9b7fd338f0,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-9-ls0-3": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.3,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f4a533b9ea7d373466448cc0e04dbbf747c5ae8c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 18,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:ae67923f180ae902bbb93de256e0a122681288f5,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-10-lh14-ls0-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.5,
+              "unit": "px"
+            },
+            "lineHeight": 0.875
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8700466054decf40db960eb40a6eceb0fea9b032,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:7b7a57f340edef273d59662e4af0dc2ac06854f0,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-8": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 8,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:36ac3a6f1afee27e40a799fb49e9a9ba5c2a6f3f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-13-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:eb7d428f540bf6479c9512116c51b054f580b0d4,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-13": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:4c78c645c849df53bcc98734f21c454514288c6f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-28": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:b1f8db2cc53368b4b3b607474629f28595617279,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-10-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:62524aa2019d66498a547f9e4798e58b3ab43d7c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-44": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 44,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6e7a7bb2104c7cee690d45677ace6ab3b9744936,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-12-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c4d44e252c8c6d37d366efe13cf1e371700ff41f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-24": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 24,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6d6d6b76611b6c716903f3564369da24b38dc19b,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-28": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:b69e6fa543b68e39b68c6932f64b703e76b5bce6,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-24": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 24,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:83d66c8e5e79ccfdf36109fa0637d32b950a31d5,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-22": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 22,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3a2bf4b677ff47835bb2b7382d9f4f3f60f1dc36,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-20": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 20,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:797c3fc64185eb7e8b48be4cc85bb5cc4911489d,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 18,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f09f746d17f29e9a2924c21768e27b5439910d4d,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 16,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:9845fa9d937ca8628e20e78f0e2eef71a52e3f43,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-40": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 40,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:31a9697317cadead6ae9ce02a3903118384cc286,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 18,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2e42ddb52e7303388d43ea9464b2d1fce2e9028a,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f417e8c3df1f7ffd54056a3dd3c8d2477aaec6ca,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-9-ls0-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.5,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:56d5774fd03875e4e8b02ca061a6e006fa447a8d,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-44-ls0-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 44,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.5,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:abf531956f48ac786e21349f42d1859dd31c0981,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-10-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:e9d16d1f65afe6166689014e3f83e45c9d1e4b3a,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:da99871f860870fe152e11c54e31de890613a819,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-9": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3b5b737a961a95068334ca8dfe35632955a4ca96,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:88a830ff93690c627a1fc81740e35dc62e9d2ccd,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-20": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 20,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:1a891930c4f4bfb38df038c3b3985a6bb19bf8d7,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-12-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f5a2a16faf57cc278a9ebe4c573a640029b1bbc5,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-11-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:1a9f3b813f9aac1a8f20534ca1afa09d0bbcbadb,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-9-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f3fcf063f694dbe5fac90680c5e474c6909da50c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-11-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6a9ae7dec34bf62245b016a620b9fbc449334a5f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-10-lh15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 0.938
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:788e1863e80e827a1a528b4731b644871776e927,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-9-5-ls0-4": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.4,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:a2214560f6a5471626489a5f826937eb43ab3856,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-9-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:cb622a03452d1665e989efbce001573ce651c867,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-13-82400131225586-lh20-73600196838379-ls0-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13.824,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.12,
+              "unit": "px"
+            },
+            "lineHeight": 1.296
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:4540fec69cb74996fae7edd9b5f2a575547b0385,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-480000495910645-lh18-720001220703125-ls0-1": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12.48,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1.17
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c9f1746bb3c56d0d734b91b8b9867cd5d4f6a59e,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-11-520000457763672-lh17-280000686645508-ls0-1": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.52,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1.08
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:e2c86d3c7656676a9dff026887009be02889847d,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:0e76ac998447d699afe7098c75f2769fa51fdee2,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-11-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 0.875
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:1b9b2d34987f52f50c9ae747fbf43deff037f46b,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 0.875
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:eb6363ff72aaa59036e1cbd4980e9d7f15990fc3,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-10-lh14-ls0-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.5,
+              "unit": "px"
+            },
+            "lineHeight": 0.875
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6a6ccb0e09ebd9d6687485493d182bb2e190d4cf,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-26": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 26,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:62b0e4f61bae1c68fa7df9a3f9067dee6a3ce0eb,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-11-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:fc9d010c5cd037169309c67690acab459f6041e6,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-17": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 17,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:ebc0229e5d08b2e293d0dda93207fab68b629b51,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-12-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:19adfeeec0e813c1f4a47a2924f7ac9d5c432618,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-bold-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6235457f1a7b540c3074d716e2ab075a181d3a6f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-13": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:88c3dcf27d435e715e7e181ab4b1c61ab1ee4a74,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-10-ls0-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.5,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:5d2db4bd102b1a325e60e0431dcecd08911822b7,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-lh18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.125
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:d97dacf1b5c0858ff33a762b7c90933eeab1032c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-12-lh18-ls0-1": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1.125
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:ffa3252d45404a5b47ac8b92c11cc25e169fe613,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-bold-22": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 22,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3a2eb39ea62f4d9a42d3b0081d37633a11b2847b,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-bold-18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 18,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:0590e1dbbffddeb296d3c95426969a7d3388358b,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-italic-10": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2,
+            "fontStyle": "italic"
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:e71bbf4552d724e0129e055bbf21fa01c078ac98,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-9": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:bd09dc1da75361e01c3c51b504a6949ca2e58b89,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-11-197440147399902-lh16-796159744262695-ls0-1": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.1974,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1.05
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:5ad43136a954f243107351994bb768a587ecc576,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-10-108799934387207-lh15-163200378417969-ls0-08": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10.1088,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.08,
+              "unit": "px"
+            },
+            "lineHeight": 0.948
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3b47edf3233ee20961674755cb6c556a8c5bc01d,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-9-331199645996094-lh13-99679946899414-ls0-08": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9.3312,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.08,
+              "unit": "px"
+            },
+            "lineHeight": 0.875
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:b0c59fda12c69f3d241ba9039337a123e23a1b69,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:9b26d5653e75441885178bb4c9bd36fcfe585806,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8c721a7e8f75ef7d9dcd9fb7a0cda9896fef8f2a,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:953e8e0ea539a2dacd1b7cfffad53203fd9a5180,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-11": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:0e39a9740872df5df137b3c73d4d13a86595fdd8,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 16,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:56b932c70da81b315891dec3796fedc0cf7f3506,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-28-lh32-lsm0-25": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": -0.25,
+              "unit": "px"
+            },
+            "lineHeight": 2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6f09377bb972b96afa807416cc124331a2f3cba6,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-9-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:44a7dec524b24b8944b748e725e21067f28b82bc,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-10-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2dc2638aea6dc399a4fcd1194bcc6274edacc19e,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-27": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 27,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:fc6325e35927687dca58195ec57838876de3bd93,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-19": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 19,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:e7b69af7b401763650a7085d8895a01db7fbccc0,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-32": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 32,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2504fceec8db794ddca256a045e4ba5f59eee182,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11-ls0-6": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.6,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8c8d758f21e11ac089e26f75de0fffeb92179570,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-13-lh17": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.063
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:961bdb796020567747439dddac37ebb263a50b56,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 15,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f4127ec5096da5c9e538a0b4979560e21e5021c1,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-12-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c0e5e5cb131eee692c6e42d5a8872fb8eabd38fb,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-13-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 13.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:d49deb1137d3fa3170ed8f259e9a6fb957832e28,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-13-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c6752bff17ff4d7502b33c6c507c4690b766d321,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-13-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 13.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:1e910fbbbe66c7501d37655143f93429703a9398,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 18,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c6fe33cd198489840da8080119e9bffe400ab1b0,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 16,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2cdc86adcd59495c4b1aefc5d22269677d204a8f,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-28-lh40-ls-0-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": -0.5,
+              "unit": "px"
+            },
+            "lineHeight": 2.5
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:7ac9e0deaeb55754a189c7f5e9babae189afa8b5,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-bold-28-lh48-ls-1": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 28,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": -1,
+              "unit": "px"
+            },
+            "lineHeight": 3
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:1f5a37a7817eb321fd4632aab2745b59a20b313a,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-9-ls0-4000000059604645": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.4,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f51435c6cc16aa3196f29a45596cc1eb3815f64e,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-14-lh20-73600196838379-ls0-11999999731779099": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.12,
+              "unit": "px"
+            },
+            "lineHeight": 1.296
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:7500827768624f63ef286e6a75142e415c170f91,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-lh18-720001220703125-ls0-10000000149011612": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1.17
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:32423ed5862ebc77709bdd0bf49dc962384efbf7,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-lh17-280000686645508-ls0-10000000149011612": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.1,
+              "unit": "px"
+            },
+            "lineHeight": 1.08
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:26a125965e1492b736c14313bd4c14d651173672,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-12-5-lh18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.125
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:9b8dbbd2bba607d90d4819728e7907d75bb4c4f6,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-14-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8295ea388e0607e970b7261af86681f2382af0e4,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-bold-11": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 700,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:492bb82de1ec3a05b48f0a162f66007e30550157,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-21": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 21,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:07dda09cfd06aa2131f9d82ad432b6d2c52bc419,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 15,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:12bc09349483b271f3396fdadf76aeba89cddb85,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 15,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:6bcb7f8c3bbe946a5cbef58b12d5c3bd70476937,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-36": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 36,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f19fddd26594a2482607ad048e74c49523b776f8,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-8-90999984741211-lh13-604887962341309-ls0-08099999278783798": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 8.91,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.081,
+              "unit": "px"
+            },
+            "lineHeight": 0.85
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:4388566b1e48949fc0a1c43c927d177f12aa4942,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-8-09999942779541-lh12-282191276550293-ls0-06479999423027039": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 8.1,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.0648,
+              "unit": "px"
+            },
+            "lineHeight": 0.768
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:58081184de6ef962524598252ccce874921b74ee,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-8-09999942779541-lh11-337407112121582-ls0-06479999423027039": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 8.1,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.0648,
+              "unit": "px"
+            },
+            "lineHeight": 0.709
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:d7b8abe94618bd3811647e400f06d4f02b30d847,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-13": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:1be39b5b5f604238b1a49deaecb73be782eb4436,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-13-lh18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.125
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:eefdf4815b98faa8b30c7e53e175e20672b153af,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-7-217099189758301-lh11-01995849609375-ls0-07": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 7.2171,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.07,
+              "unit": "px"
+            },
+            "lineHeight": 0.689
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:286fe07f9f59b637fc71f6d8c1bad55c85220402,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-6-560998916625977-lh9-94857406616211-ls0-05": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 6.561,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.05,
+              "unit": "px"
+            },
+            "lineHeight": 0.622
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:5babceeac1a5002b11f86e4f2ed6bbaa53c5c2cb,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-6-560998916625977-lh9-18329906463623-ls0-05": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 6.561,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0.05,
+              "unit": "px"
+            },
+            "lineHeight": 0.574
+          },
+          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:8de846b8a0820da7b30d7af79eef0f042ef0efd4,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semibold-11-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style, line height AUTO. Named debt, like typography/raw/*.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:343b15a20d2087ab47d726202f0306aa85dc5ed4,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-11-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$description": "Mechanical style, line height AUTO. Named debt, like typography/raw/*.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:1f08a2f7cc46011ebc112df734e8306667a4777e,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "generator": {
+      "name": "Token Press",
+      "version": "3.0.0"
+    }
+  }
+}
