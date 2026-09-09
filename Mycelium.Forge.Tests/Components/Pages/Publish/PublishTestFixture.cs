@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
 
     using Bunit;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -164,7 +164,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         [Test]
         public async Task VerifyPublishPackage()
         {
-            this.viewModelMock.Setup(x => x.Publish()).Returns(Result.Ok());
+            this.viewModelMock.Setup(x => x.Publish()).Returns(Result.Success);
 
             var publishPage = this.context.Render<Publish>();
 
@@ -174,7 +174,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             _ = publishPage.InvokeAsync(() => publishButton.ClickAsync());
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
 
-            var failedResult = Result.Fail("Package already exists.");
+            var failedResult = Error.Failure(description: "Package already exists.");
             this.viewModelMock.Setup(x => x.Publish()).Returns(failedResult);
 
             await publishPage.InvokeAsync(() => publishButton.ClickAsync());

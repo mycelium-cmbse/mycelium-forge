@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="LoginViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.Login
 {
-    using FluentResults;
+    using ErrorOr;
 
     /// <summary>
     /// Provides view model state and operations for the user authentication and sign-in page.
@@ -44,13 +44,13 @@ namespace Mycelium.Forge.ViewModels.Login
         /// <summary>
         /// Submits the credentials to authenticate the user.
         /// </summary>
-        /// <returns>A <see cref="Result" /> indicating success or failure of the login operation.</returns>
-        public Result Login()
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating success or failure of the login operation.</returns>
+        public ErrorOr<Success> Login()
         {
             this.IsSubmitting = true;
             this.IsSubmitting = false;
 
-            return Result.Ok();
+            return Result.Success;
         }
     }
 }

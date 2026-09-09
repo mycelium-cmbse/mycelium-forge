@@ -42,8 +42,8 @@ namespace Mycelium.Forge.Tests.ViewModels.VerifyEmail
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(successResult.IsSuccess, Is.True);
-                Assert.That(failureResult.IsFailed, Is.True);
+                Assert.That(successResult.IsError, Is.False);
+                Assert.That(failureResult.IsError, Is.True);
                 Assert.That(this.viewModel.IsSending, Is.False);
             }
         }

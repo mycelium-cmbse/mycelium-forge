@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Bunit;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +24,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Components.Pages;
     using Mycelium.Forge.ViewModels.SignUp;
+
+    using Error = ErrorOr.Error;
 
     [TestFixture]
     public class SignUpTestFixture
@@ -79,7 +81,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             this.viewModelMock.Setup(x => x.Username).Returns("j.doe");
             this.viewModelMock.Setup(x => x.Email).Returns("j.doe@example.com");
             this.viewModelMock.Setup(x => x.Password).Returns("Secret123!");
-            this.viewModelMock.Setup(x => x.SignUp()).Returns(Result.Ok());
+            this.viewModelMock.Setup(x => x.SignUp()).Returns(Result.Success);
 
             await signUpPage.InvokeAsync(() => createAccountButton.ClickAsync());
 
@@ -89,7 +91,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 Assert.That(this.toastService.Toasts, Has.Count.EqualTo(1));
             }
 
-            this.viewModelMock.Setup(x => x.SignUp()).Returns(Result.Fail("Registration failed"));
+            this.viewModelMock.Setup(x => x.SignUp()).Returns(Error.Failure(description: "Registration failed"));
             await signUpPage.InvokeAsync(() => createAccountButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
