@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationScopeBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -59,7 +59,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
-                                                   return Result.Fail("Unauthenticated user cannot create a {{entityLower}}.");
+                                                   return Error.Unauthorized(description: "Unauthenticated user cannot create a {{entityLower}}.");
                                                }
 
                                                if (toCreate.Owner == userContext.AccountId.Value)
@@ -76,7 +76,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 stringBuilder.Append($$"""
                                                if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
                                                {
-                                                   return Result.Ok();
+                                                   return Result.Success;
                                                }
                                        """);
             }
@@ -87,26 +87,26 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                var orgGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.OrgCreatePermission}});
 
-                                               if (orgGuard.IsFailed)
+                                               if (orgGuard.IsError)
                                                {
                                                    return orgGuard;
                                                }
 
                                                var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);
 
-                                               if (!orgResult.IsSuccess || orgResult.Value.Count == 0)
+                                               if (orgResult.IsError || orgResult.Value.Count == 0)
                                                {
-                                                   return Result.Fail("Access denied: target {{config.ScopeEntity.ToLowerInvariant()}} was not found or is not accessible.");
+                                                   return Error.Forbidden(description: "Access denied: target {{config.ScopeEntity.ToLowerInvariant()}} was not found or is not accessible.");
                                                }
 
                                                var organization = orgResult.Value[0];
 
                                                if ({{string.Join(" && ", membershipChecks)}})
                                                {
-                                                   return Result.Fail("Access denied: user is not a member of the target {{config.ScopeEntity.ToLowerInvariant()}}.");
+                                                   return Error.Forbidden(description: "Access denied: user is not a member of the target {{config.ScopeEntity.ToLowerInvariant()}}.");
                                                }
 
-                                               return Result.Ok();
+                                               return Result.Success;
                                    """);
         }
 
@@ -139,19 +139,19 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                if (thing.{{config.VisibilityProperty}} == VisibilityKind.PUBLIC)
                                                {
-                                                   return Result.Ok();
+                                                   return Result.Success;
                                                }
 
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
-                                                   return Result.Fail("Unauthenticated user cannot access non-public {{entityLower}}.");
+                                                   return Error.Unauthorized(description: "Unauthenticated user cannot access non-public {{entityLower}}.");
                                                }
 
                                                var accountId = userContext.AccountId.Value;
 
                                                if ({{string.Join(" || ", ownershipChecks)}})
                                                {
-                                                   return Result.Ok();
+                                                   return Result.Success;
                                                }
                                    """);
 
@@ -163,7 +163,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 stringBuilder.Append($$"""
                                                if ({{string.Join(" || ", bypassChecks)}})
                                                {
-                                                   return Result.Ok();
+                                                   return Result.Success;
                                                }
                                        """);
             }
@@ -176,20 +176,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                {
                                                    var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
 
-                                                   if (orgResult.IsSuccess && orgResult.Value.Count > 0)
+                                                   if (!orgResult.IsError && orgResult.Value.Count > 0)
                                                    {
                                                        var organization = orgResult.Value[0];
 
                                                        if ({{string.Join(" || ", scopeRoleChecks)}})
                                                        {
-                                                           return Result.Ok();
+                                                           return Result.Success;
                                                        }
                                                    }
 
-                                                   return Result.Fail("Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.");
+                                                   return Error.Forbidden(description: "Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.");
                                                }
 
-                                               return Result.Fail("Access denied: cannot view this {{entityLower}}.");
+                                               return Error.Forbidden(description: "Access denied: cannot view this {{entityLower}}.");
                                    """);
         }
 

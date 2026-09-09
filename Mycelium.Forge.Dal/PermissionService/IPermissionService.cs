@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.Dal.PermissionService
 {
-    using FluentResults;
+    using ErrorOr;
 
     using Mycelium.Forge.Common;
 
@@ -24,16 +24,16 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="toCreate">The entity to create.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether creation is permitted.</returns>
-        Task<Result> IsAllowedToCreate(IUserContext userContext, TThing toCreate);
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether creation is permitted.</returns>
+        Task<ErrorOr<Success>> IsAllowedToCreate(IUserContext userContext, TThing toCreate);
 
         /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to read the specified entity.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to read.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether reading is permitted.</returns>
-        Task<Result> IsAllowedToRead(IUserContext userContext, TThing thing);
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
+        Task<ErrorOr<Success>> IsAllowedToRead(IUserContext userContext, TThing thing);
 
         /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to update the specified entity,
@@ -42,15 +42,15 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="existingThing">The existing persisted entity state.</param>
         /// <param name="updatedThing">The updated entity state.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether updating is permitted.</returns>
-        Task<Result> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing);
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether updating is permitted.</returns>
+        Task<ErrorOr<Success>> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing);
 
         /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to delete the specified entity.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to delete.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
-        Task<Result> IsAllowedToDelete(IUserContext userContext, TThing thing);
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether deletion is permitted.</returns>
+        Task<ErrorOr<Success>> IsAllowedToDelete(IUserContext userContext, TThing thing);
     }
 }

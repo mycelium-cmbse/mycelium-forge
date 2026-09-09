@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="APIKeyValidator.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -16,12 +16,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     using System.CodeDom.Compiler;
     using System.Linq.Expressions;
 
-    using FluentResults;
+    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
+    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="APIKey"/> class.
@@ -52,18 +53,12 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         /// <param name="dto">The <see cref="IAPIKey"/> to validate.</param>
         /// <returns>
-        /// A new <see cref="Result"/> indicating whether the validation was successful.
+        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
         /// </returns>
-        public override async Task<Result> ValidateDto(IAPIKey dto)
+        public override async Task<ErrorOr<Success>> ValidateDto(IAPIKey dto)
         {
             var validationResult = await this.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-            {
-                return Result.Fail(string.Join("\n", validationResult.Errors.Select(x => x.ErrorMessage)));
-            }
-
-            return Result.Ok();
+            return validationResult.ToErrorOr();
         }
 
         /// <summary>
@@ -72,18 +67,12 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// <param name="dto">The <see cref="IAPIKey"/> to validate.</param>
         /// <param name="fields">The fields to validate.</param>
         /// <returns>
-        /// A new <see cref="Result"/> indicating whether the validation was successful.
+        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
         /// </returns>
-        public override async Task<Result> ValidateFields(IAPIKey dto, params Expression<Func<IAPIKey, object>>[] fields)
+        public override async Task<ErrorOr<Success>> ValidateFields(IAPIKey dto, params Expression<Func<IAPIKey, object>>[] fields)
         {
             var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-
-            if (!validationResult.IsValid)
-            {
-                return Result.Fail(string.Join("\n", validationResult.Errors.Select(x => x.ErrorMessage)));
-            }
-
-            return Result.Ok();
+            return validationResult.ToErrorOr();
         }
     }
 }

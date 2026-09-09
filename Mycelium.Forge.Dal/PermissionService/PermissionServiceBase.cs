@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.Dal.PermissionService
 {
-    using FluentResults;
+    using ErrorOr;
 
     using Mycelium.Forge.Common;
 
@@ -24,8 +24,8 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="toCreate">The entity to create.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether creation is permitted.</returns>
-        public virtual Task<Result> IsAllowedToCreate(IUserContext userContext, TThing toCreate)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether creation is permitted.</returns>
+        public virtual Task<ErrorOr<Success>> IsAllowedToCreate(IUserContext userContext, TThing toCreate)
         {
             return this.IsAllowedToCreateImplementation(userContext, toCreate);
         }
@@ -35,8 +35,8 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to read.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether reading is permitted.</returns>
-        public virtual Task<Result> IsAllowedToRead(IUserContext userContext, TThing thing)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
+        public virtual Task<ErrorOr<Success>> IsAllowedToRead(IUserContext userContext, TThing thing)
         {
             return this.IsAllowedToReadImplementation(userContext, thing);
         }
@@ -48,8 +48,8 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="existingThing">The existing persisted entity state.</param>
         /// <param name="updatedThing">The updated entity state.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether updating is permitted.</returns>
-        public virtual Task<Result> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether updating is permitted.</returns>
+        public virtual Task<ErrorOr<Success>> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing)
         {
             return this.IsAllowedToUpdateImplementation(userContext, existingThing, updatedThing);
         }
@@ -59,8 +59,8 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to delete.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
-        public virtual Task<Result> IsAllowedToDelete(IUserContext userContext, TThing thing)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether deletion is permitted.</returns>
+        public virtual Task<ErrorOr<Success>> IsAllowedToDelete(IUserContext userContext, TThing thing)
         {
             return this.IsAllowedToDeleteImplementation(userContext, thing);
         }
@@ -70,10 +70,10 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="toCreate">The entity to create.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether creation is permitted.</returns>
-        protected virtual Task<Result> IsAllowedToCreateImplementation(IUserContext userContext, TThing toCreate)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether creation is permitted.</returns>
+        protected virtual Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, TThing toCreate)
         {
-            return Task.FromResult(Result.Ok());
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
 
         /// <summary>
@@ -81,10 +81,10 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to read.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether reading is permitted.</returns>
-        protected virtual Task<Result> IsAllowedToReadImplementation(IUserContext userContext, TThing thing)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
+        protected virtual Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, TThing thing)
         {
-            return Task.FromResult(Result.Ok());
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="existingThing">The existing persisted entity state.</param>
         /// <param name="updatedThing">The updated entity state.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether updating is permitted.</returns>
-        protected virtual Task<Result> IsAllowedToUpdateImplementation(IUserContext userContext, TThing existingThing, TThing updatedThing)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether updating is permitted.</returns>
+        protected virtual Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, TThing existingThing, TThing updatedThing)
         {
-            return Task.FromResult(Result.Ok());
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
 
         /// <summary>
@@ -105,10 +105,10 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="thing">The entity to delete.</param>
-        /// <returns>An awaitable <see cref="Task{Result}" /> indicating whether deletion is permitted.</returns>
-        protected virtual Task<Result> IsAllowedToDeleteImplementation(IUserContext userContext, TThing thing)
+        /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether deletion is permitted.</returns>
+        protected virtual Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, TThing thing)
         {
-            return Task.FromResult(Result.Ok());
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
     }
 }

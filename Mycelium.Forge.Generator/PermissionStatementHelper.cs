@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionStatementHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -29,10 +29,10 @@ namespace Mycelium.Forge.Generator
         /// Gets the C# return statement for a successful result depending on whether the method is asynchronous.
         /// </summary>
         /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
-        /// <returns>A string representing either <c>return Result.Ok();</c> or <c>return Task.FromResult(Result.Ok());</c>.</returns>
+        /// <returns>A string representing either <c>return Result.Success;</c> or <c>return Task.FromResult&lt;ErrorOr&lt;Success&gt;&gt;(Result.Success);</c>.</returns>
         public static string GetOkReturn(bool isAsync)
         {
-            return GetReturnStatement("Result.Ok()", isAsync);
+            return isAsync ? "return Result.Success;" : "return Task.FromResult<ErrorOr<Success>>(Result.Success);";
         }
 
         /// <summary>
@@ -42,12 +42,27 @@ namespace Mycelium.Forge.Generator
         /// <param name="messageExpression">The message expression or raw string literal.</param>
         /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
         /// <returns>
-        /// A string representing either <c>return Result.Fail({messageExpression});</c> or
-        /// <c>return Task.FromResult(Result.Fail({messageExpression}));</c>.
+        /// A string representing either <c>return Error.Forbidden(description: {messageExpression});</c> or
+        /// <c>return Task.FromResult&lt;ErrorOr&lt;Success&gt;&gt;(Error.Forbidden(description: {messageExpression}));</c>.
         /// </returns>
         public static string GetFailReturn(string messageExpression, bool isAsync)
         {
-            return GetReturnStatement($"Result.Fail({messageExpression})", isAsync);
+            return isAsync ? $"return Error.Forbidden(description: {messageExpression});" : $"return Task.FromResult<ErrorOr<Success>>(Error.Forbidden(description: {messageExpression}));";
+        }
+
+        /// <summary>
+        /// Gets the C# return statement for an unauthorized result with the given message expression depending on whether the method is
+        /// asynchronous.
+        /// </summary>
+        /// <param name="messageExpression">The message expression or raw string literal.</param>
+        /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
+        /// <returns>
+        /// A string representing either <c>return Error.Unauthorized(description: {messageExpression});</c> or
+        /// <c>return Task.FromResult&lt;ErrorOr&lt;Success&gt;&gt;(Error.Unauthorized(description: {messageExpression}));</c>.
+        /// </returns>
+        public static string GetUnauthorizedReturn(string messageExpression, bool isAsync)
+        {
+            return isAsync ? $"return Error.Unauthorized(description: {messageExpression});" : $"return Task.FromResult<ErrorOr<Success>>(Error.Unauthorized(description: {messageExpression}));";
         }
     }
 }

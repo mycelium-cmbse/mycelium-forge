@@ -62,29 +62,29 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
-                                                   return Result.Fail("Unauthenticated user cannot create an invitation.");
+                                                   return Error.Unauthorized(description: "Unauthenticated user cannot create an invitation.");
                                                }
 
                                                var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
 
-                                               if (guard.IsSuccess)
+                                               if (!guard.IsError)
                                                {
-                                                   return Result.Ok();
+                                                   return Result.Success;
                                                }
 
                                                var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ScopeProperty}}]);
 
-                                               if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
+                                               if (!scopeResult.IsError && scopeResult.Value.Count > 0)
                                                {
                                                    var {{config.ScopeVar}} = scopeResult.Value[0];
 
                                                    if ({{string.Join(" || ", scopeRoleChecks)}})
                                                    {
-                                                       return Result.Ok();
+                                                       return Result.Success;
                                                    }
                                                }
 
-                                               return Result.Fail("Access denied: only {{config.ScopeRoleDescription}}s can invite members.");
+                                               return Error.Forbidden(description: "Access denied: only {{config.ScopeRoleDescription}}s can invite members.");
                                    """);
         }
 
@@ -103,25 +103,25 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
-                                                   return Result.Fail("Unauthenticated user cannot view an invitation.");
+                                                   return Error.Unauthorized(description: "Unauthenticated user cannot view an invitation.");
                                                }
 
                                                var accountId = userContext.AccountId.Value;
 
                                                if (thing.Owner == accountId || thing.{{config.InviteeProperty}} == accountId)
                                                {
-                                                   return Result.Ok();
+                                                   return Result.Success;
                                                }
 
                                                var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
 
-                                               if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
+                                               if (!scopeResult.IsError && scopeResult.Value.Count > 0)
                                                {
                                                    var {{config.ScopeVar}} = scopeResult.Value[0];
 
                                                    if ({{string.Join(" || ", scopeRoleChecks)}})
                                                    {
-                                                       return Result.Ok();
+                                                       return Result.Success;
                                                    }
                                                }
 
@@ -142,7 +142,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
             var isAsync = this.IsAsyncMethod(Operations.Update);
 
-            var failUnauth = PermissionStatementHelper.GetFailReturn("\"Unauthenticated user cannot respond to an invitation.\"", isAsync);
+            var failUnauth = PermissionStatementHelper.GetUnauthorizedReturn("\"Unauthenticated user cannot respond to an invitation.\"", isAsync);
             var failAlready = PermissionStatementHelper.GetFailReturn("$\"Cannot change status of invitation that is already {existingThing.Status}.\"", isAsync);
             var failNotInvitee = PermissionStatementHelper.GetFailReturn("\"Access denied: only the invited target account can accept the invitation.\"", isAsync);
             var acceptGuard = PermissionStatementHelper.GetReturnStatement($"PermissionGuard.GuardPermission(userContext, PermissionKind.{config.AcceptPermission})", isAsync);
@@ -218,30 +218,30 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
                                                {
-                                                   return Result.Fail("Unauthenticated user cannot revoke an invitation.");
+                                                   return Error.Unauthorized(description: "Unauthenticated user cannot revoke an invitation.");
                                                }
 
                                                var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
 
-                                               if (guard.IsFailed)
+                                               if (guard.IsError)
                                                {
                                                    return guard;
                                                }
 
                                                var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
 
-                                               if (scopeResult.IsSuccess && scopeResult.Value.Count > 0)
+                                               if (!scopeResult.IsError && scopeResult.Value.Count > 0)
                                                {
                                                    var {{config.ScopeVar}} = scopeResult.Value[0];
                                                    var accountId = userContext.AccountId.Value;
 
                                                    if ({{string.Join(" || ", scopeRoleChecks)}})
                                                    {
-                                                       return Result.Ok();
+                                                       return Result.Success;
                                                    }
                                                }
 
-                                               return Result.Fail("Access denied: only {{config.ScopeRoleDescription}}s can revoke invitations.");
+                                               return Error.Forbidden(description: "Access denied: only {{config.ScopeRoleDescription}}s can revoke invitations.");
                                    """);
         }
 

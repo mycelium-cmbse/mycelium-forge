@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -293,7 +293,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 var propGuardExpr = EmitPermissionGuard(propDef.RequiredPermission);
                 stringBuilder.AppendLine($"                var guard = {propGuardExpr};");
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine("                if (guard.IsFailed)");
+                stringBuilder.AppendLine("                if (guard.IsError)");
                 stringBuilder.AppendLine("                {");
                 stringBuilder.AppendLine($"                    {PermissionStatementHelper.GetReturnStatement("guard", isAsync)}");
                 stringBuilder.AppendLine("                }");
@@ -335,7 +335,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (string.IsNullOrWhiteSpace(permissionExpression))
             {
-                return "Result.Ok()";
+                return "Result.Success";
             }
 
             var hasOr = permissionExpression.Contains('|');
@@ -460,7 +460,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         }
 
         /// <summary>
-        /// Appends a permission guard statement or Result.Ok() to the string builder.
+        /// Appends a permission guard statement or Result.Success to the string builder.
         /// </summary>
         /// <param name="stringBuilder">The <see cref="StringBuilder" /> to append to.</param>
         /// <param name="permission">The required permission expression.</param>

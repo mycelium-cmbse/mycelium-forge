@@ -16,12 +16,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     using System.CodeDom.Compiler;
     using System.Linq.Expressions;
 
-    using FluentResults;
+    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
+    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="Account"/> class.
@@ -53,18 +54,12 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         /// <param name="dto">The <see cref="IAccount"/> to validate.</param>
         /// <returns>
-        /// A new <see cref="Result"/> indicating whether the validation was successful.
+        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
         /// </returns>
-        public override async Task<Result> ValidateDto(IAccount dto)
+        public override async Task<ErrorOr<Success>> ValidateDto(IAccount dto)
         {
             var validationResult = await this.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-            {
-                return Result.Fail(string.Join("\n", validationResult.Errors.Select(x => x.ErrorMessage)));
-            }
-
-            return Result.Ok();
+            return validationResult.ToErrorOr();
         }
 
         /// <summary>
@@ -73,18 +68,12 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// <param name="dto">The <see cref="IAccount"/> to validate.</param>
         /// <param name="fields">The fields to validate.</param>
         /// <returns>
-        /// A new <see cref="Result"/> indicating whether the validation was successful.
+        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
         /// </returns>
-        public override async Task<Result> ValidateFields(IAccount dto, params Expression<Func<IAccount, object>>[] fields)
+        public override async Task<ErrorOr<Success>> ValidateFields(IAccount dto, params Expression<Func<IAccount, object>>[] fields)
         {
             var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-
-            if (!validationResult.IsValid)
-            {
-                return Result.Fail(string.Join("\n", validationResult.Errors.Select(x => x.ErrorMessage)));
-            }
-
-            return Result.Ok();
+            return validationResult.ToErrorOr();
         }
     }
 }
