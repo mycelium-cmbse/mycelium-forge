@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionGuard.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Common
 {
     using System.Linq;
 
-    using FluentResults;
+    using ErrorOr;
 
     /// <summary>
     /// Provides static permission checking and operation guarding methods.
@@ -54,18 +54,18 @@ namespace Mycelium.Forge.Common
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="permission">The permission required for the operation.</param>
-        /// <returns>A <see cref="Result" /> indicating whether the permission is granted.</returns>
-        public static Result GuardPermission(IUserContext userContext, PermissionKind permission)
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating whether the permission is granted.</returns>
+        public static ErrorOr<Success> GuardPermission(IUserContext userContext, PermissionKind permission)
         {
             if (HasPermission(userContext, permission))
             {
-                return Result.Ok();
+                return Result.Success;
             }
 
             var username = userContext != null ? userContext.Username : "unknown";
             var roles = userContext != null ? string.Join(", ", userContext.CurrentRoles.Select(r => r.ToString())) : string.Empty;
 
-            return Result.Fail($"Access denied: user '{username}' with roles [{roles}] does not have the '{permission}' permission.");
+            return Error.Forbidden(description: $"Access denied: user '{username}' with roles [{roles}] does not have the '{permission}' permission.");
         }
 
         /// <summary>
@@ -108,19 +108,19 @@ namespace Mycelium.Forge.Common
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="permissions">The collection of permissions to evaluate.</param>
-        /// <returns>A <see cref="Result" /> indicating whether at least one permission is granted.</returns>
-        public static Result GuardAnyPermission(IUserContext userContext, params PermissionKind[] permissions)
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating whether at least one permission is granted.</returns>
+        public static ErrorOr<Success> GuardAnyPermission(IUserContext userContext, params PermissionKind[] permissions)
         {
             if (HasAnyPermission(userContext, permissions))
             {
-                return Result.Ok();
+                return Result.Success;
             }
 
             var username = userContext != null ? userContext.Username : "unknown";
             var roles = userContext != null ? string.Join(", ", userContext.CurrentRoles.Select(r => r.ToString())) : string.Empty;
             var required = permissions != null ? string.Join(" or ", permissions.Select(p => p.ToString())) : string.Empty;
 
-            return Result.Fail($"Access denied: user '{username}' with roles [{roles}] does not have any of the required permissions [{required}].");
+            return Error.Forbidden(description: $"Access denied: user '{username}' with roles [{roles}] does not have any of the required permissions [{required}].");
         }
 
         /// <summary>
@@ -129,19 +129,19 @@ namespace Mycelium.Forge.Common
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="permissions">The collection of permissions to evaluate.</param>
-        /// <returns>A <see cref="Result" /> indicating whether all permissions are granted.</returns>
-        public static Result GuardAllPermissions(IUserContext userContext, params PermissionKind[] permissions)
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating whether all permissions are granted.</returns>
+        public static ErrorOr<Success> GuardAllPermissions(IUserContext userContext, params PermissionKind[] permissions)
         {
             if (HasAllPermissions(userContext, permissions))
             {
-                return Result.Ok();
+                return Result.Success;
             }
 
             var username = userContext != null ? userContext.Username : "unknown";
             var roles = userContext != null ? string.Join(", ", userContext.CurrentRoles.Select(r => r.ToString())) : string.Empty;
             var required = permissions != null ? string.Join(" and ", permissions.Select(p => p.ToString())) : string.Empty;
 
-            return Result.Fail($"Access denied: user '{username}' with roles [{roles}] does not have all of the required permissions [{required}].");
+            return Error.Forbidden(description: $"Access denied: user '{username}' with roles [{roles}] does not have all of the required permissions [{required}].");
         }
     }
 }
