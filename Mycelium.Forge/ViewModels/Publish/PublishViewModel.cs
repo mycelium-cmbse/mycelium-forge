@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.Publish
 {
-    using FluentResults;
+    using ErrorOr;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Enums;
@@ -131,12 +131,12 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// <summary>
         /// Initiates the package publishing process.
         /// </summary>
-        /// <returns>A <see cref="Result" /> indicating success or failure of the publish operation.</returns>
-        public Result Publish()
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating success or failure of the publish operation.</returns>
+        public ErrorOr<Success> Publish()
         {
             this.IsPublishing = true;
             this.IsPublishing = false;
-            return Result.Ok();
+            return Result.Success;
         }
     }
 }

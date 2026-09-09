@@ -294,7 +294,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Region = "NY"
                 });
 
-                if (r1.IsFailed)
+                if (r1.IsError)
                 {
                     return r1;
                 }
@@ -310,7 +310,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Region = "NY"
                 });
 
-                if (r2.IsFailed)
+                if (r2.IsError)
                 {
                     return r2;
                 }
@@ -326,7 +326,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Region = "NY"
                 });
 
-                if (r3.IsFailed)
+                if (r3.IsError)
                 {
                     return r3;
                 }
@@ -345,7 +345,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Origin = "https://example.com"
                 });
 
-                if (a1.IsFailed)
+                if (a1.IsError)
                 {
                     return a1;
                 }
@@ -364,7 +364,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Origin = "https://example.com"
                 });
 
-                if (a2.IsFailed)
+                if (a2.IsError)
                 {
                     return a2;
                 }
@@ -500,7 +500,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     ModifiedAt = now
                 });
 
-                if (vResult.IsFailed)
+                if (vResult.IsError)
                 {
                     return vResult;
                 }
@@ -535,7 +535,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     ModifiedAt = now
                 });
 
-                if (vResult.IsFailed)
+                if (vResult.IsError)
                 {
                     return vResult;
                 }
@@ -570,7 +570,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     ModifiedAt = now
                 });
 
-                if (vResult.IsFailed)
+                if (vResult.IsError)
                 {
                     return vResult;
                 }

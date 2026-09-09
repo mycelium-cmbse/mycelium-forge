@@ -70,8 +70,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(validResult.IsSuccess, Is.True);
-                Assert.That(invalidResult.IsFailed, Is.True);
+                Assert.That(validResult.IsError, Is.False);
+                Assert.That(invalidResult.IsError, Is.True);
             }
         }
 
@@ -93,8 +93,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nameResult.IsSuccess, Is.True);
-                Assert.That(shortNameResult.IsFailed, Is.True);
+                Assert.That(nameResult.IsError, Is.False);
+                Assert.That(shortNameResult.IsError, Is.True);
             }
         }
     }

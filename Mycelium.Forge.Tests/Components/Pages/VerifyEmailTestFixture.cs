@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Bunit;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +25,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Components.Pages;
     using Mycelium.Forge.ViewModels.VerifyEmail;
+
+    using Error = ErrorOr.Error;
 
     [TestFixture]
     public class VerifyEmailTestFixture
@@ -76,7 +78,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             var verifyEmailPage = this.context.Render<VerifyEmail>();
             var resendButton = verifyEmailPage.Find("#verify-email-resend-button");
 
-            this.viewModelMock.Setup(x => x.SendEmail()).Returns(Result.Ok());
+            this.viewModelMock.Setup(x => x.SendEmail()).Returns(Result.Success);
             await verifyEmailPage.InvokeAsync(() => resendButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
@@ -85,7 +87,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 Assert.That(this.toastService.Toasts, Has.Count.EqualTo(1));
             }
 
-            this.viewModelMock.Setup(x => x.SendEmail()).Returns(Result.Fail("Rate limit exceeded"));
+            this.viewModelMock.Setup(x => x.SendEmail()).Returns(Error.Failure(description: "Rate limit exceeded"));
             await verifyEmailPage.InvokeAsync(() => resendButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())

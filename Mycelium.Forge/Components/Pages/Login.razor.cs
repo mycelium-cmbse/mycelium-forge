@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Login.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -82,16 +82,14 @@ namespace Mycelium.Forge.Components.Pages
 
             var result = this.ViewModel.Login();
 
-            if (result.IsSuccess)
+            if (result.IsError)
             {
-                this.ToastService.Success("Signed in successfully.", "Welcome");
-                this.NavigationManager.NavigateTo(PageRoutes.Home);
+                this.ToastService.Error(result.FirstError.Description, "Error");
+                return;
             }
-            else
-            {
-                var errorMessage = result.Reasons.Count > 0 ? result.Reasons[0].Message : "Failed to sign in.";
-                this.ToastService.Error(errorMessage, "Error");
-            }
+
+            this.ToastService.Success("Signed in successfully.", "Welcome");
+            this.NavigationManager.NavigateTo(PageRoutes.Home);
         }
 
         /// <summary>

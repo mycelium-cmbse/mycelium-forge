@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationPermissionServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -99,9 +99,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(accountResult.IsSuccess, Is.True);
-                Assert.That(adminResult.IsSuccess, Is.True);
-                Assert.That(anonymousResult.IsFailed, Is.True);
+                Assert.That(accountResult.IsError, Is.False);
+                Assert.That(adminResult.IsError, Is.False);
+                Assert.That(anonymousResult.IsError, Is.True);
             }
         }
 
@@ -125,9 +125,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(superAdminResult.IsSuccess, Is.True);
-                Assert.That(orgAdminResult.IsFailed, Is.True);
-                Assert.That(accountResult.IsFailed, Is.True);
+                Assert.That(superAdminResult.IsError, Is.False);
+                Assert.That(orgAdminResult.IsError, Is.True);
+                Assert.That(accountResult.IsError, Is.True);
             }
         }
 
@@ -286,12 +286,12 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(settingsAdminResult.IsSuccess, Is.True);
-                Assert.That(settingsMemberResult.IsFailed, Is.True);
-                Assert.That(adminTransferResult.IsSuccess, Is.True);
-                Assert.That(memberTransferResult.IsFailed, Is.True);
-                Assert.That(visibilityAdminResult.IsSuccess, Is.True);
-                Assert.That(visibilityMemberResult.IsFailed, Is.True);
+                Assert.That(settingsAdminResult.IsError, Is.False);
+                Assert.That(settingsMemberResult.IsError, Is.True);
+                Assert.That(adminTransferResult.IsError, Is.False);
+                Assert.That(memberTransferResult.IsError, Is.True);
+                Assert.That(visibilityAdminResult.IsError, Is.False);
+                Assert.That(visibilityMemberResult.IsError, Is.True);
             }
         }
     }

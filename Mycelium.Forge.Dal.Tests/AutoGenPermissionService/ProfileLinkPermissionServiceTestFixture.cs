@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 {
     using System.Collections.Immutable;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Moq;
 
@@ -111,7 +111,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<IUserContext>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<Guid[]>()))
-                .ReturnsAsync(Result.Ok(ImmutableList.Create<IOrganization>(org)));
+                .ReturnsAsync(ImmutableList.Create<IOrganization>(org));
 
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, personalLink);
             var personalOwnerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, personalLink);
@@ -121,11 +121,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(unauthResult.IsFailed, Is.True);
-                Assert.That(personalOwnerResult.IsSuccess, Is.True);
-                Assert.That(personalOtherResult.IsFailed, Is.True);
-                Assert.That(orgAdminResult.IsSuccess, Is.True);
-                Assert.That(orgMemberResult.IsFailed, Is.True);
+                Assert.That(unauthResult.IsError, Is.True);
+                Assert.That(personalOwnerResult.IsError, Is.False);
+                Assert.That(personalOtherResult.IsError, Is.True);
+                Assert.That(orgAdminResult.IsError, Is.False);
+                Assert.That(orgMemberResult.IsError, Is.True);
             }
         }
 
@@ -148,8 +148,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(ownerResult.IsSuccess, Is.True);
-                Assert.That(otherResult.IsFailed, Is.True);
+                Assert.That(ownerResult.IsError, Is.False);
+                Assert.That(otherResult.IsError, Is.True);
             }
         }
 
@@ -179,8 +179,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(ownerResult.IsSuccess, Is.True);
-                Assert.That(otherResult.IsFailed, Is.True);
+                Assert.That(ownerResult.IsError, Is.False);
+                Assert.That(otherResult.IsError, Is.True);
             }
         }
     }

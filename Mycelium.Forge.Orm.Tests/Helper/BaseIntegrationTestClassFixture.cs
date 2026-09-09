@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.Orm.Tests.Helper
 {
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.Extensions.Logging;
 
@@ -124,7 +124,7 @@ namespace Mycelium.Forge.Orm.Tests.Helper
         /// </summary>
         /// <param name="action">The database action taking the transaction.</param>
         /// <returns>An awaitable <see cref="Task" />.</returns>
-        protected async Task Insert(Func<NpgsqlTransaction, Task<Result>> action)
+        protected async Task Insert(Func<NpgsqlTransaction, Task<ErrorOr<Created>>> action)
         {
             await using var transaction = await this.Connection.BeginTransactionAsync();
 
@@ -132,7 +132,7 @@ namespace Mycelium.Forge.Orm.Tests.Helper
             {
                 var result = await action.Invoke(transaction);
 
-                if (result.IsFailed)
+                if (result.IsError)
                 {
                     Assert.Fail(result.ToString());
                 }

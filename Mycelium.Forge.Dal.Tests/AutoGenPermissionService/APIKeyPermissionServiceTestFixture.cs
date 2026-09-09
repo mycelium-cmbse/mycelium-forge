@@ -88,10 +88,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(unauthResult.IsFailed, Is.True);
-                Assert.That(ownerResult.IsSuccess, Is.True);
-                Assert.That(otherResult.IsFailed, Is.True);
-                Assert.That(adminResult.IsSuccess, Is.True);
+                Assert.That(unauthResult.IsError, Is.True);
+                Assert.That(ownerResult.IsError, Is.False);
+                Assert.That(otherResult.IsError, Is.True);
+                Assert.That(adminResult.IsError, Is.False);
             }
         }
     }

@@ -214,21 +214,21 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
                 var address1Result = await addressDao.CreateAsync(transaction, CancellationToken.None, address1);
 
-                if (address1Result.IsFailed)
+                if (address1Result.IsError)
                 {
                     return address1Result;
                 }
 
                 var address2Result = await addressDao.CreateAsync(transaction, CancellationToken.None, address2);
 
-                if (address2Result.IsFailed)
+                if (address2Result.IsError)
                 {
                     return address2Result;
                 }
 
                 var adminAccountResult = await accountDao.CreateAsync(transaction, CancellationToken.None, adminAccount);
 
-                if (adminAccountResult.IsFailed)
+                if (adminAccountResult.IsError)
                 {
                     return adminAccountResult;
                 }

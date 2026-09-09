@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Orm.Tests.Services
 {
-    using FluentResults;
-
     using Microsoft.Extensions.Logging;
 
     using Moq;
@@ -49,7 +47,8 @@ namespace Mycelium.Forge.Orm.Tests.Services
         /// Verifies that
         /// <see
         ///     cref="OrganizationService.UpdateAsync(IUserContext, NpgsqlTransaction, IEnumerable{IOrganization}, CancellationToken)" />
-        /// correctly updates an existing organization in the database for an administrator and rejects unauthorized updates from anonymous or non-administrator users.
+        /// correctly updates an existing organization in the database for an administrator and rejects unauthorized updates from
+        /// anonymous or non-administrator users.
         /// </summary>
         /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
@@ -73,10 +72,10 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(anonymousUpdateResult.IsFailed, Is.True);
-                Assert.That(nonAdminUpdateResult.IsFailed, Is.True);
-                Assert.That(adminUpdateResult.IsSuccess, Is.True);
-                Assert.That(updatedReadResult.IsSuccess, Is.True);
+                Assert.That(anonymousUpdateResult.IsError, Is.True);
+                Assert.That(nonAdminUpdateResult.IsError, Is.True);
+                Assert.That(adminUpdateResult.IsError, Is.False);
+                Assert.That(updatedReadResult.IsError, Is.False);
                 Assert.That(updatedReadResult.Value.Single().Email, Is.EqualTo("updated-org@example.com"));
                 Assert.That(updatedReadResult.Value.Single().BillingEmail, Is.EqualTo("updated-billing@example.com"));
             }
@@ -180,7 +179,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Region = "LX"
                 });
 
-                if (r1.IsFailed)
+                if (r1.IsError)
                 {
                     return r1;
                 }
@@ -196,7 +195,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Region = "PT"
                 });
 
-                if (r2.IsFailed)
+                if (r2.IsError)
                 {
                     return r2;
                 }
@@ -215,7 +214,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Origin = "https://example.com"
                 });
 
-                if (r3.IsFailed)
+                if (r3.IsError)
                 {
                     return r3;
                 }

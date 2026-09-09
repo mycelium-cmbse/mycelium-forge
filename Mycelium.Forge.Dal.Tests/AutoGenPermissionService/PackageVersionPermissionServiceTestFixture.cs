@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionPermissionServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 {
     using System.Collections.Immutable;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Moq;
 
@@ -111,7 +111,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<IUserContext>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<Guid[]>()))
-                .ReturnsAsync(Result.Ok(ImmutableList.Create<IPackage>(package)));
+                .ReturnsAsync(ImmutableList.Create<IPackage>(package));
 
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, version);
             var otherResult = await this.permissionService.IsAllowedToCreate(this.otherUserContext, version);
@@ -119,9 +119,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(unauthResult.IsFailed, Is.True);
-                Assert.That(otherResult.IsFailed, Is.True);
-                Assert.That(ownerResult.IsSuccess, Is.True);
+                Assert.That(unauthResult.IsError, Is.True);
+                Assert.That(otherResult.IsError, Is.True);
+                Assert.That(ownerResult.IsError, Is.False);
             }
         }
 
@@ -149,7 +149,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<IUserContext>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<Guid[]>()))
-                .ReturnsAsync(Result.Ok(ImmutableList.Create<IPackage>(package)));
+                .ReturnsAsync(ImmutableList.Create<IPackage>(package));
 
             var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, version);
             var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, version);
@@ -160,9 +160,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 // Only admins (InstallationAdministrator) can delete package versions.
                 // This is part of the package management policy - regular owners cannot delete their own versions
                 // to maintain package integrity and prevent accidental deletions.
-                Assert.That(adminResult.IsSuccess, Is.True);
-                Assert.That(ownerResult.IsFailed, Is.True);
-                Assert.That(otherResult.IsFailed, Is.True);
+                Assert.That(adminResult.IsError, Is.False);
+                Assert.That(ownerResult.IsError, Is.True);
+                Assert.That(otherResult.IsError, Is.True);
             }
         }
 
@@ -191,7 +191,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<IUserContext>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<Guid[]>()))
-                .ReturnsAsync(Result.Ok(ImmutableList.Create<IPackage>(package)));
+                .ReturnsAsync(ImmutableList.Create<IPackage>(package));
 
             var readResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, version);
 
@@ -199,14 +199,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<IUserContext>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<Guid[]>()))
-                .ReturnsAsync(Result.Ok(ImmutableList<IPackage>.Empty));
+                .ReturnsAsync(ImmutableList<IPackage>.Empty);
 
             var notFoundResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, version);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(readResult.IsSuccess, Is.True);
-                Assert.That(notFoundResult.IsFailed, Is.True);
+                Assert.That(readResult.IsError, Is.False);
+                Assert.That(notFoundResult.IsError, Is.True);
             }
 
             this.packagePermissionServiceMock.Verify(
@@ -256,7 +256,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                     It.IsAny<IUserContext>(),
                     It.IsAny<CancellationToken>(),
                     It.IsAny<Guid[]>()))
-                .ReturnsAsync(Result.Ok(ImmutableList.Create<IPackage>(package)));
+                .ReturnsAsync(ImmutableList.Create<IPackage>(package));
 
             var immutableResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingVersion, immutableBreachVersion);
             var unlistResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingVersion, unlistedVersion);
@@ -264,9 +264,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(immutableResult.IsFailed, Is.True);
-                Assert.That(unlistResult.IsSuccess, Is.True);
-                Assert.That(otherResult.IsFailed, Is.True);
+                Assert.That(immutableResult.IsError, Is.True);
+                Assert.That(unlistResult.IsError, Is.False);
+                Assert.That(otherResult.IsError, Is.True);
             }
         }
     }

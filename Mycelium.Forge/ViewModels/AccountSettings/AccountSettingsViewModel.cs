@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.AccountSettings
 {
-    using FluentResults;
+    using ErrorOr;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
@@ -58,8 +58,8 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// Creates a new organization with the specified creation details.
         /// </summary>
         /// <param name="result">The organization creation data.</param>
-        /// <returns>A <see cref="Result" /> indicating the success or failure of the operation.</returns>
-        public Result CreateOrganization(CreateOrganizationResult result)
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
+        public ErrorOr<Success> CreateOrganization(CreateOrganizationResult result)
         {
             var cleanScope = result.Scope?.TrimStart('@').ToLowerInvariant() ?? string.Empty;
 
@@ -73,7 +73,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             var membership = new AccountOrganizationMembershipModel(org, OrganizationInvitationKind.ADMINISTRATOR);
             this.Organizations.Add(membership);
 
-            return Result.Ok();
+            return Result.Success;
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 {
     using BlazorBlueprint.Components;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.AspNetCore.Components;
 
@@ -118,8 +118,8 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// Handles the result when an organization is created.
         /// </summary>
         /// <param name="result">The create organization result details.</param>
-        /// <returns>A <see cref="Result" /> indicating the outcome of the create organization operation.</returns>
-        public Result HandleCreateOrganization(CreateOrganizationResult result)
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the outcome of the create organization operation.</returns>
+        public ErrorOr<Success> HandleCreateOrganization(CreateOrganizationResult result)
         {
             return this.ViewModel.CreateOrganization(result);
         }

@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
     using Bunit;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -80,14 +80,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         public void VerifyHandleCreateOrganization()
         {
             var result = new CreateOrganizationResult { OrganizationName = "New Org", Scope = "@neworg" };
-            this.viewModelMock.Setup(x => x.CreateOrganization(result)).Returns(Result.Ok());
+            this.viewModelMock.Setup(x => x.CreateOrganization(result)).Returns(Result.Success);
 
             var accountSettingsPage = this.context.Render<AccountSettings>();
             var handleResult = accountSettingsPage.Instance.HandleCreateOrganization(result);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(handleResult.IsSuccess, Is.True);
+                Assert.That(handleResult.IsError, Is.False);
                 this.viewModelMock.Verify(x => x.CreateOrganization(result), Times.Once);
             }
         }

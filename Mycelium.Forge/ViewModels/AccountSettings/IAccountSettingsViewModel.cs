@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.AccountSettings
 {
-    using FluentResults;
+    using ErrorOr;
 
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Models.Organization;
@@ -45,8 +45,8 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// Creates a new organization associated with the user account.
         /// </summary>
         /// <param name="result">The organization creation data.</param>
-        /// <returns>A <see cref="Result" /> indicating the success or failure of the operation.</returns>
-        Result CreateOrganization(CreateOrganizationResult result);
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
+        ErrorOr<Success> CreateOrganization(CreateOrganizationResult result);
 
         /// <summary>
         /// Handles the deactivation of the current user account.

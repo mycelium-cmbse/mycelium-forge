@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SignUpViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.SignUp
 {
-    using FluentResults;
+    using ErrorOr;
 
     /// <summary>
     /// Provides view model state and operations for the user account registration and sign-up page.
@@ -50,13 +50,13 @@ namespace Mycelium.Forge.ViewModels.SignUp
         /// <summary>
         /// Submits the registration details to create a new user account.
         /// </summary>
-        /// <returns>A <see cref="Result" /> indicating success or failure of the registration operation.</returns>
-        public Result SignUp()
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating success or failure of the registration operation.</returns>
+        public ErrorOr<Success> SignUp()
         {
             this.IsSubmitting = true;
             this.IsSubmitting = false;
 
-            return Result.Ok();
+            return Result.Success;
         }
     }
 }

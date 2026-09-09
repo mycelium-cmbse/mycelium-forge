@@ -108,14 +108,14 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             {
                 var deleteResult = await this.packageDao.DeleteAsync(transaction, CancellationToken.None, [package]);
                 await transaction.CommitAsync();
-                Assert.That(deleteResult.IsSuccess, Is.True);
+                Assert.That(deleteResult.IsError, Is.False);
             }
 
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
                 var readResult = await this.packageDao.ReadAsync(readTransaction, CancellationToken.None, [packageId]);
                 await readTransaction.CommitAsync();
-                Assert.That(readResult.IsFailed, Is.True);
+                Assert.That(readResult.IsError, Is.True);
             }
         }
 
@@ -184,12 +184,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
                 using (Assert.EnterMultipleScope())
                 {
-                    Assert.That(readResult.IsSuccess, Is.True);
+                    Assert.That(readResult.IsError, Is.False);
                     Assert.That(readResult.Value, Has.Count.EqualTo(1));
                     Assert.That(readResult.Value[0].Name, Is.EqualTo("TestPackageRead"));
-                    Assert.That(emptyResult.IsFailed, Is.True);
-                    Assert.That(otherOrgReadResult.IsFailed, Is.True);
-                    Assert.That(owningOrgReadResult.IsSuccess, Is.True);
+                    Assert.That(emptyResult.IsError, Is.True);
+                    Assert.That(otherOrgReadResult.IsError, Is.True);
+                    Assert.That(owningOrgReadResult.IsError, Is.False);
                     Assert.That(owningOrgReadResult.Value, Has.Count.EqualTo(1));
                     Assert.That(owningOrgReadResult.Value[0].Id, Is.EqualTo(org1PackageId));
                 }
@@ -363,7 +363,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
                 var addressResult = await addressDao.CreateAsync(transaction, CancellationToken.None, address);
 
-                if (addressResult.IsFailed)
+                if (addressResult.IsError)
                 {
                     return addressResult;
                 }
@@ -406,7 +406,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
                 var addressResult = await addressDao.CreateAsync(transaction, CancellationToken.None, otherAddress);
 
-                if (addressResult.IsFailed)
+                if (addressResult.IsError)
                 {
                     return addressResult;
                 }
