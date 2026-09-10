@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+﻿import fs from 'node:fs';
 import path from 'node:path';
 import StyleDictionary from 'style-dictionary';
 
@@ -75,55 +75,6 @@ function dereferenceCollidingTokens(semanticGroup, primitiveGroup) {
   }
 }
 
-
-/**
- * Custom Style Dictionary parser for DTCG dimension primitives (mycelium-primitives.json).
- */
-StyleDictionary.registerParser({
-  name: 'dtcg-primitives-shim',
-  pattern: /mycelium-primitives\.json$/,
-  parser: ({ contents }) => {
-    const parsed = JSON.parse(contents);
-    normalizeDimensionPrimitives(parsed);
-    return parsed;
-  }
-});
-
-/**
- * Custom Style Dictionary parser for mode-specific semantic tokens (mycelium-semantics.json).
- */
-StyleDictionary.registerParser({
-  name: 'dtcg-semantics-shim',
-  pattern: /mycelium-semantics\.json$/,
-  parser: ({ contents, filePath }) => {
-    const parsed = JSON.parse(contents);
-    const primitivesFilePath = path.resolve(path.dirname(filePath), '..', 'shared', 'mycelium-primitives.json');
-    const primitives = JSON.parse(fs.readFileSync(primitivesFilePath, 'utf8'));
-
-    for (const groupName of collidingSemanticGroups) {
-      dereferenceCollidingTokens(parsed[groupName], primitives[groupName]);
-    }
-
-    delete parsed.$extensions;
-    return parsed;
-  }
-});
-
-/**
- * Custom Style Dictionary parser for DTCG typography definitions (typography.json).
- */
-StyleDictionary.registerParser({
-  name: 'dtcg-typography-curated-filter',
-  pattern: /typography\.json$/,
-  parser: ({ contents }) => {
-    const parsed = JSON.parse(contents);
-    if (parsed?.typography?.typography?.raw) {
-      delete parsed.typography.typography.raw;
-    }
-    return parsed;
-  }
-});
-
 /**
  * Maps a design token to its corresponding Tailwind @theme custom property declaration.
  * @param {object} token - Style Dictionary token.
@@ -158,29 +109,16 @@ function getFileHeader(fileName) {
 }
 
 /**
- * Custom Style Dictionary format generating Tailwind v4 @theme inline block from DTCG tokens.
+ * Formats the combined CSS stylesheet containing light and dark mode variable blocks.
+ * @param {string} fileName - Destination file name.
+ * @param {string} lightOutput - Light mode CSS declarations.
+ * @param {string} darkOutput - Dark mode CSS declarations.
+ * @returns {string} The full combined CSS content.
  */
-StyleDictionary.registerFormat({
-  name: 'css/tailwind-theme',
-  format: ({ dictionary, file }) => {
-    const fileName = file?.destination || 'theme.css';
-    const lines = [
-      getFileHeader(fileName),
-      '',
-      '@theme inline {'
-    ];
-
-    for (const token of dictionary.allTokens) {
-      const propertyDeclaration = mapTokenToTailwindThemeProperty(token);
-      if (propertyDeclaration) {
-        lines.push(propertyDeclaration);
-      }
-    }
-
-    lines.push('}', '');
-    return lines.join('\n');
-  }
-});
+function formatCombinedVariablesContent(fileName, lightOutput, darkOutput) {
+  const header = getFileHeader(fileName);
+  return `${header}\n\n${lightOutput.trim()}\n\n${darkOutput.trim()}\n`;
+}
 
 /**
  * Creates a StyleDictionary instance configured for CSS custom properties.
@@ -245,23 +183,77 @@ function createTailwindThemeInstance(product, tokensDirectory, outputDirectory) 
 }
 
 /**
- * Builds the combined CSS variables and Tailwind theme stylesheets for a product.
- * @param {string} product - 'forge' or 'bloom'
- * @param {string} tokensDirectory - Path to tokens directory
- * @param {string} outputDirectory - Path to output directory
- * @returns {Promise<void>}
+ * Custom Style Dictionary parser for DTCG dimension primitives (mycelium-primitives.json).
  */
+StyleDictionary.registerParser({
+  name: 'dtcg-primitives-shim',
+  pattern: /mycelium-primitives\.json$/,
+  parser: ({ contents }) => {
+    const parsed = JSON.parse(contents);
+    normalizeDimensionPrimitives(parsed);
+    return parsed;
+  }
+});
+
 /**
- * Formats the combined CSS stylesheet containing light and dark mode variable blocks.
- * @param {string} fileName - Destination file name.
- * @param {string} lightOutput - Light mode CSS declarations.
- * @param {string} darkOutput - Dark mode CSS declarations.
- * @returns {string} The full combined CSS content.
+ * Custom Style Dictionary parser for mode-specific semantic tokens (mycelium-semantics.json).
  */
-function formatCombinedVariablesContent(fileName, lightOutput, darkOutput) {
-  const header = getFileHeader(fileName);
-  return `${header}\n\n${lightOutput.trim()}\n\n${darkOutput.trim()}\n`;
-}
+StyleDictionary.registerParser({
+  name: 'dtcg-semantics-shim',
+  pattern: /mycelium-semantics\.json$/,
+  parser: ({ contents, filePath }) => {
+    const parsed = JSON.parse(contents);
+    const primitivesFilePath = path.resolve(path.dirname(filePath), '..', 'shared', 'mycelium-primitives.json');
+    const primitives = JSON.parse(fs.readFileSync(primitivesFilePath, 'utf8'));
+
+    for (const groupName of collidingSemanticGroups) {
+      dereferenceCollidingTokens(parsed[groupName], primitives[groupName]);
+    }
+
+    delete parsed.$extensions;
+    return parsed;
+  }
+});
+
+/**
+ * Custom Style Dictionary parser for DTCG typography definitions (typography.json).
+ */
+StyleDictionary.registerParser({
+  name: 'dtcg-typography-curated-filter',
+  pattern: /typography\.json$/,
+  parser: ({ contents }) => {
+    const parsed = JSON.parse(contents);
+    if (parsed?.typography?.typography?.raw) {
+      delete parsed.typography.typography.raw;
+    }
+    return parsed;
+  }
+});
+
+/**
+ * Custom Style Dictionary format generating Tailwind v4 @theme inline block from DTCG tokens.
+ */
+StyleDictionary.registerFormat({
+  name: 'css/tailwind-theme',
+  format: ({ dictionary, file }) => {
+    const fileName = file?.destination || 'theme.css';
+    const lines = [
+      getFileHeader(fileName),
+      '',
+      '@theme inline {'
+    ];
+
+    for (const token of dictionary.allTokens) {
+      const propertyDeclaration = mapTokenToTailwindThemeProperty(token);
+      if (propertyDeclaration) {
+        lines.push(propertyDeclaration);
+      }
+    }
+
+    lines.push('}', '');
+    return lines.join('\n');
+  }
+});
 
 /**
  * Builds the combined CSS variables and Tailwind theme stylesheets for a product.

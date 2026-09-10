@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="Header.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -105,9 +105,10 @@
             </button>
 
             <a href="@PageRoutes.AccountSettings"
-               class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 text-primary-foreground text-xs leading-2xs font-semibold select-none hover:opacity-90 transition-opacity"
                title="Account settings">
-                @(this.UserInitials)
+                <CollaboratorAvatar Initials="@(this.UserInitials)"
+                                    Size="w-8 h-8"
+                                    Class="hover:opacity-90 transition-opacity cursor-pointer"/>
             </a>
         }
         else

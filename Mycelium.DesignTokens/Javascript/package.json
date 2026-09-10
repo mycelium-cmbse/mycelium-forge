@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "mycelium-design-tokens",
   "version": "1.0.0",
   "description": "Design tokens pipeline for Mycelium. Converts DTCG design tokens to CSS using Style Dictionary.",

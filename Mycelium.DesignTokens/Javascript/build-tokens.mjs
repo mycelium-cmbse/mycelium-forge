@@ -1,4 +1,4 @@
-import { parseCommandLineArguments } from './argument-parser.mjs';
+﻿import { parseCommandLineArguments } from './argument-parser.mjs';
 import { buildTokens } from './token-builder.mjs';
 
 /**

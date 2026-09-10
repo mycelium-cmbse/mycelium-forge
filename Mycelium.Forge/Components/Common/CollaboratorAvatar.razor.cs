@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="CollaboratorAvatar.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Components.Common
 {
-    using System;
-
     using Microsoft.AspNetCore.Components;
 
     /// <summary>
@@ -18,6 +16,11 @@ namespace Mycelium.Forge.Components.Common
     /// </summary>
     public partial class CollaboratorAvatar : ComponentBase
     {
+        /// <summary>
+        /// The total number of collaborator color tokens available in the design system.
+        /// </summary>
+        private const int CollaboratorColorCount = 12;
+
         /// <summary>
         /// Gets or sets the collaborator full name or username.
         /// </summary>
@@ -41,6 +44,7 @@ namespace Mycelium.Forge.Components.Common
         /// </summary>
         [Parameter]
         public string Class { get; set; } = string.Empty;
+
         /// <summary>
         /// Computes the initials string to display within the avatar.
         /// </summary>
@@ -62,32 +66,12 @@ namespace Mycelium.Forge.Components.Common
             if (parts.Length == 1)
             {
                 return parts[0].Length >= 2
-                    ? parts[0].Substring(0, 2).ToUpperInvariant()
+                    ? parts[0][..2].ToUpperInvariant()
                     : parts[0].ToUpperInvariant();
             }
 
             return $"{parts[0][0]}{parts[^1][0]}".ToUpperInvariant();
         }
-
-        /// <summary>
-        /// The set of static Tailwind background utility classes for collaborator colors.
-        /// Declared as literal strings so the Tailwind scanner detects and compiles them into app.css.
-        /// </summary>
-        private static readonly string[] CollaboratorColorClasses =
-        [
-            "bg-collaborator-c01",
-            "bg-collaborator-c02",
-            "bg-collaborator-c03",
-            "bg-collaborator-c04",
-            "bg-collaborator-c05",
-            "bg-collaborator-c06",
-            "bg-collaborator-c07",
-            "bg-collaborator-c08",
-            "bg-collaborator-c09",
-            "bg-collaborator-c10",
-            "bg-collaborator-c11",
-            "bg-collaborator-c12"
-        ];
 
         /// <summary>
         /// Computes the background color CSS class for the collaborator avatar.
@@ -105,8 +89,8 @@ namespace Mycelium.Forge.Components.Common
             }
 
             var hash = Math.Abs(seed.GetHashCode());
-            var index = hash % CollaboratorColorClasses.Length;
-            return CollaboratorColorClasses[index];
+            var index = hash % CollaboratorColorCount + 1;
+            return $"bg-collaborator-c{index:D2}";
         }
     }
 }

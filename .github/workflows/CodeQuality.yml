@@ -1,4 +1,4 @@
-name: Build & Test & SonarQube
+﻿name: Build & Test & SonarQube
 
 on:
   push:
