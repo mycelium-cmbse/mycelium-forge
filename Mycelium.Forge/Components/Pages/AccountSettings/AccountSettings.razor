@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="AccountSettings.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -19,7 +19,7 @@
 
 <div class="w-full bg-background min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-<BbBreadcrumb Class="text-xs leading-2xs">
+<BbBreadcrumb Class="breadcrumb-nav">
     <BbBreadcrumbList>
         <BbBreadcrumbItem>
             <BbBreadcrumbLink Class="text-muted-foreground font-normal">
@@ -43,7 +43,7 @@
 
 <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
     <div class="flex items-center gap-2.5 w-full">
-        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <span class="section-label">
             PROFILE
         </span>
     </div>
@@ -134,7 +134,7 @@
             <BbButton id="account-settings-edit-location-button"
                       Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
-                              TyForgeSelect.razor.cspe="ButtonType.Button"
+                      Type="ButtonType.Button"
                       OnClick="@(this.OnEditLocation)"
                       Class="button-sm">
                 Edit
@@ -179,7 +179,7 @@
 
 <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
     <div class="flex items-center justify-between gap-2 w-full h-8">
-        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
+        <span class="section-label flex-1">
             ORGANIZATIONS
         </span>
         <BbButton id="account-settings-transfer-org-button"

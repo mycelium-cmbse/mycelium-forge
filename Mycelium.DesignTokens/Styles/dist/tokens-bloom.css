@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Do not edit directly, this file was auto-generated.
  * tokens-bloom.css
  */
@@ -283,6 +283,12 @@
   --color-scrim-modal: rgba(13, 18, 26, 0.55); /** Scrim behind a modal dialog. The alpha lives IN the token, so a binding pass can never flatten it. 55%: the page stays readable but is clearly out of reach. */
   --color-scrim-panel: rgba(13, 18, 26, 0.4); /** Scrim behind a side drawer or a slide-over panel. Lighter than a modal: the page behind stays workable context, not a blocked surface. */
   --color-scrim-menu: rgba(13, 18, 26, 0); /** Click-catcher behind a menu, a dropdown or an anchored popover. Fully transparent on purpose: it exists to catch the click that closes the menu, never to tint the screen. */
+  --color-untriaged-f25022: #f25022; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-7-fba00: #7fba00; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-00-a4-ef: #00a4ef; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffb900: #ffb900; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-17191-f: #17191f; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffffff: #ffffff; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
   --spacing-1: 1px; /** Scale step derived from real usage in the prototypes. */
   --spacing-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
   --spacing-3: 3px; /** Scale step derived from real usage in the prototypes. */
@@ -391,26 +397,26 @@
   --shadow-modal: 0px 12px 32px 0px rgb(0% 0% 0% / 0.18); /** Modal dialogs centred over a dim backdrop. */
   --shadow-overlay: 0px 16px 48px 0px rgb(0% 0% 0% / 0.2); /** Full-screen overlays and the command palette. */
   --shadow-sm: 0px 1px 2px 0px rgb(6% 9% 16% / 0.12); /** Raised control. Active segment of a segmented control. */
-  --typography-typography-display-2xl: 700 40px/3 Inter; /** Hero display. Rarely used in product UI. */
-  --typography-typography-display-xl: 700 32px/2.5 Inter; /** Large display. */
-  --typography-typography-display-lg: 600 24px/2 Inter; /** Page title on a marketing or docs surface. */
-  --typography-typography-heading-md: 600 20px/1.75 Inter; /** Section title inside a page body. */
-  --typography-typography-heading-sm: 600 18px/1.625 Inter; /** Card or panel title. */
-  --typography-typography-heading-xs: 600 16px/1.5 Inter; /** Group header inside a list. */
-  --typography-typography-body-lg: 400 16px/1.5 Inter; /** Lead paragraph. */
-  --typography-typography-body-md: 400 14px/1.25 Inter; /** Default body text and input values. */
-  --typography-typography-body-md-medium: 500 14px/1.25 Inter; /** Body text with emphasis. */
-  --typography-typography-body-sm: 400 12px/1.125 Inter; /** Row primary text, table cells. */
-  --typography-typography-body-sm-medium: 500 12px/1.125 Inter; /** Row text with emphasis. */
-  --typography-typography-body-xs: 500 11px/1 Inter; /** Helper text under an input, stereotypes. */
-  --typography-typography-body-prose-13: 400 13px/1.313 Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
-  --typography-typography-label-md: 500 14px/1.25 Inter; /** Form label. */
-  --typography-typography-label-sm: 500 12px/1 Inter; /** Compact label, chip text. */
-  --typography-typography-label-xs: 600 10px/0.875 Inter; /** ALL CAPS section label, count pill. */
-  --typography-typography-mono-md: 400 13px/1.25 'JetBrains Mono'; /** Code and identifiers, default size. */
-  --typography-typography-mono-sm: 400 12px/1.125 'JetBrains Mono'; /** Numeric table cells, versions. */
-  --typography-typography-mono-xs: 500 11px/1 'JetBrains Mono'; /** Compact mono, badges and hashes. */
-  --typography-typography-mono-code-11-5: 400 11.5px/1.188 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --typography-typography-display-2xl: 700 40px/48px Inter; /** Hero display. Rarely used in product UI. */
+  --typography-typography-display-xl: 700 32px/40px Inter; /** Large display. */
+  --typography-typography-display-lg: 600 24px/32px Inter; /** Page title on a marketing or docs surface. */
+  --typography-typography-heading-md: 600 20px/28px Inter; /** Section title inside a page body. */
+  --typography-typography-heading-sm: 600 18px/26px Inter; /** Card or panel title. */
+  --typography-typography-heading-xs: 600 16px/24px Inter; /** Group header inside a list. */
+  --typography-typography-body-lg: 400 16px/24px Inter; /** Lead paragraph. */
+  --typography-typography-body-md: 400 14px/20px Inter; /** Default body text and input values. */
+  --typography-typography-body-md-medium: 500 14px/20px Inter; /** Body text with emphasis. */
+  --typography-typography-body-sm: 400 12px/18px Inter; /** Row primary text, table cells. */
+  --typography-typography-body-sm-medium: 500 12px/18px Inter; /** Row text with emphasis. */
+  --typography-typography-body-xs: 500 11px/16px Inter; /** Helper text under an input, stereotypes. */
+  --typography-typography-body-prose-13: 400 13px/21px Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --typography-typography-label-md: 500 14px/20px Inter; /** Form label. */
+  --typography-typography-label-sm: 500 12px/16px Inter; /** Compact label, chip text. */
+  --typography-typography-label-xs: 600 10px/14px Inter; /** ALL CAPS section label, count pill. */
+  --typography-typography-mono-md: 400 13px/20px 'JetBrains Mono'; /** Code and identifiers, default size. */
+  --typography-typography-mono-sm: 400 12px/18px 'JetBrains Mono'; /** Numeric table cells, versions. */
+  --typography-typography-mono-xs: 500 11px/16px 'JetBrains Mono'; /** Compact mono, badges and hashes. */
+  --typography-typography-mono-code-11-5: 400 11.5px/19px 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
   --background: var(--color-gray-100);
   --foreground: var(--color-gray-800);
   --foreground-muted: var(--color-gray-700);
@@ -828,6 +834,12 @@
   --color-scrim-modal: rgba(13, 18, 26, 0.55); /** Scrim behind a modal dialog. The alpha lives IN the token, so a binding pass can never flatten it. 55%: the page stays readable but is clearly out of reach. */
   --color-scrim-panel: rgba(13, 18, 26, 0.4); /** Scrim behind a side drawer or a slide-over panel. Lighter than a modal: the page behind stays workable context, not a blocked surface. */
   --color-scrim-menu: rgba(13, 18, 26, 0); /** Click-catcher behind a menu, a dropdown or an anchored popover. Fully transparent on purpose: it exists to catch the click that closes the menu, never to tint the screen. */
+  --color-untriaged-f25022: #f25022; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-7-fba00: #7fba00; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-00-a4-ef: #00a4ef; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffb900: #ffb900; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-17191-f: #17191f; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffffff: #ffffff; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
   --spacing-1: 1px; /** Scale step derived from real usage in the prototypes. */
   --spacing-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
   --spacing-3: 3px; /** Scale step derived from real usage in the prototypes. */
@@ -936,26 +948,26 @@
   --shadow-modal: 0px 12px 32px 0px rgb(0% 0% 0% / 0.18); /** Modal dialogs centred over a dim backdrop. */
   --shadow-overlay: 0px 16px 48px 0px rgb(0% 0% 0% / 0.2); /** Full-screen overlays and the command palette. */
   --shadow-sm: 0px 1px 2px 0px rgb(6% 9% 16% / 0.12); /** Raised control. Active segment of a segmented control. */
-  --typography-typography-display-2xl: 700 40px/3 Inter; /** Hero display. Rarely used in product UI. */
-  --typography-typography-display-xl: 700 32px/2.5 Inter; /** Large display. */
-  --typography-typography-display-lg: 600 24px/2 Inter; /** Page title on a marketing or docs surface. */
-  --typography-typography-heading-md: 600 20px/1.75 Inter; /** Section title inside a page body. */
-  --typography-typography-heading-sm: 600 18px/1.625 Inter; /** Card or panel title. */
-  --typography-typography-heading-xs: 600 16px/1.5 Inter; /** Group header inside a list. */
-  --typography-typography-body-lg: 400 16px/1.5 Inter; /** Lead paragraph. */
-  --typography-typography-body-md: 400 14px/1.25 Inter; /** Default body text and input values. */
-  --typography-typography-body-md-medium: 500 14px/1.25 Inter; /** Body text with emphasis. */
-  --typography-typography-body-sm: 400 12px/1.125 Inter; /** Row primary text, table cells. */
-  --typography-typography-body-sm-medium: 500 12px/1.125 Inter; /** Row text with emphasis. */
-  --typography-typography-body-xs: 500 11px/1 Inter; /** Helper text under an input, stereotypes. */
-  --typography-typography-body-prose-13: 400 13px/1.313 Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
-  --typography-typography-label-md: 500 14px/1.25 Inter; /** Form label. */
-  --typography-typography-label-sm: 500 12px/1 Inter; /** Compact label, chip text. */
-  --typography-typography-label-xs: 600 10px/0.875 Inter; /** ALL CAPS section label, count pill. */
-  --typography-typography-mono-md: 400 13px/1.25 'JetBrains Mono'; /** Code and identifiers, default size. */
-  --typography-typography-mono-sm: 400 12px/1.125 'JetBrains Mono'; /** Numeric table cells, versions. */
-  --typography-typography-mono-xs: 500 11px/1 'JetBrains Mono'; /** Compact mono, badges and hashes. */
-  --typography-typography-mono-code-11-5: 400 11.5px/1.188 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --typography-typography-display-2xl: 700 40px/48px Inter; /** Hero display. Rarely used in product UI. */
+  --typography-typography-display-xl: 700 32px/40px Inter; /** Large display. */
+  --typography-typography-display-lg: 600 24px/32px Inter; /** Page title on a marketing or docs surface. */
+  --typography-typography-heading-md: 600 20px/28px Inter; /** Section title inside a page body. */
+  --typography-typography-heading-sm: 600 18px/26px Inter; /** Card or panel title. */
+  --typography-typography-heading-xs: 600 16px/24px Inter; /** Group header inside a list. */
+  --typography-typography-body-lg: 400 16px/24px Inter; /** Lead paragraph. */
+  --typography-typography-body-md: 400 14px/20px Inter; /** Default body text and input values. */
+  --typography-typography-body-md-medium: 500 14px/20px Inter; /** Body text with emphasis. */
+  --typography-typography-body-sm: 400 12px/18px Inter; /** Row primary text, table cells. */
+  --typography-typography-body-sm-medium: 500 12px/18px Inter; /** Row text with emphasis. */
+  --typography-typography-body-xs: 500 11px/16px Inter; /** Helper text under an input, stereotypes. */
+  --typography-typography-body-prose-13: 400 13px/21px Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --typography-typography-label-md: 500 14px/20px Inter; /** Form label. */
+  --typography-typography-label-sm: 500 12px/16px Inter; /** Compact label, chip text. */
+  --typography-typography-label-xs: 600 10px/14px Inter; /** ALL CAPS section label, count pill. */
+  --typography-typography-mono-md: 400 13px/20px 'JetBrains Mono'; /** Code and identifiers, default size. */
+  --typography-typography-mono-sm: 400 12px/18px 'JetBrains Mono'; /** Numeric table cells, versions. */
+  --typography-typography-mono-xs: 500 11px/16px 'JetBrains Mono'; /** Compact mono, badges and hashes. */
+  --typography-typography-mono-code-11-5: 400 11.5px/19px 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
   --background: var(--color-gray-1050);
   --foreground: var(--color-gray-200);
   --foreground-muted: var(--color-gray-400);

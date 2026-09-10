@@ -1,123 +1,20 @@
-﻿import fs from 'node:fs';
+import fs from 'node:fs';
 import path from 'node:path';
 import StyleDictionary from 'style-dictionary';
+import { registerCustomPlugins } from './style-dictionary-plugins.mjs';
+import { formatCombinedVariablesContent } from './tailwind-theme-mapper.mjs';
+
+// Register custom DTCG parsers and Tailwind @theme format.
+registerCustomPlugins(StyleDictionary);
 
 /**
- * Standard CSS dimension value for full border radius.
+ * Validates that a required token directory exists on disk.
+ * @param {string} directoryPath - The path to check.
  */
-const fullRadiusDimension = '999px';
-
-/**
- * Semantic groups that collide with primitive collections.
- */
-const collidingSemanticGroups = ['radius', 'spacing', 'text'];
-
-/**
- * Normalizes a primitive scalar value into a CSS dimension string.
- * @param {string} key - Token key name.
- * @param {object} token - Token definition object.
- * @returns {string|*} The normalized dimension string or original token value.
- */
-function normalizeDimensionValue(key, token) {
-  if (!token) {
-    return undefined;
+function validateDirectoryExists(directoryPath) {
+  if (!fs.existsSync(directoryPath)) {
+    throw new Error(`Required tokens directory does not exist: ${directoryPath}`);
   }
-
-  if (token.$type === 'number' && typeof token.$value === 'number') {
-    return key === 'full' ? fullRadiusDimension : `${token.$value}px`;
-  }
-
-  if (typeof token.$value === 'object' && token.$value !== null && 'value' in token.$value) {
-    return `${token.$value.value}px`;
-  }
-
-  return token.$value;
-}
-
-/**
- * Recursively normalizes dimension primitives in a DTCG token tree.
- * @param {object} tokenTree - Object tree containing token definitions.
- */
-function normalizeDimensionPrimitives(tokenTree) {
-  for (const [key, value] of Object.entries(tokenTree)) {
-    if (value && typeof value === 'object') {
-      if (value.$type === 'number' && typeof value.$value === 'number') {
-        value.$type = 'dimension';
-        value.$value = normalizeDimensionValue(key, value);
-      } else {
-        normalizeDimensionPrimitives(value);
-      }
-    }
-  }
-}
-
-/**
- * Dereferences colliding semantic token groups against shared primitives.
- * @param {object} semanticGroup - Group of semantic tokens.
- * @param {object} primitiveGroup - Group of primitive tokens.
- */
-function dereferenceCollidingTokens(semanticGroup, primitiveGroup) {
-  if (!semanticGroup || !primitiveGroup) {
-    return;
-  }
-
-  for (const [key, token] of Object.entries(semanticGroup)) {
-    if (token && typeof token === 'object') {
-      const primitiveToken = primitiveGroup[key];
-      if (primitiveToken) {
-        token.$type = 'dimension';
-        token.$value = normalizeDimensionValue(key, primitiveToken);
-        if (!token.$description && primitiveToken.$description) {
-          token.$description = primitiveToken.$description;
-        }
-      }
-    }
-  }
-}
-
-/**
- * Maps a design token to its corresponding Tailwind @theme custom property declaration.
- * @param {object} token - Style Dictionary token.
- * @returns {string|null} CSS variable declaration line or null if not applicable.
- */
-function mapTokenToTailwindThemeProperty(token) {
-  const comment = token.$description ? ` /** ${token.$description} */` : '';
-
-  if (token.$type === 'shadow') {
-    return `  --${token.name}: var(--${token.name});${comment}`;
-  }
-
-  if (token.$type === 'color' && token.path[0] !== 'color') {
-    return `  --color-${token.name}: var(--${token.name});${comment}`;
-  }
-
-  return null;
-}
-
-/**
- * Generates the standard file header comment for auto-generated files.
- * @param {string} fileName - Destination file name.
- * @returns {string} File header comment block.
- */
-function getFileHeader(fileName) {
-  return [
-    '/**',
-    ' * Do not edit directly, this file was auto-generated.',
-    ` * ${fileName}`,
-    ' */'
-  ].join('\n');
-}
-
-/**
- * Formats the combined CSS stylesheet containing light and dark mode variable blocks.
- * @param {string} fileName - Destination file name.
- * @param {string} lightOutput - Light mode CSS declarations.
- * @param {string} darkOutput - Dark mode CSS declarations.
- * @returns {string} The full combined CSS content.
- */
-function formatCombinedVariablesContent(fileName, lightOutput, darkOutput) {
-  const header = getFileHeader(fileName);
-  return `${header}\n\n${lightOutput.trim()}\n\n${darkOutput.trim()}\n`;
 }
 
 /**
@@ -129,6 +26,9 @@ function formatCombinedVariablesContent(fileName, lightOutput, darkOutput) {
  * @returns {StyleDictionary} Configured StyleDictionary instance
  */
 function createVariablesInstance(product, mode, selector, tokensDirectory) {
+  const semanticsDir = path.join(tokensDirectory, `${product}-${mode}`);
+  validateDirectoryExists(semanticsDir);
+
   const sharedGlob = path.posix.join(tokensDirectory.replace(/\\/g, '/'), 'shared/**/*.json');
   const semanticsGlob = path.posix.join(tokensDirectory.replace(/\\/g, '/'), `${product}-${mode}/**/*.json`);
 
@@ -161,6 +61,9 @@ function createVariablesInstance(product, mode, selector, tokensDirectory) {
  * @returns {StyleDictionary} Configured StyleDictionary instance
  */
 function createTailwindThemeInstance(product, tokensDirectory, outputDirectory) {
+  const semanticsDir = path.join(tokensDirectory, `${product}-light`);
+  validateDirectoryExists(semanticsDir);
+
   const sharedGlob = path.posix.join(tokensDirectory.replace(/\\/g, '/'), 'shared/**/*.json');
   const semanticsGlob = path.posix.join(tokensDirectory.replace(/\\/g, '/'), `${product}-light/**/*.json`);
 
@@ -173,7 +76,7 @@ function createTailwindThemeInstance(product, tokensDirectory, outputDirectory) 
         buildPath: `${outputDirectory.replace(/\\/g, '/')}/`,
         files: [
           {
-            destination: `theme-${product}.css`,
+            destination: 'theme-mycelium.css',
             format: 'css/tailwind-theme'
           }
         ]
@@ -183,103 +86,31 @@ function createTailwindThemeInstance(product, tokensDirectory, outputDirectory) 
 }
 
 /**
- * Custom Style Dictionary parser for DTCG dimension primitives (mycelium-primitives.json).
- */
-StyleDictionary.registerParser({
-  name: 'dtcg-primitives-shim',
-  pattern: /mycelium-primitives\.json$/,
-  parser: ({ contents }) => {
-    const parsed = JSON.parse(contents);
-    normalizeDimensionPrimitives(parsed);
-    return parsed;
-  }
-});
-
-/**
- * Custom Style Dictionary parser for mode-specific semantic tokens (mycelium-semantics.json).
- */
-StyleDictionary.registerParser({
-  name: 'dtcg-semantics-shim',
-  pattern: /mycelium-semantics\.json$/,
-  parser: ({ contents, filePath }) => {
-    const parsed = JSON.parse(contents);
-    const primitivesFilePath = path.resolve(path.dirname(filePath), '..', 'shared', 'mycelium-primitives.json');
-    const primitives = JSON.parse(fs.readFileSync(primitivesFilePath, 'utf8'));
-
-    for (const groupName of collidingSemanticGroups) {
-      dereferenceCollidingTokens(parsed[groupName], primitives[groupName]);
-    }
-
-    delete parsed.$extensions;
-    return parsed;
-  }
-});
-
-/**
- * Custom Style Dictionary parser for DTCG typography definitions (typography.json).
- */
-StyleDictionary.registerParser({
-  name: 'dtcg-typography-curated-filter',
-  pattern: /typography\.json$/,
-  parser: ({ contents }) => {
-    const parsed = JSON.parse(contents);
-    if (parsed?.typography?.typography?.raw) {
-      delete parsed.typography.typography.raw;
-    }
-    return parsed;
-  }
-});
-
-/**
- * Custom Style Dictionary format generating Tailwind v4 @theme inline block from DTCG tokens.
- */
-StyleDictionary.registerFormat({
-  name: 'css/tailwind-theme',
-  format: ({ dictionary, file }) => {
-    const fileName = file?.destination || 'theme.css';
-    const lines = [
-      getFileHeader(fileName),
-      '',
-      '@theme inline {'
-    ];
-
-    for (const token of dictionary.allTokens) {
-      const propertyDeclaration = mapTokenToTailwindThemeProperty(token);
-      if (propertyDeclaration) {
-        lines.push(propertyDeclaration);
-      }
-    }
-
-    lines.push('}', '');
-    return lines.join('\n');
-  }
-});
-
-/**
  * Builds the combined CSS variables and Tailwind theme stylesheets for a product.
  * @param {string} product - 'forge' or 'bloom'
  * @param {string} tokensDirectory - Path to tokens directory
  * @param {string} outputDirectory - Path to output directory
  * @returns {Promise<void>}
  */
-export async function buildProductTokens(product, tokensDirectory, outputDirectory) {
+async function buildProductTokens(product, tokensDirectory, outputDirectory) {
   console.log(`Building tokens for ${product}...`);
 
   const combinedFileName = `tokens-${product}.css`;
-  const themeFileName = `theme-${product}.css`;
 
   const styleDictionaryLight = createVariablesInstance(product, 'light', ':root', tokensDirectory);
   const styleDictionaryDark = createVariablesInstance(product, 'dark', '.dark', tokensDirectory);
   const styleDictionaryTailwind = createTailwindThemeInstance(product, tokensDirectory, outputDirectory);
 
-  const [lightResult] = await styleDictionaryLight.formatPlatform('css');
-  const [darkResult] = await styleDictionaryDark.formatPlatform('css');
-  await styleDictionaryTailwind.buildAllPlatforms();
+  const [[lightResult], [darkResult]] = await Promise.all([
+    styleDictionaryLight.formatPlatform('css'),
+    styleDictionaryDark.formatPlatform('css'),
+    styleDictionaryTailwind.buildAllPlatforms()
+  ]);
 
   const combinedContent = formatCombinedVariablesContent(combinedFileName, lightResult.output, darkResult.output);
   fs.writeFileSync(path.join(outputDirectory, combinedFileName), combinedContent, 'utf8');
 
-  console.log(`Generated: ${combinedFileName}, ${themeFileName}`);
+  console.log(`Generated: ${combinedFileName}, theme-mycelium.css`);
 }
 
 /**
@@ -294,11 +125,14 @@ export async function buildTokens(options) {
     fs.mkdirSync(outputDirectory, { recursive: true });
   }
 
-  if (target === 'forge' || target === 'all') {
-    await buildProductTokens('forge', tokensDirectory, outputDirectory);
+  if (target === 'all') {
+    await Promise.all([
+      buildProductTokens('forge', tokensDirectory, outputDirectory),
+      buildProductTokens('bloom', tokensDirectory, outputDirectory)
+    ]);
+  } else if (target === 'forge' || target === 'bloom') {
+    await buildProductTokens(target, tokensDirectory, outputDirectory);
   }
-  if (target === 'bloom' || target === 'all') {
-    await buildProductTokens('bloom', tokensDirectory, outputDirectory);
-  }
+
   console.log('Design token generation completed successfully.');
 }

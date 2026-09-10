@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DesignTokenGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -165,12 +165,12 @@ namespace Mycelium.DesignTokens
                 return;
             }
 
-            var npmExecutable = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "npm.cmd" : "npm";
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
             var processStartInformation = new ProcessStartInfo
             {
-                FileName = npmExecutable,
-                Arguments = "install",
+                FileName = isWindows ? "cmd.exe" : "npm",
+                Arguments = isWindows ? "/c npm install" : "install",
                 WorkingDirectory = scriptDirectory,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,

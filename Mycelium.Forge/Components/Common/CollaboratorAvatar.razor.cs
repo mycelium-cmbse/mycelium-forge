@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="CollaboratorAvatar.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -17,9 +17,29 @@ namespace Mycelium.Forge.Components.Common
     public partial class CollaboratorAvatar : ComponentBase
     {
         /// <summary>
-        /// The total number of collaborator color tokens available in the design system.
+        /// The set of static Tailwind background utility classes for collaborator colors.
         /// </summary>
-        private const int CollaboratorColorCount = 12;
+        /// <remarks>
+        /// Declared as an array of string literals so that Tailwind's static source scanner
+        /// discovers every class name at build time and emits its corresponding CSS rule into <c>app.css</c>.
+        /// Dynamically constructed class strings (such as via string interpolation) cannot be evaluated
+        /// by the static scanner.
+        /// </remarks>
+        private static readonly string[] CollaboratorColorClasses =
+        [
+            "bg-collaborator-c01",
+            "bg-collaborator-c02",
+            "bg-collaborator-c03",
+            "bg-collaborator-c04",
+            "bg-collaborator-c05",
+            "bg-collaborator-c06",
+            "bg-collaborator-c07",
+            "bg-collaborator-c08",
+            "bg-collaborator-c09",
+            "bg-collaborator-c10",
+            "bg-collaborator-c11",
+            "bg-collaborator-c12"
+        ];
 
         /// <summary>
         /// Gets or sets the collaborator full name or username.
@@ -89,8 +109,8 @@ namespace Mycelium.Forge.Components.Common
             }
 
             var hash = Math.Abs(seed.GetHashCode());
-            var index = hash % CollaboratorColorCount + 1;
-            return $"bg-collaborator-c{index:D2}";
+            var index = hash % CollaboratorColorClasses.Length;
+            return CollaboratorColorClasses[index];
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Login.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -29,7 +29,7 @@
         <BbField Class="flex flex-col gap-1.5 w-full"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Email)))">
             <BbFieldLabel For="login-email"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 EMAIL
             </BbFieldLabel>
             <BbFieldContent>
@@ -40,14 +40,14 @@
                          Placeholder="e.g. name@organisation.eu"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.ViewModel.Email)])"/>
         </BbField>
 
         <BbField Class="flex flex-col gap-1.5 w-full"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Password)))">
             <BbFieldLabel For="login-password"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 PASSWORD
             </BbFieldLabel>
             <BbFieldContent>
@@ -58,7 +58,7 @@
                          Placeholder="••••••••"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.ViewModel.Password)])"/>
         </BbField>
 

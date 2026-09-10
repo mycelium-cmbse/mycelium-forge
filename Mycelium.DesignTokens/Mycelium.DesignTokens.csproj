@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -7,7 +7,12 @@
         <LangVersion>14.0</LangVersion>
         <Company>Starion Group S.A.</Company>
         <Authors>Sam Gerene</Authors>
-        <Description>Design token pipeline for Mycelium. Converts DTCG design tokens to CSS custom properties using Style Dictionary.</Description>
+        <Description>
+	        Design token pipeline for Mycelium. 
+	        Converts DTCG design tokens to CSS custom properties using Style Dictionary. 
+	        
+	        Requires Node.js and npm to run.
+        </Description>
         <Copyright>Copyright © Starion Group S.A.</Copyright>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
@@ -40,9 +45,8 @@
         <None Update="Styles\**\*.*" Pack="true" PackagePath="Styles">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Javascript\build-tokens.mjs;Javascript\package.json">
+        <None Update="Javascript\*.mjs;Javascript\package*.json" Pack="true" PackagePath="Javascript">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
-
 </Project>

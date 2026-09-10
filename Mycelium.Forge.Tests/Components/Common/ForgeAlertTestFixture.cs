@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ForgeAlertTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -59,9 +59,9 @@ namespace Mycelium.Forge.Tests.Components.Common
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(defaultAlert.Instance.GetIconClass(), Is.EqualTo("text-muted-foreground shrink-0"));
-                Assert.That(infoAlert.Instance.GetIconClass(), Is.EqualTo("text-info-icon shrink-0"));
-                Assert.That(successAlert.Instance.GetIconClass(), Is.EqualTo("text-success-icon shrink-0"));
-                Assert.That(warningAlert.Instance.GetIconClass(), Is.EqualTo("text-warning-icon shrink-0"));
+                Assert.That(infoAlert.Instance.GetIconClass(), Is.EqualTo("text-info-strong shrink-0"));
+                Assert.That(successAlert.Instance.GetIconClass(), Is.EqualTo("text-success-vivid shrink-0"));
+                Assert.That(warningAlert.Instance.GetIconClass(), Is.EqualTo("text-warning-vivid shrink-0"));
                 Assert.That(dangerAlert.Instance.GetIconClass(), Is.EqualTo("text-destructive shrink-0"));
                 Assert.That(secondaryAlert.Instance.GetIconClass(), Is.EqualTo("text-muted-foreground shrink-0"));
                 Assert.That(unknownAlert.Instance.GetIconClass(), Is.EqualTo("text-muted-foreground shrink-0"));
@@ -87,13 +87,13 @@ namespace Mycelium.Forge.Tests.Components.Common
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(defaultAlert.Instance.GetVariantClass(), Is.EqualTo("bg-body-bg border-border text-foreground"));
-                Assert.That(infoAlert.Instance.GetVariantClass(), Is.EqualTo("bg-info border-info-border text-info-foreground"));
-                Assert.That(successAlert.Instance.GetVariantClass(), Is.EqualTo("bg-success border-success-border text-success-foreground"));
-                Assert.That(warningAlert.Instance.GetVariantClass(), Is.EqualTo("bg-warning border-warning-border text-warning-foreground"));
-                Assert.That(dangerAlert.Instance.GetVariantClass(), Is.EqualTo("bg-destructive/10 border-destructive/20 text-destructive"));
-                Assert.That(secondaryAlert.Instance.GetVariantClass(), Is.EqualTo("bg-muted border-border text-secondary-text"));
-                Assert.That(unknownAlert.Instance.GetVariantClass(), Is.EqualTo("bg-body-bg border-border text-foreground"));
+                Assert.That(defaultAlert.Instance.GetVariantClass(), Is.EqualTo("bg-background border-border text-foreground"));
+                Assert.That(infoAlert.Instance.GetVariantClass(), Is.EqualTo("bg-docs-callout-note-bg border-docs-callout-note-border text-foreground"));
+                Assert.That(successAlert.Instance.GetVariantClass(), Is.EqualTo("bg-docs-callout-tip-bg border-docs-callout-tip-border text-foreground"));
+                Assert.That(warningAlert.Instance.GetVariantClass(), Is.EqualTo("bg-docs-callout-warning-bg border-docs-callout-warning-border text-foreground"));
+                Assert.That(dangerAlert.Instance.GetVariantClass(), Is.EqualTo("bg-docs-callout-danger-bg border-docs-callout-danger-border text-foreground"));
+                Assert.That(secondaryAlert.Instance.GetVariantClass(), Is.EqualTo("bg-muted border-border text-foreground-muted"));
+                Assert.That(unknownAlert.Instance.GetVariantClass(), Is.EqualTo("bg-background border-border text-foreground"));
             }
         }
     }

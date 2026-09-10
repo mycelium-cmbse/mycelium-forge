@@ -6,8 +6,9 @@
 
 @import 'tailwindcss';
 @import './Generated/tokens-forge.css';
-@import './Generated/theme-forge.css';
+@import './Generated/theme-mycelium.css';
 @import './override.css';
+@import './components.css';
 @important;
 
 /* Scan Razor components for utility classes */
@@ -20,157 +21,15 @@
 @theme {
     --text-3xs: var(--text-10);
     --text-2xs: var(--text-11);
+    --text-md: var(--text-15);
     --leading-4xs: var(--spacing-12);
     --leading-3xs: var(--spacing-13);
     --leading-2xs: var(--spacing-15);
     --leading-xs: var(--spacing-16);
-}
-
-/* Page container */
-.page-container {
-  max-width: 1200px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--spacing-24);
-  padding-right: var(--spacing-24);
-}
-
-/* Common badge styling */
-.badge-format {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-2) var(--spacing-6);
-  border-radius: var(--radius-sm) !important;
-  background-color: var(--card);
-  border: 1px solid var(--border-subtle);
-  flex-shrink: 0;
-  font-size: var(--text-3xs);
-  line-height: var(--leading-4xs);
-  font-weight: 500;
-  color: var(--foreground-subtle);
-}
-
-.badge-version-state {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--spacing-2) var(--spacing-6);
-    border-radius: var(--radius-xs) !important;
-    font-size: var(--text-3xs);
-    line-height: var(--leading-4xs);
-    font-weight: 500;
-    background-color: var(--muted);
-    border: 1px solid var(--border-subtle);
-    flex-shrink: 0;
-}
-
-.badge-role {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-2) var(--spacing-9);
-  border-radius: var(--radius-md) !important;
-  font-size: var(--text-2xs);
-  line-height: var(--leading-3xs);
-  font-weight: 500;
-  background-color: var(--primary-subtle);
-  border: 1px solid var(--border-subtle);
-  flex-shrink: 0;
-}
-
-.badge-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--spacing-4) var(--spacing-10);
-  border-radius: var(--radius-md) !important;
-  font-size: var(--text-xs);
-  line-height: var(--leading-2xs);
-  font-weight: 500;
-  background-color: var(--muted);
-  color: var(--foreground-muted);
-  border: 1px solid var(--border-subtle);
-}
-
-/* Base border rule for dynamic badges */
-[class*="badge-lifecycle-"] {
-  border-width: 1px;
-  border-style: solid;
-}
-
-/* Lifecycle badge styles */
-.badge-lifecycle,
-.badge-lifecycle-open {
-  background-color: color-mix(in srgb, var(--lifecycle-open) 15%, transparent);
-  color: var(--lifecycle-open);
-  border-color: color-mix(in srgb, var(--lifecycle-open) 30%, transparent);
-}
-
-.badge-lifecycle-preparation {
-  background-color: color-mix(in srgb, var(--lifecycle-preparation) 15%, transparent);
-  color: var(--lifecycle-preparation);
-  border-color: color-mix(in srgb, var(--lifecycle-preparation) 30%, transparent);
-}
-
-.badge-lifecycle-review {
-  background-color: color-mix(in srgb, var(--lifecycle-review) 15%, transparent);
-  color: var(--lifecycle-review);
-  border-color: color-mix(in srgb, var(--lifecycle-review) 30%, transparent);
-}
-
-.badge-lifecycle-archived {
-  background-color: color-mix(in srgb, var(--lifecycle-archived) 15%, transparent);
-  color: var(--lifecycle-archived);
-  border-color: color-mix(in srgb, var(--lifecycle-archived) 30%, transparent);
-}
-
-/* Component containers */
-.auth-card {
-  width: 100%;
-  max-width: 440px;
-  padding: var(--spacing-32);
-  border-radius: var(--radius-xl);
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-18);
-}
-
-.dark .auth-card {
-  box-shadow: none;
-}
-
-.inner-panel {
-  width: 100%;
-  padding: var(--spacing-12) var(--spacing-14);
-  border-radius: var(--radius-lg);
-  background-color: var(--subtle);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
-}
-
-.icon-circle-primary {
-  border-radius: var(--radius-full);
-  background-color: var(--primary-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.sidebar-nav-item {
-  display: flex;
-  align-items: center;
-  height: var(--sidebar-row-height);
-  padding: var(--sidebar-row-padding-y) var(--sidebar-row-padding-x);
-  gap: var(--sidebar-row-gap);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  line-height: var(--leading-xs);
-  transition-property: color, background-color, border-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+    --leading-sm: var(--spacing-18);
+    --leading-base: var(--spacing-20);
+    --leading-lg: var(--spacing-24);
+    --leading-xl: var(--spacing-28);
+    --leading-2xl: var(--spacing-36);
+    --leading-3xl: var(--spacing-44);
 }

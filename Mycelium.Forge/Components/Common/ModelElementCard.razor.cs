@@ -82,8 +82,19 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The Tailwind CSS utility class string.</returns>
         public string GetContainerClass()
         {
-            var slug = this.GetCategorySlug();
-            return $"bg-sysml-{slug}-surface border-sysml-{slug}-border";
+            return this.GetCategorySlug() switch
+            {
+                "attributes" => "bg-sysml-attributes-surface border-sysml-attributes-border",
+                "connections" => "bg-sysml-connections-surface border-sysml-connections-border",
+                "behavior" => "bg-sysml-behavior-surface border-sysml-behavior-border",
+                "requirements" => "bg-sysml-requirements-surface border-sysml-requirements-border",
+                "verification" => "bg-sysml-verification-surface border-sysml-verification-border",
+                "allocations" => "bg-sysml-allocations-surface border-sysml-allocations-border",
+                "metadata" => "bg-sysml-metadata-surface border-sysml-metadata-border",
+                "library" => "bg-sysml-library-surface border-sysml-library-border",
+                "variation" => "bg-sysml-variation-surface border-sysml-variation-border",
+                _ => "bg-sysml-structure-surface border-sysml-structure-border"
+            };
         }
 
         /// <summary>
@@ -92,8 +103,19 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The Tailwind CSS utility class string.</returns>
         public string GetHeaderClass()
         {
-            var slug = this.GetCategorySlug();
-            return $"text-sysml-{slug}-header";
+            return this.GetCategorySlug() switch
+            {
+                "attributes" => "text-sysml-attributes-header",
+                "connections" => "text-sysml-connections-header",
+                "behavior" => "text-sysml-behavior-header",
+                "requirements" => "text-sysml-requirements-header",
+                "verification" => "text-sysml-verification-header",
+                "allocations" => "text-sysml-allocations-header",
+                "metadata" => "text-sysml-metadata-header",
+                "library" => "text-sysml-library-header",
+                "variation" => "text-sysml-variation-header",
+                _ => "text-sysml-structure-header"
+            };
         }
 
         /// <summary>
@@ -102,8 +124,19 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The Tailwind CSS utility class string.</returns>
         public string GetBadgeClass()
         {
-            var slug = this.GetCategorySlug();
-            return $"border bg-sysml-{slug}-surface text-sysml-{slug}-header border-sysml-{slug}-border";
+            return this.GetCategorySlug() switch
+            {
+                "attributes" => "border bg-sysml-attributes-surface text-sysml-attributes-header border-sysml-attributes-border",
+                "connections" => "border bg-sysml-connections-surface text-sysml-connections-header border-sysml-connections-border",
+                "behavior" => "border bg-sysml-behavior-surface text-sysml-behavior-header border-sysml-behavior-border",
+                "requirements" => "border bg-sysml-requirements-surface text-sysml-requirements-header border-sysml-requirements-border",
+                "verification" => "border bg-sysml-verification-surface text-sysml-verification-header border-sysml-verification-border",
+                "allocations" => "border bg-sysml-allocations-surface text-sysml-allocations-header border-sysml-allocations-border",
+                "metadata" => "border bg-sysml-metadata-surface text-sysml-metadata-header border-sysml-metadata-border",
+                "library" => "border bg-sysml-library-surface text-sysml-library-header border-sysml-library-border",
+                "variation" => "border bg-sysml-variation-surface text-sysml-variation-header border-sysml-variation-border",
+                _ => "border bg-sysml-structure-surface text-sysml-structure-header border-sysml-structure-border"
+            };
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "typography": {
     "typography": {
       "display": {
@@ -15,7 +15,10 @@
               "value": -1,
               "unit": "px"
             },
-            "lineHeight": 3
+            "lineHeight": {
+              "value": 48,
+              "unit": "px"
+            }
           },
           "$description": "Hero display. Rarely used in product UI.",
           "$extensions": {
@@ -41,7 +44,10 @@
               "value": -0.5,
               "unit": "px"
             },
-            "lineHeight": 2.5
+            "lineHeight": {
+              "value": 40,
+              "unit": "px"
+            }
           },
           "$description": "Large display.",
           "$extensions": {
@@ -67,7 +73,10 @@
               "value": -0.25,
               "unit": "px"
             },
-            "lineHeight": 2
+            "lineHeight": {
+              "value": 32,
+              "unit": "px"
+            }
           },
           "$description": "Page title on a marketing or docs surface.",
           "$extensions": {
@@ -95,7 +104,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.75
+            "lineHeight": {
+              "value": 28,
+              "unit": "px"
+            }
           },
           "$description": "Section title inside a page body.",
           "$extensions": {
@@ -121,7 +133,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.625
+            "lineHeight": {
+              "value": 26,
+              "unit": "px"
+            }
           },
           "$description": "Card or panel title.",
           "$extensions": {
@@ -147,7 +162,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.5
+            "lineHeight": {
+              "value": 24,
+              "unit": "px"
+            }
           },
           "$description": "Group header inside a list.",
           "$extensions": {
@@ -175,7 +193,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.5
+            "lineHeight": {
+              "value": 24,
+              "unit": "px"
+            }
           },
           "$description": "Lead paragraph.",
           "$extensions": {
@@ -201,7 +222,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.25
+            "lineHeight": {
+              "value": 20,
+              "unit": "px"
+            }
           },
           "$description": "Default body text and input values.",
           "$extensions": {
@@ -227,7 +251,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.25
+            "lineHeight": {
+              "value": 20,
+              "unit": "px"
+            }
           },
           "$description": "Body text with emphasis.",
           "$extensions": {
@@ -253,7 +280,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.125
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
           },
           "$description": "Row primary text, table cells.",
           "$extensions": {
@@ -279,7 +309,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1.125
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
           },
           "$description": "Row text with emphasis.",
           "$extensions": {
@@ -305,7 +338,10 @@
               "value": 0.2,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Helper text under an input, stereotypes.",
           "$extensions": {
@@ -331,7 +367,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.313
+            "lineHeight": {
+              "value": 21,
+              "unit": "px"
+            }
           },
           "$description": "Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure.",
           "$extensions": {
@@ -359,7 +398,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.25
+            "lineHeight": {
+              "value": 20,
+              "unit": "px"
+            }
           },
           "$description": "Form label.",
           "$extensions": {
@@ -385,7 +427,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Compact label, chip text.",
           "$extensions": {
@@ -411,7 +456,10 @@
               "value": 0.5,
               "unit": "px"
             },
-            "lineHeight": 0.875
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
           },
           "$description": "ALL CAPS section label, count pill.",
           "$extensions": {
@@ -439,7 +487,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.25
+            "lineHeight": {
+              "value": 20,
+              "unit": "px"
+            }
           },
           "$description": "Code and identifiers, default size.",
           "$extensions": {
@@ -465,7 +516,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.125
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
           },
           "$description": "Numeric table cells, versions.",
           "$extensions": {
@@ -491,7 +545,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Compact mono, badges and hashes.",
           "$extensions": {
@@ -517,7 +574,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.188
+            "lineHeight": {
+              "value": 19,
+              "unit": "px"
+            }
           },
           "$description": "Code preview inside the kpar archive browser and the forum code blocks.",
           "$extensions": {
@@ -961,7 +1021,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
           "$extensions": {
@@ -1221,7 +1284,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
           "$extensions": {
@@ -1325,7 +1391,10 @@
               "value": 0.5,
               "unit": "px"
             },
-            "lineHeight": 0.875
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
           "$extensions": {
@@ -1351,7 +1420,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
           "$extensions": {
@@ -2001,7 +2073,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2079,7 +2154,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2105,7 +2183,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 0.938
+            "lineHeight": {
+              "value": 15,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2183,7 +2264,10 @@
               "value": 0.12,
               "unit": "px"
             },
-            "lineHeight": 1.296
+            "lineHeight": {
+              "value": 20.736,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2209,7 +2293,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1.17
+            "lineHeight": {
+              "value": 18.72,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2235,7 +2322,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1.08
+            "lineHeight": {
+              "value": 17.28,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2287,7 +2377,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 0.875
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2313,7 +2406,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 0.875
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2339,7 +2435,10 @@
               "value": 0.5,
               "unit": "px"
             },
-            "lineHeight": 0.875
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2547,7 +2646,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.125
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2573,7 +2675,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1.125
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2704,7 +2809,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1.05
+            "lineHeight": {
+              "value": 16.7962,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2730,7 +2838,10 @@
               "value": 0.08,
               "unit": "px"
             },
-            "lineHeight": 0.948
+            "lineHeight": {
+              "value": 15.1632,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2756,7 +2867,10 @@
               "value": 0.08,
               "unit": "px"
             },
-            "lineHeight": 0.875
+            "lineHeight": {
+              "value": 13.9968,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -2912,7 +3026,10 @@
               "value": -0.25,
               "unit": "px"
             },
-            "lineHeight": 2
+            "lineHeight": {
+              "value": 32,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -3094,7 +3211,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.063
+            "lineHeight": {
+              "value": 17,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -3302,7 +3422,10 @@
               "value": -0.5,
               "unit": "px"
             },
-            "lineHeight": 2.5
+            "lineHeight": {
+              "value": 40,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3328,7 +3451,10 @@
               "value": -1,
               "unit": "px"
             },
-            "lineHeight": 3
+            "lineHeight": {
+              "value": 48,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3380,7 +3506,10 @@
               "value": 0.12,
               "unit": "px"
             },
-            "lineHeight": 1.296
+            "lineHeight": {
+              "value": 20.736,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3406,7 +3535,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1.17
+            "lineHeight": {
+              "value": 18.72,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3432,7 +3564,10 @@
               "value": 0.1,
               "unit": "px"
             },
-            "lineHeight": 1.08
+            "lineHeight": {
+              "value": 17.28,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3458,7 +3593,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.125
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3640,7 +3778,10 @@
               "value": 0.081,
               "unit": "px"
             },
-            "lineHeight": 0.85
+            "lineHeight": {
+              "value": 13.6049,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3666,7 +3807,10 @@
               "value": 0.0648,
               "unit": "px"
             },
-            "lineHeight": 0.768
+            "lineHeight": {
+              "value": 12.2822,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3692,7 +3836,10 @@
               "value": 0.0648,
               "unit": "px"
             },
-            "lineHeight": 0.709
+            "lineHeight": {
+              "value": 11.3374,
+              "unit": "px"
+            }
           },
           "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
           "$extensions": {
@@ -3744,7 +3891,10 @@
               "value": 0,
               "unit": "px"
             },
-            "lineHeight": 1.125
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
           },
           "$extensions": {
             "figma": {
@@ -3769,7 +3919,10 @@
               "value": 0.07,
               "unit": "px"
             },
-            "lineHeight": 0.689
+            "lineHeight": {
+              "value": 11.02,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -3795,7 +3948,10 @@
               "value": 0.05,
               "unit": "px"
             },
-            "lineHeight": 0.622
+            "lineHeight": {
+              "value": 9.9486,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
@@ -3821,7 +3977,10 @@
               "value": 0.05,
               "unit": "px"
             },
-            "lineHeight": 0.574
+            "lineHeight": {
+              "value": 9.1833,
+              "unit": "px"
+            }
           },
           "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {

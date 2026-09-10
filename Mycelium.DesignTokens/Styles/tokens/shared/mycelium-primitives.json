@@ -1,4 +1,4 @@
-﻿{
+{
   "color": {
     "ownership": {
       "thermal": {
@@ -6488,6 +6488,146 @@
         "$extensions": {
           "figma": {
             "variableId": "VariableID:8256:6",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      }
+    },
+    "untriaged": {
+      "F25022": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.949,
+            0.3137,
+            0.1333
+          ],
+          "alpha": 1
+        },
+        "$description": "UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8735:2576",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "7FBA00": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.498,
+            0.7294,
+            0
+          ],
+          "alpha": 1
+        },
+        "$description": "UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8735:2577",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "00A4EF": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0.6431,
+            0.9373
+          ],
+          "alpha": 1
+        },
+        "$description": "UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8735:2578",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "FFB900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            0.7255,
+            0
+          ],
+          "alpha": 1
+        },
+        "$description": "UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8735:2579",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "17191F": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0902,
+            0.098,
+            0.1216
+          ],
+          "alpha": 1
+        },
+        "$description": "UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8735:2580",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "FFFFFF": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 1
+        },
+        "$description": "UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8735:9836",
             "collection": "VariableCollectionId:7:2",
             "scopes": [
               "ALL_SCOPES"

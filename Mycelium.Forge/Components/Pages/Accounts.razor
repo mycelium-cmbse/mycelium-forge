@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Accounts.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -89,7 +89,7 @@
         <div class="w-full rounded-lg bg-card border border-border overflow-hidden">
             <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.ViewModel.FilteredAccounts)"
                                                       class="w-full text-left">
-                <BlazorBlueprint.Primitives.Table.BbTableHeader Class="flex items-center px-4 py-2.5 bg-muted text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border gap-3">
+                <BlazorBlueprint.Primitives.Table.BbTableHeader Class="table-header-row px-4 py-2.5 gap-3">
                     <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
                                                                         Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
                         ACCOUNT

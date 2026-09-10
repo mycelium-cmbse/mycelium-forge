@@ -46,7 +46,7 @@ namespace Mycelium.Forge.EndToEndTests
         {
             await this.Page.GotoAsync("/");
 
-            await Expect(this.Page.Locator("h1")).ToHaveTextAsync("Mycelium Forge");
+            await Expect(this.Page.Locator("h1")).ToHaveTextAsync("The MBSE model and package registry");
         }
 
         [Test]

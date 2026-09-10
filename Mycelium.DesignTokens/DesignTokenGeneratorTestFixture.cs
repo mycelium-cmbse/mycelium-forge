@@ -45,34 +45,7 @@ namespace Mycelium.DesignTokens
             var candidateDirectory = Path.GetFullPath(Path.Combine(baseDirectory, "..", "..", ".."));
 
             this.ProjectDirectory = File.Exists(Path.Combine(candidateDirectory, "Javascript", "build-tokens.mjs")) ? candidateDirectory : baseDirectory;
-
-            this.TestOutputDirectory = Path.Combine(this.ProjectDirectory, "Styles", "test-dist");
-
-            if (Directory.Exists(this.TestOutputDirectory))
-            {
-                Directory.Delete(this.TestOutputDirectory, true);
-            }
-        }
-
-        /// <summary>
-        /// Cleans up temporary test artifacts after each test execution.
-        /// </summary>
-        [TearDown]
-        public async Task TearDown()
-        {
-            if (!Directory.Exists(this.TestOutputDirectory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(this.TestOutputDirectory, true);
-            }
-            catch
-            {
-                await Console.Error.WriteLineAsync("Failed to delete test output directory.");
-            }
+            this.TestOutputDirectory = Path.Combine(this.ProjectDirectory, "Styles", "dist");
         }
 
         /// <summary>
@@ -80,13 +53,13 @@ namespace Mycelium.DesignTokens
         /// </summary>
         /// <returns>A task representing the asynchronous test operation.</returns>
         [Test]
-        public async Task VerifyGenerateAsync()
+        public async Task GenerateCssFromDtcgTokensAndVerify()
         {
             var options = new DesignTokenGeneratorOptions
             {
                 Target = "all",
                 ScriptPath = Path.Combine("Javascript", "build-tokens.mjs"),
-                OutputDirectory = Path.Combine("Styles", "test-dist"),
+                OutputDirectory = Path.Combine("Styles", "dist"),
                 TokensDirectory = Path.Combine("Styles", "tokens"),
                 WorkingDirectory = this.ProjectDirectory,
                 TimeoutSeconds = 30
@@ -98,30 +71,32 @@ namespace Mycelium.DesignTokens
             // Verify that the expected output files exist and contain the expected content
             var forgeCombinedPath = Path.Combine(this.TestOutputDirectory, "tokens-forge.css");
             var bloomCombinedPath = Path.Combine(this.TestOutputDirectory, "tokens-bloom.css");
-            var forgeLightPath = Path.Combine(this.TestOutputDirectory, "tokens-forge-light.css");
-            var forgeDarkPath = Path.Combine(this.TestOutputDirectory, "tokens-forge-dark.css");
+            var myceliumThemePath = Path.Combine(this.TestOutputDirectory, "theme-mycelium.css");
 
-            var lightContent = File.Exists(forgeLightPath) ? await File.ReadAllTextAsync(forgeLightPath) : string.Empty;
-            var darkContent = File.Exists(forgeDarkPath) ? await File.ReadAllTextAsync(forgeDarkPath) : string.Empty;
-            var combinedContent = File.Exists(forgeCombinedPath) ? await File.ReadAllTextAsync(forgeCombinedPath) : string.Empty;
+            var combinedForgeContent = File.Exists(forgeCombinedPath) ? await File.ReadAllTextAsync(forgeCombinedPath) : string.Empty;
+            var combinedBloomContent = File.Exists(bloomCombinedPath) ? await File.ReadAllTextAsync(bloomCombinedPath) : string.Empty;
+            var myceliumThemeContent = File.Exists(myceliumThemePath) ? await File.ReadAllTextAsync(myceliumThemePath) : string.Empty;
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsSuccess, Is.True);
                 Assert.That(result.ExitCode, Is.EqualTo(0));
-                Assert.That(result.GeneratedFiles, Has.Count.GreaterThanOrEqualTo(6));
+                Assert.That(result.GeneratedFiles, Has.Count.EqualTo(3));
                 Assert.That(File.Exists(forgeCombinedPath), Is.True);
                 Assert.That(File.Exists(bloomCombinedPath), Is.True);
-                Assert.That(File.Exists(forgeLightPath), Is.True);
-                Assert.That(File.Exists(forgeDarkPath), Is.True);
-                Assert.That(lightContent.Contains(":root"), Is.True);
-                Assert.That(lightContent.Contains("--primary"), Is.True);
-                Assert.That(lightContent.Contains("--background"), Is.True);
-                Assert.That(darkContent.Contains(".dark"), Is.True);
-                Assert.That(darkContent.Contains("--primary"), Is.True);
-                Assert.That(darkContent.Contains("--background"), Is.True);
-                Assert.That(combinedContent.Contains(":root"), Is.True);
-                Assert.That(combinedContent.Contains(".dark"), Is.True);
+                Assert.That(File.Exists(myceliumThemePath), Is.True);
+                Assert.That(combinedForgeContent.Contains(":root"), Is.True);
+                Assert.That(combinedForgeContent.Contains(".dark"), Is.True);
+                Assert.That(combinedForgeContent.Contains("--primary"), Is.True);
+                Assert.That(combinedForgeContent.Contains("--background"), Is.True);
+                Assert.That(combinedBloomContent.Contains(":root"), Is.True);
+                Assert.That(combinedBloomContent.Contains(".dark"), Is.True);
+                Assert.That(combinedForgeContent.Contains("--spacing-"), Is.True);
+                Assert.That(myceliumThemeContent.Contains("@theme inline"), Is.True);
+                Assert.That(myceliumThemeContent.Contains("--color-"), Is.True);
+                Assert.That(myceliumThemeContent.Contains("--radius-"), Is.True);
+                Assert.That(myceliumThemeContent.Contains("--spacing-"), Is.True);
+                Assert.That(myceliumThemeContent.Contains("--text-"), Is.True);
             }
         }
     }
