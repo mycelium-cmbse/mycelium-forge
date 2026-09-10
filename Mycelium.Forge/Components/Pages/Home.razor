@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Home.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -11,7 +11,7 @@
 
 <PageTitle>Mycelium Forge &mdash; The MBSE model and package registry</PageTitle>
 
-<section class="w-full py-16 flex flex-col items-center gap-5 select-none">
+<section class="w-full bg-card py-16 flex flex-col items-center gap-5 select-none">
     <h1 class="text-3xl leading-3xl font-semibold text-center text-foreground tracking-tight max-w-2xl">
         The MBSE model and package registry
     </h1>
@@ -61,7 +61,7 @@
     </div>
 </section>
 
-<div class="w-full bg-body-bg border-t border-border/40 py-12 select-none">
+<div class="w-full bg-background border-t border-border/40 py-12 select-none">
     <div class="page-container flex flex-col gap-12">
         <PackageSection Title="Standard libraries"
                         ViewAllHref="@($"{PageRoutes.Packages}?{UrlParameterNames.Category}=standard")"

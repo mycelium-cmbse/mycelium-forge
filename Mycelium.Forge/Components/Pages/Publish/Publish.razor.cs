@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Publish.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -70,7 +70,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public static string GetStepNumberClass(PublishStepModel step)
         {
             return step.IsCurrent
-                ? "text-2xs leading-3xs font-semibold text-white"
+                ? "text-2xs leading-3xs font-semibold text-primary-foreground"
                 : "text-2xs leading-3xs font-semibold text-muted-foreground";
         }
 
@@ -95,9 +95,9 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             return status switch
             {
-                ValidationStatus.Pass => "text-xs leading-2xs font-medium text-validated shrink-0",
-                ValidationStatus.Warning => "text-xs leading-2xs font-medium text-warning-foreground shrink-0",
-                ValidationStatus.Missing => "text-xs leading-2xs font-medium text-warning-foreground shrink-0",
+                ValidationStatus.Pass => "text-xs leading-2xs font-medium text-success-vivid shrink-0",
+                ValidationStatus.Warning => "text-xs leading-2xs font-medium text-warning-vivid shrink-0",
+                ValidationStatus.Missing => "text-xs leading-2xs font-medium text-warning-vivid shrink-0",
                 ValidationStatus.Fail => "text-xs leading-2xs font-medium text-destructive shrink-0",
                 _ => "text-xs leading-2xs font-medium text-muted-foreground shrink-0"
             };

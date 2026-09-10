@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -40,6 +40,16 @@
     <ItemGroup>
         <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Orm\Mycelium.Forge.Orm.csproj" />
+        <ProjectReference Include="..\Mycelium.DesignTokens\Mycelium.DesignTokens.csproj" />
     </ItemGroup>
+
+    <Target Name="CopyDesignTokens" BeforeTargets="BuildTailwind">
+        <ItemGroup>
+            <DesignTokenFiles Include="$(MSBuildThisFileDirectory)..\Mycelium.DesignTokens\Styles\dist\tokens-forge.css;$(MSBuildThisFileDirectory)..\Mycelium.DesignTokens\Styles\dist\theme-forge.css" />
+        </ItemGroup>
+        <Copy SourceFiles="@(DesignTokenFiles)" 
+              DestinationFolder="$(MSBuildProjectDirectory)\Styles\Generated\" 
+              SkipUnchangedFiles="true" />
+    </Target>
 
 </Project>

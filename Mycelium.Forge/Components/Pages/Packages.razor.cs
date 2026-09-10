@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Packages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -116,7 +116,7 @@ namespace Mycelium.Forge.Components.Pages
 
             return item.IsChecked
                 ? $"{baseClass} font-medium text-foreground"
-                : $"{baseClass} font-normal text-secondary-text hover:text-foreground";
+                : $"{baseClass} font-normal text-foreground-muted hover:text-foreground";
         }
 
         /// <summary>

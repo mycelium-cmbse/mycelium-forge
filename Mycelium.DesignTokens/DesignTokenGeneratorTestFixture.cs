@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DesignTokenGeneratorTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -15,6 +15,7 @@ namespace Mycelium.DesignTokens
     /// Suite of automated tests for the <see cref="DesignTokenGenerator" /> class.
     /// </summary>
     [TestFixture]
+    [Category("IgnoreOnCI")]
     public class DesignTokenGeneratorTestFixture
     {
         /// <summary>

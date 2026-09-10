@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="CreateApiKeyDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -55,7 +55,7 @@
                         <BbCheckbox @bind-Checked="permission.IsGranted"
                                     Id="@($"create-api-key-perm-{permission.Name}")"/>
                         <label for="@($"create-api-key-perm-{permission.Name}")"
-                               class="text-sm leading-xs text-secondary-text cursor-pointer select-none">
+                               class="text-sm leading-xs text-foreground-muted cursor-pointer select-none">
                             @(permission.Label)
                         </label>
                     </div>

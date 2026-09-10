@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="AccountSettings.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -17,7 +17,7 @@
 
 <PageTitle>Account Settings &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+<div class="w-full bg-background min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
 <BbBreadcrumb Class="text-xs leading-2xs">
     <BbBreadcrumbList>
@@ -76,7 +76,7 @@
             @if (this.ViewModel.Profile.IsEmailVerified)
             {
                 <BbBadge Variant="BadgeVariant.Secondary"
-                         Class="badge-role text-success-icon">
+                         Class="badge-role text-success-vivid">
                     Verified
                 </BbBadge>
             }
@@ -197,9 +197,9 @@
         {
             <div @key="organization.Scope"
                  class="flex items-center gap-3 py-2.25 w-full">
-                <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-org-member-alt-avatar-bg")">
-                    @(organization.Initials)
-                </div>
+                <CollaboratorAvatar Name="@(organization.Name)"
+                                    Initials="@(organization.Initials)"
+                                    Size="w-7 h-7" />
 
                 <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
                     @(organization.Scope)

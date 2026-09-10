@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageDetails.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -18,7 +18,7 @@
 
 <PageTitle>@(this.ViewModel.Package.Package.FullName) &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen select-none">
+<div class="w-full bg-background min-h-screen select-none">
 <header class="w-full bg-card border-b border-border py-7">
     <div class="page-container flex flex-col gap-3.5">
         <BbBreadcrumb Class="text-xs leading-2xs">
@@ -52,7 +52,7 @@
         <div class="flex flex-wrap items-center gap-2.5 w-full">
             <LucideIcon Name="box"
                         Size="26"
-                        Class="text-secondary-text shrink-0"/>
+                        Class="text-foreground-muted shrink-0"/>
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
                 @(this.ViewModel.Package.Package.FullName)
             </h1>
@@ -70,9 +70,11 @@
                      Class="badge-format">
                 @(this.ViewModel.Package.Package.Version)
             </BbBadge>
-            <span class="text-xs leading-2xs text-muted-foreground">
-                @(this.ViewModel.Package.ReleaseStatus)
-            </span>
+            @if (!string.IsNullOrWhiteSpace(this.ViewModel.Package.ReleaseStatus))
+            {
+                <ForgeBadge Text="@(this.ViewModel.Package.ReleaseStatus)"
+                            Class="badge-lifecycle-open" />
+            }
         </div>
 
         <p class="text-md leading-sm text-muted-foreground">
@@ -119,7 +121,7 @@
         <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedInstallTab)"
                                                 DefaultValue="Forge CLI"
                                                 OnValueChange="@(this.SelectInstallTab)"
-                                                class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2.5">
+                                                class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2.5">
             <BlazorBlueprint.Primitives.Tabs.BbTabsList class="flex items-center gap-4.5 text-xs leading-2xs">
                 @foreach (var tab in this.InstallTabs)
                 {
@@ -178,7 +180,7 @@
     </div>
 </header>
 
-<div class="w-full bg-body-bg py-7">
+<div class="w-full bg-background py-7">
     <div class="page-container flex flex-col lg:flex-row items-start gap-8">
         <div class="flex-1 w-full flex flex-col">
             <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedContentTab)"
@@ -272,7 +274,7 @@
 
                 <div class="flex items-center justify-between gap-2 text-sm leading-xs">
                     <span class="font-semibold text-foreground">Release validated</span>
-                    <span class="font-semibold text-success-icon">
+                    <span class="font-semibold text-success-vivid">
                         @(this.ViewModel.Package.QualityScore)
                     </span>
                 </div>
@@ -280,10 +282,10 @@
                 @foreach (var title in this.ViewModel.Package.QualityChecks.Select(check => check.Title))
                 {
                     <div @key="title"
-                         class="flex items-center gap-2 text-xs leading-2xs text-secondary-text">
+                         class="flex items-center gap-2 text-xs leading-2xs text-foreground-muted">
                         <LucideIcon Name="check"
                                     Size="14"
-                                    Class="text-validated shrink-0"/>
+                                    Class="text-success-vivid shrink-0"/>
                         <span class="flex-1 truncate">
                             @(title)
                         </span>
@@ -300,11 +302,9 @@
                 {
                     <div @key="maintainer.Name"
                          class="flex items-center gap-2 h-6.5">
-                        <div class="w-6.5 h-6.5 rounded-full bg-avatar-bg flex items-center justify-center shrink-0">
-                            <span class="text-2xs leading-3xs font-semibold text-white">
-                                @(maintainer.Initials)
-                            </span>
-                        </div>
+                        <CollaboratorAvatar Name="@(maintainer.Name)"
+                                            Initials="@(maintainer.Initials)"
+                                            Size="w-6.5 h-6.5" />
                         <span class="text-xs leading-2xs font-medium text-foreground flex-1 truncate">
                             @(maintainer.Name)
                         </span>

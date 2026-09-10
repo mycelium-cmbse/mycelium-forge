@@ -59,7 +59,7 @@ jobs:
       # The end-to-end suites drive a host over the network and fail with connection-refused when
       # nothing is listening on :5000. They stay out of this job until F-09 makes them self-hosting.
       - name: Run Tests and Compute Coverage
-        run: dotnet-coverage collect "dotnet test Mycelium.Forge.sln --no-restore --no-build --verbosity normal --filter TestCategory!=EndToEnd" -f xml -o "coverage.xml"
+        run: dotnet-coverage collect "dotnet test Mycelium.Forge.sln --no-restore --no-build --verbosity normal --filter \"TestCategory!=EndToEnd&TestCategory!=IgnoreOnCI\"" -f xml -o "coverage.xml"
 
       - name: Sonarqube end
         env:

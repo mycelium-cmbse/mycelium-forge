@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageSettings.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -17,7 +17,7 @@
 
 <PageTitle>@(this.ViewModel.Package.Publisher)/@(this.ViewModel.Package.Name) Settings &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+<div class="w-full bg-background min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
 <BbBreadcrumb Class="text-xs leading-2xs">
     <BbBreadcrumbList>
@@ -73,7 +73,7 @@
                   Class="shrink-0">
             <LucideIcon Name="plus"
                         Size="14"
-                        Class="text-secondary-text shrink-0"/>
+                        Class="text-foreground-muted shrink-0"/>
             <span>Add maintainer</span>
         </BbButton>
     </div>
@@ -83,11 +83,9 @@
         {
             <div @key="maintainer.Name"
                  class="flex items-center gap-2.5 w-full">
-                <div class="w-7.5 h-7.5 rounded-full bg-avatar-bg flex items-center justify-center shrink-0">
-                    <span class="text-2xs leading-3xs font-semibold text-white">
-                        @(maintainer.Initials)
-                    </span>
-                </div>
+                <CollaboratorAvatar Name="@(maintainer.Name)"
+                                    Initials="@(maintainer.Initials)"
+                                    Size="w-7.5 h-7.5" />
 
                 <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
                     <div class="flex items-center gap-1.5">
@@ -139,7 +137,7 @@
         <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
                                                                 Value="VisibilityKind.PRIVATE"
                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
-            <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PRIVATE ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
+            <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PRIVATE ? "border-4 border-primary bg-card" : "border border-border bg-card")">
             </div>
 
             <div class="flex-1 flex flex-col gap-0.5 min-w-0">
@@ -163,7 +161,7 @@
         <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
                                                                 Value="VisibilityKind.INTERNAL"
                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
-            <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
+            <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL ? "border-4 border-primary bg-card" : "border border-border bg-card")">
             </div>
 
             <div class="flex-1 flex flex-col gap-0.5 min-w-0">
@@ -187,7 +185,7 @@
         <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
                                                                 Value="VisibilityKind.PUBLIC"
                                                                 class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
-            <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PUBLIC ? "border-[5px] border-primary bg-card" : "border border-border bg-card")">
+            <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 @(this.ViewModel.Package.Visibility == VisibilityKind.PUBLIC ? "border-4 border-primary bg-card" : "border border-border bg-card")">
             </div>
 
             <div class="flex-1 flex flex-col gap-0.5 min-w-0">
@@ -233,7 +231,7 @@
                 @if (version.IsLatest)
                 {
                     <BbBadge Variant="BadgeVariant.Secondary"
-                             Class="badge-version-state text-secondary-text">
+                             Class="badge-version-state text-foreground-muted">
                         Latest
                     </BbBadge>
                 }
@@ -270,13 +268,13 @@
                 {
                     <BbButton Variant="ButtonVariant.Link"
                               OnClick="() => this.OnUnlistVersion(version)"
-                              Class="package-unlist-version-button text-secondary-text hover:text-foreground">
+                              Class="package-unlist-version-button text-foreground-muted hover:text-foreground">
                         Unlist
                     </BbButton>
 
                     <BbButton Variant="ButtonVariant.Link"
                               OnClick="() => this.OnDeprecateVersion(version)"
-                              Class="package-deprecate-version-button text-secondary-text hover:text-foreground">
+                              Class="package-deprecate-version-button text-foreground-muted hover:text-foreground">
                         Deprecate
                     </BbButton>
                 }

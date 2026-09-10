@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="ApiKeys.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -13,12 +13,12 @@
 
 <PageTitle>API Keys &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen py-10 select-none">
+<div class="w-full bg-background min-h-screen py-10 select-none">
     <div class="page-container flex flex-col gap-5">
         <div class="flex flex-row items-center gap-3">
             <div class="flex flex-col gap-1 flex-1">
                 <h1 class="text-3xl leading-3xl font-semibold text-foreground">API keys</h1>
-                <p class="text-sm leading-17 text-muted-foreground">
+                <p class="text-sm leading-normal text-muted-foreground">
                     Tokens for publishing from the CLI or CI. Read access to public packages requires no key.
                 </p>
             </div>
@@ -40,7 +40,7 @@
                     IconName="info">
             <Actions>
                 <a href="@PageRoutes.Documentation.Overview"
-                   class="text-sm leading-xs font-semibold text-info-icon hover:underline shrink-0">
+                   class="text-sm leading-xs font-semibold text-info-strong hover:underline shrink-0">
                     Configure
                 </a>
             </Actions>
@@ -89,16 +89,16 @@
                                 <BbTableCell Class="w-[210px] shrink-0 p-0 font-semibold text-sm leading-xs text-foreground truncate">
                                     @(key.Name)
                                 </BbTableCell>
-                                <BbTableCell Class="w-[140px] shrink-0 p-0 font-medium text-sm leading-xs text-secondary-text truncate">
+                                <BbTableCell Class="w-[140px] shrink-0 p-0 font-medium text-sm leading-xs text-foreground-muted truncate">
                                     @(key.Scope)
                                 </BbTableCell>
-                                <BbTableCell Class="w-[200px] shrink-0 p-0 font-normal text-xs leading-2xs text-secondary-text truncate">
+                                <BbTableCell Class="w-[200px] shrink-0 p-0 font-normal text-xs leading-2xs text-foreground-muted truncate">
                                     @(key.PermissionsText)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[130px] shrink-0 p-0 font-normal text-sm leading-xs text-muted-foreground">
                                     @(key.CreatedAt.ToString("MMM yyyy"))
                                 </BbTableCell>
-                                <BbTableCell Class="w-[150px] shrink-0 p-0 font-normal text-sm leading-xs text-secondary-text">
+                                <BbTableCell Class="w-[150px] shrink-0 p-0 font-normal text-sm leading-xs text-foreground-muted">
                                     @(key.ExpiresAt.ToString("MMM yyyy"))
                                 </BbTableCell>
                                 <BbTableCell Class="w-[160px] shrink-0 p-0 font-normal text-sm leading-xs text-muted-foreground">

@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="CreateOrganizationDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -47,7 +47,7 @@
                           Errors="@(this.ValidationManager[nameof(this.Scope)])"/>
             @if (!this.ValidationManager.HasError(nameof(this.Scope)))
             {
-                <BbFieldDescription Class="text-2xs leading-3xs font-normal text-validated">
+                <BbFieldDescription Class="text-2xs leading-3xs font-normal text-success-vivid">
                     Must be lowercase and globally unique across Forge.
                 </BbFieldDescription>
             }

@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Packages.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -12,13 +12,13 @@
 
 <PageTitle>Packages &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen py-8 select-none">
+<div class="w-full bg-background min-h-screen py-8 select-none">
     <div class="page-container flex flex-col gap-5">
         <SearchInput Value="@(this.SearchQuery)"
                      ValueChanged="@(this.OnSearchValueChanged)"/>
 
         <div class="w-full flex items-center justify-between gap-3 h-8">
-            <span class="text-sm leading-xs font-medium text-secondary-text flex-1 truncate">
+            <span class="text-sm leading-xs font-medium text-foreground-muted flex-1 truncate">
                 @(this.GetResultsCountText())
             </span>
 
@@ -37,7 +37,7 @@
                                 id="include-prereleases"
                                 Class="w-4 h-4 rounded-sm border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary shrink-0"/>
                     <BbLabel For="include-prereleases"
-                             Class="text-sm leading-xs font-normal text-secondary-text hover:text-foreground cursor-pointer transition-colors">
+                             Class="text-sm leading-xs font-normal text-foreground-muted hover:text-foreground cursor-pointer transition-colors">
                         Include prereleases
                     </BbLabel>
                 </div>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="w-full flex flex-col lg:flex-row items-start gap-8">
-            <aside class="w-full lg:w-72 shrink-0 p-4 rounded-lg bg-card border border-card-border shadow-xs flex flex-col gap-5.5">
+            <aside class="w-full lg:w-72 shrink-0 p-4 rounded-lg bg-card border border-border shadow-xs flex flex-col gap-5.5">
                 @foreach (var group in this.ViewModel.Facets.GroupBy(x => x.Property))
                 {
                     <div @key="group.Key"
@@ -112,7 +112,7 @@
                                         Size="26"
                                         Class="text-muted-foreground shrink-0"/>
                         </div>
-                        <h2 class="text-lg leading-17 font-semibold text-foreground text-center">
+                        <h2 class="text-lg leading-snug font-semibold text-foreground text-center">
                             No packages found
                         </h2>
                         <p class="text-sm leading-xs font-normal text-muted-foreground text-center max-w-xl">
@@ -122,7 +122,7 @@
                                   Variant="ButtonVariant.Default"
                                   Type="ButtonType.Button"
                                   OnClick="@(this.BrowseAllPackages)"
-                                  Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-17 font-semibold transition-colors mt-0.5">
+                                  Class="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-base leading-normal font-semibold transition-colors mt-0.5">
                             Browse all packages
                         </BbButton>
                     </div>

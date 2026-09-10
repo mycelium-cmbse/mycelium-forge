@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ForgeCopyText.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -66,11 +66,11 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The combined CSS class string.</returns>
         private string GetContainerClass()
         {
-            const string baseClass = " px-3 py-2";
+            const string baseClass = " px-3 py-2 border border-border";
 
             return this.Dark
-                ? $"{baseClass} bg-code-bg text-code-import"
-                : $"{baseClass} bg-card border border-border text-foreground";
+                ? $"{baseClass} bg-docs-code-background text-docs-code-foreground"
+                : $"{baseClass} bg-card text-foreground";
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Mycelium.Forge.Components.Common
         private string GetTextClass()
         {
             return this.Dark
-                ? "text-code-import"
+                ? "text-docs-code-foreground"
                 : "text-foreground";
         }
     }
