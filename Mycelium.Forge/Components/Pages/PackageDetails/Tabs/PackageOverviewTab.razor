@@ -16,25 +16,25 @@
     <h2 class="text-xl leading-lg font-semibold text-foreground">
         @(this.Model.Package.Name)
     </h2>
-    <p class="text-sm leading-xs text-secondary-text">
+    <p class="text-sm leading-xs text-foreground-muted">
         @(this.Model.ReadmeDescription)
     </p>
 
     <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
         Contents
     </h3>
-    <p class="text-sm leading-xs text-secondary-text">
+    <p class="text-sm leading-xs text-foreground-muted">
         @(this.Model.ReadmeContents)
     </p>
 
     <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
         Usage
     </h3>
-    <div class="w-full p-3 px-3.5 rounded-md bg-code-bg font-mono text-sm leading-17 flex flex-col gap-0.5 overflow-x-auto">
-        <span class="text-code-import select-all">
+    <div class="w-full p-3 px-3.5 rounded-md bg-docs-code-background font-mono text-sm leading-normal flex flex-col gap-0.5 overflow-x-auto text-docs-code-foreground">
+        <span class="select-all">
             @(this.Model.CodeUsageImport)
         </span>
-        <span class="text-code-body select-all">
+        <span class="select-all">
             @(this.Model.CodeUsageBody)
         </span>
     </div>

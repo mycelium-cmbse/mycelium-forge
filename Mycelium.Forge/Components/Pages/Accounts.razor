@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Accounts.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -13,7 +13,7 @@
 
 <PageTitle>Accounts &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+<div class="w-full bg-background min-h-screen py-9 select-none">
     <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
         <BbBreadcrumb Class="text-xs leading-2xs">
             <BbBreadcrumbList>
@@ -89,7 +89,7 @@
         <div class="w-full rounded-lg bg-card border border-border overflow-hidden">
             <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.ViewModel.FilteredAccounts)"
                                                       class="w-full text-left">
-                <BlazorBlueprint.Primitives.Table.BbTableHeader Class="flex items-center px-4 py-2.5 bg-muted text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border gap-3">
+                <BlazorBlueprint.Primitives.Table.BbTableHeader Class="table-header-row px-4 py-2.5 gap-3">
                     <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="AdminAccountModel"
                                                                         Class="flex-[2] min-w-0 p-0 text-left font-semibold truncate">
                         ACCOUNT
@@ -124,9 +124,9 @@
                                                                          Item="@account"
                                                                          Class="flex items-center px-4 py-3 bg-card hover:bg-muted/50 transition-colors gap-3">
                                 <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 flex items-center gap-2.5 p-0">
-                                    <div class="w-7 h-7 rounded-full bg-org-member-avatar-bg flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold">
-                                        @(account.Initials)
-                                    </div>
+                                    <CollaboratorAvatar Name="@(account.Name)"
+                                                        Initials="@(account.Initials)"
+                                                        Size="w-7 h-7" />
 
                                     <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
                                         <div class="flex items-center gap-1.5 min-w-0">
@@ -148,7 +148,7 @@
                                 </BlazorBlueprint.Primitives.Table.BbTableCell>
 
                                 <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 p-0">
-                                    <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text truncate block">
+                                    <span class="text-xs sm:text-sm leading-xs font-normal text-foreground-muted truncate block">
                                         @(account.Email)
                                     </span>
                                 </BlazorBlueprint.Primitives.Table.BbTableCell>
@@ -157,21 +157,21 @@
                                     @if (string.Equals(account.VerificationStatus, "Verified", StringComparison.OrdinalIgnoreCase))
                                     {
                                         <BbBadge Variant="BadgeVariant.Secondary"
-                                                 Class="badge-role text-success-icon">
+                                                 Class="badge-role !bg-success-subtle text-success-vivid">
                                             Verified
                                         </BbBadge>
                                     }
                                     else
                                     {
                                         <BbBadge Variant="BadgeVariant.Secondary"
-                                                 Class="badge-role text-warning-icon">
-                                            Pending
+                                                 Class="badge-role !bg-warning-subtle text-warning-vivid">
+                                            @(account.VerificationStatus)
                                         </BbBadge>
                                     }
                                 </BlazorBlueprint.Primitives.Table.BbTableCell>
 
                                 <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 p-0">
-                                    <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text truncate block">
+                                    <span class="text-xs sm:text-sm leading-xs font-normal text-foreground-muted truncate block">
                                         @(account.Organizations)
                                     </span>
                                 </BlazorBlueprint.Primitives.Table.BbTableCell>
@@ -179,16 +179,14 @@
                                 <BlazorBlueprint.Primitives.Table.BbTableCell Class="w-[90px] shrink-0 flex items-center p-0">
                                     @if (account.Status == ScopeStatusKind.ACTIVE)
                                     {
-                                        <span class="text-xs sm:text-sm leading-xs font-normal text-secondary-text">
+                                        <span class="text-xs sm:text-sm leading-xs font-normal text-foreground-muted">
                                             Active
                                         </span>
                                     }
                                     else
                                     {
-                                        <BbBadge Variant="BadgeVariant.Secondary"
-                                                 Class="badge-role text-muted-foreground">
-                                            @(account.Status)
-                                        </BbBadge>
+                                        <ForgeBadge Text="@(account.Status.ToString())"
+                                                    Class="badge-lifecycle-archived" />
                                     }
                                 </BlazorBlueprint.Primitives.Table.BbTableCell>
 

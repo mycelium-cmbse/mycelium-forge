@@ -13,19 +13,19 @@
 }
 
 <div class="w-full p-6 rounded-lg bg-card border border-border flex flex-col gap-3">
-    <div class="w-full p-3 px-4 rounded-lg bg-success border border-success-border flex items-center gap-2.5">
+    <div class="w-full p-3 px-4 rounded-lg bg-success-subtle border border-docs-callout-tip-border flex items-center gap-2.5">
         <LucideIcon Name="check-circle-2"
                     Size="18"
-                    Class="text-success-icon shrink-0"/>
+                    Class="text-success-vivid shrink-0"/>
         <div class="flex-1 flex flex-col gap-0.5">
-            <span class="text-base leading-17 font-semibold text-success-foreground">
+            <span class="text-base leading-normal font-semibold text-success-strong">
                 @(this.Report.Title)
             </span>
-            <span class="text-xs leading-2xs text-secondary-text">
+            <span class="text-xs leading-2xs text-foreground-muted">
                 @(this.Report.Description)
             </span>
         </div>
-        <span class="text-md leading-sm font-semibold text-success-icon shrink-0">
+        <span class="text-md leading-sm font-semibold text-success-vivid shrink-0">
             @(this.Report.Score)
         </span>
     </div>
@@ -42,7 +42,7 @@
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
                             <LucideIcon Name="check"
                                         Size="16"
-                                        Class="text-validated shrink-0"/>
+                                        Class="text-success-vivid shrink-0"/>
                             <div class="flex-1 flex flex-col gap-0.5">
                                 <span class="text-sm leading-xs font-semibold text-foreground">
                                     @(check.Title)
@@ -52,7 +52,7 @@
                                 </span>
                             </div>
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
-                        <BlazorBlueprint.Primitives.Table.BbTableCell class="text-xs leading-2xs font-medium text-validated shrink-0 p-0">
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="text-xs leading-2xs font-medium text-success-vivid shrink-0 p-0">
                             @(check.Status)
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                     </BlazorBlueprint.Primitives.Table.BbTableRow>

@@ -1,0 +1,19 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ForgeBadge.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<span class="inline-flex items-center px-2 py-0.5 rounded text-2xs font-medium border @(this.Class)">
+    @if (this.ChildContent != null)
+    {
+        @(this.ChildContent)
+    }
+    else
+    {
+        @(this.Text)
+    }
+</span>

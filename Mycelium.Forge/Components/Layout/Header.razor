@@ -8,7 +8,7 @@
 ------------------------------------------------------------------------------------------------ *@
 
 @inherits DisposableComponent
-<header class="h-14 w-full px-6 flex items-center gap-6 bg-background border-b border-border shrink-0 select-none">
+<header class="h-14 w-full px-6 flex items-center gap-6 bg-card border-b border-border shrink-0 select-none">
     <div class="flex items-center gap-2.5">
         <ForgeLogo/>
     </div>
@@ -105,9 +105,10 @@
             </button>
 
             <a href="@PageRoutes.AccountSettings"
-               class="w-8 h-8 rounded-full bg-avatar-bg flex items-center justify-center shrink-0 text-white text-xs leading-2xs font-semibold select-none hover:opacity-90 transition-opacity"
                title="Account settings">
-                @(this.UserInitials)
+                <CollaboratorAvatar Initials="@(this.UserInitials)"
+                                    Size="w-8 h-8"
+                                    Class="hover:opacity-90 transition-opacity cursor-pointer"/>
             </a>
         }
         else

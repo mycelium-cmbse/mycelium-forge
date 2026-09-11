@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="CreateApiKeyDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -12,7 +12,7 @@
         <BbField Class="w-full flex flex-col gap-1.5"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.KeyName)))">
             <BbFieldLabel For="create-api-key-name"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 KEY NAME
             </BbFieldLabel>
             <BbFieldContent>
@@ -22,14 +22,14 @@
                          Placeholder="e.g. ci-publish or deploy-runner"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.KeyName)])"/>
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-1.5"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.SelectedScope)))">
             <BbFieldLabel For="create-api-key-scope"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 SCOPE
             </BbFieldLabel>
             <BbFieldContent>
@@ -39,12 +39,12 @@
                              Items="@(this.Scopes)"
                              Id="create-api-key-scope"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.SelectedScope)])"/>
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-2">
-            <BbFieldLabel Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <BbFieldLabel Class="form-field-label">
                 PERMISSIONS
             </BbFieldLabel>
             <BbFieldContent Class="flex flex-col gap-2">
@@ -55,7 +55,7 @@
                         <BbCheckbox @bind-Checked="permission.IsGranted"
                                     Id="@($"create-api-key-perm-{permission.Name}")"/>
                         <label for="@($"create-api-key-perm-{permission.Name}")"
-                               class="text-sm leading-xs text-secondary-text cursor-pointer select-none">
+                               class="text-sm leading-xs text-foreground-muted cursor-pointer select-none">
                             @(permission.Label)
                         </label>
                     </div>
@@ -65,7 +65,7 @@
 
         <BbField Class="w-full flex flex-col gap-1.5">
             <BbFieldLabel For="create-api-key-expiration"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 EXPIRATION
             </BbFieldLabel>
             <BbFieldContent>

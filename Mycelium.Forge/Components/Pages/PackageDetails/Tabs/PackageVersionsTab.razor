@@ -62,37 +62,31 @@
                             </span>
                             @if (ver.IsLatest)
                             {
-                                <BbBadge Variant="BadgeVariant.Secondary"
-                                         Class="badge-version-state text-secondary-text">
-                                    Latest
-                                </BbBadge>
+                                <ForgeBadge Text="Latest"
+                                            Class="badge-lifecycle-open" />
                             }
                             else if (ver.IsUnlisted)
                             {
-                                <BbBadge Variant="BadgeVariant.Secondary"
-                                         Class="badge-version-state text-muted-foreground">
-                                    Unlisted
-                                </BbBadge>
+                                <ForgeBadge Text="Unlisted"
+                                            Class="badge-lifecycle-archived" />
                             }
                             else if (ver.IsDeprecated)
                             {
-                                <BbBadge Variant="BadgeVariant.Secondary"
-                                         Class="badge-version-state text-muted-foreground">
-                                    Deprecated
-                                </BbBadge>
+                                <ForgeBadge Text="Deprecated"
+                                            Class="badge-lifecycle-archived" />
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 text-muted-foreground p-0">
                             @(ver.PublishedAgo)
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
-                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 text-secondary-text p-0">
+                        <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 text-foreground-muted p-0">
                             @(ver.DependentCount)
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 flex items-center gap-1.5 p-0">
                             @if (ver.IsValidated)
                             {
                                 <BbBadge Variant="BadgeVariant.Secondary"
-                                         Class="badge-version-state text-validated">
+                                         Class="badge-version-state text-success-vivid">
                                     Validated
                                 </BbBadge>
                             }
@@ -104,10 +98,8 @@
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-20 shrink-0 text-right p-0">
                             @if (ver.IsUnlisted)
                             {
-                                <BbBadge Variant="BadgeVariant.Secondary"
-                                         Class="badge-version-state text-muted-foreground">
-                                    Unlisted
-                                </BbBadge>
+                                <ForgeBadge Text="Unlisted"
+                                            Class="badge-lifecycle-archived" />
                             }
                             else
                             {

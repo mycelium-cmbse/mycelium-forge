@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="SignUp.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -13,7 +13,7 @@
 
 <PageTitle>Sign Up &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen flex flex-col items-center justify-center py-10 px-4 select-none">
+<div class="w-full bg-background min-h-screen flex flex-col items-center justify-center py-10 px-4 select-none">
     <div class="auth-card">
         <ForgeLogo/>
 
@@ -29,7 +29,7 @@
         <BbField Class="flex flex-col gap-1.5 w-full"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Username)))">
             <BbFieldLabel For="signup-username"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 USERNAME
             </BbFieldLabel>
             <BbFieldContent>
@@ -40,14 +40,14 @@
                          Placeholder="e.g. r.andre"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.ViewModel.Username)])"/>
         </BbField>
 
         <BbField Class="flex flex-col gap-1.5 w-full"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Email)))">
             <BbFieldLabel For="signup-email"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 EMAIL
             </BbFieldLabel>
             <BbFieldContent>
@@ -58,7 +58,7 @@
                          Placeholder="e.g. name@organisation.eu"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.ViewModel.Email)])"/>
             @if (!this.ValidationManager.HasError(nameof(this.ViewModel.Email)))
             {
@@ -71,7 +71,7 @@
         <BbField Class="flex flex-col gap-1.5 w-full"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.ViewModel.Password)))">
             <BbFieldLabel For="signup-password"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 PASSWORD
             </BbFieldLabel>
             <BbFieldContent>
@@ -82,7 +82,7 @@
                          Placeholder="••••••••"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.ViewModel.Password)])"/>
         </BbField>
 

@@ -1,0 +1,1106 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ * tokens-bloom.css
+ */
+
+:root {
+  --color-ownership-thermal-base: #ea580c; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-thermal-bg: #ffeded; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-thermal-fg: #bf4040; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-power-base: #eab308; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-power-bg: #fff2d9; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-power-fg: #b2730d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-structure-base: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-structure-bg: #edf2f7; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-structure-fg: #4d668c; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-aocs-base: #06b6d4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-aocs-bg: #e8f2ff; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-aocs-fg: #2b66c9; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-comms-base: #8b5cf6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-comms-bg: #ebf7eb; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-comms-fg: #338c4d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-propulsion-base: #dc2626; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-propulsion-bg: #ffebeb; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-propulsion-fg: #cc4026; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-software-base: #10b981; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-payload-base: #ec4899; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-payload-bg: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-payload-fg: #8c4dbf; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-mechanisms-base: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-mechanisms-bg: #f2f2f2; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-mechanisms-fg: #595966; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-data-handling-base: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-avionics-bg: #ebf5fc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-avionics-fg: #3373a6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-gnc-bg: #e8f2fc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-gnc-fg: #2666a6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-collaborator-c01: #ef4444; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c02: #f97316; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c03: #f59e0b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c04: #84cc16; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c05: #22c55e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c06: #14b8a6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c07: #06b6d4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c08: #3b82f6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c09: #6366f1; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c10: #a855f7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c11: #ec4899; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c12: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-preparation: #a855f7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-open: #16a34a; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-review: #d97706; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-archived: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-header: #475569; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-surface: #f8fafc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-border: #cbd5e1; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-header: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-surface: #f1f5f9; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-border: #e2e8f0; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-header: #0d9488; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-surface: #f0fdfa; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-border: #99f6e4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-header: #b45309; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-surface: #fffbeb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-header: #1d4ed8; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-surface: #eff6ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-border: #93c5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-header: #7c3aed; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-surface: #f5f3ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-border: #c4b5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-header: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-surface: #eef2ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-border: #a5b4fc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-header: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-surface: #f9fafb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-border: #d1d5db; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-header: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-surface: #fef3c7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-header: #9333ea; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-surface: #faf5ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-border: #d8b4fe; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-gray-0: #ffffff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-50: #fbfcfe; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-100: #f7fafc; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-150: #f0f5f7; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-200: #eceff3; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-250: #e3e8ed; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-300: #dee3eb; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-350: #d1d6db; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-400: #cdd4dd; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-450: #99a3b0; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-500: #94a3b8; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-550: #738294; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-600: #667385; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-650: #4d596b; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-700: #334155; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-750: #2e333d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-800: #293342; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-850: #1e293b; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-900: #212933; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-950: #161920; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-975: #1a1f28;
+  --color-gray-1000: #0f172a; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-1050: #0d121a; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-1100: #0e1116; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-50: #e8f7f2; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-100: #ccfbf1; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-300: #2dd4bf; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-500: #0f9e8c; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-600: #0f766e; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-800: #115e59; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-950: #12241f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-50: #faece3; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-300: #e8a87c;
+  --color-copper-400: #d88255; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-500: #a34a24; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-600: #8a3e1f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-800: #5c2712;
+  --color-copper-950: #311b12; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-50: #fff2f2; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-500: #d44545; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-700: #b91c1c; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-warning-50: #fff7e0; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-warning-500: #b2730d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-warning-600: #b45309; /** Primitive derived from the reference prototypes. */
+  --color-status-success-50: #f0fdf4; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-success-500: #338c4d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-success-600: #16a34a; /** Primitive derived from the reference prototypes. */
+  --color-status-success-700: #15803d; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-info-50: #e8f2ff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-500: #2b66c9; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-700: #2563eb; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-ui-system: #6366f1; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-ui-mode-cd: #734fa6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ui-mode-cd-subtle: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-drift-166534: #166534; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-212933: #212933; /** DRIFT. 118 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-213366: #213366; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-291616: #291616; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-333842: #333842; /** DRIFT. 12 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-335999: #335999; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-425167: #425167; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-495284: #495284; /** DRIFT. 16 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-496684: #496684; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-498449: #498449; /** DRIFT. 24 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-498470: #498470; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-737985: #737985; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-808099: #808099; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-844966: #844966; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-919497: #919497; /** DRIFT. 60 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-000000: #000000; /** DRIFT. 106 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-eead4: #5eead4; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-134-e4-a: #134e4a; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-042-f2-e: #042f2e; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-db3345: #db3345; /** DRIFT. 192 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-c99-a8: #8c99a8; /** DRIFT. 97 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-e9488: #0e9488; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-f1767: #0f1767; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-f5-c6-b: #4f5c6b; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-181-b1-f: #181b1f; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d12-c2-c: #d12c2c; /** DRIFT. 22 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-a82222: #a82222; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-a6-e73: #6a6e73; /** DRIFT. 12 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ceefed: #ceefed; /** DRIFT. 10 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e9-dcfe: #e9dcfe; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-e34-dd: #6e34dd; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d0-eafa: #d0eafa; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0880-be: #0880be; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-feedcc: #feedcc; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-c27309: #c27309; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d8-f4-d8: #d8f4d8; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-228-b22: #228b22; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-fee0-e0: #fee0e0; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-ea5-e9: #0ea5e9; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-efa019: #efa019; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b2-bfd1: #b2bfd1; /** DRIFT. 20 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-dcfce7: #dcfce7; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-d28-d9: #6d28d9; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-dbeafe: #dbeafe; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e11-d48: #e11d48; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-be123-c: #be123c; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-475-c9-e: #475c9e; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-21-b04-d: #21b04d; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-f04545: #f04545; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-2-e80-ed: #2e80ed; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-059669: #059669; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-fff5-e8: #fff5e8; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d9730-d: #d9730d; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-737-d85: #737d85; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-d121-a: #0d121a; /** DRIFT. 53 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-f5-f5-ff: #f5f5ff; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9999-cc: #9999cc; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-ba55-b: #5ba55b; /** DRIFT. 15 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-b67-a5: #5b67a5; /** DRIFT. 11 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-b80-a5: #5b80a5; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-a55-b80: #a55b80; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-745-ba5: #745ba5; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-d4984: #5d4984; /** DRIFT. 14 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-ba58-c: #5ba58c; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-737-b94: #737b94; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-05-b5-d4: #05b5d4; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ebb208: #ebb208; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-b7891: #6b7891; /** DRIFT. 24 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d46-b40: #d46b40; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-edcccc: #edcccc; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-94-b0-eb: #94b0eb; /** DRIFT. 11 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-b94-a3: #8b94a3; /** DRIFT. 26 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-cce5-db: #cce5db; /** DRIFT. 27 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-218-c5-c: #218c5c; /** DRIFT. 15 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-80-c296: #80c296; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-deb866: #deb866; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e39-e9-e: #e39e9e; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-135-f4-f: #135f4f; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b2-c7-db: #b2c7db; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-1-c478-c: #1c478c; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-176-b33: #176b33; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-80570-d: #80570d; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-2970-db: #2970db; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-1-a1-f28: #1a1f28; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-78-a6-f2: #78a6f2; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-73-d18-c: #73d18c; /** DRIFT. 10 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-b381-f: #6b381f; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-141-b29: #141b29; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-261-e10: #261e10; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-3-d4552: #3d4552; /** DRIFT. 22 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-13211-b: #13211b; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b23340: #b23340; /** DRIFT. 10 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b3540-a: #b3540a; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-b59-cc: #6b59cc; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-2173-bf: #2173bf; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b8-bfc9: #b8bfc9; /** DRIFT. 86 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-bcc6-d4: #bcc6d4; /** DRIFT. 14 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-d596-b: #4d596b; /** DRIFT. 115 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-73570-d: #73570d; /** DRIFT. 14 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ccdbf5: #ccdbf5; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-734-f0-d: #734f0d; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-1-e3-a8-a: #1e3a8a; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d95-c73: #d95c73; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-c57-bd: #8c57bd; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-42-a699: #42a699; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-eb9945: #eb9945; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5782-db: #5782db; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-c75252: #c75252; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-66-b25-c: #66b25c; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9-e6-e45: #9e6e45; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b2739-e: #b2739e; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-739-ec7: #739ec7; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-995-ba5: #995ba5; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-7-a4984: #7a4984; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-aab2-bd: #aab2bd; /** DRIFT. 15 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-a737-d: #6a737d; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-24292-e: #24292e; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-cccbf: #8cccbf; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-478-c6-b: #478c6b; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6366-d9: #6366d9; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d18017: #d18017; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b26-b12: #b26b12; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-33-ad80: #33ad80; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e5-c780: #e5c780; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b24747: #b24747; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-eddeb8: #eddeb8; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d9-ccad: #d9ccad; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-cc3340: #cc3340; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9-eabba: #9eabba; /** DRIFT. 144 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-a5160: #4a5160; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ebebf5: #ebebf5; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-d8-cf2: #4d8cf2; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-c7-dbd4: #c7dbd4; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e0-cccc: #e0cccc; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-b5563: #4b5563; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9-ca3-af: #9ca3af; /** DRIFT. 18 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-334-d73: #334d73; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-blue-300: #94b0eb;
+  --color-blue-950: #141b29;
+  --color-amber-300: #deb866;
+  --color-amber-950: #261e10;
+  --color-green-100: #cce5db;
+  --color-green-300: #80c296;
+  --color-green-950: #13211b;
+  --color-red-300: #e39e9e;
+  --color-red-950: #291616;
+  --color-scrim-modal: rgba(13, 18, 26, 0.55); /** Scrim behind a modal dialog. The alpha lives IN the token, so a binding pass can never flatten it. 55%: the page stays readable but is clearly out of reach. */
+  --color-scrim-panel: rgba(13, 18, 26, 0.4); /** Scrim behind a side drawer or a slide-over panel. Lighter than a modal: the page behind stays workable context, not a blocked surface. */
+  --color-scrim-menu: rgba(13, 18, 26, 0); /** Click-catcher behind a menu, a dropdown or an anchored popover. Fully transparent on purpose: it exists to catch the click that closes the menu, never to tint the screen. */
+  --color-untriaged-f25022: #f25022; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-7-fba00: #7fba00; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-00-a4-ef: #00a4ef; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffb900: #ffb900; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-17191-f: #17191f; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffffff: #ffffff; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --spacing-1: 1px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-3: 3px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-4: 4px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-5: 5px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-6: 6px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-7: 7px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-8: 8px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-9: 9px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-10: 10px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-11: 11px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-12: 12px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-13: 13px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-14: 14px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-15: 15px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-16: 16px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-17: 17px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-18: 18px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-20: 20px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-22: 22px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-23: 23px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-24: 24px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-26: 26px; /** Covers a value the Forge design really uses. */
+  --spacing-28: 28px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-30: 30px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-32: 32px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-34: 34px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-35: 35px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-36: 36px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-40: 40px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-44: 44px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-48: 48px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-50: 50px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-52: 52px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-54: 54px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-56: 56px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-60: 60px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-64: 64px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-73: 73px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-80: 80px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-82: 82px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-104: 104px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-240: 240px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-285: 285px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-317: 317px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-405: 405px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-overlap-6: -6px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-5: -5px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-8: -8px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --radius-1: 1px; /** Scale step derived from real usage in the prototypes. */
+  --radius-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-3: 3px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-4: 4px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-5: 5px; /** Scale step derived from real usage in the prototypes. */
+  --radius-6: 6px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-7: 7px; /** Scale step derived from real usage in the prototypes. */
+  --radius-8: 8px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-9: 9px; /** Scale step derived from real usage in the prototypes. */
+  --radius-10: 10px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-11: 11px; /** Scale step derived from real usage in the prototypes. */
+  --radius-12: 12px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-13: 13px; /** Scale step derived from real usage in the prototypes. */
+  --radius-14: 14px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-15: 15px; /** Scale step derived from real usage in the prototypes. */
+  --radius-16: 16px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-17: 17px; /** Scale step derived from real usage in the prototypes. */
+  --radius-18: 18px; /** Scale step derived from real usage in the prototypes. */
+  --radius-20: 20px; /** Scale step derived from real usage in the prototypes. */
+  --radius-24: 24px; /** Scale step derived from real usage in the prototypes. */
+  --radius-100: 100px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --radius-full: 999px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-1-5: 1.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --radius-2-5: 2.5px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-6: 6px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-8: 8px; /** Scale step derived from real usage in the prototypes. */
+  --text-9: 9px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-10: 10px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-11: 11px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-12: 12px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-13: 13px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-14: 14px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-15: 15px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-16: 16px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-17: 17px; /** Scale step derived from real usage in the prototypes. */
+  --text-18: 18px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-19: 19px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-20: 20px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-22: 22px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-24: 24px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-26: 26px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-27: 27px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-28: 28px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-32: 32px; /** Scale step derived from real usage in the prototypes. */
+  --text-44: 44px; /** Scale step derived from real usage in the prototypes. */
+  --text-9-5: 9.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-10-5: 10.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-11-5: 11.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-12-5: 12.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-13-5: 13.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-5-5: 5.5px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --shadow-xs: 0px 1px 3px 0px rgb(6% 9% 16% / 0.05); /** Hairline lift. Segmented controls, small toggles. */
+  --shadow-md: 0px 2px 8px 0px rgb(6% 9% 16% / 0.06); /** Card elevation. The default panel and card shadow. */
+  --shadow-lg: 0px 4px 16px -2px rgb(6% 9% 16% / 0.06); /** Sticky or primary card. One step above shadow/md. */
+  --shadow-menu: 0px 6px 18px 0px rgb(10% 12% 16% / 0.14); /** Menus, dropdowns, context menus, popovers anchored to a trigger. */
+  --shadow-popover: 0px 8px 26px 0px rgb(6% 9% 16% / 0.12); /** Floating panel above the page, larger than a menu. */
+  --shadow-modal: 0px 12px 32px 0px rgb(0% 0% 0% / 0.18); /** Modal dialogs centred over a dim backdrop. */
+  --shadow-overlay: 0px 16px 48px 0px rgb(0% 0% 0% / 0.2); /** Full-screen overlays and the command palette. */
+  --shadow-sm: 0px 1px 2px 0px rgb(6% 9% 16% / 0.12); /** Raised control. Active segment of a segmented control. */
+  --typography-typography-display-2xl: 700 40px/48px Inter; /** Hero display. Rarely used in product UI. */
+  --typography-typography-display-xl: 700 32px/40px Inter; /** Large display. */
+  --typography-typography-display-lg: 600 24px/32px Inter; /** Page title on a marketing or docs surface. */
+  --typography-typography-heading-md: 600 20px/28px Inter; /** Section title inside a page body. */
+  --typography-typography-heading-sm: 600 18px/26px Inter; /** Card or panel title. */
+  --typography-typography-heading-xs: 600 16px/24px Inter; /** Group header inside a list. */
+  --typography-typography-body-lg: 400 16px/24px Inter; /** Lead paragraph. */
+  --typography-typography-body-md: 400 14px/20px Inter; /** Default body text and input values. */
+  --typography-typography-body-md-medium: 500 14px/20px Inter; /** Body text with emphasis. */
+  --typography-typography-body-sm: 400 12px/18px Inter; /** Row primary text, table cells. */
+  --typography-typography-body-sm-medium: 500 12px/18px Inter; /** Row text with emphasis. */
+  --typography-typography-body-xs: 500 11px/16px Inter; /** Helper text under an input, stereotypes. */
+  --typography-typography-body-prose-13: 400 13px/21px Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --typography-typography-label-md: 500 14px/20px Inter; /** Form label. */
+  --typography-typography-label-sm: 500 12px/16px Inter; /** Compact label, chip text. */
+  --typography-typography-label-xs: 600 10px/14px Inter; /** ALL CAPS section label, count pill. */
+  --typography-typography-mono-md: 400 13px/20px 'JetBrains Mono'; /** Code and identifiers, default size. */
+  --typography-typography-mono-sm: 400 12px/18px 'JetBrains Mono'; /** Numeric table cells, versions. */
+  --typography-typography-mono-xs: 500 11px/16px 'JetBrains Mono'; /** Compact mono, badges and hashes. */
+  --typography-typography-mono-code-11-5: 400 11.5px/19px 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --background: var(--color-gray-100);
+  --foreground: var(--color-gray-800);
+  --foreground-muted: var(--color-gray-700);
+  --card: var(--color-gray-0);
+  --card-foreground: var(--color-gray-800);
+  --popover: var(--color-gray-0);
+  --popover-foreground: var(--color-gray-800);
+  --subtle: var(--color-gray-50);
+  --muted: var(--color-gray-150);
+  --muted-foreground: var(--color-gray-550);
+  --border: var(--color-gray-250);
+  --border-subtle: var(--color-gray-300);
+  --border-strong: var(--color-gray-350);
+  --input: var(--color-gray-350);
+  --primary: var(--color-teal-500);
+  --primary-strong: var(--color-teal-600);
+  --primary-foreground: var(--color-gray-0);
+  --accent: var(--color-teal-50);
+  --accent-foreground: var(--color-gray-800);
+  --destructive: var(--color-status-danger-500);
+  --destructive-subtle: var(--color-status-danger-50);
+  --destructive-foreground: var(--color-gray-0);
+  --warning: var(--color-status-warning-500);
+  --warning-subtle: var(--color-status-warning-50);
+  --success: var(--color-status-success-500);
+  --info: var(--color-status-info-500);
+  --info-subtle: var(--color-status-info-50);
+  --ring: var(--color-status-info-500);
+  --ownership-system: var(--color-ui-system);
+  --ownership-thermal-base: var(--color-ownership-thermal-base);
+  --ownership-thermal-bg: var(--color-ownership-thermal-bg);
+  --ownership-thermal-fg: var(--color-ownership-thermal-fg);
+  --ownership-power-base: var(--color-ownership-power-base);
+  --ownership-power-bg: var(--color-ownership-power-bg);
+  --ownership-power-fg: var(--color-ownership-power-fg);
+  --ownership-structure-base: var(--color-ownership-structure-base);
+  --ownership-structure-bg: var(--color-ownership-structure-bg);
+  --ownership-structure-fg: var(--color-ownership-structure-fg);
+  --ownership-aocs-base: var(--color-ownership-aocs-base);
+  --ownership-aocs-bg: var(--color-ownership-aocs-bg);
+  --ownership-aocs-fg: var(--color-ownership-aocs-fg);
+  --ownership-comms-base: var(--color-ownership-comms-base);
+  --ownership-comms-bg: var(--color-ownership-comms-bg);
+  --ownership-comms-fg: var(--color-ownership-comms-fg);
+  --ownership-propulsion-base: var(--color-ownership-propulsion-base);
+  --ownership-propulsion-bg: var(--color-ownership-propulsion-bg);
+  --ownership-propulsion-fg: var(--color-ownership-propulsion-fg);
+  --ownership-software-base: var(--color-ownership-software-base);
+  --ownership-payload-base: var(--color-ownership-payload-base);
+  --ownership-payload-bg: var(--color-ownership-payload-bg);
+  --ownership-payload-fg: var(--color-ownership-payload-fg);
+  --ownership-mechanisms-base: var(--color-ownership-mechanisms-base);
+  --ownership-mechanisms-bg: var(--color-ownership-mechanisms-bg);
+  --ownership-mechanisms-fg: var(--color-ownership-mechanisms-fg);
+  --ownership-data-handling-base: var(--color-ownership-data-handling-base);
+  --ownership-avionics-bg: var(--color-ownership-avionics-bg);
+  --ownership-avionics-fg: var(--color-ownership-avionics-fg);
+  --ownership-gnc-bg: var(--color-ownership-gnc-bg);
+  --ownership-gnc-fg: var(--color-ownership-gnc-fg);
+  --collaborator-c01: var(--color-collaborator-c01);
+  --collaborator-c02: var(--color-collaborator-c02);
+  --collaborator-c03: var(--color-collaborator-c03);
+  --collaborator-c04: var(--color-collaborator-c04);
+  --collaborator-c05: var(--color-collaborator-c05);
+  --collaborator-c06: var(--color-collaborator-c06);
+  --collaborator-c07: var(--color-collaborator-c07);
+  --collaborator-c08: var(--color-collaborator-c08);
+  --collaborator-c09: var(--color-collaborator-c09);
+  --collaborator-c10: var(--color-collaborator-c10);
+  --collaborator-c11: var(--color-collaborator-c11);
+  --collaborator-c12: var(--color-collaborator-c12);
+  --lifecycle-preparation: var(--color-lifecycle-preparation);
+  --lifecycle-open: var(--color-lifecycle-open);
+  --lifecycle-review: var(--color-lifecycle-review);
+  --lifecycle-archived: var(--color-lifecycle-archived);
+  --sysml-structure-header: var(--color-sysml-structure-header);
+  --sysml-structure-surface: var(--color-sysml-structure-surface);
+  --sysml-structure-border: var(--color-sysml-structure-border);
+  --sysml-attributes-header: var(--color-sysml-attributes-header);
+  --sysml-attributes-surface: var(--color-sysml-attributes-surface);
+  --sysml-attributes-border: var(--color-sysml-attributes-border);
+  --sysml-connections-header: var(--color-sysml-connections-header);
+  --sysml-connections-surface: var(--color-sysml-connections-surface);
+  --sysml-connections-border: var(--color-sysml-connections-border);
+  --sysml-behavior-header: var(--color-sysml-behavior-header);
+  --sysml-behavior-surface: var(--color-sysml-behavior-surface);
+  --sysml-behavior-border: var(--color-sysml-behavior-border);
+  --sysml-requirements-header: var(--color-sysml-requirements-header);
+  --sysml-requirements-surface: var(--color-sysml-requirements-surface);
+  --sysml-requirements-border: var(--color-sysml-requirements-border);
+  --sysml-verification-header: var(--color-sysml-verification-header);
+  --sysml-verification-surface: var(--color-sysml-verification-surface);
+  --sysml-verification-border: var(--color-sysml-verification-border);
+  --sysml-allocations-header: var(--color-sysml-allocations-header);
+  --sysml-allocations-surface: var(--color-sysml-allocations-surface);
+  --sysml-allocations-border: var(--color-sysml-allocations-border);
+  --sysml-metadata-header: var(--color-sysml-metadata-header);
+  --sysml-metadata-surface: var(--color-sysml-metadata-surface);
+  --sysml-metadata-border: var(--color-sysml-metadata-border);
+  --sysml-library-header: var(--color-sysml-library-header);
+  --sysml-library-surface: var(--color-sysml-library-surface);
+  --sysml-library-border: var(--color-sysml-library-border);
+  --sysml-variation-header: var(--color-sysml-variation-header);
+  --sysml-variation-surface: var(--color-sysml-variation-surface);
+  --sysml-variation-border: var(--color-sysml-variation-border);
+  --foreground-strong: var(--color-gray-850);
+  --foreground-deep: var(--color-gray-1000);
+  --foreground-subtle: var(--color-gray-600);
+  --placeholder: var(--color-gray-500);
+  --primary-subtle: var(--color-teal-300);
+  --primary-deep: var(--color-teal-800);
+  --accent-strong: var(--color-teal-100);
+  --destructive-strong: var(--color-status-danger-700);
+  --success-strong: var(--color-status-success-700);
+  --success-subtle: var(--color-status-success-50);
+  --info-strong: var(--color-status-info-700);
+  --mode-cd: var(--color-ui-mode-cd);
+  --mode-cd-subtle: var(--color-ui-mode-cd-subtle);
+  --success-vivid: var(--color-status-success-600); /** The vivid green of validation checks, distinct from the success text colour. */
+  --warning-vivid: var(--color-status-warning-600); /** The alert triangle colour. */
+  --sidebar-row-padding-y: var(--spacing-9); /** Vertical padding of a sidebar nav row. 9, not 8: it is what makes the row 34 high. */
+  --sidebar-row-padding-x: var(--spacing-14); /** Horizontal padding of a sidebar nav row. */
+  --sidebar-row-gap: var(--spacing-10); /** Gap between a sidebar row icon and its label. */
+  --sidebar-row-height: var(--spacing-34); /** Height of a sidebar nav row, collapsed and expanded alike. */
+  --docs-callout-note-bg: var(--color-status-info-50); /** Documentation callout note bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-note-border: var(--color-blue-300); /** Documentation callout note border. Light and dark come from the mode, never from a variant. */
+  --docs-callout-warning-bg: var(--color-sysml-behavior-surface); /** Documentation callout warning bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-warning-border: var(--color-amber-300); /** Documentation callout warning border. Light and dark come from the mode, never from a variant. */
+  --docs-callout-tip-bg: var(--color-status-success-50); /** Documentation callout tip bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-tip-border: var(--color-green-300); /** Documentation callout tip border. Light and dark come from the mode, never from a variant. */
+  --docs-callout-danger-bg: var(--color-status-danger-50); /** Documentation callout danger bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-danger-border: var(--color-red-300); /** Documentation callout danger border. Light and dark come from the mode, never from a variant. */
+  --docs-code-foreground: var(--color-green-100); /** Code sample text. The code surface is dark in both themes, so this token does not change with the mode. */
+  --docs-code-background: var(--color-gray-900); /** Code sample surface. Dark in both themes by design, so the pale code text always reads. */
+  --scrim: var(--color-gray-1050); /** Backdrop behind a modal or overlay. */
+}
+
+.dark {
+  --color-ownership-thermal-base: #ea580c; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-thermal-bg: #ffeded; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-thermal-fg: #bf4040; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-power-base: #eab308; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-power-bg: #fff2d9; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-power-fg: #b2730d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-structure-base: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-structure-bg: #edf2f7; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-structure-fg: #4d668c; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-aocs-base: #06b6d4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-aocs-bg: #e8f2ff; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-aocs-fg: #2b66c9; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-comms-base: #8b5cf6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-comms-bg: #ebf7eb; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-comms-fg: #338c4d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-propulsion-base: #dc2626; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-propulsion-bg: #ffebeb; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-propulsion-fg: #cc4026; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-software-base: #10b981; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-payload-base: #ec4899; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-payload-bg: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-payload-fg: #8c4dbf; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-mechanisms-base: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-mechanisms-bg: #f2f2f2; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-mechanisms-fg: #595966; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-data-handling-base: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-avionics-bg: #ebf5fc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-avionics-fg: #3373a6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-gnc-bg: #e8f2fc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-gnc-fg: #2666a6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-collaborator-c01: #ef4444; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c02: #f97316; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c03: #f59e0b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c04: #84cc16; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c05: #22c55e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c06: #14b8a6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c07: #06b6d4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c08: #3b82f6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c09: #6366f1; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c10: #a855f7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c11: #ec4899; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-collaborator-c12: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-preparation: #a855f7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-open: #16a34a; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-review: #d97706; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-lifecycle-archived: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-header: #475569; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-surface: #f8fafc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-border: #cbd5e1; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-header: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-surface: #f1f5f9; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-border: #e2e8f0; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-header: #0d9488; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-surface: #f0fdfa; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-border: #99f6e4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-header: #b45309; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-surface: #fffbeb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-header: #1d4ed8; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-surface: #eff6ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-border: #93c5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-header: #7c3aed; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-surface: #f5f3ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-border: #c4b5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-header: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-surface: #eef2ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-border: #a5b4fc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-header: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-surface: #f9fafb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-border: #d1d5db; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-header: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-surface: #fef3c7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-header: #9333ea; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-surface: #faf5ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-border: #d8b4fe; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-gray-0: #ffffff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-50: #fbfcfe; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-100: #f7fafc; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-150: #f0f5f7; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-200: #eceff3; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-250: #e3e8ed; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-300: #dee3eb; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-350: #d1d6db; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-400: #cdd4dd; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-450: #99a3b0; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-500: #94a3b8; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-550: #738294; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-600: #667385; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-650: #4d596b; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-700: #334155; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-750: #2e333d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-800: #293342; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-850: #1e293b; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-900: #212933; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-950: #161920; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-975: #1a1f28;
+  --color-gray-1000: #0f172a; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-gray-1050: #0d121a; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-gray-1100: #0e1116; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-50: #e8f7f2; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-100: #ccfbf1; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-300: #2dd4bf; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-500: #0f9e8c; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-600: #0f766e; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-teal-800: #115e59; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-950: #12241f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-50: #faece3; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-300: #e8a87c;
+  --color-copper-400: #d88255; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-500: #a34a24; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-600: #8a3e1f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-800: #5c2712;
+  --color-copper-950: #311b12; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-50: #fff2f2; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-500: #d44545; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-700: #b91c1c; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-warning-50: #fff7e0; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-warning-500: #b2730d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-warning-600: #b45309; /** Primitive derived from the reference prototypes. */
+  --color-status-success-50: #f0fdf4; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-success-500: #338c4d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-success-600: #16a34a; /** Primitive derived from the reference prototypes. */
+  --color-status-success-700: #15803d; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-info-50: #e8f2ff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-500: #2b66c9; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-700: #2563eb; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-ui-system: #6366f1; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-ui-mode-cd: #734fa6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ui-mode-cd-subtle: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-drift-166534: #166534; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-212933: #212933; /** DRIFT. 118 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-213366: #213366; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-291616: #291616; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-333842: #333842; /** DRIFT. 12 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-335999: #335999; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-425167: #425167; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-495284: #495284; /** DRIFT. 16 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-496684: #496684; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-498449: #498449; /** DRIFT. 24 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-498470: #498470; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-737985: #737985; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-808099: #808099; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-844966: #844966; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-919497: #919497; /** DRIFT. 60 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-000000: #000000; /** DRIFT. 106 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-eead4: #5eead4; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-134-e4-a: #134e4a; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-042-f2-e: #042f2e; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-db3345: #db3345; /** DRIFT. 192 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-c99-a8: #8c99a8; /** DRIFT. 97 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-e9488: #0e9488; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-f1767: #0f1767; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-f5-c6-b: #4f5c6b; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-181-b1-f: #181b1f; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d12-c2-c: #d12c2c; /** DRIFT. 22 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-a82222: #a82222; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-a6-e73: #6a6e73; /** DRIFT. 12 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ceefed: #ceefed; /** DRIFT. 10 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e9-dcfe: #e9dcfe; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-e34-dd: #6e34dd; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d0-eafa: #d0eafa; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0880-be: #0880be; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-feedcc: #feedcc; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-c27309: #c27309; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d8-f4-d8: #d8f4d8; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-228-b22: #228b22; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-fee0-e0: #fee0e0; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-ea5-e9: #0ea5e9; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-efa019: #efa019; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b2-bfd1: #b2bfd1; /** DRIFT. 20 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-dcfce7: #dcfce7; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-d28-d9: #6d28d9; /** DRIFT. 13 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-dbeafe: #dbeafe; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e11-d48: #e11d48; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-be123-c: #be123c; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-475-c9-e: #475c9e; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-21-b04-d: #21b04d; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-f04545: #f04545; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-2-e80-ed: #2e80ed; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-059669: #059669; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-fff5-e8: #fff5e8; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d9730-d: #d9730d; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-737-d85: #737d85; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-0-d121-a: #0d121a; /** DRIFT. 53 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-f5-f5-ff: #f5f5ff; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9999-cc: #9999cc; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-ba55-b: #5ba55b; /** DRIFT. 15 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-b67-a5: #5b67a5; /** DRIFT. 11 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-b80-a5: #5b80a5; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-a55-b80: #a55b80; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-745-ba5: #745ba5; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-d4984: #5d4984; /** DRIFT. 14 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5-ba58-c: #5ba58c; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-737-b94: #737b94; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-05-b5-d4: #05b5d4; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ebb208: #ebb208; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-b7891: #6b7891; /** DRIFT. 24 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d46-b40: #d46b40; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-edcccc: #edcccc; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-94-b0-eb: #94b0eb; /** DRIFT. 11 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-b94-a3: #8b94a3; /** DRIFT. 26 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-cce5-db: #cce5db; /** DRIFT. 27 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-218-c5-c: #218c5c; /** DRIFT. 15 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-80-c296: #80c296; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-deb866: #deb866; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e39-e9-e: #e39e9e; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-135-f4-f: #135f4f; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b2-c7-db: #b2c7db; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-1-c478-c: #1c478c; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-176-b33: #176b33; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-80570-d: #80570d; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-2970-db: #2970db; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-1-a1-f28: #1a1f28; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-78-a6-f2: #78a6f2; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-73-d18-c: #73d18c; /** DRIFT. 10 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-b381-f: #6b381f; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-141-b29: #141b29; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-261-e10: #261e10; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-3-d4552: #3d4552; /** DRIFT. 22 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-13211-b: #13211b; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b23340: #b23340; /** DRIFT. 10 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b3540-a: #b3540a; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-b59-cc: #6b59cc; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-2173-bf: #2173bf; /** DRIFT. 8 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b8-bfc9: #b8bfc9; /** DRIFT. 86 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-bcc6-d4: #bcc6d4; /** DRIFT. 14 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-d596-b: #4d596b; /** DRIFT. 115 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-73570-d: #73570d; /** DRIFT. 14 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ccdbf5: #ccdbf5; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-734-f0-d: #734f0d; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-1-e3-a8-a: #1e3a8a; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d95-c73: #d95c73; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-c57-bd: #8c57bd; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-42-a699: #42a699; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-eb9945: #eb9945; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-5782-db: #5782db; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-c75252: #c75252; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-66-b25-c: #66b25c; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9-e6-e45: #9e6e45; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b2739-e: #b2739e; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-739-ec7: #739ec7; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-995-ba5: #995ba5; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-7-a4984: #7a4984; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-aab2-bd: #aab2bd; /** DRIFT. 15 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6-a737-d: #6a737d; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-24292-e: #24292e; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-8-cccbf: #8cccbf; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-478-c6-b: #478c6b; /** DRIFT. 4 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-6366-d9: #6366d9; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d18017: #d18017; /** DRIFT. 5 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b26-b12: #b26b12; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-33-ad80: #33ad80; /** DRIFT. 6 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e5-c780: #e5c780; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-b24747: #b24747; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-eddeb8: #eddeb8; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-d9-ccad: #d9ccad; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-cc3340: #cc3340; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9-eabba: #9eabba; /** DRIFT. 144 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-a5160: #4a5160; /** DRIFT. 3 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-ebebf5: #ebebf5; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-d8-cf2: #4d8cf2; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-c7-dbd4: #c7dbd4; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-e0-cccc: #e0cccc; /** DRIFT. 2 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-4-b5563: #4b5563; /** DRIFT. 9 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-9-ca3-af: #9ca3af; /** DRIFT. 18 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-drift-334-d73: #334d73; /** DRIFT. 1 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
+  --color-blue-300: #94b0eb;
+  --color-blue-950: #141b29;
+  --color-amber-300: #deb866;
+  --color-amber-950: #261e10;
+  --color-green-100: #cce5db;
+  --color-green-300: #80c296;
+  --color-green-950: #13211b;
+  --color-red-300: #e39e9e;
+  --color-red-950: #291616;
+  --color-scrim-modal: rgba(13, 18, 26, 0.55); /** Scrim behind a modal dialog. The alpha lives IN the token, so a binding pass can never flatten it. 55%: the page stays readable but is clearly out of reach. */
+  --color-scrim-panel: rgba(13, 18, 26, 0.4); /** Scrim behind a side drawer or a slide-over panel. Lighter than a modal: the page behind stays workable context, not a blocked surface. */
+  --color-scrim-menu: rgba(13, 18, 26, 0); /** Click-catcher behind a menu, a dropdown or an anchored popover. Fully transparent on purpose: it exists to catch the click that closes the menu, never to tint the screen. */
+  --color-untriaged-f25022: #f25022; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-7-fba00: #7fba00; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-00-a4-ef: #00a4ef; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffb900: #ffb900; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-17191-f: #17191f; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --color-untriaged-ffffff: #ffffff; /** UNTRIAGED. A colour the screens use that has no semantic role yet. Do not alias anything to it; either give it a role or merge it away. */
+  --spacing-1: 1px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-3: 3px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-4: 4px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-5: 5px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-6: 6px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-7: 7px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-8: 8px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-9: 9px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-10: 10px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-11: 11px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-12: 12px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-13: 13px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-14: 14px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-15: 15px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-16: 16px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-17: 17px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-18: 18px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-20: 20px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-22: 22px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-23: 23px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-24: 24px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-26: 26px; /** Covers a value the Forge design really uses. */
+  --spacing-28: 28px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-30: 30px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-32: 32px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-34: 34px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-35: 35px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-36: 36px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-40: 40px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-44: 44px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-48: 48px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-50: 50px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-52: 52px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-54: 54px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-56: 56px; /** Scale step derived from real usage in the prototypes. */
+  --spacing-60: 60px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-64: 64px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-73: 73px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-80: 80px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-82: 82px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-104: 104px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-240: 240px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-285: 285px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-317: 317px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-405: 405px; /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-overlap-6: -6px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-5: -5px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-8: -8px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --radius-1: 1px; /** Scale step derived from real usage in the prototypes. */
+  --radius-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-3: 3px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-4: 4px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-5: 5px; /** Scale step derived from real usage in the prototypes. */
+  --radius-6: 6px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-7: 7px; /** Scale step derived from real usage in the prototypes. */
+  --radius-8: 8px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-9: 9px; /** Scale step derived from real usage in the prototypes. */
+  --radius-10: 10px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-11: 11px; /** Scale step derived from real usage in the prototypes. */
+  --radius-12: 12px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-13: 13px; /** Scale step derived from real usage in the prototypes. */
+  --radius-14: 14px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-15: 15px; /** Scale step derived from real usage in the prototypes. */
+  --radius-16: 16px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-17: 17px; /** Scale step derived from real usage in the prototypes. */
+  --radius-18: 18px; /** Scale step derived from real usage in the prototypes. */
+  --radius-20: 20px; /** Scale step derived from real usage in the prototypes. */
+  --radius-24: 24px; /** Scale step derived from real usage in the prototypes. */
+  --radius-100: 100px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --radius-full: 999px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-1-5: 1.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --radius-2-5: 2.5px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-6: 6px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-8: 8px; /** Scale step derived from real usage in the prototypes. */
+  --text-9: 9px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-10: 10px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-11: 11px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-12: 12px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-13: 13px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-14: 14px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-15: 15px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-16: 16px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-17: 17px; /** Scale step derived from real usage in the prototypes. */
+  --text-18: 18px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-19: 19px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-20: 20px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-22: 22px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-24: 24px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-26: 26px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-27: 27px; /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-28: 28px; /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-32: 32px; /** Scale step derived from real usage in the prototypes. */
+  --text-44: 44px; /** Scale step derived from real usage in the prototypes. */
+  --text-9-5: 9.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-10-5: 10.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-11-5: 11.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-12-5: 12.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-13-5: 13.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-5-5: 5.5px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --shadow-xs: 0px 1px 3px 0px rgb(6% 9% 16% / 0.05); /** Hairline lift. Segmented controls, small toggles. */
+  --shadow-md: 0px 2px 8px 0px rgb(6% 9% 16% / 0.06); /** Card elevation. The default panel and card shadow. */
+  --shadow-lg: 0px 4px 16px -2px rgb(6% 9% 16% / 0.06); /** Sticky or primary card. One step above shadow/md. */
+  --shadow-menu: 0px 6px 18px 0px rgb(10% 12% 16% / 0.14); /** Menus, dropdowns, context menus, popovers anchored to a trigger. */
+  --shadow-popover: 0px 8px 26px 0px rgb(6% 9% 16% / 0.12); /** Floating panel above the page, larger than a menu. */
+  --shadow-modal: 0px 12px 32px 0px rgb(0% 0% 0% / 0.18); /** Modal dialogs centred over a dim backdrop. */
+  --shadow-overlay: 0px 16px 48px 0px rgb(0% 0% 0% / 0.2); /** Full-screen overlays and the command palette. */
+  --shadow-sm: 0px 1px 2px 0px rgb(6% 9% 16% / 0.12); /** Raised control. Active segment of a segmented control. */
+  --typography-typography-display-2xl: 700 40px/48px Inter; /** Hero display. Rarely used in product UI. */
+  --typography-typography-display-xl: 700 32px/40px Inter; /** Large display. */
+  --typography-typography-display-lg: 600 24px/32px Inter; /** Page title on a marketing or docs surface. */
+  --typography-typography-heading-md: 600 20px/28px Inter; /** Section title inside a page body. */
+  --typography-typography-heading-sm: 600 18px/26px Inter; /** Card or panel title. */
+  --typography-typography-heading-xs: 600 16px/24px Inter; /** Group header inside a list. */
+  --typography-typography-body-lg: 400 16px/24px Inter; /** Lead paragraph. */
+  --typography-typography-body-md: 400 14px/20px Inter; /** Default body text and input values. */
+  --typography-typography-body-md-medium: 500 14px/20px Inter; /** Body text with emphasis. */
+  --typography-typography-body-sm: 400 12px/18px Inter; /** Row primary text, table cells. */
+  --typography-typography-body-sm-medium: 500 12px/18px Inter; /** Row text with emphasis. */
+  --typography-typography-body-xs: 500 11px/16px Inter; /** Helper text under an input, stereotypes. */
+  --typography-typography-body-prose-13: 400 13px/21px Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --typography-typography-label-md: 500 14px/20px Inter; /** Form label. */
+  --typography-typography-label-sm: 500 12px/16px Inter; /** Compact label, chip text. */
+  --typography-typography-label-xs: 600 10px/14px Inter; /** ALL CAPS section label, count pill. */
+  --typography-typography-mono-md: 400 13px/20px 'JetBrains Mono'; /** Code and identifiers, default size. */
+  --typography-typography-mono-sm: 400 12px/18px 'JetBrains Mono'; /** Numeric table cells, versions. */
+  --typography-typography-mono-xs: 500 11px/16px 'JetBrains Mono'; /** Compact mono, badges and hashes. */
+  --typography-typography-mono-code-11-5: 400 11.5px/19px 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --background: var(--color-gray-1050);
+  --foreground: var(--color-gray-200);
+  --foreground-muted: var(--color-gray-400);
+  --card: var(--color-gray-950);
+  --card-foreground: var(--color-gray-200);
+  --popover: var(--color-gray-950);
+  --popover-foreground: var(--color-gray-200);
+  --subtle: var(--color-gray-950);
+  --muted: var(--color-gray-900);
+  --muted-foreground: var(--color-gray-450);
+  --border: var(--color-gray-750);
+  --border-subtle: var(--color-gray-900);
+  --border-strong: var(--color-gray-650);
+  --input: var(--color-gray-650);
+  --primary: var(--color-teal-500);
+  --primary-strong: var(--color-teal-600);
+  --primary-foreground: var(--color-gray-0);
+  --accent: var(--color-teal-950);
+  --accent-foreground: var(--color-gray-200);
+  --destructive: var(--color-status-danger-500);
+  --destructive-subtle: var(--color-status-danger-50);
+  --destructive-foreground: var(--color-gray-0);
+  --warning: var(--color-status-warning-500);
+  --warning-subtle: var(--color-status-warning-50);
+  --success: var(--color-status-success-500);
+  --info: var(--color-status-info-500);
+  --info-subtle: var(--color-status-info-50);
+  --ring: var(--color-status-info-500);
+  --ownership-system: var(--color-ui-system);
+  --ownership-thermal-base: var(--color-ownership-thermal-base);
+  --ownership-thermal-bg: var(--color-ownership-thermal-bg);
+  --ownership-thermal-fg: var(--color-ownership-thermal-fg);
+  --ownership-power-base: var(--color-ownership-power-base);
+  --ownership-power-bg: var(--color-ownership-power-bg);
+  --ownership-power-fg: var(--color-ownership-power-fg);
+  --ownership-structure-base: var(--color-ownership-structure-base);
+  --ownership-structure-bg: var(--color-ownership-structure-bg);
+  --ownership-structure-fg: var(--color-ownership-structure-fg);
+  --ownership-aocs-base: var(--color-ownership-aocs-base);
+  --ownership-aocs-bg: var(--color-ownership-aocs-bg);
+  --ownership-aocs-fg: var(--color-ownership-aocs-fg);
+  --ownership-comms-base: var(--color-ownership-comms-base);
+  --ownership-comms-bg: var(--color-ownership-comms-bg);
+  --ownership-comms-fg: var(--color-ownership-comms-fg);
+  --ownership-propulsion-base: var(--color-ownership-propulsion-base);
+  --ownership-propulsion-bg: var(--color-ownership-propulsion-bg);
+  --ownership-propulsion-fg: var(--color-ownership-propulsion-fg);
+  --ownership-software-base: var(--color-ownership-software-base);
+  --ownership-payload-base: var(--color-ownership-payload-base);
+  --ownership-payload-bg: var(--color-ownership-payload-bg);
+  --ownership-payload-fg: var(--color-ownership-payload-fg);
+  --ownership-mechanisms-base: var(--color-ownership-mechanisms-base);
+  --ownership-mechanisms-bg: var(--color-ownership-mechanisms-bg);
+  --ownership-mechanisms-fg: var(--color-ownership-mechanisms-fg);
+  --ownership-data-handling-base: var(--color-ownership-data-handling-base);
+  --ownership-avionics-bg: var(--color-ownership-avionics-bg);
+  --ownership-avionics-fg: var(--color-ownership-avionics-fg);
+  --ownership-gnc-bg: var(--color-ownership-gnc-bg);
+  --ownership-gnc-fg: var(--color-ownership-gnc-fg);
+  --collaborator-c01: var(--color-collaborator-c01);
+  --collaborator-c02: var(--color-collaborator-c02);
+  --collaborator-c03: var(--color-collaborator-c03);
+  --collaborator-c04: var(--color-collaborator-c04);
+  --collaborator-c05: var(--color-collaborator-c05);
+  --collaborator-c06: var(--color-collaborator-c06);
+  --collaborator-c07: var(--color-collaborator-c07);
+  --collaborator-c08: var(--color-collaborator-c08);
+  --collaborator-c09: var(--color-collaborator-c09);
+  --collaborator-c10: var(--color-collaborator-c10);
+  --collaborator-c11: var(--color-collaborator-c11);
+  --collaborator-c12: var(--color-collaborator-c12);
+  --lifecycle-preparation: var(--color-lifecycle-preparation);
+  --lifecycle-open: var(--color-lifecycle-open);
+  --lifecycle-review: var(--color-lifecycle-review);
+  --lifecycle-archived: var(--color-lifecycle-archived);
+  --sysml-structure-header: var(--color-sysml-structure-header);
+  --sysml-structure-surface: var(--color-sysml-structure-surface);
+  --sysml-structure-border: var(--color-sysml-structure-border);
+  --sysml-attributes-header: var(--color-sysml-attributes-header);
+  --sysml-attributes-surface: var(--color-sysml-attributes-surface);
+  --sysml-attributes-border: var(--color-sysml-attributes-border);
+  --sysml-connections-header: var(--color-sysml-connections-header);
+  --sysml-connections-surface: var(--color-sysml-connections-surface);
+  --sysml-connections-border: var(--color-sysml-connections-border);
+  --sysml-behavior-header: var(--color-sysml-behavior-header);
+  --sysml-behavior-surface: var(--color-sysml-behavior-surface);
+  --sysml-behavior-border: var(--color-sysml-behavior-border);
+  --sysml-requirements-header: var(--color-sysml-requirements-header);
+  --sysml-requirements-surface: var(--color-sysml-requirements-surface);
+  --sysml-requirements-border: var(--color-sysml-requirements-border);
+  --sysml-verification-header: var(--color-sysml-verification-header);
+  --sysml-verification-surface: var(--color-sysml-verification-surface);
+  --sysml-verification-border: var(--color-sysml-verification-border);
+  --sysml-allocations-header: var(--color-sysml-allocations-header);
+  --sysml-allocations-surface: var(--color-sysml-allocations-surface);
+  --sysml-allocations-border: var(--color-sysml-allocations-border);
+  --sysml-metadata-header: var(--color-sysml-metadata-header);
+  --sysml-metadata-surface: var(--color-sysml-metadata-surface);
+  --sysml-metadata-border: var(--color-sysml-metadata-border);
+  --sysml-library-header: var(--color-sysml-library-header);
+  --sysml-library-surface: var(--color-sysml-library-surface);
+  --sysml-library-border: var(--color-sysml-library-border);
+  --sysml-variation-header: var(--color-sysml-variation-header);
+  --sysml-variation-surface: var(--color-sysml-variation-surface);
+  --sysml-variation-border: var(--color-sysml-variation-border);
+  --foreground-strong: var(--color-gray-200);
+  --foreground-deep: var(--color-gray-200);
+  --foreground-subtle: var(--color-gray-450);
+  --placeholder: var(--color-gray-450);
+  --primary-subtle: var(--color-teal-300);
+  --primary-deep: var(--color-teal-800);
+  --accent-strong: var(--color-teal-100);
+  --destructive-strong: var(--color-status-danger-700);
+  --success-strong: var(--color-status-success-700);
+  --success-subtle: var(--color-status-success-50);
+  --info-strong: var(--color-status-info-700);
+  --mode-cd: var(--color-ui-mode-cd);
+  --mode-cd-subtle: var(--color-ui-mode-cd-subtle);
+  --success-vivid: var(--color-status-success-600); /** The vivid green of validation checks, distinct from the success text colour. */
+  --warning-vivid: var(--color-status-warning-600); /** The alert triangle colour. */
+  --sidebar-row-padding-y: var(--spacing-9); /** Vertical padding of a sidebar nav row. 9, not 8: it is what makes the row 34 high. */
+  --sidebar-row-padding-x: var(--spacing-14); /** Horizontal padding of a sidebar nav row. */
+  --sidebar-row-gap: var(--spacing-10); /** Gap between a sidebar row icon and its label. */
+  --sidebar-row-height: var(--spacing-34); /** Height of a sidebar nav row, collapsed and expanded alike. */
+  --docs-callout-note-bg: var(--color-blue-950); /** Documentation callout note bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-note-border: var(--color-blue-300); /** Documentation callout note border. Light and dark come from the mode, never from a variant. */
+  --docs-callout-warning-bg: var(--color-amber-950); /** Documentation callout warning bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-warning-border: var(--color-amber-300); /** Documentation callout warning border. Light and dark come from the mode, never from a variant. */
+  --docs-callout-tip-bg: var(--color-green-950); /** Documentation callout tip bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-tip-border: var(--color-green-300); /** Documentation callout tip border. Light and dark come from the mode, never from a variant. */
+  --docs-callout-danger-bg: var(--color-red-950); /** Documentation callout danger bg. Light and dark come from the mode, never from a variant. */
+  --docs-callout-danger-border: var(--color-red-300); /** Documentation callout danger border. Light and dark come from the mode, never from a variant. */
+  --docs-code-foreground: var(--color-green-100); /** Code sample text. The code surface is dark in both themes, so this token does not change with the mode. */
+  --docs-code-background: var(--color-gray-900); /** Code sample surface. Dark in both themes by design, so the pale code text always reads. */
+  --scrim: var(--color-gray-1050); /** Backdrop behind a modal or overlay. */
+}

@@ -13,13 +13,13 @@
 
 <PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen py-10 select-none">
+<div class="w-full bg-background min-h-screen py-10 select-none">
 <div class="max-w-[1100px] w-full mx-auto px-6 flex flex-col gap-6">
 <div class="flex flex-col gap-1.5 w-full">
     <h1 class="text-3xl leading-3xl font-semibold text-foreground tracking-tight">
         Publish to Forge
     </h1>
-    <p class="text-base leading-17 text-muted-foreground">
+    <p class="text-base leading-normal text-muted-foreground">
         Publish a library or a model so others can discover, version and, where the format allows it, import it into their projects.
     </p>
 </div>
@@ -47,12 +47,12 @@
 
 <div class="w-full flex flex-col lg:flex-row items-start gap-6">
 <div class="w-full lg:flex-1 p-6 rounded-lg bg-card border border-border flex flex-col gap-4">
-    <div class="w-full p-3.5 sm:px-4 rounded-lg bg-body-bg border border-border flex flex-col gap-2">
+    <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2">
         <div class="flex items-center gap-2.5 w-full">
             <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 ARTEFACT
             </span>
-            <span class="font-mono text-sm leading-17 text-foreground flex-1 truncate">
+            <span class="font-mono text-sm leading-normal text-foreground flex-1 truncate">
                 @(this.ViewModel.Metadata.ArtefactFileName)
             </span>
 
@@ -225,17 +225,17 @@
                     {
                         <LucideIcon Name="check"
                                     Size="16"
-                                    Class="text-validated shrink-0"/>
+                                    Class="text-success-vivid shrink-0"/>
                     }
                     else
                     {
                         <LucideIcon Name="alert-triangle"
                                     Size="16"
-                                    Class="text-warning-icon shrink-0"/>
+                                    Class="text-warning-vivid shrink-0"/>
                     }
                 </BbMarkerIcon>
 
-                <BbMarkerContent Class="text-sm leading-xs font-normal text-secondary-text flex-1 truncate">
+                <BbMarkerContent Class="text-sm leading-xs font-normal text-foreground-muted flex-1 truncate">
                     @(check.Title)
                 </BbMarkerContent>
 
@@ -247,7 +247,7 @@
     </div>
 
     <div class="flex flex-col gap-1 w-full pt-1">
-        <span class="text-xs leading-2xs font-semibold text-warning-foreground">
+        <span class="text-xs leading-2xs font-semibold text-warning-vivid">
             @(this.GetWarningsTitle())
         </span>
         <p class="text-xs leading-2xs font-normal text-muted-foreground">
@@ -261,7 +261,7 @@
                         Size="14"
                         Class="text-primary shrink-0"/>
         </BbMarkerIcon>
-        <BbMarkerContent Class="text-xs leading-2xs font-normal text-secondary-text flex-1 truncate">
+        <BbMarkerContent Class="text-xs leading-2xs font-normal text-foreground-muted flex-1 truncate">
             @(this.ViewModel.Metadata.Scope) is a verified scope
         </BbMarkerContent>
     </BbMarker>

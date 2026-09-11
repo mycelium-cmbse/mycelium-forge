@@ -1,0 +1,15 @@
+@* ------------------------------------------------------------------------------------------------
+<copyright file="CollaboratorAvatar.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="@(this.Size) rounded-full @(this.GetColorClass()) flex items-center justify-center shrink-0 relative select-none @(this.Class)"
+     title="@(this.Name)">
+    <span class="text-2xs leading-3xs font-semibold text-primary-foreground">
+        @(this.GetInitials())
+    </span>
+</div>

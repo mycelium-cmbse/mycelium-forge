@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="CreateOrganizationDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -16,7 +16,7 @@
         <BbField Class="w-full flex flex-col gap-1.5"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.OrganizationName)))">
             <BbFieldLabel For="create-org-name"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 ORGANIZATION NAME
             </BbFieldLabel>
             <BbFieldContent>
@@ -26,14 +26,14 @@
                          Placeholder="e.g. European Space Agency"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.OrganizationName)])"/>
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-1.5"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.Scope)))">
             <BbFieldLabel For="create-org-scope"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 SCOPE
             </BbFieldLabel>
             <BbFieldContent>
@@ -43,11 +43,11 @@
                          Placeholder="e.g. @@esa"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.Scope)])"/>
             @if (!this.ValidationManager.HasError(nameof(this.Scope)))
             {
-                <BbFieldDescription Class="text-2xs leading-3xs font-normal text-validated">
+                <BbFieldDescription Class="text-2xs leading-3xs font-normal text-success-vivid">
                     Must be lowercase and globally unique across Forge.
                 </BbFieldDescription>
             }
@@ -56,7 +56,7 @@
         <BbField Class="w-full flex flex-col gap-1.5"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.BillingEmail)))">
             <BbFieldLabel For="create-org-billing-email"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 BILLING EMAIL
             </BbFieldLabel>
             <BbFieldContent>
@@ -66,7 +66,7 @@
                          Placeholder="e.g. billing@esa.int"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.BillingEmail)])"/>
         </BbField>
     </ChildContent>

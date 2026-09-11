@@ -2,11 +2,29 @@
  * Imported into tailwind.css to provide unified styling across Forge components.
  */
 
+/* Fallback domain ownership semantic tokens missing from upstream DTCG (Figma) export.
+ * Declared here until Figma variable collections are updated with these chips.
+ */
+:root {
+    --radius: var(--radius-md, 0.5rem);
+    --ownership-software-bg: #ebf7eb;
+    --ownership-software-fg: #338c4d;
+    --ownership-data-handling-bg: #eef2ff;
+    --ownership-data-handling-fg: #4f46e5;
+}
+
+.dark {
+  --ownership-software-bg: #ebf7eb;
+  --ownership-software-fg: #338c4d;
+  --ownership-data-handling-bg: #eef2ff;
+  --ownership-data-handling-fg: #4f46e5;
+}
+
 /* Base button styling defaults */
 button[data-slot="button"],
 a[data-slot="button"] {
   cursor: pointer;
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
 }
 
 button[data-slot="button"]:disabled,
@@ -43,26 +61,14 @@ a[data-variant="outline"].btn-destructive:hover {
   background-color: color-mix(in oklab, var(--destructive) 10%, transparent);
 }
 
-/* Action table button overrides */
-.btn-table-action {
-  font-size: var(--primitive-font-size-xs);
-  line-height: var(--primitive-line-height-2xs);
-  font-weight: var(--primitive-font-weight-medium);
-  padding: 0;
-  height: auto;
-  min-height: 0;
-  background-color: transparent;
-  border-width: 0;
-}
-
 /* Small button utility */
 .button-sm {
-  height: var(--primitive-spacing-button-sm-h);
-  font-size: var(--primitive-font-size-xs);
-  line-height: var(--primitive-line-height-2xs);
-  padding-left: var(--primitive-spacing-button-sm-px);
-  padding-right: var(--primitive-spacing-button-sm-px);
-  gap: var(--primitive-spacing-button-sm-gap);
+  height: 1.75rem;
+  font-size: var(--text-xs);
+  line-height: var(--leading-2xs);
+  padding-left: var(--spacing-10);
+  padding-right: var(--spacing-10);
+  gap: var(--spacing-6);
   flex-shrink: 0;
 }
 
@@ -80,18 +86,18 @@ input::placeholder {
 
 /* Hides dialog title if title is empty */
 [role="dialog"] > div:first-child:has([id*="bb-dialog"][id*="-title"]:not(:empty)) {
-  border-bottom: var(--primitive-border-width-default) solid var(--border);
+  border-bottom: 1px solid var(--border);
   background-color: var(--card);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
   width: 100%;
-  padding: var(--primitive-spacing-dialog-header-pt) var(--primitive-spacing-dialog-header-px) var(--primitive-spacing-dialog-header-pb) var(--primitive-spacing-dialog-header-px);
+  padding: var(--spacing-20) var(--spacing-24) var(--spacing-16) var(--spacing-24);
 }
 
 /* Dialog container padding override for BlazorBlueprint dialogs */
 div[role="dialog"][aria-labelledby*="bb-dialog"] {
-  padding: var(--primitive-spacing-dialog-padding-none);
-  overflow: hidden;
+    padding: 0;
+    overflow: hidden;
 }
