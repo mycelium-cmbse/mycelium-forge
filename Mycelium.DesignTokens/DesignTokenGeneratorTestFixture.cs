@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DesignTokenGeneratorTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -19,11 +19,6 @@ namespace Mycelium.DesignTokens
     public class DesignTokenGeneratorTestFixture
     {
         /// <summary>
-        /// Gets or sets the generator under test.
-        /// </summary>
-        public DesignTokenGenerator Generator { get; set; }
-
-        /// <summary>
         /// Gets or sets the project root directory where source tokens and scripts reside.
         /// </summary>
         public string ProjectDirectory { get; set; }
@@ -39,9 +34,9 @@ namespace Mycelium.DesignTokens
         [SetUp]
         public void SetUp()
         {
-            this.Generator = new DesignTokenGenerator();
-
             var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Determine the project root directory by traversing up the directory hierarchy
             var candidateDirectory = Path.GetFullPath(Path.Combine(baseDirectory, "..", "..", ".."));
 
             this.ProjectDirectory = File.Exists(Path.Combine(candidateDirectory, "Javascript", "build-tokens.mjs")) ? candidateDirectory : baseDirectory;
@@ -66,13 +61,13 @@ namespace Mycelium.DesignTokens
             };
 
             // Generates the css files from the DTCG tokens
-            var result = await this.Generator.GenerateAsync(options);
+            var result = await DesignTokenGenerator.GenerateAsync(options);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsSuccess, Is.True);
                 Assert.That(result.StandardError, Is.Null.Or.Empty);
-                Assert.That(result.ExitCode, Is.EqualTo(0));
+                Assert.That(result.ExitCode, Is.Zero);
                 Assert.That(result.GeneratedFiles, Has.Count.EqualTo(3));
             }
 
@@ -90,18 +85,18 @@ namespace Mycelium.DesignTokens
                 Assert.That(File.Exists(forgeCombinedPath), Is.True);
                 Assert.That(File.Exists(bloomCombinedPath), Is.True);
                 Assert.That(File.Exists(myceliumThemePath), Is.True);
-                Assert.That(combinedForgeContent.Contains(":root"), Is.True);
-                Assert.That(combinedForgeContent.Contains(".dark"), Is.True);
-                Assert.That(combinedForgeContent.Contains("--primary"), Is.True);
-                Assert.That(combinedForgeContent.Contains("--background"), Is.True);
-                Assert.That(combinedBloomContent.Contains(":root"), Is.True);
-                Assert.That(combinedBloomContent.Contains(".dark"), Is.True);
-                Assert.That(combinedForgeContent.Contains("--spacing-"), Is.True);
-                Assert.That(myceliumThemeContent.Contains("@theme inline"), Is.True);
-                Assert.That(myceliumThemeContent.Contains("--color-"), Is.True);
-                Assert.That(myceliumThemeContent.Contains("--radius-"), Is.True);
-                Assert.That(myceliumThemeContent.Contains("--spacing-"), Is.True);
-                Assert.That(myceliumThemeContent.Contains("--text-"), Is.True);
+                Assert.That(combinedForgeContent, Does.Contain(":root"));
+                Assert.That(combinedForgeContent, Does.Contain(".dark"));
+                Assert.That(combinedForgeContent, Does.Contain("--primary"));
+                Assert.That(combinedForgeContent, Does.Contain("--background"));
+                Assert.That(combinedBloomContent, Does.Contain(":root"));
+                Assert.That(combinedBloomContent, Does.Contain(".dark"));
+                Assert.That(combinedForgeContent, Does.Contain("--spacing-"));
+                Assert.That(myceliumThemeContent, Does.Contain("@theme inline"));
+                Assert.That(myceliumThemeContent, Does.Contain("--color-"));
+                Assert.That(myceliumThemeContent, Does.Contain("--radius-"));
+                Assert.That(myceliumThemeContent, Does.Contain("--spacing-"));
+                Assert.That(myceliumThemeContent, Does.Contain("--text-"));
             }
         }
     }

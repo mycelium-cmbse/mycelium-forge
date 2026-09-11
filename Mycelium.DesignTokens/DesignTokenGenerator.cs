@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DesignTokenGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -17,7 +17,7 @@ namespace Mycelium.DesignTokens
     /// <summary>
     /// Executes the Style Dictionary process to transform DTCG design tokens into CSS stylesheets.
     /// </summary>
-    public class DesignTokenGenerator
+    public static class DesignTokenGenerator
     {
         /// <summary>
         /// Asynchronously generates CSS stylesheets from design tokens based on the provided configuration options.
@@ -27,7 +27,7 @@ namespace Mycelium.DesignTokens
         /// A task returning a <see cref="DesignTokenResult" /> containing the outcome, exit code, output messages, and
         /// list of generated files.
         /// </returns>
-        public async Task<DesignTokenResult> GenerateAsync(DesignTokenGeneratorOptions options)
+        public static async Task<DesignTokenResult> GenerateAsync(DesignTokenGeneratorOptions options)
         {
             var nodeInstallationError = await VerifyNodeIsInstalled();
 
@@ -143,8 +143,8 @@ namespace Mycelium.DesignTokens
         /// </summary>
         /// <param name="options">The generator configuration options.</param>
         /// <param name="workingDirectory">The working directory in which execution took place.</param>
-        /// <returns>A read-only list of generated CSS file paths.</returns>
-        private static IReadOnlyList<string> CollectGeneratedFiles(DesignTokenGeneratorOptions options, string workingDirectory)
+        /// <returns>A list of generated CSS file paths.</returns>
+        private static List<string> CollectGeneratedFiles(DesignTokenGeneratorOptions options, string workingDirectory)
         {
             var outputDirectoryPath = Path.Combine(workingDirectory, options.OutputDirectory);
 
