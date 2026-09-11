@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DesignTokenGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -29,12 +29,34 @@ namespace Mycelium.DesignTokens
         /// </returns>
         public async Task<DesignTokenResult> GenerateAsync(DesignTokenGeneratorOptions options)
         {
-            await VerifyNodeIsInstalled();
+            var nodeInstallationError = await VerifyNodeIsInstalled();
+
+            if (!string.IsNullOrEmpty(nodeInstallationError))
+            {
+                return new DesignTokenResult
+                {
+                    IsSuccess = false,
+                    ExitCode = -1,
+                    StandardError = nodeInstallationError
+                };
+            }
 
             var resolvedWorkingDirectory = ResolveWorkingDirectory(options);
-            await EnsureNpmDependenciesInstalledAsync(options, resolvedWorkingDirectory);
+            var npmInstallError = await RunNpmInstallAsync(options, resolvedWorkingDirectory);
+
+            if (!string.IsNullOrEmpty(npmInstallError))
+            {
+                return new DesignTokenResult
+                {
+                    IsSuccess = false,
+                    ExitCode = -1,
+                    StandardError = npmInstallError
+                };
+            }
+
             var processStartInformation = CreateProcessStartInformation(options, resolvedWorkingDirectory);
 
+            // A cancellation token source is used to enforce a timeout for the process execution.
             using var timeoutCancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(options.TimeoutSeconds));
             using var process = new Process();
             process.StartInfo = processStartInformation;
@@ -43,24 +65,17 @@ namespace Mycelium.DesignTokens
             {
                 process.Start();
 
-                var standardOutputTask = process.StandardOutput.ReadToEndAsync(timeoutCancellationTokenSource.Token);
-                var standardErrorTask = process.StandardError.ReadToEndAsync(timeoutCancellationTokenSource.Token);
-
+                var standardOutput = await process.StandardOutput.ReadToEndAsync(timeoutCancellationTokenSource.Token);
+                var standardError = await process.StandardError.ReadToEndAsync(timeoutCancellationTokenSource.Token);
                 await process.WaitForExitAsync(timeoutCancellationTokenSource.Token);
-                await Task.WhenAll(standardOutputTask, standardErrorTask);
-
-                var exitCode = process.ExitCode;
-                var isSuccess = exitCode == 0;
-
-                var generatedFiles = CollectGeneratedFiles(options, resolvedWorkingDirectory);
 
                 return new DesignTokenResult
                 {
-                    IsSuccess = isSuccess,
-                    ExitCode = exitCode,
-                    StandardOutput = await standardOutputTask,
-                    StandardError = await standardErrorTask,
-                    GeneratedFiles = generatedFiles
+                    IsSuccess = process.ExitCode == 0,
+                    ExitCode = process.ExitCode,
+                    StandardOutput = standardOutput,
+                    StandardError = standardError,
+                    GeneratedFiles = CollectGeneratedFiles(options, resolvedWorkingDirectory)
                 };
             }
             catch (OperationCanceledException) when (timeoutCancellationTokenSource.IsCancellationRequested)
@@ -78,9 +93,7 @@ namespace Mycelium.DesignTokens
                 {
                     IsSuccess = false,
                     ExitCode = -1,
-                    StandardOutput = string.Empty,
-                    StandardError = $"The design token generation process timed out after {options.TimeoutSeconds} seconds.",
-                    GeneratedFiles = []
+                    StandardError = $"The design token generation process timed out after {options.TimeoutSeconds} seconds."
                 };
             }
         }
@@ -121,7 +134,6 @@ namespace Mycelium.DesignTokens
                 WorkingDirectory = workingDirectory,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                UseShellExecute = false,
                 CreateNoWindow = true
             };
         }
@@ -151,20 +163,11 @@ namespace Mycelium.DesignTokens
         /// </summary>
         /// <param name="options">The generator configuration options.</param>
         /// <param name="workingDirectory">The working directory in which execution takes place.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when npm install execution fails.</exception>
-        private static async Task EnsureNpmDependenciesInstalledAsync(DesignTokenGeneratorOptions options, string workingDirectory)
+        /// <returns>A task representing the asynchronous operation. Contains the error message, if available.</returns>
+        private static async Task<string> RunNpmInstallAsync(DesignTokenGeneratorOptions options, string workingDirectory)
         {
             var scriptPath = Path.Combine(workingDirectory, options.ScriptPath);
             var scriptDirectory = Path.GetDirectoryName(scriptPath) ?? workingDirectory;
-            var packageJsonPath = Path.Combine(scriptDirectory, "package.json");
-            var nodeModulesDirectory = Path.Combine(scriptDirectory, "node_modules");
-
-            if (!File.Exists(packageJsonPath) || Directory.Exists(nodeModulesDirectory))
-            {
-                return;
-            }
-
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
             var processStartInformation = new ProcessStartInfo
@@ -172,9 +175,7 @@ namespace Mycelium.DesignTokens
                 FileName = isWindows ? "cmd.exe" : "npm",
                 Arguments = isWindows ? "/c npm install" : "install",
                 WorkingDirectory = scriptDirectory,
-                RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                UseShellExecute = false,
                 CreateNoWindow = true
             };
 
@@ -182,31 +183,27 @@ namespace Mycelium.DesignTokens
 
             if (process == null)
             {
-                throw new InvalidOperationException("Failed to start the npm process for installing dependencies.");
+                return "Failed to start the npm process for installing dependencies.";
             }
 
+            var standardError = await process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync();
 
-            if (process.ExitCode != 0)
-            {
-                var standardError = await process.StandardError.ReadToEndAsync();
-                throw new InvalidOperationException($"npm install failed with exit code {process.ExitCode}: {standardError}");
-            }
+            return process.ExitCode != 0
+                ? $"npm install failed with exit code {process.ExitCode}: {standardError}"
+                : string.Empty;
         }
 
         /// <summary>
         /// Verifies that Node.js is installed on the host environment.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when Node.js is not installed or not found in the system PATH.</exception>
-        private static async Task VerifyNodeIsInstalled()
+        /// <returns>A task representing the asynchronous operation. Contains the error message, if available.</returns>
+        private static async Task<string> VerifyNodeIsInstalled()
         {
             var processStartInformation = new ProcessStartInfo
             {
                 FileName = "node",
                 Arguments = "--version",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
                 CreateNoWindow = true
             };
 
@@ -214,15 +211,14 @@ namespace Mycelium.DesignTokens
 
             if (process == null)
             {
-                throw new InvalidOperationException("Node.js is not installed or could not be started.");
+                return "Node.js is not installed or could not be started.";
             }
 
             await process.WaitForExitAsync();
 
-            if (process.ExitCode != 0)
-            {
-                throw new InvalidOperationException($"Node.js execution failed with exit code {process.ExitCode}.");
-            }
+            return process.ExitCode != 0
+                ? $"Node.js execution failed with exit code {process.ExitCode}."
+                : string.Empty;
         }
     }
 }

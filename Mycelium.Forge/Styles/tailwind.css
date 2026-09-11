@@ -17,7 +17,7 @@
 /* Class-based dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Typography scale extensions mapped to design token primitives */
+/* Custom typography scale extensions mapped to design token primitives */
 @theme {
     --text-3xs: var(--text-10);
     --text-2xs: var(--text-11);

@@ -68,6 +68,14 @@ namespace Mycelium.DesignTokens
             // Generates the css files from the DTCG tokens
             var result = await this.Generator.GenerateAsync(options);
 
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.IsSuccess, Is.True);
+                Assert.That(result.StandardError, Is.Null.Or.Empty);
+                Assert.That(result.ExitCode, Is.EqualTo(0));
+                Assert.That(result.GeneratedFiles, Has.Count.EqualTo(3));
+            }
+
             // Verify that the expected output files exist and contain the expected content
             var forgeCombinedPath = Path.Combine(this.TestOutputDirectory, "tokens-forge.css");
             var bloomCombinedPath = Path.Combine(this.TestOutputDirectory, "tokens-bloom.css");
@@ -79,9 +87,6 @@ namespace Mycelium.DesignTokens
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(result.IsSuccess, Is.True);
-                Assert.That(result.ExitCode, Is.EqualTo(0));
-                Assert.That(result.GeneratedFiles, Has.Count.EqualTo(3));
                 Assert.That(File.Exists(forgeCombinedPath), Is.True);
                 Assert.That(File.Exists(bloomCombinedPath), Is.True);
                 Assert.That(File.Exists(myceliumThemePath), Is.True);
