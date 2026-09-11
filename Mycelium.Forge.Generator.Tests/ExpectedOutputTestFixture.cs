@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ExpectedOutputTestFixture.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -191,6 +191,78 @@ namespace Mycelium.Forge.Generator.Tests
 
             var expected = await File.ReadAllTextAsync(
                 Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDao", $"{className}Dao.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the expected DTO validator class for each concrete interesting class matches the expected golden file.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCaseSource(nameof(ConcreteInterestingClasses))]
+        public async Task Verify_that_the_expected_dto_validator_is_generated(string className)
+        {
+            var generator = new UmlCoreDtoValidatorGenerator();
+
+            var generated = await generator.GenerateDtoValidatorClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenDtoValidator", $"{className}Validator.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the expected service class is generated.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCase("Package")]
+        public async Task Verify_that_the_expected_service_is_generated(string className)
+        {
+            var generator = new UmlCoreServiceGenerator();
+
+            var generated = await generator.GenerateServiceClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenService", $"{className}Service.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the expected read filter class is generated.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCase("Package")]
+        public async Task Verify_that_the_expected_read_filter_is_generated(string className)
+        {
+            var generator = new UmlCoreReadFilterGenerator();
+
+            var generated = await generator.GenerateReadFilterClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenReadFilter", $"{className}ReadFilter.cs"));
+
+            Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
+        }
+
+        /// <summary>
+        /// Verifies that the expected permission service class is generated.
+        /// </summary>
+        /// <param name="className">The name of the class being tested.</param>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [TestCase("Package")]
+        public async Task Verify_that_the_expected_permission_service_is_generated(string className)
+        {
+            var generator = new UmlCorePermissionServiceGenerator();
+
+            var generated = await generator.GeneratePermissionServiceClassAsync(GeneratorSetupFixture.XmiReaderResult, className);
+
+            var expected = await File.ReadAllTextAsync(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "Expected", "AutoGenPermissionService", $"{className}PermissionService.cs"));
 
             Assert.That(generated.NormalizeLineEndings(), Is.EqualTo(expected.NormalizeLineEndings()));
         }

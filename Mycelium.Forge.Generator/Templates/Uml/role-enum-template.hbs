@@ -1,0 +1,36 @@
+﻿// ------------------------------------------------------------------------------------------------
+// <copyright file="RoleKind.cs" company="Starion Group S.A.">
+//
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+//
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Common
+{
+    using System.CodeDom.Compiler;
+
+    /// <summary>
+    /// Enumeration of application and domain roles in Mycelium Forge.
+    /// </summary>
+    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    public enum RoleKind
+    {
+        {{#each this.Roles as | role |}}
+        /// <summary>
+        /// {{role.Summary}}
+        /// </summary>
+        {{role.Name}}{{#unless @last}},
+
+        {{/unless}}{{/each}}
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
+// ------------------------------------------------------------------------------------------------

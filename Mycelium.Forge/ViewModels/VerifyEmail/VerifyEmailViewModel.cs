@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.VerifyEmail
 {
-    using FluentResults;
+    using ErrorOr;
 
     /// <summary>
     /// Provides view model state and operations for the user email verification page.
@@ -37,18 +37,18 @@ namespace Mycelium.Forge.ViewModels.VerifyEmail
         /// <summary>
         /// Sends the verification email to the configured email address.
         /// </summary>
-        /// <returns>A <see cref="Result" /> indicating the success or failure of the send operation.</returns>
-        public Result SendEmail()
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the success or failure of the send operation.</returns>
+        public ErrorOr<Success> SendEmail()
         {
             if (string.IsNullOrWhiteSpace(this.Email))
             {
-                return Result.Fail("Email address is required.");
+                return Error.Validation("Email", "Email address is required.");
             }
 
             this.IsSending = true;
             this.IsSending = false;
 
-            return Result.Ok();
+            return Result.Success;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Bunit;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +24,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Components.Pages;
     using Mycelium.Forge.ViewModels.Login;
+
+    using Error = ErrorOr.Error;
 
     [TestFixture]
     public class LoginTestFixture
@@ -107,7 +109,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             this.viewModelMock.Setup(x => x.Email).Returns("user@example.com");
             this.viewModelMock.Setup(x => x.Password).Returns("Secret123!");
-            this.viewModelMock.Setup(x => x.Login()).Returns(Result.Ok());
+            this.viewModelMock.Setup(x => x.Login()).Returns(Result.Success);
 
             await loginPage.InvokeAsync(() => loginButton.ClickAsync());
 
@@ -117,7 +119,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 Assert.That(this.toastService.Toasts, Has.Count.EqualTo(1));
             }
 
-            this.viewModelMock.Setup(x => x.Login()).Returns(Result.Fail("Invalid credentials"));
+            this.viewModelMock.Setup(x => x.Login()).Returns(Error.Failure(description: "Invalid credentials"));
             await loginPage.InvokeAsync(() => loginButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())

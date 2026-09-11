@@ -1,0 +1,291 @@
+// ------------------------------------------------------------------------------------------------
+// <copyright file="OrganizationScopeBehaviorTypeHelper.cs" company="Starion Group S.A.">
+// 
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+// 
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
+{
+    using System.Text;
+
+    using Mycelium.Forge.Generator.Constants;
+    using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Models;
+
+    using uml4net.StructuredClassifiers;
+
+    /// <summary>
+    /// Generates permission verification hooks and dependency injection for entities that can be owned by either
+    /// an account (personal scope) or an organization, evaluating scope boundaries and organization membership.
+    /// </summary>
+    public class OrganizationScopeBehaviorTypeHelper : ScopedBehaviorTypeHelperBase<OrganizationScopeConfiguration>
+    {
+        /// <summary>
+        /// Determines whether this behavior helper handles the specified operation.
+        /// </summary>
+        /// <param name="operation">The permission operation.</param>
+        /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
+        public override bool HandlesOperation(Operations operation)
+        {
+            return operation is Operations.Create or Operations.Read;
+        }
+
+        /// <summary>
+        /// Determines whether the specified operation requires an asynchronous implementation hook.
+        /// </summary>
+        /// <param name="operation">The permission operation.</param>
+        /// <returns><c>true</c> if the operation is asynchronous; otherwise <c>false</c>.</returns>
+        public override bool IsAsyncMethod(Operations operation)
+        {
+            return operation is Operations.Create or Operations.Read;
+        }
+
+        /// <summary>
+        /// Writes the create permission verification implementation body.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        public override void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        {
+            var config = this.GetConfiguration(definition, behavior);
+            var entityLower = @class.Name.ToLowerInvariant();
+            var membershipChecks = config.ScopeMemberProperties.Select(prop => $"!organization.{prop}.Contains(userContext.AccountId.Value)");
+
+            stringBuilder.Append($$"""
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Error.Unauthorized(description: "Unauthenticated user cannot create a {{entityLower}}.");
+                                               }
+
+                                               if (toCreate.Owner == userContext.AccountId.Value)
+                                               {
+                                                   return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.PersonalCreatePermission}});
+                                               }
+                                   """);
+
+            if (!string.IsNullOrWhiteSpace(config.AdminPermission))
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine();
+
+                stringBuilder.Append($$"""
+                                               if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                               {
+                                                   return Result.Success;
+                                               }
+                                       """);
+            }
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine();
+
+            stringBuilder.Append($$"""
+                                               var orgGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.OrgCreatePermission}});
+
+                                               if (orgGuard.IsError)
+                                               {
+                                                   return orgGuard;
+                                               }
+
+                                               var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);
+
+                                               if (orgResult.IsError || orgResult.Value.Count == 0)
+                                               {
+                                                   return Error.Forbidden(description: "Access denied: target {{config.ScopeEntity.ToLowerInvariant()}} was not found or is not accessible.");
+                                               }
+
+                                               var organization = orgResult.Value[0];
+
+                                               if ({{string.Join(" && ", membershipChecks)}})
+                                               {
+                                                   return Error.Forbidden(description: "Access denied: user is not a member of the target {{config.ScopeEntity.ToLowerInvariant()}}.");
+                                               }
+
+                                               return Result.Success;
+                                   """);
+        }
+
+        /// <summary>
+        /// Writes the read permission verification implementation body.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        public override void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        {
+            var config = this.GetConfiguration(definition, behavior);
+            var entityLower = @class.Name.ToLowerInvariant();
+            var bypassChecks = config.BypassPermissions.Select(p => $"PermissionGuard.HasPermission(userContext, PermissionKind.{p})").ToList();
+            var scopeRoleChecks = config.ScopeMemberProperties.Select(prop => $"organization.{prop}.Contains(accountId)");
+
+            var ownershipChecks = new List<string> { $"thing.{PropertyNames.Owner} == accountId" };
+
+            if (!string.IsNullOrWhiteSpace(config.OwnerProperty) && !config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
+            {
+                ownershipChecks.Add($"thing.{config.OwnerProperty}.Contains(accountId)");
+            }
+
+            if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
+            {
+                ownershipChecks.Add($"thing.{definition.MaintainerProperty}.Contains(accountId)");
+            }
+
+            stringBuilder.Append($$"""
+                                               if (thing.{{config.VisibilityProperty}} == VisibilityKind.PUBLIC)
+                                               {
+                                                   return Result.Success;
+                                               }
+
+                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                               {
+                                                   return Error.Unauthorized(description: "Unauthenticated user cannot access non-public {{entityLower}}.");
+                                               }
+
+                                               var accountId = userContext.AccountId.Value;
+
+                                               if ({{string.Join(" || ", ownershipChecks)}})
+                                               {
+                                                   return Result.Success;
+                                               }
+                                   """);
+
+            if (bypassChecks.Count > 0)
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine();
+
+                stringBuilder.Append($$"""
+                                               if ({{string.Join(" || ", bypassChecks)}})
+                                               {
+                                                   return Result.Success;
+                                               }
+                                       """);
+            }
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine();
+
+            stringBuilder.Append($$"""
+                                               if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
+                                               {
+                                                   var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
+
+                                                   if (!orgResult.IsError && orgResult.Value.Count > 0)
+                                                   {
+                                                       var organization = orgResult.Value[0];
+
+                                                       if ({{string.Join(" || ", scopeRoleChecks)}})
+                                                       {
+                                                           return Result.Success;
+                                                       }
+                                                   }
+
+                                                   return Error.Forbidden(description: "Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.");
+                                               }
+
+                                               return Error.Forbidden(description: "Access denied: cannot view this {{entityLower}}.");
+                                   """);
+        }
+
+        /// <summary>
+        /// Writes the update permission verification implementation body.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
+        public override void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
+        {
+            // Empty because OrganizationScope entities do not require custom behavior logic for updates;
+            // update permissions are handled by standard entity ownership, property-level permissions, and UpdatePermission in PermissionHelper.
+        }
+
+        /// <summary>
+        /// Writes the delete permission verification implementation body.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        {
+            // Empty because OrganizationScope entities do not require custom behavior logic for deletion;
+            // delete permissions are handled by standard entity ownership checks and DeletePermission in PermissionHelper.
+        }
+
+        /// <summary>
+        /// Builds the SQL read filter predicate for an entity configured with this behavior.
+        /// </summary>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        /// <param name="resolveEntityPredicate">A delegate to resolve the SQL read filter predicate of another entity by name.</param>
+        /// <returns>The SQL predicate string, or empty string if unrestricted.</returns>
+        public override string BuildReadFilterPredicate(IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, Func<string, string> resolveEntityPredicate)
+        {
+            var entityName = behavior.EntityName;
+            var config = this.GetConfiguration(definition, behavior);
+
+            var ownerChecks = new List<string>
+            {
+                $"\"{entityName}\".\"owner\" = @callerAccountId"
+            };
+
+            if (!config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase) &&
+                !config.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                var ownerPropCamel = char.ToLowerInvariant(config.OwnerProperty[0]) + config.OwnerProperty[1..];
+                ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{ownerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+            }
+
+            if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
+            {
+                var maintainerPropCamel = char.ToLowerInvariant(definition.MaintainerProperty[0]) + definition.MaintainerProperty[1..];
+                ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{maintainerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+            }
+
+            var ownerChecksSql = string.Join("\r\n                        OR ", ownerChecks);
+            var bypassSql = string.Join(" OR ", config.BypassPermissions.Select(p => $"@can{p} = true"));
+
+            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop =>
+            {
+                var propCamel = char.ToLowerInvariant(prop[0]) + prop[1..];
+                return $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{propCamel}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"owner\" AND \"targetAccount\" = @callerAccountId)";
+            });
+
+            var scopeLinksSql = string.Join("\r\n                                        OR ", scopeLinkChecks);
+
+            return $$"""
+                                         ("Thing"."data"->>'{{config.VisibilityPropertyLower}}' = 'PUBLIC')
+                                         OR (@callerAccountId IS NOT NULL AND (
+                                             {{ownerChecksSql}}
+                                             OR {{bypassSql}}
+                                             OR (
+                                                 "Thing"."data"->>'{{config.VisibilityPropertyLower}}' = 'INTERNAL'
+                                                 AND (
+                                                     {{scopeLinksSql}}
+                                                 )
+                                             )
+                                         ))
+                     """;
+        }
+
+        /// <summary>
+        /// Factory method to create a new <see cref="OrganizationScopeConfiguration" /> instance.
+        /// </summary>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The entity behavior definition.</param>
+        /// <returns>A new <see cref="OrganizationScopeConfiguration" /> instance.</returns>
+        protected override OrganizationScopeConfiguration CreateConfiguration(EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        {
+            return new OrganizationScopeConfiguration(definition, behavior);
+        }
+    }
+}

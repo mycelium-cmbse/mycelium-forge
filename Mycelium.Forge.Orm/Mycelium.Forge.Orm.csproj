@@ -22,7 +22,7 @@
 
     <ItemGroup>
         <PackageReference Include="dbup-postgresql" Version="7.0.1" />
-        <PackageReference Include="FluentResults" Version="4.0.0" />
+        <PackageReference Include="ErrorOr" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
         <PackageReference Include="Npgsql" Version="10.0.3" />
     </ItemGroup>
@@ -33,9 +33,9 @@
     </ItemGroup>
 
     <ItemGroup>
-	    <!-- DD-18: migrations are numbered, forward-only SQL scripts embedded in the assembly and
+        <!-- DD-18: migrations are numbered, forward-only SQL scripts embedded in the assembly and
              journalled by DbUp - see Migrations/Migrator.cs. -->
-		<EmbeddedResource Include="Migrations\*.sql" />
+        <EmbeddedResource Include="Migrations\*.sql" />
     </ItemGroup>
 
 </Project>

@@ -380,7 +380,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             AppendLateralJoins(sql, referenceProperties, manyToManyReferenceProperties, @class);
 
             sql.AppendLine();
-            sql.AppendLine($"                    WHERE \"{@class.Name}\".\"id\" = ANY(@include);");
+            sql.Append($"                    WHERE \"{@class.Name}\".\"id\" = ANY(@include)");
 
             writer.WriteSafeString(sql);
         }

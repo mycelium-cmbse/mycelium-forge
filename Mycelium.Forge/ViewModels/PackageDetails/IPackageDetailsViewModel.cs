@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.PackageDetails
 {
-    using FluentResults;
+    using ErrorOr;
 
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Models.Package;
@@ -40,7 +40,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// Initiates a migration of the package in Bloom to the specified target project.
         /// </summary>
         /// <param name="result">The migration parameters including destination project and version constraint.</param>
-        /// <returns>A <see cref="Result" /> indicating the success or failure of the migration initiation.</returns>
-        Result MigrateInBloom(MigrateInBloomResult result);
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the success or failure of the migration initiation.</returns>
+        ErrorOr<Success> MigrateInBloom(MigrateInBloomResult result);
     }
 }

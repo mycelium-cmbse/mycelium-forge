@@ -17,7 +17,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
 
     using Bunit;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -154,14 +154,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         public void VerifyHandleMigrateInBloom()
         {
             var result = new MigrateInBloomResult { ProjectName = "Project A", VersionConstraint = "1.3.0" };
-            this.viewModelMock.Setup(x => x.MigrateInBloom(result)).Returns(Result.Ok());
+            this.viewModelMock.Setup(x => x.MigrateInBloom(result)).Returns(Result.Success);
 
             var packageDetailsPage = this.context.Render<PackageDetails>();
             var handleResult = packageDetailsPage.Instance.HandleMigrateInBloom(result);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(handleResult.IsSuccess, Is.True);
+                Assert.That(handleResult.IsError, Is.False);
                 this.viewModelMock.Verify(x => x.MigrateInBloom(result), Times.Once);
             }
         }

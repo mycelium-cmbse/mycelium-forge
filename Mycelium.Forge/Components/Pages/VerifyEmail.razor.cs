@@ -53,15 +53,13 @@ namespace Mycelium.Forge.Components.Pages
         {
             var result = this.ViewModel.SendEmail();
 
-            if (result.IsSuccess)
+            if (result.IsError)
             {
-                this.ToastService.Success("Verification link sent. Please check your inbox.", "Email Sent");
+                this.ToastService.Error(result.FirstError.Description, "Error");
+                return;
             }
-            else
-            {
-                var errorMessage = result.Reasons.Count > 0 ? result.Reasons[0].Message : "Failed to send verification email.";
-                this.ToastService.Error(errorMessage, "Error");
-            }
+
+            this.ToastService.Success("Verification link sent. Please check your inbox.", "Email Sent");
         }
 
         /// <summary>

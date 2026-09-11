@@ -210,32 +210,30 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             var result = this.ViewModel.Publish();
 
-            if (result.IsSuccess)
+            if (result.IsError)
             {
-                var scope = this.ViewModel.Metadata.Scope;
-                var packageName = this.ViewModel.Metadata.PackageName;
-                var version = this.ViewModel.Metadata.Version;
-
-                var parameters = new Dictionary<string, object>
-                {
-                    { nameof(PublishedToForgeDialog.Scope), scope },
-                    { nameof(PublishedToForgeDialog.PackageName), packageName },
-                    { nameof(PublishedToForgeDialog.Version), version }
-                };
-
-                var options = new DialogOpenOptions
-                {
-                    ShowClose = false,
-                    Size = DialogSize.Small
-                };
-
-                await this.DialogService.OpenAsync<PublishedToForgeDialog>(parameters, options);
+                this.ToastService.Error(result.FirstError.Description, "Error");
+                return;
             }
-            else
+
+            var scope = this.ViewModel.Metadata.Scope;
+            var packageName = this.ViewModel.Metadata.PackageName;
+            var version = this.ViewModel.Metadata.Version;
+
+            var parameters = new Dictionary<string, object>
             {
-                var errorMessage = result.Reasons.Count > 0 ? result.Reasons[0].Message : "Failed to publish package.";
-                this.ToastService.Error(errorMessage, "Error");
-            }
+                { nameof(PublishedToForgeDialog.Scope), scope },
+                { nameof(PublishedToForgeDialog.PackageName), packageName },
+                { nameof(PublishedToForgeDialog.Version), version }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                ShowClose = false,
+                Size = DialogSize.Small
+            };
+
+            await this.DialogService.OpenAsync<PublishedToForgeDialog>(parameters, options);
         }
 
         /// <summary>

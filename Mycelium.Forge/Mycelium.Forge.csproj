@@ -28,7 +28,7 @@
         <PackageReference Include="BlazorBlueprint.Primitives" Version="3.15.0" />
         <PackageReference Include="BlazorBlueprint.Icons.Lucide" Version="2.0.2" />
         <PackageReference Include="Carter" Version="10.0.0" />
-        <PackageReference Include="FluentResults" Version="4.0.0" />
+        <PackageReference Include="ErrorOr" Version="2.1.1" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
         <PackageReference Include="Npgsql" Version="10.0.3" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
@@ -39,6 +39,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
+        <ProjectReference Include="..\Mycelium.Forge.Dal\Mycelium.Forge.Dal.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Orm\Mycelium.Forge.Orm.csproj" />
         <ProjectReference Include="..\Mycelium.DesignTokens\Mycelium.DesignTokens.csproj" />
     </ItemGroup>
@@ -51,5 +52,11 @@
               DestinationFolder="$(MSBuildProjectDirectory)\Styles\Generated\" 
               SkipUnchangedFiles="true" />
     </Target>
+
+    <ItemGroup>
+        <!-- DD-18: migrations are numbered, forward-only SQL scripts embedded in the assembly and
+             journalled by DbUp - see Orm/Migrator.cs. -->
+        <EmbeddedResource Include="Orm\Migrations\*.sql" />
+    </ItemGroup>
 
 </Project>

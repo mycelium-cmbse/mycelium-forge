@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SignUp.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -93,16 +93,14 @@ namespace Mycelium.Forge.Components.Pages
 
             var result = this.ViewModel.SignUp();
 
-            if (result.IsSuccess)
+            if (result.IsError)
             {
-                this.ToastService.Success("Account created successfully. Please check your email for verification.", "Account Created");
-                this.NavigationManager.NavigateTo(PageRoutes.Login);
+                this.ToastService.Error(result.FirstError.Description, "Error");
+                return;
             }
-            else
-            {
-                var errorMessage = result.Reasons.Count > 0 ? result.Reasons[0].Message : "Failed to create account.";
-                this.ToastService.Error(errorMessage, "Error");
-            }
+
+            this.ToastService.Success("Account created successfully. Please check your email for verification.", "Account Created");
+            this.NavigationManager.NavigateTo(PageRoutes.Login);
         }
 
         /// <summary>

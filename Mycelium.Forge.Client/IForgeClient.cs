@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IForgeClient.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.Client
 {
-    using FluentResults;
+    using ErrorOr;
 
     /// <summary>
     /// Defines the programmatic surface of the Mycelium Forge package registry.
@@ -26,36 +26,36 @@ namespace Mycelium.Forge.Client
         /// <summary>
         /// Searches the registry for packages matching a free-text query.
         /// </summary>
-        Task<Result> SearchAsync(string query, CancellationToken cancellationToken = default);
+        Task<ErrorOr<Success>> SearchAsync(string query, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves the manifest and metadata of a package without downloading its content.
         /// </summary>
-        Task<Result> GetMetadataAsync(string packageIdentifier, CancellationToken cancellationToken = default);
+        Task<ErrorOr<Success>> GetMetadataAsync(string packageIdentifier, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Lists the published versions of a package.
         /// </summary>
-        Task<Result> ListVersionsAsync(string packageIdentifier, CancellationToken cancellationToken = default);
+        Task<ErrorOr<Success>> ListVersionsAsync(string packageIdentifier, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Downloads the kpar content of a package version.
         /// </summary>
-        Task<Result> DownloadKparAsync(string packageIdentifier, string version, CancellationToken cancellationToken = default);
+        Task<ErrorOr<Success>> DownloadKparAsync(string packageIdentifier, string version, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Publishes a kpar as a new package or as a new version of an existing package.
         /// </summary>
-        Task<Result> PublishKparAsync(Stream kpar, CancellationToken cancellationToken = default);
+        Task<ErrorOr<Success>> PublishKparAsync(Stream kpar, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Unlists a published version, hiding it from search and new-install resolution.
         /// </summary>
-        Task<Result> UnlistAsync(string packageIdentifier, string version, CancellationToken cancellationToken = default);
+        Task<ErrorOr<Success>> UnlistAsync(string packageIdentifier, string version, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Manages the revocable API credentials used to authenticate publishing operations.
         /// </summary>
-        Task<Result> ManageApiKeysAsync(CancellationToken cancellationToken = default);
+        Task<ErrorOr<Success>> ManageApiKeysAsync(CancellationToken cancellationToken = default);
     }
 }

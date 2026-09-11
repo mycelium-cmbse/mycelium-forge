@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
 {
     using BlazorBlueprint.Components;
 
-    using FluentResults;
+    using ErrorOr;
 
     using Microsoft.AspNetCore.Components;
 
@@ -252,8 +252,8 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// Handles the event when a package migration in Bloom is initiated.
         /// </summary>
         /// <param name="result">The result containing the target project name and version constraint.</param>
-        /// <returns>A <see cref="Result" /> indicating the outcome of the migration initiation.</returns>
-        public Result HandleMigrateInBloom(MigrateInBloomResult result)
+        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the outcome of the migration initiation.</returns>
+        public ErrorOr<Success> HandleMigrateInBloom(MigrateInBloomResult result)
         {
             return this.ViewModel.MigrateInBloom(result);
         }
