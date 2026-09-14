@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackage.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -25,6 +25,12 @@ namespace Mycelium.Forge.Common
     [Class(xmiId: "EAID_65683CA4_032F_457d_B996_A3893C4293CA", isAbstract: false, isFinalSpecialization: false, isActive: false)]
     public partial interface IPackage : IThing, INamespace
     {
+        /// <summary>
+        /// A human readable description for the Package.
+        /// </summary>
+        [Property(xmiId: "EAID_03CDEFB7_67B8_4310_A5D7_E3FA99CBDD57", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        string Description { get; set; }
+
         /// <summary>
         /// Total downloads across the Package, computed as the sum of downloadCount over all its
         /// PackageVersions. Never set directly; always reflects the current totals of its versions.

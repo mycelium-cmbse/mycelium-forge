@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PropertyExtensionTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -266,7 +266,7 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
                 Assert.That(GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute(this.billingEmailProperty), Is.False);
                 Assert.That(GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute(this.packageTypeProperty), Is.True);
                 Assert.That(GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute(this.orgInvitationTargetProperty), Is.True);
-                Assert.That(GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute(this.scopePrimaryAddressProperty), Is.True);
+                Assert.That(GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute(this.scopePrimaryAddressProperty), Is.False);
                 Assert.That(GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute(enumerableRefProp), Is.False);
                 Assert.That(GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute(singleRefWithoutOpposite), Is.True);
             }

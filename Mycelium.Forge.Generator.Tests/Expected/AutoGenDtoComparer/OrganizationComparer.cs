@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationComparer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IOrganization"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public partial class OrganizationComparer : IDtoComparer<IOrganization>
     {
         /// <summary>

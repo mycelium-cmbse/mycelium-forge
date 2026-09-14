@@ -77,7 +77,7 @@ $$;
 CREATE OR REPLACE FUNCTION "Forge".query_model_version()
 RETURNS text AS $$
 BEGIN
-    RETURN '{{#Forge.SQL.ModelVersion this}}';
+    RETURN '{{Forge.ModelVersion}}';
 END;
 $$ LANGUAGE plpgsql;
 

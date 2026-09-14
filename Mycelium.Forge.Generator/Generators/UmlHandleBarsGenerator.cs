@@ -1,21 +1,25 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlHandleBarsGenerator.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
 namespace Mycelium.Forge.Generator.Generators
 {
+    using HandlebarsDotNet;
+
+    using Mycelium.Forge.Generator.HandleBarHelpers;
+
     using uml4net.Extensions;
     using uml4net.SimpleClassifiers;
     using uml4net.StructuredClassifiers;
     using uml4net.xmi.Readers;
 
     /// <summary>
-    /// Abstract super class from which all uml4net based <see cref="HandlebarsDotNet"/> generators
+    /// Abstract super class from which all uml4net based <see cref="HandlebarsDotNet" /> generators
     /// need to derive
     /// </summary>
     /// <remarks>
@@ -25,16 +29,39 @@ namespace Mycelium.Forge.Generator.Generators
     public abstract class UmlHandleBarsGenerator : HandleBarsGenerator
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="UmlHandleBarsGenerator" /> class.
+        /// </summary>
+        protected UmlHandleBarsGenerator()
+        {
+            this.Handlebars.RegisterHelper("Forge.ModelVersion", (writer, context, arguments) =>
+                ModelVersionHelper.WriteModelVersion(writer, context, arguments, this.ModelVersion));
+        }
+
+        /// <summary>
+        /// Gets or sets the default model version to use when an instance-specific version is not set.
+        /// </summary>
+        public static string DefaultModelVersion { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the model version to use during code generation.
+        /// </summary>
+        public string ModelVersion
+        {
+            get => string.IsNullOrEmpty(field) ? DefaultModelVersion : field;
+            set;
+        } = string.Empty;
+
+        /// <summary>
         /// Generates code specific to the concrete implementation
         /// </summary>
         /// <param name="xmiReaderResult">
-        /// the <see cref="XmiReaderResult"/> that contains the UML model to generate from
+        /// the <see cref="XmiReaderResult" /> that contains the UML model to generate from
         /// </param>
         /// <param name="outputDirectory">
-        /// The target <see cref="DirectoryInfo"/>
+        /// The target <see cref="DirectoryInfo" />
         /// </param>
         /// <returns>
-        /// an awaitable <see cref="Task"/>
+        /// an awaitable <see cref="Task" />
         /// </returns>
         public abstract Task GenerateAsync(XmiReaderResult xmiReaderResult, DirectoryInfo outputDirectory);
 
@@ -48,15 +75,15 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
-        /// Walks every top level <see cref="uml4net.Packages.IPackage"/> of the <paramref name="xmiReaderResult"/>
-        /// and every <see cref="uml4net.Packages.IPackage"/> contained (directly or indirectly) within it, and
-        /// collects the <see cref="IClass"/>es that are declared there.
+        /// Walks every top level <see cref="uml4net.Packages.IPackage" /> of the <paramref name="xmiReaderResult" />
+        /// and every <see cref="uml4net.Packages.IPackage" /> contained (directly or indirectly) within it, and
+        /// collects the <see cref="IClass" />es that are declared there.
         /// </summary>
         /// <param name="xmiReaderResult">
-        /// the <see cref="XmiReaderResult"/> that contains the UML model to query
+        /// the <see cref="XmiReaderResult" /> that contains the UML model to query
         /// </param>
         /// <returns>
-        /// the <see cref="IClass"/>es found in the model, ordered by name
+        /// the <see cref="IClass" />es found in the model, ordered by name
         /// </returns>
         protected static IReadOnlyList<IClass> QueryAllClasses(XmiReaderResult xmiReaderResult)
         {
@@ -76,15 +103,15 @@ namespace Mycelium.Forge.Generator.Generators
         }
 
         /// <summary>
-        /// Walks every top level <see cref="uml4net.Packages.IPackage"/> of the <paramref name="xmiReaderResult"/>
-        /// and every <see cref="uml4net.Packages.IPackage"/> contained (directly or indirectly) within it, and
-        /// collects the <see cref="IEnumeration"/>s that are declared there.
+        /// Walks every top level <see cref="uml4net.Packages.IPackage" /> of the <paramref name="xmiReaderResult" />
+        /// and every <see cref="uml4net.Packages.IPackage" /> contained (directly or indirectly) within it, and
+        /// collects the <see cref="IEnumeration" />s that are declared there.
         /// </summary>
         /// <param name="xmiReaderResult">
-        /// the <see cref="XmiReaderResult"/> that contains the UML model to query
+        /// the <see cref="XmiReaderResult" /> that contains the UML model to query
         /// </param>
         /// <returns>
-        /// the <see cref="IEnumeration"/>s found in the model, ordered by name
+        /// the <see cref="IEnumeration" />s found in the model, ordered by name
         /// </returns>
         protected static IReadOnlyList<IEnumeration> QueryAllEnumerations(XmiReaderResult xmiReaderResult)
         {

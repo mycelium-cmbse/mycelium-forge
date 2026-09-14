@@ -39,7 +39,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.DeleteBaseTableTriggerFunctions", DeleteBaseTableTriggerFunctions);
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingDeleteTriggers", WriteBasicTableThingDeleteTriggers);
             handlebars.RegisterHelper("Forge.SQL.WriteBaseTableDeleteTriggers", WriteBaseTableDeleteTriggers);
-            handlebars.RegisterHelper("Forge.SQL.ModelVersion", WriteModelVersion);
         }
 
         /// <summary>
@@ -289,17 +288,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 writer.WriteSafeString(txt);
             }
-        }
-
-        /// <summary>
-        /// Writes the model version.
-        /// </summary>
-        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" />.</param>
-        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
-        private static void WriteModelVersion(EncodedTextWriter writer, Context context, Arguments arguments)
-        {
-            writer.Write("0.1.0");
         }
     }
 }
