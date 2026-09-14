@@ -211,6 +211,7 @@ ALTER TABLE "Forge"."ProfileType" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."Scope" (
     "id" uuid NOT NULL,
+    "primaryAddress" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -346,6 +347,8 @@ ALTER TABLE "Forge"."ProfileLink" ADD CONSTRAINT "ProfileLink_profileType_FK_Sou
 CREATE INDEX "idx_ProfileLink_profileType" ON "Forge"."ProfileLink" ("profileType");
 ALTER TABLE "Forge"."ProfileType" ADD CONSTRAINT "ProfileType_owner_FK_Source" FOREIGN KEY ("owner") REFERENCES "Forge"."Forge" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX "idx_ProfileType_owner" ON "Forge"."ProfileType" ("owner");
+ALTER TABLE "Forge"."Scope" ADD CONSTRAINT "Scope_primaryAddress_FK_Source" FOREIGN KEY ("primaryAddress") REFERENCES "Forge"."Address" ("id") ON UPDATE CASCADE DEFERRABLE;
+CREATE INDEX "idx_Scope_primaryAddress" ON "Forge"."Scope" ("primaryAddress");
 
 CREATE OR REPLACE FUNCTION "Forge".thing_delete()
 RETURNS trigger

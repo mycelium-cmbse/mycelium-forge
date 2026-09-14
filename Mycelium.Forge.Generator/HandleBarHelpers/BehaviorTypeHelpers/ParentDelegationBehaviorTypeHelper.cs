@@ -110,7 +110,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             if (!string.IsNullOrWhiteSpace(config.CreatePermission))
             {
-                stringBuilder.Append("\r\n\r\n");
+                stringBuilder.Append(ModelConstants.DoubleNewLine);
 
                 stringBuilder.Append($$"""
                                                    var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
@@ -176,7 +176,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             {
                 var diffChecks = immutableProperties.Select(p => $"existingThing.{p} != updatedThing.{p}");
 
-                stringBuilder.Append("\r\n\r\n");
+                stringBuilder.Append(ModelConstants.DoubleNewLine);
 
                 stringBuilder.Append($$"""
                                                    if ({{string.Join(" ||\r\n                    ", diffChecks)}})
@@ -188,7 +188,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             if (!string.IsNullOrWhiteSpace(config.StateProperty) && !string.IsNullOrWhiteSpace(config.StateActivePermission))
             {
-                stringBuilder.Append("\r\n\r\n");
+                stringBuilder.Append(ModelConstants.DoubleNewLine);
 
                 stringBuilder.Append($$"""
                                                    if (existingThing.{{config.StateProperty}} != updatedThing.{{config.StateProperty}})
@@ -228,7 +228,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             if (!string.IsNullOrWhiteSpace(config.DeletePermission))
             {
-                stringBuilder.Append("\r\n\r\n");
+                stringBuilder.Append(ModelConstants.DoubleNewLine);
 
                 stringBuilder.Append($$"""
                                                    var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.DeletePermission}});
@@ -258,7 +258,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return await this.{{config.ParentPermServiceField}}.IsAllowedToDelete(userContext, parentResult.Value[0]);
                     """;
 
-            stringBuilder.Append("\r\n\r\n");
+            stringBuilder.Append(ModelConstants.DoubleNewLine);
 
             stringBuilder.Append($$"""
                                                var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}]);
@@ -321,7 +321,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                     """
                 : $"                               return await this.{config.ParentPermServiceField}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);";
 
-            stringBuilder.Append("\r\n\r\n");
+            stringBuilder.Append(ModelConstants.DoubleNewLine);
 
             stringBuilder.Append($$"""
                                                var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}]);

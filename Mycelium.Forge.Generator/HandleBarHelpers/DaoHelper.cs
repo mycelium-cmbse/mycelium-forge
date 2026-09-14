@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DaoHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -195,7 +195,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             if (result.Length > 0)
             {
-                writer.WriteSafeString("\r\n\r\n");
+                writer.WriteSafeString(ModelConstants.DoubleNewLine);
                 writer.WriteSafeString(result.ToString().TrimEnd());
             }
         }
@@ -307,13 +307,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     result.AppendLine("                \"\"\");");
                     result.AppendLine();
                     result.AppendLine($"                command.Parameters.Add(new NpgsqlParameter(\"@{propName}\", (NpgsqlDbType)((int)NpgsqlDbType.Array | (int)NpgsqlDbType.Uuid)) {{ Value = ({dtoName}.{propCSharpName} ?? []).ToArray() }});");
-                    result.AppendLine();
                 }
             }
 
             if (result.Length > 0)
             {
-                writer.WriteSafeString("\r\n\r\n");
+                writer.WriteSafeString(ModelConstants.DoubleNewLine);
                 writer.WriteSafeString(result.ToString().TrimEnd());
             }
         }

@@ -52,9 +52,10 @@ namespace Mycelium.Forge.Generator.Extensions
                 return string.Empty;
             }
 
-            var versionTag = tags.Find(tag => 
+            var versionTag = tags.Find(tag =>
                 string.Equals(tag.Name, VersionTagName, StringComparison.Ordinal) &&
-                tag.Element.Exists(elementId => packageTag.Element.Contains(elementId)));
+                tag.Element != null &&
+                tag.Element.Exists(packageTag.Element.Contains));
 
             return versionTag?.Value ?? string.Empty;
         }
