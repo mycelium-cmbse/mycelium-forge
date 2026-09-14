@@ -294,8 +294,7 @@ namespace Mycelium.Forge.Serializer.Json
 
                     if (reader.TokenType == JsonTokenType.Null)
                     {
-                        dtoInstance.PrimaryAddress = Guid.Empty;
-                        logger.LogDebug($"the Account.PrimaryAddress property was not found in the Json. The value is set to Guid.Empty");
+                        dtoInstance.PrimaryAddress = null;
                     }
                     else
                     {

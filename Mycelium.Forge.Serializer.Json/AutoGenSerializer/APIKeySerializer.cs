@@ -63,11 +63,14 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iAPIKey.Owner);
             writer.WriteEndObject();
-            writer.WritePropertyName("permissions"u8);
-            writer.WriteStartObject();
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iAPIKey.Permissions);
-            writer.WriteEndObject();
+            writer.WriteStartArray("permissions"u8);
+
+            foreach (var item in iAPIKey.Permissions)
+            {
+                writer.WriteStringValue(item);
+            }
+
+            writer.WriteEndArray();
             writer.WritePropertyName("revokedAt"u8);
             writer.WriteStringValue(iAPIKey.RevokedAt);
             writer.WriteStartArray("secretHash"u8);

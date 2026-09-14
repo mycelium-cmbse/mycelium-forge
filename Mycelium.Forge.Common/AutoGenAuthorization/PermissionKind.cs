@@ -18,7 +18,7 @@ namespace Mycelium.Forge.Common
     /// <summary>
     /// Enumeration of fine-grained permissions in Mycelium Forge.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public enum PermissionKind
     {
         /// <summary>

@@ -165,16 +165,13 @@ namespace Mycelium.Forge.Serializer.Json
                     permissionsSeen = true;
                     reader.Read();
 
-                    if (reader.TokenType == JsonTokenType.Null)
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
                     {
-                        dtoInstance.Permissions = Guid.Empty;
-                        logger.LogDebug($"the APIKey.Permissions property was not found in the Json. The value is set to Guid.Empty");
-                    }
-                    else
-                    {
-                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var permissionsRefId))
+                        var permissionsArrayItem = reader.GetString();
+
+                        if (permissionsArrayItem != null)
                         {
-                            dtoInstance.Permissions = permissionsRefId;
+                            dtoInstance.Permissions.Add(permissionsArrayItem);
                         }
                     }
 

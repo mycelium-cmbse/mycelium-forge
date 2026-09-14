@@ -47,7 +47,7 @@ namespace Mycelium.Forge.Serializer.Json
 
             var typeSeen = false;
             var createdAtSeen = false;
-            var experisAtSeen = false;
+            var experiesAtSeen = false;
             var modifiedAtSeen = false;
             var organizationSeen = false;
             var organizationInvitationKindSeen = false;
@@ -98,12 +98,12 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
-                if (reader.ValueTextEquals("experisAt"u8))
+                if (reader.ValueTextEquals("experiesAt"u8))
                 {
-                    experisAtSeen = true;
+                    experiesAtSeen = true;
                     reader.Read();
 
-                    dtoInstance.ExperisAt = reader.GetDateTime();
+                    dtoInstance.ExperiesAt = reader.GetDateTime();
 
                     continue;
                 }
@@ -207,9 +207,9 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 logger.LogDebug("the createdAt Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
-            if (!experisAtSeen)
+            if (!experiesAtSeen)
             {
-                logger.LogDebug("the experisAt Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
+                logger.LogDebug("the experiesAt Json property was not found in the OrganizationInvitation: {Id}", dtoInstance.Id);
             }
             if (!modifiedAtSeen)
             {

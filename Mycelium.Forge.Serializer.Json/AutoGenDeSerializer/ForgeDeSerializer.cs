@@ -57,6 +57,7 @@ namespace Mycelium.Forge.Serializer.Json
             var packageTypeSeen = false;
             var profileTypeSeen = false;
             var shortNameSeen = false;
+            var tagSeen = false;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -242,6 +243,21 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("tag"u8))
+                {
+                    tagSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var tagRefId))
+                        {
+                            dtoInstance.Tag.Add(tagRefId);
+                        }
+                    }
+
+                    continue;
+                }
 
                 reader.Skip();
             }
@@ -294,6 +310,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!shortNameSeen)
             {
                 logger.LogDebug("the shortName Json property was not found in the Forge: {Id}", dtoInstance.Id);
+            }
+            if (!tagSeen)
+            {
+                logger.LogDebug("the tag Json property was not found in the Forge: {Id}", dtoInstance.Id);
             }
 
             return dtoInstance;

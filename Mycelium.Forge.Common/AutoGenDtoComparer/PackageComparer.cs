@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IPackage"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public partial class PackageComparer : IDtoComparer<IPackage>
     {
         /// <summary>
@@ -47,6 +47,11 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
             if (oldDto.CreatedAt != newDto.CreatedAt)
             {
                 changes.Add(new PropertyChange(nameof(IPackage.CreatedAt), oldDto.CreatedAt, newDto.CreatedAt));
+            }
+
+            if (oldDto.Description != newDto.Description)
+            {
+                changes.Add(new PropertyChange(nameof(IPackage.Description), oldDto.Description, newDto.Description));
             }
 
             if (oldDto.downloadCount != newDto.downloadCount)

@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IOrganizationInvitation"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public partial class OrganizationInvitationComparer : IDtoComparer<IOrganizationInvitation>
     {
         /// <summary>
@@ -49,9 +49,9 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(IOrganizationInvitation.CreatedAt), oldDto.CreatedAt, newDto.CreatedAt));
             }
 
-            if (oldDto.ExperisAt != newDto.ExperisAt)
+            if (oldDto.ExperiesAt != newDto.ExperiesAt)
             {
-                changes.Add(new PropertyChange(nameof(IOrganizationInvitation.ExperisAt), oldDto.ExperisAt, newDto.ExperisAt));
+                changes.Add(new PropertyChange(nameof(IOrganizationInvitation.ExperiesAt), oldDto.ExperiesAt, newDto.ExperiesAt));
             }
 
             if (oldDto.isExpired != newDto.isExpired)

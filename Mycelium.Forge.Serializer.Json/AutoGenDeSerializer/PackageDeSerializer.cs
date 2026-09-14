@@ -47,6 +47,7 @@ namespace Mycelium.Forge.Serializer.Json
 
             var typeSeen = false;
             var createdAtSeen = false;
+            var descriptionSeen = false;
             var listedSeen = false;
             var modifiedAtSeen = false;
             var nameSeen = false;
@@ -98,6 +99,20 @@ namespace Mycelium.Forge.Serializer.Json
                     reader.Read();
 
                     dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("description"u8))
+                {
+                    descriptionSeen = true;
+                    reader.Read();
+
+                    var descriptionScalarValue = reader.GetString();
+
+                    if (descriptionScalarValue != null)
+                    {
+                        dtoInstance.Description = descriptionScalarValue;
+                    }
 
                     continue;
                 }
@@ -256,6 +271,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the Package: {Id}", dtoInstance.Id);
+            }
+            if (!descriptionSeen)
+            {
+                logger.LogDebug("the description Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
             if (!listedSeen)
             {

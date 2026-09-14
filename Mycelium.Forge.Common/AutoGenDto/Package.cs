@@ -28,9 +28,16 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The DateTime at which the Thing has been created.
         /// </summary>
-        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         [Implements(implementation: "IThing.CreatedAt")]
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// A human readable description for the Package.
+        /// </summary>
+        [Property(xmiId: "EAID_03CDEFB7_67B8_4310_A5D7_E3FA99CBDD57", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Implements(implementation: "IPackage.Description")]
+        public string Description { get; set; }
 
         /// <summary>
         /// Total downloads across the Package, computed as the sum of downloadCount over all its
@@ -58,7 +65,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The DateTime at which the Thing was last modified.
         /// </summary>
-        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         [Implements(implementation: "IThing.ModifiedAt")]
         public DateTime ModifiedAt { get; set; }
 
@@ -68,7 +75,7 @@ namespace Mycelium.Forge.Common
         /// name, or the Forge's own instance name. Mandatory, and globally unique across every Namespace
         /// subtype.
         /// </summary>
-        [Property(xmiId: "EAID_4F9CE1B0_75B2_4f0f_96BE_251F42265A8D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_4F9CE1B0_75B2_4f0f_96BE_251F42265A8D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         [Implements(implementation: "INamespace.Name")]
         public string Name { get; set; }
 
@@ -107,7 +114,7 @@ namespace Mycelium.Forge.Common
         /// subtype, independently of name's uniqueness. Functions as the practical "handle" or "slug" used in
         /// addresses, links, and package coordinates, while name remains the display-facing label
         /// </summary>
-        [Property(xmiId: "EAID_89C8F800_EE59_4169_853B_B38E6B1857AC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_89C8F800_EE59_4169_853B_B38E6B1857AC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         [Implements(implementation: "INamespace.ShortName")]
         public string ShortName { get; set; }
 

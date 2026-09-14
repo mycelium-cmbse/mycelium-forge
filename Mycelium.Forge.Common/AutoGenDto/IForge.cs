@@ -47,7 +47,7 @@ namespace Mycelium.Forge.Common
         List<Guid> Country { get; set; }
 
         /// <summary>
-        /// A humand readable description of this instance of Forge
+        /// A human readable description of this instance of Forge
         /// </summary>
         [Property(xmiId: "EAID_1E50A5E2_E9BC_49f3_87D5_C4D92C84B0FE", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         string Description { get; set; }
@@ -69,6 +69,11 @@ namespace Mycelium.Forge.Common
         /// </summary>
         [Property(xmiId: "EAID_dst10489B_3E2E_4795_AA63_0F70D1AB3F3A", aggregation: AggregationKind.Composite, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         List<Guid> ProfileType { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [Property(xmiId: "EAID_dst13B896_A2F7_494b_8A14_ABD1D4CD5362", aggregation: AggregationKind.Composite, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        List<Guid> Tag { get; set; }
     }
 }
 

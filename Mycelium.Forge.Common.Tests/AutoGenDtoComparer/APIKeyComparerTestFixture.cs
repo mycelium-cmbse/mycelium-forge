@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="APIKeyComparerTestFixture.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -36,7 +36,6 @@ namespace Mycelium.Forge.Common.Tests.AutoGenDtoComparer
         public void VerifyCompare()
         {
             var baseDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var permissionsGuid = Guid.NewGuid();
 
             var originalApiKey = new APIKey
             {
@@ -46,7 +45,7 @@ namespace Mycelium.Forge.Common.Tests.AutoGenDtoComparer
                 LastUsedAt = baseDate.AddDays(1),
                 ModifiedAt = baseDate.AddHours(2),
                 Name = "OriginalKey",
-                Permissions = permissionsGuid,
+                Permissions = ["read", "write"],
                 RevokedAt = baseDate.AddDays(10),
                 SecretHash = [1, 2, 3]
             };
@@ -59,12 +58,10 @@ namespace Mycelium.Forge.Common.Tests.AutoGenDtoComparer
                 LastUsedAt = originalApiKey.LastUsedAt,
                 ModifiedAt = originalApiKey.ModifiedAt,
                 Name = originalApiKey.Name,
-                Permissions = originalApiKey.Permissions,
+                Permissions = ["read", "write"],
                 RevokedAt = originalApiKey.RevokedAt,
                 SecretHash = [1, 2, 3]
             };
-
-            var differentPermissionsGuid = Guid.NewGuid();
 
             var modifiedApiKey = new APIKey
             {
@@ -74,7 +71,7 @@ namespace Mycelium.Forge.Common.Tests.AutoGenDtoComparer
                 LastUsedAt = baseDate.AddDays(5),
                 ModifiedAt = baseDate.AddDays(2),
                 Name = "ModifiedKey",
-                Permissions = differentPermissionsGuid,
+                Permissions = ["read"],
                 RevokedAt = baseDate.AddDays(20),
                 SecretHash = [4, 5, 6]
             };

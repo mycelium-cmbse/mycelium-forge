@@ -114,10 +114,17 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteStringValue(iOrganization.Owner);
             writer.WriteEndObject();
             writer.WritePropertyName("primaryAddress"u8);
-            writer.WriteStartObject();
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iOrganization.PrimaryAddress);
-            writer.WriteEndObject();
+            if (iOrganization.PrimaryAddress.HasValue)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("@id"u8);
+                writer.WriteStringValue(iOrganization.PrimaryAddress.Value);
+                writer.WriteEndObject();
+            }
+            else
+            {
+                writer.WriteNullValue();
+            }
             writer.WriteStartArray("profileLink"u8);
 
             foreach (var item in iOrganization.ProfileLink)

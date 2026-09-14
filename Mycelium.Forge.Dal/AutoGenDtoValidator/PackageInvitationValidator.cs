@@ -27,7 +27,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// <summary>
     /// DTO validator class for the <see cref="PackageInvitation"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public sealed partial class PackageInvitationValidator : DtoValidatorBase<IPackageInvitation>
     {
         /// <summary>
@@ -36,7 +36,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         public PackageInvitationValidator()
         {
             this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.ExperisAt).NotEmpty();
+            this.RuleFor(x => x.ExperiesAt).NotEmpty();
             this.RuleFor(x => x.Id).NotNull();
             this.RuleFor(x => x.ModifiedAt).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();

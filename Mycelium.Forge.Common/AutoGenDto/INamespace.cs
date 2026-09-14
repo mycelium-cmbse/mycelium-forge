@@ -34,7 +34,7 @@ namespace Mycelium.Forge.Common
         /// name, or the Forge's own instance name. Mandatory, and globally unique across every Namespace
         /// subtype.
         /// </summary>
-        [Property(xmiId: "EAID_4F9CE1B0_75B2_4f0f_96BE_251F42265A8D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_4F9CE1B0_75B2_4f0f_96BE_251F42265A8D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         string Name { get; set; }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Mycelium.Forge.Common
         /// subtype, independently of name's uniqueness. Functions as the practical "handle" or "slug" used in
         /// addresses, links, and package coordinates, while name remains the display-facing label
         /// </summary>
-        [Property(xmiId: "EAID_89C8F800_EE59_4169_853B_B38E6B1857AC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_89C8F800_EE59_4169_853B_B38E6B1857AC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         string ShortName { get; set; }
     }
 }
