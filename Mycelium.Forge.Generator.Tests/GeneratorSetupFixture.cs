@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="GeneratorSetupFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -40,9 +40,7 @@ namespace Mycelium.Forge.Generator.Tests
     /// </remarks>
     public static class GeneratorSetupFixture
     {
-        private static readonly Lazy<string> LazyStagedDirectory = new(StageModelFiles);
-
-        private static readonly Lazy<string> LazyXmiFilePath = new(() => Path.Combine(LazyStagedDirectory.Value, Path.GetFileName(AssemblyMetadataXmiPath("MyceliumModelForgeXmiPath"))));
+        private static readonly Lazy<string> LazyXmiFilePath = new(StageModelFiles);
 
         private static readonly Lazy<XmiReaderResult> LazyXmiReaderResult = new(ReadModel);
 
@@ -63,7 +61,7 @@ namespace Mycelium.Forge.Generator.Tests
         /// between <c>mycelium-forge.xmi</c> and <c>mycelium-commonprimitives.xmi</c> can be resolved
         /// by the XMI reader.
         /// </summary>
-        /// <returns>The path to the staging directory.</returns>
+        /// <returns>The path to the staged <c>mycelium-forge.xmi</c> file.</returns>
         private static string StageModelFiles()
         {
             var forgeXmiPath = AssemblyMetadataXmiPath("MyceliumModelForgeXmiPath");
@@ -78,7 +76,7 @@ namespace Mycelium.Forge.Generator.Tests
             File.Copy(forgeXmiPath, stagedForge, true);
             File.Copy(commonPrimitivesXmiPath, stagedCommon, true);
 
-            return workingDirectory;
+            return stagedForge;
         }
 
         /// <summary>
@@ -89,10 +87,13 @@ namespace Mycelium.Forge.Generator.Tests
         {
             var forgeXmiPath = XmiFilePath;
 
-            // The Forge model is currently self-contained (no cross-model href/pathmap references into
-            // Mycelium.Model.CommonPrimitives), so no PathMaps entry is needed yet. Should the model
-            // start referencing shared primitives from that package, add its path here the same way
-            // SysML2.NET maps pathmap://UML_LIBRARIES/... to a local file.
+            // The Forge model references Mycelium.Model.CommonPrimitives via relative file hrefs
+            // (e.g. href="mycelium-commonprimitives.xmi#..."). In uml4net, PathMaps is only consulted
+            // for URIs with the 'pathmap://' scheme (as SysML2.NET does for pathmap://UML_LIBRARIES/...).
+            // For relative file references, uml4net resolves them strictly via LocalReferenceBasePath and
+            // ignores PathMaps. Because NuGet extracts the two packages into separate directories on disk,
+            // StageModelFiles copies them into a single temporary folder so LocalReferenceBasePath can resolve
+            // cross-model references.
             using var scope = XmiReaderBuilder.Create()
                 .UsingSettings(settings => settings.LocalReferenceBasePath = Path.GetDirectoryName(forgeXmiPath))
                 .WithLogger(NullLoggerFactory.Instance)
