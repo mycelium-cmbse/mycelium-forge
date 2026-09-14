@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreReadFilterGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -154,7 +154,6 @@ namespace Mycelium.Forge.Generator.Generators
             this.RegisterTemplate(ReadFilterClassTemplateName);
         }
 
-
         /// <summary>
         /// Queries all concrete classes deriving from Thing from the UML model.
         /// </summary>
@@ -165,7 +164,7 @@ namespace Mycelium.Forge.Generator.Generators
             ArgumentNullException.ThrowIfNull(xmiReaderResult);
 
             return QueryAllClasses(xmiReaderResult)
-                .Where(x => (x.HasThingClass() || x.IsThingClass()) && !x.IsAbstract)
+                .Where(x => x.IsConcreteThingClass())
                 .ToList();
         }
     }

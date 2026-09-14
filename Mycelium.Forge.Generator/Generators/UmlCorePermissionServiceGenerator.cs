@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCorePermissionServiceGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -394,7 +394,7 @@ namespace Mycelium.Forge.Generator.Generators
         private static List<IClass> QueryPermissionServiceClasses(XmiReaderResult xmiReaderResult)
         {
             return QueryAllClasses(xmiReaderResult)
-                .Where(x => (x.HasThingClass() || x.IsThingClass()) && !x.IsAbstract)
+                .Where(x => x.IsConcreteThingClass())
                 .ToList();
         }
 

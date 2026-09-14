@@ -162,7 +162,7 @@ namespace Mycelium.Forge.Generator.Generators
         private static List<IClass> QueryServiceClasses(XmiReaderResult xmiReaderResult)
         {
             return QueryAllClasses(xmiReaderResult)
-                .Where(x => (x.HasThingClass() || x.IsThingClass()) && !x.IsAbstract)
+                .Where(x => x.IsConcreteThingClass())
                 .ToList();
         }
 

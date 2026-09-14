@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ClassExtensionsTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -70,6 +70,29 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
                 Assert.That(GeneratorClassExtensions.IsThingClass(this.thingClass), Is.True);
                 Assert.That(GeneratorClassExtensions.IsThingClass(this.accountClass), Is.False);
                 Assert.That(GeneratorClassExtensions.IsThingClass(this.scopeClass), Is.False);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="GeneratorClassExtensions.IsConcreteThingClass" /> identifies concrete classes in the Thing hierarchy.
+        /// </summary>
+        [Test]
+        public void VerifyIsConcreteThingClass()
+        {
+            var standaloneClass = new Class { Name = "Standalone", IsAbstract = false };
+            var standaloneAbstractClass = new Class { Name = "StandaloneAbstract", IsAbstract = true };
+            var concreteThing = new Class { Name = "Thing", IsAbstract = false };
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => GeneratorClassExtensions.IsConcreteThingClass(null!), Throws.TypeOf<ArgumentNullException>());
+                Assert.That(GeneratorClassExtensions.IsConcreteThingClass(this.accountClass), Is.True);
+                Assert.That(GeneratorClassExtensions.IsConcreteThingClass(this.organizationClass), Is.True);
+                Assert.That(GeneratorClassExtensions.IsConcreteThingClass(this.scopeClass), Is.False);
+                Assert.That(GeneratorClassExtensions.IsConcreteThingClass(this.thingClass), Is.False);
+                Assert.That(GeneratorClassExtensions.IsConcreteThingClass(concreteThing), Is.True);
+                Assert.That(GeneratorClassExtensions.IsConcreteThingClass(standaloneClass), Is.False);
+                Assert.That(GeneratorClassExtensions.IsConcreteThingClass(standaloneAbstractClass), Is.False);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreJsonDtoSerializerGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Generator.Generators
 {
+    using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.HandleBarHelpers;
 
     using uml4net.Extensions;
@@ -163,7 +164,7 @@ namespace Mycelium.Forge.Generator.Generators
         {
             var template = this.Templates[DtoSerializerProviderTemplateName];
 
-            var classes = QueryAllClasses(xmiReaderResult).Where(x => !x.IsAbstract).ToList();
+            var classes = QueryAllClasses(xmiReaderResult).Where(x => x.IsConcreteThingClass()).ToList();
 
             var generatedSerializationProvider = template(classes);
 
@@ -181,7 +182,7 @@ namespace Mycelium.Forge.Generator.Generators
         {
             var template = this.Templates[DtoSerializerTemplateName];
 
-            var classes = QueryAllClasses(xmiReaderResult).Where(x => !x.IsAbstract).ToList();
+            var classes = QueryAllClasses(xmiReaderResult).Where(x => x.IsConcreteThingClass()).ToList();
 
             foreach (var @class in classes)
             {
