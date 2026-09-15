@@ -1,0 +1,79 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="AccountMenu.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<BbDropdownMenu>
+    <BbDropdownMenuTrigger id="header-account-menu-trigger"
+                           Class="focus:outline-none shrink-0 cursor-pointer">
+        <CollaboratorAvatar Name="@(this.Name)"
+                            Size="w-8 h-8"
+                            Class="hover:opacity-90 transition-opacity cursor-pointer"/>
+    </BbDropdownMenuTrigger>
+    <BbDropdownMenuContent Side="PopoverSide.Bottom"
+                           Align="PopoverAlign.End"
+                           Offset="8"
+                           Class="w-[264px] p-0 bg-card border border-border shadow-menu rounded-lg z-50 overflow-hidden flex flex-col">
+        <div class="flex items-center px-3.5 py-3 gap-2.5 w-full h-14 select-none">
+            <CollaboratorAvatar Name="@(this.Name)"
+                                Size="w-8 h-8"/>
+            <div class="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+                <span class="text-sm leading-xs font-semibold text-foreground truncate">
+                    @(this.Name)
+                </span>
+                <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
+                    @@@(this.Handle)
+                </span>
+            </div>
+        </div>
+
+        <div class="w-full h-px bg-border"></div>
+
+        <div class="p-1.5 flex flex-col gap-0 w-full">
+            <BbDropdownMenuItem id="account-menu-my-packages"
+                                Href="@PageRoutes.MyPackages"
+                                Class="flex items-center px-2.5 py-1.75 gap-2 rounded text-sm leading-xs font-normal text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                My packages
+            </BbDropdownMenuItem>
+            <BbDropdownMenuItem id="account-menu-api-keys"
+                                Href="@PageRoutes.ApiKeys"
+                                Class="flex items-center px-2.5 py-1.75 gap-2 rounded text-sm leading-xs font-normal text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                API keys
+            </BbDropdownMenuItem>
+            <BbDropdownMenuItem id="account-menu-organizations"
+                                Href="@(PageRoutes.GetOrganizationRoute(this.Organization))"
+                                Class="flex items-center px-2.5 py-1.75 gap-2 rounded text-sm leading-xs font-normal text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                Organizations
+            </BbDropdownMenuItem>
+            <BbDropdownMenuItem id="account-menu-account-settings"
+                                Href="@PageRoutes.AccountSettings"
+                                Class="flex items-center px-2.5 py-1.75 gap-2 rounded text-sm leading-xs font-normal text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                Account settings
+            </BbDropdownMenuItem>
+        </div>
+
+        <div class="w-full h-px bg-border"></div>
+
+        <div class="p-1.5 flex flex-col gap-0 w-full">
+            <BbDropdownMenuItem id="account-menu-admin"
+                                Href="@PageRoutes.Accounts"
+                                Class="flex items-center px-2.5 py-1.75 gap-2 rounded text-sm leading-xs font-normal text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                Installation administration
+            </BbDropdownMenuItem>
+        </div>
+
+        <div class="w-full h-px bg-border"></div>
+
+        <div class="p-1.5 flex flex-col gap-0 w-full">
+            <BbDropdownMenuItem id="account-menu-sign-out"
+                                Href="@PageRoutes.Login"
+                                Class="flex items-center px-2.5 py-1.75 gap-2 rounded text-sm leading-xs font-normal text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                Sign out
+            </BbDropdownMenuItem>
+        </div>
+    </BbDropdownMenuContent>
+</BbDropdownMenu>

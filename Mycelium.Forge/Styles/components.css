@@ -94,11 +94,6 @@
   color: var(--destructive);
 }
 
-.breadcrumb-nav {
-  font-size: var(--text-xs);
-  line-height: var(--leading-2xs);
-}
-
 /* Page container */
 .page-container {
   max-width: 1200px;

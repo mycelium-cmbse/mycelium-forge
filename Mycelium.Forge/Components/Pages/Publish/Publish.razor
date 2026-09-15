@@ -46,7 +46,7 @@
 </div>
 
 <div class="w-full flex flex-col lg:flex-row items-start gap-6">
-<div class="w-full lg:flex-1 p-6 rounded-lg bg-card border border-border flex flex-col gap-4">
+<ForgeCard Class="lg:flex-1 p-6 gap-4">
     <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2">
         <div class="flex items-center gap-2.5 w-full">
             <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -209,9 +209,9 @@
                      Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
         </BbFieldContent>
     </BbField>
-</div>
+</ForgeCard>
 
-<aside class="w-full lg:w-[380px] shrink-0 p-5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+<ForgeCard Class="lg:w-[380px] shrink-0 p-5 gap-3.5">
     <h2 class="text-md leading-sm font-semibold text-foreground">
         Pre-publish validation
     </h2>
@@ -276,7 +276,7 @@
                     Class="shrink-0"/>
         <span>@(this.GetPublishButtonText())</span>
     </BbButton>
-</aside>
+</ForgeCard>
 </div>
 </div>
 </div>

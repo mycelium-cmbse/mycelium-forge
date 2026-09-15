@@ -104,7 +104,6 @@ namespace Mycelium.Forge.Data
 
             StarionOrganizationModel = new OrganizationModel(
                 StarionOrganization,
-                "SG",
                 StarionOrganization.Origin,
                 true,
                 6,
@@ -113,7 +112,6 @@ namespace Mycelium.Forge.Data
 
             EsaOrganizationModel = new OrganizationModel(
                 EsaOrganization,
-                "ES",
                 EsaOrganization.Origin,
                 true,
                 4,

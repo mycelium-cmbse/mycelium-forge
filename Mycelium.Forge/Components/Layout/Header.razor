@@ -104,12 +104,7 @@
                             Class="shrink-0"/>
             </button>
 
-            <a href="@PageRoutes.AccountSettings"
-               title="Account settings">
-                <CollaboratorAvatar Initials="@(this.UserInitials)"
-                                    Size="w-8 h-8"
-                                    Class="hover:opacity-90 transition-opacity cursor-pointer"/>
-            </a>
+            <AccountMenu/>
         }
         else
         {

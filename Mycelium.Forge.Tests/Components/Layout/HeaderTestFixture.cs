@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="HeaderTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,6 +23,7 @@ namespace Mycelium.Forge.Tests.Components.Layout
     using Moq;
 
     using Mycelium.Forge.Components.Layout;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Services;
 
     [TestFixture]
@@ -53,6 +54,21 @@ namespace Mycelium.Forge.Tests.Components.Layout
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
+        }
+
+        [Test]
+        public void VerifyAccountMenu()
+        {
+            var header = this.context.Render<Header>();
+            var accountMenu = header.FindComponent<AccountMenu>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(accountMenu, Is.Not.Null);
+                Assert.That(accountMenu.Instance.Name, Is.EqualTo("Régis André"));
+                Assert.That(accountMenu.Instance.Handle, Is.EqualTo("randre"));
+                Assert.That(accountMenu.Instance.Name.GetInitials(), Is.EqualTo("RA"));
+            }
         }
 
         [Test]

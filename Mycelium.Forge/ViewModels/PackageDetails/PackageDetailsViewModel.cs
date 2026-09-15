@@ -59,8 +59,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             var maintainers = new List<PackageMaintainerModel>
             {
-                new("Starion Group", "SG", true, PackageInvitationKind.OWNER),
-                new("R. André", "RA")
+                new("Starion Group", true, PackageInvitationKind.OWNER),
+                new("R. André")
             };
 
             var tags = new List<string>

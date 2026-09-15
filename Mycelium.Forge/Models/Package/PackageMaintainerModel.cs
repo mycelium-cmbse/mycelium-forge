@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Models.Package
 {
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents a maintainer of a package, optionally wrapping their user account DTO.
@@ -28,19 +27,16 @@ namespace Mycelium.Forge.Models.Package
         /// Initializes a new instance of the <see cref="PackageMaintainerModel" /> class with specified properties.
         /// </summary>
         /// <param name="name">The maintainer display name.</param>
-        /// <param name="initials">The maintainer initials.</param>
         /// <param name="isVerified">A value indicating whether the maintainer is verified.</param>
         /// <param name="role">The maintainer role.</param>
         /// <param name="account">The optional underlying account DTO.</param>
         public PackageMaintainerModel(
             string name,
-            string initials,
             bool isVerified = false,
             PackageInvitationKind role = PackageInvitationKind.MAINTAINER,
             IAccount account = null)
         {
             this.Name = name;
-            this.Initials = initials;
             this.IsVerified = isVerified;
             this.Role = role;
             this.Account = account;
@@ -55,7 +51,6 @@ namespace Mycelium.Forge.Models.Package
         public PackageMaintainerModel(IAccount account, PackageInvitationKind role = PackageInvitationKind.MAINTAINER, bool isVerified = false)
             : this(
                 account?.Name ?? string.Empty,
-                (account?.Name).ToInitials(),
                 isVerified,
                 role,
                 account)
@@ -66,11 +61,6 @@ namespace Mycelium.Forge.Models.Package
         /// Gets or sets the maintainer display name.
         /// </summary>
         public string Name { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the maintainer initials.
-        /// </summary>
-        public string Initials { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets a value indicating whether the maintainer is verified.
