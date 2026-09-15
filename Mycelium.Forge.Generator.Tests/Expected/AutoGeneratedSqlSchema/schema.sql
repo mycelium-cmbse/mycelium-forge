@@ -211,7 +211,7 @@ ALTER TABLE "Forge"."ProfileType" SET (autovacuum_analyze_threshold = 2500);
 
 CREATE TABLE "Forge"."Scope" (
     "id" uuid NOT NULL,
-    "primaryAddress" uuid NOT NULL,
+    "primaryAddress" uuid,
     PRIMARY KEY ("id")
 );
 
@@ -522,7 +522,7 @@ CREATE OR REPLACE TRIGGER trg_namespace_on_scope_delete
 CREATE OR REPLACE FUNCTION "Forge".query_model_version()
 RETURNS text AS $$
 BEGIN
-    RETURN '0.1.0';
+    RETURN '0.5.0';
 END;
 $$ LANGUAGE plpgsql;
 

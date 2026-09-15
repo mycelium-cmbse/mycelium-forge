@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageValidatorTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -45,6 +45,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 ModifiedAt = DateTime.UtcNow,
                 Name = "TestPackage",
                 ShortName = "test-pkg",
+                Description = "A valid test package description",
                 Owner = Guid.NewGuid(),
                 PackageOwner = [Guid.NewGuid()],
                 PackageType = Guid.NewGuid(),

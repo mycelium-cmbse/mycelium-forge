@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
     /// <summary>
     /// Default permission service for <see cref="IAccount"/>.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public partial class AccountPermissionService : PermissionServiceBase<IAccount>, IAccountPermissionService
     {
         /// <summary>

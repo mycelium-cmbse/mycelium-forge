@@ -18,7 +18,7 @@ namespace Mycelium.Forge.Common
     /// <summary>
     /// Enumeration of application and domain roles in Mycelium Forge.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public enum RoleKind
     {
         /// <summary>

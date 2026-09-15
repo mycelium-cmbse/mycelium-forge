@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PropertyExtension.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -103,7 +103,7 @@ namespace Mycelium.Forge.Generator.Extensions
                 return false;
             }
 
-            if (property.Opposite == null || property.Opposite.QueryIsEnumerable())
+            if (property.Opposite == null || property.Opposite.QueryIsEnumerable() || property.Opposite.Class == null)
             {
                 return true;
             }

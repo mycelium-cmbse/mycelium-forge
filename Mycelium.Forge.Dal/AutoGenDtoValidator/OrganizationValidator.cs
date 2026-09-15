@@ -27,7 +27,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// <summary>
     /// DTO validator class for the <see cref="Organization"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public sealed partial class OrganizationValidator : DtoValidatorBase<IOrganization>
     {
         /// <summary>
@@ -45,7 +45,6 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.Name).NotEmpty();
             this.RuleFor(x => x.Origin).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
-            this.RuleFor(x => x.PrimaryAddress).NotEmpty();
             this.RuleFor(x => x.ShortName).NotEmpty();
             this.RuleFor(x => x.Status).NotNull();
             this.AddCustomValidation();

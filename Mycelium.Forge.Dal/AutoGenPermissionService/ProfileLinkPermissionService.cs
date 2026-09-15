@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
     /// <summary>
     /// Default permission service for <see cref="IProfileLink"/>.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public partial class ProfileLinkPermissionService : PermissionServiceBase<IProfileLink>, IProfileLinkPermissionService
     {
         /// <summary>

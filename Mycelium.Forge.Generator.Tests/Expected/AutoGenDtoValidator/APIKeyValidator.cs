@@ -27,7 +27,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// <summary>
     /// DTO validator class for the <see cref="APIKey"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public sealed partial class APIKeyValidator : DtoValidatorBase<IAPIKey>
     {
         /// <summary>
@@ -42,7 +42,6 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.ModifiedAt).NotEmpty();
             this.RuleFor(x => x.Name).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
-            this.RuleFor(x => x.Permissions).NotEmpty();
             this.RuleFor(x => x.RevokedAt).NotEmpty();
             this.RuleFor(x => x.SecretHash).NotEmpty();
             this.AddCustomValidation();

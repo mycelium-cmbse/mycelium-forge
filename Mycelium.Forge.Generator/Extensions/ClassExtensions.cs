@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ClassExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -61,6 +61,18 @@ namespace Mycelium.Forge.Generator.Extensions
             ArgumentNullException.ThrowIfNull(@class);
 
             return @class.Name == ModelConstants.ThingName;
+        }
+
+        /// <summary>
+        /// Checks whether the <see cref="IClass" /> is a non-abstract class that is or derives from Thing.
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> to check.</param>
+        /// <returns>A value indicating whether the class is a concrete Thing class.</returns>
+        public static bool IsConcreteThingClass(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            return (@class.HasThingClass() || @class.IsThingClass()) && !@class.IsAbstract;
         }
 
         /// <summary>

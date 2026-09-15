@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ModelConstants.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -18,5 +18,10 @@ namespace Mycelium.Forge.Generator
         /// The name of the root Thing class in the model and database schema.
         /// </summary>
         public const string ThingName = "Thing";
+
+        /// <summary>
+        /// A double newline string used to separate code blocks in generated output.
+        /// </summary>
+        public const string DoubleNewLine = "\r\n\r\n";
     }
 }

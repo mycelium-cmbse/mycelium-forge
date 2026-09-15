@@ -1,9 +1,9 @@
 // ------------------------------------------------------------------------------------------------
 // <copyright file="GeneratorSetupFixture.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,9 @@ namespace Mycelium.Forge.Generator.Tests
 
     using Microsoft.Extensions.Logging.Abstractions;
 
+    using Mycelium.Forge.Generator.Extensions;
+    using Mycelium.Forge.Generator.Generators;
+
     using uml4net.xmi;
     using uml4net.xmi.Extensions.EnterpriseArchitect.Extender;
     using uml4net.xmi.Extensions.EnterpriseArchitect.Structure.Readers;
@@ -23,21 +26,21 @@ namespace Mycelium.Forge.Generator.Tests
 
     /// <summary>
     /// Reads the Mycelium Forge XMI model once for the whole test run, via the
-    /// <c>Mycelium.Model.Forge</c> NuGet package (see <see cref="AssemblyMetadataXmiPath"/> for how the
+    /// <c>Mycelium.Model.Forge</c> NuGet package (see <see cref="AssemblyMetadataXmiPath" /> for how the
     /// package's MSBuild property reaches this running code).
     /// </summary>
     /// <remarks>
-    /// Deliberately backed by <see cref="Lazy{T}"/> rather than an NUnit <c>[OneTimeSetUp]</c>: NUnit
-    /// evaluates <c>[TestCaseSource]</c> methods (used by <see cref="AutoGenDtoIdempotencyTests"/> and
-    /// <see cref="AutoGenEnumIdempotencyTests"/> to derive their test cases from the model) at test
+    /// Deliberately backed by <see cref="Lazy{T}" /> rather than an NUnit <c>[OneTimeSetUp]</c>: NUnit
+    /// evaluates <c>[TestCaseSource]</c> methods (used by <see cref="AutoGenDtoIdempotencyTests" /> and
+    /// <see cref="AutoGenEnumIdempotencyTests" /> to derive their test cases from the model) at test
     /// *discovery* time, which runs before any <c>[SetUpFixture]</c>'s <c>[OneTimeSetUp]</c> — so a
     /// setup-fixture-populated field would still be null when those sources first run. A lazy, self
     /// -initializing static sidesteps the ordering problem entirely: whichever caller touches
-    /// <see cref="XmiReaderResult"/> first pays the one-time read cost, no matter when that happens.
+    /// <see cref="XmiReaderResult" /> first pays the one-time read cost, no matter when that happens.
     /// </remarks>
     public static class GeneratorSetupFixture
     {
-        private static readonly Lazy<string> LazyXmiFilePath = new(() => AssemblyMetadataXmiPath("MyceliumModelForgeXmiPath"));
+        private static readonly Lazy<string> LazyXmiFilePath = new(StageModelFiles);
 
         private static readonly Lazy<XmiReaderResult> LazyXmiReaderResult = new(ReadModel);
 
@@ -49,18 +52,48 @@ namespace Mycelium.Forge.Generator.Tests
 
         /// <summary>
         /// The absolute path to <c>mycelium-forge.xmi</c>, for the (rare) test that needs to re-read
-        /// the file itself rather than reuse <see cref="XmiReaderResult"/> (e.g. <see cref="HtmlReportGeneratorTestFixture"/>).
+        /// the file itself rather than reuse <see cref="XmiReaderResult" /> (e.g. <see cref="HtmlReportGeneratorTestFixture" />).
         /// </summary>
         public static string XmiFilePath => LazyXmiFilePath.Value;
 
+        /// <summary>
+        /// Stages the model files into a single temporary directory so that cross-model references
+        /// between <c>mycelium-forge.xmi</c> and <c>mycelium-commonprimitives.xmi</c> can be resolved
+        /// by the XMI reader.
+        /// </summary>
+        /// <returns>The path to the staged <c>mycelium-forge.xmi</c> file.</returns>
+        private static string StageModelFiles()
+        {
+            var forgeXmiPath = AssemblyMetadataXmiPath("MyceliumModelForgeXmiPath");
+            var commonPrimitivesXmiPath = AssemblyMetadataXmiPath("MyceliumModelCommonPrimitivesXmiPath");
+
+            var workingDirectory = Path.Combine(Path.GetTempPath(), "Mycelium_Forge_Xmi_" + Guid.NewGuid());
+            Directory.CreateDirectory(workingDirectory);
+
+            var stagedForge = Path.Combine(workingDirectory, Path.GetFileName(forgeXmiPath));
+            var stagedCommon = Path.Combine(workingDirectory, Path.GetFileName(commonPrimitivesXmiPath));
+
+            File.Copy(forgeXmiPath, stagedForge, true);
+            File.Copy(commonPrimitivesXmiPath, stagedCommon, true);
+
+            return stagedForge;
+        }
+
+        /// <summary>
+        /// Reads the Forge XMI model.
+        /// </summary>
+        /// <returns>The <see cref="XmiReaderResult" />.</returns>
         private static XmiReaderResult ReadModel()
         {
             var forgeXmiPath = XmiFilePath;
 
-            // The Forge model is currently self-contained (no cross-model href/pathmap references into
-            // Mycelium.Model.CommonPrimitives), so no PathMaps entry is needed yet. Should the model
-            // start referencing shared primitives from that package, add its path here the same way
-            // SysML2.NET maps pathmap://UML_LIBRARIES/... to a local file.
+            // The Forge model references Mycelium.Model.CommonPrimitives via relative file hrefs
+            // (e.g. href="mycelium-commonprimitives.xmi#..."). In uml4net, PathMaps is only consulted
+            // for URIs with the 'pathmap://' scheme (as SysML2.NET does for pathmap://UML_LIBRARIES/...).
+            // For relative file references, uml4net resolves them strictly via LocalReferenceBasePath and
+            // ignores PathMaps. Because NuGet extracts the two packages into separate directories on disk,
+            // StageModelFiles copies them into a single temporary folder so LocalReferenceBasePath can resolve
+            // cross-model references.
             using var scope = XmiReaderBuilder.Create()
                 .UsingSettings(settings => settings.LocalReferenceBasePath = Path.GetDirectoryName(forgeXmiPath))
                 .WithLogger(NullLoggerFactory.Instance)
@@ -69,7 +102,10 @@ namespace Mycelium.Forge.Generator.Tests
 
             var reader = scope.Build();
 
-            return reader.Read(forgeXmiPath);
+            var result = reader.Read(forgeXmiPath);
+            UmlHandleBarsGenerator.DefaultModelVersion = result.QueryModelVersion();
+
+            return result;
         }
 
         /// <summary>

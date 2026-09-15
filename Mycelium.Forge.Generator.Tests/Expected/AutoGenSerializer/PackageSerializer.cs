@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -50,6 +50,8 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WritePropertyName("createdAt"u8);
             writer.WriteStringValue(iPackage.CreatedAt);
+            writer.WritePropertyName("description"u8);
+            writer.WriteStringValue(iPackage.Description);
             writer.WritePropertyName("listed"u8);
             writer.WriteBooleanValue(iPackage.Listed);
             writer.WritePropertyName("modifiedAt"u8);

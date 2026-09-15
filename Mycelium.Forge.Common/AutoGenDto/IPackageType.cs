@@ -38,7 +38,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Human readable character string in English by which something can be referred to.
         /// </summary>
-        [Property(xmiId: "EAID_932920D8_9B6C_4e9e_B832_DEB63E72B9E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_932920D8_9B6C_4e9e_B832_DEB63E72B9E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         string Name { get; set; }
 
         /// <summary>

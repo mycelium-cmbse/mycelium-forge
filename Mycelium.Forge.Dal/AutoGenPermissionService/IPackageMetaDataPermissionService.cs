@@ -21,7 +21,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
     /// <summary>
     /// Defines permission validation operations for <see cref="IPackageMetaData"/> instances.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public partial interface IPackageMetaDataPermissionService : IPermissionService<IPackageMetaData>
     {
     }

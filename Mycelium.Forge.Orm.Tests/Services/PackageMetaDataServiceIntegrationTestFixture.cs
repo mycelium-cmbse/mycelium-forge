@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageMetaDataServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -442,6 +442,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 Id = publicPackageId,
                 Name = "PublicPackage",
                 ShortName = "public-pkg",
+                Description = "Public package description",
                 Owner = owningOrgId,
                 PackageOwner = [orgAdminId],
                 PackageType = packageTypeId,
@@ -456,6 +457,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 Id = internalPackageId,
                 Name = "InternalPackage",
                 ShortName = "internal-pkg",
+                Description = "Internal package description",
                 Owner = owningOrgId,
                 PackageOwner = [orgAdminId],
                 PackageType = packageTypeId,
@@ -470,6 +472,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 Id = privatePackageId,
                 Name = "PrivatePackage",
                 ShortName = "private-pkg",
+                Description = "Private package description",
                 Owner = owningOrgId,
                 PackageOwner = [orgAdminId],
                 PackageType = packageTypeId,

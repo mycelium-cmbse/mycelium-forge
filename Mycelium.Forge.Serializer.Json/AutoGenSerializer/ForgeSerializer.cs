@@ -124,6 +124,17 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteEndArray();
             writer.WritePropertyName("shortName"u8);
             writer.WriteStringValue(iForge.ShortName);
+            writer.WriteStartArray("tag"u8);
+
+            foreach (var item in iForge.Tag)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("@id"u8);
+                writer.WriteStringValue(item);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
 
             writer.WriteEndObject();
         }

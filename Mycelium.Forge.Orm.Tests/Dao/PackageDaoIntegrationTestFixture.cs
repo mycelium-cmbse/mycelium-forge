@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDaoIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -50,6 +50,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Id = packageId,
                 Name = "TestPackageCreate",
                 ShortName = "test-pkg-create",
+                Description = "Test package create description",
                 Owner = this.accountId,
                 PackageType = this.packageTypeId,
                 Listed = true,
@@ -96,6 +97,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Id = packageId,
                 Name = "TestPackageDelete",
                 ShortName = "test-pkg-delete",
+                Description = "Test package delete description",
                 Owner = this.accountId,
                 PackageType = this.packageTypeId,
                 Listed = true,
@@ -134,6 +136,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Id = packageId,
                 Name = "TestPackageRead",
                 ShortName = "test-pkg-read",
+                Description = "Test package read description",
                 Owner = this.accountId,
                 PackageType = this.packageTypeId,
                 Listed = true,
@@ -149,6 +152,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Id = org1PackageId,
                 Name = "Org1InternalPackage",
                 ShortName = "org1-internal-pkg",
+                Description = "Org1 internal package description",
                 Owner = this.org1Id,
                 PackageType = this.packageTypeId,
                 Listed = true,
@@ -210,6 +214,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Id = packageId,
                 Name = "TestPackageIdentifiers",
                 ShortName = "test-pkg-identifiers",
+                Description = "Test package identifiers description",
                 Owner = this.accountId,
                 PackageType = this.packageTypeId,
                 Listed = true,
@@ -239,6 +244,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Id = packageId,
                 Name = "InitialPackageName",
                 ShortName = "initial-pkg-name",
+                Description = "Initial package description",
                 Owner = this.accountId,
                 PackageType = this.packageTypeId,
                 Listed = false,

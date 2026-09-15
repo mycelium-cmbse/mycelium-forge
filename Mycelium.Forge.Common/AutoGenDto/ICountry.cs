@@ -43,7 +43,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The country's full official name (e.g. "The Neterlands"), used for display purposes.
         /// </summary>
-        [Property(xmiId: "EAID_1C566C14_B1D0_4046_A2B0_78434ACD1F62", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_1C566C14_B1D0_4046_A2B0_78434ACD1F62", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         string Name { get; set; }
 
         /// <summary>

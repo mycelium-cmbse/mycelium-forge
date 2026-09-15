@@ -50,8 +50,8 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WritePropertyName("createdAt"u8);
             writer.WriteStringValue(iOrganizationInvitation.CreatedAt);
-            writer.WritePropertyName("experisAt"u8);
-            writer.WriteStringValue(iOrganizationInvitation.ExperisAt);
+            writer.WritePropertyName("experiesAt"u8);
+            writer.WriteStringValue(iOrganizationInvitation.ExperiesAt);
             writer.WritePropertyName("modifiedAt"u8);
             writer.WriteStringValue(iOrganizationInvitation.ModifiedAt);
             writer.WritePropertyName("organization"u8);

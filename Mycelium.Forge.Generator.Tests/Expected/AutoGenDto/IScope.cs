@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IScope.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -48,7 +48,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The email address where the Scope can be reached for anything unrelated to billing.
         /// </summary>
-        [Property(xmiId: "EAID_A3370745_185E_4a8b_BF80_3C9CE8B4B7CE", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_A3370745_185E_4a8b_BF80_3C9CE8B4B7CE", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
         string Email { get; set; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Mycelium.Forge.Common
         /// another location. When the value states  "local", then it is local to the current Forge instance,
         /// otherwise the value needs to be a URI pointing to the location it was proxied from.
         /// </summary>
-        [Property(xmiId: "EAID_3A696494_7AB4_4608_95BD_E60428D81D1B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_3A696494_7AB4_4608_95BD_E60428D81D1B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: "local")]
         string Origin { get; set; }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The primary address of the Scope
         /// </summary>
-        [Property(xmiId: "EAID_dst26755C_2E18_40f0_ABC3_15487E120A45", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_dst26755C_2E18_40f0_ABC3_15487E120A45", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
         [SubsettedProperty(propertyName: "EAID_dst71ABB8_0FA0_4c8c_BB03_2A1FCAD7F07E")]
-        Guid PrimaryAddress { get; set; }
+        Guid? PrimaryAddress { get; set; }
 
         /// <summary>
         /// The ProfileLinks that are owned by the Scope
@@ -83,7 +83,7 @@ namespace Mycelium.Forge.Common
         /// anymore. When the scope is an Organization, packages can no longer be published or uploaded, nor any
         /// PackageVersions
         /// </summary>
-        [Property(xmiId: "EAID_98A41878_8269_4533_A0B2_0F3F7989F334", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: "ACTIVE")]
+        [Property(xmiId: "EAID_98A41878_8269_4533_A0B2_0F3F7989F334", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: "ACTIVE")]
         ScopeStatusKind Status { get; set; }
 
         /// <summary>

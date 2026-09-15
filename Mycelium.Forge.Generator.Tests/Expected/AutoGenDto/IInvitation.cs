@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IInvitation.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Common
         /// The DateTime at which the Invitation expires.
         /// </summary>
         [Property(xmiId: "EAID_E3F82141_2DBE_4300_B7D9_A82A0816AFB2", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
-        DateTime ExperisAt { get; set; }
+        DateTime ExperiesAt { get; set; }
 
         /// <summary>
         /// A derived Boolean indicating whether an Invitation is past its usable window; true when the current

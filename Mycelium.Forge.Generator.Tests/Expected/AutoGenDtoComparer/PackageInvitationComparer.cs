@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageInvitationComparer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IPackageInvitation"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "1.0.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
     public partial class PackageInvitationComparer : IDtoComparer<IPackageInvitation>
     {
         /// <summary>
@@ -49,9 +49,9 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(IPackageInvitation.CreatedAt), oldDto.CreatedAt, newDto.CreatedAt));
             }
 
-            if (oldDto.ExperisAt != newDto.ExperisAt)
+            if (oldDto.ExperiesAt != newDto.ExperiesAt)
             {
-                changes.Add(new PropertyChange(nameof(IPackageInvitation.ExperisAt), oldDto.ExperisAt, newDto.ExperisAt));
+                changes.Add(new PropertyChange(nameof(IPackageInvitation.ExperiesAt), oldDto.ExperiesAt, newDto.ExperiesAt));
             }
 
             if (oldDto.isExpired != newDto.isExpired)
