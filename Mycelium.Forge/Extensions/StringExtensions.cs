@@ -40,14 +40,25 @@ namespace Mycelium.Forge.Extensions
             /// Computes the uppercase initials from a string of words separated by whitespace.
             /// </summary>
             /// <returns>
-            /// The uppercase initials extracted from the first character of each word, or an empty string if the input is
-            /// null or whitespace.
+            /// The uppercase initials extracted from the words, or an empty string if the input is null or whitespace.
             /// </returns>
-            public string ToInitials()
+            public string GetInitials()
             {
-                return string.IsNullOrWhiteSpace(value)
-                    ? string.Empty
-                    : string.Concat(value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(word => word[0])).ToUpperInvariant();
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return string.Empty;
+                }
+
+                var parts = value.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length == 1)
+                {
+                    return parts[0].Length >= 2
+                        ? parts[0][..2].ToUpperInvariant()
+                        : parts[0].ToUpperInvariant();
+                }
+
+                return $"{parts[0][0]}{parts[^1][0]}".ToUpperInvariant();
             }
         }
     }

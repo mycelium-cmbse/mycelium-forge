@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Models.Admin
 {
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents an account entry displayed in the administrator accounts table wrapping the account DTO.
@@ -90,10 +89,5 @@ namespace Mycelium.Forge.Models.Admin
         /// Gets the email address from the account DTO.
         /// </summary>
         public string Email => this.Account?.Email ?? string.Empty;
-
-        /// <summary>
-        /// Gets the uppercase initials extracted from the account name.
-        /// </summary>
-        public string Initials => (this.Account?.Name).ToInitials();
     }
 }

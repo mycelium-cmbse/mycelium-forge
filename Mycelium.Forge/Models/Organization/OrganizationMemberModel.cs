@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Models.Organization
 {
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents a member within an organization team wrapping their user account DTO.
@@ -54,10 +53,5 @@ namespace Mycelium.Forge.Models.Organization
         /// Gets the formatted handle with leading at-symbol.
         /// </summary>
         public string Username => this.Account != null ? $"@{this.Account.ShortName}" : string.Empty;
-
-        /// <summary>
-        /// Gets the uppercase initials extracted from the account name.
-        /// </summary>
-        public string Initials => (this.Account?.Name).ToInitials();
     }
 }

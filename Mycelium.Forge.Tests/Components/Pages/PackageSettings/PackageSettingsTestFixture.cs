@@ -53,7 +53,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Maintainers =
                 [
-                    new PackageMaintainerModel("Alex Rivera", "AR")
+                    new PackageMaintainerModel("Alex Rivera")
                 ],
                 Versions =
                 [
@@ -130,7 +130,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Maintainers =
                 [
-                    new PackageMaintainerModel("Alex Rivera", "AR") { IsVerified = true }
+                    new PackageMaintainerModel("Alex Rivera") { IsVerified = true }
                 ],
                 Versions =
                 [

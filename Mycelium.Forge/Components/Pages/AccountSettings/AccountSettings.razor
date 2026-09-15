@@ -19,7 +19,7 @@
 
 <div class="w-full bg-background min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-<ForgeBreadcrumb Items="@(GetBreadcrumbItems())" />
+<ForgeBreadcrumb Items="@(GetBreadcrumbItems())"/>
 
 <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
     Account settings
@@ -182,12 +182,12 @@
             <div @key="organization.Scope"
                  class="flex items-center gap-3 py-2.25 w-full">
                 <CollaboratorAvatar Name="@(organization.Name)"
-                                    Initials="@(organization.Initials)"
-                                    Size="w-7 h-7" />
+                                    Size="w-7 h-7"/>
 
-                <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
+                <a href="@(PageRoutes.GetOrganizationSettingsRoute(organization.Scope))"
+                   class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
                     @(organization.Scope)
-                </span>
+                </a>
 
                 <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
                     @(organization.Name)

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -41,11 +41,6 @@ namespace Mycelium.Forge.Components.Layout
         /// Gets or sets a value indicating whether the current user is logged in.
         /// </summary>
         public bool IsLoggedIn { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets the initials displayed in the user avatar when logged in.
-        /// </summary>
-        public string UserInitials { get; set; } = "RA";
 
         /// <summary>
         /// Gets or sets the bound search query value in the header search input.

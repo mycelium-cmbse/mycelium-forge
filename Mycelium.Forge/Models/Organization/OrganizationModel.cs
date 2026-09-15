@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Models.Organization
 {
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents an organization presentation model wrapping the organization DTO and exposing computed attributes.
@@ -28,7 +27,6 @@ namespace Mycelium.Forge.Models.Organization
         /// Initializes a new instance of the <see cref="OrganizationModel" /> class with specified properties.
         /// </summary>
         /// <param name="organization">The underlying organization DTO.</param>
-        /// <param name="initials">The short abbreviation or initials.</param>
         /// <param name="description">The organization description text.</param>
         /// <param name="isVerified">A value indicating whether the organization publisher is verified.</param>
         /// <param name="packageCount">The number of published packages.</param>
@@ -36,7 +34,6 @@ namespace Mycelium.Forge.Models.Organization
         /// <param name="importCount">The total import count across packages.</param>
         public OrganizationModel(
             IOrganization organization,
-            string initials = "",
             string description = "",
             bool isVerified = true,
             int packageCount = 0,
@@ -44,10 +41,6 @@ namespace Mycelium.Forge.Models.Organization
             int importCount = 0)
         {
             this.Organization = organization;
-
-            this.Initials = !string.IsNullOrEmpty(initials)
-                ? initials
-                : (organization?.Name).ToInitials();
 
             this.Description = !string.IsNullOrEmpty(description)
                 ? description
@@ -73,11 +66,6 @@ namespace Mycelium.Forge.Models.Organization
         /// Gets the scope namespace identifier (e.g., @starion) computed from the short name.
         /// </summary>
         public string Scope => this.Organization != null ? $"@{this.Organization.ShortName}" : string.Empty;
-
-        /// <summary>
-        /// Gets or sets the short abbreviation or initials.
-        /// </summary>
-        public string Initials { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the organization description text.

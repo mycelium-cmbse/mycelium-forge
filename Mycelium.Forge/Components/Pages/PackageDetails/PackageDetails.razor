@@ -1,4 +1,5 @@
-﻿@* ------------------------------------------------------------------------------------------------
+﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageDetails.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -6,8 +7,6 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
-
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @attribute [Route(PageRoutes.Package)]
 @rendermode InteractiveServer
 
@@ -21,7 +20,7 @@
 <div class="w-full bg-background min-h-screen select-none">
 <header class="w-full bg-card border-b border-border py-7">
     <div class="page-container flex flex-col gap-3.5">
-        <ForgeBreadcrumb Items="@(this.GetBreadcrumbItems())" />
+        <ForgeBreadcrumb Items="@(this.GetBreadcrumbItems())"/>
 
         <div class="flex flex-wrap items-center gap-2.5 w-full">
             <LucideIcon Name="box"
@@ -80,6 +79,15 @@
                                 Size="15"
                                 Class="shrink-0"/>
                     <span>Migrate in Bloom</span>
+                </BbButton>
+
+                <BbButton id="package-details-settings-button"
+                          Variant="ButtonVariant.Outline"
+                          Href="@(PageRoutes.GetPackageSettingsRoute(this.ViewModel.Package.Package.Publisher, this.ViewModel.Package.Package.Package.ShortName))">
+                    <LucideIcon Name="settings"
+                                Size="15"
+                                Class="shrink-0"/>
+                    <span>Settings</span>
                 </BbButton>
             }
 
@@ -277,7 +285,6 @@
                     <div @key="maintainer.Name"
                          class="flex items-center gap-2 h-6.5">
                         <CollaboratorAvatar Name="@(maintainer.Name)"
-                                            Initials="@(maintainer.Initials)"
                                             Size="w-6.5 h-6.5"/>
                         <span class="text-xs leading-2xs font-medium text-foreground flex-1 truncate">
                             @(maintainer.Name)

@@ -1,4 +1,5 @@
-﻿@* ------------------------------------------------------------------------------------------------
+﻿@using Mycelium.Forge.Models.Admin
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Accounts.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -6,8 +7,6 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
-
-@using Mycelium.Forge.Models.Admin
 @attribute [Route(PageRoutes.Accounts)]
 @rendermode InteractiveServer
 
@@ -15,7 +14,7 @@
 
 <div class="w-full bg-background min-h-screen py-9 select-none">
     <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-        <ForgeBreadcrumb Items="@(GetBreadcrumbItems())" />
+        <ForgeBreadcrumb Items="@(GetBreadcrumbItems())"/>
 
         <div class="flex flex-row items-center justify-between gap-3 w-full h-8">
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight flex-1 truncate">
@@ -108,8 +107,7 @@
                                                                          Class="flex items-center px-4 py-3 bg-card hover:bg-muted/50 transition-colors gap-3">
                                 <BlazorBlueprint.Primitives.Table.BbTableCell Class="flex-[2] min-w-0 flex items-center gap-2.5 p-0">
                                     <CollaboratorAvatar Name="@(account.Name)"
-                                                        Initials="@(account.Initials)"
-                                                        Size="w-7 h-7" />
+                                                        Size="w-7 h-7"/>
 
                                     <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
                                         <div class="flex items-center gap-1.5 min-w-0">
@@ -169,7 +167,7 @@
                                     else
                                     {
                                         <ForgeBadge Text="@(account.Status.ToString())"
-                                                    Class="badge-lifecycle-archived" />
+                                                    Class="badge-lifecycle-archived"/>
                                     }
                                 </BlazorBlueprint.Primitives.Table.BbTableCell>
 
