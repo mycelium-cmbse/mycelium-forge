@@ -19,48 +19,13 @@
 
 <div class="w-full bg-background min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-<BbBreadcrumb Class="text-xs leading-2xs">
-    <BbBreadcrumbList>
-        <BbBreadcrumbItem>
-            <BbBreadcrumbLink Href="@PageRoutes.Packages"
-                              Class="text-primary hover:underline font-normal">
-                Browse
-            </BbBreadcrumbLink>
-        </BbBreadcrumbItem>
-        <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-            /
-        </BbBreadcrumbSeparator>
-        <BbBreadcrumbItem>
-            <BbBreadcrumbLink Href="@(PageRoutes.GetOrganizationRoute(this.ViewModel.Package.Publisher))"
-                              Class="text-primary hover:underline font-normal">
-                @(this.ViewModel.Package.Publisher)
-            </BbBreadcrumbLink>
-        </BbBreadcrumbItem>
-        <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-            /
-        </BbBreadcrumbSeparator>
-        <BbBreadcrumbItem>
-            <BbBreadcrumbLink Href="@(PageRoutes.GetPackageRoute(this.ViewModel.Package.Publisher, this.ViewModel.Package.Name))"
-                              Class="text-primary hover:underline font-normal">
-                @(this.ViewModel.Package.Name)
-            </BbBreadcrumbLink>
-        </BbBreadcrumbItem>
-        <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-            /
-        </BbBreadcrumbSeparator>
-        <BbBreadcrumbItem>
-            <BbBreadcrumbPage Class="text-muted-foreground font-normal">
-                Settings
-            </BbBreadcrumbPage>
-        </BbBreadcrumbItem>
-    </BbBreadcrumbList>
-</BbBreadcrumb>
+<ForgeBreadcrumb Items="@(this.GetBreadcrumbItems())" />
 
 <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
     @(this.ViewModel.Package.Publisher)/@(this.ViewModel.Package.Name)
 </h1>
 
-<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+<ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
     <div class="flex items-center justify-between gap-2 w-full h-7.5">
         <h2 class="text-lg leading-lg font-semibold text-foreground flex-1">
             Maintainers
@@ -120,7 +85,7 @@
     <p class="text-xs leading-2xs text-muted-foreground w-full">
         Every package must keep at least one individual-account Owner. Transfer ownership before removing the last one.
     </p>
-</div>
+</ForgeCard>
 
 <div class="w-full p-5 sm:px-5.5 rounded-xl bg-card border border-border flex flex-col gap-3.5">
     <div class="flex items-center gap-2.5 w-full">
@@ -212,7 +177,7 @@
     </p>
 </div>
 
-<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+<ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
     <div class="flex items-center gap-2 w-full">
         <h2 class="text-lg leading-lg font-semibold text-foreground flex-1">
             Versions
@@ -281,7 +246,7 @@
             </div>
         }
     </div>
-</div>
+</ForgeCard>
 
 <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-destructive flex flex-col gap-3.5">
     <h2 class="text-lg leading-lg font-semibold text-destructive">

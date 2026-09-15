@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="AccountSettings.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -19,29 +19,13 @@
 
 <div class="w-full bg-background min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-<BbBreadcrumb Class="breadcrumb-nav">
-    <BbBreadcrumbList>
-        <BbBreadcrumbItem>
-            <BbBreadcrumbLink Class="text-muted-foreground font-normal">
-                Account
-            </BbBreadcrumbLink>
-        </BbBreadcrumbItem>
-        <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-            /
-        </BbBreadcrumbSeparator>
-        <BbBreadcrumbItem>
-            <BbBreadcrumbPage Class="text-muted-foreground font-normal">
-                Settings
-            </BbBreadcrumbPage>
-        </BbBreadcrumbItem>
-    </BbBreadcrumbList>
-</BbBreadcrumb>
+<ForgeBreadcrumb Items="@(GetBreadcrumbItems())" />
 
 <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
     Account settings
 </h1>
 
-<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+<ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
     <div class="flex items-center gap-2.5 w-full">
         <span class="section-label">
             PROFILE
@@ -175,9 +159,9 @@
             </BbButton>
         </div>
     </div>
-</div>
+</ForgeCard>
 
-<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+<ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
     <div class="flex items-center justify-between gap-2 w-full h-8">
         <span class="section-label flex-1">
             ORGANIZATIONS
@@ -219,9 +203,9 @@
 
     <ForgeAlert Variant="ForgeAlertVariant.Default"
                 Description="An Organization controls who belongs to it, not whether your Account exists. Leaving an Organization never deletes your Account."/>
-</div>
+</ForgeCard>
 
-<div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+<ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
     <h2 class="text-md leading-sm font-semibold text-foreground">
         Danger zone
     </h2>
@@ -265,6 +249,6 @@
             Delete
         </BbButton>
     </div>
-</div>
+</ForgeCard>
 </div>
 </div>

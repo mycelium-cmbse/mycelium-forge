@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
@@ -131,6 +132,36 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
             base.OnParametersSet();
 
             this.ViewModel.InitializeViewModel(this.PackageName, this.Organization);
+        }
+
+        /// <summary>
+        /// Gets the breadcrumb navigation items for the package settings page.
+        /// </summary>
+        /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
+        private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        {
+            return
+            [
+                new BreadcrumbItem
+                {
+                    Name = "Browse",
+                    Link = PageRoutes.Packages
+                },
+                new BreadcrumbItem
+                {
+                    Name = this.ViewModel.Package.Publisher,
+                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Package.Publisher)
+                },
+                new BreadcrumbItem
+                {
+                    Name = this.ViewModel.Package.Name,
+                    Link = PageRoutes.GetPackageRoute(this.ViewModel.Package.Publisher, this.ViewModel.Package.Name)
+                },
+                new BreadcrumbItem
+                {
+                    Name = "Settings"
+                }
+            ];
         }
     }
 }
