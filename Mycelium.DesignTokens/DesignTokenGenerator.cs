@@ -65,9 +65,14 @@ namespace Mycelium.DesignTokens
             {
                 process.Start();
 
-                var standardOutput = await process.StandardOutput.ReadToEndAsync(timeoutCancellationTokenSource.Token);
-                var standardError = await process.StandardError.ReadToEndAsync(timeoutCancellationTokenSource.Token);
+                var standardOutputTask = process.StandardOutput.ReadToEndAsync(timeoutCancellationTokenSource.Token);
+                var standardErrorTask = process.StandardError.ReadToEndAsync(timeoutCancellationTokenSource.Token);
+
+                var outputResults = await Task.WhenAll(standardOutputTask, standardErrorTask);
                 await process.WaitForExitAsync(timeoutCancellationTokenSource.Token);
+
+                var standardOutput = outputResults[0];
+                var standardError = outputResults[1];
 
                 return new DesignTokenResult
                 {
