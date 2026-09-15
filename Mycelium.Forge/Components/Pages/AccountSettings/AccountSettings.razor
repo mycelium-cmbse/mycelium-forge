@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="AccountSettings.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -17,9 +17,9 @@
 
 <PageTitle>Account Settings &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-body-bg min-h-screen py-9 select-none">
+<div class="w-full bg-background min-h-screen py-9 select-none">
 <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-<BbBreadcrumb Class="text-xs leading-2xs">
+<BbBreadcrumb Class="breadcrumb-nav">
     <BbBreadcrumbList>
         <BbBreadcrumbItem>
             <BbBreadcrumbLink Class="text-muted-foreground font-normal">
@@ -43,7 +43,7 @@
 
 <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
     <div class="flex items-center gap-2.5 w-full">
-        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <span class="section-label">
             PROFILE
         </span>
     </div>
@@ -76,7 +76,7 @@
             @if (this.ViewModel.Profile.IsEmailVerified)
             {
                 <BbBadge Variant="BadgeVariant.Secondary"
-                         Class="badge-role text-success-icon">
+                         Class="badge-role text-success-vivid">
                     Verified
                 </BbBadge>
             }
@@ -134,7 +134,7 @@
             <BbButton id="account-settings-edit-location-button"
                       Variant="ButtonVariant.Outline"
                       Size="ButtonSize.Small"
-                              TyForgeSelect.razor.cspe="ButtonType.Button"
+                      Type="ButtonType.Button"
                       OnClick="@(this.OnEditLocation)"
                       Class="button-sm">
                 Edit
@@ -179,7 +179,7 @@
 
 <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
     <div class="flex items-center justify-between gap-2 w-full h-8">
-        <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
+        <span class="section-label flex-1">
             ORGANIZATIONS
         </span>
         <BbButton id="account-settings-transfer-org-button"
@@ -197,9 +197,9 @@
         {
             <div @key="organization.Scope"
                  class="flex items-center gap-3 py-2.25 w-full">
-                <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-2xs leading-3xs font-semibold @(organization.IsAdministrator ? "bg-primary" : "bg-org-member-alt-avatar-bg")">
-                    @(organization.Initials)
-                </div>
+                <CollaboratorAvatar Name="@(organization.Name)"
+                                    Initials="@(organization.Initials)"
+                                    Size="w-7 h-7" />
 
                 <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
                     @(organization.Scope)

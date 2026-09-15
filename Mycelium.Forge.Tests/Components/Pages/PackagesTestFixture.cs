@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagesTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -178,7 +178,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             {
                 Assert.That(label, Is.EqualTo("Alphabetical"));
                 Assert.That(activeClass, Does.Contain("font-medium text-foreground"));
-                Assert.That(inactiveClass, Does.Contain("font-normal text-secondary-text"));
+                Assert.That(inactiveClass, Does.Contain("font-normal text-foreground-muted"));
             }
         }
     }

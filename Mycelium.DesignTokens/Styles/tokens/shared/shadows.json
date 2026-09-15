@@ -1,0 +1,322 @@
+{
+  "shadow": {
+    "xs": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0.06,
+            0.09,
+            0.16
+          ],
+          "alpha": 0.05
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 1,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 3,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Hairline lift. Segmented controls, small toggles.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:36272540740e04d1e45f2f8c29349ddc3d729c44,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    },
+    "md": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0.06,
+            0.09,
+            0.16
+          ],
+          "alpha": 0.06
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 2,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 8,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Card elevation. The default panel and card shadow.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:62bb472483481b2bdae7d103318825472c20d48c,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    },
+    "lg": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0.06,
+            0.09,
+            0.16
+          ],
+          "alpha": 0.06
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 4,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 16,
+          "unit": "px"
+        },
+        "spread": {
+          "value": -2,
+          "unit": "px"
+        }
+      },
+      "$description": "Sticky or primary card. One step above shadow/md.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:a1084868e02c856bfdff3a9a2296ae1b44427ccf,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    },
+    "menu": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1,
+            0.12,
+            0.16
+          ],
+          "alpha": 0.14
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 6,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 18,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Menus, dropdowns, context menus, popovers anchored to a trigger.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:56e1b5fa6d742783947137e016ddb162ba29aa5e,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    },
+    "popover": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0.06,
+            0.09,
+            0.16
+          ],
+          "alpha": 0.12
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 8,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 26,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Floating panel above the page, larger than a menu.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:632fbcb19ef2221458ffd03b3639386f1b7fb8d6,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    },
+    "modal": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.18
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 12,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 32,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Modal dialogs centred over a dim backdrop.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:e535fa84b048357f29985137d2842098016970d7,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    },
+    "overlay": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.2
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 16,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 48,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Full-screen overlays and the command palette.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:2880db78dc7ef3da783f735bfaf3e6a271f0ecab,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    },
+    "sm": {
+      "$type": "shadow",
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0.06,
+            0.09,
+            0.16
+          ],
+          "alpha": 0.12
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 1,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 2,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Raised control. Active segment of a segmented control.",
+      "$extensions": {
+        "figma": {
+          "styleId": "S:8f7952c28abad8716c7cffc1405aec90d909550c,",
+          "effectTypes": [
+            "DROP_SHADOW"
+          ]
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "generator": {
+      "name": "Token Press",
+      "version": "3.0.0"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="MigrateInBloomDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -12,7 +12,7 @@
         <BbField Class="w-full flex flex-col gap-1.5"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.SelectedProject)))">
             <BbFieldLabel For="migrate-in-bloom-project-select"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 PROJECT
             </BbFieldLabel>
             <BbFieldContent>
@@ -22,14 +22,14 @@
                              Items="@(this.Projects)"
                              Id="migrate-in-bloom-project-select"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.SelectedProject)])"/>
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-1.5"
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.VersionConstraint)))">
             <BbFieldLabel For="migrate-in-bloom-version-constraint"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Class="form-field-label">
                 VERSION CONSTRAINT
             </BbFieldLabel>
             <BbFieldContent>
@@ -38,7 +38,7 @@
                          ValueChanged="@(this.OnVersionConstraintChanged)"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
-            <BbFieldError Class="text-2xs leading-3xs text-destructive"
+            <BbFieldError Class="form-field-error"
                           Errors="@(this.ValidationManager[nameof(this.VersionConstraint)])"/>
         </BbField>
 
