@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Dal", "Mycel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Dal.Tests", "Mycelium.Forge.Dal.Tests\Mycelium.Forge.Dal.Tests.csproj", "{3FFB9AD6-BC53-4B5F-A00A-07F2AD7B59DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.DesignTokens", "Mycelium.DesignTokens\Mycelium.DesignTokens.csproj", "{8AAD152F-C597-4794-8B32-DD8EB9E0891D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -223,6 +225,18 @@ Global
 		{3FFB9AD6-BC53-4B5F-A00A-07F2AD7B59DB}.Release|x64.Build.0 = Release|Any CPU
 		{3FFB9AD6-BC53-4B5F-A00A-07F2AD7B59DB}.Release|x86.ActiveCfg = Release|Any CPU
 		{3FFB9AD6-BC53-4B5F-A00A-07F2AD7B59DB}.Release|x86.Build.0 = Release|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Debug|x64.Build.0 = Debug|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Debug|x86.Build.0 = Debug|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|x64.ActiveCfg = Release|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|x64.Build.0 = Release|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|x86.ActiveCfg = Release|Any CPU
+		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,7 +21,7 @@ namespace Mycelium.Forge.Components.Pages.Documentation
         /// <summary>
         /// The base CSS class applied to all sidebar navigation items.
         /// </summary>
-        private const string BaseNavItemClass = "flex items-center px-3 h-7 rounded-md text-sm leading-xs transition-colors";
+        private const string BaseNavItemClass = "sidebar-nav-item";
 
         /// <summary>
         /// Gets or sets the collection of documentation navigation groups to render.
@@ -43,7 +43,7 @@ namespace Mycelium.Forge.Components.Pages.Documentation
 
             return item.IsActive
                 ? $"{BaseNavItemClass} bg-primary-subtle text-primary font-medium"
-                : $"{BaseNavItemClass} text-secondary-text hover:text-foreground hover:bg-muted font-normal";
+                : $"{BaseNavItemClass} text-foreground-muted hover:text-foreground hover:bg-muted font-normal";
         }
     }
 }

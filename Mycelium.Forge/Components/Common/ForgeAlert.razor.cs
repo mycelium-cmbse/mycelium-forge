@@ -78,12 +78,12 @@ namespace Mycelium.Forge.Components.Common
         {
             return this.Variant switch
             {
-                ForgeAlertVariant.Info => "bg-info border-info-border text-info-foreground",
-                ForgeAlertVariant.Success => "bg-success border-success-border text-success-foreground",
-                ForgeAlertVariant.Warning => "bg-warning border-warning-border text-warning-foreground",
-                ForgeAlertVariant.Danger => "bg-destructive/10 border-destructive/20 text-destructive",
-                ForgeAlertVariant.Secondary => "bg-muted border-border text-secondary-text",
-                _ => "bg-body-bg border-border text-foreground"
+                ForgeAlertVariant.Info => "bg-docs-callout-note-bg border-docs-callout-note-border text-foreground",
+                ForgeAlertVariant.Success => "bg-docs-callout-tip-bg border-docs-callout-tip-border text-foreground",
+                ForgeAlertVariant.Warning => "bg-docs-callout-warning-bg border-docs-callout-warning-border text-foreground",
+                ForgeAlertVariant.Danger => "bg-docs-callout-danger-bg border-docs-callout-danger-border text-foreground",
+                ForgeAlertVariant.Secondary => "bg-muted border-border text-foreground-muted",
+                _ => "bg-background border-border text-foreground"
             };
         }
 
@@ -95,9 +95,9 @@ namespace Mycelium.Forge.Components.Common
         {
             return this.Variant switch
             {
-                ForgeAlertVariant.Info => "text-info-icon shrink-0",
-                ForgeAlertVariant.Success => "text-success-icon shrink-0",
-                ForgeAlertVariant.Warning => "text-warning-icon shrink-0",
+                ForgeAlertVariant.Info => "text-info-strong shrink-0",
+                ForgeAlertVariant.Success => "text-success-vivid shrink-0",
+                ForgeAlertVariant.Warning => "text-warning-vivid shrink-0",
                 ForgeAlertVariant.Danger => "text-destructive shrink-0",
                 _ => "text-muted-foreground shrink-0"
             };

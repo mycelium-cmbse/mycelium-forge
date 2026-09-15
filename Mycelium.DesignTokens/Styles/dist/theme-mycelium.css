@@ -1,0 +1,326 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ * theme-mycelium.css
+ */
+
+@theme inline {
+  --spacing-0\.25: var(--spacing-1); /** Scale step derived from real usage in the prototypes. */
+  --spacing-0\.5: var(--spacing-2); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-0\.75: var(--spacing-3); /** Scale step derived from real usage in the prototypes. */
+  --spacing-1: var(--spacing-4); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-1\.25: var(--spacing-5); /** Scale step derived from real usage in the prototypes. */
+  --spacing-1\.5: var(--spacing-6); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-1\.75: var(--spacing-7); /** Scale step derived from real usage in the prototypes. */
+  --spacing-2: var(--spacing-8); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-2\.25: var(--spacing-9); /** Scale step derived from real usage in the prototypes. */
+  --spacing-2\.5: var(--spacing-10); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-2\.75: var(--spacing-11); /** Scale step derived from real usage in the prototypes. */
+  --spacing-3: var(--spacing-12); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-3\.25: var(--spacing-13); /** Scale step derived from real usage in the prototypes. */
+  --spacing-3\.5: var(--spacing-14); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-3\.75: var(--spacing-15); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-4: var(--spacing-16); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-4\.25: var(--spacing-17); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-4\.5: var(--spacing-18); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-5: var(--spacing-20); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-5\.5: var(--spacing-22); /** Scale step derived from real usage in the prototypes. */
+  --spacing-5\.75: var(--spacing-23); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-6: var(--spacing-24); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-6\.5: var(--spacing-26); /** Covers a value the Forge design really uses. */
+  --spacing-7: var(--spacing-28); /** Scale step derived from real usage in the prototypes. */
+  --spacing-7\.5: var(--spacing-30); /** Scale step derived from real usage in the prototypes. */
+  --spacing-8: var(--spacing-32); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-8\.5: var(--spacing-34); /** Scale step derived from real usage in the prototypes. */
+  --spacing-8\.75: var(--spacing-35); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-9: var(--spacing-36); /** Scale step derived from real usage in the prototypes. */
+  --spacing-10: var(--spacing-40); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-11: var(--spacing-44); /** Scale step derived from real usage in the prototypes. */
+  --spacing-12: var(--spacing-48); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-12\.5: var(--spacing-50); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-13: var(--spacing-52); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-13\.5: var(--spacing-54); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-14: var(--spacing-56); /** Scale step derived from real usage in the prototypes. */
+  --spacing-15: var(--spacing-60); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-16: var(--spacing-64); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --spacing-18\.25: var(--spacing-73); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-20: var(--spacing-80); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-20\.5: var(--spacing-82); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-26: var(--spacing-104); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --spacing-60: var(--spacing-240); /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-71\.25: var(--spacing-285); /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-79\.25: var(--spacing-317); /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-101\.25: var(--spacing-405); /** Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm. */
+  --spacing-overlap-6: -6px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-5: -5px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-8: -8px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --radius-1: var(--radius-1); /** Scale step derived from real usage in the prototypes. */
+  --radius-2: var(--radius-2); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-3: var(--radius-3); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-4: var(--radius-4); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-5: var(--radius-5); /** Scale step derived from real usage in the prototypes. */
+  --radius-6: var(--radius-6); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-7: var(--radius-7); /** Scale step derived from real usage in the prototypes. */
+  --radius-8: var(--radius-8); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-9: var(--radius-9); /** Scale step derived from real usage in the prototypes. */
+  --radius-10: var(--radius-10); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-11: var(--radius-11); /** Scale step derived from real usage in the prototypes. */
+  --radius-12: var(--radius-12); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-13: var(--radius-13); /** Scale step derived from real usage in the prototypes. */
+  --radius-14: var(--radius-14); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-15: var(--radius-15); /** Scale step derived from real usage in the prototypes. */
+  --radius-16: var(--radius-16); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-17: var(--radius-17); /** Scale step derived from real usage in the prototypes. */
+  --radius-18: var(--radius-18); /** Scale step derived from real usage in the prototypes. */
+  --radius-20: var(--radius-20); /** Scale step derived from real usage in the prototypes. */
+  --radius-24: var(--radius-24); /** Scale step derived from real usage in the prototypes. */
+  --radius-100: var(--radius-100); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --radius-full: var(--radius-full); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --radius-1-5: var(--radius-1-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --radius-2-5: var(--radius-2-5); /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-6: var(--text-6); /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-8: var(--text-8); /** Scale step derived from real usage in the prototypes. */
+  --text-9: var(--text-9); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-10: var(--text-10); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-11: var(--text-11); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-12: var(--text-12); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-13: var(--text-13); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-14: var(--text-14); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-15: var(--text-15); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-16: var(--text-16); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-17: var(--text-17); /** Scale step derived from real usage in the prototypes. */
+  --text-18: var(--text-18); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-19: var(--text-19); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-20: var(--text-20); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-22: var(--text-22); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-24: var(--text-24); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-26: var(--text-26); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-27: var(--text-27); /** Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it. */
+  --text-28: var(--text-28); /** Scale primitive, value in px, derived from the reference prototypes. */
+  --text-32: var(--text-32); /** Scale step derived from real usage in the prototypes. */
+  --text-44: var(--text-44); /** Scale step derived from real usage in the prototypes. */
+  --text-9-5: var(--text-9-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-10-5: var(--text-10-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-11-5: var(--text-11-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-12-5: var(--text-12-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-13-5: var(--text-13-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
+  --text-5-5: var(--text-5-5); /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --shadow-xs: var(--shadow-xs); /** Hairline lift. Segmented controls, small toggles. */
+  --shadow-md: var(--shadow-md); /** Card elevation. The default panel and card shadow. */
+  --shadow-lg: var(--shadow-lg); /** Sticky or primary card. One step above shadow/md. */
+  --shadow-menu: var(--shadow-menu); /** Menus, dropdowns, context menus, popovers anchored to a trigger. */
+  --shadow-popover: var(--shadow-popover); /** Floating panel above the page, larger than a menu. */
+  --shadow-modal: var(--shadow-modal); /** Modal dialogs centred over a dim backdrop. */
+  --shadow-overlay: var(--shadow-overlay); /** Full-screen overlays and the command palette. */
+  --shadow-sm: var(--shadow-sm); /** Raised control. Active segment of a segmented control. */
+  --text-display-2xl: 40px; /** Hero display. Rarely used in product UI. */
+  --leading-display-2xl: 48px; /** Hero display. Rarely used in product UI. */
+  --font-weight-display-2xl: 700; /** Hero display. Rarely used in product UI. */
+  --font-display-2xl: Inter; /** Hero display. Rarely used in product UI. */
+  --text-display-xl: 32px; /** Large display. */
+  --leading-display-xl: 40px; /** Large display. */
+  --font-weight-display-xl: 700; /** Large display. */
+  --font-display-xl: Inter; /** Large display. */
+  --text-display-lg: 24px; /** Page title on a marketing or docs surface. */
+  --leading-display-lg: 32px; /** Page title on a marketing or docs surface. */
+  --font-weight-display-lg: 600; /** Page title on a marketing or docs surface. */
+  --font-display-lg: Inter; /** Page title on a marketing or docs surface. */
+  --text-heading-md: 20px; /** Section title inside a page body. */
+  --leading-heading-md: 28px; /** Section title inside a page body. */
+  --font-weight-heading-md: 600; /** Section title inside a page body. */
+  --font-heading-md: Inter; /** Section title inside a page body. */
+  --text-heading-sm: 18px; /** Card or panel title. */
+  --leading-heading-sm: 26px; /** Card or panel title. */
+  --font-weight-heading-sm: 600; /** Card or panel title. */
+  --font-heading-sm: Inter; /** Card or panel title. */
+  --text-heading-xs: 16px; /** Group header inside a list. */
+  --leading-heading-xs: 24px; /** Group header inside a list. */
+  --font-weight-heading-xs: 600; /** Group header inside a list. */
+  --font-heading-xs: Inter; /** Group header inside a list. */
+  --text-body-lg: 16px; /** Lead paragraph. */
+  --leading-body-lg: 24px; /** Lead paragraph. */
+  --font-weight-body-lg: 400; /** Lead paragraph. */
+  --font-body-lg: Inter; /** Lead paragraph. */
+  --text-body-md: 14px; /** Default body text and input values. */
+  --leading-body-md: 20px; /** Default body text and input values. */
+  --font-weight-body-md: 400; /** Default body text and input values. */
+  --font-body-md: Inter; /** Default body text and input values. */
+  --text-body-md-medium: 14px; /** Body text with emphasis. */
+  --leading-body-md-medium: 20px; /** Body text with emphasis. */
+  --font-weight-body-md-medium: 500; /** Body text with emphasis. */
+  --font-body-md-medium: Inter; /** Body text with emphasis. */
+  --text-body-sm: 12px; /** Row primary text, table cells. */
+  --leading-body-sm: 18px; /** Row primary text, table cells. */
+  --font-weight-body-sm: 400; /** Row primary text, table cells. */
+  --font-body-sm: Inter; /** Row primary text, table cells. */
+  --text-body-sm-medium: 12px; /** Row text with emphasis. */
+  --leading-body-sm-medium: 18px; /** Row text with emphasis. */
+  --font-weight-body-sm-medium: 500; /** Row text with emphasis. */
+  --font-body-sm-medium: Inter; /** Row text with emphasis. */
+  --text-body-xs: 11px; /** Helper text under an input, stereotypes. */
+  --leading-body-xs: 16px; /** Helper text under an input, stereotypes. */
+  --font-weight-body-xs: 500; /** Helper text under an input, stereotypes. */
+  --font-body-xs: Inter; /** Helper text under an input, stereotypes. */
+  --text-body-prose-13: 13px; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --leading-body-prose-13: 21px; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --font-weight-body-prose-13: 400; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --font-body-prose-13: Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --text-label-md: 14px; /** Form label. */
+  --leading-label-md: 20px; /** Form label. */
+  --font-weight-label-md: 500; /** Form label. */
+  --font-label-md: Inter; /** Form label. */
+  --text-label-sm: 12px; /** Compact label, chip text. */
+  --leading-label-sm: 16px; /** Compact label, chip text. */
+  --font-weight-label-sm: 500; /** Compact label, chip text. */
+  --font-label-sm: Inter; /** Compact label, chip text. */
+  --text-label-xs: 10px; /** ALL CAPS section label, count pill. */
+  --leading-label-xs: 14px; /** ALL CAPS section label, count pill. */
+  --font-weight-label-xs: 600; /** ALL CAPS section label, count pill. */
+  --font-label-xs: Inter; /** ALL CAPS section label, count pill. */
+  --text-mono-md: 13px; /** Code and identifiers, default size. */
+  --leading-mono-md: 20px; /** Code and identifiers, default size. */
+  --font-weight-mono-md: 400; /** Code and identifiers, default size. */
+  --font-mono-md: 'JetBrains Mono'; /** Code and identifiers, default size. */
+  --text-mono-sm: 12px; /** Numeric table cells, versions. */
+  --leading-mono-sm: 18px; /** Numeric table cells, versions. */
+  --font-weight-mono-sm: 400; /** Numeric table cells, versions. */
+  --font-mono-sm: 'JetBrains Mono'; /** Numeric table cells, versions. */
+  --text-mono-xs: 11px; /** Compact mono, badges and hashes. */
+  --leading-mono-xs: 16px; /** Compact mono, badges and hashes. */
+  --font-weight-mono-xs: 500; /** Compact mono, badges and hashes. */
+  --font-mono-xs: 'JetBrains Mono'; /** Compact mono, badges and hashes. */
+  --text-mono-code-11-5: 11.5px; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --leading-mono-code-11-5: 19px; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --font-weight-mono-code-11-5: 400; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --font-mono-code-11-5: 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-subtle: var(--subtle);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-success: var(--success);
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+  --color-ring: var(--ring);
+  --color-ownership-system: var(--ownership-system);
+  --color-ownership-thermal-base: var(--ownership-thermal-base);
+  --color-ownership-thermal-bg: var(--ownership-thermal-bg);
+  --color-ownership-thermal-fg: var(--ownership-thermal-fg);
+  --color-ownership-power-base: var(--ownership-power-base);
+  --color-ownership-power-bg: var(--ownership-power-bg);
+  --color-ownership-power-fg: var(--ownership-power-fg);
+  --color-ownership-structure-base: var(--ownership-structure-base);
+  --color-ownership-structure-bg: var(--ownership-structure-bg);
+  --color-ownership-structure-fg: var(--ownership-structure-fg);
+  --color-ownership-aocs-base: var(--ownership-aocs-base);
+  --color-ownership-aocs-bg: var(--ownership-aocs-bg);
+  --color-ownership-aocs-fg: var(--ownership-aocs-fg);
+  --color-ownership-comms-base: var(--ownership-comms-base);
+  --color-ownership-comms-bg: var(--ownership-comms-bg);
+  --color-ownership-comms-fg: var(--ownership-comms-fg);
+  --color-ownership-propulsion-base: var(--ownership-propulsion-base);
+  --color-ownership-propulsion-bg: var(--ownership-propulsion-bg);
+  --color-ownership-propulsion-fg: var(--ownership-propulsion-fg);
+  --color-ownership-software-base: var(--ownership-software-base);
+  --color-ownership-payload-base: var(--ownership-payload-base);
+  --color-ownership-payload-bg: var(--ownership-payload-bg);
+  --color-ownership-payload-fg: var(--ownership-payload-fg);
+  --color-ownership-mechanisms-base: var(--ownership-mechanisms-base);
+  --color-ownership-mechanisms-bg: var(--ownership-mechanisms-bg);
+  --color-ownership-mechanisms-fg: var(--ownership-mechanisms-fg);
+  --color-ownership-data-handling-base: var(--ownership-data-handling-base);
+  --color-ownership-avionics-bg: var(--ownership-avionics-bg);
+  --color-ownership-avionics-fg: var(--ownership-avionics-fg);
+  --color-ownership-gnc-bg: var(--ownership-gnc-bg);
+  --color-ownership-gnc-fg: var(--ownership-gnc-fg);
+  --color-collaborator-c01: var(--collaborator-c01);
+  --color-collaborator-c02: var(--collaborator-c02);
+  --color-collaborator-c03: var(--collaborator-c03);
+  --color-collaborator-c04: var(--collaborator-c04);
+  --color-collaborator-c05: var(--collaborator-c05);
+  --color-collaborator-c06: var(--collaborator-c06);
+  --color-collaborator-c07: var(--collaborator-c07);
+  --color-collaborator-c08: var(--collaborator-c08);
+  --color-collaborator-c09: var(--collaborator-c09);
+  --color-collaborator-c10: var(--collaborator-c10);
+  --color-collaborator-c11: var(--collaborator-c11);
+  --color-collaborator-c12: var(--collaborator-c12);
+  --color-lifecycle-preparation: var(--lifecycle-preparation);
+  --color-lifecycle-open: var(--lifecycle-open);
+  --color-lifecycle-review: var(--lifecycle-review);
+  --color-lifecycle-archived: var(--lifecycle-archived);
+  --color-sysml-structure-header: var(--sysml-structure-header);
+  --color-sysml-structure-surface: var(--sysml-structure-surface);
+  --color-sysml-structure-border: var(--sysml-structure-border);
+  --color-sysml-attributes-header: var(--sysml-attributes-header);
+  --color-sysml-attributes-surface: var(--sysml-attributes-surface);
+  --color-sysml-attributes-border: var(--sysml-attributes-border);
+  --color-sysml-connections-header: var(--sysml-connections-header);
+  --color-sysml-connections-surface: var(--sysml-connections-surface);
+  --color-sysml-connections-border: var(--sysml-connections-border);
+  --color-sysml-behavior-header: var(--sysml-behavior-header);
+  --color-sysml-behavior-surface: var(--sysml-behavior-surface);
+  --color-sysml-behavior-border: var(--sysml-behavior-border);
+  --color-sysml-requirements-header: var(--sysml-requirements-header);
+  --color-sysml-requirements-surface: var(--sysml-requirements-surface);
+  --color-sysml-requirements-border: var(--sysml-requirements-border);
+  --color-sysml-verification-header: var(--sysml-verification-header);
+  --color-sysml-verification-surface: var(--sysml-verification-surface);
+  --color-sysml-verification-border: var(--sysml-verification-border);
+  --color-sysml-allocations-header: var(--sysml-allocations-header);
+  --color-sysml-allocations-surface: var(--sysml-allocations-surface);
+  --color-sysml-allocations-border: var(--sysml-allocations-border);
+  --color-sysml-metadata-header: var(--sysml-metadata-header);
+  --color-sysml-metadata-surface: var(--sysml-metadata-surface);
+  --color-sysml-metadata-border: var(--sysml-metadata-border);
+  --color-sysml-library-header: var(--sysml-library-header);
+  --color-sysml-library-surface: var(--sysml-library-surface);
+  --color-sysml-library-border: var(--sysml-library-border);
+  --color-sysml-variation-header: var(--sysml-variation-header);
+  --color-sysml-variation-surface: var(--sysml-variation-surface);
+  --color-sysml-variation-border: var(--sysml-variation-border);
+  --color-foreground-strong: var(--foreground-strong);
+  --color-foreground-deep: var(--foreground-deep);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-placeholder: var(--placeholder);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-deep: var(--primary-deep);
+  --color-accent-strong: var(--accent-strong);
+  --color-destructive-strong: var(--destructive-strong);
+  --color-success-strong: var(--success-strong);
+  --color-success-subtle: var(--success-subtle);
+  --color-info-strong: var(--info-strong);
+  --color-mode-cd: var(--mode-cd);
+  --color-mode-cd-subtle: var(--mode-cd-subtle);
+  --color-success-vivid: var(--success-vivid); /** The vivid green of validation checks, distinct from the success text colour. */
+  --color-warning-vivid: var(--warning-vivid); /** The alert triangle colour. */
+  --color-docs-callout-note-bg: var(--docs-callout-note-bg); /** Documentation callout note bg. Light and dark come from the mode, never from a variant. */
+  --color-docs-callout-note-border: var(--docs-callout-note-border); /** Documentation callout note border. Light and dark come from the mode, never from a variant. */
+  --color-docs-callout-warning-bg: var(--docs-callout-warning-bg); /** Documentation callout warning bg. Light and dark come from the mode, never from a variant. */
+  --color-docs-callout-warning-border: var(--docs-callout-warning-border); /** Documentation callout warning border. Light and dark come from the mode, never from a variant. */
+  --color-docs-callout-tip-bg: var(--docs-callout-tip-bg); /** Documentation callout tip bg. Light and dark come from the mode, never from a variant. */
+  --color-docs-callout-tip-border: var(--docs-callout-tip-border); /** Documentation callout tip border. Light and dark come from the mode, never from a variant. */
+  --color-docs-callout-danger-bg: var(--docs-callout-danger-bg); /** Documentation callout danger bg. Light and dark come from the mode, never from a variant. */
+  --color-docs-callout-danger-border: var(--docs-callout-danger-border); /** Documentation callout danger border. Light and dark come from the mode, never from a variant. */
+  --color-docs-code-foreground: var(--docs-code-foreground); /** Code sample text. The code surface is dark in both themes, so this token does not change with the mode. */
+  --color-docs-code-background: var(--docs-code-background); /** Code sample surface. Dark in both themes by design, so the pale code text always reads. */
+  --color-scrim: var(--scrim); /** Backdrop behind a modal or overlay. */
+}

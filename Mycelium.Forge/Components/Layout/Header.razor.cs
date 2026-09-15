@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -20,6 +20,11 @@ namespace Mycelium.Forge.Components.Layout
     /// </summary>
     public partial class Header : DisposableComponent
     {
+        /// <summary>
+        /// The base CSS class applied to all top-level header navigation links.
+        /// </summary>
+        private const string BaseNavLinkClass = "header-nav-link";
+
         /// <summary>
         /// Gets or sets the navigation manager instance.
         /// </summary>
@@ -95,10 +100,10 @@ namespace Mycelium.Forge.Components.Layout
 
             if (isActive)
             {
-                return "text-sm leading-xs font-semibold text-primary";
+                return $"{BaseNavLinkClass} font-semibold text-primary";
             }
 
-            return "text-sm leading-xs font-medium text-muted-foreground hover:text-foreground transition-colors";
+            return $"{BaseNavLinkClass} font-medium text-muted-foreground hover:text-foreground";
         }
 
         /// <summary>

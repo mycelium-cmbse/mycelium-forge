@@ -1,0 +1,3961 @@
+{
+  "background": {
+    "$type": "color",
+    "$value": "{color.gray.1100}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:98",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--background)"
+        }
+      }
+    }
+  },
+  "foreground": {
+    "$type": "color",
+    "$value": "{color.gray.200}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:99",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--foreground)"
+        }
+      }
+    }
+  },
+  "foreground-muted": {
+    "$type": "color",
+    "$value": "{color.gray.400}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:100",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--foreground-muted)"
+        }
+      }
+    }
+  },
+  "card": {
+    "$type": "color",
+    "$value": "{color.gray.950}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:101",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--card)"
+        }
+      }
+    }
+  },
+  "card-foreground": {
+    "$type": "color",
+    "$value": "{color.gray.200}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:102",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--card-foreground)"
+        }
+      }
+    }
+  },
+  "popover": {
+    "$type": "color",
+    "$value": "{color.gray.950}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:103",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--popover)"
+        }
+      }
+    }
+  },
+  "popover-foreground": {
+    "$type": "color",
+    "$value": "{color.gray.200}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:104",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--popover-foreground)"
+        }
+      }
+    }
+  },
+  "subtle": {
+    "$type": "color",
+    "$value": "{color.gray.950}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:105",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--subtle)"
+        }
+      }
+    }
+  },
+  "muted": {
+    "$type": "color",
+    "$value": "{color.gray.900}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:106",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--muted)"
+        }
+      }
+    }
+  },
+  "muted-foreground": {
+    "$type": "color",
+    "$value": "{color.gray.450}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:107",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--muted-foreground)"
+        }
+      }
+    }
+  },
+  "border": {
+    "$type": "color",
+    "$value": "{color.gray.750}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:108",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--border)"
+        }
+      }
+    }
+  },
+  "border-subtle": {
+    "$type": "color",
+    "$value": "{color.gray.900}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:109",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--border-subtle)"
+        }
+      }
+    }
+  },
+  "border-strong": {
+    "$type": "color",
+    "$value": "{color.gray.650}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:110",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--border-strong)"
+        }
+      }
+    }
+  },
+  "input": {
+    "$type": "color",
+    "$value": "{color.gray.650}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:111",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--input)"
+        }
+      }
+    }
+  },
+  "primary": {
+    "$type": "color",
+    "$value": "{color.copper.400}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:112",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--primary)"
+        }
+      }
+    }
+  },
+  "primary-strong": {
+    "$type": "color",
+    "$value": "{color.copper.500}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:113",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--primary-strong)"
+        }
+      }
+    }
+  },
+  "primary-foreground": {
+    "$type": "color",
+    "$value": "{color.gray.0}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:114",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--primary-foreground)"
+        }
+      }
+    }
+  },
+  "accent": {
+    "$type": "color",
+    "$value": "{color.copper.950}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:115",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--accent)"
+        }
+      }
+    }
+  },
+  "accent-foreground": {
+    "$type": "color",
+    "$value": "{color.gray.200}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:116",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--accent-foreground)"
+        }
+      }
+    }
+  },
+  "destructive": {
+    "$type": "color",
+    "$value": "{color.status.danger.500}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:117",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--destructive)"
+        }
+      }
+    }
+  },
+  "destructive-subtle": {
+    "$type": "color",
+    "$value": "{color.status.danger.50}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:118",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--destructive-subtle)"
+        }
+      }
+    }
+  },
+  "destructive-foreground": {
+    "$type": "color",
+    "$value": "{color.gray.0}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:119",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--destructive-foreground)"
+        }
+      }
+    }
+  },
+  "warning": {
+    "$type": "color",
+    "$value": "{color.status.warning.500}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:120",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--warning)"
+        }
+      }
+    }
+  },
+  "warning-subtle": {
+    "$type": "color",
+    "$value": "{color.status.warning.50}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:121",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--warning-subtle)"
+        }
+      }
+    }
+  },
+  "success": {
+    "$type": "color",
+    "$value": "{color.status.success.500}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:122",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--success)"
+        }
+      }
+    }
+  },
+  "info": {
+    "$type": "color",
+    "$value": "{color.status.info.500}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:123",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--info)"
+        }
+      }
+    }
+  },
+  "info-subtle": {
+    "$type": "color",
+    "$value": "{color.status.info.50}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:124",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--info-subtle)"
+        }
+      }
+    }
+  },
+  "ring": {
+    "$type": "color",
+    "$value": "{color.status.info.500}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7862:125",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--ring)"
+        }
+      }
+    }
+  },
+  "ownership": {
+    "system": {
+      "$type": "color",
+      "$value": "{color.ui.system}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:126",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--ownership-system)"
+          }
+        }
+      }
+    },
+    "thermal": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.thermal.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:127",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-thermal-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.thermal.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:37",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-thermal-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.thermal.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:39",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-thermal-fg)"
+            }
+          }
+        }
+      }
+    },
+    "power": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.power.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:128",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-power-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.power.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:33",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-power-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.power.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:35",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-power-fg)"
+            }
+          }
+        }
+      }
+    },
+    "structure": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.structure.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:129",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-structure-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.structure.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:49",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-structure-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.structure.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:51",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-structure-fg)"
+            }
+          }
+        }
+      }
+    },
+    "aocs": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.aocs.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:130",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-aocs-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.aocs.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:29",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-aocs-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.aocs.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:31",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-aocs-fg)"
+            }
+          }
+        }
+      }
+    },
+    "comms": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.comms.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:131",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-comms-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.comms.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:41",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-comms-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.comms.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:43",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-comms-fg)"
+            }
+          }
+        }
+      }
+    },
+    "propulsion": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.propulsion.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:132",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-propulsion-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.propulsion.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:53",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-propulsion-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.propulsion.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:55",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-propulsion-fg)"
+            }
+          }
+        }
+      }
+    },
+    "software": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.software.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:133",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-software-base)"
+            }
+          }
+        }
+      }
+    },
+    "payload": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.payload.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:134",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-payload-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.payload.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:45",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-payload-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.payload.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:47",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-payload-fg)"
+            }
+          }
+        }
+      }
+    },
+    "mechanisms": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.mechanisms.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:135",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-mechanisms-base)"
+            }
+          }
+        }
+      },
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.mechanisms.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:61",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-mechanisms-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.mechanisms.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:63",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-mechanisms-fg)"
+            }
+          }
+        }
+      }
+    },
+    "data-handling": {
+      "base": {
+        "$type": "color",
+        "$value": "{color.ownership.data-handling.base}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:136",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-data-handling-base)"
+            }
+          }
+        }
+      }
+    },
+    "avionics": {
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.avionics.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:57",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-avionics-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.avionics.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:59",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-avionics-fg)"
+            }
+          }
+        }
+      }
+    },
+    "gnc": {
+      "bg": {
+        "$type": "color",
+        "$value": "{color.ownership.gnc.bg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:65",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-gnc-bg)"
+            }
+          }
+        }
+      },
+      "fg": {
+        "$type": "color",
+        "$value": "{color.ownership.gnc.fg}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7908:67",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--ownership-gnc-fg)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "collaborator": {
+    "c01": {
+      "$type": "color",
+      "$value": "{color.collaborator.c01}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:137",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c01)"
+          }
+        }
+      }
+    },
+    "c02": {
+      "$type": "color",
+      "$value": "{color.collaborator.c02}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:138",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c02)"
+          }
+        }
+      }
+    },
+    "c03": {
+      "$type": "color",
+      "$value": "{color.collaborator.c03}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:139",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c03)"
+          }
+        }
+      }
+    },
+    "c04": {
+      "$type": "color",
+      "$value": "{color.collaborator.c04}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:140",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c04)"
+          }
+        }
+      }
+    },
+    "c05": {
+      "$type": "color",
+      "$value": "{color.collaborator.c05}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:141",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c05)"
+          }
+        }
+      }
+    },
+    "c06": {
+      "$type": "color",
+      "$value": "{color.collaborator.c06}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:142",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c06)"
+          }
+        }
+      }
+    },
+    "c07": {
+      "$type": "color",
+      "$value": "{color.collaborator.c07}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:143",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c07)"
+          }
+        }
+      }
+    },
+    "c08": {
+      "$type": "color",
+      "$value": "{color.collaborator.c08}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:144",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c08)"
+          }
+        }
+      }
+    },
+    "c09": {
+      "$type": "color",
+      "$value": "{color.collaborator.c09}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:145",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c09)"
+          }
+        }
+      }
+    },
+    "c10": {
+      "$type": "color",
+      "$value": "{color.collaborator.c10}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:146",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c10)"
+          }
+        }
+      }
+    },
+    "c11": {
+      "$type": "color",
+      "$value": "{color.collaborator.c11}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:147",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c11)"
+          }
+        }
+      }
+    },
+    "c12": {
+      "$type": "color",
+      "$value": "{color.collaborator.c12}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:148",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--collaborator-c12)"
+          }
+        }
+      }
+    }
+  },
+  "lifecycle": {
+    "preparation": {
+      "$type": "color",
+      "$value": "{color.lifecycle.preparation}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:149",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--lifecycle-preparation)"
+          }
+        }
+      }
+    },
+    "open": {
+      "$type": "color",
+      "$value": "{color.lifecycle.open}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:150",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--lifecycle-open)"
+          }
+        }
+      }
+    },
+    "review": {
+      "$type": "color",
+      "$value": "{color.lifecycle.review}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:151",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--lifecycle-review)"
+          }
+        }
+      }
+    },
+    "archived": {
+      "$type": "color",
+      "$value": "{color.lifecycle.archived}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:152",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--lifecycle-archived)"
+          }
+        }
+      }
+    }
+  },
+  "sysml": {
+    "structure": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.structure.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:153",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-structure-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.structure.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:154",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-structure-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.structure.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:155",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-structure-border)"
+            }
+          }
+        }
+      }
+    },
+    "attributes": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.attributes.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:156",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-attributes-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.attributes.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:157",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-attributes-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.attributes.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:158",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-attributes-border)"
+            }
+          }
+        }
+      }
+    },
+    "connections": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.connections.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:159",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-connections-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.connections.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:160",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-connections-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.connections.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:161",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-connections-border)"
+            }
+          }
+        }
+      }
+    },
+    "behavior": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.behavior.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:162",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-behavior-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.behavior.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:163",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-behavior-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.behavior.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:164",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-behavior-border)"
+            }
+          }
+        }
+      }
+    },
+    "requirements": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.requirements.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:165",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-requirements-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.requirements.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:166",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-requirements-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.requirements.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:167",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-requirements-border)"
+            }
+          }
+        }
+      }
+    },
+    "verification": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.verification.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:168",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-verification-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.verification.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:169",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-verification-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.verification.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:170",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-verification-border)"
+            }
+          }
+        }
+      }
+    },
+    "allocations": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.allocations.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:171",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-allocations-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.allocations.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:172",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-allocations-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.allocations.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:173",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-allocations-border)"
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.metadata.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:174",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-metadata-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.metadata.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:175",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-metadata-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.metadata.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:176",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-metadata-border)"
+            }
+          }
+        }
+      }
+    },
+    "library": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.library.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:177",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-library-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.library.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:178",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-library-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.library.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:179",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-library-border)"
+            }
+          }
+        }
+      }
+    },
+    "variation": {
+      "header": {
+        "$type": "color",
+        "$value": "{color.sysml.variation.header}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:180",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-variation-header)"
+            }
+          }
+        }
+      },
+      "surface": {
+        "$type": "color",
+        "$value": "{color.sysml.variation.surface}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:181",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-variation-surface)"
+            }
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{color.sysml.variation.border}",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:7862:182",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {
+              "WEB": "var(--sysml-variation-border)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "radius": {
+    "1": {
+      "$type": "dimension",
+      "$value": "{radius.1}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127364",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-1)"
+          }
+        }
+      }
+    },
+    "2": {
+      "$type": "dimension",
+      "$value": "{radius.2}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:183",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-2)"
+          }
+        }
+      }
+    },
+    "3": {
+      "$type": "dimension",
+      "$value": "{radius.3}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:184",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-3)"
+          }
+        }
+      }
+    },
+    "4": {
+      "$type": "dimension",
+      "$value": "{radius.4}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:185",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-4)"
+          }
+        }
+      }
+    },
+    "5": {
+      "$type": "dimension",
+      "$value": "{radius.5}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127366",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-5)"
+          }
+        }
+      }
+    },
+    "6": {
+      "$type": "dimension",
+      "$value": "{radius.6}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:186",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-6)"
+          }
+        }
+      }
+    },
+    "7": {
+      "$type": "dimension",
+      "$value": "{radius.7}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127368",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-7)"
+          }
+        }
+      }
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "{radius.8}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:187",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-8)"
+          }
+        }
+      }
+    },
+    "9": {
+      "$type": "dimension",
+      "$value": "{radius.9}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127370",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-9)"
+          }
+        }
+      }
+    },
+    "10": {
+      "$type": "dimension",
+      "$value": "{radius.10}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:188",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-10)"
+          }
+        }
+      }
+    },
+    "11": {
+      "$type": "dimension",
+      "$value": "{radius.11}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127372",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-11)"
+          }
+        }
+      }
+    },
+    "12": {
+      "$type": "dimension",
+      "$value": "{radius.12}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:189",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-12)"
+          }
+        }
+      }
+    },
+    "13": {
+      "$type": "dimension",
+      "$value": "{radius.13}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127374",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-13)"
+          }
+        }
+      }
+    },
+    "14": {
+      "$type": "dimension",
+      "$value": "{radius.14}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:190",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-14)"
+          }
+        }
+      }
+    },
+    "15": {
+      "$type": "dimension",
+      "$value": "{radius.15}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127376",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-15)"
+          }
+        }
+      }
+    },
+    "16": {
+      "$type": "dimension",
+      "$value": "{radius.16}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:191",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-16)"
+          }
+        }
+      }
+    },
+    "17": {
+      "$type": "dimension",
+      "$value": "{radius.17}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127378",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-17)"
+          }
+        }
+      }
+    },
+    "18": {
+      "$type": "dimension",
+      "$value": "{radius.18}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127380",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-18)"
+          }
+        }
+      }
+    },
+    "20": {
+      "$type": "dimension",
+      "$value": "{radius.20}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127382",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-20)"
+          }
+        }
+      }
+    },
+    "24": {
+      "$type": "dimension",
+      "$value": "{radius.24}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127384",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-24)"
+          }
+        }
+      }
+    },
+    "100": {
+      "$type": "dimension",
+      "$value": "{radius.100}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54606",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-100)"
+          }
+        }
+      }
+    },
+    "full": {
+      "$type": "number",
+      "$value": "{radius.full}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:192",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-full)"
+          }
+        }
+      }
+    },
+    "1-5": {
+      "$type": "number",
+      "$value": "{radius.1-5}",
+      "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8103:3",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-1-5)"
+          }
+        }
+      }
+    },
+    "2-5": {
+      "$type": "number",
+      "$value": "{radius.2-5}",
+      "$description": "Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8114:18891",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--radius-2-5)"
+          }
+        }
+      }
+    }
+  },
+  "spacing": {
+    "1": {
+      "$type": "dimension",
+      "$value": "{spacing.1}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127386",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-1)"
+          }
+        }
+      }
+    },
+    "2": {
+      "$type": "dimension",
+      "$value": "{spacing.2}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:193",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-2)"
+          }
+        }
+      }
+    },
+    "3": {
+      "$type": "dimension",
+      "$value": "{spacing.3}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127388",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-3)"
+          }
+        }
+      }
+    },
+    "4": {
+      "$type": "dimension",
+      "$value": "{spacing.4}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:194",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-4)"
+          }
+        }
+      }
+    },
+    "5": {
+      "$type": "dimension",
+      "$value": "{spacing.5}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127390",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-5)"
+          }
+        }
+      }
+    },
+    "6": {
+      "$type": "dimension",
+      "$value": "{spacing.6}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:195",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-6)"
+          }
+        }
+      }
+    },
+    "7": {
+      "$type": "dimension",
+      "$value": "{spacing.7}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127392",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-7)"
+          }
+        }
+      }
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "{spacing.8}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:196",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-8)"
+          }
+        }
+      }
+    },
+    "9": {
+      "$type": "dimension",
+      "$value": "{spacing.9}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127394",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-9)"
+          }
+        }
+      }
+    },
+    "10": {
+      "$type": "dimension",
+      "$value": "{spacing.10}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:197",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-10)"
+          }
+        }
+      }
+    },
+    "11": {
+      "$type": "dimension",
+      "$value": "{spacing.11}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127396",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-11)"
+          }
+        }
+      }
+    },
+    "12": {
+      "$type": "dimension",
+      "$value": "{spacing.12}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:198",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-12)"
+          }
+        }
+      }
+    },
+    "13": {
+      "$type": "dimension",
+      "$value": "{spacing.13}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127398",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-13)"
+          }
+        }
+      }
+    },
+    "14": {
+      "$type": "dimension",
+      "$value": "{spacing.14}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:199",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-14)"
+          }
+        }
+      }
+    },
+    "15": {
+      "$type": "dimension",
+      "$value": "{spacing.15}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54582",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-15)"
+          }
+        }
+      }
+    },
+    "16": {
+      "$type": "dimension",
+      "$value": "{spacing.16}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:200",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-16)"
+          }
+        }
+      }
+    },
+    "17": {
+      "$type": "dimension",
+      "$value": "{spacing.17}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54584",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-17)"
+          }
+        }
+      }
+    },
+    "18": {
+      "$type": "dimension",
+      "$value": "{spacing.18}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:201",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-18)"
+          }
+        }
+      }
+    },
+    "20": {
+      "$type": "dimension",
+      "$value": "{spacing.20}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:202",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-20)"
+          }
+        }
+      }
+    },
+    "22": {
+      "$type": "dimension",
+      "$value": "{spacing.22}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127400",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-22)"
+          }
+        }
+      }
+    },
+    "23": {
+      "$type": "dimension",
+      "$value": "{spacing.23}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54586",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-23)"
+          }
+        }
+      }
+    },
+    "24": {
+      "$type": "dimension",
+      "$value": "{spacing.24}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:203",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-24)"
+          }
+        }
+      }
+    },
+    "26": {
+      "$type": "dimension",
+      "$value": "{spacing.26}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8472:7288",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-26)"
+          }
+        }
+      }
+    },
+    "28": {
+      "$type": "dimension",
+      "$value": "{spacing.28}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127402",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-28)"
+          }
+        }
+      }
+    },
+    "30": {
+      "$type": "dimension",
+      "$value": "{spacing.30}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127404",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-30)"
+          }
+        }
+      }
+    },
+    "32": {
+      "$type": "dimension",
+      "$value": "{spacing.32}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:204",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-32)"
+          }
+        }
+      }
+    },
+    "34": {
+      "$type": "dimension",
+      "$value": "{spacing.34}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127406",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-34)"
+          }
+        }
+      }
+    },
+    "35": {
+      "$type": "dimension",
+      "$value": "{spacing.35}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54588",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-35)"
+          }
+        }
+      }
+    },
+    "36": {
+      "$type": "dimension",
+      "$value": "{spacing.36}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127408",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-36)"
+          }
+        }
+      }
+    },
+    "40": {
+      "$type": "dimension",
+      "$value": "{spacing.40}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:205",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-40)"
+          }
+        }
+      }
+    },
+    "44": {
+      "$type": "dimension",
+      "$value": "{spacing.44}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127410",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-44)"
+          }
+        }
+      }
+    },
+    "48": {
+      "$type": "dimension",
+      "$value": "{spacing.48}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:206",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-48)"
+          }
+        }
+      }
+    },
+    "50": {
+      "$type": "dimension",
+      "$value": "{spacing.50}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54590",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-50)"
+          }
+        }
+      }
+    },
+    "52": {
+      "$type": "dimension",
+      "$value": "{spacing.52}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54592",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-52)"
+          }
+        }
+      }
+    },
+    "54": {
+      "$type": "dimension",
+      "$value": "{spacing.54}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54594",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-54)"
+          }
+        }
+      }
+    },
+    "56": {
+      "$type": "dimension",
+      "$value": "{spacing.56}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127412",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-56)"
+          }
+        }
+      }
+    },
+    "60": {
+      "$type": "dimension",
+      "$value": "{spacing.60}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54596",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-60)"
+          }
+        }
+      }
+    },
+    "64": {
+      "$type": "dimension",
+      "$value": "{spacing.64}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:207",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-64)"
+          }
+        }
+      }
+    },
+    "73": {
+      "$type": "dimension",
+      "$value": "{spacing.73}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54598",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-73)"
+          }
+        }
+      }
+    },
+    "80": {
+      "$type": "dimension",
+      "$value": "{spacing.80}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54600",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-80)"
+          }
+        }
+      }
+    },
+    "82": {
+      "$type": "dimension",
+      "$value": "{spacing.82}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54602",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-82)"
+          }
+        }
+      }
+    },
+    "104": {
+      "$type": "dimension",
+      "$value": "{spacing.104}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54604",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-104)"
+          }
+        }
+      }
+    },
+    "240": {
+      "$type": "dimension",
+      "$value": "{spacing.240}",
+      "$description": "Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8112:54590",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-240)"
+          }
+        }
+      }
+    },
+    "285": {
+      "$type": "dimension",
+      "$value": "{spacing.285}",
+      "$description": "Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8112:54594",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-285)"
+          }
+        }
+      }
+    },
+    "317": {
+      "$type": "dimension",
+      "$value": "{spacing.317}",
+      "$description": "Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8112:54586",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-317)"
+          }
+        }
+      }
+    },
+    "405": {
+      "$type": "dimension",
+      "$value": "{spacing.405}",
+      "$description": "Large layout offset. It positions a block on the canvas rather than spacing content, which is why it sits above the rhythm.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8112:54588",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-405)"
+          }
+        }
+      }
+    },
+    "overlap-6": {
+      "$type": "number",
+      "$value": "{spacing.overlap-6}",
+      "$description": "Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8112:54582",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-overlap-6)"
+          }
+        }
+      }
+    },
+    "overlap-5": {
+      "$type": "number",
+      "$value": "{spacing.overlap-5}",
+      "$description": "Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8112:54584",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-overlap-5)"
+          }
+        }
+      }
+    },
+    "overlap-8": {
+      "$type": "number",
+      "$value": "{spacing.overlap-8}",
+      "$description": "Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8112:54592",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--spacing-overlap-8)"
+          }
+        }
+      }
+    }
+  },
+  "text": {
+    "6": {
+      "$type": "dimension",
+      "$value": "{text.6}",
+      "$description": "Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8114:18893",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-6)"
+          }
+        }
+      }
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "{text.8}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127414",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-8)"
+          }
+        }
+      }
+    },
+    "9": {
+      "$type": "dimension",
+      "$value": "{text.9}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:208",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-9)"
+          }
+        }
+      }
+    },
+    "10": {
+      "$type": "dimension",
+      "$value": "{text.10}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:209",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-10)"
+          }
+        }
+      }
+    },
+    "11": {
+      "$type": "dimension",
+      "$value": "{text.11}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:210",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-11)"
+          }
+        }
+      }
+    },
+    "12": {
+      "$type": "dimension",
+      "$value": "{text.12}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:211",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-12)"
+          }
+        }
+      }
+    },
+    "13": {
+      "$type": "dimension",
+      "$value": "{text.13}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:212",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-13)"
+          }
+        }
+      }
+    },
+    "14": {
+      "$type": "dimension",
+      "$value": "{text.14}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:213",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-14)"
+          }
+        }
+      }
+    },
+    "15": {
+      "$type": "dimension",
+      "$value": "{text.15}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:214",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-15)"
+          }
+        }
+      }
+    },
+    "16": {
+      "$type": "dimension",
+      "$value": "{text.16}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:215",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-16)"
+          }
+        }
+      }
+    },
+    "17": {
+      "$type": "dimension",
+      "$value": "{text.17}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127416",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-17)"
+          }
+        }
+      }
+    },
+    "18": {
+      "$type": "dimension",
+      "$value": "{text.18}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:216",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-18)"
+          }
+        }
+      }
+    },
+    "19": {
+      "$type": "dimension",
+      "$value": "{text.19}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54608",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-19)"
+          }
+        }
+      }
+    },
+    "20": {
+      "$type": "dimension",
+      "$value": "{text.20}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:217",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-20)"
+          }
+        }
+      }
+    },
+    "22": {
+      "$type": "dimension",
+      "$value": "{text.22}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:218",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-22)"
+          }
+        }
+      }
+    },
+    "24": {
+      "$type": "dimension",
+      "$value": "{text.24}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:219",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-24)"
+          }
+        }
+      }
+    },
+    "26": {
+      "$type": "dimension",
+      "$value": "{text.26}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54610",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-26)"
+          }
+        }
+      }
+    },
+    "27": {
+      "$type": "dimension",
+      "$value": "{text.27}",
+      "$description": "Extends the numeric scale to cover a value the Bloom design actually uses. Added rather than rounding the design onto a scale that was never designed for it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8101:54612",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-27)"
+          }
+        }
+      }
+    },
+    "28": {
+      "$type": "dimension",
+      "$value": "{text.28}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:7862:220",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-28)"
+          }
+        }
+      }
+    },
+    "32": {
+      "$type": "dimension",
+      "$value": "{text.32}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127418",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-32)"
+          }
+        }
+      }
+    },
+    "44": {
+      "$type": "dimension",
+      "$value": "{text.44}",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8081:127420",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-44)"
+          }
+        }
+      }
+    },
+    "9-5": {
+      "$type": "number",
+      "$value": "{text.9-5}",
+      "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8103:5",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-9-5)"
+          }
+        }
+      }
+    },
+    "10-5": {
+      "$type": "number",
+      "$value": "{text.10-5}",
+      "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8103:7",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-10-5)"
+          }
+        }
+      }
+    },
+    "11-5": {
+      "$type": "number",
+      "$value": "{text.11-5}",
+      "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8103:9",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-11-5)"
+          }
+        }
+      }
+    },
+    "12-5": {
+      "$type": "number",
+      "$value": "{text.12-5}",
+      "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8103:11",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-12-5)"
+          }
+        }
+      }
+    },
+    "13-5": {
+      "$type": "number",
+      "$value": "{text.13-5}",
+      "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8103:13",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-13-5)"
+          }
+        }
+      }
+    },
+    "5-5": {
+      "$type": "number",
+      "$value": "{text.5-5}",
+      "$description": "Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8114:18895",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--text-5-5)"
+          }
+        }
+      }
+    }
+  },
+  "foreground-strong": {
+    "$type": "color",
+    "$value": "{color.gray.200}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:39",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--foreground-strong)"
+        }
+      }
+    }
+  },
+  "foreground-deep": {
+    "$type": "color",
+    "$value": "{color.gray.200}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:40",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--foreground-deep)"
+        }
+      }
+    }
+  },
+  "foreground-subtle": {
+    "$type": "color",
+    "$value": "{color.gray.450}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:41",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--foreground-subtle)"
+        }
+      }
+    }
+  },
+  "placeholder": {
+    "$type": "color",
+    "$value": "{color.gray.450}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:42",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--placeholder)"
+        }
+      }
+    }
+  },
+  "primary-subtle": {
+    "$type": "color",
+    "$value": "{color.copper.300}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:43",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--primary-subtle)"
+        }
+      }
+    }
+  },
+  "primary-deep": {
+    "$type": "color",
+    "$value": "{color.copper.800}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:44",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--primary-deep)"
+        }
+      }
+    }
+  },
+  "accent-strong": {
+    "$type": "color",
+    "$value": "{color.teal.100}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:45",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--accent-strong)"
+        }
+      }
+    }
+  },
+  "destructive-strong": {
+    "$type": "color",
+    "$value": "{color.status.danger.700}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:46",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--destructive-strong)"
+        }
+      }
+    }
+  },
+  "success-strong": {
+    "$type": "color",
+    "$value": "{color.status.success.700}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:47",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--success-strong)"
+        }
+      }
+    }
+  },
+  "success-subtle": {
+    "$type": "color",
+    "$value": "{color.status.success.50}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:48",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--success-subtle)"
+        }
+      }
+    }
+  },
+  "info-strong": {
+    "$type": "color",
+    "$value": "{color.status.info.700}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7907:49",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--info-strong)"
+        }
+      }
+    }
+  },
+  "mode-cd": {
+    "$type": "color",
+    "$value": "{color.ui.mode-cd}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7908:69",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--mode-cd)"
+        }
+      }
+    }
+  },
+  "mode-cd-subtle": {
+    "$type": "color",
+    "$value": "{color.ui.mode-cd-subtle}",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7908:71",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--mode-cd-subtle)"
+        }
+      }
+    }
+  },
+  "success-vivid": {
+    "$type": "color",
+    "$value": "{color.status.success.600}",
+    "$description": "The vivid green of validation checks, distinct from the success text colour.",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7945:29",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--success-vivid)"
+        }
+      }
+    }
+  },
+  "warning-vivid": {
+    "$type": "color",
+    "$value": "{color.status.warning.600}",
+    "$description": "The alert triangle colour.",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:7945:31",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_SCOPES"
+        ],
+        "codeSyntax": {
+          "WEB": "var(--warning-vivid)"
+        }
+      }
+    }
+  },
+  "sidebar": {
+    "row-padding-y": {
+      "$type": "number",
+      "$value": "{spacing.9}",
+      "$description": "Vertical padding of a sidebar nav row. 9, not 8: it is what makes the row 34 high.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8100:2",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--sidebar-row-padding-y)"
+          }
+        }
+      }
+    },
+    "row-padding-x": {
+      "$type": "number",
+      "$value": "{spacing.14}",
+      "$description": "Horizontal padding of a sidebar nav row.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8100:3",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--sidebar-row-padding-x)"
+          }
+        }
+      }
+    },
+    "row-gap": {
+      "$type": "number",
+      "$value": "{spacing.10}",
+      "$description": "Gap between a sidebar row icon and its label.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8100:4",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--sidebar-row-gap)"
+          }
+        }
+      }
+    },
+    "row-height": {
+      "$type": "number",
+      "$value": "{spacing.34}",
+      "$description": "Height of a sidebar nav row, collapsed and expanded alike.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8100:5",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--sidebar-row-height)"
+          }
+        }
+      }
+    }
+  },
+  "docs": {
+    "callout": {
+      "note": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.blue.950}",
+          "$description": "Documentation callout note bg. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127363",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-note-bg"
+              }
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.blue.300}",
+          "$description": "Documentation callout note border. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127364",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-note-border"
+              }
+            }
+          }
+        }
+      },
+      "warning": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.amber.950}",
+          "$description": "Documentation callout warning bg. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127365",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-warning-bg"
+              }
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.amber.300}",
+          "$description": "Documentation callout warning border. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127366",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-warning-border"
+              }
+            }
+          }
+        }
+      },
+      "tip": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.green.950}",
+          "$description": "Documentation callout tip bg. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127367",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-tip-bg"
+              }
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.green.300}",
+          "$description": "Documentation callout tip border. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127368",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-tip-border"
+              }
+            }
+          }
+        }
+      },
+      "danger": {
+        "bg": {
+          "$type": "color",
+          "$value": "{color.red.950}",
+          "$description": "Documentation callout danger bg. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127369",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-danger-bg"
+              }
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.red.300}",
+          "$description": "Documentation callout danger border. Light and dark come from the mode, never from a variant.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8100:127370",
+              "collection": "VariableCollectionId:7862:97",
+              "scopes": [
+                "ALL_FILLS",
+                "STROKE_COLOR"
+              ],
+              "codeSyntax": {
+                "WEB": "--docs-callout-danger-border"
+              }
+            }
+          }
+        }
+      }
+    },
+    "code": {
+      "foreground": {
+        "$type": "color",
+        "$value": "{color.green.100}",
+        "$description": "Code sample text. The code surface is dark in both themes, so this token does not change with the mode.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8101:127385",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "codeSyntax": {
+              "WEB": "--docs-code-foreground"
+            }
+          }
+        }
+      },
+      "background": {
+        "$type": "color",
+        "$value": "{color.gray.900}",
+        "$description": "Code sample surface. Dark in both themes by design, so the pale code text always reads.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8101:127386",
+            "collection": "VariableCollectionId:7862:97",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "codeSyntax": {
+              "WEB": "--docs-code-background"
+            }
+          }
+        }
+      }
+    }
+  },
+  "scrim": {
+    "$type": "color",
+    "$value": "{color.gray.1050}",
+    "$description": "Backdrop behind a modal or overlay.",
+    "$extensions": {
+      "figma": {
+        "variableId": "VariableID:8101:127387",
+        "collection": "VariableCollectionId:7862:97",
+        "scopes": [
+          "ALL_FILLS",
+          "STROKE_COLOR"
+        ],
+        "codeSyntax": {
+          "WEB": "--scrim"
+        }
+      }
+    },
+    "modal": {
+      "$type": "color",
+      "$value": "{color.scrim.modal}",
+      "$description": "Scrim behind a modal dialog. The alpha lives IN the token, so a binding pass can never flatten it. 55%: the page stays readable but is clearly out of reach. Same value in all four modes: a scrim is dark in the light theme too.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8256:3",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--scrim-modal)"
+          }
+        }
+      }
+    },
+    "panel": {
+      "$type": "color",
+      "$value": "{color.scrim.panel}",
+      "$description": "Scrim behind a side drawer or a slide-over panel. Lighter than a modal: the page behind stays workable context, not a blocked surface. Same value in all four modes: a scrim is dark in the light theme too.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8256:5",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--scrim-panel)"
+          }
+        }
+      }
+    },
+    "menu": {
+      "$type": "color",
+      "$value": "{color.scrim.menu}",
+      "$description": "Click-catcher behind a menu, a dropdown or an anchored popover. Fully transparent on purpose: it exists to catch the click that closes the menu, never to tint the screen. Same value in all four modes: a scrim is dark in the light theme too.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8256:7",
+          "collection": "VariableCollectionId:7862:97",
+          "scopes": [
+            "ALL_SCOPES"
+          ],
+          "codeSyntax": {
+            "WEB": "var(--scrim-menu)"
+          }
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "generator": {
+      "name": "Token Press",
+      "version": "3.0.0"
+    },
+    "figma": {
+      "collection": {
+        "id": "VariableCollectionId:7862:97",
+        "name": "Mycelium Semantics",
+        "defaultModeId": "7862:0"
+      },
+      "mode": "Forge Dark"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DocumentationToc.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,13 +22,13 @@ namespace Mycelium.Forge.Components.Pages.Documentation
         /// <summary>
         /// The base CSS class applied to all table of contents items.
         /// </summary>
-        private const string BaseTocItemClass = "text-sm leading-xs transition-colors";
+        private const string BaseTocItemClass = "toc-nav-item";
 
         /// <summary>
         /// Gets or sets the JavaScript runtime service.
         /// </summary>
         [Inject]
-        public IJSRuntime JSRuntime { get; set; }
+        public IJSRuntime JsRuntime { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of table of contents entries to display.
@@ -70,7 +70,7 @@ namespace Mycelium.Forge.Components.Pages.Documentation
                 tocItem.IsActive = tocItem == item;
             }
 
-            await this.JSRuntime.InvokeVoidAsync("forgeInterop.scrollToElement", item.TargetId);
+            await this.JsRuntime.InvokeVoidAsync("forgeInterop.scrollToElement", item.TargetId);
         }
     }
 }
