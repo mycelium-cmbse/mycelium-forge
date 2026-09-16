@@ -184,7 +184,7 @@
                 <CollaboratorAvatar Name="@(organization.Name)"
                                     Size="w-7 h-7"/>
 
-                <a href="@(PageRoutes.GetOrganizationSettingsRoute(organization.Scope))"
+                <a href="@(PageRoutes.GetOrganizationRoute(organization.Scope))"
                    class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
                     @(organization.Scope)
                 </a>

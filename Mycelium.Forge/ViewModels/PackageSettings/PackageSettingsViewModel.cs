@@ -72,7 +72,6 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             {
                 IsVerified = true,
                 Role = PackageInvitationKind.OWNER,
-                Href = PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
                 Maintainers = maintainers,
                 Versions = versions
             };

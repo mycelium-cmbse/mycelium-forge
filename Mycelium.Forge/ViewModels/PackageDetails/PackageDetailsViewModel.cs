@@ -158,7 +158,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 IsVerified = true,
                 Role = PackageInvitationKind.OWNER,
                 License = "Apache-2.0",
-                Href = PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
                 Maintainers = maintainers,
                 Versions = versions
             };

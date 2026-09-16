@@ -29,5 +29,14 @@ namespace Mycelium.Forge.Components.Common
         /// </summary>
         [Parameter]
         public string Class { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets the breadcrumb items materialized as a read-only list for indexed access.
+        /// </summary>
+        /// <returns>A read-only list containing the breadcrumb items.</returns>
+        public IReadOnlyList<BreadcrumbItem> GetItemsList()
+        {
+            return this.Items as IReadOnlyList<BreadcrumbItem> ?? [.. this.Items];
+        }
     }
 }

@@ -79,7 +79,7 @@
                                         Item="@package"
                                         Class="px-5 py-3.5 flex items-center hover:bg-muted/50 transition-colors">
                                 <BbTableCell Class="w-[430px] shrink-0 p-0">
-                                    <a href="@(PageRoutes.GetPackageSettingsRoute(package.Publisher, package.Package.ShortName))"
+                                    <a href="@(PageRoutes.GetPackageRoute(package.Publisher, package.Package.ShortName))"
                                        class="font-semibold text-foreground hover:text-primary transition-colors truncate">
                                         @(package.Name)
                                     </a>

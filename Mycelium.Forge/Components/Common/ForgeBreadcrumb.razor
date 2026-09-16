@@ -9,9 +9,13 @@
 
 <BbBreadcrumb Class="@($"text-xs leading-2xs {this.Class}")">
     <BbBreadcrumbList>
-        @foreach (var item in this.Items)
+        @{
+            var itemsList = this.GetItemsList();
+        }
+        @for (var i = 0; i < itemsList.Count; i++)
         {
-            var isLast = item == this.Items.Last();
+            var item = itemsList[i];
+            var isLast = i == itemsList.Count - 1;
 
             <BbBreadcrumbItem @key="@(item)">
                 @if (isLast || string.IsNullOrWhiteSpace(item.Link))

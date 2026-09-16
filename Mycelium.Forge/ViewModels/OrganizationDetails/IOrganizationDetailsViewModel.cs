@@ -28,6 +28,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         List<PackageModel> Packages { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is an administrator of the organization.
+        /// </summary>
+        bool IsUserAdmin { get; set; }
+
+        /// <summary>
         /// Initializes the organization view model state for the specified organization identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the organization.</param>

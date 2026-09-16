@@ -70,8 +70,8 @@ namespace Mycelium.Forge.Components.Common
                 return "bg-primary";
             }
 
-            var hash = Math.Abs(this.Name.GetHashCode());
-            var index = hash % CollaboratorColorClasses.Length;
+            var hash = (uint)this.Name.GetHashCode();
+            var index = hash % (uint)CollaboratorColorClasses.Length;
             return CollaboratorColorClasses[index];
         }
     }
