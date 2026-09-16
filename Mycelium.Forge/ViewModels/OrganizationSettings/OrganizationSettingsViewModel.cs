@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -60,7 +60,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         {
             this.Organization = new OrganizationModel(
                 SeedData.StarionOrganization,
-                "SG",
                 SeedData.StarionOrganization.Origin,
                 true,
                 6,

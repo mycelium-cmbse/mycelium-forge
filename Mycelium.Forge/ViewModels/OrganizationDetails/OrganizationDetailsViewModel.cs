@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -42,7 +42,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         {
             this.Organization = new OrganizationModel(
                 SeedData.StarionOrganization,
-                "SG",
                 SeedData.StarionOrganization.Origin,
                 true,
                 6,
@@ -52,14 +51,14 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
             this.Packages =
             [
                 new PackageModel(
-                    new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60) },
+                    new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60), Description = "A package for handling ECSS E-ST-32-10c specifications." },
                     "@starion",
                     "v0.3.0",
                     PackageFormatConstants.SysMlV2,
                     "comms · rf · telemetry · ecss",
                     190),
                 new PackageModel(
-                    new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90) },
+                    new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90), Description = "A package for handling ECSS E-ST-31-01c specifications." },
                     "@starion",
                     "v1.0.0",
                     PackageFormatConstants.SysMlV2,

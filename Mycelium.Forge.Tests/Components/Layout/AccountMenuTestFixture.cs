@@ -16,7 +16,10 @@ namespace Mycelium.Forge.Tests.Components.Layout
 
     using Bunit;
 
+    using Microsoft.Extensions.DependencyInjection;
+
     using Mycelium.Forge.Components.Common;
+    using Mycelium.Forge.Services;
 
     [TestFixture]
     public class AccountMenuTestFixture
@@ -30,6 +33,7 @@ namespace Mycelium.Forge.Tests.Components.Layout
 
             this.context.Services.AddBlazorBlueprintPrimitives();
             this.context.Services.AddBlazorBlueprintComponents();
+            this.context.Services.AddScoped<IUserService, UserService>();
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
         }
 

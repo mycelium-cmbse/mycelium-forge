@@ -48,6 +48,7 @@ namespace Mycelium.Forge.Tests.Components.Layout
             this.themeServiceMock.Setup(x => x.InitializeThemeAsync()).Returns(Task.CompletedTask);
 
             this.context.Services.AddSingleton(this.themeServiceMock.Object);
+            this.context.Services.AddScoped<IUserService, UserService>();
         }
 
         [TearDown]

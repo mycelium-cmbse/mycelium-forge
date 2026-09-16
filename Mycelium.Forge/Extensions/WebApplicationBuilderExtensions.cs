@@ -45,7 +45,8 @@ namespace Mycelium.Forge.Extensions
         }
 
         /// <summary>
-        /// Registers auto-generated domain services, DAOs, validators, comparers, and permission services in the application service collection.
+        /// Registers auto-generated domain services, DAOs, validators, comparers, and permission services in the application
+        /// service collection.
         /// </summary>
         /// <param name="builder">The <see cref="WebApplicationBuilder" /> to configure.</param>
         /// <returns>The configured <see cref="WebApplicationBuilder" /> instance.</returns>
@@ -79,6 +80,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<IVerifyEmailViewModel, VerifyEmailViewModel>();
             builder.Services.AddTransient<IDocumentationViewModel, DocumentationViewModel>();
             builder.Services.AddScoped<IThemeService, ThemeService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IJsInterop, JsInterop>();
 
             return builder;
