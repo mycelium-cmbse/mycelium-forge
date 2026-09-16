@@ -5,8 +5,37 @@
 /* Fallback domain ownership semantic tokens missing from upstream DTCG (Figma) export.
  * Declared here until Figma variable collections are updated with these chips.
  */
+
+/* BlazorBlueprint theming tokens manual override */
 :root {
-    --radius: var(--radius-md, 0.5rem);
+    --radius: var(--radius-8);
+    --secondary: var(--color-gray-150);
+    --secondary-foreground: var(--color-gray-800);
+    --chart-1: var(--color-copper-400);
+    --chart-2: var(--color-teal-500);
+    --chart-3: var(--color-gray-700);
+    --chart-4: var(--color-status-warning-500);
+    --chart-5: var(--color-copper-300);
+    --sidebar: var(--color-gray-100);
+    --sidebar-foreground: var(--color-gray-800);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+    --alert-success: var(--success);
+    --alert-success-foreground: var(--success-strong);
+    --alert-success-bg: var(--docs-callout-tip-bg);
+    --alert-info: var(--info);
+    --alert-info-foreground: var(--info-strong);
+    --alert-info-bg: var(--docs-callout-note-bg);
+    --alert-warning: var(--warning);
+    --alert-warning-foreground: var(--warning-vivid);
+    --alert-warning-bg: var(--docs-callout-warning-bg);
+    --alert-danger: var(--destructive);
+    --alert-danger-foreground: var(--destructive-strong);
+    --alert-danger-bg: var(--docs-callout-danger-bg);
     --ownership-software-bg: #ebf7eb;
     --ownership-software-fg: #338c4d;
     --ownership-data-handling-bg: #eef2ff;
@@ -14,17 +43,44 @@
 }
 
 .dark {
-  --ownership-software-bg: #ebf7eb;
-  --ownership-software-fg: #338c4d;
-  --ownership-data-handling-bg: #eef2ff;
-  --ownership-data-handling-fg: #4f46e5;
+    --secondary: var(--color-gray-750);
+    --secondary-foreground: var(--color-gray-0);
+    --chart-1: var(--color-status-info-500);
+    --chart-2: var(--color-teal-300);
+    --chart-3: var(--color-copper-300);
+    --chart-4: var(--color-ui-system);
+    --chart-5: var(--color-status-danger-500);
+    --sidebar: var(--color-gray-850);
+    --sidebar-foreground: var(--color-gray-0);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+    --alert-success: var(--success);
+    --alert-success-foreground: var(--success-strong);
+    --alert-success-bg: var(--docs-callout-tip-bg);
+    --alert-info: var(--info);
+    --alert-info-foreground: var(--info-strong);
+    --alert-info-bg: var(--docs-callout-note-bg);
+    --alert-warning: var(--warning);
+    --alert-warning-foreground: var(--warning-vivid);
+    --alert-warning-bg: var(--docs-callout-warning-bg);
+    --alert-danger: var(--destructive);
+    --alert-danger-foreground: var(--destructive-strong);
+    --alert-danger-bg: var(--docs-callout-danger-bg);
+    --ownership-software-bg: #ebf7eb;
+    --ownership-software-fg: #338c4d;
+    --ownership-data-handling-bg: #eef2ff;
+    --ownership-data-handling-fg: #4f46e5;
 }
 
 /* Base button styling defaults */
 button[data-slot="button"],
 a[data-slot="button"] {
   cursor: pointer;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
 }
 
 button[data-slot="button"]:disabled,

@@ -19,37 +19,11 @@
 
 <div class="w-full bg-background min-h-screen py-9 select-none">
     <div class="max-w-[1000px] w-full mx-auto px-6 flex flex-col gap-4.5">
-        <BbBreadcrumb Class="text-xs leading-2xs">
-            <BbBreadcrumbList>
-                <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@PageRoutes.Packages"
-                                      Class="text-primary hover:underline font-normal">
-                        Browse
-                    </BbBreadcrumbLink>
-                </BbBreadcrumbItem>
-                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-                    /
-                </BbBreadcrumbSeparator>
-                <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@(PageRoutes.GetOrganizationRoute(this.ViewModel.Organization.Scope))"
-                                      Class="text-primary hover:underline font-normal">
-                        @(this.ViewModel.Organization.Scope)
-                    </BbBreadcrumbLink>
-                </BbBreadcrumbItem>
-                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-                    /
-                </BbBreadcrumbSeparator>
-                <BbBreadcrumbItem>
-                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
-                        Settings
-                    </BbBreadcrumbPage>
-                </BbBreadcrumbItem>
-            </BbBreadcrumbList>
-        </BbBreadcrumb>
+        <ForgeBreadcrumb Items="@(this.GetBreadcrumbItems())"/>
 
         <div class="flex items-center gap-3 w-full">
             <div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0 text-primary-foreground text-2xs leading-3xs font-semibold">
-                @(this.ViewModel.Organization.Initials)
+                @(this.ViewModel.Organization.Name.GetInitials())
             </div>
 
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight flex-1 truncate">
@@ -66,7 +40,7 @@
             @(this.ViewModel.Organization.Name) &middot; @(this.ViewModel.Organization.Description)
         </p>
 
-        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+        <ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
             <div class="flex items-center justify-between gap-2 w-full h-8">
                 <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
                     MEMBERS
@@ -86,8 +60,7 @@
                 {
                     <div class="flex items-center gap-3 py-2.25 w-full" @key="member.Account.Id">
                         <CollaboratorAvatar Name="@(member.Name)"
-                                            Initials="@(member.Initials)"
-                                            Size="w-7 h-7" />
+                                            Size="w-7 h-7"/>
 
                         <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
                             <span class="text-sm leading-xs font-medium text-foreground truncate">
@@ -122,9 +95,9 @@
             <p class="text-xs leading-2xs text-muted-foreground w-full">
                 An Organization must keep at least one Organization Administrator. The Organization Administrator role takes effect only once the recipient accepts it.
             </p>
-        </div>
+        </ForgeCard>
 
-        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+        <ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
             <div class="flex items-center gap-2.5 w-full">
                 <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
                     PENDING INVITATIONS
@@ -170,9 +143,9 @@
 
             <ForgeAlert Variant="ForgeAlertVariant.Default"
                         Description="An invitation admits an Account only after explicit acceptance, and expires automatically."/>
-        </div>
+        </ForgeCard>
 
-        <div class="w-full p-5 sm:px-5.5 rounded-lg bg-card border border-border flex flex-col gap-3.5">
+        <ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
             <div class="flex items-center gap-2.5 w-full">
                 <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
                     SCOPE
@@ -193,6 +166,6 @@
             <p class="text-xs leading-2xs text-muted-foreground w-full">
                 The organization cannot be deleted while its scope still holds packages.
             </p>
-        </div>
+        </ForgeCard>
     </div>
 </div>

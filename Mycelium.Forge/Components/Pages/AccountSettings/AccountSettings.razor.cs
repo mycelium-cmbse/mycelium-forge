@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
+    using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.AccountSettings;
 
@@ -161,6 +162,25 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
             base.OnInitialized();
 
             this.ViewModel.InitializeViewModel();
+        }
+
+        /// <summary>
+        /// Gets the breadcrumb navigation items for the account settings page.
+        /// </summary>
+        /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
+        private static IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        {
+            return
+            [
+                new BreadcrumbItem
+                {
+                    Name = "Account"
+                },
+                new BreadcrumbItem
+                {
+                    Name = "Settings"
+                }
+            ];
         }
     }
 }

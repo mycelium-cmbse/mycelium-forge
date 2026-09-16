@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishedToForgeDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -163,9 +163,10 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
                 return this.PackageHref;
             }
 
-            if (this.Package != null && !string.IsNullOrEmpty(this.Package.Href))
+            if (this.Package?.Package != null && !string.IsNullOrEmpty(this.Package.Package.ShortName))
             {
-                return this.Package.Href;
+                var publisherRoute = string.IsNullOrEmpty(this.Package.Publisher) ? "starion" : this.Package.Publisher;
+                return PageRoutes.GetPackageRoute(publisherRoute, this.Package.Package.ShortName);
             }
 
             var cleanScope = (this.Scope ?? "starion").TrimStart('@');

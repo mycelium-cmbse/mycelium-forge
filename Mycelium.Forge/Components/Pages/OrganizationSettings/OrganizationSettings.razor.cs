@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.Organization;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
@@ -106,6 +107,31 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
             base.OnParametersSet();
 
             this.ViewModel.InitializeViewModel(this.Id);
+        }
+
+        /// <summary>
+        /// Gets the breadcrumb navigation items for the organization settings page.
+        /// </summary>
+        /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
+        private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        {
+            return
+            [
+                new BreadcrumbItem
+                {
+                    Name = "Search",
+                    Link = PageRoutes.Packages
+                },
+                new BreadcrumbItem
+                {
+                    Name = this.ViewModel.Organization.Scope,
+                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Organization.Scope)
+                },
+                new BreadcrumbItem
+                {
+                    Name = "Settings"
+                }
+            ];
         }
     }
 }

@@ -31,6 +31,11 @@ namespace Mycelium.Forge.Components.Pages
         public IOrganizationDetailsViewModel ViewModel { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether the current user is an administrator of the organization.
+        /// </summary>
+        public bool IsUserAdmin => this.ViewModel.IsUserAdmin;
+
+        /// <summary>
         /// Gets the formatted metadata summary line for the organization.
         /// </summary>
         /// <returns>A formatted string with verified status, package, version, import counts, and member year.</returns>
