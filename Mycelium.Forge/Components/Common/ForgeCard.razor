@@ -1,0 +1,12 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ForgeCard.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5 @(this.Class)" @attributes="@(this.AdditionalAttributes)">
+    @(this.ChildContent)
+</div>

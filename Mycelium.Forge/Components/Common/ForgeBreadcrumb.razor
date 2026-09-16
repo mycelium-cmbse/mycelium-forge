@@ -1,0 +1,44 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ForgeBreadcrumb.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<BbBreadcrumb Class="@($"text-xs leading-2xs {this.Class}")">
+    <BbBreadcrumbList>
+        @{
+            var itemsList = this.GetItemsList();
+        }
+        @for (var i = 0; i < itemsList.Count; i++)
+        {
+            var item = itemsList[i];
+            var isLast = i == itemsList.Count - 1;
+
+            <BbBreadcrumbItem @key="@(item)">
+                @if (isLast || string.IsNullOrWhiteSpace(item.Link))
+                {
+                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
+                        @(item.Name)
+                    </BbBreadcrumbPage>
+                }
+                else
+                {
+                    <BbBreadcrumbLink Href="@(item.Link)"
+                                      Class="text-primary hover:underline font-normal">
+                        @(item.Name)
+                    </BbBreadcrumbLink>
+                }
+            </BbBreadcrumbItem>
+
+            @if (!isLast)
+            {
+                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
+                    /
+                </BbBreadcrumbSeparator>
+            }
+        }
+    </BbBreadcrumbList>
+</BbBreadcrumb>

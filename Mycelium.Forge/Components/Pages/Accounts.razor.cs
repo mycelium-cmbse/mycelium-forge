@@ -15,6 +15,7 @@ namespace Mycelium.Forge.Components.Pages
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Admin;
+    using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.ViewModels.AdminAccounts;
 
     /// <summary>
@@ -127,6 +128,26 @@ namespace Mycelium.Forge.Components.Pages
         {
             base.OnInitialized();
             this.ViewModel.InitializeViewModel(this.SearchQuery, this.SelectedStatusFilter, this.SelectedVerificationFilter);
+        }
+
+        /// <summary>
+        /// Gets the breadcrumb navigation items for the accounts page.
+        /// </summary>
+        /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
+        private static IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        {
+            return
+            [
+                new BreadcrumbItem
+                {
+                    Name = "Installation",
+                    Link = PageRoutes.Documentation.Overview
+                },
+                new BreadcrumbItem
+                {
+                    Name = "Accounts"
+                }
+            ];
         }
     }
 }

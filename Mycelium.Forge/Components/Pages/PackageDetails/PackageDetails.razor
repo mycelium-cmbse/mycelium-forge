@@ -1,3 +1,4 @@
+﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @* ------------------------------------------------------------------------------------------------
 <copyright file="PackageDetails.razor" company="Starion Group S.A.">
 
@@ -6,8 +7,6 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
-
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @attribute [Route(PageRoutes.Package)]
 @rendermode InteractiveServer
 
@@ -21,33 +20,7 @@
 <div class="w-full bg-background min-h-screen select-none">
 <header class="w-full bg-card border-b border-border py-7">
     <div class="page-container flex flex-col gap-3.5">
-        <BbBreadcrumb Class="breadcrumb-nav">
-            <BbBreadcrumbList>
-                <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@PageRoutes.Packages"
-                                      Class="text-primary hover:underline font-normal">
-                        Browse
-                    </BbBreadcrumbLink>
-                </BbBreadcrumbItem>
-                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-                    /
-                </BbBreadcrumbSeparator>
-                <BbBreadcrumbItem>
-                    <BbBreadcrumbLink Href="@(PageRoutes.GetOrganizationRoute(this.ViewModel.Package.Package.Publisher))"
-                                      Class="text-primary hover:underline font-normal">
-                        @(this.ViewModel.Package.Package.Publisher)
-                    </BbBreadcrumbLink>
-                </BbBreadcrumbItem>
-                <BbBreadcrumbSeparator Class="text-muted-foreground font-normal">
-                    /
-                </BbBreadcrumbSeparator>
-                <BbBreadcrumbItem>
-                    <BbBreadcrumbPage Class="text-muted-foreground font-normal">
-                        @(this.ViewModel.Package.Package.Name)
-                    </BbBreadcrumbPage>
-                </BbBreadcrumbItem>
-            </BbBreadcrumbList>
-        </BbBreadcrumb>
+        <ForgeBreadcrumb Items="@(this.GetBreadcrumbItems())"/>
 
         <div class="flex flex-wrap items-center gap-2.5 w-full">
             <LucideIcon Name="box"
@@ -73,7 +46,22 @@
             @if (!string.IsNullOrWhiteSpace(this.ViewModel.Package.ReleaseStatus))
             {
                 <ForgeBadge Text="@(this.ViewModel.Package.ReleaseStatus)"
-                            Class="badge-lifecycle-open" />
+                            Class="badge-lifecycle-open"/>
+            }
+            @if (this.IsUserAdmin)
+            {
+                <div class="flex-1"></div>
+
+                <BbButton id="package-details-settings-button"
+                          Variant="ButtonVariant.Outline"
+                          Size="ButtonSize.Small"
+                          Href="@(PageRoutes.GetPackageSettingsRoute(this.ViewModel.Package.Package.Publisher, this.ViewModel.Package.Package.Package.ShortName))"
+                          Class="shrink-0">
+                    <LucideIcon Name="settings"
+                                Size="14"
+                                Class="shrink-0"/>
+                    <span>Settings</span>
+                </BbButton>
             }
         </div>
 
@@ -220,7 +208,7 @@
         </div>
 
         <aside class="w-full lg:w-[340px] shrink-0 flex flex-col gap-4">
-            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+            <ForgeCard>
                 <span class="section-label">
                     METADATA
                 </span>
@@ -265,9 +253,9 @@
                         @(this.ViewModel.Package.PackageUrlDisplayName)
                     </span>
                 </div>
-            </div>
+            </ForgeCard>
 
-            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+            <ForgeCard>
                 <span class="section-label">
                     QUALITY
                 </span>
@@ -291,9 +279,9 @@
                         </span>
                     </div>
                 }
-            </div>
+            </ForgeCard>
 
-            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+            <ForgeCard>
                 <span class="section-label">
                     MAINTAINERS
                 </span>
@@ -303,8 +291,7 @@
                     <div @key="maintainer.Name"
                          class="flex items-center gap-2 h-6.5">
                         <CollaboratorAvatar Name="@(maintainer.Name)"
-                                            Initials="@(maintainer.Initials)"
-                                            Size="w-6.5 h-6.5" />
+                                            Size="w-6.5 h-6.5"/>
                         <span class="text-xs leading-2xs font-medium text-foreground flex-1 truncate">
                             @(maintainer.Name)
                         </span>
@@ -316,9 +303,9 @@
                         }
                     </div>
                 }
-            </div>
+            </ForgeCard>
 
-            <div class="w-full p-4 rounded-lg bg-card border border-border flex flex-col gap-2.5">
+            <ForgeCard>
                 <span class="section-label">
                     TAGS
                 </span>
@@ -332,9 +319,8 @@
                         </BbBadge>
                     }
                 </div>
-            </div>
+            </ForgeCard>
         </aside>
     </div>
 </div>
-
 </div>

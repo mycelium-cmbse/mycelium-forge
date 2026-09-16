@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="Packages.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -100,7 +100,7 @@
                 {
                     @foreach (var package in this.ViewModel.PackageResults)
                     {
-                        <PackageRow @key="package.Href"
+                        <PackageRow @key="package.FullName"
                                     Model="@package"/>
                     }
                 }

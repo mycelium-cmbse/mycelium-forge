@@ -217,7 +217,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 License = "Apache-2.0",
                 Maintainers =
                 [
-                    new PackageMaintainerModel("Alex Rivera", "AR") { IsVerified = true }
+                    new PackageMaintainerModel("Alex Rivera") { IsVerified = true }
                 ]
             };
 

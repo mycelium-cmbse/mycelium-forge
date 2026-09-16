@@ -48,9 +48,6 @@ namespace Mycelium.Forge.Models.Package
             this.Format = format;
             this.Tags = tags;
             this.ImportCount = importCount;
-
-            var publisherRoute = string.IsNullOrEmpty(publisher) ? "starion" : publisher;
-            this.Href = PageRoutes.GetPackageRoute(publisherRoute, package?.ShortName ?? string.Empty);
         }
 
         /// <summary>
@@ -69,11 +66,6 @@ namespace Mycelium.Forge.Models.Package
         public string FullName => !string.IsNullOrEmpty(this.Publisher) && !string.IsNullOrEmpty(this.Name)
             ? $"{this.Publisher}/{this.Name}"
             : this.Name ?? string.Empty;
-
-        /// <summary>
-        /// Gets or sets the relative URL to the package page.
-        /// </summary>
-        public string Href { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the package description.

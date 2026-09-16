@@ -31,9 +31,9 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         {
             var maintainers = new List<PackageMaintainerModel>
             {
-                new("Starion Group", "SG", true, PackageInvitationKind.OWNER),
-                new("R. André", "SG", false, PackageInvitationKind.OWNER),
-                new("J. Klein", "SG")
+                new("Starion Group", true, PackageInvitationKind.OWNER),
+                new("R. André", false, PackageInvitationKind.OWNER),
+                new("J. Klein")
             };
 
             var versions = new List<PackageVersionModel>
@@ -72,7 +72,6 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             {
                 IsVerified = true,
                 Role = PackageInvitationKind.OWNER,
-                Href = PageRoutes.GetPackageRoute(resolvedOrganization, resolvedName),
                 Maintainers = maintainers,
                 Versions = versions
             };

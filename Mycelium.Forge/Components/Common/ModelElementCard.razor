@@ -14,7 +14,7 @@
             <div class="flex items-center gap-2 min-w-0">
                 <LucideIcon Name="box"
                             Size="16"
-                            Class="@($"{this.GetHeaderClass()} shrink-0")" />
+                            Class="@($"{this.GetHeaderClass()} shrink-0")"/>
                 <span class="text-sm leading-xs font-semibold truncate @(this.GetHeaderClass())">
                     @(this.Element.Name)
                 </span>
@@ -24,7 +24,7 @@
             </div>
 
             <ForgeBadge Text="@(this.GetCategoryDisplayName())"
-                        Class="@($"shrink-0 {this.GetBadgeClass()}")" />
+                        Class="@($"shrink-0 {this.GetBadgeClass()}")"/>
         </div>
 
         @if (!string.IsNullOrEmpty(this.Element.AttributeSummary))

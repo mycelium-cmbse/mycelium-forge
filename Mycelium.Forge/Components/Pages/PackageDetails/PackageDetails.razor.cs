@@ -15,7 +15,9 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
 
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageDetails.Dialogs;
+    using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.PackageDetails;
 
@@ -266,6 +268,31 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             base.OnParametersSet();
 
             this.ViewModel.InitializeViewModel(this.PackageName, this.Organization);
+        }
+
+        /// <summary>
+        /// Gets the breadcrumb navigation items for the package details page.
+        /// </summary>
+        /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
+        private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        {
+            return
+            [
+                new BreadcrumbItem
+                {
+                    Name = "Search",
+                    Link = PageRoutes.Packages
+                },
+                new BreadcrumbItem
+                {
+                    Name = this.ViewModel.Package.Package.Publisher,
+                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Package.Package.Publisher)
+                },
+                new BreadcrumbItem
+                {
+                    Name = this.ViewModel.Package.Package.Name
+                }
+            ];
         }
     }
 }

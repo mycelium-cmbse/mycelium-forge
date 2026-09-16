@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishedToForgeDialogTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -207,7 +207,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.PackageHref, string.Empty);
-                parameters.Add(x => x.Package, new PackageModel(new Package { Name = "P" }, "@org", "1.0.0") { Href = "/packages/@org/P" });
+                parameters.Add(x => x.Package, new PackageModel(new Package { Name = "P" }, "@org", "1.0.0"));
             });
 
             var packageHref = dialog2.Instance.GetPackageHref();
@@ -235,7 +235,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(explicitHref, Is.EqualTo("/explicit/href"));
-                Assert.That(packageHref, Is.EqualTo("/packages/@org/P"));
                 Assert.That(builtHref, Does.Contain("starion").And.Contain("ECSS-MM-PWR"));
                 Assert.That(fallbackHref, Is.EqualTo(PageRoutes.Packages));
             }
