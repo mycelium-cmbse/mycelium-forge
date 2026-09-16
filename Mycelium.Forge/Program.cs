@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -79,12 +79,7 @@ namespace Mycelium.Forge
                     .AddEnvironmentVariables()
                     .Build();
 
-                var databaseConfig = configuration.GetSection(nameof(DatabaseConfig)).Get<DatabaseConfig>()
-                                     ?? configuration.GetSection("DatabaseConnection").Get<DatabaseConfig>();
-
-                var connectionString = databaseConfig != null && !string.IsNullOrWhiteSpace(databaseConfig.Host)
-                    ? databaseConfig.BuildConnectionString()
-                    : configuration.GetConnectionString("Default");
+                var connectionString = configuration.GetDatabaseConnectionString();
 
                 if (string.IsNullOrWhiteSpace(connectionString))
                 {
@@ -101,8 +96,7 @@ namespace Mycelium.Forge
                     .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                     .ConfigureServices((context, services) =>
                     {
-                        services.Configure<DatabaseConfig>(context.Configuration.GetSection("DatabaseConnection"));
-                        services.AddSingleton(provider => provider.GetRequiredService<IOptions<DatabaseConfig>>().Value);
+                        services.RegisterDatabase(context.Configuration);
                         services.AddForgeDal();
                         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
                     });

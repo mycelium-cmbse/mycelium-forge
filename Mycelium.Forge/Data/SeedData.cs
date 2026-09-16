@@ -179,7 +179,7 @@ namespace Mycelium.Forge.Data
             {
                 Id = Guid.NewGuid(),
                 Owner = forgeId,
-                Name = PackageFormatConstants.Cdp4Comet,
+                Name = "Cdp4Comet",
                 Description = "Concurrent Design Platform COMET data definitions.",
                 CreatedAt = DateTime.UtcNow,
                 ModifiedAt = DateTime.UtcNow
@@ -189,7 +189,7 @@ namespace Mycelium.Forge.Data
             {
                 Id = Guid.NewGuid(),
                 Owner = forgeId,
-                Name = PackageFormatConstants.Capella,
+                Name = "Capella",
                 Description = "Capella system architecture and Arcadia methodology models.",
                 CreatedAt = DateTime.UtcNow,
                 ModifiedAt = DateTime.UtcNow
