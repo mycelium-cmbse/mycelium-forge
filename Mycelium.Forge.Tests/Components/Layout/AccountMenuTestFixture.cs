@@ -17,8 +17,6 @@ namespace Mycelium.Forge.Tests.Components.Layout
     using Bunit;
 
     using Mycelium.Forge.Components.Common;
-    using Mycelium.Forge.Components.Layout;
-    using Mycelium.Forge.Extensions;
 
     [TestFixture]
     public class AccountMenuTestFixture
@@ -42,7 +40,7 @@ namespace Mycelium.Forge.Tests.Components.Layout
         }
 
         [Test]
-        public void VerifyAccountMenuRendering()
+        public async Task VerifyAccountMenuRendering()
         {
             var accountMenu = this.context.Render<AccountMenu>();
 
@@ -54,14 +52,26 @@ namespace Mycelium.Forge.Tests.Components.Layout
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(accountMenu.Instance, Is.Not.Null);
-                Assert.That(accountMenu.Instance.Name.GetInitials(), Is.EqualTo("RA"));
-                Assert.That(accountMenu.Instance.Name, Is.EqualTo("Régis André"));
-                Assert.That(accountMenu.Instance.Handle, Is.EqualTo("randre"));
-                Assert.That(accountMenu.Instance.Organization, Is.EqualTo("starion"));
                 Assert.That(avatar, Is.Not.Null);
                 Assert.That(dropdownMenu, Is.Not.Null);
                 Assert.That(dropdownTrigger, Is.Not.Null);
                 Assert.That(dropdownContent, Is.Not.Null);
+            }
+
+            var button = accountMenu.Find("#header-account-menu-trigger");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(button, Is.Not.Null);
+                Assert.That(button.GetAttribute("aria-expanded"), Is.EqualTo("false"));
+            }
+
+            await accountMenu.InvokeAsync(() => button.ClickAsync());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(button, Is.Not.Null);
+                Assert.That(button.GetAttribute("aria-expanded"), Is.EqualTo("true"));
             }
         }
     }

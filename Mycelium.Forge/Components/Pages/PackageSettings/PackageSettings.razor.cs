@@ -144,7 +144,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
             [
                 new BreadcrumbItem
                 {
-                    Name = "Browse",
+                    Name = "Search",
                     Link = PageRoutes.Packages
                 },
                 new BreadcrumbItem

@@ -48,6 +48,21 @@
                 <ForgeBadge Text="@(this.ViewModel.Package.ReleaseStatus)"
                             Class="badge-lifecycle-open"/>
             }
+            @if (this.IsUserAdmin)
+            {
+                <div class="flex-1"></div>
+
+                <BbButton id="package-details-settings-button"
+                          Variant="ButtonVariant.Outline"
+                          Size="ButtonSize.Small"
+                          Href="@(PageRoutes.GetPackageSettingsRoute(this.ViewModel.Package.Package.Publisher, this.ViewModel.Package.Package.Package.ShortName))"
+                          Class="shrink-0">
+                    <LucideIcon Name="settings"
+                                Size="14"
+                                Class="shrink-0"/>
+                    <span>Settings</span>
+                </BbButton>
+            }
         </div>
 
         <p class="text-md leading-sm text-muted-foreground">
@@ -79,15 +94,6 @@
                                 Size="15"
                                 Class="shrink-0"/>
                     <span>Migrate in Bloom</span>
-                </BbButton>
-
-                <BbButton id="package-details-settings-button"
-                          Variant="ButtonVariant.Outline"
-                          Href="@(PageRoutes.GetPackageSettingsRoute(this.ViewModel.Package.Package.Publisher, this.ViewModel.Package.Package.Package.ShortName))">
-                    <LucideIcon Name="settings"
-                                Size="15"
-                                Class="shrink-0"/>
-                    <span>Settings</span>
                 </BbButton>
             }
 

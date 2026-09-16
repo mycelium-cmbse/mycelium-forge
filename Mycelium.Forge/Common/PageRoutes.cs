@@ -20,7 +20,7 @@ namespace Mycelium.Forge.Common
         public const string Home = "/";
 
         /// <summary>
-        /// The package browsing and discovery page route path.
+        /// The package search and discovery page route path.
         /// </summary>
         public const string Packages = "/packages";
 

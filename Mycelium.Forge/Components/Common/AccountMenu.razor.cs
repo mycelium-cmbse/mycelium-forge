@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Components.Layout
+namespace Mycelium.Forge.Components.Common
 {
     using Microsoft.AspNetCore.Components;
 

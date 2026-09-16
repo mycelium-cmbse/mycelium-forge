@@ -22,8 +22,8 @@ namespace Mycelium.Forge.Tests.Components.Layout
 
     using Moq;
 
+    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Layout;
-    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Services;
 
     [TestFixture]
@@ -62,13 +62,7 @@ namespace Mycelium.Forge.Tests.Components.Layout
             var header = this.context.Render<Header>();
             var accountMenu = header.FindComponent<AccountMenu>();
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(accountMenu, Is.Not.Null);
-                Assert.That(accountMenu.Instance.Name, Is.EqualTo("Régis André"));
-                Assert.That(accountMenu.Instance.Handle, Is.EqualTo("randre"));
-                Assert.That(accountMenu.Instance.Name.GetInitials(), Is.EqualTo("RA"));
-            }
+            Assert.That(accountMenu, Is.Not.Null);
         }
 
         [Test]

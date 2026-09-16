@@ -280,7 +280,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             [
                 new BreadcrumbItem
                 {
-                    Name = "Browse",
+                    Name = "Search",
                     Link = PageRoutes.Packages
                 },
                 new BreadcrumbItem
