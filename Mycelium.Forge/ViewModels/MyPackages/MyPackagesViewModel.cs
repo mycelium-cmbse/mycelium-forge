@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.MyPackages
 {
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Models.Package;
 
@@ -28,7 +29,26 @@ namespace Mycelium.Forge.ViewModels.MyPackages
         /// </summary>
         public void InitializeViewModel()
         {
-            this.Packages = [.. SeedData.MyPackages];
+            var currentUser = SeedData.RegisAccount;
+
+            this.Packages = SeedData.Packages
+                .Where(p => p.PackageOwner.Contains(currentUser.Id) || p.PackageMaintainer.Contains(currentUser.Id))
+                .Select(p =>
+                {
+                    var model = PackageModel.FromPackage(p);
+
+                    if(p.PackageOwner.Contains(currentUser.Id))
+                    {
+                        model.Role = PackageInvitationKind.OWNER;
+                    }
+                    else if (p.PackageMaintainer.Contains(currentUser.Id))
+                    {
+                        model.Role = PackageInvitationKind.MAINTAINER;
+                    }
+
+                    return model;
+                })
+                .ToList();
         }
     }
 }

@@ -48,8 +48,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 new(
                     new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
                     "Starion Group",
-                    "1.3.0",
-                    description: "Power subsystem model.")
+                    "1.3.0")
             };
 
             this.viewModelMock.Setup(x => x.PackageCount).Returns("120");

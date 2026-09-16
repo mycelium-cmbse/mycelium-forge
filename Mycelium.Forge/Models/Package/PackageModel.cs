@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Models.Package
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Data;
     using Mycelium.Forge.Extensions;
 
     /// <summary>
@@ -31,50 +32,25 @@ namespace Mycelium.Forge.Models.Package
         /// <param name="publisher">The publisher namespace or author handle.</param>
         /// <param name="version">The package release version.</param>
         /// <param name="format">The format name (e.g., SysML v2, CDP4-COMET, Capella).</param>
-        /// <param name="description">The package description.</param>
         /// <param name="tags">The tags string.</param>
         /// <param name="importCount">The number of imports.</param>
         public PackageModel(
             IPackage package,
             string publisher = "",
             string version = "",
-            string format = "SysML v2",
-            string description = "",
+            string format = PackageFormatConstants.SysMlV2,
             string tags = "",
-            string importCount = "")
+            int importCount = 0)
         {
             this.Package = package;
             this.Publisher = publisher;
             this.Version = version;
             this.Format = format;
-            this.Description = description;
             this.Tags = tags;
             this.ImportCount = importCount;
 
             var publisherRoute = string.IsNullOrEmpty(publisher) ? "starion" : publisher;
             this.Href = PageRoutes.GetPackageRoute(publisherRoute, package?.ShortName ?? string.Empty);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PackageModel" /> class with specified string-based properties.
-        /// </summary>
-        /// <param name="name">The package name.</param>
-        /// <param name="description">The package description.</param>
-        /// <param name="format">The format name (e.g., SysML v2, CDP4-COMET, Capella).</param>
-        /// <param name="publisher">The publisher namespace or author handle.</param>
-        /// <param name="version">The package release version.</param>
-        /// <param name="tags">The tags string.</param>
-        /// <param name="importCount">The number of imports.</param>
-        public PackageModel(
-            string name,
-            string description = "",
-            string format = "SysML v2",
-            string publisher = "",
-            string version = "",
-            string tags = "",
-            string importCount = "")
-            : this(new Package { Name = name, ShortName = name.ToLowerInvariant() }, publisher, version, format, description, tags, importCount)
-        {
         }
 
         /// <summary>
@@ -102,7 +78,7 @@ namespace Mycelium.Forge.Models.Package
         /// <summary>
         /// Gets or sets the package description.
         /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public string Description => this.Package?.Description ?? string.Empty;
 
         /// <summary>
         /// Gets or sets the format name.
@@ -127,7 +103,7 @@ namespace Mycelium.Forge.Models.Package
         /// <summary>
         /// Gets or sets the number of imports.
         /// </summary>
-        public string ImportCount { get; set; } = string.Empty;
+        public int ImportCount { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the publisher is verified.
@@ -179,6 +155,47 @@ namespace Mycelium.Forge.Models.Package
 
             var cleanVersion = this.Version.TrimStart('v', 'V');
             return $"^{cleanVersion}";
+        }
+
+        /// <summary>
+        /// Creates a <see cref="PackageModel" /> by resolving publisher, version, and format information from seed data.
+        /// </summary>
+        /// <param name="package">The underlying package DTO.</param>
+        /// <returns>A new <see cref="PackageModel" />.</returns>
+        public static PackageModel FromPackage(IPackage package)
+        {
+            var publisher = SeedData.Organizations.FirstOrDefault(o => o.Id == package.Owner);
+            var publisherScope = publisher != null ? $"@{publisher.ShortName}" : "@starion";
+            var version = SeedData.PackageVersions.FirstOrDefault(v => v.Owner == package.Id);
+            var versionString = version?.Version ?? "v1.0.0";
+            var packageType = SeedData.PackageTypes.FirstOrDefault(t => t.Id == package.PackageType);
+            var format = packageType?.Name ?? PackageFormatConstants.SysMlV2;
+            var downloadCount = version?.DownloadCount ?? 0;
+
+            var tags = package.ShortName switch
+            {
+                "sysmlv2-isq-quantities" => "standard-library · units · quantities · isq",
+                "sysmlv2-kernel-library" => "standard-library · kerml · kernel",
+                "ecss-e-st-10-04c" => "standard-library · space-environment · ecss",
+                "ecss-mm-pwr" => "mission-model · power · ecss",
+                "smallsat-platform-model" => "mission-model · smallsat · platform",
+                "ecss-e-st-32-10c" => "comms · rf · telemetry · ecss",
+                "cdp4-comet-core" => "concurrent-design · cdp4 · ecss-10-25",
+                "capella-system-template" => "arcadia · capella · operational-analysis",
+                "ecss-e-st-31-01c" => "mechanical · structures · loads · ecss",
+                _ => "standard-library"
+            };
+
+            return new PackageModel(
+                package,
+                publisherScope,
+                versionString,
+                format,
+                tags,
+                downloadCount)
+            {
+                IsVerified = true
+            };
         }
     }
 }

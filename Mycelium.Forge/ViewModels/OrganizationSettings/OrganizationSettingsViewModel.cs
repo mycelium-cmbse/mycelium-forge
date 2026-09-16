@@ -58,9 +58,24 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <param name="id">The unique identifier or slug handle of the organization.</param>
         public void InitializeViewModel(string id)
         {
-            this.Organization = SeedData.StarionOrganizationModel;
+            this.Organization = new OrganizationModel(
+                SeedData.StarionOrganization,
+                "SG",
+                SeedData.StarionOrganization.Origin,
+                true,
+                6,
+                14,
+                390);
+
             this.CurrentUserRole = OrganizationInvitationKind.ADMINISTRATOR;
-            this.Members = [.. SeedData.StarionMembers];
+
+            this.Members =
+            [
+                new OrganizationMemberModel(SeedData.RegisAccount, OrganizationInvitationKind.ADMINISTRATOR),
+                new OrganizationMemberModel(SeedData.StefanAccount, OrganizationInvitationKind.ADMINISTRATOR),
+                new OrganizationMemberModel(SeedData.KleinAccount),
+                new OrganizationMemberModel(SeedData.BlancAccount)
+            ];
 
             this.PendingInvitations =
             [

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -68,7 +68,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
                 packageDto,
                 resolvedOrganization,
                 "v1.2.0",
-                importCount: "210")
+                importCount: 210)
             {
                 IsVerified = true,
                 Role = PackageInvitationKind.OWNER,

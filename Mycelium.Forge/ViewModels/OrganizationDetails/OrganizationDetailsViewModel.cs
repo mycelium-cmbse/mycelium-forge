@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -35,7 +35,14 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         /// <param name="id">The unique identifier of the organization.</param>
         public void InitializeViewModel(Guid id)
         {
-            this.Organization = SeedData.StarionOrganizationModel;
+            this.Organization = new OrganizationModel(
+                SeedData.StarionOrganization,
+                "SG",
+                SeedData.StarionOrganization.Origin,
+                true,
+                6,
+                14,
+                390);
 
             this.Packages =
             [
@@ -43,18 +50,16 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
                     new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60) },
                     "@starion",
                     "v0.3.0",
-                    "SysML v2",
-                    "RF telecommunication link budget and space communication interfaces.",
+                    PackageFormatConstants.SysMlV2,
                     "comms · rf · telemetry · ecss",
-                    "190"),
+                    190),
                 new PackageModel(
                     new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90) },
                     "@starion",
                     "v1.0.0",
-                    "SysML v2",
-                    "Structural and mechanical engineering domain metamodels and loads analysis.",
+                    PackageFormatConstants.SysMlV2,
                     "mechanical · structures · loads · ecss",
-                    "165")
+                    165)
             ];
         }
     }

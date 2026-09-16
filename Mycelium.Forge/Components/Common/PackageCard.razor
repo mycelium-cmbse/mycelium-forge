@@ -49,7 +49,7 @@
                 <span class="text-foreground-muted truncate flex-1">
                     by @(this.Model.Publisher) · @(this.Model.Version)
                 </span>
-                @if (!string.IsNullOrEmpty(this.Model.ImportCount))
+                @if (this.Model.ImportCount > 0)
                 {
                     <span class="text-muted-foreground shrink-0">
                         @(this.Model.ImportCount) imports

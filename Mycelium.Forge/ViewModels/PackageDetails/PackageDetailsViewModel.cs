@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -141,7 +141,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             var packageDto = new Package
             {
                 Name = resolvedName,
-                ShortName = resolvedName.ToLowerInvariant(),
+                Description = $"{resolvedName} mission model: Power subsystem. Part definitions for the power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
                 Visibility = VisibilityKind.PUBLIC,
                 CreatedAt = DateTime.UtcNow.AddDays(-14)
             };
@@ -150,10 +150,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 packageDto,
                 resolvedOrganization,
                 "v1.2.0",
-                "SysML v2",
-                $"{resolvedName} mission model: Power subsystem. Part definitions for the power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
+                PackageFormatConstants.SysMlV2,
                 string.Join(" · ", tags),
-                "210")
+                210)
             {
                 IsVerified = true,
                 Role = PackageInvitationKind.OWNER,

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="HomeViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.Home
 {
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Models.Package;
 
@@ -17,6 +18,11 @@ namespace Mycelium.Forge.ViewModels.Home
     /// </summary>
     public class HomeViewModel : IHomeViewModel
     {
+        /// <summary>
+        /// The list of standard library publisher handles.
+        /// </summary>
+        private static readonly IReadOnlyList<string> StandardLibraryPublishers = ["@omg", "@esa"];
+
         /// <summary>
         /// Gets or sets the total published package count displayed in the hero section.
         /// </summary>
@@ -62,10 +68,25 @@ namespace Mycelium.Forge.ViewModels.Home
         /// </summary>
         public void InitializeViewModel()
         {
-            this.StandardLibraries = [.. SeedData.StandardLibraryPackages];
-            this.RecentlyUpdated = [.. SeedData.RecentlyUpdatedPackages];
-            this.MostUsed = [.. SeedData.MostUsedPackages];
-            this.ModelsFromOtherMbseTools = [.. SeedData.ModelsFromOtherMbseTools];
+            var allModels = SeedData.Packages.Select(PackageModel.FromPackage).ToList();
+
+            this.StandardLibraries = allModels
+                .Where(p => StandardLibraryPublishers.Contains(p.Publisher) && p.Format == PackageFormatConstants.SysMlV2)
+                .ToList();
+
+            this.RecentlyUpdated = allModels
+                .OrderByDescending(p => p.Package.CreatedAt)
+                .Take(3)
+                .ToList();
+
+            this.MostUsed = allModels
+                .OrderByDescending(p => p.ImportCount)
+                .Take(3)
+                .ToList();
+
+            this.ModelsFromOtherMbseTools = allModels
+                .Where(p => p.Format != PackageFormatConstants.SysMlV2)
+                .ToList();
         }
     }
 }
