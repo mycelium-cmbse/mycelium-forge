@@ -97,7 +97,7 @@ namespace Mycelium.Forge.ViewModels.Packages
 
             filtered = sort switch
             {
-                PackageSortOption.Downloads => filtered.OrderByDescending(package => package.ImportCount),
+                PackageSortOption.Downloads => filtered.OrderByDescending(package => package.DownloadCount),
                 PackageSortOption.Alphabetical => filtered.OrderBy(package => package.Name),
                 PackageSortOption.RecentlyUpdated => filtered.OrderBy(package => package.LastPublished),
                 _ => filtered

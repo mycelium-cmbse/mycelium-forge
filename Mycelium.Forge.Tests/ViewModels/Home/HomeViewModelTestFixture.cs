@@ -32,7 +32,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
                 Assert.That(this.viewModel.PackageCount, Is.Not.Empty);
                 Assert.That(this.viewModel.VersionCount, Is.Not.Empty);
                 Assert.That(this.viewModel.PublisherCount, Is.Not.Empty);
-                Assert.That(this.viewModel.ImportCount, Is.Not.Empty);
+                Assert.That(this.viewModel.DownloadCount, Is.Not.Empty);
                 Assert.That(this.viewModel.StandardLibraries, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.RecentlyUpdated, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.MostUsed, Has.Count.GreaterThan(0));

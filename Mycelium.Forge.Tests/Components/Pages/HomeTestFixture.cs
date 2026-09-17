@@ -54,7 +54,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             this.viewModelMock.Setup(x => x.PackageCount).Returns("120");
             this.viewModelMock.Setup(x => x.VersionCount).Returns("450");
             this.viewModelMock.Setup(x => x.PublisherCount).Returns("35");
-            this.viewModelMock.Setup(x => x.ImportCount).Returns("15.2k");
+            this.viewModelMock.Setup(x => x.DownloadCount).Returns("15.2k");
             this.viewModelMock.Setup(x => x.StandardLibraries).Returns(packages);
             this.viewModelMock.Setup(x => x.RecentlyUpdated).Returns(packages);
             this.viewModelMock.Setup(x => x.MostUsed).Returns(packages);
@@ -80,7 +80,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 Assert.That(markup, Does.Contain("packages"));
                 Assert.That(markup, Does.Contain("versions"));
                 Assert.That(markup, Does.Contain("publishers"));
-                Assert.That(markup, Does.Contain("imports"));
+                Assert.That(markup, Does.Contain("downloads"));
             }
         }
 

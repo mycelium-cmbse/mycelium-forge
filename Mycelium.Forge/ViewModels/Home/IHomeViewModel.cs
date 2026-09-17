@@ -32,9 +32,9 @@ namespace Mycelium.Forge.ViewModels.Home
         string PublisherCount { get; set; }
 
         /// <summary>
-        /// Gets or sets the total package import count displayed in the hero section.
+        /// Gets or sets the total package download count displayed in the hero section.
         /// </summary>
-        string ImportCount { get; set; }
+        string DownloadCount { get; set; }
 
         /// <summary>
         /// Gets or sets the standard library package models.

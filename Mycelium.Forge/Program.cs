@@ -16,7 +16,6 @@ namespace Mycelium.Forge
     using Carter;
 
     using Microsoft.AspNetCore.HttpOverrides;
-    using Microsoft.Extensions.Options;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components;
@@ -86,7 +85,8 @@ namespace Mycelium.Forge
                     throw new InvalidOperationException("Database connection settings are not configured in DatabaseConnection or ConnectionStrings:Default.");
                 }
 
-                return Migrator.Run(connectionString) ? 0 : 1;
+                var databaseMigrator = new DatabaseMigrator();
+                return databaseMigrator.Migrate(connectionString) ? 0 : 1;
             }
 
             if (args is ["seed"])

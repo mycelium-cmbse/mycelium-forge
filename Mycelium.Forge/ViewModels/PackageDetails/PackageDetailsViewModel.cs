@@ -141,6 +141,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             var packageDto = new Package
             {
                 Name = resolvedName,
+                ShortName = resolvedName,
                 Description = $"{resolvedName} mission model: Power subsystem. Part definitions for the power bus, battery, solar array, and power conditioning unit, typed by ISQ quantity kinds.",
                 Visibility = VisibilityKind.PUBLIC,
                 CreatedAt = DateTime.UtcNow.AddDays(-14)

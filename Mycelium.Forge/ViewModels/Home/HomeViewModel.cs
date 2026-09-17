@@ -39,9 +39,9 @@ namespace Mycelium.Forge.ViewModels.Home
         public string PublisherCount { get; set; } = "6";
 
         /// <summary>
-        /// Gets or sets the total package import count displayed in the hero section.
+        /// Gets or sets the total package download count displayed in the hero section.
         /// </summary>
-        public string ImportCount { get; set; } = "2,582";
+        public string DownloadCount { get; set; } = "5,470";
 
         /// <summary>
         /// Gets or sets the standard library package models.
@@ -80,7 +80,7 @@ namespace Mycelium.Forge.ViewModels.Home
                 .ToList();
 
             this.MostUsed = allModels
-                .OrderByDescending(p => p.ImportCount)
+                .OrderByDescending(p => p.DownloadCount)
                 .Take(3)
                 .ToList();
 

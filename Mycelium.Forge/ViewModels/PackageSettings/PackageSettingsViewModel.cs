@@ -68,7 +68,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
                 packageDto,
                 resolvedOrganization,
                 "v1.2.0",
-                importCount: 210)
+                downloadCount: 210)
             {
                 IsVerified = true,
                 Role = PackageInvitationKind.OWNER,
