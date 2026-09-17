@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Common
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
     /// Displays a categorized grid of package cards with a title and action link.
@@ -34,7 +34,7 @@ namespace Mycelium.Forge.Components.Common
         /// Gets or sets the collection of packages displayed within this section.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<PackageModel> Packages { get; set; } = [];
+        public IReadOnlyList<PackageRowViewModel> Packages { get; set; } = [];
 
         /// <summary>
         /// Gets or sets optional additional CSS classes for the section container.

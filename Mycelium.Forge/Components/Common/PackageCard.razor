@@ -7,63 +7,68 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 
-@if (this.Model != null)
+@if (this.PackageRowViewModel == null)
 {
-    <a href="@(PageRoutes.GetPackageRoute(this.Model.Publisher, this.Model.Package.ShortName))"
-       class="block select-none group focus:outline-none">
-        <div class="p-4 rounded-lg bg-card border border-border hover:border-primary transition-colors shadow-xs flex flex-col justify-between min-h-30 gap-2.5 @(this.Class)">
-            <div class="flex items-center gap-2 w-full h-4.5">
-                <LucideIcon Name="box"
-                            Size="18"
-                            Class="text-muted-foreground shrink-0"/>
-                <span class="text-sm leading-xs font-semibold text-foreground truncate group-hover:text-primary transition-colors flex-1">
-                    @(this.Model.Name)
-                </span>
-                @if (this.Model.IsVerified)
-                {
-                    <LucideIcon Name="badge-check"
-                                Size="16"
-                                Class="text-primary shrink-0"/>
-                }
-                <BbBadge Variant="BadgeVariant.Outline"
-                         Class="badge-format">
-                    @(this.Model.Format)
-                </BbBadge>
+    return;
+}
+
+<a href="@PageRoutes.GetPackageRoute(this.PackageRowViewModel.Publisher, this.PackageRowViewModel.ShortName)"
+   class="block select-none group focus:outline-none">
+    <div class="p-4 rounded-lg bg-card border border-border hover:border-primary transition-colors shadow-xs flex flex-col justify-between min-h-30 gap-2.5 @(this.Class)">
+        <div class="flex items-center gap-2 w-full h-4.5">
+            <LucideIcon Name="box"
+                        Size="18"
+                        Class="text-muted-foreground shrink-0"
+                        aria-hidden="true"/>
+            <span class="text-sm leading-xs font-semibold text-foreground truncate group-hover:text-primary transition-colors flex-1">
+                @(this.PackageRowViewModel.Name)
+            </span>
+            @if (this.PackageRowViewModel.IsVerified)
+            {
+                <LucideIcon Name="badge-check"
+                            Size="16"
+                            Class="text-primary shrink-0"
+                            aria-hidden="true"/>
+            }
+            <BbBadge Variant="BadgeVariant.Outline"
+                     Class="badge-format">
+                @(this.PackageRowViewModel.Format)
+            </BbBadge>
+        </div>
+
+        @if (!string.IsNullOrEmpty(this.PackageRowViewModel.Description))
+        {
+            <p class="text-xs leading-2xs text-muted-foreground line-clamp-2 w-full">
+                @(this.PackageRowViewModel.Description)
+            </p>
+        }
+
+        @if (!string.IsNullOrEmpty(this.PackageRowViewModel.Tags))
+        {
+            <div class="text-2xs leading-3xs text-muted-foreground truncate w-full">
+                @string.Join(" · ", this.PackageRowViewModel.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             </div>
+        }
 
-            @if (!string.IsNullOrEmpty(this.Model.Description))
-            {
-                <p class="text-xs leading-2xs text-muted-foreground line-clamp-2 w-full">
-                    @(this.Model.Description)
-                </p>
-            }
-
-            @if (!string.IsNullOrEmpty(this.Model.Tags))
-            {
-                <div class="text-2xs leading-3xs text-muted-foreground truncate w-full">
-                    @(string.Join(" · ", this.Model.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
-                </div>
-            }
-
-            <div class="flex items-center justify-between gap-2 w-full h-3.5 text-2xs leading-3xs">
-                <span class="text-foreground-muted truncate flex-1">
-                    by @(this.Model.Publisher) · @(this.Model.Version)
-                </span>
-                <div class="flex items-center gap-1.5 text-muted-foreground shrink-0">
-                    @if (this.Model.DownloadCount > 0)
+        <div class="flex items-center justify-between gap-2 w-full h-3.5 text-2xs leading-3xs">
+            <span class="text-foreground-muted truncate flex-1">
+                by @(this.PackageRowViewModel.Publisher) · @(this.PackageRowViewModel.Version)
+            </span>
+            <div class="flex items-center gap-1.5 text-muted-foreground shrink-0">
+                @if (this.PackageRowViewModel.DownloadCount > 0)
+                {
+                    <span>@(this.PackageRowViewModel.DownloadCount) downloads</span>
+                }
+                @if (this.PackageRowViewModel.DependentsCount > 0)
+                {
+                    if (this.PackageRowViewModel.DownloadCount > 0)
                     {
-                        <span>@(this.Model.DownloadCount) downloads</span>
+                        <span>·</span>
                     }
-                    @if (this.Model.DependentsCount > 0)
-                    {
-                        @if (this.Model.DownloadCount > 0)
-                        {
-                            <span>·</span>
-                        }
-                        <span>@(this.Model.DependentsCount) dependents</span>
-                    }
-                </div>
+
+                    <span>@(this.PackageRowViewModel.DependentsCount) dependents</span>
+                }
             </div>
         </div>
-    </a>
-}
+    </div>
+</a>

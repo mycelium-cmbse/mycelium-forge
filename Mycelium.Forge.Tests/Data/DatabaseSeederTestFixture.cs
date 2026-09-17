@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeederTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -109,7 +109,6 @@ namespace Mycelium.Forge.Tests.Data
                 this.packageServiceMock.Object,
                 this.packageVersionServiceMock.Object,
                 this.apiKeyServiceMock.Object,
-                this.databaseMigratorMock.Object,
                 this.databaseConfig,
                 this.loggerMock.Object);
         }

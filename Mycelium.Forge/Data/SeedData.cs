@@ -511,6 +511,72 @@ namespace Mycelium.Forge.Data
                     PublicationDate = EcssMechanicalPackage.CreatedAt,
                     CreatedAt = EcssMechanicalPackage.CreatedAt,
                     ModifiedAt = EcssMechanicalPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlIsqQuantitiesPackage.Id,
+                    Version = "v2025.1",
+                    DownloadCount = 980,
+                    Listed = true,
+                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlKernelLibraryPackage.Id,
+                    Version = "v2025.1",
+                    DownloadCount = 1450,
+                    Listed = true,
+                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssEnvironmentPackage.Id,
+                    Version = "v0.9.0",
+                    DownloadCount = 320,
+                    Listed = true,
+                    PublicationDate = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "v1.1.0",
+                    DownloadCount = 180,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "v1.0.0",
+                    DownloadCount = 95,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = Cdp4CometCorePackage.Id,
+                    Version = "v10.25.0",
+                    DownloadCount = 185,
+                    Listed = true,
+                    PublicationDate = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
+                    CreatedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90)
                 }
             ];
 

@@ -52,5 +52,24 @@ namespace Mycelium.Forge.Services
         {
             return this.currentUser;
         }
+
+        /// <summary>
+        /// Gets the user context, which includes the account ID, username, and current roles of the authenticated user.
+        /// </summary>
+        /// <returns>The user context.</returns>
+        public IUserContext GetUserContext()
+        {
+            if (this.currentUser == null)
+            {
+                return UserContext.CreateAnonymous();
+            }
+
+            return new UserContext
+            {
+                AccountId = this.currentUser.Id,
+                Username = this.currentUser.ShortName,
+                CurrentRoles = this.CurrentRoles
+            };
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SearchInput.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -31,6 +31,12 @@ namespace Mycelium.Forge.Components.Common
         /// </summary>
         [Parameter]
         public string Placeholder { get; set; } = "Search models, libraries, units, quantity kinds...";
+
+        /// <summary>
+        /// Gets or sets the accessible aria label for screen readers.
+        /// </summary>
+        [Parameter]
+        public string AriaLabel { get; set; } = "Search packages";
 
         /// <summary>
         /// Gets or sets the bound search query value.

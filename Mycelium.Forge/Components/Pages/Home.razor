@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="Home.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -28,16 +28,16 @@
     </form>
 
     <div class="flex flex-wrap items-center justify-center gap-12 pt-2">
-        <StatItem Value="@(this.ViewModel.PackageCount)"
+        <StatItem Value="@(this.ViewModel.PackageCount.ToString("N0"))"
                   Label="packages"
                   Class="min-w-14"/>
-        <StatItem Value="@(this.ViewModel.VersionCount)"
+        <StatItem Value="@(this.ViewModel.VersionCount.ToString("N0"))"
                   Label="versions"
                   Class="min-w-12"/>
-        <StatItem Value="@(this.ViewModel.PublisherCount)"
+        <StatItem Value="@(this.ViewModel.PublisherCount.ToString("N0"))"
                   Label="publishers"
                   Class="min-w-15"/>
-        <StatItem Value="@(this.ViewModel.DownloadCount)"
+        <StatItem Value="@(this.ViewModel.DownloadCount.ToString("N0"))"
                   Label="downloads"
                   Class="min-w-16"/>
     </div>

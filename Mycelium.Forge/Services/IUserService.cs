@@ -29,5 +29,11 @@ namespace Mycelium.Forge.Services
         /// <param name="forceLoad">The value indicating whether to force a reload.</param>
         /// <returns>The current user account.</returns>
         IAccount GetCurrentUser(bool forceLoad = false);
+
+        /// <summary>
+        /// Gets the user context, which includes the account ID, username, and current roles of the authenticated user.
+        /// </summary>
+        /// <returns>The user context.</returns>
+        IUserContext GetUserContext();
     }
 }

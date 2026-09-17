@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="SearchInput.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -10,12 +10,14 @@
 <div class="w-full h-11 px-4 flex items-center gap-2.5 rounded-lg bg-card border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-xs transition-colors @(this.Class)">
     <LucideIcon Name="search"
                 Size="@(this.IconSize)"
-                Class="text-muted-foreground shrink-0"/>
+                Class="text-muted-foreground shrink-0"
+                aria-hidden="true"/>
     <BbInput Type="InputType.Search"
              Name="@(this.Name)"
              Value="@(this.Value)"
              ValueChanged="@(this.ValueChanged)"
              Placeholder="@(this.Placeholder)"
+             aria-label="@(this.AriaLabel)"
              UpdateTiming="@(this.UpdateTiming)"
              Class="@(this.InputClass)"/>
     @if (this.ShowShortcut)
