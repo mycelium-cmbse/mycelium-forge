@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageCard.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -49,12 +49,20 @@
                 <span class="text-foreground-muted truncate flex-1">
                     by @(this.Model.Publisher) · @(this.Model.Version)
                 </span>
-                @if (this.Model.ImportCount > 0)
-                {
-                    <span class="text-muted-foreground shrink-0">
-                        @(this.Model.ImportCount) imports
-                    </span>
-                }
+                <div class="flex items-center gap-1.5 text-muted-foreground shrink-0">
+                    @if (this.Model.DownloadCount > 0)
+                    {
+                        <span>@(this.Model.DownloadCount) downloads</span>
+                    }
+                    @if (this.Model.DependentsCount > 0)
+                    {
+                        @if (this.Model.DownloadCount > 0)
+                        {
+                            <span>·</span>
+                        }
+                        <span>@(this.Model.DependentsCount) dependents</span>
+                    }
+                </div>
             </div>
         </div>
     </a>

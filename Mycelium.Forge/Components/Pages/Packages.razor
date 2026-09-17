@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Packages.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 @using Mycelium.Forge.Models.Package
 @attribute [Route(PageRoutes.Packages)]
+@rendermode InteractiveServer
 
 <PageTitle>Packages &mdash; Mycelium Forge</PageTitle>
 
@@ -131,3 +132,5 @@
         </div>
     </div>
 </div>
+
+<BbProviders/>

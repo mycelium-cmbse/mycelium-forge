@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Home.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -20,8 +20,12 @@
         Publish, discover and reuse system models and libraries across SysML v2, CDP4-COMET and Capella.
     </p>
 
-    <SearchInput Class="max-w-2xl"
-                 ShowShortcut="true"/>
+    <form method="get"
+          action="@(PageRoutes.Packages)"
+          class="w-full max-w-2xl flex justify-center">
+        <SearchInput Class="w-full"
+                     ShowShortcut="true"/>
+    </form>
 
     <div class="flex flex-wrap items-center justify-center gap-12 pt-2">
         <StatItem Value="@(this.ViewModel.PackageCount)"
@@ -33,8 +37,8 @@
         <StatItem Value="@(this.ViewModel.PublisherCount)"
                   Label="publishers"
                   Class="min-w-15"/>
-        <StatItem Value="@(this.ViewModel.ImportCount)"
-                  Label="imports"
+        <StatItem Value="@(this.ViewModel.DownloadCount)"
+                  Label="downloads"
                   Class="min-w-16"/>
     </div>
 

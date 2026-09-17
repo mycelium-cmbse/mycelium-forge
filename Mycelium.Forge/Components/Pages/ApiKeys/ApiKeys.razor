@@ -10,6 +10,7 @@
 @using BlazorBlueprint.Primitives.Table
 @using Mycelium.Forge.Models.ApiKey
 @attribute [Route(PageRoutes.ApiKeys)]
+@rendermode InteractiveServer
 
 <PageTitle>API Keys &mdash; Mycelium Forge</PageTitle>
 
@@ -145,3 +146,5 @@
         }
     </div>
 </div>
+
+<BbProviders/>
