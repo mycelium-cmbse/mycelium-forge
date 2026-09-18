@@ -92,7 +92,7 @@ namespace Mycelium.Forge.ViewModels.Rows
         public bool IsVerified { get; private init; }
 
         /// <summary>
-        /// Gets the relative elapsed time since the package was created, formatted as a human-readable string.
+        /// Gets the relative elapsed time since the latest listed package version was published, formatted as a human-readable string.
         /// </summary>
         public string LastPublished { get; private init; } = string.Empty;
 
@@ -100,6 +100,11 @@ namespace Mycelium.Forge.ViewModels.Rows
         /// Gets the UTC creation timestamp of the package.
         /// </summary>
         public DateTime CreatedAt { get; private init; }
+
+        /// <summary>
+        /// Gets the publication timestamp of the latest listed package version.
+        /// </summary>
+        public DateTime LatestPublicationDate { get; private init; }
 
         /// <summary>
         /// Generates <see cref="PackageRowViewModel" /> instances for the specified packages and related things.
@@ -132,6 +137,8 @@ namespace Mycelium.Forge.ViewModels.Rows
                     .ThenByDescending(v => v.Version)
                     .FirstOrDefault();
 
+                var latestPublicationDate = latestVersion?.PublicationDate ?? package.CreatedAt;
+
                 rows.Add(new PackageRowViewModel
                 {
                     Name = package.Name,
@@ -145,7 +152,8 @@ namespace Mycelium.Forge.ViewModels.Rows
                     DependentsCount = ResolveDependentsCountForPackage(package),
                     IsVerified = true,
                     CreatedAt = package.CreatedAt,
-                    LastPublished = package.CreatedAt != default ? package.CreatedAt.ToTimeAgo() : string.Empty
+                    LatestPublicationDate = latestPublicationDate,
+                    LastPublished = latestPublicationDate.ToTimeAgo()
                 });
             }
 
