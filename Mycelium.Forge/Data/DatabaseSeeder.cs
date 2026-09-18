@@ -212,7 +212,11 @@ namespace Mycelium.Forge.Data
                 return false;
             }
 
-            this.logger.LogInformation("Seeded {Count} {EntityName}.", thingsList.Count, typeof(T).Name);
+            if (this.logger.IsEnabled(LogLevel.Information))
+            {
+                this.logger.LogInformation("Seeded {Count} {EntityName}.", thingsList.Count, typeof(T).Name);
+            }
+
             return true;
         }
     }
