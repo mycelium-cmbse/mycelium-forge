@@ -115,9 +115,8 @@ namespace Mycelium.Forge.ViewModels.Home
         public async Task InitializeViewModel()
         {
             var userContext = this.userService.GetUserContext();
-            var token = CancellationToken.None;
 
-            var packagesResult = await this.packageService.ReadAsync(userContext, token);
+            var packagesResult = await this.packageService.ReadAsync(userContext, CancellationToken.None);
 
             if (packagesResult.IsError)
             {
@@ -130,9 +129,9 @@ namespace Mycelium.Forge.ViewModels.Home
             var versionIds = packages.SelectMany(p => p.Version);
             var packageTypeIds = packages.Select(p => p.PackageType);
 
-            var organizations = await this.organizationService.ReadOrEmpty(userContext, token, organizationIds);
-            var packageVersions = await this.packageVersionService.ReadOrEmpty(userContext, token, versionIds);
-            var packageTypes = await this.packageTypeService.ReadOrEmpty(userContext, token, packageTypeIds);
+            var organizations = await this.organizationService.ReadOrEmpty(userContext, organizationIds);
+            var packageVersions = await this.packageVersionService.ReadOrEmpty(userContext, versionIds);
+            var packageTypes = await this.packageTypeService.ReadOrEmpty(userContext, packageTypeIds);
 
             var allRows = PackageRowViewModel.GenerateRows(packages, [.. organizations, .. packageVersions, .. packageTypes]);
 

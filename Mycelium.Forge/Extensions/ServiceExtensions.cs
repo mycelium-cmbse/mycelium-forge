@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ServiceExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,17 +26,17 @@ namespace Mycelium.Forge.Extensions
         /// <typeparam name="T">The domain entity type implementing <see cref="IThing" />.</typeparam>
         /// <param name="service">The <see cref="IService{T}" /> instance.</param>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
-        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <param name="iids">An optional collection of unique identifiers to read.</param>
         /// <param name="emptyWhenNoIds">
         /// A value indicating whether to return an empty collection when <paramref name="iids" /> is null or empty,
         /// or to query all entities when <see langword="false" />.
         /// </param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>
         /// A task representing the asynchronous operation, resolving to an <see cref="ImmutableList{T}" /> of entities,
         /// or an empty collection if an error occurs or no identifiers were supplied when required.
         /// </returns>
-        public static async Task<ImmutableList<T>> ReadOrEmpty<T>(this IService<T> service, IUserContext userContext, CancellationToken token = default, IEnumerable<Guid> iids = null, bool emptyWhenNoIds = true)
+        public static async Task<ImmutableList<T>> ReadOrEmpty<T>(this IService<T> service, IUserContext userContext, IEnumerable<Guid> iids = null, bool emptyWhenNoIds = true, CancellationToken token = default)
             where T : IThing
         {
             ArgumentNullException.ThrowIfNull(service);

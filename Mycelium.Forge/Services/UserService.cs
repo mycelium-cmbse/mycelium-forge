@@ -19,9 +19,9 @@ namespace Mycelium.Forge.Services
     public class UserService : IUserService
     {
         /// <summary>
-        /// Gets or sets the underlying account entity of the currently authenticated user, if available.
+        /// The underlying account entity of the currently authenticated user, if available.
         /// </summary>
-        private readonly IAccount currentUser;
+        private readonly Account currentUser;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService" /> class, populated with initial mock/seed user data.
@@ -51,7 +51,7 @@ namespace Mycelium.Forge.Services
         public Task<IAccount> GetCurrentUser(bool forceLoad = false)
         {
             // Returns the current user account. In a real implementation, this would fetch from a data source if forceLoad is true, that's why we return a Task.
-            return Task.FromResult(this.currentUser);
+            return Task.FromResult<IAccount>(this.currentUser);
         }
 
         /// <summary>
