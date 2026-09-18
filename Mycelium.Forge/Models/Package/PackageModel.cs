@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Models.Package
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Extensions;
+    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
     /// Represents a package item displayed in the catalog sections, package lists, and package settings.
@@ -123,6 +124,11 @@ namespace Mycelium.Forge.Models.Package
             : string.Empty;
 
         /// <summary>
+        /// Gets the UTC creation timestamp of the package.
+        /// </summary>
+        public DateTime CreatedAt => this.Package?.CreatedAt ?? default;
+
+        /// <summary>
         /// Gets or sets the user's role for this package.
         /// </summary>
         public PackageInvitationKind Role { get; set; } = PackageInvitationKind.OWNER;
@@ -172,33 +178,8 @@ namespace Mycelium.Forge.Models.Package
             var format = packageType?.Name ?? PackageFormatConstants.SysMlV2;
             var downloadCount = version?.DownloadCount ?? 0;
 
-            var tags = package.ShortName switch
-            {
-                "sysmlv2-isq-quantities" => "standard-library · units · quantities · isq",
-                "sysmlv2-kernel-library" => "standard-library · kerml · kernel",
-                "ecss-e-st-10-04c" => "standard-library · space-environment · ecss",
-                "ecss-mm-pwr" => "mission-model · power · ecss",
-                "smallsat-platform-model" => "mission-model · smallsat · platform",
-                "ecss-e-st-32-10c" => "comms · rf · telemetry · ecss",
-                "cdp4-comet-core" => "concurrent-design · cdp4 · ecss-10-25",
-                "capella-system-template" => "arcadia · capella · operational-analysis",
-                "ecss-e-st-31-01c" => "mechanical · structures · loads · ecss",
-                _ => "standard-library"
-            };
-
-            var dependentsCount = package.ShortName switch
-            {
-                "sysmlv2-isq-quantities" => 12,
-                "sysmlv2-kernel-library" => 18,
-                "ecss-e-st-10-04c" => 5,
-                "ecss-mm-pwr" => 2,
-                "smallsat-platform-model" => 1,
-                "ecss-e-st-32-10c" => 3,
-                "cdp4-comet-core" => 4,
-                "capella-system-template" => 2,
-                "ecss-e-st-31-01c" => 3,
-                _ => 0
-            };
+            var tags = PackageRowViewModel.ResolveTagsForPackage(package);
+            var dependentsCount = PackageRowViewModel.ResolveDependentsCountForPackage(package);
 
             return new PackageModel(
                 package,

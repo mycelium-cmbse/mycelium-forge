@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="WebApplicationBuilderExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -82,6 +82,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddScoped<IThemeService, ThemeService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IJsInterop, JsInterop>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
 
             return builder;
         }

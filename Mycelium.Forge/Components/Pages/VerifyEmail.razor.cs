@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="VerifyEmail.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,11 +9,11 @@
 
 namespace Mycelium.Forge.Components.Pages
 {
-    using BlazorBlueprint.Components;
-
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.VerifyEmail;
 
     /// <summary>
@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Components.Pages
         public IVerifyEmailViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the toast notification service.
+        /// Gets or sets the notification service.
         /// </summary>
         [Inject]
-        public ToastService ToastService { get; set; }
+        public INotificationService NotificationService { get; set; }
 
         /// <summary>
         /// Gets or sets the navigation manager instance.
@@ -55,11 +55,11 @@ namespace Mycelium.Forge.Components.Pages
 
             if (result.IsError)
             {
-                this.ToastService.Error(result.FirstError.Description, "Error");
+                this.NotificationService.AddNotification(result.FirstError.Description, "Error", NotificationType.Error);
                 return;
             }
 
-            this.ToastService.Success("Verification link sent. Please check your inbox.", "Email Sent");
+            this.NotificationService.AddNotification("Verification link sent. Please check your inbox.", "Email Sent", NotificationType.Success);
         }
 
         /// <summary>

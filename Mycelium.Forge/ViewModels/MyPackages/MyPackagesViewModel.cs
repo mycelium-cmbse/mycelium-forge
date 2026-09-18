@@ -12,6 +12,7 @@ namespace Mycelium.Forge.ViewModels.MyPackages
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.Services;
 
     /// <summary>
     /// Provides view model state and operations for the My Packages page, listing packages
@@ -19,6 +20,20 @@ namespace Mycelium.Forge.ViewModels.MyPackages
     /// </summary>
     public class MyPackagesViewModel : IMyPackagesViewModel
     {
+        /// <summary>
+        /// The (injected) <see cref="IUserService" /> used to retrieve the current user account.
+        /// </summary>
+        private readonly IUserService userService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MyPackagesViewModel" /> class.
+        /// </summary>
+        /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
+        public MyPackagesViewModel(IUserService userService)
+        {
+            this.userService = userService;
+        }
+
         /// <summary>
         /// Gets or sets the collection of packages owned or maintained by the current user.
         /// </summary>
@@ -29,7 +44,7 @@ namespace Mycelium.Forge.ViewModels.MyPackages
         /// </summary>
         public void InitializeViewModel()
         {
-            var currentUser = SeedData.RegisAccount;
+            var currentUser = this.userService.GetCurrentUser();
 
             this.Packages = SeedData.Packages
                 .Where(p => p.PackageOwner.Contains(currentUser.Id) || p.PackageMaintainer.Contains(currentUser.Id))
@@ -37,7 +52,7 @@ namespace Mycelium.Forge.ViewModels.MyPackages
                 {
                     var model = PackageModel.FromPackage(p);
 
-                    if(p.PackageOwner.Contains(currentUser.Id))
+                    if (p.PackageOwner.Contains(currentUser.Id))
                     {
                         model.Role = PackageInvitationKind.OWNER;
                     }

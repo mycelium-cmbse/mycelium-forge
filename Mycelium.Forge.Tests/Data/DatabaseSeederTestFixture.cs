@@ -110,7 +110,8 @@ namespace Mycelium.Forge.Tests.Data
                 this.packageVersionServiceMock.Object,
                 this.apiKeyServiceMock.Object,
                 this.databaseConfig,
-                this.loggerMock.Object);
+                this.loggerMock.Object,
+                this.databaseMigratorMock.Object);
         }
 
         [Test]

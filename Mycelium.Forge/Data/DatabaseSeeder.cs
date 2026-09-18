@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeeder.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -87,6 +87,7 @@ namespace Mycelium.Forge.Data
         /// <param name="apiKeyService">The domain service for <see cref="IAPIKey" /> entities.</param>
         /// <param name="databaseConfig">The database configuration options.</param>
         /// <param name="logger">The logger for diagnostic messages.</param>
+        /// <param name="databaseMigrator">The database migration service.</param>
         public DatabaseSeeder(
             IForgeService forgeService,
             ICountryService countryService,
@@ -97,7 +98,8 @@ namespace Mycelium.Forge.Data
             IPackageVersionService packageVersionService,
             IAPIKeyService apiKeyService,
             DatabaseConfig databaseConfig,
-            ILogger<DatabaseSeeder> logger)
+            ILogger<DatabaseSeeder> logger,
+            IDatabaseMigrator databaseMigrator)
         {
             ArgumentNullException.ThrowIfNull(forgeService);
             ArgumentNullException.ThrowIfNull(countryService);
@@ -109,6 +111,7 @@ namespace Mycelium.Forge.Data
             ArgumentNullException.ThrowIfNull(apiKeyService);
             ArgumentNullException.ThrowIfNull(databaseConfig);
             ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(databaseMigrator);
 
             this.forgeService = forgeService;
             this.countryService = countryService;
@@ -120,8 +123,7 @@ namespace Mycelium.Forge.Data
             this.apiKeyService = apiKeyService;
             this.databaseConfig = databaseConfig;
             this.logger = logger;
-
-            this.databaseMigrator = new DatabaseMigrator();
+            this.databaseMigrator = databaseMigrator;
         }
 
         /// <summary>

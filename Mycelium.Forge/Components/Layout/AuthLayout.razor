@@ -14,3 +14,14 @@
         @(this.Body)
     </main>
 </div>
+
+@* 
+    Notification Component is registered here to support notifications in the auth layout. 
+    As for regular layout we put this inside the header and it is not present here.
+
+    OBS: We could move it to a common place, however using it inside the header bar and not separately 
+    is necessary otherwise it would create one extra signalR connection for the notification component 
+    (header + notification) in many pages (e.g., Publish Page - 1 signalR connection for the page, 1 
+    for header and +1 for notification component), which is not ideal.
+*@
+<NotificationComponent @rendermode="InteractiveServer"/>

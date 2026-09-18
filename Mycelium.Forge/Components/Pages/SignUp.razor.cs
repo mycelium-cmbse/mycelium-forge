@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SignUp.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,11 +9,10 @@
 
 namespace Mycelium.Forge.Components.Pages
 {
-    using BlazorBlueprint.Components;
-
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Model;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.SignUp;
 
@@ -29,10 +28,10 @@ namespace Mycelium.Forge.Components.Pages
         public ISignUpViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the toast notification service.
+        /// Gets or sets the notification service.
         /// </summary>
         [Inject]
-        public ToastService ToastService { get; set; }
+        public INotificationService NotificationService { get; set; }
 
         /// <summary>
         /// Gets or sets the navigation manager instance.
@@ -95,11 +94,11 @@ namespace Mycelium.Forge.Components.Pages
 
             if (result.IsError)
             {
-                this.ToastService.Error(result.FirstError.Description, "Error");
+                this.NotificationService.AddNotification(result.FirstError.Description, "Error", NotificationType.Error);
                 return;
             }
 
-            this.ToastService.Success("Account created successfully. Please check your email for verification.", "Account Created");
+            this.NotificationService.AddNotification("Account created successfully. Please check your email for verification.", "Account Created", NotificationType.Success);
             this.NavigationManager.NavigateTo(PageRoutes.Login);
         }
 
@@ -108,7 +107,7 @@ namespace Mycelium.Forge.Components.Pages
         /// </summary>
         public void OnContinueWithSso()
         {
-            this.ToastService.Info("Redirecting to identity provider...", "Single Sign-On");
+            this.NotificationService.AddNotification("Redirecting to identity provider...", "Single Sign-On", NotificationType.Info);
         }
 
         /// <summary>

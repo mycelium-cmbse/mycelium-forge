@@ -157,7 +157,7 @@ namespace Mycelium.Forge.ViewModels.Rows
         /// </summary>
         /// <param name="package">The package DTO.</param>
         /// <returns>A tags string appropriate for the package.</returns>
-        private static string ResolveTagsForPackage(IPackage package)
+        public static string ResolveTagsForPackage(IPackage package)
         {
             return package.ShortName switch
             {
@@ -179,7 +179,7 @@ namespace Mycelium.Forge.ViewModels.Rows
         /// </summary>
         /// <param name="package">The package DTO.</param>
         /// <returns>The dependents count for the package.</returns>
-        private static int ResolveDependentsCountForPackage(IPackage package)
+        public static int ResolveDependentsCountForPackage(IPackage package)
         {
             return package.ShortName switch
             {

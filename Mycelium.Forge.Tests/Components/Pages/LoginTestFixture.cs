@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="LoginTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,6 +23,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
     using Moq;
 
     using Mycelium.Forge.Components.Pages;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Login;
 
     using Error = ErrorOr.Error;
@@ -32,7 +33,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
     {
         private BunitContext context;
         private Mock<ILoginViewModel> viewModelMock;
-        private ToastService toastService;
+        private NotificationService notificationService;
 
         [SetUp]
         public void SetUp()
@@ -46,7 +47,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
             this.viewModelMock = new Mock<ILoginViewModel>();
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
-            this.toastService = this.context.Services.GetRequiredService<ToastService>();
+            this.notificationService = new NotificationService();
+            this.context.Services.AddSingleton<INotificationService>(this.notificationService);
         }
 
         [TearDown]
@@ -63,7 +65,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             await loginPage.InvokeAsync(() => ssoButton.ClickAsync());
 
-            Assert.That(this.toastService.Toasts, Has.Count.EqualTo(1));
+            Assert.That(this.notificationService.Results.Items, Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -116,7 +118,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             using (Assert.EnterMultipleScope())
             {
                 this.viewModelMock.Verify(x => x.Login(), Times.Once);
-                Assert.That(this.toastService.Toasts, Has.Count.EqualTo(1));
+                Assert.That(this.notificationService.Results.Items, Has.Count.EqualTo(1));
             }
 
             this.viewModelMock.Setup(x => x.Login()).Returns(Error.Failure(description: "Invalid credentials"));
@@ -125,7 +127,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             using (Assert.EnterMultipleScope())
             {
                 this.viewModelMock.Verify(x => x.Login(), Times.Exactly(2));
-                Assert.That(this.toastService.Toasts, Has.Count.EqualTo(2));
+                Assert.That(this.notificationService.Results.Items, Has.Count.EqualTo(2));
             }
         }
     }
