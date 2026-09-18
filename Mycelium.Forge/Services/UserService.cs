@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UserService.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -47,10 +47,11 @@ namespace Mycelium.Forge.Services
         /// Gets the current user account, optionally forcing a reload from the data source.
         /// </summary>
         /// <param name="forceLoad">The value indicating whether to force a reload.</param>
-        /// <returns>The current user account.</returns>
-        public IAccount GetCurrentUser(bool forceLoad = false)
+        /// <returns>A <see cref="Task{IAccount}" /> representing the asynchronous operation.</returns>
+        public Task<IAccount> GetCurrentUser(bool forceLoad = false)
         {
-            return this.currentUser;
+            // Returns the current user account. In a real implementation, this would fetch from a data source if forceLoad is true, that's why we return a Task.
+            return Task.FromResult(this.currentUser);
         }
 
         /// <summary>

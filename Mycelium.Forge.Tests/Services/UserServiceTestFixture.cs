@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UserServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Tests.Services
 {
+    using System.Threading.Tasks;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Services;
@@ -45,10 +47,10 @@ namespace Mycelium.Forge.Tests.Services
         }
 
         [Test]
-        public void VerifyGetCurrentUser()
+        public async Task VerifyGetCurrentUser()
         {
-            var user = this.userService.GetCurrentUser();
-            var userForceLoaded = this.userService.GetCurrentUser(true);
+            var user = await this.userService.GetCurrentUser();
+            var userForceLoaded = await this.userService.GetCurrentUser(true);
 
             using (Assert.EnterMultipleScope())
             {

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -42,9 +42,10 @@ namespace Mycelium.Forge.ViewModels.MyPackages
         /// <summary>
         /// Initializes the view model state and populates the packages collection.
         /// </summary>
-        public void InitializeViewModel()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task InitializeViewModel()
         {
-            var currentUser = this.userService.GetCurrentUser();
+            var currentUser = await this.userService.GetCurrentUser();
 
             this.Packages = SeedData.Packages
                 .Where(p => p.PackageOwner.Contains(currentUser.Id) || p.PackageMaintainer.Contains(currentUser.Id))

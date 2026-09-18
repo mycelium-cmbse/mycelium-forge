@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IUserService.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -27,8 +27,8 @@ namespace Mycelium.Forge.Services
         /// Gets the current user account, optionally forcing a reload from the data source.
         /// </summary>
         /// <param name="forceLoad">The value indicating whether to force a reload.</param>
-        /// <returns>The current user account.</returns>
-        IAccount GetCurrentUser(bool forceLoad = false);
+        /// <returns>A <see cref="Task{IAccount}" /> representing the asynchronous operation.</returns>
+        Task<IAccount> GetCurrentUser(bool forceLoad = false);
 
         /// <summary>
         /// Gets the user context, which includes the account ID, username, and current roles of the authenticated user.

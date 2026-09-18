@@ -51,7 +51,7 @@ namespace Mycelium.Forge.Components.Common
         {
             await base.OnInitializedAsync();
 
-            this.currentUser = this.UserService.GetCurrentUser();
+            this.currentUser = await this.UserService.GetCurrentUser();
         }
     }
 }
