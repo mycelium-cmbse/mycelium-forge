@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="VerifyEmailTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -24,16 +24,18 @@ namespace Mycelium.Forge.Tests.Components.Pages
     using Moq;
 
     using Mycelium.Forge.Components.Pages;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.VerifyEmail;
 
     using Error = ErrorOr.Error;
+    using Result = ErrorOr.Result;
 
     [TestFixture]
     public class VerifyEmailTestFixture
     {
         private BunitContext context;
         private Mock<IVerifyEmailViewModel> viewModelMock;
-        private ToastService toastService;
+        private NotificationService notificationService;
         private NavigationManager navigationManager;
 
         [SetUp]
@@ -48,7 +50,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
             this.viewModelMock = new Mock<IVerifyEmailViewModel>();
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
-            this.toastService = this.context.Services.GetRequiredService<ToastService>();
+            this.notificationService = new NotificationService();
+            this.context.Services.AddSingleton<INotificationService>(this.notificationService);
             this.navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
         }
 
@@ -84,7 +87,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             using (Assert.EnterMultipleScope())
             {
                 this.viewModelMock.Verify(x => x.SendEmail(), Times.Once);
-                Assert.That(this.toastService.Toasts, Has.Count.EqualTo(1));
+                Assert.That(this.notificationService.Results.Items, Has.Count.EqualTo(1));
             }
 
             this.viewModelMock.Setup(x => x.SendEmail()).Returns(Error.Failure(description: "Rate limit exceeded"));
@@ -93,7 +96,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             using (Assert.EnterMultipleScope())
             {
                 this.viewModelMock.Verify(x => x.SendEmail(), Times.Exactly(2));
-                Assert.That(this.toastService.Toasts, Has.Count.EqualTo(2));
+                Assert.That(this.notificationService.Results.Items, Has.Count.EqualTo(2));
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MyPackages.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -106,10 +106,11 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Initializes the component lifecycle and populates the view model state.
         /// </summary>
-        protected override void OnInitialized()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        protected override async Task OnInitializedAsync()
         {
-            base.OnInitialized();
-            this.ViewModel.InitializeViewModel();
+            await base.OnInitializedAsync();
+            await this.ViewModel.InitializeViewModel();
         }
     }
 }

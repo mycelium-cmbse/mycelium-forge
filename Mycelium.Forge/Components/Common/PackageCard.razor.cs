@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Common
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
     /// Displays summary information for a published package library card.
@@ -19,10 +19,10 @@ namespace Mycelium.Forge.Components.Common
     public partial class PackageCard : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the package model data to display.
+        /// Gets or sets the package row view model data to display.
         /// </summary>
         [Parameter]
-        public PackageModel Model { get; set; }
+        public PackageRowViewModel PackageRowViewModel { get; set; }
 
         /// <summary>
         /// Gets or sets optional additional CSS classes to apply to the card.

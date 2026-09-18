@@ -67,7 +67,7 @@ namespace Mycelium.Forge.ViewModels.Packages
         public void InitializeViewModel(string query, PackageSortOption sort, bool includePrereleases)
         {
             this.allPackages.Clear();
-            this.allPackages.AddRange(SeedData.CatalogPackages);
+            this.allPackages.AddRange(SeedData.Packages.Select(PackageModel.FromPackage));
 
             this.InitializeFacets();
             this.Search(query, sort, includePrereleases);
@@ -95,11 +95,12 @@ namespace Mycelium.Forge.ViewModels.Packages
 
             filtered = this.ApplyFacetFilters(filtered);
 
+            // This will be changed in a next PR. For now, using the creation date only
             filtered = sort switch
             {
-                PackageSortOption.Downloads => filtered.OrderByDescending(package => ParseImportCount(package.ImportCount)),
+                PackageSortOption.Downloads => filtered.OrderByDescending(package => package.DownloadCount),
                 PackageSortOption.Alphabetical => filtered.OrderBy(package => package.Name),
-                PackageSortOption.RecentlyUpdated => filtered.OrderBy(package => package.LastPublished),
+                PackageSortOption.RecentlyUpdated => filtered.OrderByDescending(package => package.CreatedAt),
                 _ => filtered
             };
 
@@ -205,33 +206,6 @@ namespace Mycelium.Forge.ViewModels.Packages
                 .. metamodelOptions,
                 .. licenseOptions
             ];
-        }
-
-        /// <summary>
-        /// Parses a human-readable import count string into a numeric value for sorting.
-        /// </summary>
-        /// <param name="importCount">The formatted import count string.</param>
-        /// <returns>The parsed numeric count.</returns>
-        private static int ParseImportCount(string importCount)
-        {
-            if (string.IsNullOrWhiteSpace(importCount))
-            {
-                return 0;
-            }
-
-            var clean = importCount.Trim().ToLowerInvariant();
-
-            if (clean.EndsWith('k') && double.TryParse(clean[..^1], out var kValue))
-            {
-                return (int)(kValue * 1000);
-            }
-
-            if (int.TryParse(clean, out var intValue))
-            {
-                return intValue;
-            }
-
-            return 0;
         }
     }
 }

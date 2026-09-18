@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageRow.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -49,9 +49,17 @@
                         @(string.Join(" · ", this.Model.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
                     </span>
                 }
-                <span class="text-muted-foreground shrink-0">
-                    by @(this.Model.Publisher) · @(this.Model.LastPublished) · @(this.Model.ImportCount) imports
-                </span>
+                <div class="flex items-center gap-1.5 text-muted-foreground shrink-0">
+                    <span>by @(this.Model.Publisher) · @(this.Model.LastPublished)</span>
+                    @if (this.Model.DownloadCount > 0)
+                    {
+                        <span>· @(this.Model.DownloadCount) downloads</span>
+                    }
+                    @if (this.Model.DependentsCount > 0)
+                    {
+                        <span>· @(this.Model.DependentsCount) dependents</span>
+                    }
+                </div>
             </div>
         </div>
     </a>

@@ -54,8 +54,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             var packageModel = new PackageModel(
                 new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
                 "Starion Group",
-                "1.3.0",
-                description: "Power subsystem model.")
+                "1.3.0")
             {
                 License = "Apache-2.0",
                 Versions =
@@ -212,8 +211,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             var verifiedPackage = new PackageModel(
                 new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
                 "Starion Group",
-                "1.3.0",
-                description: "Power subsystem model.")
+                "1.3.0")
             {
                 IsVerified = true,
                 License = "Apache-2.0",

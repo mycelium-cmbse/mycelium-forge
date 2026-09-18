@@ -1,0 +1,76 @@
+// ------------------------------------------------------------------------------------------------
+// <copyright file="UserService.cs" company="Starion Group S.A.">
+// 
+//   Copyright 2026 Starion Group S.A.
+//   SPDX-License-Identifier: Apache-2.0
+// 
+// </copyright>
+// ------------------------------------------------------------------------------------------------
+
+namespace Mycelium.Forge.Services
+{
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Data;
+
+    /// <summary>
+    /// Scoped service that holds the identity, profile details, and assigned roles of the currently authenticated user.
+    /// One instance per Blazor circuit ensures concurrent users are isolated.
+    /// </summary>
+    public class UserService : IUserService
+    {
+        /// <summary>
+        /// The underlying account entity of the currently authenticated user, if available.
+        /// </summary>
+        private readonly Account currentUser;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserService" /> class, populated with initial mock/seed user data.
+        /// </summary>
+        public UserService()
+        {
+            this.currentUser = SeedData.RegisAccount;
+            this.CurrentRoles = [RoleKind.InstallationAdministrator, RoleKind.OrganizationAdministrator, RoleKind.Account];
+        }
+
+        /// <summary>
+        /// Gets or sets the application and domain roles currently assigned to the user.
+        /// </summary>
+        /// <remarks>This will likely be removed when IAccount roles is implemented.</remarks>
+        public IReadOnlyList<RoleKind> CurrentRoles { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the user is authenticated.
+        /// </summary>
+        public bool IsAuthenticated => this.currentUser != null && !this.CurrentRoles.Contains(RoleKind.Anonymous);
+
+        /// <summary>
+        /// Gets the current user account, optionally forcing a reload from the data source.
+        /// </summary>
+        /// <param name="forceLoad">The value indicating whether to force a reload.</param>
+        /// <returns>A <see cref="Task{IAccount}" /> representing the asynchronous operation.</returns>
+        public Task<IAccount> GetCurrentUser(bool forceLoad = false)
+        {
+            // Returns the current user account. In a real implementation, this would fetch from a data source if forceLoad is true, that's why we return a Task.
+            return Task.FromResult<IAccount>(this.currentUser);
+        }
+
+        /// <summary>
+        /// Gets the user context, which includes the account ID, username, and current roles of the authenticated user.
+        /// </summary>
+        /// <returns>The user context.</returns>
+        public IUserContext GetUserContext()
+        {
+            if (this.currentUser == null)
+            {
+                return UserContext.CreateAnonymous();
+            }
+
+            return new UserContext
+            {
+                AccountId = this.currentUser.Id,
+                Username = this.currentUser.ShortName,
+                CurrentRoles = this.CurrentRoles
+            };
+        }
+    }
+}
