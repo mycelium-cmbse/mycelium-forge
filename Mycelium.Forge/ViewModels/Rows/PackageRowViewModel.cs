@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageRowViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -93,7 +93,8 @@ namespace Mycelium.Forge.ViewModels.Rows
 
         /// <summary>
         /// Gets the relative elapsed time since the package was created, formatted as a human-readable string.
-        /// Gets the relative elapsed time since the latest listed package version was published, formatted as a human-readable string.
+        /// Gets the relative elapsed time since the latest listed package version was published, formatted as a human-readable
+        /// string.
         /// </summary>
         public string LastPublished { get; private init; } = string.Empty;
 

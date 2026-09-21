@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeederTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -35,6 +35,7 @@ namespace Mycelium.Forge.Tests.Data
         private Mock<IOrganizationService> organizationServiceMock;
         private Mock<IPackageService> packageServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
+        private Mock<IPackageMetaDataService> packageMetaDataServiceMock;
         private Mock<IAPIKeyService> apiKeyServiceMock;
         private Mock<IDatabaseMigrator> databaseMigratorMock;
         private Mock<ILogger<DatabaseSeeder>> loggerMock;
@@ -51,6 +52,7 @@ namespace Mycelium.Forge.Tests.Data
             this.organizationServiceMock = new Mock<IOrganizationService>();
             this.packageServiceMock = new Mock<IPackageService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
+            this.packageMetaDataServiceMock = new Mock<IPackageMetaDataService>();
             this.apiKeyServiceMock = new Mock<IAPIKeyService>();
             this.databaseMigratorMock = new Mock<IDatabaseMigrator>();
             this.loggerMock = new Mock<ILogger<DatabaseSeeder>>();
@@ -96,6 +98,10 @@ namespace Mycelium.Forge.Tests.Data
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
 
+            this.packageMetaDataServiceMock
+                .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageMetaData>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result.Created);
+
             this.apiKeyServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IAPIKey>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
@@ -108,6 +114,7 @@ namespace Mycelium.Forge.Tests.Data
                 this.organizationServiceMock.Object,
                 this.packageServiceMock.Object,
                 this.packageVersionServiceMock.Object,
+                this.packageMetaDataServiceMock.Object,
                 this.apiKeyServiceMock.Object,
                 this.databaseConfig,
                 this.loggerMock.Object,

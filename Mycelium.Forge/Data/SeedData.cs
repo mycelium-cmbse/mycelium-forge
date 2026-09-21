@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -777,7 +777,8 @@ namespace Mycelium.Forge.Data
         public static IReadOnlyList<APIKey> ApiKeys { get; }
 
         /// <summary>
-        /// Creates a <see cref="PackageMetaData" /> instance linked to the specified <see cref="PackageVersion" /> using only codegenerated properties.
+        /// Creates a <see cref="PackageMetaData" /> instance linked to the specified <see cref="PackageVersion" /> using only
+        /// codegenerated properties.
         /// </summary>
         /// <param name="packageVersion">The owning package version.</param>
         /// <returns>A configured <see cref="PackageMetaData" /> entity.</returns>

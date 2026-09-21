@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,11 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.PackageDetails
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models.DialogResults;
 
     /// <summary>
     /// Defines the view model contract for the Mycelium Forge package details page.
@@ -54,6 +50,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// Gets or sets the collection of package metadata DTOs corresponding to package versions.
         /// </summary>
         IReadOnlyList<IPackageMetaData> MetaDatas { get; set; }
+
+        /// <summary>
+        /// Gets the package metadata DTO for the currently selected package version.
+        /// </summary>
+        IPackageMetaData CurrentMetaData { get; }
 
         /// <summary>
         /// Gets the collection of model elements contained within the package release.

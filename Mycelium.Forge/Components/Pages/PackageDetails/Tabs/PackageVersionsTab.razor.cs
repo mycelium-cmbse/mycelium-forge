@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionsTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -47,7 +47,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// Determines whether the specified package version is the latest release.
         /// </summary>
         /// <param name="version">The package version DTO.</param>
-        /// <returns><see langword="true"/> if the version is the latest release; otherwise, <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the version is the latest release; otherwise, <see langword="false" />.</returns>
         public bool IsLatestVersion(IPackageVersion version)
         {
             return this.Versions.Count > 0 && version == this.Versions[0];
@@ -57,7 +57,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// Determines whether the specified package version has passed automated validation checks.
         /// </summary>
         /// <param name="version">The package version DTO.</param>
-        /// <returns><see langword="true"/> if the version has passed all quality checks; otherwise, <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> if the version has passed all quality checks; otherwise, <see langword="false" />.</returns>
         public bool IsValidated(IPackageVersion version)
         {
             var metaData = this.MetaDatas.FirstOrDefault(m => m.Owner == version.Id || m.Id == version.MetaData);

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -192,15 +192,30 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         }
 
         /// <summary>
+        /// Gets the cache key for package details.
+        /// </summary>
+        /// <param name="organization">The organization short name.</param>
+        /// <param name="packageName">The package name.</param>
+        /// <returns>The cache key string.</returns>
+        private static string GetCacheKey(string organization, string packageName)
+        {
+            return $"pkg-details:{organization}:{packageName}";
+        }
+
+        /// <summary>
         /// Retrieves the package details data from cache or database asynchronously.
         /// </summary>
         /// <param name="userContext">The user context.</param>
         /// <param name="packageName">The package name.</param>
         /// <param name="organization">The organization short name.</param>
         /// <returns>A <see cref="Task" /> containing the cached package details model.</returns>
+        /// <remarks>
+        /// Caching package details data reduces repeated database queries across distinct tab route navigations and requests for
+        /// the same package.
+        /// </remarks>
         private async Task<PackageDetailsCacheModel> GetOrLoadPackageDataAsync(IUserContext userContext, string packageName, string organization)
         {
-            var cacheKey = $"pkg-details:{organization}:{packageName}";
+            var cacheKey = GetCacheKey(organization, packageName);
 
             if (this.memoryCache.TryGetValue(cacheKey, out PackageDetailsCacheModel cachedData))
             {

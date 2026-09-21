@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Tests.Extensions
     using System.Collections.Generic;
 
     using Microsoft.AspNetCore.Builder;
+    using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.JSInterop;
@@ -77,6 +78,20 @@ namespace Mycelium.Forge.Tests.Extensions
         }
 
         /// <summary>
+        /// Verifies that <see cref="WebApplicationBuilderExtensions.RegisterServices" /> registers services and memory cache.
+        /// </summary>
+        [Test]
+        public void VerifyRegisterServices()
+        {
+            this.builder.RegisterServices();
+
+            using var app = this.builder.Build();
+            var memoryCache = app.Services.GetService<IMemoryCache>();
+
+            Assert.That(memoryCache, Is.Not.Null);
+        }
+
+        /// <summary>
         /// Verifies that <see cref="WebApplicationBuilderExtensions.RegisterViewModels" /> registers view models and services.
         /// </summary>
         [Test]
@@ -87,18 +102,14 @@ namespace Mycelium.Forge.Tests.Extensions
             this.builder.Services.AddSingleton(Mock.Of<IOrganizationService>());
             this.builder.Services.AddSingleton(Mock.Of<IPackageVersionService>());
             this.builder.Services.AddSingleton(Mock.Of<IPackageTypeService>());
+            this.builder.Services.AddSingleton(Mock.Of<IUserService>());
             this.builder.RegisterViewModels();
 
             using var app = this.builder.Build();
             using var scope = app.Services.CreateScope();
             var homeViewModel = scope.ServiceProvider.GetService<IHomeViewModel>();
-            var themeService = scope.ServiceProvider.GetService<IThemeService>();
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(homeViewModel, Is.Not.Null);
-                Assert.That(themeService, Is.Not.Null);
-            }
+            Assert.That(homeViewModel, Is.Not.Null);
         }
     }
 }

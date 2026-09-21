@@ -1,4 +1,4 @@
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @using Mycelium.Forge.ViewModels.PackageDetails
 @using Mycelium.Forge.ViewModels.Rows
 @* ------------------------------------------------------------------------------------------------
@@ -78,8 +78,7 @@
         <PackageDetailsActions Package="@(this.ViewModel.Package)"
                                Organization="@(this.ViewModel.Organization)"
                                SelectedVersion="@(this.ViewModel.SelectedVersion)"
-                               IsUserAdmin="@(this.ViewModel.IsUserAdmin)"
-                               @rendermode="InteractiveServer" />
+                               IsUserAdmin="@(this.ViewModel.IsUserAdmin)"/>
 
         <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-border">
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
@@ -199,6 +198,27 @@
                     <span class="text-muted-foreground">Metamodel</span>
                     <span class="font-medium text-foreground text-right">@(this.ViewModel.PackageType.Name)</span>
                 </div>
+
+                @if (this.ViewModel.CurrentMetaData != null)
+                {
+                    <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                        <span class="text-muted-foreground">Provenance</span>
+                        @if (this.ViewModel.CurrentMetaData.MetadataSource == MetadataSource.DeclaredByArtefact)
+                        {
+                            <BbBadge Variant="BadgeVariant.Secondary"
+                                     Class="badge-format">
+                                Manifest-declared
+                            </BbBadge>
+                        }
+                        else
+                        {
+                            <BbBadge Variant="BadgeVariant.Outline"
+                                     Class="badge-format text-muted-foreground">
+                                Publisher-asserted
+                            </BbBadge>
+                        }
+                    </div>
+                }
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground min-w-fit">Repository</span>

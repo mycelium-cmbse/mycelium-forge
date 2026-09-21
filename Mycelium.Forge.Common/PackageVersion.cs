@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersion.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,10 +10,13 @@
 namespace Mycelium.Forge.Common
 {
     /// <summary>
-    /// Partial class implementation for <see cref="PackageVersion" /> providing release content, file integrity attributes, and deprecation properties.
+    /// Partial class implementation for <see cref="PackageVersion" /> providing release content, file integrity attributes,
+    /// and deprecation properties.
     /// </summary>
     /// <remarks>
-    /// This partial class is temporary and will be removed once the domain metamodel is updated to include release README documentation, changelog release notes, artifact file size, cryptographic checksums, digital signatures, and release deprecation attributes in the code-generated DTO.
+    /// This partial class is temporary and will be removed once the domain metamodel is updated to include release README
+    /// documentation, changelog release notes, artifact file size, cryptographic checksums, digital signatures, and release
+    /// deprecation attributes in the code-generated DTO.
     /// </remarks>
     public partial class PackageVersion
     {

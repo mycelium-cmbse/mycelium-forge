@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeeder.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -60,6 +60,11 @@ namespace Mycelium.Forge.Data
         private readonly IOrganizationService organizationService;
 
         /// <summary>
+        /// The domain service for <see cref="IPackageMetaData" /> entities.
+        /// </summary>
+        private readonly IPackageMetaDataService packageMetaDataService;
+
+        /// <summary>
         /// The domain service for <see cref="IPackage" /> entities.
         /// </summary>
         private readonly IPackageService packageService;
@@ -73,11 +78,6 @@ namespace Mycelium.Forge.Data
         /// The domain service for <see cref="IPackageVersion" /> entities.
         /// </summary>
         private readonly IPackageVersionService packageVersionService;
-
-        /// <summary>
-        /// The domain service for <see cref="IPackageMetaData" /> entities.
-        /// </summary>
-        private readonly IPackageMetaDataService packageMetaDataService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseSeeder" /> class.

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ModelElementCard.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -36,7 +36,9 @@ namespace Mycelium.Forge.Components.Common
         {
             var raw = !string.IsNullOrWhiteSpace(this.Element.Category)
                 ? this.Element.Category
-                : !string.IsNullOrWhiteSpace(this.Element.Kind) ? this.Element.Kind : "structure";
+                : !string.IsNullOrWhiteSpace(this.Element.Kind)
+                    ? this.Element.Kind
+                    : "structure";
 
             return raw.Trim().ToLowerInvariant() switch
             {

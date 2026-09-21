@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Package.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,14 +9,16 @@
 
 namespace Mycelium.Forge.Common
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
-    /// Partial class implementation for <see cref="Package" /> providing extended metadata, repository URLs, documentation, tags, verification status, and deprecation attributes.
+    /// Partial class implementation for <see cref="Package" /> providing extended metadata, repository URLs, documentation,
+    /// tags, verification status, and deprecation attributes.
     /// </summary>
     /// <remarks>
-    /// This partial class is temporary and will be removed once the domain metamodel is updated to include repository links, homepage and documentation URLs, SPDX license expressions, tag relationships, verification status, and deprecation lifecycle attributes in the code-generated DTO.
+    /// This partial class is temporary and will be removed once the domain metamodel is updated to include repository links,
+    /// homepage and documentation URLs, SPDX license expressions, tag relationships, verification status, and deprecation
+    /// lifecycle attributes in the code-generated DTO.
     /// </remarks>
     public partial class Package
     {
@@ -49,7 +51,8 @@ namespace Mycelium.Forge.Common
         /// Gets or sets a value indicating whether the package is deprecated.
         /// </summary>
         /// <remarks>
-        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the domain model.
+        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the
+        /// domain model.
         /// </remarks>
         public bool IsDeprecated { get; set; }
 
@@ -57,7 +60,8 @@ namespace Mycelium.Forge.Common
         /// Gets or sets the human-readable explanation or migration guidance for why the package was deprecated.
         /// </summary>
         /// <remarks>
-        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the domain model.
+        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the
+        /// domain model.
         /// </remarks>
         public string DeprecationReason { get; set; } = string.Empty;
 

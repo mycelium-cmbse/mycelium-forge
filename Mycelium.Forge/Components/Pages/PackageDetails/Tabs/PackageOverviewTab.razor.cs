@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageOverviewTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -31,6 +31,16 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         public IPackageVersion Version { get; set; }
 
         /// <summary>
+        /// Gets the code usage import statement.
+        /// </summary>
+        public string CodeUsageImport => InstallCommandHelper.GenerateSysMlV2Import(this.Package.ShortName);
+
+        /// <summary>
+        /// Gets the code usage example body statement.
+        /// </summary>
+        public string CodeUsageBody => "part def MySystem :> BaseSystem { }";
+
+        /// <summary>
         /// Extracts section titles from the release README markdown content.
         /// </summary>
         /// <returns>A comma-separated string of section titles, or an empty string.</returns>
@@ -51,15 +61,5 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 
             return titles.Count > 0 ? string.Join(", ", titles) : string.Empty;
         }
-
-        /// <summary>
-        /// Gets the code usage import statement.
-        /// </summary>
-        public string CodeUsageImport => InstallCommandHelper.GenerateSysMlV2Import(this.Package.ShortName);
-
-        /// <summary>
-        /// Gets the code usage example body statement.
-        /// </summary>
-        public string CodeUsageBody => "part def MySystem :> BaseSystem { }";
     }
 }

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageValidationTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,13 +9,9 @@
 
 namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents the validation report and quality checks tab component for package details.

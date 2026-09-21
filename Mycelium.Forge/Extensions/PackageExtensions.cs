@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -29,7 +29,7 @@ namespace Mycelium.Forge.Extensions
                 return string.Empty;
             }
 
-            return GetFullName(package, organization.ShortName);
+            return package.GetFullName(organization.ShortName);
         }
 
         /// <summary>

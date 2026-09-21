@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="WebApplicationBuilderExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -55,6 +55,11 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddMemoryCache();
             builder.Services.AddForgeDal();
 
+            builder.Services.AddScoped<IThemeService, ThemeService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IJsInterop, JsInterop>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+
             return builder;
         }
 
@@ -81,10 +86,6 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<ILoginViewModel, LoginViewModel>();
             builder.Services.AddTransient<IVerifyEmailViewModel, VerifyEmailViewModel>();
             builder.Services.AddTransient<IDocumentationViewModel, DocumentationViewModel>();
-            builder.Services.AddScoped<IThemeService, ThemeService>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IJsInterop, JsInterop>();
-            builder.Services.AddScoped<INotificationService, NotificationService>();
 
             return builder;
         }
