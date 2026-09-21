@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -27,6 +27,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
     [TestFixture]
@@ -35,7 +36,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         private BunitContext context;
         private Mock<IPublishViewModel> viewModelMock;
         private DialogService dialogService;
-        private ToastService toastService;
+        private NotificationService notificationService;
 
         [SetUp]
         public void SetUp()
@@ -82,10 +83,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.viewModelMock.Setup(x => x.MetamodelOptions).Returns(["SysML v2 (2025-02)"]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
+            this.notificationService = new NotificationService();
+            this.context.Services.AddSingleton<INotificationService>(this.notificationService);
 
-            // Use the dialog and toast services injected by blazorblueprint helper methods
             this.dialogService = this.context.Services.GetRequiredService<DialogService>();
-            this.toastService = this.context.Services.GetRequiredService<ToastService>();
         }
 
         [TearDown]
@@ -178,7 +179,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.viewModelMock.Setup(x => x.Publish()).Returns(failedResult);
 
             await publishPage.InvokeAsync(() => publishButton.ClickAsync());
-            Assert.That(this.toastService.Toasts, Has.Count.EqualTo(1));
+            Assert.That(this.notificationService.Results.Items, Has.Count.EqualTo(1));
         }
     }
 }

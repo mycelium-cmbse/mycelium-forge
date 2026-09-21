@@ -12,190 +12,647 @@ namespace Mycelium.Forge.Data
     using System.Diagnostics.CodeAnalysis;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models.Admin;
-    using Mycelium.Forge.Models.Organization;
-    using Mycelium.Forge.Models.Package;
 
     /// <summary>
-    /// Provides centralized seed data and mock models for registry entities.
+    /// Provides centralized development seed data entities for database persistence.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public static class SeedData
     {
-        /// <summary>
-        /// Constant label representing verified account status.
-        /// </summary>
-        private const string VerifiedStatus = "Verified";
-
-        /// <summary>
-        /// Constant representing the Starion publisher scope prefix.
-        /// </summary>
-        private const string StarionScope = "@starion";
-
-        /// <summary>
-        /// Constant representing the SysML v2 format name.
-        /// </summary>
-        private const string SysmlV2Format = "SysML v2";
-
-        /// <summary>
-        /// Constant representing version 1.0.0.
-        /// </summary>
-        private const string Version100 = "v1.0.0";
-
         static SeedData()
         {
-            RegisAccount = CreateAccount(
-                "a1111111-1111-1111-1111-111111111111",
-                "R. André",
-                "r.andre",
-                "regis.andre@starion.eu",
-                new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc),
-                "stariongroup.eu",
-                "Toulouse, France");
+            var forgeId = Guid.NewGuid();
 
-            StefanAccount = CreateAccount(
-                "a2222222-2222-2222-2222-222222222222",
-                "S. Kramer",
-                "s.kramer",
-                "stefan.kramer@starion.eu",
-                new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc));
+            RegisAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "R. André",
+                ShortName = "r.andre",
+                Email = "regis.andre@starion.eu",
+                Website = "stariongroup.eu",
+                Origin = "Toulouse, France",
+                Status = ScopeStatusKind.ACTIVE,
+                CreatedAt = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc)
+            };
 
-            KleinAccount = CreateAccount(
-                "a3333333-3333-3333-3333-333333333333",
-                "J. Klein",
-                "j.klein",
-                "j.klein@esa.int",
-                new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc));
+            StefanAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "S. Kramer",
+                ShortName = "s.kramer",
+                Email = "stefan.kramer@starion.eu",
+                Origin = "local",
+                Status = ScopeStatusKind.ACTIVE,
+                CreatedAt = new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc)
+            };
 
-            BlancAccount = CreateAccount(
-                "a4444444-4444-4444-4444-444444444444",
-                "M. Blanc",
-                "m.blanc",
-                "m.blanc@starion.eu",
-                new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc));
+            KleinAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "J. Klein",
+                ShortName = "j.klein",
+                Email = "j.klein@esa.int",
+                Origin = "local",
+                Status = ScopeStatusKind.ACTIVE,
+                CreatedAt = new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc)
+            };
 
-            NovakAccount = CreateAccount(
-                "a5555555-5555-5555-5555-555555555555",
-                "A. Novak",
-                "a.novak",
-                "a.novak@esa.int",
-                new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc));
+            BlancAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "M. Blanc",
+                ShortName = "m.blanc",
+                Email = "m.blanc@starion.eu",
+                Origin = "local",
+                Status = ScopeStatusKind.ACTIVE,
+                CreatedAt = new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc)
+            };
 
-            StarionOrganization = CreateOrganization(
-                "b1111111-1111-1111-1111-111111111111",
-                "Starion Group",
-                "starion",
-                "Systems engineering models and ECSS mission libraries for early-phase spacecraft design.",
-                new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            NovakAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "A. Novak",
+                ShortName = "a.novak",
+                Email = "a.novak@esa.int",
+                Origin = "local",
+                Status = ScopeStatusKind.ACTIVE,
+                CreatedAt = new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc)
+            };
 
-            EsaOrganization = CreateOrganization(
-                "b2222222-2222-2222-2222-222222222222",
-                "European Space Agency",
-                "esa",
-                "European Space Agency engineering libraries and flight dynamics models.",
-                new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            Accounts =
+            [
+                RegisAccount,
+                StefanAccount,
+                KleinAccount,
+                BlancAccount,
+                NovakAccount
+            ];
 
-            OmgOrganization = CreateOrganization(
-                "b3333333-3333-3333-3333-333333333333",
-                "Object Management Group",
-                "omg",
-                "Official SysML v2 and KerML specification standard libraries.",
-                new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            Forge = new Forge
+            {
+                Id = forgeId,
+                Name = "Mycelium Forge",
+                ShortName = "forge",
+                Description = "The central package registry and distribution platform for MBSE model libraries.",
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                Administrator = [RegisAccount.Id],
+                Account =
+                [
+                    RegisAccount.Id,
+                    StefanAccount.Id,
+                    KleinAccount.Id,
+                    BlancAccount.Id,
+                    NovakAccount.Id
+                ]
+            };
 
-            StarionOrganizationModel = new OrganizationModel(
+            Countries =
+            [
+                new Country
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = forgeId,
+                    Alpha2Code = "FR",
+                    Alpha3Code = "FRA",
+                    NumericCode = "250",
+                    Name = "France",
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow
+                },
+                new Country
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = forgeId,
+                    Alpha2Code = "NL",
+                    Alpha3Code = "NLD",
+                    NumericCode = "528",
+                    Name = "Netherlands",
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow
+                },
+                new Country
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = forgeId,
+                    Alpha2Code = "DE",
+                    Alpha3Code = "DEU",
+                    NumericCode = "276",
+                    Name = "Germany",
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow
+                },
+                new Country
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = forgeId,
+                    Alpha2Code = "US",
+                    Alpha3Code = "USA",
+                    NumericCode = "840",
+                    Name = "United States",
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow
+                }
+            ];
+
+            SysmlV2PackageType = new PackageType
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = PackageFormatConstants.SysMlV2,
+                Description = "Systems Modeling Language v2 package format.",
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow
+            };
+
+            Cdp4CometPackageType = new PackageType
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "Cdp4Comet",
+                Description = "Concurrent Design Platform COMET data definitions.",
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow
+            };
+
+            CapellaPackageType = new PackageType
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "Capella",
+                Description = "Capella system architecture and Arcadia methodology models.",
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow
+            };
+
+            PackageTypes =
+            [
+                SysmlV2PackageType,
+                Cdp4CometPackageType,
+                CapellaPackageType
+            ];
+
+            StarionOrganization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "Starion Group",
+                ShortName = "starion",
+                Email = "contact@stariongroup.eu",
+                Origin = "Systems engineering models and ECSS mission libraries for early-phase spacecraft design.",
+                Status = ScopeStatusKind.ACTIVE,
+                Administrator = [RegisAccount.Id, StefanAccount.Id],
+                Member = [RegisAccount.Id, StefanAccount.Id, KleinAccount.Id, BlancAccount.Id],
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            };
+
+            EsaOrganization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "European Space Agency",
+                ShortName = "esa",
+                Email = "contact@esa.int",
+                Origin = "European Space Agency engineering libraries and flight dynamics models.",
+                Status = ScopeStatusKind.ACTIVE,
+                Administrator = [RegisAccount.Id],
+                Member = [RegisAccount.Id, KleinAccount.Id, NovakAccount.Id],
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            };
+
+            OmgOrganization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Owner = forgeId,
+                Name = "Object Management Group",
+                ShortName = "omg",
+                Email = "info@omg.org",
+                Origin = "Official SysML v2 and KerML specification standard libraries.",
+                Status = ScopeStatusKind.ACTIVE,
+                Administrator = [RegisAccount.Id],
+                Member = [RegisAccount.Id],
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            };
+
+            Organizations =
+            [
                 StarionOrganization,
-                StarionOrganization.Origin,
-                true,
-                6,
-                14,
-                390);
-
-            EsaOrganizationModel = new OrganizationModel(
                 EsaOrganization,
-                EsaOrganization.Origin,
-                true,
-                4,
-                8,
-                210);
-
-            StarionMembers =
-            [
-                new OrganizationMemberModel(RegisAccount, OrganizationInvitationKind.ADMINISTRATOR),
-                new OrganizationMemberModel(StefanAccount, OrganizationInvitationKind.ADMINISTRATOR),
-                new OrganizationMemberModel(KleinAccount),
-                new OrganizationMemberModel(BlancAccount)
+                OmgOrganization
             ];
 
-            RegisOrganizationMemberships =
+            SysmlIsqQuantitiesPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = OmgOrganization.Id,
+                PackageType = SysmlV2PackageType.Id,
+                Name = "SysMLv2-ISQ-Quantities",
+                ShortName = "sysmlv2-isq-quantities",
+                Description = "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [RegisAccount.Id],
+                PackageMaintainer = [StefanAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-30),
+                ModifiedAt = DateTime.UtcNow.AddDays(-30)
+            };
+
+            SysmlKernelLibraryPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = OmgOrganization.Id,
+                PackageType = SysmlV2PackageType.Id,
+                Name = "SysMLv2-Kernel-Library",
+                ShortName = "sysmlv2-kernel-library",
+                Description = "Fundamental KerML metamodel library containing base types, collections, and control functions.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [RegisAccount.Id],
+                PackageMaintainer = [StefanAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-30),
+                ModifiedAt = DateTime.UtcNow.AddDays(-30)
+            };
+
+            EcssEnvironmentPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = EsaOrganization.Id,
+                PackageType = SysmlV2PackageType.Id,
+                Name = "ECSS-E-ST-10-04C",
+                ShortName = "ecss-e-st-10-04c",
+                Description = "Space environment definitions and planetary constants for mission analysis and spacecraft design.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [NovakAccount.Id],
+                PackageMaintainer = [RegisAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-60),
+                ModifiedAt = DateTime.UtcNow.AddDays(-60)
+            };
+
+            EcssPowerSubsystemPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = StarionOrganization.Id,
+                PackageType = SysmlV2PackageType.Id,
+                Name = "ECSS-MM-PWR",
+                ShortName = "ecss-mm-pwr",
+                Description = "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and PCU.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [RegisAccount.Id],
+                PackageMaintainer = [StefanAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-14),
+                ModifiedAt = DateTime.UtcNow.AddDays(-14)
+            };
+
+            SmallSatPlatformPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = StarionOrganization.Id,
+                PackageType = SysmlV2PackageType.Id,
+                Name = "SmallSat-Platform-Model",
+                ShortName = "smallsat-platform-model",
+                Description = "Parametric smallsat platform model including propulsion and telemetry budget templates.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [RegisAccount.Id],
+                PackageMaintainer = [StefanAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-21),
+                ModifiedAt = DateTime.UtcNow.AddDays(-21)
+            };
+
+            EcssRfCommsPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = StarionOrganization.Id,
+                PackageType = SysmlV2PackageType.Id,
+                Name = "ecss-e-st-32-10c",
+                ShortName = "ecss-e-st-32-10c",
+                Description = "RF telecommunication link budget and space communication interfaces.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [RegisAccount.Id],
+                PackageMaintainer = [StefanAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-60),
+                ModifiedAt = DateTime.UtcNow.AddDays(-60)
+            };
+
+            Cdp4CometCorePackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = StarionOrganization.Id,
+                PackageType = Cdp4CometPackageType.Id,
+                Name = "CDP4-COMET-Core",
+                ShortName = "cdp4-comet-core",
+                Description = "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [StefanAccount.Id],
+                PackageMaintainer = [RegisAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-30),
+                ModifiedAt = DateTime.UtcNow.AddDays(-30)
+            };
+
+            CapellaSystemTemplatePackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = EsaOrganization.Id,
+                PackageType = CapellaPackageType.Id,
+                Name = "Capella-System-Template",
+                ShortName = "capella-system-template",
+                Description = "Arcadia methodology operational analysis and system architecture template for space instruments.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [KleinAccount.Id],
+                PackageMaintainer = [StefanAccount.Id, RegisAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-90),
+                ModifiedAt = DateTime.UtcNow.AddDays(-90)
+            };
+
+            EcssMechanicalPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = StarionOrganization.Id,
+                PackageType = SysmlV2PackageType.Id,
+                Name = "ecss-e-st-31-01c",
+                ShortName = "ecss-e-st-31-01c",
+                Description = "Structural and mechanical engineering domain metamodels and loads analysis.",
+                Visibility = VisibilityKind.PUBLIC,
+                Listed = true,
+                PackageOwner = [RegisAccount.Id],
+                PackageMaintainer = [StefanAccount.Id],
+                CreatedAt = DateTime.UtcNow.AddDays(-90),
+                ModifiedAt = DateTime.UtcNow.AddDays(-90)
+            };
+
+            Packages =
             [
-                new AccountOrganizationMembershipModel(StarionOrganization, OrganizationInvitationKind.ADMINISTRATOR),
-                new AccountOrganizationMembershipModel(EsaOrganization, OrganizationInvitationKind.ADMINISTRATOR)
+                SysmlIsqQuantitiesPackage,
+                SysmlKernelLibraryPackage,
+                EcssEnvironmentPackage,
+                EcssPowerSubsystemPackage,
+                SmallSatPlatformPackage,
+                EcssRfCommsPackage,
+                Cdp4CometCorePackage,
+                CapellaSystemTemplatePackage,
+                EcssMechanicalPackage
             ];
 
-            AdminAccounts =
+            PackageVersions =
             [
-                new AdminAccountModel(RegisAccount, true, VerifiedStatus, "@starion (admin), @esa (admin)"),
-                new AdminAccountModel(StefanAccount, false, VerifiedStatus, "@starion (admin)"),
-                new AdminAccountModel(KleinAccount, false, VerifiedStatus, "@starion (publisher)"),
-                new AdminAccountModel(BlancAccount, false, "Pending", "@starion (member)"),
-                new AdminAccountModel(NovakAccount, false, VerifiedStatus, "@esa (member)")
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlIsqQuantitiesPackage.Id,
+                    Version = "v2025.2",
+                    DownloadCount = 1400,
+                    Listed = true,
+                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt,
+                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt,
+                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlKernelLibraryPackage.Id,
+                    Version = "v2025.2",
+                    DownloadCount = 2100,
+                    Listed = true,
+                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt,
+                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt,
+                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssEnvironmentPackage.Id,
+                    Version = "v1.0.0",
+                    DownloadCount = 860,
+                    Listed = true,
+                    PublicationDate = EcssEnvironmentPackage.CreatedAt,
+                    CreatedAt = EcssEnvironmentPackage.CreatedAt,
+                    ModifiedAt = EcssEnvironmentPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "v1.2.0",
+                    DownloadCount = 210,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt,
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt,
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SmallSatPlatformPackage.Id,
+                    Version = "v0.8.2",
+                    DownloadCount = 145,
+                    Listed = true,
+                    PublicationDate = SmallSatPlatformPackage.CreatedAt,
+                    CreatedAt = SmallSatPlatformPackage.CreatedAt,
+                    ModifiedAt = SmallSatPlatformPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssRfCommsPackage.Id,
+                    Version = "v0.3.0",
+                    DownloadCount = 190,
+                    Listed = true,
+                    PublicationDate = EcssRfCommsPackage.CreatedAt,
+                    CreatedAt = EcssRfCommsPackage.CreatedAt,
+                    ModifiedAt = EcssRfCommsPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = Cdp4CometCorePackage.Id,
+                    Version = "v10.25.1",
+                    DownloadCount = 320,
+                    Listed = true,
+                    PublicationDate = Cdp4CometCorePackage.CreatedAt,
+                    CreatedAt = Cdp4CometCorePackage.CreatedAt,
+                    ModifiedAt = Cdp4CometCorePackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = CapellaSystemTemplatePackage.Id,
+                    Version = "v6.1.0",
+                    DownloadCount = 185,
+                    Listed = true,
+                    PublicationDate = CapellaSystemTemplatePackage.CreatedAt,
+                    CreatedAt = CapellaSystemTemplatePackage.CreatedAt,
+                    ModifiedAt = CapellaSystemTemplatePackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssMechanicalPackage.Id,
+                    Version = "v1.0.0",
+                    DownloadCount = 165,
+                    Listed = true,
+                    PublicationDate = EcssMechanicalPackage.CreatedAt,
+                    CreatedAt = EcssMechanicalPackage.CreatedAt,
+                    ModifiedAt = EcssMechanicalPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlIsqQuantitiesPackage.Id,
+                    Version = "v2025.1",
+                    DownloadCount = 980,
+                    Listed = true,
+                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlKernelLibraryPackage.Id,
+                    Version = "v2025.1",
+                    DownloadCount = 1450,
+                    Listed = true,
+                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssEnvironmentPackage.Id,
+                    Version = "v0.9.0",
+                    DownloadCount = 320,
+                    Listed = true,
+                    PublicationDate = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "v1.1.0",
+                    DownloadCount = 180,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "v1.0.0",
+                    DownloadCount = 95,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = Cdp4CometCorePackage.Id,
+                    Version = "v10.25.0",
+                    DownloadCount = 185,
+                    Listed = true,
+                    PublicationDate = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
+                    CreatedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90)
+                }
             ];
 
             ApiKeys =
             [
-                CreateApiKey("c1111111-1111-1111-1111-111111111111", "ci-publish", new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc), 3),
-                CreateApiKey("c2222222-2222-2222-2222-222222222222", "release-bot", new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc), 14),
-                CreateApiKey("c3333333-3333-3333-3333-333333333333", "local-dev", new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc), 30)
-            ];
-
-            StandardLibraryPackages =
-            [
-                SysmlIsqQuantitiesPackageModel,
-                SysmlKernelLibraryPackageModel,
-                EcssEnvironmentPackageModel
-            ];
-
-            RecentlyUpdatedPackages =
-            [
-                EcssPowerSubsystemPackageModel,
-                SmallSatPlatformPackageModel,
-                EcssRfCommsPackageModel
-            ];
-
-            MostUsedPackages =
-            [
-                SysmlKernelLibraryPackageModel,
-                SysmlIsqQuantitiesPackageModel,
-                EcssEnvironmentPackageModel
-            ];
-
-            ModelsFromOtherMbseTools =
-            [
-                Cdp4CometCorePackageModel,
-                CapellaSystemTemplatePackageModel,
-                EcssMechanicalPackageModel
-            ];
-
-            MyPackages =
-            [
-                CreateMyPackage(EcssPowerSubsystemPackageModel.Package, StarionScope, "v1.2.0", SysmlV2Format, "ECSS mission model: Power subsystem.", "210"),
-                CreateMyPackage(SmallSatPlatformPackageModel.Package, StarionScope, "v0.8.2", SysmlV2Format, "Parametric smallsat platform model.", "145"),
-                CreateMyPackage(EcssRfCommsPackageModel.Package, StarionScope, "v0.3.0", SysmlV2Format, "RF telecommunication link budget.", "190"),
-                CreateMyPackage(EcssMechanicalPackageModel.Package, StarionScope, Version100, SysmlV2Format, "Structural and mechanical engineering domain metamodels.", "165"),
-                CreateMyPackage(Cdp4CometCorePackageModel.Package, StarionScope, "v10.25.1", "CDP4-COMET", "Core concurrent engineering data definitions.", "320", PackageInvitationKind.MAINTAINER),
-                CreateMyPackage(EcssEnvironmentPackageModel.Package, "@esa", Version100, SysmlV2Format, "Space environment definitions and planetary constants.", "860", PackageInvitationKind.MAINTAINER)
-            ];
-
-            CatalogPackages =
-            [
-                EcssPowerSubsystemPackageModel,
-                SysmlIsqQuantitiesPackageModel,
-                SysmlKernelLibraryPackageModel,
-                EcssEnvironmentPackageModel,
-                SmallSatPlatformPackageModel,
-                Cdp4CometCorePackageModel
+                new APIKey
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = RegisAccount.Id,
+                    Name = "ci-publish",
+                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ExpiresAt = new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc),
+                    LastUsedAt = DateTime.UtcNow.AddDays(-3),
+                    ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    SecretHash = [1, 2, 3],
+                    Permissions = ["read", "write"]
+                },
+                new APIKey
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = RegisAccount.Id,
+                    Name = "release-bot",
+                    CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ExpiresAt = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc),
+                    LastUsedAt = DateTime.UtcNow.AddDays(-14),
+                    ModifiedAt = new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc),
+                    RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    SecretHash = [1, 2, 3],
+                    Permissions = ["read", "write"]
+                },
+                new APIKey
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = RegisAccount.Id,
+                    Name = "local-dev",
+                    CreatedAt = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ExpiresAt = new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
+                    LastUsedAt = DateTime.UtcNow.AddDays(-30),
+                    ModifiedAt = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc),
+                    RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    SecretHash = [1, 2, 3],
+                    Permissions = ["read", "write"]
+                }
             ];
         }
+
+        /// <summary>
+        /// Gets the root Forge platform entity.
+        /// </summary>
+        public static Forge Forge { get; }
+
+        /// <summary>
+        /// Gets the list of initial countries.
+        /// </summary>
+        public static IReadOnlyList<Country> Countries { get; }
+
+        /// <summary>
+        /// Gets the SysML v2 package type entity.
+        /// </summary>
+        public static PackageType SysmlV2PackageType { get; }
+
+        /// <summary>
+        /// Gets the CDP4-COMET package type entity.
+        /// </summary>
+        public static PackageType Cdp4CometPackageType { get; }
+
+        /// <summary>
+        /// Gets the Capella package type entity.
+        /// </summary>
+        public static PackageType CapellaPackageType { get; }
+
+        /// <summary>
+        /// Gets the list of initial package types.
+        /// </summary>
+        public static IReadOnlyList<PackageType> PackageTypes { get; }
 
         /// <summary>
         /// Gets the primary user account for Regis André.
@@ -223,6 +680,11 @@ namespace Mycelium.Forge.Data
         public static Account NovakAccount { get; }
 
         /// <summary>
+        /// Gets the list of initial accounts.
+        /// </summary>
+        public static IReadOnlyList<Account> Accounts { get; }
+
+        /// <summary>
         /// Gets the Starion Group organization.
         /// </summary>
         public static Organization StarionOrganization { get; }
@@ -238,325 +700,68 @@ namespace Mycelium.Forge.Data
         public static Organization OmgOrganization { get; }
 
         /// <summary>
-        /// Gets the presentation model for Starion Group.
+        /// Gets the list of initial organizations.
         /// </summary>
-        public static OrganizationModel StarionOrganizationModel { get; }
+        public static IReadOnlyList<Organization> Organizations { get; }
 
         /// <summary>
-        /// Gets the presentation model for European Space Agency.
+        /// Gets the package entity for SysMLv2-ISQ-Quantities.
         /// </summary>
-        public static OrganizationModel EsaOrganizationModel { get; }
+        public static Package SysmlIsqQuantitiesPackage { get; }
 
         /// <summary>
-        /// Gets the list of members for Starion Group.
+        /// Gets the package entity for SysMLv2-Kernel-Library.
         /// </summary>
-        public static IReadOnlyList<OrganizationMemberModel> StarionMembers { get; }
+        public static Package SysmlKernelLibraryPackage { get; }
 
         /// <summary>
-        /// Gets the organization memberships for the current user.
+        /// Gets the package entity for ECSS-E-ST-10-04C.
         /// </summary>
-        public static IReadOnlyList<AccountOrganizationMembershipModel> RegisOrganizationMemberships { get; }
+        public static Package EcssEnvironmentPackage { get; }
 
         /// <summary>
-        /// Gets the list of administrator accounts for installation management.
+        /// Gets the package entity for ECSS-MM-PWR.
         /// </summary>
-        public static IReadOnlyList<AdminAccountModel> AdminAccounts { get; }
+        public static Package EcssPowerSubsystemPackage { get; }
+
+        /// <summary>
+        /// Gets the package entity for SmallSat-Platform-Model.
+        /// </summary>
+        public static Package SmallSatPlatformPackage { get; }
+
+        /// <summary>
+        /// Gets the package entity for ecss-e-st-32-10c.
+        /// </summary>
+        public static Package EcssRfCommsPackage { get; }
+
+        /// <summary>
+        /// Gets the package entity for CDP4-COMET-Core.
+        /// </summary>
+        public static Package Cdp4CometCorePackage { get; }
+
+        /// <summary>
+        /// Gets the package entity for Capella-System-Template.
+        /// </summary>
+        public static Package CapellaSystemTemplatePackage { get; }
+
+        /// <summary>
+        /// Gets the package entity for ecss-e-st-31-01c.
+        /// </summary>
+        public static Package EcssMechanicalPackage { get; }
+
+        /// <summary>
+        /// Gets the master list of seeded package entities.
+        /// </summary>
+        public static IReadOnlyList<Package> Packages { get; }
+
+        /// <summary>
+        /// Gets the master list of seeded package version entities.
+        /// </summary>
+        public static IReadOnlyList<PackageVersion> PackageVersions { get; }
 
         /// <summary>
         /// Gets the master list of API keys.
         /// </summary>
         public static IReadOnlyList<APIKey> ApiKeys { get; }
-
-        /// <summary>
-        /// Gets the list of standard library packages for the home catalog.
-        /// </summary>
-        public static IReadOnlyList<PackageModel> StandardLibraryPackages { get; }
-
-        /// <summary>
-        /// Gets the list of recently updated packages for the home catalog.
-        /// </summary>
-        public static IReadOnlyList<PackageModel> RecentlyUpdatedPackages { get; }
-
-        /// <summary>
-        /// Gets the list of most used packages for the home catalog.
-        /// </summary>
-        public static IReadOnlyList<PackageModel> MostUsedPackages { get; }
-
-        /// <summary>
-        /// Gets the list of packages from other MBSE tools for the home catalog.
-        /// </summary>
-        public static IReadOnlyList<PackageModel> ModelsFromOtherMbseTools { get; }
-
-        /// <summary>
-        /// Gets the list of packages owned or maintained by the current user.
-        /// </summary>
-        public static IReadOnlyList<PackageModel> MyPackages { get; }
-
-        /// <summary>
-        /// Gets the list of package discovery and catalog search result items.
-        /// </summary>
-        public static IReadOnlyList<PackageModel> CatalogPackages { get; }
-
-        /// <summary>
-        /// Gets the mock model for the SysMLv2-ISQ-Quantities package.
-        /// </summary>
-        public static PackageModel SysmlIsqQuantitiesPackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("SysMLv2-ISQ-Quantities", "sysmlv2-isq-quantities", 30),
-            "@omg",
-            "v2025.2",
-            SysmlV2Format,
-            "Standard quantities and units definition package for SysML v2 models based on ISO/IEC 80000.",
-            "standard-library · units · quantities · isq",
-            "1.4k");
-
-        /// <summary>
-        /// Gets the mock model for the SysMLv2-Kernel-Library package.
-        /// </summary>
-        public static PackageModel SysmlKernelLibraryPackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("SysMLv2-Kernel-Library", "sysmlv2-kernel-library", 30),
-            "@omg",
-            "v2025.2",
-            SysmlV2Format,
-            "Fundamental KerML metamodel library containing base types, collections, and control functions.",
-            "standard-library · kerml · kernel",
-            "2.1k");
-
-        /// <summary>
-        /// Gets the mock model for the ECSS-E-ST-10-04C package.
-        /// </summary>
-        public static PackageModel EcssEnvironmentPackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("ECSS-E-ST-10-04C", "ecss-e-st-10-04c", 60),
-            "@esa",
-            Version100,
-            SysmlV2Format,
-            "Space environment definitions and planetary constants for mission analysis and spacecraft design.",
-            "standard-library · space-environment · ecss",
-            "860");
-
-        /// <summary>
-        /// Gets the mock model for the ECSS-MM-PWR package.
-        /// </summary>
-        public static PackageModel EcssPowerSubsystemPackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("ECSS-MM-PWR", "ecss-mm-pwr", 14),
-            StarionScope,
-            "v1.2.0",
-            SysmlV2Format,
-            "ECSS mission model: Power subsystem. Part definitions for power bus, battery, solar array, and PCU.",
-            "mission-model · power · ecss",
-            "210");
-
-        /// <summary>
-        /// Gets the mock model for the SmallSat-Platform-Model package.
-        /// </summary>
-        public static PackageModel SmallSatPlatformPackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("SmallSat-Platform-Model", "smallsat-platform-model", 21),
-            StarionScope,
-            "v0.8.2",
-            SysmlV2Format,
-            "Parametric smallsat platform model including propulsion and telemetry budget templates.",
-            "mission-model · smallsat · platform",
-            "145");
-
-        /// <summary>
-        /// Gets the mock model for the ecss-e-st-32-10c package.
-        /// </summary>
-        public static PackageModel EcssRfCommsPackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("ecss-e-st-32-10c", "ecss-e-st-32-10c", 60),
-            StarionScope,
-            "v0.3.0",
-            SysmlV2Format,
-            "RF telecommunication link budget and space communication interfaces.",
-            "comms · rf · telemetry · ecss",
-            "190");
-
-        /// <summary>
-        /// Gets the mock model for the CDP4-COMET-Core package.
-        /// </summary>
-        public static PackageModel Cdp4CometCorePackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("CDP4-COMET-Core", "cdp4-comet-core", 30),
-            StarionScope,
-            "v10.25.1",
-            "CDP4-COMET",
-            "Core concurrent engineering data definitions and iteration exchange schemas for ECSS-E-TM-10-25.",
-            "concurrent-design · cdp4 · ecss-10-25",
-            "320");
-
-        /// <summary>
-        /// Gets the mock model for the Capella-System-Template package.
-        /// </summary>
-        public static PackageModel CapellaSystemTemplatePackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("Capella-System-Template", "capella-system-template", 90),
-            "@esa",
-            "v6.1.0",
-            "Capella",
-            "Arcadia methodology operational analysis and system architecture template for space instruments.",
-            "arcadia · capella · operational-analysis",
-            "185");
-
-        /// <summary>
-        /// Gets the mock model for the ecss-e-st-31-01c package.
-        /// </summary>
-        public static PackageModel EcssMechanicalPackageModel { get; } = CreateVerifiedPackage(
-            CreatePackage("ecss-e-st-31-01c", "ecss-e-st-31-01c", 90),
-            StarionScope,
-            Version100,
-            SysmlV2Format,
-            "Structural and mechanical engineering domain metamodels and loads analysis.",
-            "mechanical · structures · loads · ecss",
-            "165");
-
-        /// <summary>
-        /// Creates an active account entity.
-        /// </summary>
-        /// <param name="guid">The unique identifier string.</param>
-        /// <param name="name">The display name.</param>
-        /// <param name="shortName">The short name.</param>
-        /// <param name="email">The email address.</param>
-        /// <param name="createdAt">The creation date.</param>
-        /// <param name="website">The optional website.</param>
-        /// <param name="origin">The optional origin.</param>
-        /// <returns>A new <see cref="Account" />.</returns>
-        private static Account CreateAccount(
-            string guid,
-            string name,
-            string shortName,
-            string email,
-            DateTime createdAt,
-            string website = "",
-            string origin = "")
-        {
-            return new Account
-            {
-                Id = Guid.Parse(guid),
-                Name = name,
-                ShortName = shortName,
-                Email = email,
-                Website = website,
-                Origin = origin,
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = createdAt
-            };
-        }
-
-        /// <summary>
-        /// Creates an active organization entity.
-        /// </summary>
-        /// <param name="guid">The unique identifier string.</param>
-        /// <param name="name">The organization name.</param>
-        /// <param name="shortName">The short name.</param>
-        /// <param name="origin">The origin or mission description.</param>
-        /// <param name="createdAt">The creation date.</param>
-        /// <returns>A new <see cref="Organization" />.</returns>
-        private static Organization CreateOrganization(string guid, string name, string shortName, string origin, DateTime createdAt)
-        {
-            return new Organization
-            {
-                Id = Guid.Parse(guid),
-                Name = name,
-                ShortName = shortName,
-                Origin = origin,
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = createdAt
-            };
-        }
-
-        /// <summary>
-        /// Creates an API key entity with specified properties.
-        /// </summary>
-        /// <param name="guid">The unique identifier string.</param>
-        /// <param name="name">The key name.</param>
-        /// <param name="createdAt">The creation date.</param>
-        /// <param name="expiresAt">The expiration date.</param>
-        /// <param name="lastUsedDaysAgo">The number of days since last use.</param>
-        /// <returns>A new <see cref="APIKey" />.</returns>
-        private static APIKey CreateApiKey(string guid, string name, DateTime createdAt, DateTime expiresAt, int lastUsedDaysAgo)
-        {
-            return new APIKey
-            {
-                Id = Guid.Parse(guid),
-                Name = name,
-                CreatedAt = createdAt,
-                ExpiresAt = expiresAt,
-                LastUsedAt = DateTime.UtcNow.AddDays(-lastUsedDaysAgo)
-            };
-        }
-
-        /// <summary>
-        /// Creates a public package entity with standard metadata.
-        /// </summary>
-        /// <param name="name">The name of the package.</param>
-        /// <param name="shortName">The short URL-friendly name.</param>
-        /// <param name="daysAgo">The creation age in days.</param>
-        /// <returns>A new <see cref="Package" />.</returns>
-        private static Package CreatePackage(string name, string shortName, int daysAgo)
-        {
-            return new Package
-            {
-                Name = name,
-                ShortName = shortName,
-                Visibility = VisibilityKind.PUBLIC,
-                CreatedAt = DateTime.UtcNow.AddDays(-daysAgo)
-            };
-        }
-
-        /// <summary>
-        /// Creates a verified package model with standard metadata.
-        /// </summary>
-        /// <param name="package">The underlying package entity.</param>
-        /// <param name="scope">The publisher scope prefix.</param>
-        /// <param name="version">The package version string.</param>
-        /// <param name="format">The format descriptor.</param>
-        /// <param name="description">The summary description.</param>
-        /// <param name="tags">The associated tags.</param>
-        /// <param name="importCount">The import count display value.</param>
-        /// <returns>A new verified <see cref="PackageModel" />.</returns>
-        private static PackageModel CreateVerifiedPackage(
-            IPackage package,
-            string scope,
-            string version,
-            string format,
-            string description,
-            string tags,
-            string importCount)
-        {
-            return new PackageModel(
-                package,
-                scope,
-                version,
-                format,
-                description,
-                tags,
-                importCount)
-            {
-                IsVerified = true
-            };
-        }
-
-        /// <summary>
-        /// Creates a user package model with the specified role and import count.
-        /// </summary>
-        /// <param name="package">The underlying package entity.</param>
-        /// <param name="scope">The publisher scope prefix.</param>
-        /// <param name="version">The package version string.</param>
-        /// <param name="format">The format descriptor.</param>
-        /// <param name="description">The summary description.</param>
-        /// <param name="importCount">The import count display value.</param>
-        /// <param name="role">The user role for the package.</param>
-        /// <returns>A new <see cref="PackageModel" />.</returns>
-        private static PackageModel CreateMyPackage(
-            IPackage package,
-            string scope,
-            string version,
-            string format,
-            string description,
-            string importCount,
-            PackageInvitationKind role = PackageInvitationKind.OWNER)
-        {
-            return new PackageModel(package, scope, version, format, description, importCount: importCount)
-            {
-                IsVerified = true,
-                Role = role
-            };
-        }
     }
 }

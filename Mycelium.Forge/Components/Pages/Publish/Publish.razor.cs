@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Publish.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -16,7 +16,9 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
     using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Model;
     using Mycelium.Forge.Models.Publish;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
     /// <summary>
@@ -31,10 +33,10 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public IPublishViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the toast notification service.
+        /// Gets or sets the notification service.
         /// </summary>
         [Inject]
-        public ToastService ToastService { get; set; }
+        public INotificationService NotificationService { get; set; }
 
         /// <summary>
         /// Gets or sets the navigation manager instance.
@@ -212,7 +214,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
 
             if (result.IsError)
             {
-                this.ToastService.Error(result.FirstError.Description, "Error");
+                this.NotificationService.AddNotification(result.FirstError.Description, "Error", NotificationType.Error);
                 return;
             }
 

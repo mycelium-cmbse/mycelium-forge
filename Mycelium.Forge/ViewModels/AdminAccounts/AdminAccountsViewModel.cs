@@ -42,7 +42,15 @@ namespace Mycelium.Forge.ViewModels.AdminAccounts
         /// <param name="verificationFilter">The initial verification filter option.</param>
         public void InitializeViewModel(string searchQuery = "", string statusFilter = AllStatusFilter, VerificationFilterOption verificationFilter = VerificationFilterOption.All)
         {
-            this.Accounts = [.. SeedData.AdminAccounts];
+            this.Accounts =
+            [
+                new AdminAccountModel(SeedData.RegisAccount, true, "Verified", "@starion (admin), @esa (admin)"),
+                new AdminAccountModel(SeedData.StefanAccount, false, "Verified", "@starion (admin)"),
+                new AdminAccountModel(SeedData.KleinAccount, false, "Verified", "@starion (publisher)"),
+                new AdminAccountModel(SeedData.BlancAccount, false, "Pending", "@starion (member)"),
+                new AdminAccountModel(SeedData.NovakAccount, false, "Verified", "@esa (member)")
+            ];
+
             this.ApplyFilters(searchQuery, statusFilter, verificationFilter);
         }
 

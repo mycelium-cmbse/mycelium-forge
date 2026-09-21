@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IMyPackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -24,6 +24,7 @@ namespace Mycelium.Forge.ViewModels.MyPackages
         /// <summary>
         /// Initializes the view model state and populates the packages collection.
         /// </summary>
-        void InitializeViewModel();
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task InitializeViewModel();
     }
 }

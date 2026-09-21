@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.ViewModels.Home
 {
-    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
     /// Defines the view model contract for the Mycelium Forge home landing page.
@@ -19,46 +19,47 @@ namespace Mycelium.Forge.ViewModels.Home
         /// <summary>
         /// Gets or sets the total published package count displayed in the hero section.
         /// </summary>
-        string PackageCount { get; set; }
+        int PackageCount { get; set; }
 
         /// <summary>
         /// Gets or sets the total package version count displayed in the hero section.
         /// </summary>
-        string VersionCount { get; set; }
+        int VersionCount { get; set; }
 
         /// <summary>
         /// Gets or sets the total registered publisher count displayed in the hero section.
         /// </summary>
-        string PublisherCount { get; set; }
+        int PublisherCount { get; set; }
 
         /// <summary>
-        /// Gets or sets the total package import count displayed in the hero section.
+        /// Gets or sets the total package download count displayed in the hero section.
         /// </summary>
-        string ImportCount { get; set; }
+        int DownloadCount { get; set; }
 
         /// <summary>
         /// Gets or sets the standard library package models.
         /// </summary>
-        List<PackageModel> StandardLibraries { get; set; }
+        List<PackageRowViewModel> StandardLibraries { get; set; }
 
         /// <summary>
         /// Gets or sets the recently updated package models.
         /// </summary>
-        List<PackageModel> RecentlyUpdated { get; set; }
+        List<PackageRowViewModel> RecentlyUpdated { get; set; }
 
         /// <summary>
         /// Gets or sets the most used package models.
         /// </summary>
-        List<PackageModel> MostUsed { get; set; }
+        List<PackageRowViewModel> MostUsed { get; set; }
 
         /// <summary>
         /// Gets or sets the package models from other MBSE tools.
         /// </summary>
-        List<PackageModel> ModelsFromOtherMbseTools { get; set; }
+        List<PackageRowViewModel> ModelsFromOtherMbseTools { get; set; }
 
         /// <summary>
         /// Initializes the view model state and populates the package catalog collections.
         /// </summary>
-        void InitializeViewModel();
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task InitializeViewModel();
     }
 }

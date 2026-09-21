@@ -42,7 +42,11 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
                 "Starion Group",
                 "Systems engineer, concurrent design.");
 
-            this.Organizations = [.. SeedData.RegisOrganizationMemberships];
+            this.Organizations =
+            [
+                new AccountOrganizationMembershipModel(SeedData.StarionOrganization, OrganizationInvitationKind.ADMINISTRATOR),
+                new AccountOrganizationMembershipModel(SeedData.EsaOrganization, OrganizationInvitationKind.ADMINISTRATOR)
+            ];
         }
 
         /// <summary>

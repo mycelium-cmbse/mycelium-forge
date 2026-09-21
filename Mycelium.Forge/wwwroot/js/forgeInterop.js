@@ -102,7 +102,25 @@
         }
     };
 
-    // Apply theme immediately on initial script evaluation
+    // Apply theme immediately on script evaluation to prevent flash of unstyled content.
     applyTheme(resolveDarkMode());
+
+    // Register the Blazor Enhanced Navigation listener so the theme is re-applied after each
+    // soft navigation. window.Blazor is only guaranteed to exist after DOMContentLoaded, so we
+    // defer registration until then — but guard with readyState in case the script loads late
+    // (i.e. DOMContentLoaded has already fired by the time this runs).
+    if (typeof document !== 'undefined') {
+        const registerEnhancedLoad = function () {
+            window.Blazor?.addEventListener('enhancedload', function () {
+                applyTheme(resolveDarkMode());
+            });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', registerEnhancedLoad, { once: true });
+        } else {
+            registerEnhancedLoad();
+        }
+    }
 })();
 

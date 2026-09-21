@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageSection.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -19,7 +19,8 @@
                 <span>View all</span>
                 <LucideIcon Name="arrow-right"
                             Size="14"
-                            Class="shrink-0"/>
+                            Class="shrink-0"
+                            aria-hidden="true"/>
             </BbButton>
         }
     </div>
@@ -28,7 +29,7 @@
         @foreach (var package in this.Packages)
         {
             <PackageCard @key="package.FullName"
-                         Model="@package"/>
+                         PackageRowViewModel="@package"/>
         }
     </div>
 </section>

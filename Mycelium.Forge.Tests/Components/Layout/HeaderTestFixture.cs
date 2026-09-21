@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="HeaderTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -48,6 +48,9 @@ namespace Mycelium.Forge.Tests.Components.Layout
             this.themeServiceMock.Setup(x => x.InitializeThemeAsync()).Returns(Task.CompletedTask);
 
             this.context.Services.AddSingleton(this.themeServiceMock.Object);
+            this.context.Services.AddScoped<IUserService, UserService>();
+            this.context.Services.AddScoped<INotificationService, NotificationService>();
+            this.context.Services.AddScoped<ToastService>();
         }
 
         [TearDown]

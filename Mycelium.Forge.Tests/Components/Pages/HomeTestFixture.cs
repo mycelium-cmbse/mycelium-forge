@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -23,8 +24,8 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages;
-    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.Home;
+    using Mycelium.Forge.ViewModels.Rows;
 
     [TestFixture]
     public class HomeTestFixture
@@ -43,19 +44,25 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             this.viewModelMock = new Mock<IHomeViewModel>();
 
-            var packages = new List<PackageModel>
+            var package = new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC };
+            var organization = new Organization { ShortName = "starion" };
+
+            var versions = new List<PackageVersion>
             {
-                new(
-                    new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC },
-                    "Starion Group",
-                    "1.3.0",
-                    description: "Power subsystem model.")
+                new() { Version = "1.3.0", Listed = true, DownloadCount = 100 }
             };
 
-            this.viewModelMock.Setup(x => x.PackageCount).Returns("120");
-            this.viewModelMock.Setup(x => x.VersionCount).Returns("450");
-            this.viewModelMock.Setup(x => x.PublisherCount).Returns("35");
-            this.viewModelMock.Setup(x => x.ImportCount).Returns("15.2k");
+            var packageType = new PackageType { Name = "SysML v2" };
+
+            var relatedThings = new List<IThing> { organization, packageType };
+            relatedThings.AddRange(versions);
+
+            var packages = PackageRowViewModel.GenerateRows([package], relatedThings).ToList();
+
+            this.viewModelMock.Setup(x => x.PackageCount).Returns(120);
+            this.viewModelMock.Setup(x => x.VersionCount).Returns(450);
+            this.viewModelMock.Setup(x => x.PublisherCount).Returns(35);
+            this.viewModelMock.Setup(x => x.DownloadCount).Returns(15200);
             this.viewModelMock.Setup(x => x.StandardLibraries).Returns(packages);
             this.viewModelMock.Setup(x => x.RecentlyUpdated).Returns(packages);
             this.viewModelMock.Setup(x => x.MostUsed).Returns(packages);
@@ -81,7 +88,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 Assert.That(markup, Does.Contain("packages"));
                 Assert.That(markup, Does.Contain("versions"));
                 Assert.That(markup, Does.Contain("publishers"));
-                Assert.That(markup, Does.Contain("imports"));
+                Assert.That(markup, Does.Contain("downloads"));
             }
         }
 

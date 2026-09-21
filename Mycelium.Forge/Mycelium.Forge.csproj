@@ -34,6 +34,8 @@
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
+        <PackageReference Include="ReactiveUI" Version="24.2.0" />
+        <PackageReference Include="ReactiveUI.Routing" Version="24.2.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     </ItemGroup>
 
@@ -48,7 +50,7 @@
         <ItemGroup>
             <DesignTokenFiles Include="$(MSBuildThisFileDirectory)..\Mycelium.DesignTokens\Styles\dist\tokens-forge.css;$(MSBuildThisFileDirectory)..\Mycelium.DesignTokens\Styles\dist\theme-mycelium.css" />
         </ItemGroup>
-        <Copy SourceFiles="@(DesignTokenFiles)" 
+        <Copy SourceFiles="@(DesignTokenFiles)"
               DestinationFolder="$(MSBuildProjectDirectory)\Styles\Generated\" 
               SkipUnchangedFiles="true" />
     </Target>
