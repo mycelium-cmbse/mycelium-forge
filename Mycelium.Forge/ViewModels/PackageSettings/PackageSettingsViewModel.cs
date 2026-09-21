@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -38,9 +38,9 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             var versions = new List<PackageVersionModel>
             {
-                new("v1.2.0", "published 2 weeks ago", isLatest: true),
-                new("v1.1.0", "published 2 months ago"),
-                new("v1.0.0", "published 4 months ago", isUnlisted: true)
+                new("1.2.0", "published 2 weeks ago", isLatest: true),
+                new("1.1.0", "published 2 months ago"),
+                new("1.0.0", "published 4 months ago", isUnlisted: true)
             };
 
             string resolvedOrganization;
@@ -67,7 +67,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             this.Package = new PackageModel(
                 packageDto,
                 resolvedOrganization,
-                "v1.2.0",
+                "1.2.0",
                 downloadCount: 210)
             {
                 IsVerified = true,

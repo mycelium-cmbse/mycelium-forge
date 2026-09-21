@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeeder.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -75,6 +75,11 @@ namespace Mycelium.Forge.Data
         private readonly IPackageVersionService packageVersionService;
 
         /// <summary>
+        /// The domain service for <see cref="IPackageMetaData" /> entities.
+        /// </summary>
+        private readonly IPackageMetaDataService packageMetaDataService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseSeeder" /> class.
         /// </summary>
         /// <param name="forgeService">The domain service for <see cref="IForge" /> entities.</param>
@@ -84,6 +89,7 @@ namespace Mycelium.Forge.Data
         /// <param name="organizationService">The domain service for <see cref="IOrganization" /> entities.</param>
         /// <param name="packageService">The domain service for <see cref="IPackage" /> entities.</param>
         /// <param name="packageVersionService">The domain service for <see cref="IPackageVersion" /> entities.</param>
+        /// <param name="packageMetaDataService">The domain service for <see cref="IPackageMetaData" /> entities.</param>
         /// <param name="apiKeyService">The domain service for <see cref="IAPIKey" /> entities.</param>
         /// <param name="databaseConfig">The database configuration options.</param>
         /// <param name="logger">The logger for diagnostic messages.</param>
@@ -96,6 +102,7 @@ namespace Mycelium.Forge.Data
             IOrganizationService organizationService,
             IPackageService packageService,
             IPackageVersionService packageVersionService,
+            IPackageMetaDataService packageMetaDataService,
             IAPIKeyService apiKeyService,
             DatabaseConfig databaseConfig,
             ILogger<DatabaseSeeder> logger,
@@ -108,6 +115,7 @@ namespace Mycelium.Forge.Data
             ArgumentNullException.ThrowIfNull(organizationService);
             ArgumentNullException.ThrowIfNull(packageService);
             ArgumentNullException.ThrowIfNull(packageVersionService);
+            ArgumentNullException.ThrowIfNull(packageMetaDataService);
             ArgumentNullException.ThrowIfNull(apiKeyService);
             ArgumentNullException.ThrowIfNull(databaseConfig);
             ArgumentNullException.ThrowIfNull(logger);
@@ -120,6 +128,7 @@ namespace Mycelium.Forge.Data
             this.organizationService = organizationService;
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
+            this.packageMetaDataService = packageMetaDataService;
             this.apiKeyService = apiKeyService;
             this.databaseConfig = databaseConfig;
             this.logger = logger;
@@ -157,6 +166,7 @@ namespace Mycelium.Forge.Data
                     !await this.SeedThing(seederUserContext, this.organizationService, SeedData.Organizations, cancellationToken) ||
                     !await this.SeedThing(seederUserContext, this.packageService, SeedData.Packages, cancellationToken) ||
                     !await this.SeedThing(seederUserContext, this.packageVersionService, SeedData.PackageVersions, cancellationToken) ||
+                    !await this.SeedThing(seederUserContext, this.packageMetaDataService, SeedData.PackageMetaDatas, cancellationToken) ||
                     !await this.SeedThing(seederUserContext, this.apiKeyService, SeedData.ApiKeys, cancellationToken))
                 {
                     return false;

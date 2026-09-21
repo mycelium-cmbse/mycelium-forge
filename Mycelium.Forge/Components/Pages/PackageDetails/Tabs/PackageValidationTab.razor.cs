@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageValidationTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,19 +9,29 @@
 
 namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
 
     /// <summary>
-    /// Represents the automated validation test results tab component for package details.
+    /// Represents the validation report and quality checks tab component for package details.
     /// </summary>
     public partial class PackageValidationTab : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the automated validation report model for the package release.
+        /// Gets or sets the collection of quality validation check tuples (Title, Detail, Passed).
         /// </summary>
         [Parameter]
-        public PackageValidationReportModel Report { get; set; }
+        public IReadOnlyList<(string Title, string Detail, bool Passed)> Checks { get; set; } = [];
+
+        /// <summary>
+        /// Gets or sets the currently selected package version DTO.
+        /// </summary>
+        [Parameter]
+        public IPackageVersion Version { get; set; }
     }
 }

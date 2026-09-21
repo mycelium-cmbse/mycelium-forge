@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PageRoutes.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -107,6 +107,23 @@ namespace Mycelium.Forge.Common
         }
 
         /// <summary>
+        /// Computes the navigation route URL from a package identifier name (e.g., @organization/packageName).
+        /// </summary>
+        /// <param name="name">The package identifier coordinate string.</param>
+        /// <returns>The resolved package route URL, or a hash fallback if not matched.</returns>
+        public static string GetHref(string name)
+        {
+            var parts = (name ?? string.Empty).TrimStart('@').Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 2)
+            {
+                return GetPackageRoute(parts[0], parts[1]);
+            }
+
+            return $"#{name}";
+        }
+
+        /// <summary>
         /// Generates the relative URL for the organization profile page.
         /// </summary>
         /// <param name="id">The organization identifier or scope.</param>
@@ -138,6 +155,19 @@ namespace Mycelium.Forge.Common
         {
             var cleanId = (id ?? string.Empty).TrimStart('@');
             return $"/organizations/{cleanId}/settings";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for downloading a package version artifact.
+        /// </summary>
+        /// <param name="organization">The organization scope or publisher name.</param>
+        /// <param name="packageName">The package name.</param>
+        /// <param name="version">The package version string.</param>
+        /// <returns>The formatted package download route path.</returns>
+        public static string GetPackageDownloadRoute(string organization, string packageName, string version)
+        {
+            var cleanOrg = (organization ?? string.Empty).TrimStart('@');
+            return $"/api/packages/{cleanOrg}/{packageName}/{version}/download";
         }
 
         /// <summary>

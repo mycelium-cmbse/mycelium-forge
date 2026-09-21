@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageOverviewTab.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -7,35 +7,38 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 
-@if (this.Model == null)
-{
-    return;
-}
-
 <ForgeCard Class="p-6 gap-3">
     <h2 class="text-xl leading-lg font-semibold text-foreground">
-        @(this.Model.Package.Name)
+        @(this.Package.Name)
     </h2>
-    <p class="text-sm leading-xs text-foreground-muted">
-        @(this.Model.ReadmeDescription)
-    </p>
+    
+    @if (this.Version != null)
+    {
+        <p class="text-sm leading-xs text-foreground-muted">
+            @(this.Version.Readme)
+        </p>
 
-    <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
-        Contents
-    </h3>
-    <p class="text-sm leading-xs text-foreground-muted">
-        @(this.Model.ReadmeContents)
-    </p>
+        @if (!string.IsNullOrWhiteSpace(this.GetReadmeContents()))
+        {
+            <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
+                Contents
+            </h3>
+            <p class="text-sm leading-xs text-foreground-muted">
+                @(this.GetReadmeContents())
+            </p>
+        }
 
-    <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
-        Usage
-    </h3>
-    <div class="w-full p-3 px-3.5 rounded-md bg-docs-code-background font-mono text-sm leading-normal flex flex-col gap-0.5 overflow-x-auto text-docs-code-foreground">
-        <span class="select-all">
-            @(this.Model.CodeUsageImport)
-        </span>
-        <span class="select-all">
-            @(this.Model.CodeUsageBody)
-        </span>
-    </div>
+        <h3 class="text-md leading-sm font-semibold text-foreground pt-1">
+            Usage
+        </h3>
+        <div class="w-full p-3 px-3.5 rounded-md bg-docs-code-background font-mono text-sm leading-normal flex flex-col gap-0.5 overflow-x-auto text-docs-code-foreground">
+            <span class="select-all">
+                @(this.CodeUsageImport)
+            </span>
+            <span class="select-all">
+                @(this.CodeUsageBody)
+            </span>
+        </div>
+    }
+    
 </ForgeCard>

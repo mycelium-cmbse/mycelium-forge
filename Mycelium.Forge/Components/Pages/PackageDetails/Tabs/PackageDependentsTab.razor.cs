@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDependentsTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.Common;
 
     /// <summary>
     /// Represents the reverse dependents and consumers list tab component for package details.
@@ -19,9 +19,9 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
     public partial class PackageDependentsTab : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the collection of dependent packages and projects.
+        /// Gets or sets the collection of dependent package and project tuples (Name, Summary, IsProject, IsVerified).
         /// </summary>
         [Parameter]
-        public IReadOnlyList<PackageRelationshipModel> Dependents { get; set; } = [];
+        public IReadOnlyList<(string Name, string Summary, bool IsProject, bool IsVerified)> Dependents { get; set; } = [];
     }
 }

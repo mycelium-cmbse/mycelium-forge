@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageDependenciesTab.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -21,19 +21,20 @@
     </p>
 
     <div class="w-full rounded-lg bg-card border border-border overflow-hidden mt-1">
-        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Dependencies)"
+        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Dependencies.Cast<object>())"
+                                                  TData="object"
                                                   class="w-full text-left text-sm leading-xs">
             <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
                 @foreach (var dep in this.Dependencies)
                 {
-                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="dep.Name"
-                                                                 Item="@dep"
+                    <BlazorBlueprint.Primitives.Table.BbTableRow TData="object"
+                                                                 @key="dep.Name"
                                                                  class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
                             <LucideIcon Name="box"
                                         Size="16"
                                         Class="text-muted-foreground shrink-0"/>
-                            <a href="@dep.Href"
+                            <a href="@(PageRoutes.GetHref(dep.Name))"
                                class="font-semibold text-primary hover:underline">
                                 @(dep.Name)
                             </a>
