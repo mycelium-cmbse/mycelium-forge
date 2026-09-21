@@ -44,7 +44,7 @@
                                             Class="text-muted-foreground shrink-0"/>
                             }
 
-                            <a href="@(PageRoutes.GetHref(dependent.Name))"
+                            <a href="@(PageRoutes.GetHrefFromPackageFullName(dependent.Name))"
                                class="font-semibold text-primary hover:underline">
                                 @(dependent.Name)
                             </a>

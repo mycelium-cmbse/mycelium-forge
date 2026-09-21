@@ -76,11 +76,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         IReadOnlyList<(string Title, string Detail, bool Passed)> QualityChecks { get; }
 
         /// <summary>
-        /// Gets or sets the dictionary of install commands.
-        /// </summary>
-        IReadOnlyDictionary<string, string> InstallCommands { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the current user is an administrator of the package.
         /// </summary>
         bool IsUserAdmin { get; set; }
@@ -90,13 +85,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
         /// <param name="organization">The organization of the package.</param>
+        /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        Task InitializeViewModel(string packageName, string organization);
-
-        /// <summary>
-        /// Initiates a migration of the package in Bloom to the specified target project.
-        /// </summary>
-        /// <param name="result">The migration parameters including destination project and version constraint.</param>
-        void MigrateInBloom(MigrateInBloomResult result);
+        Task InitializeViewModel(string packageName, string organization, string tab = null);
     }
 }

@@ -52,6 +52,7 @@ namespace Mycelium.Forge.Extensions
         /// <returns>The configured <see cref="WebApplicationBuilder" /> instance.</returns>
         public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
         {
+            builder.Services.AddMemoryCache();
             builder.Services.AddForgeDal();
 
             return builder;
@@ -68,6 +69,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<IPackagesViewModel, PackagesViewModel>();
             builder.Services.AddTransient<IOrganizationDetailsViewModel, OrganizationDetailsViewModel>();
             builder.Services.AddTransient<IPackageDetailsViewModel, PackageDetailsViewModel>();
+            builder.Services.AddTransient<IPackageDetailsActionsViewModel, PackageDetailsActionsViewModel>();
             builder.Services.AddTransient<IPublishViewModel, PublishViewModel>();
             builder.Services.AddTransient<IMyPackagesViewModel, MyPackagesViewModel>();
             builder.Services.AddTransient<IApiKeysViewModel, ApiKeysViewModel>();

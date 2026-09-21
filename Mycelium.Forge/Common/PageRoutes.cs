@@ -35,6 +35,11 @@ namespace Mycelium.Forge.Common
         public const string Package = "/packages/{organization}/{packageName}";
 
         /// <summary>
+        /// The package details tab page route path.
+        /// </summary>
+        public const string PackageTab = "/packages/{organization}/{packageName}/{tab}";
+
+        /// <summary>
         /// The organization and publisher profile page route path.
         /// </summary>
         public const string Organization = "/organizations/{id}";
@@ -95,15 +100,22 @@ namespace Mycelium.Forge.Common
         public const string Accounts = "/admin/accounts";
 
         /// <summary>
-        /// Generates the relative URL for the package details page.
+        /// Generates the relative URL for the package details page, optionally with a specified tab.
         /// </summary>
         /// <param name="organization">The organization scope or publisher name.</param>
         /// <param name="packageName">The package name.</param>
+        /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>The formatted package route path.</returns>
-        public static string GetPackageRoute(string organization, string packageName)
+        public static string GetPackageRoute(string organization, string packageName, string tab = null)
         {
             var cleanOrg = (organization ?? string.Empty).TrimStart('@');
-            return $"/packages/{cleanOrg}/{packageName}";
+
+            if (string.IsNullOrWhiteSpace(tab))
+            {
+                return $"/packages/{cleanOrg}/{packageName}";
+            }
+
+            return $"/packages/{cleanOrg}/{packageName}/{tab.ToLowerInvariant()}";
         }
 
         /// <summary>
@@ -111,7 +123,7 @@ namespace Mycelium.Forge.Common
         /// </summary>
         /// <param name="name">The package identifier coordinate string.</param>
         /// <returns>The resolved package route URL, or a hash fallback if not matched.</returns>
-        public static string GetHref(string name)
+        public static string GetHrefFromPackageFullName(string name)
         {
             var parts = (name ?? string.Empty).TrimStart('@').Split('/', StringSplitOptions.RemoveEmptyEntries);
 

@@ -10,14 +10,14 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 @attribute [Route(PageRoutes.Package)]
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@attribute [Route(PageRoutes.PackageTab)]
 
 @if (this.ViewModel.Package == null)
 {
     return;
 }
 
-<PageTitle>@(this.GetPackageFullName()) &mdash; Mycelium Forge</PageTitle>
+<PageTitle>@(this.ViewModel.Package.GetFullName(this.ViewModel.Organization)) &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-background min-h-screen select-none">
 <header class="w-full bg-card border-b border-border py-7">
@@ -29,7 +29,7 @@
                         Size="26"
                         Class="text-foreground-muted shrink-0"/>
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
-                @(this.GetPackageFullName())
+                @(this.ViewModel.Package.GetFullName(this.ViewModel.Organization))
             </h1>
             @if (this.ViewModel.Package.IsVerified)
             {
@@ -39,7 +39,7 @@
             }
             <BbBadge Variant="BadgeVariant.Outline"
                      Class="badge-format">
-                @(this.GetFormat())
+                @(this.ViewModel.PackageType.Name)
             </BbBadge>
             <BbBadge Variant="BadgeVariant.Secondary"
                      Class="badge-format">
@@ -72,59 +72,14 @@
         </p>
 
         <p class="text-xs leading-2xs text-muted-foreground">
-            @(this.GetProvenance())
+            Published recently by @@@(this.ViewModel.Organization.ShortName) · @(this.ViewModel.Package.License) · @(this.ViewModel.Package.downloadCount) downloads
         </p>
 
-        <div class="flex items-center gap-3 pt-1">
-            <BbButton id="package-details-add-to-project-button"
-                      Variant="ButtonVariant.Default"
-                      Type="ButtonType.Button"
-                      OnClick="@(this.OpenAddToProjectDialog)">
-                <LucideIcon Name="plus"
-                            Size="16"
-                            Class="shrink-0"/>
-                <span>Add to project</span>
-            </BbButton>
-
-            @if (this.ViewModel.IsUserAdmin)
-            {
-                <BbButton id="package-details-migrate-in-bloom-button"
-                          Variant="ButtonVariant.Default"
-                          Type="ButtonType.Button"
-                          OnClick="@(this.OpenMigrateInBloomDialog)">
-                    <LucideIcon Name="external-link"
-                                Size="15"
-                                Class="shrink-0"/>
-                    <span>Migrate in Bloom</span>
-                </BbButton>
-            }
-
-            <BbButton Variant="ButtonVariant.Outline"
-                      Type="ButtonType.Button">
-                <LucideIcon Name="download"
-                            Size="16"
-                            Class="shrink-0"/>
-                <span>Download kpar</span>
-            </BbButton>
-        </div>
-
-        <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedInstallTab)"
-                                                DefaultValue="@(InstallCommandConstants.ForgeCli)"
-                                                OnValueChange="@(this.SelectInstallTab)"
-                                                class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2.5">
-            <BlazorBlueprint.Primitives.Tabs.BbTabsList class="flex items-center gap-4.5 text-xs leading-2xs">
-                @foreach (var tab in this.InstallTabs)
-                {
-                    <BlazorBlueprint.Primitives.Tabs.BbTabsTrigger @key="tab"
-                                                                   Value="@tab"
-                                                                   class="@(this.GetInstallTabClass(tab))">
-                        @(tab)
-                    </BlazorBlueprint.Primitives.Tabs.BbTabsTrigger>
-                }
-            </BlazorBlueprint.Primitives.Tabs.BbTabsList>
-
-            <ForgeCopyText Text="@(this.GetCurrentInstallCommand())"/>
-        </BlazorBlueprint.Primitives.Tabs.BbTabs>
+        <PackageDetailsActions Package="@(this.ViewModel.Package)"
+                               Organization="@(this.ViewModel.Organization)"
+                               SelectedVersion="@(this.ViewModel.SelectedVersion)"
+                               IsUserAdmin="@(this.ViewModel.IsUserAdmin)"
+                               @rendermode="InteractiveServer" />
 
         <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-border">
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
@@ -173,46 +128,47 @@
 
 <div class="w-full bg-background py-7">
     <div class="page-container flex flex-col lg:flex-row items-start gap-8">
-        <div class="flex-1 w-full flex flex-col">
-            <BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedContentTab)"
-                                                    DefaultValue="@(PackageTabConstants.Overview)"
-                                                    OnValueChange="@(this.SelectContentTab)"
-                                                    class="w-full flex flex-col gap-4">
-                <BlazorBlueprint.Primitives.Tabs.BbTabsList class="w-full h-10 rounded-lg bg-card border border-border flex items-center gap-0.5 p-0.5 overflow-x-auto">
-                    @foreach (var tab in this.ContentTabs)
-                    {
-                        <BlazorBlueprint.Primitives.Tabs.BbTabsTrigger @key="tab"
-                                                                       Value="@tab"
-                                                                       class="@(this.GetContentTabClass(tab))">
-                            @(tab.ToUpperCaseFirst())
-                        </BlazorBlueprint.Primitives.Tabs.BbTabsTrigger>
-                    }
-                </BlazorBlueprint.Primitives.Tabs.BbTabsList>
+        <div class="flex-1 w-full flex flex-col gap-4">
+            <div class="w-full h-10 rounded-lg bg-card border border-border flex items-center gap-0.5 p-0.5 overflow-x-auto">
+                @foreach (var tab in this.ContentTabs)
+                {
+                    <a @key="tab"
+                       href="@(PageRoutes.GetPackageRoute(this.ViewModel.Organization.ShortName, this.ViewModel.Package.ShortName, tab))"
+                       class="@(this.GetContentTabClass(tab))">
+                        @(tab.ToUpperCaseFirst())
+                    </a>
+                }
+            </div>
 
-                <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="@PackageTabConstants.Overview">
-                    <PackageOverviewTab Package="@(this.ViewModel.Package)"
-                                        Version="@(this.ViewModel.SelectedVersion)"/>
-                </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
-                <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="@PackageTabConstants.Contents">
-                    <PackageContentsTab Elements="@(this.ViewModel.Elements)"/>
-                </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
-                <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="@PackageTabConstants.Dependencies">
-                    <PackageDependenciesTab Dependencies="@(this.ViewModel.Dependencies)"/>
-                </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
-                <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="@PackageTabConstants.Dependents">
-                    <PackageDependentsTab Dependents="@(this.ViewModel.Dependents)"/>
-                </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
-                <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="@PackageTabConstants.Versions">
-                    <PackageVersionsTab Versions="@(this.ViewModel.Versions)"
-                                        MetaDatas="@(this.ViewModel.MetaDatas)"
-                                        Organization="@(this.ViewModel.Organization)"
-                                        Package="@(this.ViewModel.Package)"/>
-                </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
-                <BlazorBlueprint.Primitives.Tabs.BbTabsContent Value="@PackageTabConstants.Validation">
-                    <PackageValidationTab Checks="@(this.ViewModel.QualityChecks)"
-                                          Version="@(this.ViewModel.SelectedVersion)"/>
-                </BlazorBlueprint.Primitives.Tabs.BbTabsContent>
-            </BlazorBlueprint.Primitives.Tabs.BbTabs>
+            @if (this.SelectedContentTab == PackageTabConstants.Overview)
+            {
+                <PackageOverviewTab Package="@(this.ViewModel.Package)"
+                                    Version="@(this.ViewModel.SelectedVersion)"/>
+            }
+            else if (this.SelectedContentTab == PackageTabConstants.Contents)
+            {
+                <PackageContentsTab Elements="@(this.ViewModel.Elements)"/>
+            }
+            else if (this.SelectedContentTab == PackageTabConstants.Dependencies)
+            {
+                <PackageDependenciesTab Dependencies="@(this.ViewModel.Dependencies)"/>
+            }
+            else if (this.SelectedContentTab == PackageTabConstants.Dependents)
+            {
+                <PackageDependentsTab Dependents="@(this.ViewModel.Dependents)"/>
+            }
+            else if (this.SelectedContentTab == PackageTabConstants.Versions)
+            {
+                <PackageVersionsTab Versions="@(this.ViewModel.Versions)"
+                                    MetaDatas="@(this.ViewModel.MetaDatas)"
+                                    Organization="@(this.ViewModel.Organization)"
+                                    Package="@(this.ViewModel.Package)"/>
+            }
+            else if (this.SelectedContentTab == PackageTabConstants.Validation)
+            {
+                <PackageValidationTab Checks="@(this.ViewModel.QualityChecks)"
+                                      Version="@(this.ViewModel.SelectedVersion)"/>
+            }
         </div>
 
         <aside class="w-full lg:w-[340px] shrink-0 flex flex-col gap-4">
@@ -241,7 +197,7 @@
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground">Metamodel</span>
-                    <span class="font-medium text-foreground text-right">@(this.GetMetamodel())</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.PackageType.Name)</span>
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
@@ -250,7 +206,7 @@
                        target="_blank"
                        rel="noopener noreferrer"
                        class="font-medium text-primary hover:underline text-right truncate">
-                        @(this.GetRepositoryDisplayName())
+                        @(this.ViewModel.Package.RepositoryUrl)
                     </a>
                 </div>
 

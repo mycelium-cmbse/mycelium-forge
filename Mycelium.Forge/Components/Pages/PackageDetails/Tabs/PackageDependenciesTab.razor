@@ -34,7 +34,7 @@
                             <LucideIcon Name="box"
                                         Size="16"
                                         Class="text-muted-foreground shrink-0"/>
-                            <a href="@(PageRoutes.GetHref(dep.Name))"
+                            <a href="@(PageRoutes.GetHrefFromPackageFullName(dep.Name))"
                                class="font-semibold text-primary hover:underline">
                                 @(dep.Name)
                             </a>

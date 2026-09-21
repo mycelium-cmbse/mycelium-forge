@@ -1,0 +1,60 @@
+@* ------------------------------------------------------------------------------------------------
+<copyright file="PackageDetailsActions.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+@using Mycelium.Forge.ViewModels.PackageDetails
+
+<div class="flex items-center gap-3 pt-1">
+    <BbButton id="package-details-add-to-project-button"
+              Variant="ButtonVariant.Default"
+              Type="ButtonType.Button"
+              OnClick="@(this.OpenAddToProjectDialog)">
+        <LucideIcon Name="plus"
+                    Size="16"
+                    Class="shrink-0"/>
+        <span>Add to project</span>
+    </BbButton>
+
+    @if (this.ViewModel.IsUserAdmin)
+    {
+        <BbButton id="package-details-migrate-in-bloom-button"
+                  Variant="ButtonVariant.Default"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OpenMigrateInBloomDialog)">
+            <LucideIcon Name="external-link"
+                        Size="15"
+                        Class="shrink-0"/>
+            <span>Migrate in Bloom</span>
+        </BbButton>
+    }
+
+    <BbButton Variant="ButtonVariant.Outline"
+              Type="ButtonType.Button">
+        <LucideIcon Name="download"
+                    Size="16"
+                    Class="shrink-0"/>
+        <span>Download kpar</span>
+    </BbButton>
+</div>
+
+<BlazorBlueprint.Primitives.Tabs.BbTabs Value="@(this.SelectedInstallTab)"
+                                        DefaultValue="@(InstallCommandConstants.ForgeCli)"
+                                        OnValueChange="@(this.SelectInstallTab)"
+                                        class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2.5">
+    <BlazorBlueprint.Primitives.Tabs.BbTabsList class="flex items-center gap-4.5 text-xs leading-2xs">
+        @foreach (var tab in this.InstallTabs)
+        {
+            <BlazorBlueprint.Primitives.Tabs.BbTabsTrigger @key="tab"
+                                                           Value="@tab"
+                                                           class="@(this.GetInstallTabClass(tab))">
+                @(tab)
+            </BlazorBlueprint.Primitives.Tabs.BbTabsTrigger>
+        }
+    </BlazorBlueprint.Primitives.Tabs.BbTabsList>
+
+    <ForgeCopyText Text="@(this.GetCurrentInstallCommand())"/>
+</BlazorBlueprint.Primitives.Tabs.BbTabs>

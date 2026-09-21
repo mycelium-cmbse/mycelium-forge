@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Gets or sets the source code repository URL for the package.
         /// </summary>
-        public string RepositoryUrl { get; set; } = "https://github.com/stariongroup/power-bus";
+        public string RepositoryUrl { get; set; } = "https://github.com/stariongroup/repo";
 
         /// <summary>
         /// Gets or sets the primary project homepage or external website URL.

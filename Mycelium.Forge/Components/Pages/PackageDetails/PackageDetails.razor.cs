@@ -9,15 +9,11 @@
 
 namespace Mycelium.Forge.Components.Pages.PackageDetails
 {
-    using BlazorBlueprint.Components;
-
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Components.Pages.PackageDetails.Dialogs;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
-    using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.PackageDetails;
 
     /// <summary>
@@ -26,10 +22,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
     public partial class PackageDetails : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the dialog service used to display modal dialogs.
+        /// Gets or sets the navigation manager used for URI navigation.
         /// </summary>
         [Inject]
-        public DialogService DialogService { get; set; }
+        public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
         /// Gets or sets the organization segment supplied from the URL route.
@@ -44,26 +40,16 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         public string PackageName { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the content tab supplied from the URL route.
+        /// </summary>
+        [Parameter]
+        public string Tab { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets the view model for the package details page.
         /// </summary>
         [Inject]
         public IPackageDetailsViewModel ViewModel { get; set; }
-
-        /// <summary>
-        /// Gets or sets the currently selected install method tab.
-        /// </summary>
-        public string SelectedInstallTab { get; set; } = InstallCommandConstants.ForgeCli;
-
-        /// <summary>
-        /// Gets the available installation method tabs.
-        /// </summary>
-        public IReadOnlyList<string> InstallTabs { get; } =
-        [
-            InstallCommandConstants.ForgeCli,
-            InstallCommandConstants.SysMlV2Import,
-            InstallCommandConstants.Manifest,
-            InstallCommandConstants.Purl
-        ];
 
         /// <summary>
         /// Gets the available package content tabs.
@@ -84,46 +70,14 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         public string SelectedContentTab { get; set; } = PackageTabConstants.Overview;
 
         /// <summary>
-        /// Gets the install command string for the currently selected install tab.
-        /// </summary>
-        /// <returns>The resolved install command string, or an empty string if not available.</returns>
-        public string GetCurrentInstallCommand()
-        {
-            return this.ViewModel.InstallCommands.TryGetValue(this.SelectedInstallTab, out var command)
-                ? command
-                : string.Empty;
-        }
-
-        /// <summary>
-        /// Selects a main content navigation tab.
+        /// Selects a main content navigation tab and navigates to its route.
         /// </summary>
         /// <param name="tab">The name of the content tab.</param>
         public void SelectContentTab(string tab)
         {
             this.SelectedContentTab = tab;
-        }
-
-        /// <summary>
-        /// Selects an installation method tab.
-        /// </summary>
-        /// <param name="tab">The name of the installation method tab.</param>
-        public void SelectInstallTab(string tab)
-        {
-            this.SelectedInstallTab = tab;
-        }
-
-        /// <summary>
-        /// Gets the CSS classes for an installation method tab trigger.
-        /// </summary>
-        /// <param name="tab">The installation method tab name.</param>
-        /// <returns>The computed CSS class string.</returns>
-        public string GetInstallTabClass(string tab)
-        {
-            const string baseClass = "cursor-pointer transition-colors";
-
-            return string.Equals(this.SelectedInstallTab, tab, StringComparison.OrdinalIgnoreCase)
-                ? $"{baseClass} font-semibold text-primary"
-                : $"{baseClass} font-medium text-muted-foreground hover:text-foreground";
+            var targetRoute = PageRoutes.GetPackageRoute(this.Organization, this.PackageName, tab);
+            this.NavigationManager.NavigateTo(targetRoute);
         }
 
         /// <summary>
@@ -138,15 +92,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             return string.Equals(this.SelectedContentTab, tab, StringComparison.OrdinalIgnoreCase)
                 ? $"{baseClass} bg-primary/10 text-primary font-semibold"
                 : $"{baseClass} text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium";
-        }
-
-        /// <summary>
-        /// Computes the fully qualified package name in the format @organization/packageName.
-        /// </summary>
-        /// <returns>The fully qualified package identifier string.</returns>
-        public string GetPackageFullName()
-        {
-            return $"@{this.ViewModel.Organization.ShortName}/{this.ViewModel.Package.Name}";
         }
 
         /// <summary>
@@ -179,15 +124,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         }
 
         /// <summary>
-        /// Computes the display format string for the package.
-        /// </summary>
-        /// <returns>The package format name.</returns>
-        public string GetFormat()
-        {
-            return this.ViewModel.PackageType?.Name ?? "SysML v2";
-        }
-
-        /// <summary>
         /// Computes the lifecycle release status label for the package.
         /// </summary>
         /// <returns>A string indicating the release status label.</returns>
@@ -202,37 +138,6 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         }
 
         /// <summary>
-        /// Computes the publication provenance summary string for the package.
-        /// </summary>
-        /// <returns>A formatted provenance string.</returns>
-        public string GetProvenance()
-        {
-            var publisher = this.ViewModel.Organization.ShortName;
-            var license = this.ViewModel.Package.License;
-            var downloads = this.ViewModel.Package.downloadCount;
-
-            return $"Published recently by @{publisher} · {license} · {downloads} downloads";
-        }
-
-        /// <summary>
-        /// Computes the metamodel specification string for the package.
-        /// </summary>
-        /// <returns>The metamodel specification string.</returns>
-        public string GetMetamodel()
-        {
-            return this.ViewModel.PackageType.Name;
-        }
-
-        /// <summary>
-        /// Computes the display text for the repository URL.
-        /// </summary>
-        /// <returns>The repository URL string.</returns>
-        public string GetRepositoryDisplayName()
-        {
-            return this.ViewModel.Package.RepositoryUrl;
-        }
-
-        /// <summary>
         /// Computes the canonical Package URL (purl) identifier.
         /// </summary>
         /// <returns>The resolved package URL string.</returns>
@@ -242,80 +147,26 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         }
 
         /// <summary>
-        /// Opens the Add to Project dialog.
+        /// Method invoked when the component is ready to start, having received its
+        /// initial parameters from its parent in the render tree.
+        /// Override this method if you will perform an asynchronous operation and
+        /// want the component to refresh when that operation is completed.
         /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OpenAddToProjectDialog()
-        {
-            var onResult = new EventCallbackFactory().Create(this, (AddToProjectResult result) => this.HandleAddDependency(result));
-
-            var parameters = new Dictionary<string, object>
-            {
-                { nameof(AddToProjectDialog.Package), this.ViewModel.Package },
-                { nameof(AddToProjectDialog.PackageVersion), this.ViewModel.SelectedVersion },
-                { nameof(AddToProjectDialog.OnResult), onResult }
-            };
-
-            var options = new DialogOpenOptions
-            {
-                Title = "Add to project",
-                Description = $"{this.GetPackageFullName()} · {this.ViewModel.SelectedVersion.GetVersion()}"
-            };
-
-            await this.DialogService.OpenAsync<AddToProjectDialog>(parameters, options);
-        }
-
-        /// <summary>
-        /// Handles the event when a package dependency is added to a project.
-        /// </summary>
-        /// <param name="result">The result containing the target project name and version constraint.</param>
-        public void HandleAddDependency(AddToProjectResult result)
-        {
-            // Implementation pending future project integration support.
-        }
-
-        /// <summary>
-        /// Opens the Migrate in Bloom dialog.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OpenMigrateInBloomDialog()
-        {
-            var onResult = new EventCallbackFactory().Create(this, (MigrateInBloomResult result) => this.HandleMigrateInBloom(result));
-
-            var parameters = new Dictionary<string, object>
-            {
-                { nameof(MigrateInBloomDialog.Package), this.ViewModel.Package },
-                { nameof(MigrateInBloomDialog.PackageVersion), this.ViewModel.SelectedVersion },
-                { nameof(MigrateInBloomDialog.OnResult), onResult }
-            };
-
-            var options = new DialogOpenOptions
-            {
-                Title = "Migrate in Bloom",
-                Description = $"{this.GetPackageFullName()} · {this.ViewModel.SelectedVersion.GetVersion()}"
-            };
-
-            await this.DialogService.OpenAsync<MigrateInBloomDialog>(parameters, options);
-        }
-
-        /// <summary>
-        /// Handles the event when a package migration in Bloom is initiated.
-        /// </summary>
-        /// <param name="result">The result containing the target project name and version constraint.</param>
-        public void HandleMigrateInBloom(MigrateInBloomResult result)
-        {
-            this.ViewModel.MigrateInBloom(result);
-        }
-
-        /// <summary>
-        /// Handles asynchronous initialization of the component and view model state.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation.</returns>
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
 
-            await this.ViewModel.InitializeViewModel(this.PackageName, this.Organization);
+            if (!string.IsNullOrWhiteSpace(this.Tab) && this.ContentTabs.Contains(this.Tab.ToLowerInvariant()))
+            {
+                this.SelectedContentTab = this.Tab.ToLowerInvariant();
+            }
+            else
+            {
+                this.SelectedContentTab = PackageTabConstants.Overview;
+            }
+
+            await this.ViewModel.InitializeViewModel(this.PackageName, this.Organization, this.SelectedContentTab);
         }
 
         /// <summary>
