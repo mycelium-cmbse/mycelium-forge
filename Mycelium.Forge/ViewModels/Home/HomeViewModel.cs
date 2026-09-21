@@ -129,9 +129,15 @@ namespace Mycelium.Forge.ViewModels.Home
             var versionIds = packages.SelectMany(p => p.Version);
             var packageTypeIds = packages.Select(p => p.PackageType);
 
-            var organizations = await this.organizationService.ReadOrEmpty(userContext, organizationIds);
-            var packageVersions = await this.packageVersionService.ReadOrEmpty(userContext, versionIds);
-            var packageTypes = await this.packageTypeService.ReadOrEmpty(userContext, packageTypeIds);
+            var organizationsTask = this.organizationService.ReadOrEmpty(userContext, organizationIds);
+            var packageVersionsTask = this.packageVersionService.ReadOrEmpty(userContext, versionIds);
+            var packageTypesTask = this.packageTypeService.ReadOrEmpty(userContext, packageTypeIds);
+
+            await Task.WhenAll(organizationsTask, packageVersionsTask, packageTypesTask);
+
+            var organizations = organizationsTask.Result;
+            var packageVersions = packageVersionsTask.Result;
+            var packageTypes = packageTypesTask.Result;
 
             var allRows = PackageRowViewModel.GenerateRows(packages, [.. organizations, .. packageVersions, .. packageTypes]);
 
@@ -146,7 +152,7 @@ namespace Mycelium.Forge.ViewModels.Home
                 .ToList();
 
             this.RecentlyUpdated = allRows
-                .OrderByDescending(p => p.CreatedAt)
+                .OrderByDescending(p => p.LatestPublicationDate)
                 .Take(3)
                 .ToList();
 

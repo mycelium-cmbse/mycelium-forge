@@ -95,11 +95,12 @@ namespace Mycelium.Forge.ViewModels.Packages
 
             filtered = this.ApplyFacetFilters(filtered);
 
+            // This will be changed in a next PR. For now, using the creation date only
             filtered = sort switch
             {
                 PackageSortOption.Downloads => filtered.OrderByDescending(package => package.DownloadCount),
                 PackageSortOption.Alphabetical => filtered.OrderBy(package => package.Name),
-                PackageSortOption.RecentlyUpdated => filtered.OrderBy(package => package.LastPublished),
+                PackageSortOption.RecentlyUpdated => filtered.OrderByDescending(package => package.CreatedAt),
                 _ => filtered
             };
 
