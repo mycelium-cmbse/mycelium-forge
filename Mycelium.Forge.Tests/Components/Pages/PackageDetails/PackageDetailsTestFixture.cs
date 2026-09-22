@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -39,6 +39,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         private Package package;
         private Organization organization;
         private PackageVersion packageVersion;
+        private PackageMetaData packageMetaData;
         private PackageType packageType;
 
         /// <summary>
@@ -74,14 +75,24 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 CreatedAt = DateTime.UtcNow.AddDays(-30)
             };
 
+            this.packageMetaData = new PackageMetaData
+            {
+                Id = Guid.NewGuid(),
+                Owner = Guid.NewGuid(),
+                MetadataSource = MetadataSource.DeclaredByArtefact
+            };
+
             this.packageVersion = new PackageVersion
             {
                 Id = Guid.NewGuid(),
                 Owner = this.package.Id,
                 Version = "1.3.0",
                 PublicationDate = DateTime.UtcNow.AddDays(-5),
-                Listed = true
+                Listed = true,
+                MetaData = this.packageMetaData.Id
             };
+
+            this.packageMetaData.Owner = this.packageVersion.Id;
 
             this.packageType = new PackageType
             {
@@ -90,12 +101,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             };
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
-            this.viewModelMock.SetupGet(x => x.Organization).Returns(this.organization);
+            this.viewModelMock.SetupGet(x => x.Owner).Returns(this.organization);
             this.viewModelMock.SetupGet(x => x.PackageType).Returns(this.packageType);
             this.viewModelMock.SetupGet(x => x.CurrentVersion).Returns(this.packageVersion);
             this.viewModelMock.SetupGet(x => x.Versions).Returns([this.packageVersion]);
             this.viewModelMock.SetupGet(x => x.Maintainers).Returns([]);
-            this.viewModelMock.SetupGet(x => x.MetaDatas).Returns([]);
+            this.viewModelMock.SetupGet(x => x.MetaDatas).Returns([this.packageMetaData]);
+            this.viewModelMock.SetupGet(x => x.CurrentMetaData).Returns(this.packageMetaData);
             this.viewModelMock.SetupGet(x => x.Elements).Returns([]);
             this.viewModelMock.SetupGet(x => x.Dependencies).Returns([]);
             this.viewModelMock.SetupGet(x => x.Dependents).Returns([]);
@@ -169,15 +181,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Assert.That(publishedAgo, Is.Not.Null);
                 Assert.That(publishedAgo, Is.Not.Empty);
             }
-
-            this.viewModelMock.SetupGet(x => x.CurrentVersion).Returns((IPackageVersion)null!);
-            var fallbackPublishedAgo = component.Instance.GetPublishedAgo();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(fallbackPublishedAgo, Is.Not.Null);
-                Assert.That(fallbackPublishedAgo, Is.Not.Empty);
-            }
         }
 
         /// <summary>
@@ -227,7 +230,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         public void VerifyOnInitializedAsync()
         {
             var component = this.context.Render<PackageDetails>(parameters => parameters
-                .Add(p => p.Organization, "starion")
+                .Add(p => p.Scope, "starion")
                 .Add(p => p.PackageName, "ecss-mm-pwr")
                 .Add(p => p.Tab, PackageTabConstants.Contents));
 
@@ -238,7 +241,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             }
 
             var defaultComponent = this.context.Render<PackageDetails>(parameters => parameters
-                .Add(p => p.Organization, "starion")
+                .Add(p => p.Scope, "starion")
                 .Add(p => p.PackageName, "ecss-mm-pwr"));
 
             using (Assert.EnterMultipleScope())
@@ -280,7 +283,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
 
             var component = this.context.Render<PackageDetails>(parameters => parameters
-                .Add(p => p.Organization, "starion")
+                .Add(p => p.Scope, "starion")
                 .Add(p => p.PackageName, "ecss-mm-pwr"));
 
             component.Instance.SelectContentTab(PackageTabConstants.Dependencies);

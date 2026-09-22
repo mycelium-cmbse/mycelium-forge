@@ -44,7 +44,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <summary>
         /// Gets or sets the selected or latest package version DTO.
         /// </summary>
-        IPackageVersion SelectedVersion { get; set; }
+        IPackageVersion CurrentVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of package metadata DTOs corresponding to package versions.

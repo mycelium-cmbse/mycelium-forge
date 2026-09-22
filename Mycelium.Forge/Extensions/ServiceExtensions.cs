@@ -15,20 +15,20 @@ namespace Mycelium.Forge.Extensions
     using Mycelium.Forge.Dal.Services;
 
     /// <summary>
-    /// Provides extension methods for <see cref="IService{T}" /> instances.
+    /// Provides extension methods for <see cref="IReadService{T}" /> instances.
     /// </summary>
     public static class ServiceExtensions
     {
-        /// <param name="service">The <see cref="IService{T}" /> instance.</param>
+        /// <param name="service">The <see cref="IReadService{T}" /> instance.</param>
         /// <typeparam name="T">The domain entity type implementing <see cref="IThing" />.</typeparam>
-        extension<T>(IService<T> service) where T : IThing
+        extension<T>(IReadService<T> service) where T : IThing
         {
             /// <summary>
             /// Asynchronously reads instances of <typeparamref name="T" /> managing its own connection and transaction,
             /// returning an empty collection if an error occurs or if no identifiers are specified when required.
             /// </summary>
             /// <typeparam name="T">The domain entity type implementing <see cref="IThing" />.</typeparam>
-            /// <param name="service">The <see cref="IService{T}" /> instance.</param>
+            /// <param name="service">The <see cref="IReadService{T}" /> instance.</param>
             /// <param name="userContext">The contextual user information and assigned roles.</param>
             /// <param name="iids">An optional collection of unique identifiers to read.</param>
             /// <param name="emptyWhenNoIds">
@@ -63,7 +63,8 @@ namespace Mycelium.Forge.Extensions
             }
 
             /// <summary>
-            /// Asynchronously reads a single instance of <typeparamref name="T" /> by its unique identifier, returning
+            /// Asynchronously reads a single instance of <typeparamref name="T" /> by its unique identifier, returning null if not
+            /// found.
             /// </summary>
             /// <param name="userContext">The contextual user information and assigned roles.</param>
             /// <param name="iid">The unique identifier of the instance to read.</param>

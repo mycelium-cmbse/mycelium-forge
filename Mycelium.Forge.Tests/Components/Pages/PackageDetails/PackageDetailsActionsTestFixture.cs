@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsActionsTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -78,7 +78,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             };
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
-            this.viewModelMock.SetupGet(x => x.Organization).Returns(this.organization);
+            this.viewModelMock.SetupGet(x => x.Owner).Returns(this.organization);
             this.viewModelMock.SetupGet(x => x.SelectedVersion).Returns(this.packageVersion);
             this.viewModelMock.SetupGet(x => x.IsUserAdmin).Returns(true);
 
@@ -111,7 +111,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         {
             var component = this.context.Render<PackageDetailsActions>(parameters => parameters
                 .Add(p => p.Package, this.package)
-                .Add(p => p.Organization, this.organization)
+                .Add(p => p.Owner, this.organization)
                 .Add(p => p.SelectedVersion, this.packageVersion)
                 .Add(p => p.IsUserAdmin, true));
 
@@ -141,7 +141,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         {
             var component = this.context.Render<PackageDetailsActions>(parameters => parameters
                 .Add(p => p.Package, this.package)
-                .Add(p => p.Organization, this.organization)
+                .Add(p => p.Owner, this.organization)
                 .Add(p => p.SelectedVersion, this.packageVersion));
 
             component.Instance.SelectInstallTab(InstallCommandConstants.ForgeCli);
@@ -199,7 +199,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         {
             var component = this.context.Render<PackageDetailsActions>(parameters => parameters
                 .Add(p => p.Package, this.package)
-                .Add(p => p.Organization, this.organization)
+                .Add(p => p.Owner, this.organization)
                 .Add(p => p.SelectedVersion, this.packageVersion));
 
             _ = component.Instance.OpenAddToProjectDialog();
@@ -220,7 +220,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         {
             var component = this.context.Render<PackageDetailsActions>(parameters => parameters
                 .Add(p => p.Package, this.package)
-                .Add(p => p.Organization, this.organization)
+                .Add(p => p.Owner, this.organization)
                 .Add(p => p.SelectedVersion, this.packageVersion));
 
             _ = component.Instance.OpenMigrateInBloomDialog();
@@ -241,7 +241,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         {
             var component = this.context.Render<PackageDetailsActions>(parameters => parameters
                 .Add(p => p.Package, this.package)
-                .Add(p => p.Organization, this.organization)
+                .Add(p => p.Owner, this.organization)
                 .Add(p => p.SelectedVersion, this.packageVersion));
 
             component.Instance.SelectInstallTab(InstallCommandConstants.Manifest);

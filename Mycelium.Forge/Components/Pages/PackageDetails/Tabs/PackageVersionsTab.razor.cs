@@ -79,7 +79,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// </summary>
         /// <param name="version">The package version DTO.</param>
         /// <returns>The count of dependents; currently returns 0 because version-specific dependent tracking is not yet supported.</returns>
-        public int GetDependentCount(IPackageVersion version)
+        public static int GetDependentCount(IPackageVersion version)
         {
             return 0;
         }

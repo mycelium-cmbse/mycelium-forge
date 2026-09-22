@@ -115,7 +115,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <returns>A human-readable relative time string.</returns>
         public string GetPublishedAgo()
         {
-            return this.ViewModel.SelectedVersion.PublicationDate.ToTimeAgo();
+            return this.ViewModel.CurrentVersion.PublicationDate.ToTimeAgo();
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <returns>A string indicating the release status label.</returns>
         public string GetReleaseStatus()
         {
-            if (this.ViewModel.Package.IsDeprecated || this.ViewModel.SelectedVersion.IsDeprecated)
+            if (this.ViewModel.Package.IsDeprecated || this.ViewModel.CurrentVersion.IsDeprecated)
             {
                 return "Deprecated";
             }
@@ -138,7 +138,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <returns>The resolved package URL string.</returns>
         public string GetPackageUrl()
         {
-            return InstallCommandHelper.GeneratePurl(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, this.ViewModel.SelectedVersion.GetVersion());
+            return InstallCommandHelper.GeneratePurl(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, this.ViewModel.CurrentVersion.GetVersion());
         }
 
         /// <summary>

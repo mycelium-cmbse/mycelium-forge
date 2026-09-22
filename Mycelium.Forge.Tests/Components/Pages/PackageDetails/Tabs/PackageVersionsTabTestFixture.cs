@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionsTabTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -79,7 +79,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             var emptyTab = this.context.Render<PackageVersionsTab>(parameters =>
             {
                 parameters.Add(x => x.Versions, []);
-                parameters.Add(x => x.Organization, this.organization);
+                parameters.Add(x => x.Owner, this.organization);
                 parameters.Add(x => x.Package, this.package);
             });
 
@@ -126,7 +126,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             {
                 parameters.Add(x => x.Versions, versions);
                 parameters.Add(x => x.MetaDatas, metaDatas);
-                parameters.Add(x => x.Organization, this.organization);
+                parameters.Add(x => x.Owner, this.organization);
                 parameters.Add(x => x.Package, this.package);
             });
 

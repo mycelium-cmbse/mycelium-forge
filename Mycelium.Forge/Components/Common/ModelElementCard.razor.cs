@@ -36,9 +36,7 @@ namespace Mycelium.Forge.Components.Common
         {
             var raw = !string.IsNullOrWhiteSpace(this.Element.Category)
                 ? this.Element.Category
-                : !string.IsNullOrWhiteSpace(this.Element.Kind)
-                    ? this.Element.Kind
-                    : "structure";
+                : this.Element.Kind;
 
             return raw.Trim().ToLowerInvariant() switch
             {

@@ -43,7 +43,7 @@
             </BbBadge>
             <BbBadge Variant="BadgeVariant.Secondary"
                      Class="badge-format">
-                @(this.ViewModel.SelectedVersion.GetVersion())
+                @(this.ViewModel.CurrentVersion.GetVersion())
             </BbBadge>
             @if (!string.IsNullOrWhiteSpace(this.GetReleaseStatus()))
             {
@@ -77,7 +77,7 @@
 
         <PackageDetailsActions Package="@(this.ViewModel.Package)"
                                Owner="@(this.ViewModel.Owner)"
-                               SelectedVersion="@(this.ViewModel.SelectedVersion)"
+                               SelectedVersion="@(this.ViewModel.CurrentVersion)"
                                IsUserAdmin="@(this.ViewModel.IsUserAdmin)"/>
 
         <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-border">
@@ -102,7 +102,7 @@
                     LATEST
                 </span>
                 <span class="text-xl leading-lg font-semibold text-foreground">
-                    @(this.ViewModel.SelectedVersion.GetVersion())
+                    @(this.ViewModel.CurrentVersion.GetVersion())
                 </span>
             </div>
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
@@ -142,7 +142,7 @@
             @if (this.SelectedContentTab == PackageTabConstants.Overview)
             {
                 <PackageOverviewTab Package="@(this.ViewModel.Package)"
-                                    Version="@(this.ViewModel.SelectedVersion)"/>
+                                    Version="@(this.ViewModel.CurrentVersion)"/>
             }
             else if (this.SelectedContentTab == PackageTabConstants.Contents)
             {
@@ -166,7 +166,7 @@
             else if (this.SelectedContentTab == PackageTabConstants.Validation)
             {
                 <PackageValidationTab Checks="@(this.ViewModel.QualityChecks)"
-                                      Version="@(this.ViewModel.SelectedVersion)"/>
+                                      Version="@(this.ViewModel.CurrentVersion)"/>
             }
         </div>
 
@@ -178,7 +178,7 @@
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground">Latest stable</span>
-                    <span class="font-medium text-foreground text-right">@(this.ViewModel.SelectedVersion.GetVersion())</span>
+                    <span class="font-medium text-foreground text-right">@(this.ViewModel.CurrentVersion.GetVersion())</span>
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">

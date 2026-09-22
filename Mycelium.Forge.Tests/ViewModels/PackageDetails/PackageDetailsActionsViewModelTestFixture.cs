@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsActionsViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -71,7 +71,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Package, Is.EqualTo(package));
-                Assert.That(this.viewModel.Organization, Is.EqualTo(org));
+                Assert.That(this.viewModel.Owner, Is.EqualTo(org));
                 Assert.That(this.viewModel.SelectedVersion, Is.EqualTo(version));
                 Assert.That(this.viewModel.IsUserAdmin, Is.True);
                 Assert.That(this.viewModel.InstallCommands, Has.Count.GreaterThan(0));

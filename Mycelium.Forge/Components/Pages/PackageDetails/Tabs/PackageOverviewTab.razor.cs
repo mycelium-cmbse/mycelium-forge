@@ -38,7 +38,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// <summary>
         /// Gets the code usage example body statement.
         /// </summary>
-        public string CodeUsageBody => "part def MySystem :> BaseSystem { }";
+        public static string CodeUsageBody => "part def MySystem :> BaseSystem { }";
 
         /// <summary>
         /// Extracts section titles from the release README markdown content.

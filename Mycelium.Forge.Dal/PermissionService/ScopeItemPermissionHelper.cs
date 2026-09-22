@@ -67,29 +67,30 @@ namespace Mycelium.Forge.Dal.PermissionService
             }
 
             // Verify organization administration permissions when managing an organization-scoped item
-            if (orgManagePermission.HasValue &&
-                PermissionGuard.HasPermission(userContext, orgManagePermission.Value))
+            if (!orgManagePermission.HasValue || !PermissionGuard.HasPermission(userContext, orgManagePermission.Value))
             {
-                var organizationResult = transaction == null
-                    ? await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId])
-                    : await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
+                return Error.Forbidden(description: $"Access denied: cannot manage {itemName} for this scope.");
+            }
 
-                // Verify that the owning organization exists
-                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
-                {
-                    var organization = organizationResult.Value[0];
+            var organizationResult = transaction == null
+                ? await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId])
+                : await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
 
-                    // Verify that the current user is an administrator of the organization
-                    if (organization.Administrator.Contains(userContext.AccountId.Value))
-                    {
-                        return Result.Success;
-                    }
-                }
-
+            // Verify that the owning organization exists
+            if (organizationResult.IsError || organizationResult.Value.Count == 0)
+            {
                 return Error.Forbidden(description: "Access denied: user is not an administrator of the target organization.");
             }
 
-            return Error.Forbidden(description: $"Access denied: cannot manage {itemName} for this scope.");
+            var organization = organizationResult.Value[0];
+
+            // Verify that the current user is an administrator of the organization
+            if (organization.Administrator.Contains(userContext.AccountId.Value))
+            {
+                return Result.Success;
+            }
+
+            return Error.Forbidden(description: "Access denied: user is not an administrator of the target organization.");
         }
 
         /// <summary>
@@ -121,29 +122,29 @@ namespace Mycelium.Forge.Dal.PermissionService
                 return Result.Success;
             }
 
-            if (userContext.AccountId != null)
+            if (userContext.AccountId == null)
             {
-                var organizationResult = transaction == null
-                    ? await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId])
-                    : await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
+                return Error.Forbidden(description: "Access denied: cannot view this item.");
+            }
 
-                if (organizationResult.IsError || organizationResult.Value.Count == 0)
-                {
-                    return Error.Forbidden(description: "Access denied: cannot read this item.");
-                }
+            var organizationResult = transaction == null
+                ? await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId])
+                : await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
 
-                var organization = organizationResult.Value[0];
-
-                if (organization.Member.Contains(userContext.AccountId.Value) ||
-                    organization.Administrator.Contains(userContext.AccountId.Value))
-                {
-                    return Result.Success;
-                }
-
+            if (organizationResult.IsError || organizationResult.Value.Count == 0)
+            {
                 return Error.Forbidden(description: "Access denied: cannot read this item.");
             }
 
-            return Error.Forbidden(description: "Access denied: cannot view this item.");
+            var organization = organizationResult.Value[0];
+
+            if (organization.Member.Contains(userContext.AccountId.Value) ||
+                organization.Administrator.Contains(userContext.AccountId.Value))
+            {
+                return Result.Success;
+            }
+
+            return Error.Forbidden(description: "Access denied: cannot read this item.");
         }
     }
 }
