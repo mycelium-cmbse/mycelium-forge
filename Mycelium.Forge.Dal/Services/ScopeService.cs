@@ -98,7 +98,7 @@ namespace Mycelium.Forge.Dal.Services
                 this.logger.LogDebug("Starting ReadAsync for Scope within transaction");
             }
 
-            var remainingIds = iids != null ? new HashSet<Guid>(iids) : [];
+            var remainingIds = iids is { Length: > 0 } ? new HashSet<Guid>(iids) : null;
             var scopes = new List<IScope>();
 
             var organizationResult = await ReadFromServiceAsync(this.organizationService, userContext, transaction, remainingIds, scopes, token);
@@ -108,7 +108,7 @@ namespace Mycelium.Forge.Dal.Services
                 return organizationResult.Errors;
             }
 
-            if (remainingIds.Count > 0)
+            if (remainingIds == null || remainingIds.Count > 0)
             {
                 var accountResult = await ReadFromServiceAsync(this.accountService, userContext, transaction, remainingIds, scopes, token);
 
@@ -173,7 +173,7 @@ namespace Mycelium.Forge.Dal.Services
         /// <returns>A <see cref="ErrorOr{Success}" /> indicating success or errors encountered.</returns>
         private static async Task<ErrorOr<Success>> ReadFromServiceAsync<T>(IReadService<T> service, IUserContext userContext, NpgsqlTransaction transaction, HashSet<Guid> remainingIds, List<IScope> scopes, CancellationToken token) where T : IThing, IScope
         {
-            var targetIds = remainingIds.ToArray();
+            var targetIds = remainingIds?.ToArray();
             var result = await service.ReadAsync(userContext, transaction, token, targetIds);
 
             if (result.IsError)
@@ -189,7 +189,7 @@ namespace Mycelium.Forge.Dal.Services
             foreach (var scope in result.Value)
             {
                 scopes.Add(scope);
-                remainingIds.Remove(scope.Id);
+                remainingIds?.Remove(scope.Id);
             }
 
             return Result.Success;

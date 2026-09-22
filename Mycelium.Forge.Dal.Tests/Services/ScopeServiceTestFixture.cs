@@ -154,11 +154,59 @@ namespace Mycelium.Forge.Dal.Tests.Services
                 Assert.That(orgFailResult.Errors[0].Description, Is.EqualTo("Org failure"));
             }
 
-            // Case: Both services succeed
+            // Case: Org returns NotFound, Account succeeds -> ignores NotFound and returns account
+            this.organizationServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>()))
+                .ReturnsAsync(Error.NotFound(description: "Org not found"));
+
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>()))
+                .ReturnsAsync(ImmutableList.Create<IAccount>(account));
+
+            var orgNotFoundResult = await this.service.ReadAsync(this.userContext, dummyTransaction, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgNotFoundResult.IsError, Is.False);
+                Assert.That(orgNotFoundResult.Value, Has.Count.EqualTo(1));
+                Assert.That(orgNotFoundResult.Value[0].Id, Is.EqualTo(account.Id));
+            }
+
+            // Case: Requested IIDs not found in either service -> returns NotFound error
+            this.organizationServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), queryIds))
+                .ReturnsAsync(ImmutableList<IOrganization>.Empty);
+
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), queryIds))
+                .ReturnsAsync(ImmutableList<IAccount>.Empty);
+
+            var notFoundResult = await this.service.ReadAsync(this.userContext, dummyTransaction, CancellationToken.None, queryIds);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(notFoundResult.IsError, Is.True);
+                Assert.That(notFoundResult.Errors[0].Type, Is.EqualTo(ErrorType.NotFound));
+            }
+
+            // Case: Short-circuiting when all query IDs are found in Org service -> Account service is not called
+            var singleOrgQueryIds = new[] { org.Id };
+
+            this.organizationServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), singleOrgQueryIds))
+                .ReturnsAsync(ImmutableList.Create<IOrganization>(org));
+
+            this.accountServiceMock.Invocations.Clear();
+
+            var shortCircuitResult = await this.service.ReadAsync(this.userContext, dummyTransaction, CancellationToken.None, singleOrgQueryIds);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(shortCircuitResult.IsError, Is.False);
+                Assert.That(shortCircuitResult.Value, Has.Count.EqualTo(1));
+                this.accountServiceMock.Verify(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>()), Times.Never());
+            }
+
+            // Case: Both services succeed with specific IDs
             this.organizationServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), queryIds))
                 .ReturnsAsync(ImmutableList.Create<IOrganization>(org));
 
-            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), queryIds))
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == account.Id)))
                 .ReturnsAsync(ImmutableList.Create<IAccount>(account));
 
             var bothSuccessResult = await this.service.ReadAsync(this.userContext, dummyTransaction, CancellationToken.None, queryIds);
@@ -169,6 +217,23 @@ namespace Mycelium.Forge.Dal.Tests.Services
                 Assert.That(bothSuccessResult.Value, Has.Count.EqualTo(2));
                 Assert.That(bothSuccessResult.Value[0].Id, Is.EqualTo(org.Id));
                 Assert.That(bothSuccessResult.Value[1].Id, Is.EqualTo(account.Id));
+            }
+
+            // Case: Both services succeed with empty array (queries all)
+            this.organizationServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), null))
+                .ReturnsAsync(ImmutableList.Create<IOrganization>(org));
+
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), null))
+                .ReturnsAsync(ImmutableList.Create<IAccount>(account));
+
+            var emptyArrayResult = await this.service.ReadAsync(this.userContext, dummyTransaction, CancellationToken.None, []);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(emptyArrayResult.IsError, Is.False);
+                Assert.That(emptyArrayResult.Value, Has.Count.EqualTo(2));
+                Assert.That(emptyArrayResult.Value[0].Id, Is.EqualTo(org.Id));
+                Assert.That(emptyArrayResult.Value[1].Id, Is.EqualTo(account.Id));
             }
 
             // Case: Standalone connection exception handled gracefully
