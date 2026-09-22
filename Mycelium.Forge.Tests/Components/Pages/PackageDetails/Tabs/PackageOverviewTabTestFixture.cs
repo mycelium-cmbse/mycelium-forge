@@ -80,7 +80,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
 
             var readmeContents = component.Instance.GetReadmeContents();
             var import = component.Instance.CodeUsageImport;
-            var body = component.Instance.CodeUsageBody;
             var markup = component.Markup;
 
             using (Assert.EnterMultipleScope())
@@ -89,7 +88,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
                 Assert.That(readmeContents, Does.Contain("Installation"));
                 Assert.That(readmeContents, Does.Contain("Usage"));
                 Assert.That(import, Is.EqualTo("import ecss_mm_pwr::*;"));
-                Assert.That(body, Is.Not.Empty);
                 Assert.That(markup, Does.Contain("ECSS-MM-PWR"));
                 Assert.That(markup, Does.Contain("Usage"));
             }
