@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageVersionsTab.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -80,7 +80,7 @@
                             @(ver.PublicationDate.ToTimeAgo())
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 text-foreground-muted p-0">
-                            0
+                            @(this.GetDependentCount(ver))
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 flex items-center gap-1.5 p-0">
                             @if (this.IsValidated(ver))

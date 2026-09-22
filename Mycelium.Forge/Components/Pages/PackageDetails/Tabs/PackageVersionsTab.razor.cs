@@ -73,5 +73,15 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         {
             return PageRoutes.GetPackageDownloadRoute(this.Organization.ShortName, this.Package.ShortName, version.GetVersion());
         }
+
+        /// <summary>
+        /// Gets the number of dependent packages or projects using the specified package version.
+        /// </summary>
+        /// <param name="version">The package version DTO.</param>
+        /// <returns>The count of dependents; currently returns 0 because version-specific dependent tracking is not yet supported.</returns>
+        public int GetDependentCount(IPackageVersion version)
+        {
+            return 0;
+        }
     }
 }
