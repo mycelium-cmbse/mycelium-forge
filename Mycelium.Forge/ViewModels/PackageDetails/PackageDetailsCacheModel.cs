@@ -22,9 +22,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public IPackage Package { get; set; }
 
         /// <summary>
-        /// Gets or sets the owning organization DTO.
+        /// Gets or sets the owning scope DTO.
         /// </summary>
-        public IOrganization Organization { get; set; }
+        public IScope Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the package type DTO.

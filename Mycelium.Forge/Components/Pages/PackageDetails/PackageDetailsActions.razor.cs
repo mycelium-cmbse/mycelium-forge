@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsActions.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -43,10 +43,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         public IPackage Package { get; set; }
 
         /// <summary>
-        /// Gets or sets the owning organization DTO.
+        /// Gets or sets the owning scope DTO.
         /// </summary>
         [Parameter]
-        public IOrganization Organization { get; set; }
+        public IScope Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the currently selected package version DTO.
@@ -138,7 +138,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             var options = new DialogOpenOptions
             {
                 Title = "Add to project",
-                Description = $"{this.ViewModel.Package.GetFullName(this.ViewModel.Organization)} · {this.ViewModel.SelectedVersion.GetVersion()}"
+                Description = $"{this.ViewModel.Package.GetFullName(this.ViewModel.Owner)} · {this.ViewModel.SelectedVersion.GetVersion()}"
             };
 
             await this.DialogService.OpenAsync<AddToProjectDialog>(parameters, options);
@@ -176,7 +176,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             var options = new DialogOpenOptions
             {
                 Title = "Migrate in Bloom",
-                Description = $"{this.ViewModel.Package.GetFullName(this.ViewModel.Organization)} · {this.ViewModel.SelectedVersion.GetVersion()}"
+                Description = $"{this.ViewModel.Package.GetFullName(this.ViewModel.Owner)} · {this.ViewModel.SelectedVersion.GetVersion()}"
             };
 
             await this.DialogService.OpenAsync<MigrateInBloomDialog>(parameters, options);
@@ -199,7 +199,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         {
             base.OnInitialized();
 
-            this.ViewModel.Initialize(this.Package, this.Organization, this.SelectedVersion, this.IsUserAdmin);
+            this.ViewModel.Initialize(this.Package, this.Owner, this.SelectedVersion, this.IsUserAdmin);
         }
     }
 }

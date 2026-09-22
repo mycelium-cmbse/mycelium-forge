@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -92,9 +92,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public IPackage Package { get; set; }
 
         /// <summary>
-        /// Gets or sets the owning organization DTO.
+        /// Gets or sets the owning scope DTO.
         /// </summary>
-        public IOrganization Organization { get; set; }
+        public IScope Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the package type DTO.
@@ -124,7 +124,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <summary>
         /// Gets the package metadata DTO for the currently selected package version.
         /// </summary>
-        public IPackageMetaData CurrentMetaData => this.MetaDatas.FirstOrDefault(m => m.Owner == this.SelectedVersion?.Id || m.Id == this.SelectedVersion?.MetaData);
+        public IPackageMetaData CurrentMetaData => this.MetaDatas.FirstOrDefault(m => m.Id == this.SelectedVersion.MetaData || m.Owner == this.SelectedVersion.Id);
 
         /// <summary>
         /// Gets the collection of model elements contained within the package release.
@@ -152,16 +152,16 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public bool IsUserAdmin { get; set; } = true;
 
         /// <summary>
-        /// Initializes the package view model state for the specified package name and organization asynchronously.
+        /// Initializes the package view model state for the specified package name and scope asynchronously.
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
-        /// <param name="organization">The organization of the package.</param>
+        /// <param name="scope">The owning scope or publisher of the package.</param>
         /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        public async Task InitializeViewModel(string packageName, string organization, string tab = null)
+        public async Task InitializeViewModel(string packageName, string scope, string tab = null)
         {
             var userContext = this.userService.GetUserContext();
-            var cachedData = await this.GetOrLoadPackageDataAsync(userContext, packageName, organization);
+            var cachedData = await this.GetOrLoadPackageDataAsync(userContext, packageName, scope);
 
             if (cachedData.Package == null)
             {
@@ -169,7 +169,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             }
 
             this.Package = cachedData.Package;
-            this.Organization = cachedData.Organization;
+            this.Owner = cachedData.Owner;
             this.PackageType = cachedData.PackageType;
             this.Versions = cachedData.Versions;
             this.SelectedVersion = cachedData.SelectedVersion;
@@ -194,12 +194,12 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <summary>
         /// Gets the cache key for package details.
         /// </summary>
-        /// <param name="organization">The organization short name.</param>
+        /// <param name="scope">The scope short name.</param>
         /// <param name="packageName">The package name.</param>
         /// <returns>The cache key string.</returns>
-        private static string GetCacheKey(string organization, string packageName)
+        private static string GetCacheKey(string scope, string packageName)
         {
-            return $"pkg-details:{organization}:{packageName}";
+            return $"pkg-details:{scope}:{packageName}";
         }
 
         /// <summary>
@@ -207,15 +207,15 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// </summary>
         /// <param name="userContext">The user context.</param>
         /// <param name="packageName">The package name.</param>
-        /// <param name="organization">The organization short name.</param>
+        /// <param name="scope">The scope short name.</param>
         /// <returns>A <see cref="Task" /> containing the cached package details model.</returns>
         /// <remarks>
         /// Caching package details data reduces repeated database queries across distinct tab route navigations and requests for
         /// the same package.
         /// </remarks>
-        private async Task<PackageDetailsCacheModel> GetOrLoadPackageDataAsync(IUserContext userContext, string packageName, string organization)
+        private async Task<PackageDetailsCacheModel> GetOrLoadPackageDataAsync(IUserContext userContext, string packageName, string scope)
         {
-            var cacheKey = GetCacheKey(organization, packageName);
+            var cacheKey = GetCacheKey(scope, packageName);
 
             if (this.memoryCache.TryGetValue(cacheKey, out PackageDetailsCacheModel cachedData))
             {
@@ -230,28 +230,32 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 return new PackageDetailsCacheModel();
             }
 
-            var org = await this.organizationService.ReadOrNull(userContext, package.Owner);
-            var packageType = await this.packageTypeService.ReadOrNull(userContext, package.PackageType);
+            var orgTask = this.organizationService.ReadOrNull(userContext, package.Owner);
+            var accountTask = this.accountService.ReadOrNull(userContext, package.Owner);
+            var packageTypeTask = this.packageTypeService.ReadOrNull(userContext, package.PackageType);
+            var versionsTask = this.packageVersionService.ReadOrEmpty(userContext, package.Version);
 
-            var versions = (await this.packageVersionService.ReadOrEmpty(userContext, package.Version))
+            List<Guid> maintainerIds = [.. package.PackageMaintainer, .. package.PackageOwner];
+            var maintainersTask = this.accountService.ReadOrEmpty(userContext, maintainerIds);
+
+            await Task.WhenAll(orgTask, accountTask, packageTypeTask, versionsTask, maintainersTask);
+
+            var owner = (IScope)orgTask.Result ?? accountTask.Result;
+            var packageType = packageTypeTask.Result;
+            
+            var versions = versionsTask.Result
                 .OrderByDescending(v => v.PublicationDate)
                 .ToList();
 
-            var selectedVersion = versions.FirstOrDefault();
+            var selectedVersion = versions.First();
+            var maintainers = maintainersTask.Result;
 
-            List<Guid> maintainerIds = [.. package.PackageMaintainer, .. package.PackageOwner];
-            var maintainers = await this.accountService.ReadOrEmpty(userContext, maintainerIds);
-
-            List<Guid> initialMetaDataIds = selectedVersion?.MetaData != null
-                ? [selectedVersion.MetaData]
-                : [];
-
-            var metaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, initialMetaDataIds)).ToList();
+            var metaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, [selectedVersion.MetaData])).ToList();
 
             var result = new PackageDetailsCacheModel
             {
                 Package = package,
-                Organization = org,
+                Owner = owner,
                 PackageType = packageType,
                 Versions = versions,
                 SelectedVersion = selectedVersion,

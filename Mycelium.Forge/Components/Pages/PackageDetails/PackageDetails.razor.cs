@@ -28,10 +28,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
-        /// Gets or sets the organization segment supplied from the URL route.
+        /// Gets or sets the scope segment supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string Organization { get; set; } = string.Empty;
+        public string Scope { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the package name supplied from the URL route.
@@ -76,7 +76,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         public void SelectContentTab(string tab)
         {
             this.SelectedContentTab = tab;
-            var targetRoute = PageRoutes.GetPackageRoute(this.Organization, this.PackageName, tab);
+            var targetRoute = PageRoutes.GetPackageRoute(this.Scope, this.PackageName, tab);
             this.NavigationManager.NavigateTo(targetRoute);
         }
 
@@ -115,12 +115,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <returns>A human-readable relative time string.</returns>
         public string GetPublishedAgo()
         {
-            if (this.ViewModel.SelectedVersion != null)
-            {
-                return this.ViewModel.SelectedVersion.PublicationDate.ToTimeAgo();
-            }
-
-            return this.ViewModel.Package.CreatedAt.ToTimeAgo();
+            return this.ViewModel.SelectedVersion.PublicationDate.ToTimeAgo();
         }
 
         /// <summary>
@@ -129,7 +124,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <returns>A string indicating the release status label.</returns>
         public string GetReleaseStatus()
         {
-            if (this.ViewModel.Package.IsDeprecated || (this.ViewModel.SelectedVersion?.IsDeprecated ?? false))
+            if (this.ViewModel.Package.IsDeprecated || this.ViewModel.SelectedVersion.IsDeprecated)
             {
                 return "Deprecated";
             }
@@ -143,7 +138,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <returns>The resolved package URL string.</returns>
         public string GetPackageUrl()
         {
-            return InstallCommandHelper.GeneratePurl(this.ViewModel.Organization.ShortName, this.ViewModel.Package.ShortName, this.ViewModel.SelectedVersion.GetVersion());
+            return InstallCommandHelper.GeneratePurl(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, this.ViewModel.SelectedVersion.GetVersion());
         }
 
         /// <summary>
@@ -166,7 +161,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 this.SelectedContentTab = PackageTabConstants.Overview;
             }
 
-            await this.ViewModel.InitializeViewModel(this.PackageName, this.Organization, this.SelectedContentTab);
+            await this.ViewModel.InitializeViewModel(this.PackageName, this.Scope, this.SelectedContentTab);
         }
 
         /// <summary>
@@ -184,8 +179,8 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 },
                 new BreadcrumbItem
                 {
-                    Name = $"@{this.ViewModel.Organization.ShortName}",
-                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Organization.ShortName)
+                    Name = $"@{this.ViewModel.Owner.ShortName}",
+                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Owner.ShortName)
                 },
                 new BreadcrumbItem
                 {

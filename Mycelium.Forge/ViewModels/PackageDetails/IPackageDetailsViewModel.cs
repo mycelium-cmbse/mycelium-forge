@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,9 +22,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         IPackage Package { get; set; }
 
         /// <summary>
-        /// Gets or sets the owning organization DTO.
+        /// Gets or sets the owning scope DTO.
         /// </summary>
-        IOrganization Organization { get; set; }
+        IScope Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the package type DTO.
@@ -82,12 +82,12 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         bool IsUserAdmin { get; set; }
 
         /// <summary>
-        /// Initializes the package view model state for the specified package name and organization asynchronously.
+        /// Initializes the package view model state for the specified package name and scope asynchronously.
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
-        /// <param name="organization">The organization of the package.</param>
+        /// <param name="scope">The owning scope or publisher of the package.</param>
         /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        Task InitializeViewModel(string packageName, string organization, string tab = null);
+        Task InitializeViewModel(string packageName, string scope, string tab = null);
     }
 }

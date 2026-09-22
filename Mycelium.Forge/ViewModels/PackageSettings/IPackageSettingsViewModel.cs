@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,11 +22,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         PackageModel Package { get; set; }
 
         /// <summary>
-        /// Initializes the package settings view model state for the specified package name and organization.
+        /// Initializes the package settings view model state for the specified package name and scope.
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
-        /// <param name="organization">The organization identifier.</param>
-        void InitializeViewModel(string packageName, string organization);
+        /// <param name="scope">The owning scope or publisher identifier.</param>
+        void InitializeViewModel(string packageName, string scope);
 
         /// <summary>
         /// Saves the exposed package model state.

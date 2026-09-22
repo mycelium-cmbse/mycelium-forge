@@ -40,9 +40,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public IPackage Package { get; set; }
 
         /// <summary>
-        /// Gets or sets the owning organization DTO.
+        /// Gets or sets the owning scope DTO.
         /// </summary>
-        public IOrganization Organization { get; set; }
+        public IScope Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the selected package version DTO.
@@ -63,17 +63,17 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// Initializes the package actions view model state with provided package details.
         /// </summary>
         /// <param name="package">The package instance.</param>
-        /// <param name="organization">The owning organization instance.</param>
+        /// <param name="owner">The owning scope instance.</param>
         /// <param name="selectedVersion">The currently selected package version.</param>
         /// <param name="isUserAdmin">A value indicating whether the current user is an administrator.</param>
-        public void Initialize(IPackage package, IOrganization organization, IPackageVersion selectedVersion, bool isUserAdmin)
+        public void Initialize(IPackage package, IScope owner, IPackageVersion selectedVersion, bool isUserAdmin)
         {
             this.Package = package;
-            this.Organization = organization;
+            this.Owner = owner;
             this.SelectedVersion = selectedVersion;
             this.IsUserAdmin = isUserAdmin;
 
-            var publisher = this.Organization.ShortName;
+            var publisher = this.Owner.ShortName;
             var currentVersion = this.SelectedVersion.GetVersion();
 
             this.InstallCommands = InstallCommandHelper.GenerateInstallCommands(publisher, this.Package.ShortName, currentVersion);

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -17,36 +17,36 @@ namespace Mycelium.Forge.Extensions
     public static class PackageExtensions
     {
         /// <summary>
-        /// Computes the fully qualified package name in the format @organization/packageName.
+        /// Computes the fully qualified package name in the format @scope/packageName.
         /// </summary>
         /// <param name="package">The package instance.</param>
-        /// <param name="organization">The owning organization instance.</param>
+        /// <param name="owner">The owning scope instance.</param>
         /// <returns>The fully qualified package identifier string.</returns>
-        public static string GetFullName(this IPackage package, IOrganization organization)
+        public static string GetFullName(this IPackage package, IScope owner)
         {
-            if (package == null || organization == null)
+            if (package == null || owner == null)
             {
                 return string.Empty;
             }
 
-            return package.GetFullName(organization.ShortName);
+            return package.GetFullName(owner.ShortName);
         }
 
         /// <summary>
-        /// Computes the fully qualified package name in the format @organization/packageName.
+        /// Computes the fully qualified package name in the format @scope/packageName.
         /// </summary>
         /// <param name="package">The package instance.</param>
-        /// <param name="organizationShortName">The organization short name or publisher slug.</param>
+        /// <param name="scopeShortName">The scope short name or publisher slug.</param>
         /// <returns>The fully qualified package identifier string.</returns>
-        public static string GetFullName(this IPackage package, string organizationShortName)
+        public static string GetFullName(this IPackage package, string scopeShortName)
         {
-            if (package == null || string.IsNullOrWhiteSpace(organizationShortName))
+            if (package == null || string.IsNullOrWhiteSpace(scopeShortName))
             {
                 return string.Empty;
             }
 
-            var cleanOrg = organizationShortName.TrimStart('@');
-            return $"@{cleanOrg}/{package.Name}";
+            var cleanScope = scopeShortName.TrimStart('@');
+            return $"@{cleanScope}/{package.Name}";
         }
     }
 }

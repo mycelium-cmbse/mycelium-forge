@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="HomeViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -24,6 +24,11 @@ namespace Mycelium.Forge.ViewModels.Home
         /// The list of standard library publisher handles.
         /// </summary>
         private static readonly IReadOnlyList<string> StandardLibraryPublishers = ["@omg", "@esa"];
+
+        /// <summary>
+        /// The (injected) <see cref="IAccountService" /> used to retrieve account data.
+        /// </summary>
+        private readonly IAccountService accountService;
 
         /// <summary>
         /// The (injected) <see cref="IOrganizationService" /> used to retrieve organization data.
@@ -55,14 +60,16 @@ namespace Mycelium.Forge.ViewModels.Home
         /// </summary>
         /// <param name="packageService">The (injected) <see cref="IPackageService" />.</param>
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" />.</param>
+        /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" />.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
-        public HomeViewModel(IPackageService packageService, IOrganizationService organizationService, IPackageVersionService packageVersionService,
-            IPackageTypeService packageTypeService, IUserService userService)
+        public HomeViewModel(IPackageService packageService, IOrganizationService organizationService, IAccountService accountService,
+            IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, IUserService userService)
         {
             this.packageService = packageService;
             this.organizationService = organizationService;
+            this.accountService = accountService;
             this.packageVersionService = packageVersionService;
             this.packageTypeService = packageTypeService;
             this.userService = userService;
@@ -125,25 +132,29 @@ namespace Mycelium.Forge.ViewModels.Home
 
             var packages = packagesResult.Value;
 
-            var organizationIds = packages.Select(p => p.Owner);
+            var ownerIds = packages.Select(p => p.Owner).ToList();
             var versionIds = packages.SelectMany(p => p.Version);
             var packageTypeIds = packages.Select(p => p.PackageType);
 
-            var organizationsTask = this.organizationService.ReadOrEmpty(userContext, organizationIds);
+            var organizationsTask = this.organizationService.ReadOrEmpty(userContext, ownerIds);
+            var accountsTask = this.accountService.ReadOrEmpty(userContext, ownerIds);
             var packageVersionsTask = this.packageVersionService.ReadOrEmpty(userContext, versionIds);
             var packageTypesTask = this.packageTypeService.ReadOrEmpty(userContext, packageTypeIds);
 
-            await Task.WhenAll(organizationsTask, packageVersionsTask, packageTypesTask);
+            await Task.WhenAll(organizationsTask, accountsTask, packageVersionsTask, packageTypesTask);
 
             var organizations = organizationsTask.Result;
+            var accounts = accountsTask.Result;
             var packageVersions = packageVersionsTask.Result;
             var packageTypes = packageTypesTask.Result;
 
-            var allRows = PackageRowViewModel.GenerateRows(packages, [.. organizations, .. packageVersions, .. packageTypes]);
+            var scopes = organizations.Cast<IScope>().Concat(accounts).ToList();
+
+            var allRows = PackageRowViewModel.GenerateRows(packages, [.. scopes, .. packageVersions, .. packageTypes]);
 
             this.PackageCount = packages.Count;
             this.VersionCount = packageVersions.Count;
-            this.PublisherCount = organizations.Count;
+            this.PublisherCount = scopes.Select(s => s.Id).Count();
             this.DownloadCount = packages.Sum(p => p.downloadCount);
 
             this.StandardLibraries = allRows

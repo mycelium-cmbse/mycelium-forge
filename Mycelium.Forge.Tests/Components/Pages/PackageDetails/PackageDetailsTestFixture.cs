@@ -92,7 +92,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
             this.viewModelMock.SetupGet(x => x.Organization).Returns(this.organization);
             this.viewModelMock.SetupGet(x => x.PackageType).Returns(this.packageType);
-            this.viewModelMock.SetupGet(x => x.SelectedVersion).Returns(this.packageVersion);
+            this.viewModelMock.SetupGet(x => x.CurrentVersion).Returns(this.packageVersion);
             this.viewModelMock.SetupGet(x => x.Versions).Returns([this.packageVersion]);
             this.viewModelMock.SetupGet(x => x.Maintainers).Returns([]);
             this.viewModelMock.SetupGet(x => x.MetaDatas).Returns([]);
@@ -170,7 +170,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Assert.That(publishedAgo, Is.Not.Empty);
             }
 
-            this.viewModelMock.SetupGet(x => x.SelectedVersion).Returns((IPackageVersion)null!);
+            this.viewModelMock.SetupGet(x => x.CurrentVersion).Returns((IPackageVersion)null!);
             var fallbackPublishedAgo = component.Instance.GetPublishedAgo();
 
             using (Assert.EnterMultipleScope())

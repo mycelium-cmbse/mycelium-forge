@@ -1,4 +1,4 @@
-﻿@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 @using Mycelium.Forge.ViewModels.PackageDetails
 @using Mycelium.Forge.ViewModels.Rows
 @* ------------------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@
     return;
 }
 
-<PageTitle>@(this.ViewModel.Package.GetFullName(this.ViewModel.Organization)) &mdash; Mycelium Forge</PageTitle>
+<PageTitle>@(this.ViewModel.Package.GetFullName(this.ViewModel.Owner)) &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-background min-h-screen select-none">
 <header class="w-full bg-card border-b border-border py-7">
@@ -29,7 +29,7 @@
                         Size="26"
                         Class="text-foreground-muted shrink-0"/>
             <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
-                @(this.ViewModel.Package.GetFullName(this.ViewModel.Organization))
+                @(this.ViewModel.Package.GetFullName(this.ViewModel.Owner))
             </h1>
             @if (this.ViewModel.Package.IsVerified)
             {
@@ -57,7 +57,7 @@
                 <BbButton id="package-details-settings-button"
                           Variant="ButtonVariant.Outline"
                           Size="ButtonSize.Small"
-                          Href="@(PageRoutes.GetPackageSettingsRoute(this.ViewModel.Organization.ShortName, this.ViewModel.Package.ShortName))"
+                          Href="@(PageRoutes.GetPackageSettingsRoute(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName))"
                           Class="shrink-0">
                     <LucideIcon Name="settings"
                                 Size="14"
@@ -72,11 +72,11 @@
         </p>
 
         <p class="text-xs leading-2xs text-muted-foreground">
-            Published recently by @@@(this.ViewModel.Organization.ShortName) · @(this.ViewModel.Package.License) · @(this.ViewModel.Package.downloadCount) downloads
+            Published recently by @@@(this.ViewModel.Owner.ShortName) · @(this.ViewModel.Package.License) · @(this.ViewModel.Package.downloadCount) downloads
         </p>
 
         <PackageDetailsActions Package="@(this.ViewModel.Package)"
-                               Organization="@(this.ViewModel.Organization)"
+                               Owner="@(this.ViewModel.Owner)"
                                SelectedVersion="@(this.ViewModel.SelectedVersion)"
                                IsUserAdmin="@(this.ViewModel.IsUserAdmin)"/>
 
@@ -132,7 +132,7 @@
                 @foreach (var tab in this.ContentTabs)
                 {
                     <a @key="tab"
-                       href="@(PageRoutes.GetPackageRoute(this.ViewModel.Organization.ShortName, this.ViewModel.Package.ShortName, tab))"
+                       href="@(PageRoutes.GetPackageRoute(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, tab))"
                        class="@(this.GetContentTabClass(tab))">
                         @(tab.ToUpperCaseFirst())
                     </a>
@@ -160,7 +160,7 @@
             {
                 <PackageVersionsTab Versions="@(this.ViewModel.Versions)"
                                     MetaDatas="@(this.ViewModel.MetaDatas)"
-                                    Organization="@(this.ViewModel.Organization)"
+                                    Owner="@(this.ViewModel.Owner)"
                                     Package="@(this.ViewModel.Package)"/>
             }
             else if (this.SelectedContentTab == PackageTabConstants.Validation)
@@ -199,26 +199,23 @@
                     <span class="font-medium text-foreground text-right">@(this.ViewModel.PackageType.Name)</span>
                 </div>
 
-                @if (this.ViewModel.CurrentMetaData != null)
-                {
-                    <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
-                        <span class="text-muted-foreground">Provenance</span>
-                        @if (this.ViewModel.CurrentMetaData.MetadataSource == MetadataSource.DeclaredByArtefact)
-                        {
-                            <BbBadge Variant="BadgeVariant.Secondary"
-                                     Class="badge-format">
-                                Manifest-declared
-                            </BbBadge>
-                        }
-                        else
-                        {
-                            <BbBadge Variant="BadgeVariant.Outline"
-                                     Class="badge-format text-muted-foreground">
-                                Publisher-asserted
-                            </BbBadge>
-                        }
-                    </div>
-                }
+                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground">Provenance</span>
+                    @if (this.ViewModel.CurrentMetaData.MetadataSource == MetadataSource.DeclaredByArtefact)
+                    {
+                        <BbBadge Variant="BadgeVariant.Secondary"
+                                 Class="badge-format">
+                            Manifest-declared
+                        </BbBadge>
+                    }
+                    else
+                    {
+                        <BbBadge Variant="BadgeVariant.Outline"
+                                 Class="badge-format text-muted-foreground">
+                            Publisher-asserted
+                        </BbBadge>
+                    }
+                </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground min-w-fit">Repository</span>

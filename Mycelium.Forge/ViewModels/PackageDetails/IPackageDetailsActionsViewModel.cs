@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackageDetailsActionsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,9 +23,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         IPackage Package { get; set; }
 
         /// <summary>
-        /// Gets or sets the owning organization DTO.
+        /// Gets or sets the owning scope DTO.
         /// </summary>
-        IOrganization Organization { get; set; }
+        IScope Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the selected package version DTO.
@@ -46,10 +46,10 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// Initializes the package actions view model state with provided package details.
         /// </summary>
         /// <param name="package">The package instance.</param>
-        /// <param name="organization">The owning organization instance.</param>
+        /// <param name="owner">The owning scope instance.</param>
         /// <param name="selectedVersion">The currently selected package version.</param>
         /// <param name="isUserAdmin">A value indicating whether the current user is an administrator.</param>
-        void Initialize(IPackage package, IOrganization organization, IPackageVersion selectedVersion, bool isUserAdmin);
+        void Initialize(IPackage package, IScope owner, IPackageVersion selectedVersion, bool isUserAdmin);
 
         /// <summary>
         /// Initiates a migration of the package in Bloom to the specified target project.

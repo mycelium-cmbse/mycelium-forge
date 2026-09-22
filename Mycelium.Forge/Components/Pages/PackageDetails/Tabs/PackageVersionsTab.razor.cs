@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionsTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,10 +26,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         public IReadOnlyList<IPackageVersion> Versions { get; set; } = [];
 
         /// <summary>
-        /// Gets or sets the owning organization DTO.
+        /// Gets or sets the owning scope DTO.
         /// </summary>
         [Parameter]
-        public IOrganization Organization { get; set; }
+        public IScope Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the package DTO.
@@ -60,7 +60,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// <returns><see langword="true" /> if the version has passed all quality checks; otherwise, <see langword="false" />.</returns>
         public bool IsValidated(IPackageVersion version)
         {
-            var metaData = this.MetaDatas.FirstOrDefault(m => m.Owner == version.Id || m.Id == version.MetaData);
+            var metaData = this.MetaDatas.FirstOrDefault(m => m.Id == version.MetaData || m.Owner == version.Id);
             return metaData != null && metaData.QualityChecks.Count > 0 && metaData.QualityChecks.All(check => check.Passed);
         }
 
@@ -71,7 +71,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// <returns>The formatted download route URL string.</returns>
         public string GetDownloadUrl(IPackageVersion version)
         {
-            return PageRoutes.GetPackageDownloadRoute(this.Organization.ShortName, this.Package.ShortName, version.GetVersion());
+            return PageRoutes.GetPackageDownloadRoute(this.Owner.ShortName, this.Package.ShortName, version.GetVersion());
         }
 
         /// <summary>

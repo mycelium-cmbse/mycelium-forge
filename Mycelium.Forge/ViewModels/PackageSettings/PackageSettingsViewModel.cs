@@ -23,11 +23,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         public PackageModel Package { get; set; }
 
         /// <summary>
-        /// Initializes the package settings view model state for the specified package name and organization.
+        /// Initializes the package settings view model state for the specified package name and scope.
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
-        /// <param name="organization">The organization identifier.</param>
-        public void InitializeViewModel(string packageName, string organization)
+        /// <param name="scope">The owning scope or publisher identifier.</param>
+        public void InitializeViewModel(string packageName, string scope)
         {
             var maintainers = new List<PackageMaintainerModel>
             {
@@ -43,15 +43,15 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
                 new("1.0.0", "published 4 months ago", isUnlisted: true)
             };
 
-            string resolvedOrganization;
+            string resolvedScope;
 
-            if (string.IsNullOrWhiteSpace(organization))
+            if (string.IsNullOrWhiteSpace(scope))
             {
-                resolvedOrganization = "@starion";
+                resolvedScope = "@starion";
             }
             else
             {
-                resolvedOrganization = organization.StartsWith('@') ? organization : $"@{organization}";
+                resolvedScope = scope.StartsWith('@') ? scope : $"@{scope}";
             }
 
             var resolvedName = string.IsNullOrWhiteSpace(packageName) ? "ECSS-MM-PWR" : packageName;
@@ -66,7 +66,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             this.Package = new PackageModel(
                 packageDto,
-                resolvedOrganization,
+                resolvedScope,
                 "1.2.0",
                 downloadCount: 210)
             {

@@ -180,7 +180,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.Organization, Is.EqualTo(org));
                 Assert.That(this.viewModel.PackageType, Is.EqualTo(packageType));
                 Assert.That(this.viewModel.Versions, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.SelectedVersion, Is.EqualTo(version));
+                Assert.That(this.viewModel.CurrentVersion, Is.EqualTo(version));
                 Assert.That(this.viewModel.Maintainers, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.MetaDatas, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.CurrentMetaData, Is.EqualTo(metaData));
