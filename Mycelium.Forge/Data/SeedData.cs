@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -398,6 +398,177 @@ namespace Mycelium.Forge.Data
                 ModifiedAt = DateTime.UtcNow.AddDays(-90)
             };
 
+            PackageVersions =
+            [
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlIsqQuantitiesPackage.Id,
+                    Version = "2025.2",
+                    DownloadCount = 1400,
+                    Listed = true,
+                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt,
+                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt,
+                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlKernelLibraryPackage.Id,
+                    Version = "2025.2",
+                    DownloadCount = 2100,
+                    Listed = true,
+                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt,
+                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt,
+                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssEnvironmentPackage.Id,
+                    Version = "1.0.0",
+                    DownloadCount = 860,
+                    Listed = true,
+                    PublicationDate = EcssEnvironmentPackage.CreatedAt,
+                    CreatedAt = EcssEnvironmentPackage.CreatedAt,
+                    ModifiedAt = EcssEnvironmentPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "1.2.0",
+                    DownloadCount = 210,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt,
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt,
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SmallSatPlatformPackage.Id,
+                    Version = "0.8.2",
+                    DownloadCount = 145,
+                    Listed = true,
+                    PublicationDate = SmallSatPlatformPackage.CreatedAt,
+                    CreatedAt = SmallSatPlatformPackage.CreatedAt,
+                    ModifiedAt = SmallSatPlatformPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssRfCommsPackage.Id,
+                    Version = "0.3.0",
+                    DownloadCount = 190,
+                    Listed = true,
+                    PublicationDate = EcssRfCommsPackage.CreatedAt,
+                    CreatedAt = EcssRfCommsPackage.CreatedAt,
+                    ModifiedAt = EcssRfCommsPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = Cdp4CometCorePackage.Id,
+                    Version = "10.25.1",
+                    DownloadCount = 320,
+                    Listed = true,
+                    PublicationDate = Cdp4CometCorePackage.CreatedAt,
+                    CreatedAt = Cdp4CometCorePackage.CreatedAt,
+                    ModifiedAt = Cdp4CometCorePackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = CapellaSystemTemplatePackage.Id,
+                    Version = "6.1.0",
+                    DownloadCount = 185,
+                    Listed = true,
+                    PublicationDate = CapellaSystemTemplatePackage.CreatedAt,
+                    CreatedAt = CapellaSystemTemplatePackage.CreatedAt,
+                    ModifiedAt = CapellaSystemTemplatePackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssMechanicalPackage.Id,
+                    Version = "1.0.0",
+                    DownloadCount = 165,
+                    Listed = true,
+                    PublicationDate = EcssMechanicalPackage.CreatedAt,
+                    CreatedAt = EcssMechanicalPackage.CreatedAt,
+                    ModifiedAt = EcssMechanicalPackage.CreatedAt
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlIsqQuantitiesPackage.Id,
+                    Version = "2025.1",
+                    DownloadCount = 980,
+                    Listed = true,
+                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = SysmlKernelLibraryPackage.Id,
+                    Version = "2025.1",
+                    DownloadCount = 1450,
+                    Listed = true,
+                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssEnvironmentPackage.Id,
+                    Version = "0.9.0",
+                    DownloadCount = 320,
+                    Listed = true,
+                    PublicationDate = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "1.1.0",
+                    DownloadCount = 180,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = EcssPowerSubsystemPackage.Id,
+                    Version = "1.0.0",
+                    DownloadCount = 95,
+                    Listed = true,
+                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
+                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
+                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180)
+                },
+                new PackageVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = Cdp4CometCorePackage.Id,
+                    Version = "10.25.0",
+                    DownloadCount = 185,
+                    Listed = true,
+                    PublicationDate = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
+                    CreatedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
+                    ModifiedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90)
+                }
+            ];
+
+            PackageMetaDatas = PackageVersions.Select(CreatePackageMetaData).ToList();
+
             Packages =
             [
                 SysmlIsqQuantitiesPackage,
@@ -411,174 +582,12 @@ namespace Mycelium.Forge.Data
                 EcssMechanicalPackage
             ];
 
-            PackageVersions =
-            [
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = SysmlIsqQuantitiesPackage.Id,
-                    Version = "v2025.2",
-                    DownloadCount = 1400,
-                    Listed = true,
-                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt,
-                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt,
-                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = SysmlKernelLibraryPackage.Id,
-                    Version = "v2025.2",
-                    DownloadCount = 2100,
-                    Listed = true,
-                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt,
-                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt,
-                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = EcssEnvironmentPackage.Id,
-                    Version = "v1.0.0",
-                    DownloadCount = 860,
-                    Listed = true,
-                    PublicationDate = EcssEnvironmentPackage.CreatedAt,
-                    CreatedAt = EcssEnvironmentPackage.CreatedAt,
-                    ModifiedAt = EcssEnvironmentPackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = EcssPowerSubsystemPackage.Id,
-                    Version = "v1.2.0",
-                    DownloadCount = 210,
-                    Listed = true,
-                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt,
-                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt,
-                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = SmallSatPlatformPackage.Id,
-                    Version = "v0.8.2",
-                    DownloadCount = 145,
-                    Listed = true,
-                    PublicationDate = SmallSatPlatformPackage.CreatedAt,
-                    CreatedAt = SmallSatPlatformPackage.CreatedAt,
-                    ModifiedAt = SmallSatPlatformPackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = EcssRfCommsPackage.Id,
-                    Version = "v0.3.0",
-                    DownloadCount = 190,
-                    Listed = true,
-                    PublicationDate = EcssRfCommsPackage.CreatedAt,
-                    CreatedAt = EcssRfCommsPackage.CreatedAt,
-                    ModifiedAt = EcssRfCommsPackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = Cdp4CometCorePackage.Id,
-                    Version = "v10.25.1",
-                    DownloadCount = 320,
-                    Listed = true,
-                    PublicationDate = Cdp4CometCorePackage.CreatedAt,
-                    CreatedAt = Cdp4CometCorePackage.CreatedAt,
-                    ModifiedAt = Cdp4CometCorePackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = CapellaSystemTemplatePackage.Id,
-                    Version = "v6.1.0",
-                    DownloadCount = 185,
-                    Listed = true,
-                    PublicationDate = CapellaSystemTemplatePackage.CreatedAt,
-                    CreatedAt = CapellaSystemTemplatePackage.CreatedAt,
-                    ModifiedAt = CapellaSystemTemplatePackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = EcssMechanicalPackage.Id,
-                    Version = "v1.0.0",
-                    DownloadCount = 165,
-                    Listed = true,
-                    PublicationDate = EcssMechanicalPackage.CreatedAt,
-                    CreatedAt = EcssMechanicalPackage.CreatedAt,
-                    ModifiedAt = EcssMechanicalPackage.CreatedAt
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = SysmlIsqQuantitiesPackage.Id,
-                    Version = "v2025.1",
-                    DownloadCount = 980,
-                    Listed = true,
-                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90)
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = SysmlKernelLibraryPackage.Id,
-                    Version = "v2025.1",
-                    DownloadCount = 1450,
-                    Listed = true,
-                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90)
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = EcssEnvironmentPackage.Id,
-                    Version = "v0.9.0",
-                    DownloadCount = 320,
-                    Listed = true,
-                    PublicationDate = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90)
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = EcssPowerSubsystemPackage.Id,
-                    Version = "v1.1.0",
-                    DownloadCount = 180,
-                    Listed = true,
-                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90)
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = EcssPowerSubsystemPackage.Id,
-                    Version = "v1.0.0",
-                    DownloadCount = 95,
-                    Listed = true,
-                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
-                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
-                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180)
-                },
-                new PackageVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = Cdp4CometCorePackage.Id,
-                    Version = "v10.25.0",
-                    DownloadCount = 185,
-                    Listed = true,
-                    PublicationDate = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
-                    CreatedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90)
-                }
-            ];
+            foreach (var package in Packages)
+            {
+                package.Version = PackageVersions.Where(x => x.Owner == package.Id).Select(x => x.Id).ToList();
+            }
+
+            PackageInvitations = Accounts.Select(CreatePackageInvitation).ToList();
 
             ApiKeys =
             [
@@ -760,8 +769,63 @@ namespace Mycelium.Forge.Data
         public static IReadOnlyList<PackageVersion> PackageVersions { get; }
 
         /// <summary>
+        /// Gets the master list of seeded package metadata entities.
+        /// </summary>
+        public static IReadOnlyList<PackageMetaData> PackageMetaDatas { get; }
+
+        /// <summary>
+        /// Gets the master list of seeded package invitations.
+        /// </summary>
+        public static IReadOnlyList<PackageInvitation> PackageInvitations { get; }
+
+        /// <summary>
         /// Gets the master list of API keys.
         /// </summary>
         public static IReadOnlyList<APIKey> ApiKeys { get; }
+
+        /// <summary>
+        /// Creates a <see cref="PackageMetaData" /> instance linked to the specified <see cref="PackageVersion" /> using only
+        /// codegenerated properties.
+        /// </summary>
+        /// <param name="packageVersion">The owning package version.</param>
+        /// <returns>A configured <see cref="PackageMetaData" /> entity.</returns>
+        private static PackageMetaData CreatePackageMetaData(PackageVersion packageVersion)
+        {
+            var metaData = new PackageMetaData
+            {
+                Id = Guid.NewGuid(),
+                Owner = packageVersion.Id,
+                CreatedAt = packageVersion.CreatedAt,
+                ModifiedAt = packageVersion.ModifiedAt
+            };
+
+            packageVersion.MetaData = metaData.Id;
+            return metaData;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="PackageInvitation" /> instance linked to the specified <see cref="Account" /> using only
+        /// codegenerated properties.
+        /// </summary>
+        /// <param name="account">The owning account.</param>
+        /// <returns>A configured <see cref="PackageInvitation" /> entity.</returns>
+        private static PackageInvitation CreatePackageInvitation(Account account)
+        {
+            var invitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Owner = account.Id,
+                Package = SysmlIsqQuantitiesPackage.Id,
+                Target = StefanAccount.Id == account.Id ? RegisAccount.Id : StefanAccount.Id,
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER,
+                Status = InvitationStatusKind.PENDING,
+                ExperiesAt = DateTime.UtcNow.AddDays(14),
+                CreatedAt = account.CreatedAt,
+                ModifiedAt = account.ModifiedAt
+            };
+
+            account.OwnedPackageInvitation = invitation.Id;
+            return invitation;
+        }
     }
 }

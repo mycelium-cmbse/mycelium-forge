@@ -45,6 +45,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.PackageOwner).NotEmpty();
             this.RuleFor(x => x.PackageType).NotEmpty();
             this.RuleFor(x => x.ShortName).NotEmpty();
+            this.RuleFor(x => x.Version).NotEmpty();
             this.RuleFor(x => x.Visibility).NotNull();
             this.AddCustomValidation();
         }

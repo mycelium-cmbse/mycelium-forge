@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,11 +23,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         public PackageModel Package { get; set; }
 
         /// <summary>
-        /// Initializes the package settings view model state for the specified package name and organization.
+        /// Initializes the package settings view model state for the specified package name and scope.
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
-        /// <param name="organization">The organization identifier.</param>
-        public void InitializeViewModel(string packageName, string organization)
+        /// <param name="scope">The owning scope or publisher identifier.</param>
+        public void InitializeViewModel(string packageName, string scope)
         {
             var maintainers = new List<PackageMaintainerModel>
             {
@@ -38,20 +38,20 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             var versions = new List<PackageVersionModel>
             {
-                new("v1.2.0", "published 2 weeks ago", isLatest: true),
-                new("v1.1.0", "published 2 months ago"),
-                new("v1.0.0", "published 4 months ago", isUnlisted: true)
+                new("1.2.0", "published 2 weeks ago", isLatest: true),
+                new("1.1.0", "published 2 months ago"),
+                new("1.0.0", "published 4 months ago", isUnlisted: true)
             };
 
-            string resolvedOrganization;
+            string resolvedScope;
 
-            if (string.IsNullOrWhiteSpace(organization))
+            if (string.IsNullOrWhiteSpace(scope))
             {
-                resolvedOrganization = "@starion";
+                resolvedScope = "@starion";
             }
             else
             {
-                resolvedOrganization = organization.StartsWith('@') ? organization : $"@{organization}";
+                resolvedScope = scope.StartsWith('@') ? scope : $"@{scope}";
             }
 
             var resolvedName = string.IsNullOrWhiteSpace(packageName) ? "ECSS-MM-PWR" : packageName;
@@ -66,8 +66,8 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             this.Package = new PackageModel(
                 packageDto,
-                resolvedOrganization,
-                "v1.2.0",
+                resolvedScope,
+                "1.2.0",
                 downloadCount: 210)
             {
                 IsVerified = true,

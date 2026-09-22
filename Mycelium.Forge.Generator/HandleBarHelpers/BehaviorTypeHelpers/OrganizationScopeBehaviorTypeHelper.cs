@@ -92,7 +92,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return orgGuard;
                                                }
 
-                                               var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner]);
+                                               var orgResult = transaction == null
+                                                   ? await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner])
+                                                   : await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
 
                                                if (orgResult.IsError || orgResult.Value.Count == 0)
                                                {
@@ -174,7 +176,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
                                                {
-                                                   var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.Owner]);
+                                                   var orgResult = transaction == null
+                                                       ? await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.Owner])
+                                                       : await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
 
                                                    if (!orgResult.IsError && orgResult.Value.Count > 0)
                                                    {

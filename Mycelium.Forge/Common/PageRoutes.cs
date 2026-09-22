@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PageRoutes.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -32,7 +32,12 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The package details page route path.
         /// </summary>
-        public const string Package = "/packages/{organization}/{packageName}";
+        public const string Package = "/packages/{scope}/{packageName}";
+
+        /// <summary>
+        /// The package details tab page route path.
+        /// </summary>
+        public const string PackageTab = "/packages/{scope}/{packageName}/{tab}";
 
         /// <summary>
         /// The organization and publisher profile page route path.
@@ -77,7 +82,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The package settings page route path.
         /// </summary>
-        public const string PackageSettings = "/packages/{organization}/{packageName}/settings";
+        public const string PackageSettings = "/packages/{scope}/{packageName}/settings";
 
         /// <summary>
         /// The user account settings page route path.
@@ -95,15 +100,39 @@ namespace Mycelium.Forge.Common
         public const string Accounts = "/admin/accounts";
 
         /// <summary>
-        /// Generates the relative URL for the package details page.
+        /// Generates the relative URL for the package details page, optionally with a specified tab.
         /// </summary>
-        /// <param name="organization">The organization scope or publisher name.</param>
+        /// <param name="scope">The owning scope or publisher name.</param>
         /// <param name="packageName">The package name.</param>
+        /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>The formatted package route path.</returns>
-        public static string GetPackageRoute(string organization, string packageName)
+        public static string GetPackageRoute(string scope, string packageName, string tab = null)
         {
-            var cleanOrg = (organization ?? string.Empty).TrimStart('@');
-            return $"/packages/{cleanOrg}/{packageName}";
+            var cleanScope = (scope ?? string.Empty).TrimStart('@');
+
+            if (string.IsNullOrWhiteSpace(tab))
+            {
+                return $"/packages/{cleanScope}/{packageName}";
+            }
+
+            return $"/packages/{cleanScope}/{packageName}/{tab.ToLowerInvariant()}";
+        }
+
+        /// <summary>
+        /// Computes the navigation route URL from a package identifier name (e.g., @scope/packageName).
+        /// </summary>
+        /// <param name="name">The package identifier coordinate string.</param>
+        /// <returns>The resolved package route URL, or a hash fallback if not matched.</returns>
+        public static string GetHrefFromPackageFullName(string name)
+        {
+            var parts = (name ?? string.Empty).TrimStart('@').Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 2)
+            {
+                return GetPackageRoute(parts[0], parts[1]);
+            }
+
+            return $"#{name}";
         }
 
         /// <summary>
@@ -120,13 +149,13 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Generates the relative URL for the package settings page.
         /// </summary>
-        /// <param name="organization">The organization scope or publisher name.</param>
+        /// <param name="scope">The owning scope or publisher name.</param>
         /// <param name="packageName">The package name.</param>
         /// <returns>The formatted package settings route path.</returns>
-        public static string GetPackageSettingsRoute(string organization, string packageName)
+        public static string GetPackageSettingsRoute(string scope, string packageName)
         {
-            var cleanOrg = (organization ?? string.Empty).TrimStart('@');
-            return $"/packages/{cleanOrg}/{packageName}/settings";
+            var cleanScope = (scope ?? string.Empty).TrimStart('@');
+            return $"/packages/{cleanScope}/{packageName}/settings";
         }
 
         /// <summary>
@@ -138,6 +167,19 @@ namespace Mycelium.Forge.Common
         {
             var cleanId = (id ?? string.Empty).TrimStart('@');
             return $"/organizations/{cleanId}/settings";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for downloading a package version artifact.
+        /// </summary>
+        /// <param name="scope">The owning scope or publisher name.</param>
+        /// <param name="packageName">The package name.</param>
+        /// <param name="version">The package version string.</param>
+        /// <returns>The formatted package download route path.</returns>
+        public static string GetPackageDownloadRoute(string scope, string packageName, string version)
+        {
+            var cleanScope = (scope ?? string.Empty).TrimStart('@');
+            return $"/api/packages/{cleanScope}/{packageName}/{version}/download";
         }
 
         /// <summary>

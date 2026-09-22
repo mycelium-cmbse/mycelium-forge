@@ -617,6 +617,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return $"                {propCSharpName} = reader[\"{propName}\"] is DBNull ? null : (Guid)reader[\"{propName}\"]{comma}";
             }
 
+            if (property.IsComposite)
+            {
+                return $"                {propCSharpName} = reader[\"{propName}\"] is DBNull ? Guid.Empty : (Guid)reader[\"{propName}\"]{comma}";
+            }
+
             return $"                {propCSharpName} = (Guid)reader[\"{propName}\"]{comma}";
         }
 

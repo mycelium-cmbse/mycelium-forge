@@ -92,7 +92,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         public void VerifyOnParametersSet()
         {
             var packageSettingsPage = this.context.Render<PackageSettings>(parameters => parameters
-                .Add(p => p.Organization, "@starion")
+                .Add(p => p.Scope, "@starion")
                 .Add(p => p.PackageName, "ECSS-MM-PWR"));
 
             using (Assert.EnterMultipleScope())

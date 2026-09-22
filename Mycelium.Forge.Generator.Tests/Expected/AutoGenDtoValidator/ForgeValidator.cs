@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ForgeValidator.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -35,6 +35,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         public ForgeValidator()
         {
+            this.RuleFor(x => x.Account).NotEmpty();
             this.RuleFor(x => x.Administrator).NotEmpty();
             this.RuleFor(x => x.CreatedAt).NotEmpty();
             this.RuleFor(x => x.Description).NotEmpty();

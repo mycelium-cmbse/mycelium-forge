@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="MigrateInBloomDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -13,8 +13,9 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
 
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.Services;
 
     /// <summary>
@@ -40,10 +41,16 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         public EventCallback<MigrateInBloomResult> OnResult { get; set; }
 
         /// <summary>
-        /// Gets or sets the package model being migrated.
+        /// Gets or sets the package DTO being migrated.
         /// </summary>
         [Parameter]
-        public PackageModel Package { get; set; }
+        public IPackage Package { get; set; }
+
+        /// <summary>
+        /// Gets or sets the package version DTO being migrated.
+        /// </summary>
+        [Parameter]
+        public IPackageVersion PackageVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the cascading dialog reference used to control and close the dialog.
@@ -143,12 +150,11 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         {
             base.OnInitialized();
 
-            this.SelectedProject = this.Projects.Count > 0 ? this.Projects[0] : string.Empty;
+            this.SelectedProject = this.Projects.Count > 0
+                ? this.Projects[0]
+                : string.Empty;
 
-            if (this.Package != null)
-            {
-                this.VersionConstraint = this.Package.GetDefaultVersionConstraint();
-            }
+            this.VersionConstraint = $"^{this.PackageVersion.GetVersion()}";
         }
     }
 }
