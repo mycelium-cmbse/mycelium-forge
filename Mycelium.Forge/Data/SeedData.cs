@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -587,6 +587,8 @@ namespace Mycelium.Forge.Data
                 package.Version = PackageVersions.Where(x => x.Owner == package.Id).Select(x => x.Id).ToList();
             }
 
+            PackageInvitations = Accounts.Select(CreatePackageInvitation).ToList();
+
             ApiKeys =
             [
                 new APIKey
@@ -772,6 +774,11 @@ namespace Mycelium.Forge.Data
         public static IReadOnlyList<PackageMetaData> PackageMetaDatas { get; }
 
         /// <summary>
+        /// Gets the master list of seeded package invitations.
+        /// </summary>
+        public static IReadOnlyList<PackageInvitation> PackageInvitations { get; }
+
+        /// <summary>
         /// Gets the master list of API keys.
         /// </summary>
         public static IReadOnlyList<APIKey> ApiKeys { get; }
@@ -794,6 +801,31 @@ namespace Mycelium.Forge.Data
 
             packageVersion.MetaData = metaData.Id;
             return metaData;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="PackageInvitation" /> instance linked to the specified <see cref="Account" /> using only
+        /// codegenerated properties.
+        /// </summary>
+        /// <param name="account">The owning account.</param>
+        /// <returns>A configured <see cref="PackageInvitation" /> entity.</returns>
+        private static PackageInvitation CreatePackageInvitation(Account account)
+        {
+            var invitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Owner = account.Id,
+                Package = SysmlIsqQuantitiesPackage.Id,
+                Target = StefanAccount.Id == account.Id ? RegisAccount.Id : StefanAccount.Id,
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER,
+                Status = InvitationStatusKind.PENDING,
+                ExperiesAt = DateTime.UtcNow.AddDays(14),
+                CreatedAt = account.CreatedAt,
+                ModifiedAt = account.ModifiedAt
+            };
+
+            account.OwnedPackageInvitation = invitation.Id;
+            return invitation;
         }
     }
 }
