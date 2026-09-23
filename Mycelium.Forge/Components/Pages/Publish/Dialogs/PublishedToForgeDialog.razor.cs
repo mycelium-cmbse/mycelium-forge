@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishedToForgeDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -55,7 +55,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
         /// Gets or sets the published package version string.
         /// </summary>
         [Parameter]
-        public string Version { get; set; } = "v1.3.0";
+        public string Version { get; set; } = "1.3.0";
 
         /// <summary>
         /// Gets or sets the modal dialog title.

@@ -45,11 +45,11 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             var organization = new OrganizationModel(
                 new Organization { Name = "Starion Group", ShortName = "starion" },
-                description: "Engineering systems.",
-                isVerified: true,
-                packageCount: 12,
-                versionCount: 48,
-                importCount: 3500)
+                "Engineering systems.",
+                true,
+                12,
+                48,
+                3500)
             {
                 MemberSinceYear = 2023
             };

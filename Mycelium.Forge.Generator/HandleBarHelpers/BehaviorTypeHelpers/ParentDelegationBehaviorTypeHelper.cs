@@ -137,15 +137,17 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
 
             stringBuilder.Append($$"""
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}]);
+                                                var parentResult = transaction == null
+                                                    ? await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}])
+                                                    : await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ParentKey}}]);
 
-                                               if (!parentResult.IsError && parentResult.Value.Count > 0)
-                                               {
-                                                   return Result.Success;
-                                               }
+                                                if (!parentResult.IsError && parentResult.Value.Count > 0)
+                                                {
+                                                    return Result.Success;
+                                                }
 
-                                               return Error.Forbidden(description: "Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
-                                   """);
+                                                return Error.Forbidden(description: "Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
+                                    """);
         }
 
         /// <summary>
@@ -166,11 +168,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 .ToList();
 
             stringBuilder.Append($$"""
-                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
-                                               {
-                                                   return Error.Unauthorized(description: "Unauthenticated user cannot update {{@class.Name.ToLowerInvariant()}}.");
-                                               }
-                                   """);
+                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                                {
+                                                    return Error.Unauthorized(description: "Unauthenticated user cannot update {{@class.Name.ToLowerInvariant()}}.");
+                                                }
+                                    """);
 
             if (immutableProperties.Count > 0 && !string.IsNullOrWhiteSpace(config.StateProperty))
             {
@@ -179,11 +181,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 stringBuilder.Append(ModelConstants.DoubleNewLine);
 
                 stringBuilder.Append($$"""
-                                                   if ({{string.Join(" ||\r\n                    ", diffChecks)}})
-                                                   {
-                                                       return Error.Forbidden(description: "{{@class.Name}}s are immutable; only the {{config.StateProperty.ToLowerInvariant()}} status may be modified.");
-                                                   }
-                                       """);
+                                                    if ({{string.Join(" ||\r\n                    ", diffChecks)}})
+                                                    {
+                                                        return Error.Forbidden(description: "{{@class.Name}}s are immutable; only the {{config.StateProperty.ToLowerInvariant()}} status may be modified.");
+                                                    }
+                                        """);
             }
 
             if (!string.IsNullOrWhiteSpace(config.StateProperty) && !string.IsNullOrWhiteSpace(config.StateActivePermission))
@@ -191,18 +193,18 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 stringBuilder.Append(ModelConstants.DoubleNewLine);
 
                 stringBuilder.Append($$"""
-                                                   if (existingThing.{{config.StateProperty}} != updatedThing.{{config.StateProperty}})
-                                                   {
-                                                       var stateGuard = updatedThing.{{config.StateProperty}}
-                                                           ? PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateActivePermission}})
-                                                           : PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateInactivePermission}});
+                                                    if (existingThing.{{config.StateProperty}} != updatedThing.{{config.StateProperty}})
+                                                    {
+                                                        var stateGuard = updatedThing.{{config.StateProperty}}
+                                                            ? PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateActivePermission}})
+                                                            : PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.StateInactivePermission}});
 
-                                                       if (stateGuard.IsError)
-                                                       {
-                                                           return stateGuard;
-                                                       }
-                                                   }
-                                       """);
+                                                        if (stateGuard.IsError)
+                                                        {
+                                                            return stateGuard;
+                                                        }
+                                                    }
+                                        """);
             }
 
             stringBuilder.Append(GetOwnershipBlock(config, Operations.Update));
@@ -220,56 +222,58 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
 
             stringBuilder.Append($$"""
-                                               if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
-                                               {
-                                                   return Error.Unauthorized(description: "Unauthenticated user cannot erase a {{@class.Name.ToLowerInvariant()}}.");
-                                               }
-                                   """);
+                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                                {
+                                                    return Error.Unauthorized(description: "Unauthenticated user cannot erase a {{@class.Name.ToLowerInvariant()}}.");
+                                                }
+                                    """);
 
             if (!string.IsNullOrWhiteSpace(config.DeletePermission))
             {
                 stringBuilder.Append(ModelConstants.DoubleNewLine);
 
                 stringBuilder.Append($$"""
-                                                   var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.DeletePermission}});
+                                                    var eraseGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.DeletePermission}});
 
-                                                   if (eraseGuard.IsError)
-                                                   {
-                                                       return eraseGuard;
-                                                   }
-                                       """);
+                                                    if (eraseGuard.IsError)
+                                                    {
+                                                        return eraseGuard;
+                                                    }
+                                        """);
             }
 
             var ownershipChecks = BuildOwnershipChecks(config);
 
             var ownershipBlock = ownershipChecks.Count > 0
                 ? $$"""
-                                                   var {{config.ParentVar}} = parentResult.Value[0];
-                                                   var accountId = userContext.AccountId.Value;
+                                                    var {{config.ParentVar}} = parentResult.Value[0];
+                                                    var accountId = userContext.AccountId.Value;
 
-                                                   if ({{string.Join(" || ", ownershipChecks)}})
-                                                   {
-                                                       return Result.Success;
-                                                   }
+                                                    if ({{string.Join(" || ", ownershipChecks)}})
+                                                    {
+                                                        return Result.Success;
+                                                    }
 
-                                                   return Error.Forbidden(description: "Access denied: only {{config.ParentEntity.ToLowerInvariant()}} owners can delete {{config.ParentEntity.ToLowerInvariant()}} versions.");
+                                                    return Error.Forbidden(description: "Access denied: only {{config.ParentEntity.ToLowerInvariant()}} owners can delete {{config.ParentEntity.ToLowerInvariant()}} versions.");
                     """
                 : $$"""
-                                                   return await this.{{config.ParentPermServiceField}}.IsAllowedToDelete(userContext, parentResult.Value[0]);
+                                                    return await this.{{config.ParentPermServiceField}}.IsAllowedToDelete(userContext, parentResult.Value[0], transaction);
                     """;
 
             stringBuilder.Append(ModelConstants.DoubleNewLine);
 
             stringBuilder.Append($$"""
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}]);
+                                                var parentResult = transaction == null
+                                                    ? await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}])
+                                                    : await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ParentKey}}]);
 
-                                               if (!parentResult.IsError && parentResult.Value.Count > 0)
-                                               {
-                                   {{ownershipBlock}}
-                                               }
+                                                if (!parentResult.IsError && parentResult.Value.Count > 0)
+                                                {
+                                    {{ownershipBlock}}
+                                                }
 
-                                               return Error.Forbidden(description: "Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
-                                   """);
+                                                return Error.Forbidden(description: "Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
+                                    """);
         }
 
         /// <summary>
@@ -309,30 +313,32 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             var ownershipBlock = ownershipChecks.Count > 0
                 ? $$"""
-                                                   var {{config.ParentVar}} = parentResult.Value[0];
-                                                   var accountId = userContext.AccountId.Value;
+                                                    var {{config.ParentVar}} = parentResult.Value[0];
+                                                    var accountId = userContext.AccountId.Value;
 
-                                                   if ({{string.Join(" || ", ownershipChecks)}})
-                                                   {
-                                                       return Result.Success;
-                                                   }
+                                                    if ({{string.Join(" || ", ownershipChecks)}})
+                                                    {
+                                                        return Result.Success;
+                                                    }
 
-                                                   return Error.Forbidden(description: "Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.");
+                                                    return Error.Forbidden(description: "Access denied: user is not an owner or maintainer of the {{config.ParentEntity.ToLowerInvariant()}}.");
                     """
-                : $"                               return await this.{config.ParentPermServiceField}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0]);";
+                : $"                               return await this.{config.ParentPermServiceField}.IsAllowedToUpdate(userContext, parentResult.Value[0], parentResult.Value[0], transaction);";
 
             stringBuilder.Append(ModelConstants.DoubleNewLine);
 
             stringBuilder.Append($$"""
-                                               var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}]);
+                                                var parentResult = transaction == null
+                                                    ? await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}])
+                                                    : await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}]);
 
-                                               if (!parentResult.IsError && parentResult.Value.Count > 0)
-                                               {
-                                   {{ownershipBlock}}
-                                               }
+                                                if (!parentResult.IsError && parentResult.Value.Count > 0)
+                                                {
+                                    {{ownershipBlock}}
+                                                }
 
-                                               return Error.Forbidden(description: "Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
-                                   """);
+                                                return Error.Forbidden(description: "Access denied: parent {{config.ParentEntity.ToLowerInvariant()}} was not found or is not accessible.");
+                                    """);
 
             return stringBuilder.ToString();
         }

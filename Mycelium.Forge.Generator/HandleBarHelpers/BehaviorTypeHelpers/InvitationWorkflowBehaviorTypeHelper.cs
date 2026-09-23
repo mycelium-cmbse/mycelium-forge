@@ -72,7 +72,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return Result.Success;
                                                }
 
-                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ScopeProperty}}]);
+                                               var scopeResult = transaction == null
+                                                   ? await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.{{config.ScopeProperty}}])
+                                                   : await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.{{config.ScopeProperty}}]);
 
                                                if (!scopeResult.IsError && scopeResult.Value.Count > 0)
                                                {
@@ -113,7 +115,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return Result.Success;
                                                }
 
-                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
+                                               var scopeResult = transaction == null
+                                                   ? await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}])
+                                                   : await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
 
                                                if (!scopeResult.IsError && scopeResult.Value.Count > 0)
                                                {
@@ -228,7 +232,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return guard;
                                                }
 
-                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
+                                               var scopeResult = transaction == null
+                                                   ? await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ScopeProperty}}])
+                                                   : await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
 
                                                if (!scopeResult.IsError && scopeResult.Value.Count > 0)
                                                {

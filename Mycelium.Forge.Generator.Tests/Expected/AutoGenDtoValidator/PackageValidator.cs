@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageValidator.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -45,6 +45,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.PackageOwner).NotEmpty();
             this.RuleFor(x => x.PackageType).NotEmpty();
             this.RuleFor(x => x.ShortName).NotEmpty();
+            this.RuleFor(x => x.Version).NotEmpty();
             this.RuleFor(x => x.Visibility).NotNull();
             this.AddCustomValidation();
         }

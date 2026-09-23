@@ -1,0 +1,28 @@
+@* ------------------------------------------------------------------------------------------------
+<copyright file="TableSkeleton.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="@(this.ComputedClass)"
+     @attributes="@(this.AdditionalAttributes)">
+    <div class="flex @(this.GapClass)">
+        @for (var i = 0; i < this.ColumnCount; i++)
+        {
+            <BbSkeleton Class="@($"{this.HeaderHeightClass} flex-1")" />
+        }
+    </div>
+    <BbSeparator />
+    @for (var i = 0; i < this.RowCount; i++)
+    {
+        <div class="flex @(this.GapClass)">
+            @for (var j = 0; j < this.ColumnCount; j++)
+            {
+                <BbSkeleton Class="@($"{this.RowHeightClass} flex-1")" />
+            }
+        </div>
+    }
+</div>

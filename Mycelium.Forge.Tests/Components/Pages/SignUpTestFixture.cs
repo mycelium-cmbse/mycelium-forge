@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SignUpTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -15,8 +15,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
     using BlazorBlueprint.Primitives.Extensions;
 
     using Bunit;
-
-    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
