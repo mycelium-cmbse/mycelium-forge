@@ -161,7 +161,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         public async Task InitializeViewModel(string packageName, string scope, string tab = null)
         {
-            var userContext = this.userService.GetUserContext();
+            var userContext = await this.userService.GetUserContext();
             var cachedData = await this.GetOrLoadPackageDataAsync(userContext, packageName, scope);
 
             if (cachedData.Package == null)

@@ -1,0 +1,25 @@
+@* ------------------------------------------------------------------------------------------------
+<copyright file="SignInRequired.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full bg-background min-h-screen py-10 select-none">
+    <div class="page-container flex flex-col items-center justify-center gap-4 py-20 text-center">
+        <div class="icon-circle-primary w-15 h-15">
+            <LucideIcon Name="lock"
+                        Size="28"
+                        Class="text-primary shrink-0"/>
+        </div>
+        <h1 class="text-2xl font-semibold text-foreground">Sign in required</h1>
+        <p class="text-sm text-muted-foreground">You must be signed in to access this page.</p>
+        <BbButton id="sign-in-required-button"
+                  Variant="ButtonVariant.Default"
+                  Href="@(this.GetSignInUrl())">
+            Sign in
+        </BbButton>
+    </div>
+</div>

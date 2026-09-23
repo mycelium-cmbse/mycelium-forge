@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Components.Pages
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -23,15 +24,22 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages;
-    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.MyPackages;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="MyPackages" /> component.
+    /// </summary>
     [TestFixture]
     public class MyPackagesTestFixture
     {
         private BunitContext context;
         private Mock<IMyPackagesViewModel> viewModelMock;
+        private Package starionPackage;
+        private Package esaPackage;
 
+        /// <summary>
+        /// Sets up mock dependencies and test context before each test.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -43,30 +51,52 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             this.viewModelMock = new Mock<IMyPackagesViewModel>();
 
-            var packages = new List<PackageModel>
+            this.starionPackage = new Package
             {
-                new(new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr", Visibility = VisibilityKind.PUBLIC }, "Starion Group"),
-                new(new Package { Name = "Internal-Core", ShortName = "internal-core", Visibility = VisibilityKind.PRIVATE }, "ESA")
+                Id = Guid.NewGuid(),
+                Name = "ECSS-MM-PWR",
+                ShortName = "ecss-mm-pwr",
+                Visibility = VisibilityKind.PUBLIC
             };
 
+            this.esaPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Name = "Internal-Core",
+                ShortName = "internal-core",
+                Visibility = VisibilityKind.PRIVATE
+            };
+
+            List<IPackage> packages = [this.starionPackage, this.esaPackage];
+
             this.viewModelMock.Setup(x => x.Packages).Returns(packages);
+            this.viewModelMock.Setup(x => x.GetPublisher(this.starionPackage)).Returns("@starion");
+            this.viewModelMock.Setup(x => x.GetPublisher(this.esaPackage)).Returns("@esa");
+            this.viewModelMock.Setup(x => x.GetRole(It.IsAny<IPackage>())).Returns(PackageInvitationKind.OWNER);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }
 
+        /// <summary>
+        /// Tears down the bUnit context after each test.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
         [TearDown]
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
         }
 
+        /// <summary>
+        /// Verifies that packages are filtered correctly based on the selected publisher.
+        /// </summary>
         [Test]
         public void VerifyFilteredPackages()
         {
             var myPackagesPage = this.context.Render<MyPackages>();
 
             var allPackages = myPackagesPage.Instance.FilteredPackages();
-            myPackagesPage.Instance.SelectedPublisher = "Starion Group";
+            myPackagesPage.Instance.SelectedPublisher = "@starion";
             var starionPackages = myPackagesPage.Instance.FilteredPackages();
 
             using (Assert.EnterMultipleScope())
@@ -76,6 +106,9 @@ namespace Mycelium.Forge.Tests.Components.Pages
             }
         }
 
+        /// <summary>
+        /// Verifies the CSS classes applied to publisher filter chips.
+        /// </summary>
         [Test]
         public void VerifyGetPublisherChipClass()
         {
@@ -92,6 +125,9 @@ namespace Mycelium.Forge.Tests.Components.Pages
             }
         }
 
+        /// <summary>
+        /// Verifies that the publisher filter options list is correctly generated with counts.
+        /// </summary>
         [Test]
         public void VerifyGetPublisherFilterOptions()
         {
@@ -105,11 +141,14 @@ namespace Mycelium.Forge.Tests.Components.Pages
             }
         }
 
+        /// <summary>
+        /// Verifies that the correct badge variant is returned for public and private visibility.
+        /// </summary>
         [Test]
         public void VerifyGetVisibilityBadgeVariant()
         {
-            var publicPkg = new PackageModel(new Package { Visibility = VisibilityKind.PUBLIC });
-            var privatePkg = new PackageModel(new Package { Visibility = VisibilityKind.PRIVATE });
+            var publicPkg = new Package { Visibility = VisibilityKind.PUBLIC };
+            var privatePkg = new Package { Visibility = VisibilityKind.PRIVATE };
 
             var publicVariant = MyPackages.GetVisibilityBadgeVariant(publicPkg);
             var privateVariant = MyPackages.GetVisibilityBadgeVariant(privatePkg);
@@ -121,6 +160,9 @@ namespace Mycelium.Forge.Tests.Components.Pages
             }
         }
 
+        /// <summary>
+        /// Verifies that the component initializes the view model on render.
+        /// </summary>
         [Test]
         public void VerifyOnInitialized()
         {

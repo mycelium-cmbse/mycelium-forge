@@ -16,10 +16,12 @@ namespace Mycelium.Forge.Components.Pages
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Login;
 
+    using ReactiveUI;
+
     /// <summary>
     /// Represents the user authentication and sign-in page of the Mycelium Forge registry.
     /// </summary>
-    public partial class Login : ComponentBase
+    public partial class Login : DisposableComponent
     {
         /// <summary>
         /// Gets or sets the view model for the sign-in page.
@@ -45,6 +47,12 @@ namespace Mycelium.Forge.Components.Pages
         public ValidationManager ValidationManager { get; } = new();
 
         /// <summary>
+        /// Gets or sets the return URL parameter to navigate to after successful sign in.
+        /// </summary>
+        [SupplyParameterFromQuery(Name = UrlParameterNames.ReturnUrl)]
+        public string ReturnUrl { get; set; }
+
+        /// <summary>
         /// Handles changes to the email input value.
         /// </summary>
         /// <param name="email">The new email address value.</param>
@@ -67,7 +75,8 @@ namespace Mycelium.Forge.Components.Pages
         /// <summary>
         /// Executes the login authentication workflow.
         /// </summary>
-        public void OnLogin()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnLogin()
         {
             var isValid = this.ValidationManager
                 .Check(nameof(this.ViewModel.Email), !string.IsNullOrWhiteSpace(this.ViewModel.Email), "Email address is required.")
@@ -79,16 +88,12 @@ namespace Mycelium.Forge.Components.Pages
                 return;
             }
 
-            var result = this.ViewModel.Login();
+            var result = await this.ViewModel.Login();
 
-            if (result.IsError)
+            if (!result.IsError)
             {
-                this.NotificationService.AddNotification(result.FirstError.Description, "Error", NotificationType.Error);
-                return;
+                this.NavigationManager.NavigateTo(PageRoutes.AuthLogin, forceLoad: true);
             }
-
-            this.NotificationService.AddNotification("Signed in successfully.", "Welcome", NotificationType.Success);
-            this.NavigationManager.NavigateTo(PageRoutes.Home);
         }
 
         /// <summary>
@@ -100,11 +105,13 @@ namespace Mycelium.Forge.Components.Pages
         }
 
         /// <summary>
-        /// Initializes the component lifecycle and populates the view model state.
+        /// Initializes the component lifecycle, populates the view model state, and subscribes to property changes.
         /// </summary>
         protected override void OnInitialized()
         {
             base.OnInitialized();
+
+            this.Disposables.Add(this.ViewModel.WhenAnyValue(x => x.IsSubmitting).Subscribe(_ => this.InvokeAsync(this.StateHasChanged)));
             this.ViewModel.InitializeViewModel();
         }
     }

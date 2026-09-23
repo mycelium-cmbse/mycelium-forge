@@ -18,12 +18,6 @@ namespace Mycelium.Forge.Services
     public interface IUserService
     {
         /// <summary>
-        /// Gets or sets the application and domain roles currently assigned to the user.
-        /// </summary>
-        /// <remarks>This will likely be removed when IAccount roles is implemented.</remarks>
-        IReadOnlyList<RoleKind> CurrentRoles { get; set; }
-
-        /// <summary>
         /// Gets the current user account, optionally forcing a reload from the data source.
         /// </summary>
         /// <param name="forceLoad">The value indicating whether to force a reload.</param>
@@ -33,7 +27,16 @@ namespace Mycelium.Forge.Services
         /// <summary>
         /// Gets the user context, which includes the account ID, username, and current roles of the authenticated user.
         /// </summary>
-        /// <returns>The user context.</returns>
-        IUserContext GetUserContext();
+        /// <param name="forceLoad">The value indicating whether to force a reload.</param>
+        /// <returns>A <see cref="Task{IUserContext}" /> representing the asynchronous operation.</returns>
+        Task<IUserContext> GetUserContext(bool forceLoad = false);
+
+        /// <summary>
+        /// Sets the currently authenticated user by account identifier and optional roles.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user account to set as current, or <c>null</c> for unauthenticated.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task SetCurrentUser(Guid? userId, CancellationToken cancellationToken = default);
     }
 }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="UrlParameterNames.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -38,5 +38,15 @@ namespace Mycelium.Forge.Common
         /// The email address parameter name.
         /// </summary>
         public const string Email = "email";
+
+        /// <summary>
+        /// The publisher filter parameter name.
+        /// </summary>
+        public const string Publisher = "publisher";
+
+        /// <summary>
+        /// The return URL parameter name.
+        /// </summary>
+        public const string ReturnUrl = "returnUrl";
     }
 }
