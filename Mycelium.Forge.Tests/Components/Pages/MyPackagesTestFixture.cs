@@ -48,6 +48,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             this.context.Services.AddBlazorBlueprintPrimitives();
             this.context.Services.AddBlazorBlueprintComponents();
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
+            this.context.AddAuthorization();
 
             this.viewModelMock = new Mock<IMyPackagesViewModel>();
 
@@ -113,9 +114,9 @@ namespace Mycelium.Forge.Tests.Components.Pages
         public void VerifyGetPublisherChipClass()
         {
             var myPackagesPage = this.context.Render<MyPackages>();
-            myPackagesPage.Instance.SelectedPublisher = "all";
+            myPackagesPage.Instance.SelectedPublisher = MyPackages.AllPublishers;
 
-            var allClass = myPackagesPage.Instance.GetPublisherChipClass("all");
+            var allClass = myPackagesPage.Instance.GetPublisherChipClass(MyPackages.AllPublishers);
             var otherClass = myPackagesPage.Instance.GetPublisherChipClass("esa");
 
             using (Assert.EnterMultipleScope())
@@ -137,7 +138,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(options, Has.Count.EqualTo(3));
-                Assert.That(options[0].Key, Is.EqualTo("all"));
+                Assert.That(options[0].Key, Is.EqualTo(MyPackages.AllPublishers));
             }
         }
 

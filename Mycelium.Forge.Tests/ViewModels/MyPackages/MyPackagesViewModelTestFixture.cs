@@ -16,6 +16,8 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
 
     using ErrorOr;
 
+    using Microsoft.Extensions.Logging;
+
     using Moq;
 
     using Mycelium.Forge.Common;
@@ -35,6 +37,7 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
         private Mock<IScopeService> scopeServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
         private Mock<IUserService> userServiceMock;
+        private Mock<ILogger<MyPackagesViewModel>> loggerMock;
         private MyPackagesViewModel viewModel;
         private IAccount testAccount;
         private IUserContext userContext;
@@ -54,6 +57,7 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
             this.scopeServiceMock = new Mock<IScopeService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
             this.userServiceMock = new Mock<IUserService>();
+            this.loggerMock = new Mock<ILogger<MyPackagesViewModel>>();
 
             this.testAccount = SeedData.RegisAccount;
 
@@ -118,8 +122,8 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
                 .ReturnsAsync(this.testAccount);
 
             this.userServiceMock
-                .Setup(s => s.GetUserContext())
-                .Returns(this.userContext);
+                .Setup(s => s.GetUserContext(It.IsAny<bool>()))
+                .ReturnsAsync(this.userContext);
 
             this.packageServiceMock
                 .Setup(s => s.ReadByMaintainerOrOwnerAsync(this.userContext, this.testAccount.Id, It.IsAny<CancellationToken>()))
@@ -137,7 +141,17 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
                 this.packageServiceMock.Object,
                 this.scopeServiceMock.Object,
                 this.packageVersionServiceMock.Object,
-                this.userServiceMock.Object);
+                this.userServiceMock.Object,
+                this.loggerMock.Object);
+        }
+
+        /// <summary>
+        /// Tears down the view model after each test execution.
+        /// </summary>
+        [TearDown]
+        public void TearDown()
+        {
+            this.viewModel.Dispose();
         }
 
         /// <summary>
@@ -150,7 +164,8 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
                 this.packageServiceMock.Object,
                 this.scopeServiceMock.Object,
                 this.packageVersionServiceMock.Object,
-                this.userServiceMock.Object);
+                this.userServiceMock.Object,
+                this.loggerMock.Object);
 
             Assert.That(instance, Is.Not.Null);
         }
@@ -259,16 +274,16 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
             };
 
             this.userServiceMock
-                .Setup(s => s.GetUserContext())
-                .Returns(unauthUserContext);
+                .Setup(s => s.GetUserContext(It.IsAny<bool>()))
+                .ReturnsAsync(unauthUserContext);
 
             await this.viewModel.InitializeViewModel();
             Assert.That(this.viewModel.Packages, Has.Count.EqualTo(0));
 
             // Case 3: PackageService returns error
             this.userServiceMock
-                .Setup(s => s.GetUserContext())
-                .Returns(this.userContext);
+                .Setup(s => s.GetUserContext(It.IsAny<bool>()))
+                .ReturnsAsync(this.userContext);
 
             this.userServiceMock
                 .Setup(s => s.GetCurrentUser(It.IsAny<bool>()))
@@ -285,6 +300,14 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
             this.packageServiceMock
                 .Setup(s => s.ReadByMaintainerOrOwnerAsync(this.userContext, this.testAccount.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ImmutableList<IPackage>.Empty);
+
+            await this.viewModel.InitializeViewModel();
+            Assert.That(this.viewModel.Packages, Has.Count.EqualTo(0));
+
+            // Case 5: Exception thrown
+            this.packageServiceMock
+                .Setup(s => s.ReadByMaintainerOrOwnerAsync(this.userContext, this.testAccount.Id, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Connection failed"));
 
             await this.viewModel.InitializeViewModel();
             Assert.That(this.viewModel.Packages, Has.Count.EqualTo(0));
