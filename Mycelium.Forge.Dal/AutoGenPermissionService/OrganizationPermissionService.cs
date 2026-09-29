@@ -43,7 +43,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether creation is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IOrganization toCreate, NpgsqlTransaction transaction = null)
+        protected override Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IOrganization toCreate, NpgsqlTransaction transaction)
         {
             return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.CreateOrganization));
         }
@@ -55,7 +55,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether reading is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IOrganization thing, NpgsqlTransaction transaction = null)
+        protected override Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IOrganization thing, NpgsqlTransaction transaction)
         {
             return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
@@ -68,7 +68,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IOrganization existingThing, IOrganization updatedThing, NpgsqlTransaction transaction = null)
+        protected override Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IOrganization existingThing, IOrganization updatedThing, NpgsqlTransaction transaction)
         {
             if (userContext.AccountId.HasValue && existingThing.Administrator.Contains(userContext.AccountId.Value))
             {
@@ -115,7 +115,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether deletion is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IOrganization thing, NpgsqlTransaction transaction = null)
+        protected override Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IOrganization thing, NpgsqlTransaction transaction)
         {
             if (userContext.AccountId.HasValue && thing.Administrator.Contains(userContext.AccountId.Value))
             {

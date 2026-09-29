@@ -57,9 +57,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether creation is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IProfileLink toCreate, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IProfileLink toCreate, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.Owner, this.organizationService, "profilelink", PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings, transaction);
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.Owner, this.organizationService, "profilelink", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether reading is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IProfileLink thing, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IProfileLink thing, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.Owner, this.organizationService, [PermissionKind.ViewOrganizationMemberList, PermissionKind.ViewAllOrganizations, PermissionKind.ViewAllAccounts], transaction);
+            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.Owner, this.organizationService, transaction, [PermissionKind.ViewOrganizationMemberList, PermissionKind.ViewAllOrganizations, PermissionKind.ViewAllAccounts]);
         }
 
         /// <summary>
@@ -82,9 +82,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IProfileLink existingThing, IProfileLink updatedThing, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IProfileLink existingThing, IProfileLink updatedThing, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "profilelink", PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings, transaction);
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "profilelink", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
         }
 
         /// <summary>
@@ -94,9 +94,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether deletion is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IProfileLink thing, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IProfileLink thing, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.Owner, this.organizationService, "profilelink", PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings, transaction);
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.Owner, this.organizationService, "profilelink", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
         }
     }
 }

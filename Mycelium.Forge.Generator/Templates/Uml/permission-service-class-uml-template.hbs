@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="{{this.Name}}PermissionService.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -37,7 +37,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether creation is permitted.</returns>
-        protected override {{Permission.WriteAsyncModifierCreate this}}Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, I{{this.Name}} toCreate, NpgsqlTransaction transaction = null)
+        protected override {{Permission.WriteAsyncModifierCreate this}}Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, I{{this.Name}} toCreate, NpgsqlTransaction transaction)
         {
 {{Permission.WriteIsAllowedToCreate this}}
         }
@@ -49,7 +49,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether reading is permitted.</returns>
-        protected override {{Permission.WriteAsyncModifierRead this}}Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, I{{this.Name}} thing, NpgsqlTransaction transaction = null)
+        protected override {{Permission.WriteAsyncModifierRead this}}Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, I{{this.Name}} thing, NpgsqlTransaction transaction)
         {
 {{Permission.WriteIsAllowedToRead this}}
         }
@@ -62,7 +62,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
-        protected override {{Permission.WriteAsyncModifierUpdate this}}Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, I{{this.Name}} existingThing, I{{this.Name}} updatedThing, NpgsqlTransaction transaction = null)
+        protected override {{Permission.WriteAsyncModifierUpdate this}}Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, I{{this.Name}} existingThing, I{{this.Name}} updatedThing, NpgsqlTransaction transaction)
         {
 {{Permission.WriteIsAllowedToUpdate this}}
         }
@@ -74,7 +74,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether deletion is permitted.</returns>
-        protected override {{Permission.WriteAsyncModifierDelete this}}Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, I{{this.Name}} thing, NpgsqlTransaction transaction = null)
+        protected override {{Permission.WriteAsyncModifierDelete this}}Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, I{{this.Name}} thing, NpgsqlTransaction transaction)
         {
 {{Permission.WriteIsAllowedToDelete this}}
         }

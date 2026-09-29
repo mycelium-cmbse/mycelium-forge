@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationScopeBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -92,9 +92,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    return orgGuard;
                                                }
 
-                                               var orgResult = transaction == null
-                                                   ? await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner])
-                                                   : await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
+                                               var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
 
                                                if (orgResult.IsError || orgResult.Value.Count == 0)
                                                {
@@ -176,9 +174,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append($$"""
                                                if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
                                                {
-                                                   var orgResult = transaction == null
-                                                       ? await this.{{config.ScopeServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.Owner])
-                                                       : await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+                                                   var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
 
                                                    if (!orgResult.IsError && orgResult.Value.Count > 0)
                                                    {

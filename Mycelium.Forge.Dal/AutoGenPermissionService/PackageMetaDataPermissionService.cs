@@ -64,7 +64,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether creation is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IPackageMetaData toCreate, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IPackageMetaData toCreate, NpgsqlTransaction transaction)
         {
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
@@ -78,9 +78,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return guard;
             }
 
-            var parentResult = transaction == null
-                ? await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner])
-                : await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
 
             if (!parentResult.IsError && parentResult.Value.Count > 0)
             {
@@ -97,11 +95,9 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether reading is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IPackageMetaData thing, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IPackageMetaData thing, NpgsqlTransaction transaction)
         {
-            var parentResult = transaction == null
-                ? await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [thing.Owner])
-                : await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
 
             if (!parentResult.IsError && parentResult.Value.Count > 0)
             {
@@ -119,16 +115,14 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IPackageMetaData existingThing, IPackageMetaData updatedThing, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IPackageMetaData existingThing, IPackageMetaData updatedThing, NpgsqlTransaction transaction)
         {
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Error.Unauthorized(description: "Unauthenticated user cannot update packagemetadata.");
             }
 
-            var parentResult = transaction == null
-                ? await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [existingThing.Owner])
-                : await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Owner]);
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Owner]);
 
             if (!parentResult.IsError && parentResult.Value.Count > 0)
             {
@@ -145,7 +139,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether deletion is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IPackageMetaData thing, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IPackageMetaData thing, NpgsqlTransaction transaction)
         {
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
@@ -159,9 +153,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return eraseGuard;
             }
 
-            var parentResult = transaction == null
-                ? await this.packageVersionService.ReadAsync(userContext, CancellationToken.None, [thing.Owner])
-                : await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+            var parentResult = await this.packageVersionService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
 
             if (!parentResult.IsError && parentResult.Value.Count > 0)
             {
