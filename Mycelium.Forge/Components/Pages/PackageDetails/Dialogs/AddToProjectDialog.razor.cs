@@ -13,8 +13,9 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
 
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.Services;
 
     /// <summary>
@@ -29,10 +30,16 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         public IDialogReference DialogReference { get; set; }
 
         /// <summary>
-        /// Gets or sets the package model being added.
+        /// Gets or sets the package DTO being added.
         /// </summary>
         [Parameter]
-        public PackageModel Package { get; set; }
+        public IPackage Package { get; set; }
+
+        /// <summary>
+        /// Gets or sets the package version DTO being added.
+        /// </summary>
+        [Parameter]
+        public IPackageVersion PackageVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the list of available target projects.
@@ -70,7 +77,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         /// <summary>
         /// Gets or sets the version constraint expression.
         /// </summary>
-        public string VersionConstraint { get; set; } = "^1.2.0";
+        public string VersionConstraint { get; set; } = string.Empty;
 
         /// <summary>
         /// Handles changes to the selected project value.
@@ -143,12 +150,11 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Dialogs
         {
             base.OnInitialized();
 
-            if (this.Package != null)
-            {
-                this.VersionConstraint = this.Package.GetDefaultVersionConstraint();
-            }
+            this.SelectedProject = this.Projects.Count > 0
+                ? this.Projects[0]
+                : string.Empty;
 
-            this.SelectedProject = this.Projects.Count > 0 ? this.Projects[0] : string.Empty;
+            this.VersionConstraint = $"^{this.PackageVersion.GetVersion()}";
         }
     }
 }

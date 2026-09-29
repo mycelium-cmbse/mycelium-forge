@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageVersionModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Models.Package
 {
+    using Mycelium.Forge.Common;
+
     /// <summary>
     /// Represents an immutable release version entry for a package in the version history.
     /// </summary>
@@ -31,6 +33,7 @@ namespace Mycelium.Forge.Models.Package
         /// <param name="size">The formatted package archive size.</param>
         /// <param name="isLatest">A value indicating whether the version is the latest release.</param>
         /// <param name="isUnlisted">A value indicating whether the package version is unlisted.</param>
+        /// <param name="metadataSource">The metadata source provenance origin.</param>
         public PackageVersionModel(
             string version,
             string publishedAgo = "",
@@ -38,7 +41,8 @@ namespace Mycelium.Forge.Models.Package
             bool isValidated = false,
             string size = "",
             bool isLatest = false,
-            bool isUnlisted = false)
+            bool isUnlisted = false,
+            MetadataSource metadataSource = MetadataSource.DeclaredByArtefact)
         {
             this.Version = version;
             this.PublishedAgo = publishedAgo;
@@ -47,6 +51,7 @@ namespace Mycelium.Forge.Models.Package
             this.Size = size;
             this.IsLatest = isLatest;
             this.IsUnlisted = isUnlisted;
+            this.MetadataSource = metadataSource;
         }
 
         /// <summary>
@@ -88,6 +93,11 @@ namespace Mycelium.Forge.Models.Package
         /// Gets or sets a value indicating whether the package version is deprecated.
         /// </summary>
         public bool IsDeprecated { get; set; }
+
+        /// <summary>
+        /// Gets or sets the metadata source provenance origin.
+        /// </summary>
+        public MetadataSource MetadataSource { get; set; } = MetadataSource.DeclaredByArtefact;
 
         /// <summary>
         /// Gets or sets the direct download URL for the package version artifact.

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettings.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,10 +22,10 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
     public partial class PackageSettings : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the organization segment supplied from the URL route.
+        /// Gets or sets the scope segment supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string Organization { get; set; } = string.Empty;
+        public string Scope { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the package name supplied from the URL route.
@@ -131,7 +131,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         {
             base.OnParametersSet();
 
-            this.ViewModel.InitializeViewModel(this.PackageName, this.Organization);
+            this.ViewModel.InitializeViewModel(this.PackageName, this.Scope);
         }
 
         /// <summary>

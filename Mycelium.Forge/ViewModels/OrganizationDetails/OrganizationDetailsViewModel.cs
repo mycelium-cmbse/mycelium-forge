@@ -53,14 +53,14 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
                 new PackageModel(
                     new Package { Name = "ecss-e-st-32-10c", ShortName = "ecss-e-st-32-10c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-60), Description = "A package for handling ECSS E-ST-32-10c specifications." },
                     "@starion",
-                    "v0.3.0",
+                    "0.3.0",
                     PackageFormatConstants.SysMlV2,
                     "comms · rf · telemetry · ecss",
                     190),
                 new PackageModel(
                     new Package { Name = "ecss-e-st-31-01c", ShortName = "ecss-e-st-31-01c", Visibility = VisibilityKind.PUBLIC, CreatedAt = DateTime.UtcNow.AddDays(-90), Description = "A package for handling ECSS E-ST-31-01c specifications." },
                     "@starion",
-                    "v1.0.0",
+                    "1.0.0",
                     PackageFormatConstants.SysMlV2,
                     "mechanical · structures · loads · ecss",
                     165)

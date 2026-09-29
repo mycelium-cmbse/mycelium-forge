@@ -54,7 +54,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", {personalArg}, {platformArg}, {orgArg});");
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg}, {orgArg});");
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 ? $"[{string.Join(", ", config.ReadBypassPermissions.Select(p => $"PermissionKind.{p}"))}]"
                 : "null";
 
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, {bypassArg});");
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, transaction, {bypassArg});");
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", {personalArg}, {platformArg}, {orgArg});");
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg}, {orgArg});");
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", {personalArg}, {platformArg}, {orgArg});");
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg}, {orgArg});");
         }
 
         /// <summary>

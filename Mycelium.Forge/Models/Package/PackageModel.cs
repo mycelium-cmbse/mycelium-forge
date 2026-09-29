@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -173,7 +173,7 @@ namespace Mycelium.Forge.Models.Package
             var publisher = SeedData.Organizations.FirstOrDefault(o => o.Id == package.Owner);
             var publisherScope = publisher != null ? $"@{publisher.ShortName}" : "@starion";
             var version = SeedData.PackageVersions.FirstOrDefault(v => v.Owner == package.Id);
-            var versionString = version?.Version ?? "v1.0.0";
+            var versionString = version?.Version ?? "1.0.0";
             var packageType = SeedData.PackageTypes.FirstOrDefault(t => t.Id == package.PackageType);
             var format = packageType?.Name ?? PackageFormatConstants.SysMlV2;
             var downloadCount = version?.DownloadCount ?? 0;

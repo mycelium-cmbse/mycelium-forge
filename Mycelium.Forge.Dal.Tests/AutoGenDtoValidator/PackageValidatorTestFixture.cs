@@ -49,6 +49,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 Owner = Guid.NewGuid(),
                 PackageOwner = [Guid.NewGuid()],
                 PackageType = Guid.NewGuid(),
+                Version = [Guid.NewGuid()],
                 Listed = true,
                 Visibility = VisibilityKind.PUBLIC
             };

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageContentsTab.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,18 +11,16 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models.Package;
-
     /// <summary>
     /// Represents the model elements and declarations tab component for package details.
     /// </summary>
     public partial class PackageContentsTab : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the collection of model elements contained in the package.
+        /// Gets or sets the collection of model element tuples (Name, Kind, Category, AttributeSummary) contained in the package.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<PackageElementModel> Elements { get; set; } = [];
+        public IReadOnlyList<(string Name, string Kind, string Category, string AttributeSummary)> Elements { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the currently selected element kind filter tab.
@@ -66,10 +64,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// <summary>
         /// Gets the collection of model elements filtered by the selected element kind category.
         /// </summary>
-        /// <returns>A list of model elements matching the selected kind category or all elements if none match.</returns>
-        public IReadOnlyList<PackageElementModel> GetFilteredElements()
+        /// <returns>A list of model element tuples matching the selected kind category or all elements if none match.</returns>
+        public IReadOnlyList<(string Name, string Kind, string Category, string AttributeSummary)> GetFilteredElements()
         {
-            if (this.Elements == null || this.Elements.Count == 0)
+            if (this.Elements.Count == 0)
             {
                 return [];
             }

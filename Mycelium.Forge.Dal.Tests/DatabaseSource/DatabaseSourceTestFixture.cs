@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSourceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -44,6 +44,26 @@ namespace Mycelium.Forge.Dal.Tests.DatabaseSource
                 Assert.That(() => new DatabaseSource(null), Throws.ArgumentNullException);
                 Assert.That(databaseSource, Is.Not.Null);
             }
+        }
+
+        /// <summary>
+        /// Verifies the <see cref="DatabaseSource.ExecuteInTransactionAsync" /> method.
+        /// </summary>
+        [Test]
+        public void VerifyExecuteInTransactionAsync()
+        {
+            var config = new DatabaseConfig
+            {
+                Host = "localhost",
+                Port = 5432,
+                Database = "forge",
+                Username = "forge",
+                Password = "password"
+            };
+
+            var databaseSource = new DatabaseSource(config);
+
+            Assert.That(async () => await databaseSource.ExecuteInTransactionAsync(null, CancellationToken.None), Throws.ArgumentNullException);
         }
     }
 }

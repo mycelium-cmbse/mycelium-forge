@@ -7,7 +7,7 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 
-@using Mycelium.Forge.Models.Package
+@using Mycelium.Forge.Common
 @if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
@@ -25,47 +25,47 @@
         <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Versions)"
                                                   class="w-full text-left text-xs leading-2xs">
             <BlazorBlueprint.Primitives.Table.BbTableHeader Class="px-4 py-2.5 bg-secondary flex items-center text-3xs leading-4xs font-semibold text-muted-foreground uppercase tracking-wider">
-                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="IPackageVersion"
                                                                     Class="w-28 shrink-0 p-0 text-left font-semibold">
                     VERSION
                 </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="IPackageVersion"
                                                                     Class="w-36 shrink-0 p-0 text-left font-semibold">
                     PUBLISHED
                 </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="IPackageVersion"
                                                                     Class="w-28 shrink-0 p-0 text-left font-semibold">
                     DEPENDENTS
                 </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="IPackageVersion"
                                                                     Class="w-36 shrink-0 p-0 text-left font-semibold">
                     VALIDATION
                 </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
-                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="IPackageVersion"
                                                                     Class="w-24 shrink-0 p-0 text-left font-semibold">
                     SIZE
                 </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
                 <div class="flex-1"></div>
-                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="PackageVersionModel"
+                <BlazorBlueprint.Primitives.Table.BbTableHeaderCell TData="IPackageVersion"
                                                                     Class="w-20 shrink-0 p-0 text-right font-semibold">
                 </BlazorBlueprint.Primitives.Table.BbTableHeaderCell>
             </BlazorBlueprint.Primitives.Table.BbTableHeader>
             <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
                 @foreach (var ver in this.Versions)
                 {
-                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="ver.Version"
+                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="ver.Id"
                                                                  Item="@ver"
                                                                  class="px-4 py-2.5 flex items-center hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 flex items-center gap-1.5 p-0">
-                            <span class="font-semibold @(ver.IsUnlisted ? "text-muted-foreground" : "text-primary")">
-                                @(ver.Version)
+                            <span class="font-semibold @(ver.Listed ? "text-primary" : "text-muted-foreground")">
+                                @(ver.GetVersion())
                             </span>
-                            @if (ver.IsLatest)
+                            @if (this.IsLatestVersion(ver))
                             {
                                 <ForgeBadge Text="Latest"
                                             Class="badge-lifecycle-open" />
                             }
-                            else if (ver.IsUnlisted)
+                            else if (!ver.Listed)
                             {
                                 <ForgeBadge Text="Unlisted"
                                             Class="badge-lifecycle-archived" />
@@ -77,13 +77,13 @@
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 text-muted-foreground p-0">
-                            @(ver.PublishedAgo)
+                            @(ver.PublicationDate.ToTimeAgo())
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-28 shrink-0 text-foreground-muted p-0">
-                            @(ver.DependentCount)
+                            @(GetDependentCount(ver))
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 flex items-center gap-1.5 p-0">
-                            @if (ver.IsValidated)
+                            @if (this.IsValidated(ver))
                             {
                                 <BbBadge Variant="BadgeVariant.Secondary"
                                          Class="badge-version-state text-success-vivid">
@@ -92,18 +92,18 @@
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-24 shrink-0 text-muted-foreground p-0">
-                            @(ver.Size)
+                            @(ver.GetFormattedSize())
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <div class="flex-1"></div>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-20 shrink-0 text-right p-0">
-                            @if (ver.IsUnlisted)
+                            @if (!ver.Listed)
                             {
                                 <ForgeBadge Text="Unlisted"
                                             Class="badge-lifecycle-archived" />
                             }
                             else
                             {
-                                <a href="@ver.DownloadUrl"
+                                <a href="@(this.GetDownloadUrl(ver))"
                                    class="font-semibold text-primary hover:underline">
                                     Download
                                 </a>

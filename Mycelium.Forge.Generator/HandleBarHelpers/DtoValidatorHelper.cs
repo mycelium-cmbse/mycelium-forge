@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Generator.HandleBarHelpers
 {
-    using System.Text;
-
     using HandlebarsDotNet;
 
     using uml4net.Classification;
@@ -74,9 +72,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             if (!property.QueryIsDataType())
             {
-                return !property.IsComposite
-                    ? $"            this.RuleFor(x => x.{propertyName}).NotEmpty();{Environment.NewLine}"
-                    : string.Empty;
+                return $"            this.RuleFor(x => x.{propertyName}).NotEmpty();{Environment.NewLine}";
             }
 
             var ruleType = RequiresNotEmpty(property) ? ".NotEmpty();" : ".NotNull();";

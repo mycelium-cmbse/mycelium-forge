@@ -92,7 +92,9 @@ namespace Mycelium.Forge.ViewModels.Rows
         public bool IsVerified { get; private init; }
 
         /// <summary>
-        /// Gets the relative elapsed time since the latest listed package version was published, formatted as a human-readable string.
+        /// Gets the relative elapsed time since the package was created, formatted as a human-readable string.
+        /// Gets the relative elapsed time since the latest listed package version was published, formatted as a human-readable
+        /// string.
         /// </summary>
         public string LastPublished { get; private init; } = string.Empty;
 
@@ -111,14 +113,14 @@ namespace Mycelium.Forge.ViewModels.Rows
         /// </summary>
         /// <param name="packages">The collection of <see cref="IPackage" /> instances.</param>
         /// <param name="things">
-        /// The collection of related <see cref="IThing" /> instances containing organizations, package
+        /// The collection of related <see cref="IThing" /> instances containing scopes (organizations or accounts), package
         /// versions, and package types.
         /// </param>
         /// <returns>A read-only list of <see cref="PackageRowViewModel" /> instances.</returns>
         public static IReadOnlyList<PackageRowViewModel> GenerateRows(IEnumerable<IPackage> packages, IEnumerable<IThing> things)
         {
             var thingsList = things?.ToList() ?? [];
-            var organizations = thingsList.OfType<IOrganization>().ToList();
+            var scopes = thingsList.OfType<IScope>().ToList();
             var packageVersions = thingsList.OfType<IPackageVersion>().ToList();
             var packageTypes = thingsList.OfType<IPackageType>().ToList();
 
@@ -126,8 +128,8 @@ namespace Mycelium.Forge.ViewModels.Rows
 
             foreach (var package in packages)
             {
-                var organization = organizations.FirstOrDefault(o => o.Id == package.Owner);
-                var publisher = organization != null ? $"@{organization.ShortName}" : DefaultPublisher;
+                var owner = scopes.FirstOrDefault(s => s.Id == package.Owner);
+                var publisher = owner != null ? $"@{owner.ShortName}" : DefaultPublisher;
 
                 var packageType = packageTypes.FirstOrDefault(t => t.Id == package.PackageType);
 

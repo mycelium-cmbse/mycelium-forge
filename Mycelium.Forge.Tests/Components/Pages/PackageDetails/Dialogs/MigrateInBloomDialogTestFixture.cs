@@ -24,7 +24,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Dialogs
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageDetails.Dialogs;
     using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.Models.Package;
 
     [TestFixture]
     public class MigrateInBloomDialogTestFixture
@@ -77,19 +76,21 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Dialogs
         public void VerifyOnInitialized()
         {
             var projects = new List<string> { "Spacecraft Mission", "Ground Station Network" };
-            var package = new PackageModel(new Package { Name = "ECSS-MM-PWR" }, "@starion", "1.3.0");
+            var package = new Package { Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr" };
+            var packageVersion = new PackageVersion { Version = "1.3.0" };
 
             var dialog = this.context.Render<MigrateInBloomDialog>(parameters =>
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.Projects, projects);
                 parameters.Add(x => x.Package, package);
+                parameters.Add(x => x.PackageVersion, packageVersion);
             });
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(dialog.Instance.SelectedProject, Is.EqualTo("Spacecraft Mission"));
-                Assert.That(dialog.Instance.VersionConstraint, Is.EqualTo(package.GetDefaultVersionConstraint()));
+                Assert.That(dialog.Instance.VersionConstraint, Is.EqualTo("^1.3.0"));
             }
         }
 

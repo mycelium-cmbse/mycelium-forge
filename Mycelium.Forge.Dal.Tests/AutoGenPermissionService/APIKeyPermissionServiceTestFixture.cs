@@ -12,6 +12,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.AutoGenPermissionService;
 
+    using Npgsql;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -21,6 +23,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     public class APIKeyPermissionServiceTestFixture
     {
         private APIKeyPermissionService permissionService;
+        private NpgsqlTransaction transaction;
         private Guid userId;
         private Guid otherUserId;
         private UserContext ownerUserContext;
@@ -34,6 +37,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         [SetUp]
         public void SetUp()
         {
+            this.transaction = null;
             this.permissionService = new APIKeyPermissionService();
             this.userId = Guid.NewGuid();
             this.otherUserId = Guid.NewGuid();
@@ -81,10 +85,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Name = "CI Token"
             };
 
-            var unauthResult = await this.permissionService.IsAllowedToDelete(this.anonymousUserContext, apiKey);
-            var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, apiKey);
-            var otherResult = await this.permissionService.IsAllowedToDelete(this.otherUserContext, apiKey);
-            var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, apiKey);
+            var unauthResult = await this.permissionService.IsAllowedToDelete(this.anonymousUserContext, apiKey, this.transaction);
+            var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, apiKey, this.transaction);
+            var otherResult = await this.permissionService.IsAllowedToDelete(this.otherUserContext, apiKey, this.transaction);
+            var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, apiKey, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {

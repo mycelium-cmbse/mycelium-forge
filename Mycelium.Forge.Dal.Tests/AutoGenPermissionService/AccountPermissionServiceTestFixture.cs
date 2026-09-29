@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AccountPermissionServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,6 +12,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.AutoGenPermissionService;
 
+    using Npgsql;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -21,6 +23,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     public class AccountPermissionServiceTestFixture
     {
         private AccountPermissionService permissionService;
+        private NpgsqlTransaction transaction;
         private Guid userId;
         private Guid otherUserId;
         private UserContext ownerUserContext;
@@ -34,6 +37,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         [SetUp]
         public void SetUp()
         {
+            this.transaction = null;
             this.permissionService = new AccountPermissionService();
             this.userId = Guid.NewGuid();
             this.otherUserId = Guid.NewGuid();
@@ -95,10 +99,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Email = "bob@example.com"
             };
 
-            var unauthenticatedResult = await this.permissionService.IsAllowedToUpdate(this.anonymousUserContext, existingAccount, updatedAccount);
-            var ownerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAccount, updatedAccount);
-            var nonOwnerResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingAccount, updatedAccount);
-            var adminResult = await this.permissionService.IsAllowedToUpdate(this.adminUserContext, otherAccount, updatedAccount);
+            var unauthenticatedResult = await this.permissionService.IsAllowedToUpdate(this.anonymousUserContext, existingAccount, updatedAccount, this.transaction);
+            var ownerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAccount, updatedAccount, this.transaction);
+            var nonOwnerResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingAccount, updatedAccount, this.transaction);
+            var adminResult = await this.permissionService.IsAllowedToUpdate(this.adminUserContext, otherAccount, updatedAccount, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {

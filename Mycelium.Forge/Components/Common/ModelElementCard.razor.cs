@@ -11,18 +11,16 @@ namespace Mycelium.Forge.Components.Common
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models.Package;
-
     /// <summary>
     /// Component representing a model element color-coded with SysML category surface, header, and border design tokens.
     /// </summary>
     public partial class ModelElementCard : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the model element data displayed by this card.
+        /// Gets or sets the model element tuple (Name, Kind, Category, AttributeSummary) displayed by this card.
         /// </summary>
         [Parameter]
-        public PackageElementModel Element { get; set; }
+        public (string Name, string Kind, string Category, string AttributeSummary) Element { get; set; }
 
         /// <summary>
         /// Gets or sets optional custom CSS classes applied to the card container.
@@ -33,13 +31,12 @@ namespace Mycelium.Forge.Components.Common
         /// <summary>
         /// Resolves the category slug corresponding to the element.
         /// </summary>
-        /// <remarks>Mock method while the actual data is being developed.</remarks>
         /// <returns>The lowercase category slug string.</returns>
         public string GetCategorySlug()
         {
-            var raw = !string.IsNullOrWhiteSpace(this.Element?.Category)
+            var raw = !string.IsNullOrWhiteSpace(this.Element.Category)
                 ? this.Element.Category
-                : this.Element?.Kind ?? "structure";
+                : this.Element.Kind;
 
             return raw.Trim().ToLowerInvariant() switch
             {
@@ -63,12 +60,12 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The category display name string.</returns>
         public string GetCategoryDisplayName()
         {
-            if (!string.IsNullOrWhiteSpace(this.Element?.Category))
+            if (!string.IsNullOrWhiteSpace(this.Element.Category))
             {
                 return this.Element.Category;
             }
 
-            if (!string.IsNullOrWhiteSpace(this.Element?.Kind))
+            if (!string.IsNullOrWhiteSpace(this.Element.Kind))
             {
                 return this.Element.Kind;
             }

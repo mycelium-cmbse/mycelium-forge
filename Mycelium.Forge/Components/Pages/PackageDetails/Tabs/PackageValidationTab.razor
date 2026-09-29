@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageValidationTab.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -7,7 +7,10 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 
-@if (this.Report?.Checks == null || this.Report.Checks.Count == 0)
+@using Mycelium.Forge.Common
+@using Mycelium.Forge.Extensions
+
+@if (this.Checks == null || this.Checks.Count == 0)
 {
     return;
 }
@@ -19,25 +22,26 @@
                     Class="text-success-vivid shrink-0"/>
         <div class="flex-1 flex flex-col gap-0.5">
             <span class="text-base leading-normal font-semibold text-success-strong">
-                @(this.Report.Title)
+                @(this.Checks.All(check => check.Passed) ? "Release validation passed" : "Release validation issues")
             </span>
             <span class="text-xs leading-2xs text-foreground-muted">
-                @(this.Report.Description)
+                @($"{this.Version.GetVersion()} loaded and resolved cleanly in a fresh workspace.")
             </span>
         </div>
         <span class="text-md leading-sm font-semibold text-success-vivid shrink-0">
-            @(this.Report.Score)
+            @($"{this.Checks.Count(check => check.Passed)} / {this.Checks.Count}")
         </span>
     </div>
 
     <div class="w-full rounded-lg bg-card border border-border overflow-hidden mt-1">
-        <BlazorBlueprint.Primitives.Table.BbTable Data="@(this.Report.Checks)"
-                                                  class="w-full text-left text-sm leading-xs">
+        <BlazorBlueprint.Primitives.Table.BbTable TData="object"
+                                                  Data="@(this.Checks.Cast<object>())"
+                                                  class="w-full text-left text-xs leading-2xs">
             <BlazorBlueprint.Primitives.Table.BbTableBody class="divide-y divide-border">
-                @foreach (var check in this.Report.Checks)
+                @foreach (var check in this.Checks)
                 {
-                    <BlazorBlueprint.Primitives.Table.BbTableRow @key="check.Title"
-                                                                 Item="@check"
+                    <BlazorBlueprint.Primitives.Table.BbTableRow TData="object"
+                                                                 @key="check.Title"
                                                                  class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
                             <LucideIcon Name="check"
@@ -53,7 +57,7 @@
                             </div>
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="text-xs leading-2xs font-medium text-success-vivid shrink-0 p-0">
-                            @(check.Status)
+                            @(check.Passed ? "Pass" : "Fail")
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                     </BlazorBlueprint.Primitives.Table.BbTableRow>
                 }

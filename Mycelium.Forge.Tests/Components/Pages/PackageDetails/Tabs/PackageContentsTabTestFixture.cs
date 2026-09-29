@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageContentsTabTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -18,13 +18,18 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
     using Bunit;
 
     using Mycelium.Forge.Components.Pages.PackageDetails.Tabs;
-    using Mycelium.Forge.Models.Package;
 
+    /// <summary>
+    /// Test fixture for <see cref="PackageContentsTab" /> component.
+    /// </summary>
     [TestFixture]
     public class PackageContentsTabTestFixture
     {
         private BunitContext context;
 
+        /// <summary>
+        /// Sets up the test context before each test execution.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -35,20 +40,27 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
         }
 
+        /// <summary>
+        /// Tears down the test context after each test execution.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous tear down.</returns>
         [TearDown]
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
         }
 
+        /// <summary>
+        /// Verifies that <see cref="PackageContentsTab.GetFilteredElements" /> filters elements by category or returns all.
+        /// </summary>
         [Test]
         public void VerifyGetFilteredElements()
         {
-            var elements = new List<PackageElementModel>
+            var elements = new List<(string Name, string Kind, string Category, string AttributeSummary)>
             {
-                new("PowerSubsystem", "«part def»", "Parts", "3 parts, 2 attributes"),
-                new("Voltage", "«attribute def»", "Attributes", "Real"),
-                new("Current", "«attribute def»", "Attributes", "Real")
+                ("PowerSubsystem", "«part def»", "Parts", "3 parts, 2 attributes"),
+                ("Voltage", "«attribute def»", "Attributes", "Real"),
+                ("Current", "«attribute def»", "Attributes", "Real")
             };
 
             var tab = this.context.Render<PackageContentsTab>(parameters => { parameters.Add(x => x.Elements, elements); });
@@ -63,7 +75,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             var fallback = tab.Instance.GetFilteredElements();
 
             var emptyTab = this.context.Render<PackageContentsTab>(parameters => { parameters.Add(x => x.Elements, []); });
-
             var empty = emptyTab.Instance.GetFilteredElements();
 
             using (Assert.EnterMultipleScope())
@@ -76,12 +87,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             }
         }
 
+        /// <summary>
+        /// Verifies that <see cref="PackageContentsTab.GetKindButtonClass(string)" /> computes active and inactive button styling.
+        /// </summary>
         [Test]
         public void VerifyGetKindButtonClass()
         {
-            var elements = new List<PackageElementModel>
+            var elements = new List<(string Name, string Kind, string Category, string AttributeSummary)>
             {
-                new("PowerSubsystem", "«part def»", "Parts", "3 parts")
+                ("PowerSubsystem", "«part def»", "Parts", "3 parts")
             };
 
             var tab = this.context.Render<PackageContentsTab>(parameters => { parameters.Add(x => x.Elements, elements); });
@@ -96,19 +110,21 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             }
         }
 
+        /// <summary>
+        /// Verifies that <see cref="PackageContentsTab" /> renders correctly for populated and empty elements.
+        /// </summary>
         [Test]
         public void VerifyPackageContentsTabRendering()
         {
             var emptyTab = this.context.Render<PackageContentsTab>(parameters => { parameters.Add(x => x.Elements, []); });
 
-            var elements = new List<PackageElementModel>
+            var elements = new List<(string Name, string Kind, string Category, string AttributeSummary)>
             {
-                new("PowerSubsystem", "«part def»", "Parts", "3 parts, 2 attributes"),
-                new("Voltage", "«attribute def»", "Attributes", "Real")
+                ("PowerSubsystem", "«part def»", "Parts", "3 parts, 2 attributes"),
+                ("Voltage", "«attribute def»", "Attributes", "Real")
             };
 
             var tab = this.context.Render<PackageContentsTab>(parameters => { parameters.Add(x => x.Elements, elements); });
-
             var markup = tab.Markup;
 
             using (Assert.EnterMultipleScope())
@@ -122,12 +138,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             }
         }
 
+        /// <summary>
+        /// Verifies that <see cref="PackageContentsTab.SelectKindTab(string)" /> updates the selected kind tab.
+        /// </summary>
         [Test]
         public void VerifySelectKindTab()
         {
-            var elements = new List<PackageElementModel>
+            var elements = new List<(string Name, string Kind, string Category, string AttributeSummary)>
             {
-                new("PowerSubsystem", "«part def»", "Parts", "3 parts")
+                ("PowerSubsystem", "«part def»", "Parts", "3 parts")
             };
 
             var tab = this.context.Render<PackageContentsTab>(parameters => { parameters.Add(x => x.Elements, elements); });
