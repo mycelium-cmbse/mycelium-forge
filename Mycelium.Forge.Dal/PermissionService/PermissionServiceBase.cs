@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionServiceBase.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether creation is permitted.</returns>
-        public virtual Task<ErrorOr<Success>> IsAllowedToCreate(IUserContext userContext, TThing toCreate, NpgsqlTransaction transaction = null)
+        public virtual Task<ErrorOr<Success>> IsAllowedToCreate(IUserContext userContext, TThing toCreate, NpgsqlTransaction transaction)
         {
             return this.IsAllowedToCreateImplementation(userContext, toCreate, transaction);
         }
@@ -40,7 +40,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
-        public virtual Task<ErrorOr<Success>> IsAllowedToRead(IUserContext userContext, TThing thing, NpgsqlTransaction transaction = null)
+        public virtual Task<ErrorOr<Success>> IsAllowedToRead(IUserContext userContext, TThing thing, NpgsqlTransaction transaction)
         {
             return this.IsAllowedToReadImplementation(userContext, thing, transaction);
         }
@@ -54,7 +54,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether updating is permitted.</returns>
-        public virtual Task<ErrorOr<Success>> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing, NpgsqlTransaction transaction = null)
+        public virtual Task<ErrorOr<Success>> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing, NpgsqlTransaction transaction)
         {
             return this.IsAllowedToUpdateImplementation(userContext, existingThing, updatedThing, transaction);
         }
@@ -66,7 +66,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether deletion is permitted.</returns>
-        public virtual Task<ErrorOr<Success>> IsAllowedToDelete(IUserContext userContext, TThing thing, NpgsqlTransaction transaction = null)
+        public virtual Task<ErrorOr<Success>> IsAllowedToDelete(IUserContext userContext, TThing thing, NpgsqlTransaction transaction)
         {
             return this.IsAllowedToDeleteImplementation(userContext, thing, transaction);
         }
@@ -78,7 +78,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether creation is permitted.</returns>
-        protected virtual Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, TThing toCreate, NpgsqlTransaction transaction = null)
+        protected virtual Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, TThing toCreate, NpgsqlTransaction transaction)
         {
             return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
@@ -90,7 +90,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
-        protected virtual Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, TThing thing, NpgsqlTransaction transaction = null)
+        protected virtual Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, TThing thing, NpgsqlTransaction transaction)
         {
             return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
@@ -104,7 +104,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether updating is permitted.</returns>
-        protected virtual Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, TThing existingThing, TThing updatedThing, NpgsqlTransaction transaction = null)
+        protected virtual Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, TThing existingThing, TThing updatedThing, NpgsqlTransaction transaction)
         {
             return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
@@ -116,7 +116,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether deletion is permitted.</returns>
-        protected virtual Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, TThing thing, NpgsqlTransaction transaction = null)
+        protected virtual Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, TThing thing, NpgsqlTransaction transaction)
         {
             return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }

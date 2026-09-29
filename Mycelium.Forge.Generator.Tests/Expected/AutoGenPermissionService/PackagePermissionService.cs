@@ -57,7 +57,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether creation is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IPackage toCreate, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IPackage toCreate, NpgsqlTransaction transaction)
         {
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
@@ -81,9 +81,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return orgGuard;
             }
 
-            var orgResult = transaction == null
-                ? await this.organizationService.ReadAsync(userContext, CancellationToken.None, [toCreate.Owner])
-                : await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
+            var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
 
             if (orgResult.IsError || orgResult.Value.Count == 0)
             {
@@ -107,7 +105,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether reading is permitted.</returns>
-        protected override async Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IPackage thing, NpgsqlTransaction transaction = null)
+        protected override async Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IPackage thing, NpgsqlTransaction transaction)
         {
             if (thing.Visibility == VisibilityKind.PUBLIC)
             {
@@ -133,9 +131,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             if (thing.Visibility == VisibilityKind.INTERNAL)
             {
-                var orgResult = transaction == null
-                    ? await this.organizationService.ReadAsync(userContext, CancellationToken.None, [thing.Owner])
-                    : await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+                var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
 
                 if (!orgResult.IsError && orgResult.Value.Count > 0)
                 {
@@ -161,7 +157,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IPackage existingThing, IPackage updatedThing, NpgsqlTransaction transaction = null)
+        protected override Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IPackage existingThing, IPackage updatedThing, NpgsqlTransaction transaction)
         {
             if (userContext.AccountId.HasValue && existingThing.PackageOwner.Contains(userContext.AccountId.Value))
             {
@@ -218,7 +214,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether deletion is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IPackage thing, NpgsqlTransaction transaction = null)
+        protected override Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IPackage thing, NpgsqlTransaction transaction)
         {
             if (userContext.AccountId.HasValue && thing.PackageOwner.Contains(userContext.AccountId.Value))
             {

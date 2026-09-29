@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ParentDelegationBehaviorTypeHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -137,9 +137,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
 
             stringBuilder.Append($$"""
-                                                var parentResult = transaction == null
-                                                    ? await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}])
-                                                    : await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ParentKey}}]);
+                                                var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ParentKey}}]);
 
                                                 if (!parentResult.IsError && parentResult.Value.Count > 0)
                                                 {
@@ -263,9 +261,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append(ModelConstants.DoubleNewLine);
 
             stringBuilder.Append($$"""
-                                                var parentResult = transaction == null
-                                                    ? await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [thing.{{config.ParentKey}}])
-                                                    : await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ParentKey}}]);
+                                                var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ParentKey}}]);
 
                                                 if (!parentResult.IsError && parentResult.Value.Count > 0)
                                                 {
@@ -328,9 +324,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.Append(ModelConstants.DoubleNewLine);
 
             stringBuilder.Append($$"""
-                                                var parentResult = transaction == null
-                                                    ? await this.{{config.ParentServiceField}}.ReadAsync(userContext, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}])
-                                                    : await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}]);
+                                                var parentResult = await this.{{config.ParentServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [{{(operation == Operations.Create ? "toCreate" : "existingThing")}}.{{config.ParentKey}}]);
 
                                                 if (!parentResult.IsError && parentResult.Value.Count > 0)
                                                 {

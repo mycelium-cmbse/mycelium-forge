@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ScopeItemPermissionHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -30,20 +30,20 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="ownerScopeId">The unique identifier of the owning scope.</param>
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" /> domain service.</param>
         /// <param name="itemName">The friendly name of the managed entity type.</param>
+        /// <param name="transaction">The database transaction.</param>
         /// <param name="personalManagePermission">The optional permission required for personal scope management.</param>
         /// <param name="platformManagePermission">The optional permission required for platform administrator management.</param>
         /// <param name="orgManagePermission">The optional permission required for organization management.</param>
-        /// <param name="transaction">The optional database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether management is permitted.</returns>
         public static async Task<ErrorOr<Success>> IsAllowedToManageScopeItem(
             IUserContext userContext,
             Guid ownerScopeId,
             IOrganizationService organizationService,
             string itemName,
+            NpgsqlTransaction transaction,
             PermissionKind? personalManagePermission = null,
             PermissionKind? platformManagePermission = null,
-            PermissionKind? orgManagePermission = null,
-            NpgsqlTransaction transaction = null)
+            PermissionKind? orgManagePermission = null)
         {
             // Verify that the user is authenticated and possesses a valid account identifier
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -72,9 +72,7 @@ namespace Mycelium.Forge.Dal.PermissionService
                 return Error.Forbidden(description: $"Access denied: cannot manage {itemName} for this scope.");
             }
 
-            var organizationResult = transaction == null
-                ? await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId])
-                : await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
+            var organizationResult = await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
 
             // Verify that the owning organization exists
             if (organizationResult.IsError || organizationResult.Value.Count == 0)
@@ -99,16 +97,16 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="ownerScopeId">The unique identifier of the owning scope.</param>
-        /// <param name="organizationService">The (injected) <see cref="IOrganizationService" /> domain service.</param>
+        /// <param name="organizationService">The organization service.</param>
+        /// <param name="transaction">The database transaction.</param>
         /// <param name="readBypassPermissions">The optional permissions that bypass membership checks for read access.</param>
-        /// <param name="transaction">The optional database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
         public static async Task<ErrorOr<Success>> IsAllowedToReadScopeItem(
             IUserContext userContext,
             Guid ownerScopeId,
             IOrganizationService organizationService,
-            IEnumerable<PermissionKind> readBypassPermissions = null,
-            NpgsqlTransaction transaction = null)
+            NpgsqlTransaction transaction,
+            IEnumerable<PermissionKind> readBypassPermissions = null)
         {
             if (userContext.AccountId != null && ownerScopeId == userContext.AccountId.Value)
             {
@@ -127,9 +125,7 @@ namespace Mycelium.Forge.Dal.PermissionService
                 return Error.Forbidden(description: "Access denied: cannot view this item.");
             }
 
-            var organizationResult = transaction == null
-                ? await organizationService.ReadAsync(userContext, CancellationToken.None, [ownerScopeId])
-                : await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
+            var organizationResult = await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
 
             if (organizationResult.IsError || organizationResult.Value.Count == 0)
             {

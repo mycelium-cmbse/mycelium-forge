@@ -12,6 +12,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.AutoGenPermissionService;
 
+    using Npgsql;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -21,6 +23,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     public class OrganizationPermissionServiceTestFixture
     {
         private OrganizationPermissionService permissionService;
+        private NpgsqlTransaction transaction;
         private Guid userId;
         private Guid otherUserId;
         private Guid thirdPartyUserId;
@@ -36,6 +39,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         [SetUp]
         public void SetUp()
         {
+            this.transaction = null;
             this.permissionService = new OrganizationPermissionService();
             this.userId = Guid.NewGuid();
             this.otherUserId = Guid.NewGuid();
@@ -93,9 +97,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Member = [this.userId]
             };
 
-            var accountResult = await this.permissionService.IsAllowedToCreate(this.accountUserContext, organization);
-            var adminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, organization);
-            var anonymousResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, organization);
+            var accountResult = await this.permissionService.IsAllowedToCreate(this.accountUserContext, organization, this.transaction);
+            var adminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, organization, this.transaction);
+            var anonymousResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, organization, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
@@ -119,9 +123,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Member = [this.otherUserId]
             };
 
-            var superAdminResult = await this.permissionService.IsAllowedToDelete(this.installationAdminUserContext, organization);
-            var orgAdminResult = await this.permissionService.IsAllowedToDelete(this.orgAdminUserContext, organization);
-            var accountResult = await this.permissionService.IsAllowedToDelete(this.accountUserContext, organization);
+            var superAdminResult = await this.permissionService.IsAllowedToDelete(this.installationAdminUserContext, organization, this.transaction);
+            var orgAdminResult = await this.permissionService.IsAllowedToDelete(this.orgAdminUserContext, organization, this.transaction);
+            var accountResult = await this.permissionService.IsAllowedToDelete(this.accountUserContext, organization, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
@@ -186,26 +190,26 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Member = [this.userId, this.otherUserId]
             };
 
-            var adminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, organization);
-            var memberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, organization);
+            var adminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, organization, this.transaction);
+            var memberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, organization, this.transaction);
 
-            var nonMemberAccountResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, nonMemberOrg);
-            var nonMemberSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, nonMemberOrg);
+            var nonMemberAccountResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, nonMemberOrg, this.transaction);
+            var nonMemberSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, nonMemberOrg, this.transaction);
 
-            var anonymousPublicResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, publicOrg);
-            var nonMemberPublicResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, publicOrg);
+            var anonymousPublicResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, publicOrg, this.transaction);
+            var nonMemberPublicResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, publicOrg, this.transaction);
 
-            var internalAdminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, internalOrg);
-            var internalMemberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, internalOrg);
-            var internalNonMemberResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, internalOrg);
-            var internalSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, internalOrg);
-            var internalAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, internalOrg);
+            var internalAdminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, internalOrg, this.transaction);
+            var internalMemberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, internalOrg, this.transaction);
+            var internalNonMemberResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, internalOrg, this.transaction);
+            var internalSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, internalOrg, this.transaction);
+            var internalAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, internalOrg, this.transaction);
 
-            var privateAdminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, privateOrg);
-            var privateMemberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, privateOrg);
-            var privateNonMemberResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, privateOrg);
-            var privateSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, privateOrg);
-            var privateAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, privateOrg);
+            var privateAdminResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, privateOrg, this.transaction);
+            var privateMemberResult = await this.permissionService.IsAllowedToRead(this.orgMemberUserContext, privateOrg, this.transaction);
+            var privateNonMemberResult = await this.permissionService.IsAllowedToRead(this.accountUserContext, privateOrg, this.transaction);
+            var privateSuperAdminResult = await this.permissionService.IsAllowedToRead(this.installationAdminUserContext, privateOrg, this.transaction);
+            var privateAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, privateOrg, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
@@ -275,14 +279,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 DefaultPackageVisibility = VisibilityKind.INTERNAL
             };
 
-            var settingsAdminResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingOrg, updatedSettingsOrg);
-            var settingsMemberResult = await this.permissionService.IsAllowedToUpdate(this.orgMemberUserContext, existingOrg, updatedSettingsOrg);
+            var settingsAdminResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingOrg, updatedSettingsOrg, this.transaction);
+            var settingsMemberResult = await this.permissionService.IsAllowedToUpdate(this.orgMemberUserContext, existingOrg, updatedSettingsOrg, this.transaction);
 
-            var adminTransferResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingOrg, updatedAdminOrg);
-            var memberTransferResult = await this.permissionService.IsAllowedToUpdate(this.orgMemberUserContext, existingOrg, updatedAdminOrg);
+            var adminTransferResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingOrg, updatedAdminOrg, this.transaction);
+            var memberTransferResult = await this.permissionService.IsAllowedToUpdate(this.orgMemberUserContext, existingOrg, updatedAdminOrg, this.transaction);
 
-            var visibilityAdminResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingOrg, updatedVisibilityOrg);
-            var visibilityMemberResult = await this.permissionService.IsAllowedToUpdate(this.orgMemberUserContext, existingOrg, updatedVisibilityOrg);
+            var visibilityAdminResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingOrg, updatedVisibilityOrg, this.transaction);
+            var visibilityMemberResult = await this.permissionService.IsAllowedToUpdate(this.orgMemberUserContext, existingOrg, updatedVisibilityOrg, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {

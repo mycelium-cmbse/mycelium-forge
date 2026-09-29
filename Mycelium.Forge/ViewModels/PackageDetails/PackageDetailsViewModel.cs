@@ -193,14 +193,19 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         }
 
         /// <summary>
-        /// Gets the cache key for package details.
+        /// Gets the cache key for package details scoped to the current user context.
         /// </summary>
+        /// <param name="userContext">The contextual user information.</param>
         /// <param name="scope">The scope short name.</param>
         /// <param name="packageName">The package name.</param>
         /// <returns>The cache key string.</returns>
-        private static string GetCacheKey(string scope, string packageName)
+        private static string GetCacheKey(IUserContext userContext, string scope, string packageName)
         {
-            return $"pkg-details:{scope}:{packageName}";
+            var userIdentifier = userContext.IsAuthenticated && userContext.AccountId.HasValue
+                ? userContext.AccountId.Value
+                : Guid.Empty;
+
+            return $"pkg-details:{scope}:{packageName}:{userIdentifier}";
         }
 
         /// <summary>
@@ -216,7 +221,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// </remarks>
         private async Task<PackageDetailsCacheModel> GetOrLoadPackageDataAsync(IUserContext userContext, string packageName, string scope)
         {
-            var cacheKey = GetCacheKey(scope, packageName);
+            var cacheKey = GetCacheKey(userContext, scope, packageName);
 
             if (this.memoryCache.TryGetValue(cacheKey, out PackageDetailsCacheModel cachedData))
             {

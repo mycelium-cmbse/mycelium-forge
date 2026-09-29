@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IPermissionService.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="toCreate">The entity to create.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether creation is permitted.</returns>
-        Task<ErrorOr<Success>> IsAllowedToCreate(IUserContext userContext, TThing toCreate, NpgsqlTransaction transaction = null);
+        Task<ErrorOr<Success>> IsAllowedToCreate(IUserContext userContext, TThing toCreate, NpgsqlTransaction transaction);
 
         /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to read the specified entity.
@@ -37,7 +37,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="thing">The entity to read.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
-        Task<ErrorOr<Success>> IsAllowedToRead(IUserContext userContext, TThing thing, NpgsqlTransaction transaction = null);
+        Task<ErrorOr<Success>> IsAllowedToRead(IUserContext userContext, TThing thing, NpgsqlTransaction transaction);
 
         /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to update the specified entity,
@@ -48,7 +48,7 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether updating is permitted.</returns>
-        Task<ErrorOr<Success>> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing, NpgsqlTransaction transaction = null);
+        Task<ErrorOr<Success>> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing, NpgsqlTransaction transaction);
 
         /// <summary>
         /// Determines whether the user described by <paramref name="userContext" /> is allowed to delete the specified entity.
@@ -57,6 +57,6 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether deletion is permitted.</returns>
-        Task<ErrorOr<Success>> IsAllowedToDelete(IUserContext userContext, TThing thing, NpgsqlTransaction transaction = null);
+        Task<ErrorOr<Success>> IsAllowedToDelete(IUserContext userContext, TThing thing, NpgsqlTransaction transaction);
     }
 }
