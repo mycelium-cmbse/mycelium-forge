@@ -9,7 +9,7 @@
 @using BlazorBlueprint.Primitives.Table
 
 @attribute [Route(PageRoutes.MyPackages)]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inherits DisposableComponent
 
 <PageTitle>My Packages &mdash; Mycelium Forge</PageTitle>
