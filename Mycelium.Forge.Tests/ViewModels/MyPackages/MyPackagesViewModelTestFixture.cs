@@ -39,7 +39,7 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
         private Mock<IUserService> userServiceMock;
         private Mock<ILogger<MyPackagesViewModel>> loggerMock;
         private MyPackagesViewModel viewModel;
-        private IAccount testAccount;
+        private Account testAccount;
         private IUserContext userContext;
         private Package testPackage1;
         private Package testPackage2;

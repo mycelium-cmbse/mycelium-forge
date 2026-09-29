@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="UserService.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -175,8 +175,8 @@ namespace Mycelium.Forge.Services
         /// </summary>
         /// <remarks>This is only a placeholder and will be removed once OIDC is configured.</remarks>
         /// <param name="userId">The optional user account identifier.</param>
-        /// <returns>A populated <see cref="IUserContext" /> placeholder.</returns>
-        private static IUserContext GetJwtContextPlaceholder(Guid? userId = null)
+        /// <returns>A populated <see cref="UserContext" /> placeholder.</returns>
+        private static UserContext GetJwtContextPlaceholder(Guid? userId = null)
         {
             return new UserContext
             {

@@ -252,7 +252,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 .OrderByDescending(v => v.PublicationDate)
                 .ToList();
 
-            var selectedVersion = versions.First();
+            var selectedVersion = versions[0];
             var maintainers = maintainersTask.Result;
 
             var metaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, [selectedVersion.MetaData])).ToList();
