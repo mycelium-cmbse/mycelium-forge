@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AuthModule.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Api
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Security.Claims;
 
     using Carter;
@@ -26,7 +27,11 @@ namespace Mycelium.Forge.Api
     /// <remarks>
     /// This module is a temporary placeholder used solely to allow mock authentication data during development.
     /// It MUST be removed once OpenID Connect (OIDC) is fully configured and MUST NEVER be used in real production.
+    /// <para>
+    /// Excluded from code coverage as it is a temporary development-only module that will be removed before production.
+    /// </para>
     /// </remarks>
+    [ExcludeFromCodeCoverage]
     public sealed class AuthModule : ICarterModule
     {
         /// <summary>
