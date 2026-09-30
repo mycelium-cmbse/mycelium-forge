@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Models.Package
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.ViewModels.Rows;
@@ -17,7 +18,7 @@ namespace Mycelium.Forge.Models.Package
     /// <summary>
     /// Represents a package item displayed in the catalog sections, package lists, and package settings.
     /// </summary>
-    public class PackageModel
+    public class PackageModel : IPackageRowItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageModel" /> class.
@@ -63,6 +64,11 @@ namespace Mycelium.Forge.Models.Package
         /// Gets the package name.
         /// </summary>
         public string Name => this.Package?.Name ?? string.Empty;
+
+        /// <summary>
+        /// Gets the package short name.
+        /// </summary>
+        public string ShortName => this.Package?.ShortName ?? string.Empty;
 
         /// <summary>
         /// Gets the full scoped package identifier.
@@ -176,7 +182,8 @@ namespace Mycelium.Forge.Models.Package
             var versionString = version?.Version ?? "1.0.0";
             var packageType = SeedData.PackageTypes.FirstOrDefault(t => t.Id == package.PackageType);
             var format = packageType?.Name ?? PackageFormatConstants.SysMlV2;
-            var downloadCount = version?.DownloadCount ?? 0;
+            package.ComputeDownloadCount(SeedData.PackageVersions);
+            var downloadCount = package.downloadCount;
 
             var tags = PackageRowViewModel.ResolveTagsForPackage(package);
             var dependentsCount = PackageRowViewModel.ResolveDependentsCountForPackage(package);

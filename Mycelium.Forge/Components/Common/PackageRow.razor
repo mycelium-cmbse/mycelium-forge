@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageRow.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,7 @@
 
 @if (this.Model != null)
 {
-    <a href="@(PageRoutes.GetPackageRoute(this.Model.Publisher, this.Model.Package.ShortName))"
+    <a href="@(PageRoutes.GetPackageRoute(this.Model.Publisher, this.Model.ShortName))"
        class="block select-none group focus:outline-none w-full">
         <div class="px-4.5 py-4 rounded-lg bg-card border border-border hover:border-primary transition-colors shadow-xs flex flex-col justify-between min-h-25 gap-2 w-full @(this.Class)">
             <div class="flex items-center gap-2 w-full h-5">
@@ -51,10 +51,8 @@
                 }
                 <div class="flex items-center gap-1.5 text-muted-foreground shrink-0">
                     <span>by @(this.Model.Publisher) · @(this.Model.LastPublished)</span>
-                    @if (this.Model.DownloadCount > 0)
-                    {
-                        <span>· @(this.Model.DownloadCount) downloads</span>
-                    }
+                    <span>· @(this.Model.DownloadCount.ToCompactMetric()) downloads</span>
+
                     @if (this.Model.DependentsCount > 0)
                     {
                         <span>· @(this.Model.DependentsCount) dependents</span>

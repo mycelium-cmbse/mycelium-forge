@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Data
     using System.Diagnostics.CodeAnalysis;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
 
     /// <summary>
     /// Provides centralized development seed data entities for database persistence.

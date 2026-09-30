@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -23,15 +24,21 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages;
-    using Mycelium.Forge.Models.Organization;
     using Mycelium.Forge.ViewModels.OrganizationDetails;
 
+    /// <summary>
+    /// Test fixture for <see cref="OrganizationDetails" /> component.
+    /// </summary>
     [TestFixture]
     public class OrganizationDetailsTestFixture
     {
         private BunitContext context;
         private Mock<IOrganizationDetailsViewModel> viewModelMock;
+        private Organization organization;
 
+        /// <summary>
+        /// Sets up the test context and mocked dependencies.
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -43,50 +50,56 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             this.viewModelMock = new Mock<IOrganizationDetailsViewModel>();
 
-            var organization = new OrganizationModel(
-                new Organization { Name = "Starion Group", ShortName = "starion" },
-                "Engineering systems.",
-                true,
-                12,
-                48,
-                3500)
+            this.organization = new Organization
             {
-                MemberSinceYear = 2023
+                Id = Guid.NewGuid(),
+                Name = "Starion Group",
+                ShortName = "starion",
+                Origin = "https://example.com",
+                CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
-            this.viewModelMock.Setup(x => x.Organization).Returns(organization);
+            this.viewModelMock.Setup(x => x.Organization).Returns(this.organization);
             this.viewModelMock.Setup(x => x.Packages).Returns([]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }
 
+        /// <summary>
+        /// Disposes the test context.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
         [TearDown]
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
         }
 
+        /// <summary>
+        /// Verifies that the organization meta text is formatted correctly.
+        /// </summary>
         [Test]
         public void VerifyGetOrganizationMetaText()
         {
             var orgDetailsPage = this.context.Render<OrganizationDetails>();
             var metaText = orgDetailsPage.Instance.GetOrganizationMetaText();
 
-            Assert.That(metaText, Does.Contain("Verified publisher · 12 packages · 48 versions · 3500 imports · member since 2023"));
+            Assert.That(metaText, Does.Contain("0 packages · member since 2023"));
         }
 
+        /// <summary>
+        /// Verifies that OnParametersSet initializes the view model with the short name.
+        /// </summary>
         [Test]
         public void VerifyOnParametersSet()
         {
-            var guid = Guid.NewGuid();
-
             var orgDetailsPage = this.context.Render<OrganizationDetails>(parameters => parameters
-                .Add(p => p.Id, guid.ToString()));
+                .Add(p => p.ShortName, "starion"));
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(orgDetailsPage.Instance, Is.Not.Null);
-                this.viewModelMock.Verify(x => x.InitializeViewModel(guid), Times.Once);
+                this.viewModelMock.Verify(x => x.InitializeViewModel("starion", It.IsAny<CancellationToken>()), Times.Once);
             }
         }
     }

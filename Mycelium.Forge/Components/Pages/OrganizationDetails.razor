@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="OrganizationDetails.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -30,15 +30,9 @@
                     <h1 class="text-2xl leading-xl font-semibold text-foreground tracking-tight">
                         @(this.ViewModel.Organization.Name)
                     </h1>
-                    @if (this.ViewModel.Organization.IsVerified)
-                    {
-                        <LucideIcon Name="badge-check"
-                                    Size="18"
-                                    Class="text-primary shrink-0"/>
-                    }
                     <BbBadge Variant="BadgeVariant.Secondary"
                              Class="badge-role">
-                        @(this.ViewModel.Organization.Scope)
+                        @@@(this.ViewModel.Organization.ShortName)
                     </BbBadge>
                     @if (this.IsUserAdmin)
                     {
@@ -47,7 +41,7 @@
                         <BbButton id="organization-details-settings-button"
                                   Variant="ButtonVariant.Outline"
                                   Size="ButtonSize.Small"
-                                  Href="@(PageRoutes.GetOrganizationSettingsRoute(this.ViewModel.Organization.Scope))"
+                                  Href="@(PageRoutes.GetOrganizationSettingsRoute(this.ViewModel.Organization.ShortName))"
                                   Class="shrink-0">
                             <LucideIcon Name="settings"
                                         Size="14"
@@ -58,7 +52,7 @@
                 </div>
 
                 <p class="text-base leading-normal text-muted-foreground truncate w-full">
-                    @(this.ViewModel.Organization.Description)
+                    @(this.ViewModel.Organization.Origin)
                 </p>
 
                 <p class="text-xs leading-2xs text-muted-foreground truncate w-full">
@@ -73,10 +67,23 @@
             </h2>
 
             <div class="w-full flex flex-col gap-3">
-                @foreach (var package in this.ViewModel.Packages)
+                @if (this.ViewModel.Packages.Count > 0)
                 {
-                    <PackageRow @key="package.FullName"
-                                Model="@package"/>
+                    @foreach (var package in this.ViewModel.Packages)
+                    {
+                        <PackageRow @key="package.FullName"
+                                    Model="@package"/>
+                    }
+                }
+                else
+                {
+                    <div class="w-full py-12 flex flex-col items-center justify-center gap-2 select-none border border-dashed border-border rounded-xl">
+                        <LucideIcon Name="box"
+                                    Size="32"
+                                    Class="text-muted-foreground shrink-0"/>
+                        <p class="text-base font-medium text-foreground">No packages found</p>
+                        <p class="text-sm text-muted-foreground">This publisher has not published any packages yet.</p>
+                    </div>
                 }
             </div>
         </section>
