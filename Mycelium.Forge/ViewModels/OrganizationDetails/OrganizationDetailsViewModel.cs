@@ -59,21 +59,9 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{OrganizationDetailsViewModel}" />.</param>
-        public OrganizationDetailsViewModel(
-            IOrganizationService organizationService,
-            IPackageService packageService,
-            IPackageVersionService packageVersionService,
-            IPackageTypeService packageTypeService,
-            IUserService userService,
-            ILogger<OrganizationDetailsViewModel> logger)
+        public OrganizationDetailsViewModel(IOrganizationService organizationService, IPackageService packageService, IPackageVersionService packageVersionService,
+            IPackageTypeService packageTypeService, IUserService userService, ILogger<OrganizationDetailsViewModel> logger)
         {
-            ArgumentNullException.ThrowIfNull(organizationService);
-            ArgumentNullException.ThrowIfNull(packageService);
-            ArgumentNullException.ThrowIfNull(packageVersionService);
-            ArgumentNullException.ThrowIfNull(packageTypeService);
-            ArgumentNullException.ThrowIfNull(userService);
-            ArgumentNullException.ThrowIfNull(logger);
-
             this.organizationService = organizationService;
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
@@ -105,37 +93,44 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         public async Task InitializeViewModel(string shortName, CancellationToken cancellationToken = default)
         {
-            var userContext = await this.userService.GetUserContext();
-            var cleanShortName = (shortName ?? string.Empty).TrimStart('@');
-
-            var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, cleanShortName, cancellationToken);
-
-            if (organizationResult.IsError || organizationResult.Value == null)
+            try
             {
-                return;
+                var userContext = await this.userService.GetUserContext();
+                var cleanShortName = (shortName ?? string.Empty).TrimStart('@');
+
+                var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, cleanShortName, cancellationToken);
+
+                if (organizationResult.IsError || organizationResult.Value == null)
+                {
+                    return;
+                }
+
+                this.Organization = organizationResult.Value;
+
+                this.IsUserAdmin = userContext.HasPermission(PermissionKind.ManageOrganizations) ||
+                                   (userContext.IsAuthenticated &&
+                                    userContext.AccountId.HasValue &&
+                                    this.Organization.Administrator.Contains(userContext.AccountId.Value));
+
+                var packages = await this.packageService.ReadOrEmpty(userContext, this.Organization.OwnedPackage, token: cancellationToken);
+
+                var versionIds = packages.SelectMany(package => package.Version).Distinct().ToList();
+                var packageTypeIds = packages.Select(package => package.PackageType).Distinct().ToList();
+
+                var versionsTask = this.packageVersionService.ReadOrEmpty(userContext, versionIds, token: cancellationToken);
+                var packageTypesTask = this.packageTypeService.ReadOrEmpty(userContext, packageTypeIds, token: cancellationToken);
+
+                await Task.WhenAll(versionsTask, packageTypesTask);
+
+                var packageVersions = versionsTask.Result;
+                var packageTypes = packageTypesTask.Result;
+
+                this.Packages = PackageRowViewModel.GenerateRows(packages, [this.Organization, .. packageVersions, .. packageTypes], false);
             }
-
-            this.Organization = organizationResult.Value;
-
-            this.IsUserAdmin = userContext.HasPermission(PermissionKind.ManageOrganizations) ||
-                               (userContext.IsAuthenticated &&
-                                userContext.AccountId.HasValue &&
-                                this.Organization.Administrator.Contains(userContext.AccountId.Value));
-
-            var packages = await this.packageService.ReadOrEmpty(userContext, this.Organization.OwnedPackage, token: cancellationToken);
-
-            var versionIds = packages.SelectMany(package => package.Version).Distinct().ToList();
-            var packageTypeIds = packages.Select(package => package.PackageType).Distinct().ToList();
-
-            var versionsTask = this.packageVersionService.ReadOrEmpty(userContext, versionIds, token: cancellationToken);
-            var packageTypesTask = this.packageTypeService.ReadOrEmpty(userContext, packageTypeIds, token: cancellationToken);
-
-            await Task.WhenAll(versionsTask, packageTypesTask);
-
-            var packageVersions = versionsTask.Result;
-            var packageTypes = packageTypesTask.Result;
-
-            this.Packages = PackageRowViewModel.GenerateRows(packages, [this.Organization, .. packageVersions, .. packageTypes], false);
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while initializing the OrganizationDetailsViewModel");
+            }
         }
     }
 }

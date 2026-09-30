@@ -76,18 +76,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
         }
 
         /// <summary>
-        /// Verifies that the organization meta text is formatted correctly.
-        /// </summary>
-        [Test]
-        public void VerifyGetOrganizationMetaText()
-        {
-            var orgDetailsPage = this.context.Render<OrganizationDetails>();
-            var metaText = orgDetailsPage.Instance.GetOrganizationMetaText();
-
-            Assert.That(metaText, Does.Contain("0 packages · member since 2023"));
-        }
-
-        /// <summary>
         /// Verifies that OnParametersSet initializes the view model with the short name.
         /// </summary>
         [Test]

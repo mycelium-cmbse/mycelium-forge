@@ -34,7 +34,7 @@
                              Class="badge-role">
                         @@@(this.ViewModel.Organization.ShortName)
                     </BbBadge>
-                    @if (this.IsUserAdmin)
+                    @if (this.ViewModel.IsUserAdmin)
                     {
                         <div class="flex-1"></div>
 
@@ -56,7 +56,7 @@
                 </p>
 
                 <p class="text-xs leading-2xs text-muted-foreground truncate w-full">
-                    @(this.GetOrganizationMetaText())
+                    @(this.ViewModel.Packages.Count) packages · member since @(this.ViewModel.Organization.CreatedAt.Year)
                 </p>
             </div>
         </ForgeCard>
