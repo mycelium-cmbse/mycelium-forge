@@ -21,16 +21,19 @@ namespace Mycelium.Forge.Common.Extensions
         /// </summary>
         private const int PreservedCharacterCount = 8;
 
-        /// <summary>
-        /// Sanitizes the <see cref="Guid" /> for logging by masking all but the last 8 characters to prevent sensitive identifier
-        /// exposure.
-        /// </summary>
         /// <param name="value">The <see cref="Guid" /> value to sanitize.</param>
-        /// <returns>A redacted, log-safe string representation of the identifier.</returns>
-        public static string SanitizeForLog(this Guid value)
+        extension(Guid value)
         {
-            var valueText = value.ToString("N");
-            return $"***{valueText[^PreservedCharacterCount..]}";
+            /// <summary>
+            /// Sanitizes the <see cref="Guid" /> for logging by masking all but the last 8 characters to prevent sensitive identifier
+            /// exposure.
+            /// </summary>
+            /// <returns>A redacted, log-safe string representation of the identifier.</returns>
+            public string SanitizeForLog()
+            {
+                var valueText = value.ToString("N");
+                return $"***{valueText[^PreservedCharacterCount..]}";
+            }
         }
     }
 }

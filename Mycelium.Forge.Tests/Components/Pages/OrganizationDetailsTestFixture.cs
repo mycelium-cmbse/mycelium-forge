@@ -43,13 +43,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             this.viewModelMock = new Mock<IOrganizationDetailsViewModel>();
 
-            var organization = new OrganizationModel(
-                new Organization { Name = "Starion Group", ShortName = "starion" },
-                "Engineering systems.",
-                true,
-                12,
-                48,
-                3500)
+            var organization = new OrganizationModel(new Organization { Name = "Starion Group", ShortName = "starion" }, "Engineering systems.", true, 12, 48, 3500)
             {
                 MemberSinceYear = 2023
             };

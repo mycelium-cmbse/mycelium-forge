@@ -137,12 +137,7 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
                 .Setup(s => s.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>()))
                 .ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version1, this.version2));
 
-            this.viewModel = new MyPackagesViewModel(
-                this.packageServiceMock.Object,
-                this.scopeServiceMock.Object,
-                this.packageVersionServiceMock.Object,
-                this.userServiceMock.Object,
-                this.loggerMock.Object);
+            this.viewModel = new MyPackagesViewModel(this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.userServiceMock.Object, this.loggerMock.Object);
         }
 
         /// <summary>
@@ -160,12 +155,7 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
         [Test]
         public void VerifyConstructor()
         {
-            var instance = new MyPackagesViewModel(
-                this.packageServiceMock.Object,
-                this.scopeServiceMock.Object,
-                this.packageVersionServiceMock.Object,
-                this.userServiceMock.Object,
-                this.loggerMock.Object);
+            var instance = new MyPackagesViewModel(this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.userServiceMock.Object, this.loggerMock.Object);
 
             Assert.That(instance, Is.Not.Null);
         }

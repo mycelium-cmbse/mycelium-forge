@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="LoginViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,7 +12,6 @@ namespace Mycelium.Forge.ViewModels.Login
     using ErrorOr;
 
     using Mycelium.Forge.Data;
-    using Mycelium.Forge.Model;
     using Mycelium.Forge.Services;
 
     using ReactiveUI;
@@ -28,11 +27,6 @@ namespace Mycelium.Forge.ViewModels.Login
         private readonly ILogger<LoginViewModel> logger;
 
         /// <summary>
-        /// The (injected) <see cref="INotificationService" /> used to dispatch notifications.
-        /// </summary>
-        private readonly INotificationService notificationService;
-
-        /// <summary>
         /// The (injected) <see cref="IUserService" /> used to manage the active session user identity.
         /// </summary>
         private readonly IUserService userService;
@@ -41,12 +35,10 @@ namespace Mycelium.Forge.ViewModels.Login
         /// Initializes a new instance of the <see cref="LoginViewModel" /> class.
         /// </summary>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
-        /// <param name="notificationService">The (injected) <see cref="INotificationService" />.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{LoginViewModel}" />.</param>
-        public LoginViewModel(IUserService userService, INotificationService notificationService, ILogger<LoginViewModel> logger)
+        public LoginViewModel(IUserService userService, ILogger<LoginViewModel> logger)
         {
             this.userService = userService;
-            this.notificationService = notificationService;
             this.logger = logger;
         }
 
@@ -98,9 +90,10 @@ namespace Mycelium.Forge.ViewModels.Login
             }
             catch (Exception exception)
             {
-                this.logger.LogError(exception, "An error occurred while authenticating user.");
-                this.notificationService.AddNotification("An unexpected error occurred during authentication.", "Error", NotificationType.Error);
-                return Error.Unexpected(description: "An unexpected error occurred during authentication.");
+                const string message = "An error occurred while authenticating user.";
+
+                this.logger.LogError(exception, message);
+                return Error.Unexpected(description: message);
             }
             finally
             {

@@ -18,7 +18,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Login
     using Moq;
 
     using Mycelium.Forge.Data;
-    using Mycelium.Forge.Model;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Login;
 
@@ -29,8 +28,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Login
     public class LoginViewModelTestFixture
     {
         private Mock<IUserService> userServiceMock;
-
-        private Mock<INotificationService> notificationServiceMock;
 
         private Mock<ILogger<LoginViewModel>> loggerMock;
 
@@ -43,13 +40,9 @@ namespace Mycelium.Forge.Tests.ViewModels.Login
         public void SetUp()
         {
             this.userServiceMock = new Mock<IUserService>();
-            this.notificationServiceMock = new Mock<INotificationService>();
             this.loggerMock = new Mock<ILogger<LoginViewModel>>();
 
-            this.viewModel = new LoginViewModel(
-                this.userServiceMock.Object,
-                this.notificationServiceMock.Object,
-                this.loggerMock.Object);
+            this.viewModel = new LoginViewModel(this.userServiceMock.Object, this.loggerMock.Object);
         }
 
         /// <summary>
@@ -108,7 +101,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Login
             {
                 Assert.That(exceptionResult.IsError, Is.True);
                 Assert.That(this.viewModel.IsSubmitting, Is.False);
-                this.notificationServiceMock.Verify(service => service.AddNotification("An unexpected error occurred during authentication.", "Error", NotificationType.Error), Times.Once);
             }
         }
     }
