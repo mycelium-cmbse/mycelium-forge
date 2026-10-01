@@ -54,6 +54,7 @@ namespace Mycelium.Forge.Extensions
         public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddMemoryCache();
+            builder.Services.AddFusionCache();
             builder.Services.AddForgeDal();
 
             builder.Services.AddScoped<IThemeService, ThemeService>();

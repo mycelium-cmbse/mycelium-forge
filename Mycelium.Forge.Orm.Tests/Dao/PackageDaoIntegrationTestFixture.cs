@@ -20,6 +20,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
     using NUnit.Framework;
 
+    using ZiggyCreatures.Caching.Fusion;
+
     /// <summary>
     /// Suite of tests for the <see cref="PackageDao" /> class.
     /// </summary>
@@ -29,12 +31,22 @@ namespace Mycelium.Forge.Orm.Tests.Dao
     {
         private PackageDao packageDao;
         private PackageTypeDao packageTypeDao;
+        private IFusionCache fusionCache;
         private Guid packageTypeId;
         private Guid forgeId;
         private Guid accountId;
         private Guid otherAccountId;
         private Guid org1Id;
         private Guid org2Id;
+
+        /// <summary>
+        /// Cleans up resources after each test.
+        /// </summary>
+        [TearDown]
+        public void TearDown()
+        {
+            this.fusionCache.Dispose();
+        }
 
         /// <summary>
         /// Verifies that <see cref="PackageDao.CreateAsync" /> correctly persists a new Package in the database.
@@ -160,6 +172,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             };
 
             await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, org1InternalPackage));
+            await this.fusionCache.RemoveAsync($"Package:{org1PackageId}");
 
             var orgBUserContext = new UserContext
             {
@@ -284,29 +297,37 @@ namespace Mycelium.Forge.Orm.Tests.Dao
         /// <remarks>A <see cref="Task" /></remarks>
         protected override async Task PostSetup()
         {
+            this.fusionCache = new FusionCache(new FusionCacheOptions());
+
             this.packageDao = new PackageDao(
                 this.TestLoggerFactory.CreateLogger<PackageDao>(),
-                this.Serializer);
+                this.Serializer,
+                this.fusionCache);
 
             this.packageTypeDao = new PackageTypeDao(
                 this.TestLoggerFactory.CreateLogger<PackageTypeDao>(),
-                this.Serializer);
+                this.Serializer,
+                this.fusionCache);
 
             var forgeDao = new ForgeDao(
                 this.TestLoggerFactory.CreateLogger<ForgeDao>(),
-                this.Serializer);
+                this.Serializer,
+                this.fusionCache);
 
             var countryDao = new CountryDao(
                 this.TestLoggerFactory.CreateLogger<CountryDao>(),
-                this.Serializer);
+                this.Serializer,
+                this.fusionCache);
 
             var addressDao = new AddressDao(
                 this.TestLoggerFactory.CreateLogger<AddressDao>(),
-                this.Serializer);
+                this.Serializer,
+                this.fusionCache);
 
             var accountDao = new AccountDao(
                 this.TestLoggerFactory.CreateLogger<AccountDao>(),
-                this.Serializer);
+                this.Serializer,
+                this.fusionCache);
 
             this.forgeId = Guid.NewGuid();
 
@@ -422,7 +443,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
             var organizationDao = new OrganizationDao(
                 this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
+                this.Serializer,
+                this.fusionCache);
 
             this.org1Id = Guid.NewGuid();
             this.org2Id = Guid.NewGuid();

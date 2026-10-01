@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationDaoIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -19,6 +19,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
     using Npgsql;
 
     using NUnit.Framework;
+
+    using ZiggyCreatures.Caching.Fusion;
 
     /// <summary>
     /// Suite of integration tests for the <see cref="OrganizationDao" /> class verifying read filter execution.
@@ -106,25 +108,32 @@ namespace Mycelium.Forge.Orm.Tests.Dao
         /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
+            var fusionCache = new FusionCache(new FusionCacheOptions());
+
             this.organizationDao = new OrganizationDao(
                 this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var forgeDao = new ForgeDao(
                 this.TestLoggerFactory.CreateLogger<ForgeDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var countryDao = new CountryDao(
                 this.TestLoggerFactory.CreateLogger<CountryDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var addressDao = new AddressDao(
                 this.TestLoggerFactory.CreateLogger<AddressDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var accountDao = new AccountDao(
                 this.TestLoggerFactory.CreateLogger<AccountDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             this.forgeId = Guid.NewGuid();
 

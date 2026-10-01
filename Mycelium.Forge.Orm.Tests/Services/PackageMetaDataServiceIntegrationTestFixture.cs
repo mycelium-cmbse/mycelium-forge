@@ -26,6 +26,8 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
     using NUnit.Framework;
 
+    using ZiggyCreatures.Caching.Fusion;
+
     /// <summary>
     /// Integration test suite for <see cref="PackageMetaDataService" /> verifying end-to-end read behavior
     /// against a real PostgreSQL instance provided by Testcontainers.
@@ -131,9 +133,12 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     return connection;
                 });
 
+            var fusionCache = new FusionCache(new FusionCacheOptions());
+
             var organizationDao = new OrganizationDao(
                 this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var orgPermissionService = new OrganizationPermissionService();
 
@@ -147,7 +152,8 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             var packageDao = new PackageDao(
                 this.TestLoggerFactory.CreateLogger<PackageDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var packagePermissionService = new PackagePermissionService(organizationService);
 
@@ -161,7 +167,8 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             var packageVersionDao = new PackageVersionDao(
                 this.TestLoggerFactory.CreateLogger<PackageVersionDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var packageVersionPermissionService = new PackageVersionPermissionService(packageService, packagePermissionService);
 
@@ -175,7 +182,8 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             var packageMetaDataDao = new PackageMetaDataDao(
                 this.TestLoggerFactory.CreateLogger<PackageMetaDataDao>(),
-                this.Serializer);
+                this.Serializer,
+                fusionCache);
 
             var packageMetaDataPermissionService = new PackageMetaDataPermissionService(this.packageVersionService, packageVersionPermissionService);
 
@@ -245,11 +253,13 @@ namespace Mycelium.Forge.Orm.Tests.Services
             Guid otherOrgMemberId,
             Guid orgAdminId)
         {
-            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);
-            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer);
-            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer);
-            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer);
-            var packageTypeDao = new PackageTypeDao(this.TestLoggerFactory.CreateLogger<PackageTypeDao>(), this.Serializer);
+            var fusionCache = new FusionCache(new FusionCacheOptions());
+
+            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer, fusionCache);
+            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer, fusionCache);
+            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer, fusionCache);
+            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer, fusionCache);
+            var packageTypeDao = new PackageTypeDao(this.TestLoggerFactory.CreateLogger<PackageTypeDao>(), this.Serializer, fusionCache);
 
             var forgeId = Guid.NewGuid();
             var now = DateTime.UtcNow;
