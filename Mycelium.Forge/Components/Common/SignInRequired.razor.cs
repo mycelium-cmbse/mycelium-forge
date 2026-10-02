@@ -36,7 +36,7 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The computed login URL string.</returns>
         public string GetSignInUrl()
         {
-            return UrlHelper.GetSignInUrl(this.ReturnUrl, this.NavigationManager);
+            return this.ReturnUrl.GetSignInUrl(this.NavigationManager);
         }
     }
 }

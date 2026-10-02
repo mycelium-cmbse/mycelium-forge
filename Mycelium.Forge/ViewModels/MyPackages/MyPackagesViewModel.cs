@@ -134,7 +134,7 @@ namespace Mycelium.Forge.ViewModels.MyPackages
                 this.scopes = scopesTask.Result;
                 this.versions = versionsTask.Result;
 
-                this.Packages.ForEach(package => package.ComputeDownloadCount(this.versions));
+                this.Packages.ForEach(x => x.ComputeDownloadCount(this.versions));
             }
             catch (Exception exception)
             {

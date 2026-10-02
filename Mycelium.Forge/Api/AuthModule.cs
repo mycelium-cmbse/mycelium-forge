@@ -43,9 +43,7 @@ namespace Mycelium.Forge.Api
         /// <param name="app">The endpoint route builder the routes are registered on.</param>
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            var auth = app.MapGroup("/api/auth");
-
-            auth.MapGet("/login", async (HttpContext httpContext, IUserService userService, CancellationToken cancellationToken) =>
+            app.MapGet(PageRoutes.AuthLogin, async (HttpContext httpContext, IUserService userService, CancellationToken cancellationToken) =>
             {
                 var regisAccount = SeedData.RegisAccount;
                 await userService.SetCurrentUser(regisAccount.Id, cancellationToken);
@@ -68,7 +66,7 @@ namespace Mycelium.Forge.Api
                 return Results.LocalRedirect(PageRoutes.Home);
             }).WithName("AuthLogin");
 
-            auth.MapGet("/logout", async (HttpContext httpContext, IUserService userService, CancellationToken cancellationToken) =>
+            app.MapGet(PageRoutes.Logout, async (HttpContext httpContext, IUserService userService, CancellationToken cancellationToken) =>
             {
                 await userService.SetCurrentUser(null, cancellationToken);
                 await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

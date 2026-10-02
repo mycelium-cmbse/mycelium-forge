@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Login.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -90,10 +90,13 @@ namespace Mycelium.Forge.Components.Pages
 
             var result = await this.ViewModel.Login();
 
-            if (!result.IsError)
+            if (result.IsError)
             {
-                this.NavigationManager.NavigateTo(PageRoutes.AuthLogin, forceLoad: true);
+                this.NotificationService.AddNotification(result.FirstError.Description, "Error", NotificationType.Error);
+                return;
             }
+
+            this.NavigationManager.NavigateTo(PageRoutes.AuthLogin, true);
         }
 
         /// <summary>
