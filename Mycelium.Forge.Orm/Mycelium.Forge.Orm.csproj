@@ -25,7 +25,7 @@
         <PackageReference Include="ErrorOr" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
         <PackageReference Include="Npgsql" Version="10.0.3" />
-        <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />
+        <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.9.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -16,8 +16,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
 
     using ErrorOr;
 
-    using Microsoft.Extensions.Caching.Memory;
-
     using Moq;
 
     using Mycelium.Forge.Common;
@@ -39,7 +37,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
         private Mock<IPackageTypeService> packageTypeServiceMock;
         private Mock<IAccountService> accountServiceMock;
         private Mock<IUserService> userServiceMock;
-        private MemoryCache memoryCache;
         private UserContext userContext;
         private PackageDetailsViewModel viewModel;
 
@@ -56,7 +53,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.packageTypeServiceMock = new Mock<IPackageTypeService>();
             this.accountServiceMock = new Mock<IAccountService>();
             this.userServiceMock = new Mock<IUserService>();
-            this.memoryCache = new MemoryCache(new MemoryCacheOptions());
 
             this.userContext = new UserContext
             {
@@ -73,22 +69,12 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 this.packageMetaDataServiceMock.Object,
                 this.packageTypeServiceMock.Object,
                 this.accountServiceMock.Object,
-                this.userServiceMock.Object,
-                this.memoryCache);
-        }
-
-        /// <summary>
-        /// Tears down the test context after each test execution.
-        /// </summary>
-        [TearDown]
-        public void TearDown()
-        {
-            this.memoryCache.Dispose();
+                this.userServiceMock.Object);
         }
 
         /// <summary>
         /// Verifies that <see cref="PackageDetailsViewModel.InitializeViewModel" /> loads and populates package details from
-        /// services and cache.
+        /// services.
         /// </summary>
         [Test]
         public async Task VerifyInitializeViewModel()
@@ -172,7 +158,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 .ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageMetaData>(metaData)));
 
             // First call: loads from services
-            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion", PackageTabConstants.Versions);
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
 
             using (Assert.EnterMultipleScope())
             {
@@ -192,10 +178,10 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.IsUserAdmin, Is.True);
             }
 
-            // Second call: loaded from cache
-            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion", PackageTabConstants.Overview);
+            // Second call
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
 
-            this.packageServiceMock.Verify(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>()), Times.Once);
+            this.packageServiceMock.Verify(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>()), Times.Exactly(2));
 
             // Non-existent package
             this.packageServiceMock

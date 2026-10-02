@@ -86,8 +86,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// </summary>
         /// <param name="packageName">The name of the package.</param>
         /// <param name="scope">The owning scope or publisher of the package.</param>
-        /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        Task InitializeViewModel(string packageName, string scope, string tab = null);
+        Task InitializeViewModel(string packageName, string scope);
     }
 }

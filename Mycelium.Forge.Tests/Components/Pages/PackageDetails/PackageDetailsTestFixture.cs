@@ -237,7 +237,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(component.Instance.SelectedContentTab, Is.EqualTo(PackageTabConstants.Contents));
-                this.viewModelMock.Verify(x => x.InitializeViewModel("ecss-mm-pwr", "starion", PackageTabConstants.Contents), Times.Once);
+                this.viewModelMock.Verify(x => x.InitializeViewModel("ecss-mm-pwr", "starion"), Times.Once);
             }
 
             var defaultComponent = this.context.Render<PackageDetails>(parameters => parameters

@@ -1,6 +1,3 @@
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
-@using Mycelium.Forge.ViewModels.PackageDetails
-@using Mycelium.Forge.ViewModels.Rows
 @* ------------------------------------------------------------------------------------------------
 <copyright file="PackageDetails.razor" company="Starion Group S.A.">
 
@@ -9,10 +6,12 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
+@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+
 @attribute [Route(PageRoutes.Package)]
 @attribute [Route(PageRoutes.PackageTab)]
 
-@if (this.ViewModel.Package == null)
+@if (this.ViewModel.Package == null || this.ViewModel.Owner == null)
 {
     return;
 }

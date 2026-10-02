@@ -161,7 +161,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 this.SelectedContentTab = PackageTabConstants.Overview;
             }
 
-            await this.ViewModel.InitializeViewModel(this.PackageName, this.Scope, this.SelectedContentTab);
+            await this.ViewModel.InitializeViewModel(this.PackageName, this.Scope);
         }
 
         /// <summary>
