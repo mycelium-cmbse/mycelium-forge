@@ -17,18 +17,22 @@ namespace Mycelium.Forge.Common.Extensions
     /// </summary>
     public static class PackageExtensions
     {
-        /// <summary>
-        /// Computes and sets the total download count on the specified <see cref="IPackage" /> as the sum of downloads across the provided package versions.
-        /// </summary>
         /// <param name="package">The package whose download count is to be computed and set.</param>
-        /// <param name="packageVersions">The collection of <see cref="IPackageVersion" /> instances associated with the package.</param>
-        public static void ComputeDownloadCount(this IPackage package, IEnumerable<IPackageVersion> packageVersions)
+        extension(IPackage package)
         {
-            if (package is Package concretePackage && packageVersions != null)
+            /// <summary>
+            /// Computes and sets the total download count on the specified <see cref="IPackage" /> as the sum of downloads across the
+            /// provided package versions.
+            /// </summary>
+            /// <param name="packageVersions">The collection of <see cref="IPackageVersion" /> instances associated with the package.</param>
+            public void ComputeDownloadCount(IEnumerable<IPackageVersion> packageVersions)
             {
-                concretePackage.downloadCount = packageVersions
-                    .Where(v => v.Owner == package.Id)
-                    .Sum(v => v.DownloadCount);
+                if (package is Package concretePackage && packageVersions != null)
+                {
+                    concretePackage.downloadCount = packageVersions
+                        .Where(v => v.Owner == package.Id)
+                        .Sum(v => v.DownloadCount);
+                }
             }
         }
     }

@@ -16,23 +16,26 @@ namespace Mycelium.Forge.Extensions
     /// </summary>
     public static class IntegerExtensions
     {
-        /// <summary>
-        /// Formats an integer value into a compact metric string representation (e.g., 600 -> "600", 1600 -> "1.6k", 16000 ->
-        /// "16k").
-        /// </summary>
         /// <param name="value">The integer value to format.</param>
-        /// <returns>A compact metric string representation of the integer.</returns>
-        public static string ToCompactMetric(this int value)
+        extension(int value)
         {
-            var absoluteValue = Math.Abs(value);
-
-            return absoluteValue switch
+            /// <summary>
+            /// Formats an integer value into a compact metric string representation (e.g., 600 -> "600", 1600 -> "1.6k", 16000 ->
+            /// "16k").
+            /// </summary>
+            /// <returns>A compact metric string representation of the integer.</returns>
+            public string ToCompactMetric()
             {
-                < 1000 => value.ToString(CultureInfo.InvariantCulture),
-                < 1000000 => (value / 1000.0).ToString("0.#k", CultureInfo.InvariantCulture),
-                < 1000000000 => (value / 1000000.0).ToString("0.#M", CultureInfo.InvariantCulture),
-                _ => (value / 1000000000.0).ToString("0.#B", CultureInfo.InvariantCulture)
-            };
+                var absoluteValue = Math.Abs(value);
+
+                return absoluteValue switch
+                {
+                    < 1000 => value.ToString(CultureInfo.InvariantCulture),
+                    < 1000000 => (value / 1000.0).ToString("0.#k", CultureInfo.InvariantCulture),
+                    < 1000000000 => (value / 1000000.0).ToString("0.#M", CultureInfo.InvariantCulture),
+                    _ => (value / 1000000000.0).ToString("0.#B", CultureInfo.InvariantCulture)
+                };
+            }
         }
     }
 }
