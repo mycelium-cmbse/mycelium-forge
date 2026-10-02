@@ -11,17 +11,9 @@ namespace Mycelium.Forge.Tests.Extensions
 {
     using Mycelium.Forge.Extensions;
 
-    /// <summary>
-    /// Test fixture for <see cref="IntegerExtensions" />.
-    /// </summary>
     [TestFixture]
     public class IntegerExtensionsTestFixture
     {
-        /// <summary>
-        /// Verifies that <see cref="IntegerExtensions.ToCompactMetric(int)" /> formats integer values into compact metric strings.
-        /// </summary>
-        /// <param name="value">The integer input value.</param>
-        /// <param name="expected">The expected formatted metric string.</param>
         [Test]
         [TestCase(0, "0")]
         [TestCase(600, "600")]

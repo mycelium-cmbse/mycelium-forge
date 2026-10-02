@@ -11,15 +11,9 @@ namespace Mycelium.Forge.Common.Tests
 {
     using System;
 
-    /// <summary>
-    /// Test fixture for <see cref="UserContext" />.
-    /// </summary>
     [TestFixture]
     public class UserContextTestFixture
     {
-        /// <summary>
-        /// Verifies the <see cref="UserContext.HasPermission" /> method.
-        /// </summary>
         [Test]
         public void VerifyHasPermission()
         {

@@ -25,9 +25,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.OrganizationDetails;
 
-    /// <summary>
-    /// Test fixture for <see cref="OrganizationDetailsViewModel" />.
-    /// </summary>
     [TestFixture]
     public class OrganizationDetailsViewModelTestFixture
     {
@@ -39,9 +36,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
         private Mock<ILogger<OrganizationDetailsViewModel>> loggerMock;
         private OrganizationDetailsViewModel viewModel;
 
-        /// <summary>
-        /// Sets up mock dependencies and test instances.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -52,19 +46,9 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
             this.userServiceMock = new Mock<IUserService>();
             this.loggerMock = new Mock<ILogger<OrganizationDetailsViewModel>>();
 
-            this.viewModel = new OrganizationDetailsViewModel(
-                this.organizationServiceMock.Object,
-                this.packageServiceMock.Object,
-                this.packageVersionServiceMock.Object,
-                this.packageTypeServiceMock.Object,
-                this.userServiceMock.Object,
-                this.loggerMock.Object);
+            this.viewModel = new OrganizationDetailsViewModel(this.organizationServiceMock.Object, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.userServiceMock.Object, this.loggerMock.Object);
         }
 
-        /// <summary>
-        /// Verifies the <see cref="OrganizationDetailsViewModel.InitializeViewModel" /> method across all scenarios.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyInitializeViewModel()
         {
@@ -117,8 +101,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
             };
 
             // Scenario 1: Organization service returns error
-            this.userServiceMock.Setup(x => x.GetUserContext())
-                .ReturnsAsync(adminUserContext);
+            this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(adminUserContext);
 
             this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "unknown", It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Error.NotFound("Not found"));
@@ -162,15 +145,10 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
                 CurrentRoles = [RoleKind.InstallationAdministrator]
             };
 
-            this.userServiceMock.Setup(x => x.GetUserContext())
-                .ReturnsAsync(installAdminContext);
+            this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(installAdminContext);
 
             await this.viewModel.InitializeViewModel("starion");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(this.viewModel.IsUserAdmin, Is.True);
-            }
+            Assert.That(this.viewModel.IsUserAdmin, Is.True);
 
             // Scenario 4: User is not admin
             var regularUserContext = new UserContext
@@ -179,15 +157,10 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
                 CurrentRoles = [RoleKind.Account]
             };
 
-            this.userServiceMock.Setup(x => x.GetUserContext())
-                .ReturnsAsync(regularUserContext);
+            this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(regularUserContext);
 
             await this.viewModel.InitializeViewModel("starion");
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(this.viewModel.IsUserAdmin, Is.False);
-            }
+            Assert.That(this.viewModel.IsUserAdmin, Is.False);
         }
     }
 }

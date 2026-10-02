@@ -16,18 +16,9 @@ namespace Mycelium.Forge.Common.Tests.Extensions
 
     using Mycelium.Forge.Common.Extensions;
 
-    /// <summary>
-    /// Test fixture for <see cref="PackageExtensions" />.
-    /// </summary>
     [TestFixture]
     public class PackageExtensionsTestFixture
     {
-        /// <summary>
-        /// Verifies that
-        /// <see
-        ///     cref="PackageExtensions.ComputeDownloadCount(IPackage, System.Collections.Generic.IEnumerable{Mycelium.Forge.Common.IPackageVersion})" />
-        /// computes and sets the total download count on the package.
-        /// </summary>
         [Test]
         public void VerifyComputeDownloadCount()
         {

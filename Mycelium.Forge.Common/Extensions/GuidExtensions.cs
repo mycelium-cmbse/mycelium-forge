@@ -28,7 +28,6 @@ namespace Mycelium.Forge.Common.Extensions
             /// Sanitizes the <see cref="Guid" /> for logging by masking all but the last 8 characters to prevent sensitive identifier
             /// exposure.
             /// </summary>
-        /// <param name="value">The <see cref="Guid" /> value to sanitize.</param>
             /// <returns>A redacted, log-safe string representation of the identifier.</returns>
             public string SanitizeForLog()
             {

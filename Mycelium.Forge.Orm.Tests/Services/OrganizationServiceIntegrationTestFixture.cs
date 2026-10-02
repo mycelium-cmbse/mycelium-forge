@@ -28,10 +28,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Integration test suite for <see cref="OrganizationService" /> verifying end-to-end read behaviour
-    /// against a real PostgreSQL instance provided by Testcontainers.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class OrganizationServiceIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -45,11 +41,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
         private Guid adminAccountId;
         private Guid memberAccountId;
 
-        /// <summary>
-        /// Verifies that <see cref="OrganizationService.ReadByShortNameAsync(IUserContext, string, CancellationToken)" />
-        /// returns the organization when it exists, and returns a not found error when it does not exist.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadByShortNameAsync()
         {
@@ -84,14 +75,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             }
         }
 
-        /// <summary>
-        /// Verifies that
-        /// <see
-        ///     cref="OrganizationService.UpdateAsync(IUserContext, NpgsqlTransaction, IEnumerable{IOrganization}, CancellationToken)" />
-        /// correctly updates an existing organization in the database for an administrator and rejects unauthorized updates from
-        /// anonymous or non-administrator users.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyUpdateAsync()
         {
@@ -122,10 +105,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             }
         }
 
-        /// <summary>
-        /// Wires up DAOs, the service under test, user contexts, and prerequisite database records before each test.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
             var organizationDao = new OrganizationDao(
@@ -175,12 +154,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             await this.SeedDatabaseAsync(organizationDao, this.adminAccountId);
         }
 
-        /// <summary>
-        /// Seeds the database with prerequisite records required by the tests.
-        /// </summary>
-        /// <param name="organizationDao">The <see cref="OrganizationDao" /> used to insert organizations.</param>
-        /// <param name="adminAccount">The ID of the administrator account.</param>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         private async Task SeedDatabaseAsync(OrganizationDao organizationDao, Guid adminAccount)
         {
             var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);

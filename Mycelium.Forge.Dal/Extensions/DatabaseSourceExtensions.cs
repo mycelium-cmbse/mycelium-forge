@@ -42,14 +42,8 @@ namespace Mycelium.Forge.Dal.Extensions
         /// A <see cref="ErrorOr{TValue}" /> containing an <see cref="ImmutableList{TThing}" /> of permitted entities or
         /// an error.
         /// </returns>
-        internal static async Task<ErrorOr<ImmutableList<TThing>>> ReadWithFilterAsync<TThing>(
-            this IDatabaseSource databaseSource,
-            Func<NpgsqlTransaction, CancellationToken, Task<ErrorOr<ImmutableList<TThing>>>> readDaoAsync,
-            IPermissionService<TThing> permissionService,
-            IUserContext userContext,
-            ILogger logger,
-            CancellationToken token = default)
-            where TThing : IThing
+        internal static async Task<ErrorOr<ImmutableList<TThing>>> ReadWithFilterAsync<TThing>(this IDatabaseSource databaseSource, Func<NpgsqlTransaction, CancellationToken, Task<ErrorOr<ImmutableList<TThing>>>> readDaoAsync,
+            IPermissionService<TThing> permissionService, IUserContext userContext, ILogger logger, CancellationToken token = default) where TThing : IThing
         {
             try
             {

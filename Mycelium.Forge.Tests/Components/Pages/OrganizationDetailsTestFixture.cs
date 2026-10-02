@@ -26,9 +26,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
     using Mycelium.Forge.Components.Pages;
     using Mycelium.Forge.ViewModels.OrganizationDetails;
 
-    /// <summary>
-    /// Test fixture for <see cref="OrganizationDetails" /> component.
-    /// </summary>
     [TestFixture]
     public class OrganizationDetailsTestFixture
     {
@@ -36,9 +33,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
         private Mock<IOrganizationDetailsViewModel> viewModelMock;
         private Organization organization;
 
-        /// <summary>
-        /// Sets up the test context and mocked dependencies.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -65,19 +59,12 @@ namespace Mycelium.Forge.Tests.Components.Pages
             this.context.Services.AddSingleton(this.viewModelMock.Object);
         }
 
-        /// <summary>
-        /// Disposes the test context.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [TearDown]
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
         }
 
-        /// <summary>
-        /// Verifies that OnParametersSet initializes the view model with the short name.
-        /// </summary>
         [Test]
         public void VerifyOnParametersSet()
         {
