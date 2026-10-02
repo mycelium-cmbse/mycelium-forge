@@ -133,8 +133,6 @@ namespace Mycelium.Forge.ViewModels.MyPackages
 
                 this.scopes = scopesTask.Result;
                 this.versions = versionsTask.Result;
-
-                this.Packages.ForEach(x => x.ComputeDownloadCount(this.versions));
             }
             catch (Exception exception)
             {
@@ -144,6 +142,16 @@ namespace Mycelium.Forge.ViewModels.MyPackages
             {
                 this.IsLoading = false;
             }
+        }
+
+        /// <summary>
+        /// Gets the total download count for the specified package across all its loaded versions.
+        /// </summary>
+        /// <param name="package">The package DTO.</param>
+        /// <returns>The total number of downloads.</returns>
+        public int GetDownloadCount(IPackage package)
+        {
+            return package.ComputeDownloadCount(this.versions);
         }
 
         /// <summary>

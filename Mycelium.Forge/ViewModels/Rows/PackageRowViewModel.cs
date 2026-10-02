@@ -141,8 +141,6 @@ namespace Mycelium.Forge.ViewModels.Rows
                     .ThenByDescending(v => v.Version)
                     .FirstOrDefault();
 
-                package.ComputeDownloadCount(packageVersions);
-
                 var latestPublicationDate = latestVersion?.PublicationDate ?? package.CreatedAt;
 
                 rows.Add(new PackageRowViewModel
@@ -154,7 +152,7 @@ namespace Mycelium.Forge.ViewModels.Rows
                     Version = latestVersion != null ? latestVersion.Version : DefaultVersion,
                     Format = packageType?.Name ?? PackageFormatConstants.SysMlV2,
                     Tags = ResolveTagsForPackage(package),
-                    DownloadCount = package.downloadCount,
+                    DownloadCount = package.ComputeDownloadCount(packageVersions),
                     DependentsCount = ResolveDependentsCountForPackage(package),
                     IsVerified = isVerified,
                     CreatedAt = package.CreatedAt,

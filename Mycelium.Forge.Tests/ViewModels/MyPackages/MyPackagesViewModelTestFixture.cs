@@ -205,6 +205,22 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
         }
 
         /// <summary>
+        /// Verifies all scenarios of <see cref="MyPackagesViewModel.GetDownloadCount" />.
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyGetDownloadCount()
+        {
+            await this.viewModel.InitializeViewModel();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.GetDownloadCount(this.testPackage1), Is.Zero);
+                Assert.That(this.viewModel.GetDownloadCount(this.testPackage2), Is.Zero);
+            }
+        }
+
+        /// <summary>
         /// Verifies all scenarios of <see cref="MyPackagesViewModel.GetRole" />.
         /// </summary>
         /// <returns>An awaitable <see cref="Task" />.</returns>

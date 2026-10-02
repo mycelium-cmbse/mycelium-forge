@@ -107,7 +107,7 @@
                                     </BbBadge>
                                 </BbTableCell>
                                 <BbTableCell Class="w-[110px] shrink-0 font-normal text-secondary-foreground p-0">
-                                    @(package.downloadCount)
+                                    @(this.ViewModel.GetDownloadCount(package))
                                 </BbTableCell>
                                 <BbTableCell Class="w-[180px] shrink-0 font-normal text-muted-foreground p-0">
                                     @(latestVersion?.PublicationDate ?? package.CreatedAt)

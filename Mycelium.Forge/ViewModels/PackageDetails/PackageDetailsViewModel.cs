@@ -109,6 +109,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public IReadOnlyList<IPackageVersion> Versions { get; set; } = [];
 
         /// <summary>
+        /// Gets the total download count computed across all versions of the package.
+        /// </summary>
+        public int DownloadCount => this.Package.ComputeDownloadCount(this.Versions);
+
+        /// <summary>
         /// Gets or sets the collection of maintainer account DTOs.
         /// </summary>
         public IReadOnlyList<IAccount> Maintainers { get; set; } = [];
@@ -252,8 +257,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             var versions = versionsTask.Result
                 .OrderByDescending(v => v.PublicationDate)
                 .ToList();
-
-            package.ComputeDownloadCount(versions);
 
             var selectedVersion = versions[0];
             var maintainers = maintainersTask.Result;

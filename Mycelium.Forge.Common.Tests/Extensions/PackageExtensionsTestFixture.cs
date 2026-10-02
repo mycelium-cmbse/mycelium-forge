@@ -53,33 +53,28 @@ namespace Mycelium.Forge.Common.Tests.Extensions
 
             var versions = new List<IPackageVersion> { version1, version2, otherVersion };
 
-            package.ComputeDownloadCount(versions);
-
             var emptyVersionsPackage = new Package
             {
                 Id = Guid.NewGuid()
             };
-
-            emptyVersionsPackage.ComputeDownloadCount([]);
 
             var nullVersionsPackage = new Package
             {
                 Id = Guid.NewGuid()
             };
 
-            nullVersionsPackage.ComputeDownloadCount(null!);
-
             IPackage nullPackage = null!;
-            nullPackage.ComputeDownloadCount(versions);
 
             var mockPackage = new Mock<IPackage>();
-            mockPackage.Object.ComputeDownloadCount(versions);
+            mockPackage.Setup(p => p.Id).Returns(packageId);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(package.downloadCount, Is.EqualTo(500));
-                Assert.That(emptyVersionsPackage.downloadCount, Is.Zero);
-                Assert.That(nullVersionsPackage.downloadCount, Is.Zero);
+                Assert.That(package.ComputeDownloadCount(versions), Is.EqualTo(500));
+                Assert.That(emptyVersionsPackage.ComputeDownloadCount([]), Is.Zero);
+                Assert.That(nullVersionsPackage.ComputeDownloadCount(null!), Is.Zero);
+                Assert.That(nullPackage.ComputeDownloadCount(versions), Is.Zero);
+                Assert.That(mockPackage.Object.ComputeDownloadCount(versions), Is.EqualTo(500));
             }
         }
     }

@@ -182,8 +182,7 @@ namespace Mycelium.Forge.Models.Package
             var versionString = version?.Version ?? "1.0.0";
             var packageType = SeedData.PackageTypes.FirstOrDefault(t => t.Id == package.PackageType);
             var format = packageType?.Name ?? PackageFormatConstants.SysMlV2;
-            package.ComputeDownloadCount(SeedData.PackageVersions);
-            var downloadCount = package.downloadCount;
+            var downloadCount = package.ComputeDownloadCount(SeedData.PackageVersions);
 
             var tags = PackageRowViewModel.ResolveTagsForPackage(package);
             var dependentsCount = PackageRowViewModel.ResolveDependentsCountForPackage(package);
