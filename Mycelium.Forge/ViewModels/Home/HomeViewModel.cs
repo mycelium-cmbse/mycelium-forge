@@ -115,7 +115,7 @@ namespace Mycelium.Forge.ViewModels.Home
         /// <returns>A <see cref="Task" />.</returns>
         public async Task InitializeViewModel()
         {
-            var userContext = this.userService.GetUserContext();
+            var userContext = await this.userService.GetUserContext();
 
             var packagesResult = await this.packageService.ReadAsync(userContext, CancellationToken.None);
 

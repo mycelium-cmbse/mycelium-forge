@@ -1,9 +1,9 @@
 // ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -26,6 +26,8 @@ namespace Mycelium.Forge
 
     using OpenTelemetry.Resources;
     using OpenTelemetry.Trace;
+
+    using ReactiveUI.Builder;
 
     using Serilog;
     using Serilog.Formatting.Compact;
@@ -140,6 +142,8 @@ namespace Mycelium.Forge
 
             builder.Services.AddBlazorBlueprintComponents();
 
+            RxAppBuilder.CreateReactiveUIBuilder().BuildApp();
+
             builder.RegisterDatabase();
             builder.RegisterServices();
             builder.RegisterViewModels();
@@ -169,6 +173,9 @@ namespace Mycelium.Forge
 
             // SSS-CC-EXT-FG1: the Forge HTTP API is served over HTTPS.
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseAntiforgery();
 

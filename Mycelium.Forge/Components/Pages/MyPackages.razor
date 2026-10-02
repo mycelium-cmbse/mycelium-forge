@@ -1,6 +1,4 @@
-@using BlazorBlueprint.Primitives.Table
-@using Mycelium.Forge.Models.Package
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="MyPackages.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -8,8 +6,12 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
+
 @attribute [Route(PageRoutes.MyPackages)]
-@rendermode InteractiveServer
+@attribute [Authorize]
+@rendermode @(new InteractiveServerRenderMode(false))
+@using BlazorBlueprint.Primitives.Table
+@inherits DisposableComponent
 
 <PageTitle>My Packages &mdash; Mycelium Forge</PageTitle>
 
@@ -33,7 +35,15 @@
             </BbButton>
         </div>
 
-        @if (this.ViewModel.Packages.Count > 0)
+        @if (this.ViewModel.IsLoading)
+        {
+            <div class="w-full flex items-center justify-start">
+                <BadgeSkeleton/>
+            </div>
+
+            <TableSkeleton/>
+        }
+        else if (this.ViewModel.Packages.Count > 0)
         {
             <div class="w-full flex items-center justify-start">
                 <BbToggleGroup TValue="string"
@@ -54,39 +64,41 @@
                 <BbTable Data="@(this.FilteredPackages())"
                          Class="w-full text-left text-sm leading-xs">
                     <BbTableHeader Class="table-header-row px-5 py-3">
-                        <BbTableHeaderCell TData="PackageModel" Class="w-[430px] shrink-0 p-0 text-left font-semibold">
+                        <BbTableHeaderCell TData="IPackage" Class="w-[430px] shrink-0 p-0 text-left font-semibold">
                             PACKAGE
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="PackageModel" Class="w-[120px] shrink-0 p-0 text-left font-semibold">
+                        <BbTableHeaderCell TData="IPackage" Class="w-[120px] shrink-0 p-0 text-left font-semibold">
                             LATEST
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="PackageModel" Class="w-[130px] shrink-0 p-0 text-left font-semibold">
+                        <BbTableHeaderCell TData="IPackage" Class="w-[130px] shrink-0 p-0 text-left font-semibold">
                             VISIBILITY
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="PackageModel" Class="w-[110px] shrink-0 p-0 text-left font-semibold">
+                        <BbTableHeaderCell TData="IPackage" Class="w-[110px] shrink-0 p-0 text-left font-semibold">
                             DOWNLOADS
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="PackageModel" Class="w-[180px] shrink-0 p-0 text-left font-semibold">
+                        <BbTableHeaderCell TData="IPackage" Class="w-[180px] shrink-0 p-0 text-left font-semibold">
                             LAST PUBLISHED
                         </BbTableHeaderCell>
-                        <BbTableHeaderCell TData="PackageModel" Class="w-[150px] shrink-0 p-0 text-left font-semibold">
+                        <BbTableHeaderCell TData="IPackage" Class="w-[150px] shrink-0 p-0 text-left font-semibold">
                             ROLE
                         </BbTableHeaderCell>
                     </BbTableHeader>
                     <BbTableBody Class="divide-y divide-border">
                         @foreach (var package in this.FilteredPackages())
                         {
+                            var latestVersion = this.ViewModel.GetLatestVersion(package);
+
                             <BbTableRow @key="package.Name"
                                         Item="@package"
                                         Class="px-5 py-3.5 flex items-center hover:bg-muted/50 transition-colors">
                                 <BbTableCell Class="w-[430px] shrink-0 p-0">
-                                    <a href="@(PageRoutes.GetPackageRoute(package.Publisher, package.Package.ShortName))"
+                                    <a href="@(PageRoutes.GetPackageRoute(this.ViewModel.GetPublisher(package), package.ShortName))"
                                        class="font-semibold text-foreground hover:text-primary transition-colors truncate">
                                         @(package.Name)
                                     </a>
                                 </BbTableCell>
                                 <BbTableCell Class="w-[120px] shrink-0 font-normal text-secondary-foreground p-0">
-                                    @(package.Version)
+                                    @(latestVersion?.GetVersion() ?? string.Empty)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[130px] shrink-0 p-0">
                                     <BbBadge Variant="@(GetVisibilityBadgeVariant(package))"
@@ -95,15 +107,15 @@
                                     </BbBadge>
                                 </BbTableCell>
                                 <BbTableCell Class="w-[110px] shrink-0 font-normal text-secondary-foreground p-0">
-                                    @(package.DownloadCount)
+                                    @(package.downloadCount)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[180px] shrink-0 font-normal text-muted-foreground p-0">
-                                    @(package.LastPublished)
+                                    @(latestVersion?.PublicationDate ?? package.CreatedAt)
                                 </BbTableCell>
                                 <BbTableCell Class="w-[150px] shrink-0 p-0">
                                     <BbBadge Variant="BadgeVariant.Secondary"
-                                             Class="@($"badge-role {(package.Role == PackageInvitationKind.OWNER ? "text-primary" : "text-muted-foreground")}")">
-                                        @(package.Role)
+                                             Class="@($"badge-role {(this.ViewModel.GetRole(package) == PackageInvitationKind.OWNER ? "text-primary" : "text-muted-foreground")}")">
+                                        @(this.ViewModel.GetRole(package))
                                     </BbBadge>
                                 </BbTableCell>
                             </BbTableRow>

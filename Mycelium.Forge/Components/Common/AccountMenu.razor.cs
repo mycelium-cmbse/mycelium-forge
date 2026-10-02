@@ -25,10 +25,21 @@ namespace Mycelium.Forge.Components.Common
         private IAccount currentUser;
 
         /// <summary>
+        /// Gets a value indicating whether the current user has the installation administrator role.
+        /// </summary>
+        private bool isInstallationAdministrator;
+
+        /// <summary>
         /// Gets or sets the injected user service.
         /// </summary>
         [Inject]
         public IUserService UserService { get; set; }
+
+        /// <summary>
+        /// Gets or sets the navigation manager instance.
+        /// </summary>
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
         /// Gets or sets the primary organization identifier for navigation.
@@ -36,9 +47,14 @@ namespace Mycelium.Forge.Components.Common
         public string Organization { get; set; } = "starion";
 
         /// <summary>
-        /// Gets a value indicating whether the current user has the installation administrator role.
+        /// Handles the user sign-out action by clearing current authentication and navigating to login.
         /// </summary>
-        public bool IsInstallationAdministrator => this.UserService.CurrentRoles.Contains(RoleKind.InstallationAdministrator);
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnSignOut()
+        {
+            await this.UserService.SetCurrentUser(null);
+            this.NavigationManager.NavigateTo(PageRoutes.Logout, forceLoad: true);
+        }
 
         /// <summary>
         /// Method invoked when the component is ready to start, having received its
@@ -52,6 +68,9 @@ namespace Mycelium.Forge.Components.Common
             await base.OnInitializedAsync();
 
             this.currentUser = await this.UserService.GetCurrentUser();
+
+            var userContext = await this.UserService.GetUserContext();
+            this.isInstallationAdministrator = userContext.CurrentRoles.Contains(RoleKind.InstallationAdministrator);
         }
     }
 }

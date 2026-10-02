@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="Header.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -7,6 +7,7 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits DisposableComponent
 @rendermode InteractiveServer
 
@@ -75,47 +76,47 @@
                         Class="shrink-0"/>
         </button>
 
-        @if (this.IsLoggedIn)
-        {
-            @if (!this.IsHomePage())
-            {
-                <SearchInput Value="@(this.SearchQuery)"
-                             ValueChanged="@(this.OnSearchInputChanged)"
-                             Placeholder="Search models and packages…"
-                             ShowShortcut="true"
-                             IconSize="16"
-                             InputClass="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground placeholder:truncate truncate text-ellipsis border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"
-                             KbdClass="hidden sm:inline-flex items-center px-1.5 py-0.5 text-3xs leading-4xs font-medium text-muted-foreground bg-card border border-border rounded shrink-0"
-                             Class="!w-[220px] !h-8 !px-2.5 !gap-2 shrink-0"/>
-            }
+        <AuthorizeView>
+            <Authorized>
+                @if (!this.IsHomePage())
+                {
+                    <SearchInput Value="@(this.SearchQuery)"
+                                 ValueChanged="@(this.OnSearchInputChanged)"
+                                 Placeholder="Search models and packages…"
+                                 ShowShortcut="true"
+                                 IconSize="16"
+                                 InputClass="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground placeholder:truncate truncate text-ellipsis border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"
+                                 KbdClass="hidden sm:inline-flex items-center px-1.5 py-0.5 text-3xs leading-4xs font-medium text-muted-foreground bg-card border border-border rounded shrink-0"
+                                 Class="!w-[220px] !h-8 !px-2.5 !gap-2 shrink-0"/>
+                }
 
-            <BbButton Variant="ButtonVariant.Default"
-                      Size="ButtonSize.Small"
-                      Href="@PageRoutes.Publish"
-                      Class="h-8 px-3.5 gap-1.5 shrink-0">
-                <LucideIcon Name="plus"
-                            Size="14"/>
-                <span>Publish</span>
-            </BbButton>
+                <BbButton Variant="ButtonVariant.Default"
+                          Size="ButtonSize.Small"
+                          Href="@PageRoutes.Publish"
+                          Class="h-8 px-3.5 gap-1.5 shrink-0">
+                    <LucideIcon Name="plus"
+                                Size="14"/>
+                    <span>Publish</span>
+                </BbButton>
 
-            <button type="button"
-                    class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
-                    aria-label="Notifications">
-                <LucideIcon Name="bell"
-                            Size="20"
-                            Class="shrink-0"/>
-            </button>
+                <button type="button"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+                        aria-label="Notifications">
+                    <LucideIcon Name="bell"
+                                Size="20"
+                                Class="shrink-0"/>
+                </button>
 
-            <AccountMenu/>
-        }
-        else
-        {
-            <BbButton Variant="ButtonVariant.Outline"
-                      Size="ButtonSize.Small"
-                      Href="@PageRoutes.Login"
-                      Class="h-8 px-3 text-xs shrink-0">
-                Sign in
-            </BbButton>
-        }
+                <AccountMenu/>
+            </Authorized>
+            <NotAuthorized>
+                <BbButton Variant="ButtonVariant.Outline"
+                          Size="ButtonSize.Small"
+                          Href="@PageRoutes.Login"
+                          Class="h-8 px-3 text-xs shrink-0">
+                    Sign in
+                </BbButton>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </header>

@@ -38,11 +38,6 @@ namespace Mycelium.Forge.Components.Layout
         public IThemeService ThemeService { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the current user is logged in.
-        /// </summary>
-        public bool IsLoggedIn { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets the bound search query value in the header search input.
         /// </summary>
         public string SearchQuery { get; set; } = string.Empty;

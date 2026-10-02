@@ -64,7 +64,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Username = "testuser"
             };
 
-            this.userServiceMock.Setup(x => x.GetUserContext()).Returns(this.userContext);
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
 
             this.viewModel = new PackageDetailsViewModel(
                 this.packageServiceMock.Object,

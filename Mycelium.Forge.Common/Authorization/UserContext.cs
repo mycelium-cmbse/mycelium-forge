@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Common
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Default implementation of <see cref="IUserContext" /> carrying identity and assigned roles.
@@ -35,7 +36,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Gets a value indicating whether the user is authenticated.
         /// </summary>
-        public bool IsAuthenticated => this.AccountId.HasValue && !string.IsNullOrWhiteSpace(this.Username);
+        public bool IsAuthenticated => this.AccountId.HasValue && !this.CurrentRoles.Contains(RoleKind.Anonymous);
 
         /// <summary>
         /// Creates an anonymous user context.

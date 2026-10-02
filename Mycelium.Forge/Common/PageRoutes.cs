@@ -50,6 +50,16 @@ namespace Mycelium.Forge.Common
         public const string Login = "/login";
 
         /// <summary>
+        /// The user authentication cookie login endpoint route path.
+        /// </summary>
+        public const string AuthLogin = "/api/auth/login";
+
+        /// <summary>
+        /// The user authentication sign-out endpoint route path.
+        /// </summary>
+        public const string Logout = "/api/auth/logout";
+
+        /// <summary>
         /// The user registration and sign-up page route path.
         /// </summary>
         public const string SignUp = "/signup";
