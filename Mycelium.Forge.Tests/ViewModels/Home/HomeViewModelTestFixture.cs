@@ -24,9 +24,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Home;
 
-    /// <summary>
-    /// Test fixture for <see cref="HomeViewModel" />.
-    /// </summary>
     [TestFixture]
     public class HomeViewModelTestFixture
     {
@@ -38,9 +35,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
         private IUserContext userContext;
         private HomeViewModel viewModel;
 
-        /// <summary>
-        /// Sets up mock dependencies and creates the view model before each test.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -66,10 +60,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
                 this.userServiceMock.Object);
         }
 
-        /// <summary>
-        /// Verifies that <see cref="HomeViewModel.InitializeViewModel" /> loads packages, scopes, and types.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         [Test]
         public async Task VerifyInitializeViewModel()
         {
@@ -142,7 +132,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
                 Assert.That(this.viewModel.PackageCount, Is.EqualTo(2));
                 Assert.That(this.viewModel.VersionCount, Is.EqualTo(2));
                 Assert.That(this.viewModel.PublisherCount, Is.EqualTo(1));
-                Assert.That(this.viewModel.DownloadCount, Is.Zero);
+                Assert.That(this.viewModel.DownloadCount, Is.EqualTo(700));
                 Assert.That(this.viewModel.StandardLibraries, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.RecentlyUpdated, Has.Count.EqualTo(2));
                 Assert.That(this.viewModel.MostUsed, Has.Count.EqualTo(2));

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IMyPackagesViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -38,6 +38,13 @@ namespace Mycelium.Forge.ViewModels.MyPackages
         /// <param name="package">The package DTO.</param>
         /// <returns>The publisher handle string.</returns>
         string GetPublisher(IPackage package);
+
+        /// <summary>
+        /// Gets the total download count for the specified package across all its loaded versions.
+        /// </summary>
+        /// <param name="package">The package DTO.</param>
+        /// <returns>The total number of downloads.</returns>
+        int GetDownloadCount(IPackage package);
 
         /// <summary>
         /// Gets the latest listed release version string for the specified package.

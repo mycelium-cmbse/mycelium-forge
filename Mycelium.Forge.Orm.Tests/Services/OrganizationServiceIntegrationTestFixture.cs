@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Orm.Tests.Services
 {
+    using ErrorOr;
+
     using Microsoft.Extensions.Logging;
 
     using Moq;
@@ -26,10 +28,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Integration test suite for <see cref="OrganizationService" /> verifying end-to-end read behaviour
-    /// against a real PostgreSQL instance provided by Testcontainers.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class OrganizationServiceIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -43,14 +41,40 @@ namespace Mycelium.Forge.Orm.Tests.Services
         private Guid adminAccountId;
         private Guid memberAccountId;
 
-        /// <summary>
-        /// Verifies that
-        /// <see
-        ///     cref="OrganizationService.UpdateAsync(IUserContext, NpgsqlTransaction, IEnumerable{IOrganization}, CancellationToken)" />
-        /// correctly updates an existing organization in the database for an administrator and rejects unauthorized updates from
-        /// anonymous or non-administrator users.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyReadByShortNameAsync()
+        {
+            var anonPublicResult = await this.service.ReadByShortNameAsync(this.anonymousUserContext, "public-org", CancellationToken.None);
+            var memberPublicResult = await this.service.ReadByShortNameAsync(this.memberUserContext, "public-org", CancellationToken.None);
+            var adminPublicResult = await this.service.ReadByShortNameAsync(this.adminUserContext, "public-org", CancellationToken.None);
+
+            var adminPrivateResult = await this.service.ReadByShortNameAsync(this.adminUserContext, "private-org", CancellationToken.None);
+            var anonPrivateResult = await this.service.ReadByShortNameAsync(this.anonymousUserContext, "private-org", CancellationToken.None);
+            var notFoundResult = await this.service.ReadByShortNameAsync(this.adminUserContext, "non-existent-org", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(anonPublicResult.IsError, Is.False);
+                Assert.That(anonPublicResult.Value.Id, Is.EqualTo(this.publicOrgId));
+                Assert.That(anonPublicResult.Value.ShortName, Is.EqualTo("public-org"));
+
+                Assert.That(memberPublicResult.IsError, Is.False);
+                Assert.That(memberPublicResult.Value.Id, Is.EqualTo(this.publicOrgId));
+
+                Assert.That(adminPublicResult.IsError, Is.False);
+                Assert.That(adminPublicResult.Value.Id, Is.EqualTo(this.publicOrgId));
+
+                Assert.That(adminPrivateResult.IsError, Is.False);
+                Assert.That(adminPrivateResult.Value.Id, Is.EqualTo(this.privateOrgId));
+
+                Assert.That(anonPrivateResult.IsError, Is.False);
+                Assert.That(anonPrivateResult.Value.Id, Is.EqualTo(this.privateOrgId));
+
+                Assert.That(notFoundResult.IsError, Is.True);
+                Assert.That(notFoundResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
+            }
+        }
+
         [Test]
         public async Task VerifyUpdateAsync()
         {
@@ -81,10 +105,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             }
         }
 
-        /// <summary>
-        /// Wires up DAOs, the service under test, user contexts, and prerequisite database records before each test.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
             var organizationDao = new OrganizationDao(
@@ -94,6 +114,15 @@ namespace Mycelium.Forge.Orm.Tests.Services
             var orgPermissionService = new OrganizationPermissionService();
 
             var databaseSourceMock = new Mock<IDatabaseSource>();
+
+            databaseSourceMock
+                .Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
+                .Returns(async () =>
+                {
+                    var connection = new NpgsqlConnection(this.ConnectionString);
+                    await connection.OpenAsync();
+                    return connection;
+                });
 
             this.service = new OrganizationService(
                 organizationDao,
@@ -125,12 +154,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             await this.SeedDatabaseAsync(organizationDao, this.adminAccountId);
         }
 
-        /// <summary>
-        /// Seeds the database with prerequisite records required by the tests.
-        /// </summary>
-        /// <param name="organizationDao">The <see cref="OrganizationDao" /> used to insert organizations.</param>
-        /// <param name="adminAccount">The ID of the administrator account.</param>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         private async Task SeedDatabaseAsync(OrganizationDao organizationDao, Guid adminAccount)
         {
             var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);
