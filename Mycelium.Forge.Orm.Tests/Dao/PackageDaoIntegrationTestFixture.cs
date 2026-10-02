@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDaoIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,9 +22,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
     using ZiggyCreatures.Caching.Fusion;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="PackageDao" /> class.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class PackageDaoIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -39,19 +36,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
         private Guid org1Id;
         private Guid org2Id;
 
-        /// <summary>
-        /// Cleans up resources after each test.
-        /// </summary>
         [TearDown]
         public void TearDown()
         {
             this.fusionCache.Dispose();
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.CreateAsync" /> correctly persists a new Package in the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyCreateAsync()
         {
@@ -69,6 +59,14 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Visibility = VisibilityKind.PUBLIC
             };
 
+            await using (var primeTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.packageDao.ReadIdentifiersAsync(primeTransaction, CancellationToken.None);
+                await primeTransaction.CommitAsync();
+            }
+
+            var cachedIdentifiersBeforeCreate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
                 var result = await this.packageDao.CreateAsync(transaction, CancellationToken.None, package);
@@ -77,13 +75,19 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Assert.That(result.IsSuccess, Is.True);
             }
 
+            var cachedIdentifiersAfterCreate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
                 var readResult = await this.packageDao.ReadAsync(readTransaction, CancellationToken.None, [packageId]);
                 await readTransaction.CommitAsync();
 
+                var cachedPackage = await this.fusionCache.TryGetAsync<Package>($"Package:{packageId}");
+
                 using (Assert.EnterMultipleScope())
                 {
+                    Assert.That(cachedIdentifiersBeforeCreate.HasValue, Is.True);
+                    Assert.That(cachedIdentifiersAfterCreate.HasValue, Is.False);
                     Assert.That(readResult.IsSuccess, Is.True);
                     Assert.That(readResult.Value, Has.Count.EqualTo(1));
                     Assert.That(readResult.Value[0].Id, Is.EqualTo(packageId));
@@ -91,14 +95,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                     Assert.That(readResult.Value[0].ShortName, Is.EqualTo("test-pkg-create"));
                     Assert.That(readResult.Value[0].Owner, Is.EqualTo(this.accountId));
                     Assert.That(readResult.Value[0].PackageType, Is.EqualTo(this.packageTypeId));
+                    Assert.That(cachedPackage.HasValue, Is.True);
+                    Assert.That(cachedPackage.Value.Name, Is.EqualTo("TestPackageCreate"));
                 }
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.DeleteAsync" /> deletes a Package from the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyDeleteAsync()
         {
@@ -118,6 +120,14 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
             await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, package));
 
+            await using (var primeTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.packageDao.ReadIdentifiersAsync(primeTransaction, CancellationToken.None);
+                await primeTransaction.CommitAsync();
+            }
+
+            var cachedIdentifiersBeforeDelete = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
                 var deleteResult = await this.packageDao.DeleteAsync(transaction, CancellationToken.None, [package]);
@@ -125,19 +135,24 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Assert.That(deleteResult.IsError, Is.False);
             }
 
+            var cachedIdentifiersAfterDelete = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
                 var readResult = await this.packageDao.ReadAsync(readTransaction, CancellationToken.None, [packageId]);
                 await readTransaction.CommitAsync();
-                Assert.That(readResult.IsError, Is.True);
+                var cachedAfterDelete = await this.fusionCache.TryGetAsync<Package>($"Package:{packageId}");
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(cachedIdentifiersBeforeDelete.HasValue, Is.True);
+                    Assert.That(cachedIdentifiersAfterDelete.HasValue, Is.False);
+                    Assert.That(readResult.IsError, Is.True);
+                    Assert.That(cachedAfterDelete.HasValue, Is.False);
+                }
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.ReadAsync" /> reads packages by identifiers, handles missing entries,
-        /// and enforces organization visibility filters on internal packages.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -213,10 +228,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.ReadIdentifiersAsync" /> returns all Package IDs in the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadIdentifiersAsync()
         {
@@ -238,15 +249,20 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
             await using var transaction = await this.Connection.BeginTransactionAsync();
             var identifiers = await this.packageDao.ReadIdentifiersAsync(transaction, CancellationToken.None);
+            var cachedIdentifiersFromSecondCall = await this.packageDao.ReadIdentifiersAsync(transaction, CancellationToken.None);
             await transaction.CommitAsync();
 
-            Assert.That(identifiers, Does.Contain(packageId));
+            var cachedIdentifiers = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(identifiers, Does.Contain(packageId));
+                Assert.That(cachedIdentifiersFromSecondCall, Does.Contain(packageId));
+                Assert.That(cachedIdentifiers.HasValue, Is.True);
+                Assert.That(cachedIdentifiers.Value, Does.Contain(packageId));
+            }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.UpdateAsync" /> updates mutable fields of an existing Package.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyUpdateAsync()
         {
@@ -266,6 +282,14 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
             await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, package));
 
+            await using (var primeTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.packageDao.ReadIdentifiersAsync(primeTransaction, CancellationToken.None);
+                await primeTransaction.CommitAsync();
+            }
+
+            var cachedIdentifiersBeforeUpdate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+
             package.Name = "UpdatedPackageName";
             package.Listed = true;
             package.Visibility = VisibilityKind.PUBLIC;
@@ -277,57 +301,38 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Assert.That(updateResult.IsSuccess, Is.True);
             }
 
+            var cachedIdentifiersAfterUpdate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
                 var readResult = await this.packageDao.ReadAsync(readTransaction, CancellationToken.None, [packageId]);
                 await readTransaction.CommitAsync();
 
+                var cachedAfterUpdate = await this.fusionCache.TryGetAsync<Package>($"Package:{packageId}");
+
                 using (Assert.EnterMultipleScope())
                 {
+                    Assert.That(cachedIdentifiersBeforeUpdate.HasValue, Is.True);
+                    Assert.That(cachedIdentifiersAfterUpdate.HasValue, Is.False);
                     Assert.That(readResult.Value[0].Name, Is.EqualTo("UpdatedPackageName"));
                     Assert.That(readResult.Value[0].Listed, Is.True);
                     Assert.That(readResult.Value[0].Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
+                    Assert.That(cachedAfterUpdate.HasValue, Is.True);
+                    Assert.That(cachedAfterUpdate.Value.Name, Is.EqualTo("UpdatedPackageName"));
                 }
             }
         }
 
-        /// <summary>
-        /// Sets up DAOs and prerequisite records before each test.
-        /// </summary>
-        /// <remarks>A <see cref="Task" /></remarks>
         protected override async Task PostSetup()
         {
             this.fusionCache = new FusionCache(new FusionCacheOptions());
 
-            this.packageDao = new PackageDao(
-                this.TestLoggerFactory.CreateLogger<PackageDao>(),
-                this.Serializer,
-                this.fusionCache);
-
-            this.packageTypeDao = new PackageTypeDao(
-                this.TestLoggerFactory.CreateLogger<PackageTypeDao>(),
-                this.Serializer,
-                this.fusionCache);
-
-            var forgeDao = new ForgeDao(
-                this.TestLoggerFactory.CreateLogger<ForgeDao>(),
-                this.Serializer,
-                this.fusionCache);
-
-            var countryDao = new CountryDao(
-                this.TestLoggerFactory.CreateLogger<CountryDao>(),
-                this.Serializer,
-                this.fusionCache);
-
-            var addressDao = new AddressDao(
-                this.TestLoggerFactory.CreateLogger<AddressDao>(),
-                this.Serializer,
-                this.fusionCache);
-
-            var accountDao = new AccountDao(
-                this.TestLoggerFactory.CreateLogger<AccountDao>(),
-                this.Serializer,
-                this.fusionCache);
+            this.packageDao = new PackageDao(this.TestLoggerFactory.CreateLogger<PackageDao>(), this.Serializer, this.fusionCache);
+            this.packageTypeDao = new PackageTypeDao(this.TestLoggerFactory.CreateLogger<PackageTypeDao>(), this.Serializer, this.fusionCache);
+            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer, this.fusionCache);
+            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer, this.fusionCache);
+            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer, this.fusionCache);
+            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer, this.fusionCache);
 
             this.forgeId = Guid.NewGuid();
 
@@ -441,10 +446,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 return await accountDao.CreateAsync(transaction, CancellationToken.None, otherAccount);
             });
 
-            var organizationDao = new OrganizationDao(
-                this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer,
-                this.fusionCache);
+            var organizationDao = new OrganizationDao(this.TestLoggerFactory.CreateLogger<OrganizationDao>(), this.Serializer, this.fusionCache);
 
             this.org1Id = Guid.NewGuid();
             this.org2Id = Guid.NewGuid();

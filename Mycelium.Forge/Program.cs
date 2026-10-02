@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -97,6 +97,8 @@ namespace Mycelium.Forge
                     .ConfigureServices((context, services) =>
                     {
                         services.RegisterDatabase(context.Configuration);
+                        services.AddMemoryCache();
+                        services.AddFusionCache();
                         services.AddForgeDal();
                         services.AddScoped<IDatabaseMigrator, DatabaseMigrator>();
                         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
@@ -142,6 +144,7 @@ namespace Mycelium.Forge
 
             builder.RegisterDatabase();
             builder.RegisterServices();
+            builder.RegisterDecorators();
             builder.RegisterViewModels();
 
             var app = builder.Build();
