@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
     {
         private PackageDao packageDao;
         private PackageTypeDao packageTypeDao;
-        private IFusionCache fusionCache;
+        private FusionCache fusionCache;
         private Guid packageTypeId;
         private Guid forgeId;
         private Guid accountId;
