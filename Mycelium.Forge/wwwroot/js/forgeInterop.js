@@ -102,6 +102,24 @@
         }
     };
 
+    /**
+     * Handles global keyboard shortcuts, focusing and selecting the search input when Ctrl+K or Cmd+K is pressed.
+     * @param {KeyboardEvent} event - The keyboard event.
+     * @returns {void}
+     */
+    function handleSearchShortcut(event) {
+        if ((event.ctrlKey || event.metaKey) && (event.key === 'k' || event.key === 'K')) {
+            const searchInput = document.querySelector('.search-input-focusable');
+            if (searchInput) {
+                event.preventDefault();
+                searchInput.focus();
+                if (typeof searchInput.select === 'function') {
+                    searchInput.select();
+                }
+            }
+        }
+    }
+
     // Apply theme immediately on script evaluation to prevent flash of unstyled content.
     applyTheme(resolveDarkMode());
 
@@ -110,6 +128,8 @@
     // defer registration until then — but guard with readyState in case the script loads late
     // (i.e. DOMContentLoaded has already fired by the time this runs).
     if (typeof document !== 'undefined') {
+        document.addEventListener('keydown', handleSearchShortcut);
+
         const registerEnhancedLoad = function () {
             window.Blazor?.addEventListener('enhancedload', function () {
                 applyTheme(resolveDarkMode());
