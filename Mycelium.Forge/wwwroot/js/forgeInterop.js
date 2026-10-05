@@ -108,15 +108,21 @@
      * @returns {void}
      */
     function handleSearchShortcut(event) {
-        if ((event.ctrlKey || event.metaKey) && (event.key === 'k' || event.key === 'K')) {
-            const searchInput = document.querySelector('.search-input-focusable');
-            if (searchInput) {
-                event.preventDefault();
-                searchInput.focus();
-                if (typeof searchInput.select === 'function') {
-                    searchInput.select();
-                }
-            }
+        if (!(event.ctrlKey || event.metaKey) || (event.key !== 'k' && event.key !== 'K')) {
+            return;
+        }
+
+        const searchInput = document.querySelector('.search-input-focusable');
+
+        if (!searchInput) {
+            return;
+        }
+
+        event.preventDefault();
+        searchInput.focus();
+
+        if (typeof searchInput.select === 'function') {
+            searchInput.select();
         }
     }
 
