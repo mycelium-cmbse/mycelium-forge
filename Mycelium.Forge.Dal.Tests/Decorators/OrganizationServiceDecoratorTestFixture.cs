@@ -73,8 +73,8 @@ namespace Mycelium.Forge.Dal.Tests.Decorators
         {
             var org = new Organization
             {
-                Id = Guid.NewGuid(), 
-                Name = "test-org", 
+                Id = Guid.NewGuid(),
+                Name = "test-org",
                 ShortName = "test-org"
             };
 
@@ -253,13 +253,15 @@ namespace Mycelium.Forge.Dal.Tests.Decorators
         public async Task VerifyUpdateAsync()
         {
             var orgId1 = Guid.NewGuid();
-            var org1 = new Organization { Id = orgId1, Name = "Org One", ShortName = "org-one" };
+            var org1 = new Organization { Id = orgId1, Name = "Org One", ShortName = "org-one-new" };
             var orgId2 = Guid.NewGuid();
             var org2 = new Organization { Id = orgId2, Name = "Org Two", ShortName = "org-two" };
 
-            // Prime cache with tags and short name keys
+            // Prime cache with tags and short name keys, including old short name and package coordinate tagged with Scope ID
             await this.fusionCache.SetAsync("Key1", "Val1", tags: [$"Scope:{orgId1}"]);
-            await this.fusionCache.SetAsync("Scope:ShortName:org-one", orgId1);
+            await this.fusionCache.SetAsync("Scope:ShortName:org-one-old", orgId1, tags: [$"Scope:{orgId1}"]);
+            await this.fusionCache.SetAsync("Package:Coordinate:org-one-old/my-package", Guid.NewGuid(), tags: [$"Scope:{orgId1}"]);
+            await this.fusionCache.SetAsync("Scope:ShortName:org-one-new", orgId1);
             await this.fusionCache.SetAsync("Key2", "Val2", tags: [$"Scope:{orgId2}"]);
             await this.fusionCache.SetAsync("Scope:ShortName:org-two", orgId2);
 
@@ -269,7 +271,9 @@ namespace Mycelium.Forge.Dal.Tests.Decorators
 
             var txResult = await this.decorator.UpdateAsync(this.userContext, null, [org1], CancellationToken.None);
             var cachedKey1 = await this.fusionCache.TryGetAsync<string>("Key1");
-            var cachedShortName1 = await this.fusionCache.TryGetAsync<Guid>("Scope:ShortName:org-one");
+            var cachedOldShortName1 = await this.fusionCache.TryGetAsync<Guid>("Scope:ShortName:org-one-old");
+            var cachedCoordinate1 = await this.fusionCache.TryGetAsync<Guid>("Package:Coordinate:org-one-old/my-package");
+            var cachedNewShortName1 = await this.fusionCache.TryGetAsync<Guid>("Scope:ShortName:org-one-new");
             var cachedKey2 = await this.fusionCache.TryGetAsync<string>("Key2");
             var cachedShortName2 = await this.fusionCache.TryGetAsync<Guid>("Scope:ShortName:org-two");
 
@@ -277,7 +281,9 @@ namespace Mycelium.Forge.Dal.Tests.Decorators
             {
                 Assert.That(txResult.IsError, Is.False);
                 Assert.That(cachedKey1.HasValue, Is.False);
-                Assert.That(cachedShortName1.HasValue, Is.False);
+                Assert.That(cachedOldShortName1.HasValue, Is.False);
+                Assert.That(cachedCoordinate1.HasValue, Is.False);
+                Assert.That(cachedNewShortName1.HasValue, Is.False);
                 Assert.That(cachedKey2.HasValue, Is.True);
                 Assert.That(cachedShortName2.HasValue, Is.True);
             }

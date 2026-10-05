@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DaoHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -44,6 +44,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Dao.UpdateAsyncWriteValueTypeAndSingleReferenceProperties", UpdateAsyncWriteValueTypeAndSingleReferenceProperties);
             handlebars.RegisterHelper("Dao.UpdateAsyncAppendMultiReferencePropertiesToSqlBuilder", UpdateAsyncAppendMultiReferencePropertiesToSqlBuilder);
             handlebars.RegisterHelper("Dao.ReadAsyncWriteReadSQL", ReadAsyncWriteReadSql);
+            handlebars.RegisterHelper("Dao.WriteExpireContainerCache", WriteExpireContainerCache);
             handlebars.RegisterHelper("Dao.WriteMapToDto", WriteMapToDto);
         }
 
@@ -529,6 +530,111 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 sql.AppendLine("                       GROUP BY 1");
                 sql.AppendLine($"                    ) AS \"{manyToManyTableName}\" ON true");
             }
+        }
+
+        /// <summary>
+        /// Writes the cache expiration logic for related container entities in <c>ExpireContainerCache</c>.
+        /// </summary>
+        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        private static void WriteExpireContainerCache(EncodedTextWriter writer, Context context, Arguments arguments)
+        {
+            if (context.Value is not IClass @class)
+            {
+                throw new ArgumentException(ContextMustBeIClass, nameof(context));
+            }
+
+            var oppositeCompositeProperties = @class.QueryAllOppositeCompositePropertiesIncludingSuperclass()
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            if (oppositeCompositeProperties.Count == 0)
+            {
+                writer.WriteSafeString("            await Task.CompletedTask;");
+                return;
+            }
+
+            var result = new StringBuilder();
+            result.AppendLine("            foreach (var thing in things)");
+            result.AppendLine("            {");
+
+            foreach (var property in oppositeCompositeProperties)
+            {
+                var concreteClasses = QueryConcreteContainerClasses(property);
+
+                if (concreteClasses.Count == 0)
+                {
+                    continue;
+                }
+
+                AppendPropertyCacheExpiration(result, property, concreteClasses, @class.Name);
+            }
+
+            result.Append("            }");
+            writer.WriteSafeString(result);
+        }
+
+        /// <summary>
+        /// Queries the non-abstract concrete classes that specialize or represent the type of the specified property.
+        /// </summary>
+        /// <param name="property">The reference property pointing to a container entity.</param>
+        /// <returns>A list of concrete <see cref="IClass" /> instances ordered by name.</returns>
+        private static List<IClass> QueryConcreteContainerClasses(IProperty property)
+        {
+            var allClasses = new List<IClass>();
+
+            if (property.Type is IClass propClass)
+            {
+                allClasses.Add(propClass);
+                allClasses.AddRange(propClass.QueryAllSpecializations());
+            }
+
+            return allClasses
+                .Where(x => !x.IsAbstract)
+                .Distinct()
+                .OrderBy(x => x.Name.CapitalizeFirstLetter())
+                .ToList();
+        }
+
+        /// <summary>
+        /// Appends cache expiration logic for a single container property across all its concrete container classes.
+        /// </summary>
+        /// <param name="result">The <see cref="StringBuilder" /> to append code to.</param>
+        /// <param name="property">The opposite composite property representing container ownership.</param>
+        /// <param name="concreteClasses">The list of concrete container classes.</param>
+        /// <param name="subjectClassName">The name of the subject class being modified.</param>
+        private static void AppendPropertyCacheExpiration(StringBuilder result, IProperty property, List<IClass> concreteClasses, string subjectClassName)
+        {
+            var isNullable = property.QueryIsNullable();
+            var propName = property.Name.CapitalizeFirstLetter();
+            var condition = isNullable ? $"thing.{propName} != null" : $"thing.{propName} != Guid.Empty";
+            var valueAccessor = isNullable ? $"{propName}.Value" : propName;
+
+            result.AppendLine($"                if ({condition})");
+            result.AppendLine("                {");
+
+            var isFirst = true;
+
+            foreach (var concreteClass in concreteClasses)
+            {
+                if (!isFirst)
+                {
+                    result.AppendLine();
+                }
+
+                isFirst = false;
+                var className = concreteClass.Name.CapitalizeFirstLetter();
+
+                result.AppendLine($"                    if (this.fusionCache.GetOrDefault<List<Guid>>(\"{className}::Identifiers\", defaultValue: [], token: token).Contains(thing.{valueAccessor}))");
+                result.AppendLine("                    {");
+                result.AppendLine($"                        this.logger.LogDebug(\"Expiring the {className} Identifier cache after a new {subjectClassName} was created\");");
+                result.AppendLine($"                        await this.fusionCache.ExpireAsync(\"{className}::Identifiers\", token: token);");
+                result.AppendLine($"                        await this.fusionCache.ExpireAsync($\"{className}:{{thing.{valueAccessor}}}\", token: token);");
+                result.AppendLine("                    }");
+            }
+
+            result.AppendLine("                }");
         }
 
         /// <summary>

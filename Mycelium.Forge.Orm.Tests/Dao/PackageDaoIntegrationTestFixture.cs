@@ -65,7 +65,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 await primeTransaction.CommitAsync();
             }
 
+            await this.fusionCache.SetAsync("Account::Identifiers", new List<Guid> { this.accountId });
+            await this.fusionCache.SetAsync($"Account:{this.accountId}", new Account { Id = this.accountId });
+
             var cachedIdentifiersBeforeCreate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+            var cachedAccountIdentifiersBeforeCreate = await this.fusionCache.TryGetAsync<List<Guid>>("Account::Identifiers");
+            var cachedAccountBeforeCreate = await this.fusionCache.TryGetAsync<Account>($"Account:{this.accountId}");
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
@@ -76,6 +81,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
 
             var cachedIdentifiersAfterCreate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+            var cachedAccountIdentifiersAfterCreate = await this.fusionCache.TryGetAsync<List<Guid>>("Account::Identifiers");
+            var cachedAccountAfterCreate = await this.fusionCache.TryGetAsync<Account>($"Account:{this.accountId}");
 
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
@@ -88,6 +95,10 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 {
                     Assert.That(cachedIdentifiersBeforeCreate.HasValue, Is.True);
                     Assert.That(cachedIdentifiersAfterCreate.HasValue, Is.False);
+                    Assert.That(cachedAccountIdentifiersBeforeCreate.HasValue, Is.True);
+                    Assert.That(cachedAccountBeforeCreate.HasValue, Is.True);
+                    Assert.That(cachedAccountIdentifiersAfterCreate.HasValue, Is.False);
+                    Assert.That(cachedAccountAfterCreate.HasValue, Is.False);
                     Assert.That(readResult.IsSuccess, Is.True);
                     Assert.That(readResult.Value, Has.Count.EqualTo(1));
                     Assert.That(readResult.Value[0].Id, Is.EqualTo(packageId));
@@ -112,7 +123,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Name = "TestPackageDelete",
                 ShortName = "test-pkg-delete",
                 Description = "Test package delete description",
-                Owner = this.accountId,
+                Owner = this.org1Id,
                 PackageType = this.packageTypeId,
                 Listed = true,
                 Visibility = VisibilityKind.PUBLIC
@@ -126,7 +137,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 await primeTransaction.CommitAsync();
             }
 
+            await this.fusionCache.SetAsync("Organization::Identifiers", new List<Guid> { this.org1Id });
+            await this.fusionCache.SetAsync($"Organization:{this.org1Id}", new Organization { Id = this.org1Id });
+
             var cachedIdentifiersBeforeDelete = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+            var cachedOrgIdentifiersBeforeDelete = await this.fusionCache.TryGetAsync<List<Guid>>("Organization::Identifiers");
+            var cachedOrgBeforeDelete = await this.fusionCache.TryGetAsync<Organization>($"Organization:{this.org1Id}");
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
@@ -136,6 +152,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
 
             var cachedIdentifiersAfterDelete = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+            var cachedOrgIdentifiersAfterDelete = await this.fusionCache.TryGetAsync<List<Guid>>("Organization::Identifiers");
+            var cachedOrgAfterDelete = await this.fusionCache.TryGetAsync<Organization>($"Organization:{this.org1Id}");
 
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
@@ -147,6 +165,10 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 {
                     Assert.That(cachedIdentifiersBeforeDelete.HasValue, Is.True);
                     Assert.That(cachedIdentifiersAfterDelete.HasValue, Is.False);
+                    Assert.That(cachedOrgIdentifiersBeforeDelete.HasValue, Is.True);
+                    Assert.That(cachedOrgBeforeDelete.HasValue, Is.True);
+                    Assert.That(cachedOrgIdentifiersAfterDelete.HasValue, Is.False);
+                    Assert.That(cachedOrgAfterDelete.HasValue, Is.False);
                     Assert.That(readResult.IsError, Is.True);
                     Assert.That(cachedAfterDelete.HasValue, Is.False);
                 }
@@ -288,7 +310,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 await primeTransaction.CommitAsync();
             }
 
+            await this.fusionCache.SetAsync("Account::Identifiers", new List<Guid> { this.accountId });
+            await this.fusionCache.SetAsync($"Account:{this.accountId}", new Account { Id = this.accountId });
+
             var cachedIdentifiersBeforeUpdate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+            var cachedAccountIdentifiersBeforeUpdate = await this.fusionCache.TryGetAsync<List<Guid>>("Account::Identifiers");
+            var cachedAccountBeforeUpdate = await this.fusionCache.TryGetAsync<Account>($"Account:{this.accountId}");
 
             package.Name = "UpdatedPackageName";
             package.Listed = true;
@@ -302,6 +329,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
 
             var cachedIdentifiersAfterUpdate = await this.fusionCache.TryGetAsync<List<Guid>>("Package::Identifiers");
+            var cachedAccountIdentifiersAfterUpdate = await this.fusionCache.TryGetAsync<List<Guid>>("Account::Identifiers");
+            var cachedAccountAfterUpdate = await this.fusionCache.TryGetAsync<Account>($"Account:{this.accountId}");
 
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
@@ -314,6 +343,10 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 {
                     Assert.That(cachedIdentifiersBeforeUpdate.HasValue, Is.True);
                     Assert.That(cachedIdentifiersAfterUpdate.HasValue, Is.False);
+                    Assert.That(cachedAccountIdentifiersBeforeUpdate.HasValue, Is.True);
+                    Assert.That(cachedAccountBeforeUpdate.HasValue, Is.True);
+                    Assert.That(cachedAccountIdentifiersAfterUpdate.HasValue, Is.False);
+                    Assert.That(cachedAccountAfterUpdate.HasValue, Is.False);
                     Assert.That(readResult.Value[0].Name, Is.EqualTo("UpdatedPackageName"));
                     Assert.That(readResult.Value[0].Listed, Is.True);
                     Assert.That(readResult.Value[0].Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
