@@ -36,5 +36,12 @@ namespace Mycelium.Forge.Common
         /// Gets a value indicating whether the user is authenticated.
         /// </summary>
         bool IsAuthenticated { get; }
+
+        /// <summary>
+        /// Determines whether the user context has the specified permission based on its current roles.
+        /// </summary>
+        /// <param name="permission">The permission to check.</param>
+        /// <returns><c>true</c> if the user context has the permission; otherwise, <c>false</c>.</returns>
+        bool HasPermission(PermissionKind permission);
     }
 }

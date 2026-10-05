@@ -190,6 +190,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.Dependents, Has.Count.EqualTo(0));
                 Assert.That(this.viewModel.QualityChecks, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.IsUserAdmin, Is.True);
+                Assert.That(this.viewModel.DownloadCount, Is.Zero);
             }
 
             // Second call: loaded from cache

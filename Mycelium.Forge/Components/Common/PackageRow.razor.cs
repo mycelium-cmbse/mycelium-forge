@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Components.Common
 {
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
     /// Displays summary information for a published package discovery row item.
@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Components.Common
         /// Gets or sets the package row model data to display.
         /// </summary>
         [Parameter]
-        public PackageModel Model { get; set; }
+        public IPackageRowItem Model { get; set; }
 
         /// <summary>
         /// Gets or sets optional additional CSS classes to apply to the row container.
