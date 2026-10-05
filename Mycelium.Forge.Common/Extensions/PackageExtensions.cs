@@ -22,19 +22,19 @@ namespace Mycelium.Forge.Common.Extensions
         {
             /// <summary>
             /// Computes the total download count on the specified <see cref="IPackage" /> as the sum of downloads across the
-            /// provided package versions.
+            /// owned package versions.
             /// </summary>
             /// <param name="packageVersions">The collection of <see cref="IPackageVersion" /> instances associated with the package.</param>
             /// <returns>The total number of downloads across all package versions belonging to this package.</returns>
             public int ComputeDownloadCount(IEnumerable<IPackageVersion> packageVersions)
             {
-                if (package == null || packageVersions == null)
+                if (package == null || package.Version.Count == 0 || packageVersions == null)
                 {
                     return 0;
                 }
 
                 return packageVersions
-                    .Where(v => v.Owner == package.Id)
+                    .Where(v => package.Version.Contains(v.Id))
                     .Sum(v => v.DownloadCount);
             }
         }
