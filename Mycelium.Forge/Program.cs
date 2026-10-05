@@ -1,9 +1,9 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -96,6 +96,8 @@ namespace Mycelium.Forge
                     .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                     .ConfigureServices((context, services) =>
                     {
+                        services.AddMemoryCache();
+                        services.AddFusionCache();
                         services.RegisterDatabase(context.Configuration);
                         services.AddForgeDal();
                         services.AddScoped<IDatabaseMigrator, DatabaseMigrator>();
