@@ -50,7 +50,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
                 Username = "testuser"
             };
 
-            this.userServiceMock.Setup(x => x.GetUserContext()).Returns(this.userContext);
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
 
             this.viewModel = new HomeViewModel(
                 this.packageServiceMock.Object,
@@ -132,7 +132,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
                 Assert.That(this.viewModel.PackageCount, Is.EqualTo(2));
                 Assert.That(this.viewModel.VersionCount, Is.EqualTo(2));
                 Assert.That(this.viewModel.PublisherCount, Is.EqualTo(1));
-                Assert.That(this.viewModel.DownloadCount, Is.Zero);
+                Assert.That(this.viewModel.DownloadCount, Is.EqualTo(700));
                 Assert.That(this.viewModel.StandardLibraries, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.RecentlyUpdated, Has.Count.EqualTo(2));
                 Assert.That(this.viewModel.MostUsed, Has.Count.EqualTo(2));
@@ -145,7 +145,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
 
             await this.viewModel.InitializeViewModel();
 
-            this.userServiceMock.Verify(x => x.GetUserContext(), Times.Exactly(2));
+            this.userServiceMock.Verify(x => x.GetUserContext(false), Times.Exactly(2));
         }
     }
 }

@@ -10,6 +10,7 @@
 @attribute [Route(PageRoutes.Login)]
 @layout AuthLayout
 @rendermode InteractiveServer
+@inherits DisposableComponent
 
 <PageTitle>Sign In &mdash; Mycelium Forge</PageTitle>
 
@@ -66,6 +67,7 @@
                   Variant="ButtonVariant.Default"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnLogin)"
+                  Loading="@(this.ViewModel.IsSubmitting)"
                   Class="w-full">
             Sign in
         </BbButton>

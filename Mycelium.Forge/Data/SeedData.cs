@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Data
     using System.Diagnostics.CodeAnalysis;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
 
     /// <summary>
     /// Provides centralized development seed data entities for database persistence.
@@ -25,7 +26,7 @@ namespace Mycelium.Forge.Data
 
             RegisAccount = new Account
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("c7e6d9d6-f1c4-4b95-b66f-8e182c331601"),
                 Owner = forgeId,
                 Name = "R. André",
                 ShortName = "r.andre",

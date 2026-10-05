@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="LoginViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,17 +9,40 @@
 
 namespace Mycelium.Forge.Tests.ViewModels.Login
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using Microsoft.Extensions.Logging;
+
+    using Moq;
+
+    using Mycelium.Forge.Data;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Login;
 
     [TestFixture]
     public class LoginViewModelTestFixture
     {
+        private Mock<IUserService> userServiceMock;
+
+        private Mock<ILogger<LoginViewModel>> loggerMock;
+
         private LoginViewModel viewModel;
 
         [SetUp]
         public void SetUp()
         {
-            this.viewModel = new LoginViewModel();
+            this.userServiceMock = new Mock<IUserService>();
+            this.loggerMock = new Mock<ILogger<LoginViewModel>>();
+
+            this.viewModel = new LoginViewModel(this.userServiceMock.Object, this.loggerMock.Object);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            this.viewModel.Dispose();
         }
 
         [Test]
@@ -40,13 +63,27 @@ namespace Mycelium.Forge.Tests.ViewModels.Login
         }
 
         [Test]
-        public void VerifyLogin()
+        public async Task VerifyLogin()
         {
-            var result = this.viewModel.Login();
+            var successResult = await this.viewModel.Login(CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(result.IsSuccess, Is.True);
+                Assert.That(successResult.IsError, Is.False);
+                Assert.That(this.viewModel.IsSubmitting, Is.False);
+                this.userServiceMock.Verify(service => service.SetCurrentUser(SeedData.RegisAccount.Id, It.IsAny<CancellationToken>()), Times.Once);
+            }
+
+            // Exception case
+            this.userServiceMock
+                .Setup(service => service.SetCurrentUser(It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Connection broken"));
+
+            var exceptionResult = await this.viewModel.Login(CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(exceptionResult.IsError, Is.True);
                 Assert.That(this.viewModel.IsSubmitting, Is.False);
             }
         }

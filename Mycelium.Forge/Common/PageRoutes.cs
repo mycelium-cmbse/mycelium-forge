@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PageRoutes.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -42,12 +42,22 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The organization and publisher profile page route path.
         /// </summary>
-        public const string Organization = "/organizations/{id}";
+        public const string Organization = "/organizations/{shortName}";
 
         /// <summary>
         /// The user authentication and sign-in page route path.
         /// </summary>
         public const string Login = "/login";
+
+        /// <summary>
+        /// The user authentication cookie login endpoint route path.
+        /// </summary>
+        public const string AuthLogin = "/api/auth/login";
+
+        /// <summary>
+        /// The user authentication sign-out endpoint route path.
+        /// </summary>
+        public const string Logout = "/api/auth/logout";
 
         /// <summary>
         /// The user registration and sign-up page route path.
@@ -138,12 +148,12 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Generates the relative URL for the organization profile page.
         /// </summary>
-        /// <param name="id">The organization identifier or scope.</param>
+        /// <param name="shortName">The organization identifier or scope.</param>
         /// <returns>The formatted organization route path.</returns>
-        public static string GetOrganizationRoute(string id)
+        public static string GetOrganizationRoute(string shortName)
         {
-            var cleanId = (id ?? string.Empty).TrimStart('@');
-            return $"/organizations/{cleanId}";
+            var cleanShortName = (shortName ?? string.Empty).TrimStart('@');
+            return $"/organizations/{cleanShortName}";
         }
 
         /// <summary>

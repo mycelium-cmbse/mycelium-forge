@@ -9,8 +9,8 @@
 
 namespace Mycelium.Forge.ViewModels.OrganizationDetails
 {
-    using Mycelium.Forge.Models.Organization;
-    using Mycelium.Forge.Models.Package;
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
     /// Defines the view model contract for the organization and publisher profile page.
@@ -20,12 +20,12 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         /// <summary>
         /// Gets or sets the organization profile details.
         /// </summary>
-        OrganizationModel Organization { get; set; }
+        IOrganization Organization { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of packages published by the organization.
+        /// Gets or sets the collection of package rows published by the organization.
         /// </summary>
-        List<PackageModel> Packages { get; set; }
+        IReadOnlyList<PackageRowViewModel> Packages { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is an administrator of the organization.
@@ -33,9 +33,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         bool IsUserAdmin { get; set; }
 
         /// <summary>
-        /// Initializes the organization view model state for the specified organization identifier.
+        /// Initializes the organization view model state for the specified organization short name asynchronously.
         /// </summary>
-        /// <param name="id">The unique identifier of the organization.</param>
-        void InitializeViewModel(Guid id);
+        /// <param name="shortName">The short name of the organization.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
+        Task InitializeViewModel(string shortName, CancellationToken cancellationToken = default);
     }
 }

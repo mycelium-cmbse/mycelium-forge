@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ILoginViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,7 +12,7 @@ namespace Mycelium.Forge.ViewModels.Login
     using ErrorOr;
 
     /// <summary>
-    /// Defines operations and state management for the user authentication and sign-in page.
+    /// Defines the view model contract for the user authentication and sign-in page.
     /// </summary>
     public interface ILoginViewModel
     {
@@ -39,7 +39,12 @@ namespace Mycelium.Forge.ViewModels.Login
         /// <summary>
         /// Submits the credentials to authenticate the user.
         /// </summary>
-        /// <returns>A <see cref="ErrorOr{Success}" /> indicating success or failure of the login operation.</returns>
-        ErrorOr<Success> Login();
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <remarks>This is only a placeholder and will be removed once OIDC is configured</remarks>
+        /// <returns>
+        /// A <see cref="Task{TResult}" /> containing an <see cref="ErrorOr{TValue}" /> indicating success or failure of
+        /// the login operation.
+        /// </returns>
+        Task<ErrorOr<Success>> Login(CancellationToken cancellationToken = default);
     }
 }

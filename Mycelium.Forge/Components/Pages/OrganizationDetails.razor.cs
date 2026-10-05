@@ -19,10 +19,10 @@ namespace Mycelium.Forge.Components.Pages
     public partial class OrganizationDetails : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the organization identifier supplied from the URL route.
+        /// Gets or sets the organization short name supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string Id { get; set; } = string.Empty;
+        public string ShortName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the view model for the organization profile page.
@@ -31,32 +31,13 @@ namespace Mycelium.Forge.Components.Pages
         public IOrganizationDetailsViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the current user is an administrator of the organization.
+        /// Handles component parameter updates and initializes the view model with the organization short name asynchronously.
         /// </summary>
-        public bool IsUserAdmin => this.ViewModel.IsUserAdmin;
-
-        /// <summary>
-        /// Gets the formatted metadata summary line for the organization.
-        /// </summary>
-        /// <returns>A formatted string with verified status, package, version, import counts, and member year.</returns>
-        public string GetOrganizationMetaText()
+        /// <returns>A <see cref="Task" /> representing the initialization.</returns>
+        protected override async Task OnParametersSetAsync()
         {
-            var verifiedPrefix = this.ViewModel.Organization.IsVerified ? "Verified publisher · " : string.Empty;
-            return $"{verifiedPrefix}{this.ViewModel.Organization.PackageCount} packages · {this.ViewModel.Organization.VersionCount} versions · {this.ViewModel.Organization.ImportCount} imports · member since {this.ViewModel.Organization.MemberSinceYear}";
-        }
-
-        /// <summary>
-        /// Handles component parameter updates and initializes the view model with the parsed organization identifier.
-        /// </summary>
-        protected override void OnParametersSet()
-        {
-            base.OnParametersSet();
-
-            var idParsed = Guid.TryParse(this.Id, out var parsedGuid)
-                ? parsedGuid
-                : Guid.Empty;
-
-            this.ViewModel.InitializeViewModel(idParsed);
+            await base.OnParametersSetAsync();
+            await this.ViewModel.InitializeViewModel(this.ShortName);
         }
     }
 }

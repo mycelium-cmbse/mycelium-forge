@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -23,7 +24,6 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages;
-    using Mycelium.Forge.Models.Organization;
     using Mycelium.Forge.ViewModels.OrganizationDetails;
 
     [TestFixture]
@@ -31,6 +31,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
     {
         private BunitContext context;
         private Mock<IOrganizationDetailsViewModel> viewModelMock;
+        private Organization organization;
 
         [SetUp]
         public void SetUp()
@@ -43,18 +44,16 @@ namespace Mycelium.Forge.Tests.Components.Pages
 
             this.viewModelMock = new Mock<IOrganizationDetailsViewModel>();
 
-            var organization = new OrganizationModel(
-                new Organization { Name = "Starion Group", ShortName = "starion" },
-                description: "Engineering systems.",
-                isVerified: true,
-                packageCount: 12,
-                versionCount: 48,
-                importCount: 3500)
+            this.organization = new Organization
             {
-                MemberSinceYear = 2023
+                Id = Guid.NewGuid(),
+                Name = "Starion Group",
+                ShortName = "starion",
+                Origin = "https://example.com",
+                CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
-            this.viewModelMock.Setup(x => x.Organization).Returns(organization);
+            this.viewModelMock.Setup(x => x.Organization).Returns(this.organization);
             this.viewModelMock.Setup(x => x.Packages).Returns([]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
@@ -67,26 +66,15 @@ namespace Mycelium.Forge.Tests.Components.Pages
         }
 
         [Test]
-        public void VerifyGetOrganizationMetaText()
-        {
-            var orgDetailsPage = this.context.Render<OrganizationDetails>();
-            var metaText = orgDetailsPage.Instance.GetOrganizationMetaText();
-
-            Assert.That(metaText, Does.Contain("Verified publisher · 12 packages · 48 versions · 3500 imports · member since 2023"));
-        }
-
-        [Test]
         public void VerifyOnParametersSet()
         {
-            var guid = Guid.NewGuid();
-
             var orgDetailsPage = this.context.Render<OrganizationDetails>(parameters => parameters
-                .Add(p => p.Id, guid.ToString()));
+                .Add(p => p.ShortName, "starion"));
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(orgDetailsPage.Instance, Is.Not.Null);
-                this.viewModelMock.Verify(x => x.InitializeViewModel(guid), Times.Once);
+                this.viewModelMock.Verify(x => x.InitializeViewModel("starion", It.IsAny<CancellationToken>()), Times.Once);
             }
         }
     }

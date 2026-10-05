@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IPackageDetailsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -35,6 +35,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// Gets or sets the collection of released package version DTOs.
         /// </summary>
         IReadOnlyList<IPackageVersion> Versions { get; set; }
+
+        /// <summary>
+        /// Gets the total download count computed across all versions of the package.
+        /// </summary>
+        int DownloadCount { get; }
 
         /// <summary>
         /// Gets or sets the collection of maintainer account DTOs.

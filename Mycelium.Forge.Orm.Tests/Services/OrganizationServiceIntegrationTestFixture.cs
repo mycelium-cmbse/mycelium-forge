@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Orm.Tests.Services
 {
+    using ErrorOr;
+
     using Microsoft.Extensions.Logging;
 
     using Moq;
@@ -40,6 +42,40 @@ namespace Mycelium.Forge.Orm.Tests.Services
         private Guid privateOrgId;
         private Guid adminAccountId;
         private Guid memberAccountId;
+
+        [Test]
+        public async Task VerifyReadByShortNameAsync()
+        {
+            var anonPublicResult = await this.service.ReadByShortNameAsync(this.anonymousUserContext, "public-org", CancellationToken.None);
+            var memberPublicResult = await this.service.ReadByShortNameAsync(this.memberUserContext, "public-org", CancellationToken.None);
+            var adminPublicResult = await this.service.ReadByShortNameAsync(this.adminUserContext, "public-org", CancellationToken.None);
+
+            var adminPrivateResult = await this.service.ReadByShortNameAsync(this.adminUserContext, "private-org", CancellationToken.None);
+            var anonPrivateResult = await this.service.ReadByShortNameAsync(this.anonymousUserContext, "private-org", CancellationToken.None);
+            var notFoundResult = await this.service.ReadByShortNameAsync(this.adminUserContext, "non-existent-org", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(anonPublicResult.IsError, Is.False);
+                Assert.That(anonPublicResult.Value.Id, Is.EqualTo(this.publicOrgId));
+                Assert.That(anonPublicResult.Value.ShortName, Is.EqualTo("public-org"));
+
+                Assert.That(memberPublicResult.IsError, Is.False);
+                Assert.That(memberPublicResult.Value.Id, Is.EqualTo(this.publicOrgId));
+
+                Assert.That(adminPublicResult.IsError, Is.False);
+                Assert.That(adminPublicResult.Value.Id, Is.EqualTo(this.publicOrgId));
+
+                Assert.That(adminPrivateResult.IsError, Is.False);
+                Assert.That(adminPrivateResult.Value.Id, Is.EqualTo(this.privateOrgId));
+
+                Assert.That(anonPrivateResult.IsError, Is.False);
+                Assert.That(anonPrivateResult.Value.Id, Is.EqualTo(this.privateOrgId));
+
+                Assert.That(notFoundResult.IsError, Is.True);
+                Assert.That(notFoundResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
+            }
+        }
 
         [Test]
         public async Task VerifyUpdateAsync()
@@ -80,6 +116,15 @@ namespace Mycelium.Forge.Orm.Tests.Services
             var orgPermissionService = new OrganizationPermissionService();
 
             var databaseSourceMock = new Mock<IDatabaseSource>();
+
+            databaseSourceMock
+                .Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
+                .Returns(async () =>
+                {
+                    var connection = new NpgsqlConnection(this.ConnectionString);
+                    await connection.OpenAsync();
+                    return connection;
+                });
 
             this.service = new OrganizationService(organizationDao, new OrganizationValidator(), orgPermissionService, new OrganizationComparer(), this.TestLoggerFactory.CreateLogger<OrganizationService>(), databaseSourceMock.Object);
 

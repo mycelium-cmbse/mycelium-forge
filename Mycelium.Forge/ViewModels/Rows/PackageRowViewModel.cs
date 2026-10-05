@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageRowViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,12 +10,13 @@
 namespace Mycelium.Forge.ViewModels.Rows
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
     using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents the display data for a single package version row or card in the catalog sections.
     /// </summary>
-    public sealed class PackageRowViewModel
+    public sealed class PackageRowViewModel : IPackageRowItem
     {
         /// <summary>
         /// Constant representing the default starion publisher namespace.
@@ -116,8 +117,9 @@ namespace Mycelium.Forge.ViewModels.Rows
         /// The collection of related <see cref="IThing" /> instances containing scopes (organizations or accounts), package
         /// versions, and package types.
         /// </param>
+        /// <param name="isVerified">A value indicating whether the packages should be marked as verified.</param>
         /// <returns>A read-only list of <see cref="PackageRowViewModel" /> instances.</returns>
-        public static IReadOnlyList<PackageRowViewModel> GenerateRows(IEnumerable<IPackage> packages, IEnumerable<IThing> things)
+        public static IReadOnlyList<PackageRowViewModel> GenerateRows(IEnumerable<IPackage> packages, IEnumerable<IThing> things, bool isVerified = true)
         {
             var thingsList = things?.ToList() ?? [];
             var scopes = thingsList.OfType<IScope>().ToList();
@@ -150,9 +152,9 @@ namespace Mycelium.Forge.ViewModels.Rows
                     Version = latestVersion != null ? latestVersion.Version : DefaultVersion,
                     Format = packageType?.Name ?? PackageFormatConstants.SysMlV2,
                     Tags = ResolveTagsForPackage(package),
-                    DownloadCount = latestVersion?.DownloadCount ?? 0,
+                    DownloadCount = package.ComputeDownloadCount(packageVersions),
                     DependentsCount = ResolveDependentsCountForPackage(package),
-                    IsVerified = true,
+                    IsVerified = isVerified,
                     CreatedAt = package.CreatedAt,
                     LatestPublicationDate = latestPublicationDate,
                     LastPublished = latestPublicationDate.ToTimeAgo()

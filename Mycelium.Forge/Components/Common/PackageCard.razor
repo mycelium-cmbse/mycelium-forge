@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageCard.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -55,18 +55,11 @@
                 by @(this.PackageRowViewModel.Publisher) · @(this.PackageRowViewModel.Version)
             </span>
             <div class="flex items-center gap-1.5 text-muted-foreground shrink-0">
-                @if (this.PackageRowViewModel.DownloadCount > 0)
-                {
-                    <span>@(this.PackageRowViewModel.DownloadCount) downloads</span>
-                }
+                <span>@(this.PackageRowViewModel.DownloadCount.ToCompactMetric()) downloads</span>
+
                 @if (this.PackageRowViewModel.DependentsCount > 0)
                 {
-                    if (this.PackageRowViewModel.DownloadCount > 0)
-                    {
-                        <span>·</span>
-                    }
-
-                    <span>@(this.PackageRowViewModel.DependentsCount) dependents</span>
+                    <span>· @(this.PackageRowViewModel.DependentsCount) dependents</span>
                 }
             </div>
         </div>

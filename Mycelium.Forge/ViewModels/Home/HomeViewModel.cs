@@ -115,7 +115,7 @@ namespace Mycelium.Forge.ViewModels.Home
         /// <returns>A <see cref="Task" />.</returns>
         public async Task InitializeViewModel()
         {
-            var userContext = this.userService.GetUserContext();
+            var userContext = await this.userService.GetUserContext();
 
             var packagesResult = await this.packageService.ReadAsync(userContext, CancellationToken.None);
 
@@ -145,7 +145,7 @@ namespace Mycelium.Forge.ViewModels.Home
             this.PackageCount = packages.Count;
             this.VersionCount = packageVersions.Count;
             this.PublisherCount = scopes.Select(s => s.Id).Count();
-            this.DownloadCount = packages.Sum(p => p.downloadCount);
+            this.DownloadCount = allRows.Sum(p => p.DownloadCount);
 
             this.StandardLibraries = allRows
                 .Where(p => StandardLibraryPublishers.Contains(p.Publisher) && p.Format == PackageFormatConstants.SysMlV2)

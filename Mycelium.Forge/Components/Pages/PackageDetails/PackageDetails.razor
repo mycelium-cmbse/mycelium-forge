@@ -1,7 +1,4 @@
-@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
-@using Mycelium.Forge.ViewModels.PackageDetails
-@using Mycelium.Forge.ViewModels.Rows
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageDetails.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -9,6 +6,9 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
+
+@using Mycelium.Forge.Components.Pages.PackageDetails.Tabs
+
 @attribute [Route(PageRoutes.Package)]
 @attribute [Route(PageRoutes.PackageTab)]
 
@@ -72,7 +72,7 @@
         </p>
 
         <p class="text-xs leading-2xs text-muted-foreground">
-            Published recently by @@@(this.ViewModel.Owner.ShortName) · @(this.ViewModel.Package.License) · @(this.ViewModel.Package.downloadCount) downloads
+            Published recently by @@@(this.ViewModel.Owner.ShortName) · @(this.ViewModel.Package.License) · @(this.ViewModel.DownloadCount.ToCompactMetric()) downloads
         </p>
 
         <PackageDetailsActions Package="@(this.ViewModel.Package)"
@@ -86,7 +86,7 @@
                     DOWNLOADS
                 </span>
                 <span class="text-xl leading-lg font-semibold text-foreground">
-                    @(this.ViewModel.Package.downloadCount)
+                    @(this.ViewModel.DownloadCount.ToCompactMetric())
                 </span>
             </div>
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
