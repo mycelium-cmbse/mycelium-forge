@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -28,10 +28,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
     using ZiggyCreatures.Caching.Fusion;
 
-    /// <summary>
-    /// Integration test suite for <see cref="OrganizationService" /> verifying end-to-end read behaviour
-    /// against a real PostgreSQL instance provided by Testcontainers.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class OrganizationServiceIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -45,14 +41,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
         private Guid adminAccountId;
         private Guid memberAccountId;
 
-        /// <summary>
-        /// Verifies that
-        /// <see
-        ///     cref="OrganizationService.UpdateAsync(IUserContext, NpgsqlTransaction, IEnumerable{IOrganization}, CancellationToken)" />
-        /// correctly updates an existing organization in the database for an administrator and rejects unauthorized updates from
-        /// anonymous or non-administrator users.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyUpdateAsync()
         {
@@ -83,30 +71,17 @@ namespace Mycelium.Forge.Orm.Tests.Services
             }
         }
 
-        /// <summary>
-        /// Wires up DAOs, the service under test, user contexts, and prerequisite database records before each test.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
             var fusionCache = new FusionCache(new FusionCacheOptions());
 
-            var organizationDao = new OrganizationDao(
-                this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer,
-                fusionCache);
+            var organizationDao = new OrganizationDao(this.TestLoggerFactory.CreateLogger<OrganizationDao>(), this.Serializer, fusionCache);
 
             var orgPermissionService = new OrganizationPermissionService();
 
             var databaseSourceMock = new Mock<IDatabaseSource>();
 
-            this.service = new OrganizationService(
-                organizationDao,
-                new OrganizationValidator(),
-                orgPermissionService,
-                new OrganizationComparer(),
-                this.TestLoggerFactory.CreateLogger<OrganizationService>(),
-                databaseSourceMock.Object);
+            this.service = new OrganizationService(organizationDao, new OrganizationValidator(), orgPermissionService, new OrganizationComparer(), this.TestLoggerFactory.CreateLogger<OrganizationService>(), databaseSourceMock.Object);
 
             this.adminAccountId = Guid.NewGuid();
             this.memberAccountId = Guid.NewGuid();
@@ -130,12 +105,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             await this.SeedDatabaseAsync(organizationDao, this.adminAccountId);
         }
 
-        /// <summary>
-        /// Seeds the database with prerequisite records required by the tests.
-        /// </summary>
-        /// <param name="organizationDao">The <see cref="OrganizationDao" /> used to insert organizations.</param>
-        /// <param name="adminAccount">The ID of the administrator account.</param>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         private async Task SeedDatabaseAsync(OrganizationDao organizationDao, Guid adminAccount)
         {
             var fusionCache = new FusionCache(new FusionCacheOptions());

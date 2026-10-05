@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDaoIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -22,9 +22,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
     using ZiggyCreatures.Caching.Fusion;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="PackageDao" /> class.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class PackageDaoIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -39,19 +36,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
         private Guid org1Id;
         private Guid org2Id;
 
-        /// <summary>
-        /// Cleans up resources after each test.
-        /// </summary>
         [TearDown]
         public void TearDown()
         {
             this.fusionCache.Dispose();
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.CreateAsync" /> correctly persists a new Package in the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyCreateAsync()
         {
@@ -122,10 +112,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.DeleteAsync" /> deletes a Package from the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyDeleteAsync()
         {
@@ -189,11 +175,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.ReadAsync" /> reads packages by identifiers, handles missing entries,
-        /// and enforces organization visibility filters on internal packages.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -269,10 +250,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.ReadIdentifiersAsync" /> returns all Package IDs in the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadIdentifiersAsync()
         {
@@ -308,10 +285,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.UpdateAsync" /> updates mutable fields of an existing Package.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyUpdateAsync()
         {
@@ -383,10 +356,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Sets up DAOs and prerequisite records before each test.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
             this.fusionCache = new FusionCache(new FusionCacheOptions());
