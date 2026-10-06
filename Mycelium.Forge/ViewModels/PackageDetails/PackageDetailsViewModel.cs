@@ -167,11 +167,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         public async Task InitializeViewModel(string packageName, string scope, string tab = null)
         {
-            if (string.IsNullOrWhiteSpace(packageName) || string.IsNullOrWhiteSpace(scope))
-            {
-                return;
-            }
-
             var normalizedPackageName = packageName.Trim().ToLowerInvariant();
             var normalizedScope = scope.Trim().ToLowerInvariant();
 
