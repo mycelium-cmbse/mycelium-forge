@@ -32,19 +32,19 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// A humand readable description of this PackageType
         /// </summary>
-        [Property(xmiId: "EAID_DB2CC1A3_0314_471e_BE53_04A8E620A06D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_DB2CC1A3_0314_471e_BE53_04A8E620A06D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string Description { get; set; }
 
         /// <summary>
         /// Human readable character string in English by which something can be referred to.
         /// </summary>
-        [Property(xmiId: "EAID_932920D8_9B6C_4e9e_B832_DEB63E72B9E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_932920D8_9B6C_4e9e_B832_DEB63E72B9E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         string Name { get; set; }
 
         /// <summary>
         /// The unique identifier of the owning Forge.
         /// </summary>
-        [Property(xmiId: "EAID_srcF15AA0_EBC4_4186_B88D_3B78570FFDFA", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_srcF15AA0_EBC4_4186_B88D_3B78570FFDFA", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         Guid Owner { get; set; }
     }
 }

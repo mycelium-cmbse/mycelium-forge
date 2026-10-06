@@ -32,42 +32,42 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The DateTime at which the Thing has been created.
         /// </summary>
-        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.CreatedAt")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// A humand readable description of this PackageType
         /// </summary>
-        [Property(xmiId: "EAID_DB2CC1A3_0314_471e_BE53_04A8E620A06D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_DB2CC1A3_0314_471e_BE53_04A8E620A06D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackageType.Description")]
         public string Description { get; set; }
 
         /// <summary>
         /// Universally Unique Identifier (UUID) that uniquely identifies an instance of Thing.
         /// </summary>
-        [Property(xmiId: "EAID_3A963DC1_6E7A_4925_8686_A68C8799F12E", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_3A963DC1_6E7A_4925_8686_A68C8799F12E", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.Id")]
         public Guid Id { get; set; }
 
         /// <summary>
         /// The DateTime at which the Thing was last modified.
         /// </summary>
-        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.ModifiedAt")]
         public DateTime ModifiedAt { get; set; }
 
         /// <summary>
         /// Human readable character string in English by which something can be referred to.
         /// </summary>
-        [Property(xmiId: "EAID_932920D8_9B6C_4e9e_B832_DEB63E72B9E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_932920D8_9B6C_4e9e_B832_DEB63E72B9E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackageType.Name")]
         public string Name { get; set; }
 
         /// <summary>
         /// The unique identifier of the owning Forge.
         /// </summary>
-        [Property(xmiId: "EAID_srcF15AA0_EBC4_4186_B88D_3B78570FFDFA", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_srcF15AA0_EBC4_4186_B88D_3B78570FFDFA", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "IPackageType.Owner")]
         public Guid Owner { get; set; }
     }

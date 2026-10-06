@@ -27,20 +27,20 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The unique identifier of the owning Scope.
         /// </summary>
-        [Property(xmiId: "EAID_src19B56E_EDEF_4ae8_9DFA_BB957BFD237E", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_src19B56E_EDEF_4ae8_9DFA_BB957BFD237E", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         Guid Owner { get; set; }
 
         /// <summary>
         /// The type of Profile that is being referenced
         /// </summary>
-        [Property(xmiId: "EAID_dst6CA9DA_2B68_4638_A050_F2C1D6256329", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_dst6CA9DA_2B68_4638_A050_F2C1D6256329", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         Guid ProfileType { get; set; }
 
         /// <summary>
         /// The actual web address pointing to the Account's profile on the platform identified by the
         /// associated ProfileType
         /// </summary>
-        [Property(xmiId: "EAID_D49CC3FC_62EC_404e_9B1E_879EA59D11FD", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_D49CC3FC_62EC_404e_9B1E_879EA59D11FD", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string Uri { get; set; }
     }
 }

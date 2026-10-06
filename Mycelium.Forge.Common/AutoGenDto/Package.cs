@@ -28,14 +28,14 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The DateTime at which the Thing has been created.
         /// </summary>
-        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.CreatedAt")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// A human readable description for the Package.
         /// </summary>
-        [Property(xmiId: "EAID_03CDEFB7_67B8_4310_A5D7_E3FA99CBDD57", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_03CDEFB7_67B8_4310_A5D7_E3FA99CBDD57", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.Description")]
         public string Description { get; set; }
 
@@ -43,14 +43,14 @@ namespace Mycelium.Forge.Common
         /// Total downloads across the Package, computed as the sum of downloadCount over all its
         /// PackageVersions. Never set directly; always reflects the current totals of its versions.
         /// </summary>
-        [Property(xmiId: "EAID_92CAFF82_73D8_4c5d_86A2_5768EDE59367", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: true, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_92CAFF82_73D8_4c5d_86A2_5768EDE59367", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: true, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.DownloadCount")]
         public int downloadCount { get; internal set; }
 
         /// <summary>
         /// Universally Unique Identifier (UUID) that uniquely identifies an instance of Thing.
         /// </summary>
-        [Property(xmiId: "EAID_3A963DC1_6E7A_4925_8686_A68C8799F12E", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_3A963DC1_6E7A_4925_8686_A68C8799F12E", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.Id")]
         public Guid Id { get; set; }
 
@@ -58,52 +58,52 @@ namespace Mycelium.Forge.Common
         /// Whether the Package appears in search results and browsable listings. When false, it's still
         /// reachable directly (e.g. by exact name or link) but hidden from discovery.
         /// </summary>
-        [Property(xmiId: "EAID_4F8A692D_12D7_4a0e_BF07_B7BD116E7E01", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_4F8A692D_12D7_4a0e_BF07_B7BD116E7E01", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.Listed")]
         public bool Listed { get; set; }
 
         /// <summary>
         /// The DateTime at which the Thing was last modified.
         /// </summary>
-        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.ModifiedAt")]
         public DateTime ModifiedAt { get; set; }
 
         /// <summary>
-        /// A human readable character string in English by which a Namespace instance can be referred to.e.g.
+        /// A human readable character string in English by which a Namespace instance can be referred to. e.g.
         /// an Organization's full legal or display name, an Account's chosen display name, a Package's full
         /// name, or the Forge's own instance name. Mandatory, and globally unique across every Namespace
         /// subtype.
         /// </summary>
-        [Property(xmiId: "EAID_4F9CE1B0_75B2_4f0f_96BE_251F42265A8D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_4F9CE1B0_75B2_4f0f_96BE_251F42265A8D", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "INamespace.Name")]
         public string Name { get; set; }
 
         /// <summary>
         /// The unique identifier of the owning Scope.
         /// </summary>
-        [Property(xmiId: "EAID_srcAF0422_E33E_4c34_AA14_D530733FFD0B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_srcAF0422_E33E_4c34_AA14_D530733FFD0B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "IPackage.Owner")]
         public Guid Owner { get; set; }
 
         /// <summary>
         /// The accounts that represent the Package maintainers
         /// </summary>
-        [Property(xmiId: "EAID_dst10BE38_3F02_4f31_AB54_D3C754FAC7FE", aggregation: AggregationKind.None, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_dst10BE38_3F02_4f31_AB54_D3C754FAC7FE", aggregation: AggregationKind.None, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.PackageMaintainer")]
         public List<Guid> PackageMaintainer { get; set; } = [];
 
         /// <summary>
         /// The accounts that represent the Package owners
         /// </summary>
-        [Property(xmiId: "EAID_dst2A162D_DE42_4b01_9B5F_17A7DA9D182F", aggregation: AggregationKind.None, lowerValue: 1, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_dst2A162D_DE42_4b01_9B5F_17A7DA9D182F", aggregation: AggregationKind.None, lowerValue: 1, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.PackageOwner")]
         public List<Guid> PackageOwner { get; set; } = [];
 
         /// <summary>
         /// The referenced PackageType that denotes what kind of Package this is.
         /// </summary>
-        [Property(xmiId: "EAID_dst22907F_7B04_491a_9894_18D7F240B0C8", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_dst22907F_7B04_491a_9894_18D7F240B0C8", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.PackageType")]
         public Guid PackageType { get; set; }
 
@@ -114,14 +114,14 @@ namespace Mycelium.Forge.Common
         /// subtype, independently of name's uniqueness. Functions as the practical "handle" or "slug" used in
         /// addresses, links, and package coordinates, while name remains the display-facing label
         /// </summary>
-        [Property(xmiId: "EAID_89C8F800_EE59_4169_853B_B38E6B1857AC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_89C8F800_EE59_4169_853B_B38E6B1857AC", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "INamespace.ShortName")]
         public string ShortName { get; set; }
 
         /// <summary>
         /// The PackageVersions that are owned by the Package
         /// </summary>
-        [Property(xmiId: "EAID_dstEAA194_978B_4aa5_BEBC_DC3C38829711", aggregation: AggregationKind.Composite, lowerValue: 1, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_dstEAA194_978B_4aa5_BEBC_DC3C38829711", aggregation: AggregationKind.Composite, lowerValue: 1, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.Version")]
         public List<Guid> Version { get; set; } = [];
 
@@ -130,7 +130,7 @@ namespace Mycelium.Forge.Common
         /// Account, per the earlier invariant, since "internal" only makes sense within an organizational
         /// boundary
         /// </summary>
-        [Property(xmiId: "EAID_84CB2554_8FEB_49ee_ADC4_8AEAECB7D2D1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_84CB2554_8FEB_49ee_ADC4_8AEAECB7D2D1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.Visibility")]
         public VisibilityKind Visibility { get; set; }
     }

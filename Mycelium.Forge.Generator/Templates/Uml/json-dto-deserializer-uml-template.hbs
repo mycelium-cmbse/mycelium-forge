@@ -140,12 +140,12 @@ namespace Mycelium.Forge.Serializer.Json
                     {{else if (Property.QueryIsDateTime property )}}
                         dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetDateTime());
                     {{else if (Property.QueryIsNumeric property )}}
-                        {{#if (Property.QueryIsInteger property) }}
+                        {{#if (Property.QueryIsByte property) }}
+                        dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetByte());
+                        {{else if (Property.QueryIsInteger property) }}
                         dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetInt32());
                         {{else if (Property.QueryIsDouble property) }}
                         dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetDouble());
-                        {{else if (Property.QueryIsByte property) }}
-                        dtoInstance.{{Property.WritePropertyName property}}.Add(reader.GetByte());
                         {{ else }}
                         throw new NotImplementedException("Enumerable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                         {{/if}}
@@ -166,12 +166,12 @@ namespace Mycelium.Forge.Serializer.Json
                     {{else if (Property.QueryIsDateTime property )}}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetDateTime();
                     {{else if (Property.QueryIsNumeric property )}}
-                        {{#if (Property.QueryIsInteger property) }}
+                        {{#if (Property.QueryIsByte property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetByte();
+                        {{else if (Property.QueryIsInteger property) }}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetInt32();
                         {{else if (Property.QueryIsDouble property) }}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetDouble();
-                        {{else if (Property.QueryIsByte property) }}
-                        dtoInstance.{{Property.WritePropertyName property}} = reader.TokenType == JsonTokenType.Null ? null : reader.GetByte();
                         {{ else }}
                         throw new NotImplementedException("Nullable Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                         {{/if}}
@@ -189,12 +189,12 @@ namespace Mycelium.Forge.Serializer.Json
                     {{else if (Property.QueryIsDateTime property )}}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.GetDateTime();
                     {{else if (Property.QueryIsNumeric property )}}
-                        {{#if (Property.QueryIsInteger property) }}
+                        {{#if (Property.QueryIsByte property) }}
+                        dtoInstance.{{Property.WritePropertyName property}} = reader.GetByte();
+                        {{else if (Property.QueryIsInteger property) }}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.GetInt32();
                         {{else if (Property.QueryIsDouble property) }}
                         dtoInstance.{{Property.WritePropertyName property}} = reader.GetDouble();
-                        {{else if (Property.QueryIsByte property) }}
-                        dtoInstance.{{Property.WritePropertyName property}} = reader.GetByte();
                         {{ else }}
                         throw new NotImplementedException("Scalar Numeric - {{ class.Name }}.{{property.Name}} is not yet supported");
                         {{/if}}

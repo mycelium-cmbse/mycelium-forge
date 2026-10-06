@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -19,9 +19,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="uml4net.HandleBars" Version="8.4.0" />
-        <PackageReference Include="uml4net.Reporting" Version="8.6.0" />
-        <PackageReference Include="uml4net.xmi.Extensions.EnterpriseArchitect" Version="8.6.0" />
+        <PackageReference Include="uml4net.HandleBars" Version="9.1.0" />
+        <PackageReference Include="uml4net.Reporting" Version="9.1.0" />
+        <PackageReference Include="uml4net.xmi.Extensions.EnterpriseArchitect" Version="9.1.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.6.0" />
     </ItemGroup>
 
