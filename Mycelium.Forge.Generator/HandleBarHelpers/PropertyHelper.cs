@@ -145,8 +145,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new HandlebarsException("{{#Property.WriteForDTOClass}} helper must have exactly two arguments");
                 }
 
-                var property = (IProperty)parameters[0];
-                var classContext = (IClass)parameters[1];
+                var property = parameters.QueryFirst<IProperty>("Property.WriteForDTOClass");
+                var classContext = parameters[1] as IClass ?? throw new HandlebarsException("Property.WriteForDTOClass requires an IClass second argument.");
 
                 var sb = new StringBuilder();
                 var propertyName = property.Name.CapitalizeFirstLetter();

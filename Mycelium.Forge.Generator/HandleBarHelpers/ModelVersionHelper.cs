@@ -39,13 +39,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="fallbackVersion">The fallback model version to write when none is resolved.</param>
         public static void WriteModelVersion(EncodedTextWriter writer, Context context, Arguments arguments, string fallbackVersion = "0.1.0")
         {
-            if (arguments.Length > 0 && arguments[0] is string argVersion)
-            {
-                writer.WriteSafeString(argVersion);
-                return;
-            }
+            var version = arguments.Length > 0
+                ? arguments.QueryFirst<string>("Forge.ModelVersion")
+                : fallbackVersion;
 
-            writer.WriteSafeString(fallbackVersion);
+            writer.WriteSafeString(version);
         }
     }
 }

@@ -28,17 +28,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// </param>
         public static void RegisterEnumerationHelper(this IHandlebars handlebars)
         {
-            handlebars.RegisterHelper("Enumeration.WriteLengthLongestLiteral", (writer, context, arguments) =>
+            handlebars.RegisterHelper("Enumeration.WriteLengthLongestLiteral", (writer, _, arguments) =>
             {
-                if (arguments.Length != 1)
-                {
-                    throw new HandlebarsException("{{#Enumeration.WriteLengthLongestLiteral}} helper must have exactly one argument");
-                }
-
-                if (arguments.Single() is not Enumeration enumeration)
-                {
-                    throw new HandlebarsException("{{#Enumeration.WriteLengthLongestLiteral}} argument must be an Enumeration");
-                }
+                var enumeration = arguments.QuerySingle<Enumeration>("Enumeration.WriteLengthLongestLiteral");
 
                 var maxLenght = enumeration.OwnedLiteral
                     .Select(enumerationLiteral => enumerationLiteral.Name)
