@@ -162,7 +162,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 if (!isRedefinedPropertyInContext)
                 {
-                    sb.Append(property.Visibility.ToString().ToLower(CultureInfo.InvariantCulture));
+                    var visibility = (property.Visibility ?? VisibilityKind.Public).ToString().ToLower(CultureInfo.InvariantCulture);
+                    sb.Append(visibility);
                     sb.Append(' ');
                 }
 

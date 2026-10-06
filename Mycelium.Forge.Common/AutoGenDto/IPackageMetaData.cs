@@ -26,7 +26,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The unique identifier of the owning PackageVersion.
         /// </summary>
-        [Property(xmiId: "EAID_src94AFDF_F62B_4600_9B44_6076F54197E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_src94AFDF_F62B_4600_9B44_6076F54197E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         Guid Owner { get; set; }
     }
 }

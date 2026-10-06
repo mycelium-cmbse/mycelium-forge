@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IInvitation.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -27,7 +27,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The DateTime at which the Invitation expires.
         /// </summary>
-        [Property(xmiId: "EAID_E3F82141_2DBE_4300_B7D9_A82A0816AFB2", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_E3F82141_2DBE_4300_B7D9_A82A0816AFB2", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         DateTime ExperiesAt { get; set; }
 
         /// <summary>
@@ -36,14 +36,14 @@ namespace Mycelium.Forge.Common
         /// it's always accurate and never needs to be actively updated or swept by a background process as time
         /// passes.
         /// </summary>
-        [Property(xmiId: "EAID_E6B5A8E1_3061_45bd_B6AB_E6F39B0FDE9F", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: true, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_E6B5A8E1_3061_45bd_B6AB_E6F39B0FDE9F", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: true, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         bool isExpired { get; }
 
         /// <summary>
         /// The current state of an Invitation in its lifecycle, typed as InvitationStatusKind. Governs whether
         /// the invitation can still be acted on (accepted, declined) or has already been resolved or expired
         /// </summary>
-        [Property(xmiId: "EAID_1F5D5916_4806_4a92_A0C3_95CBD1DA1595", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_1F5D5916_4806_4a92_A0C3_95CBD1DA1595", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         InvitationStatusKind Status { get; set; }
     }
 }

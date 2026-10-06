@@ -29,7 +29,7 @@ namespace Mycelium.Forge.Common
         /// The two-letter ISO 3166-1 alpha-2 code (e.g. "US", "NL"). Serves as the natural key � globally
         /// unique, and the form most commonly used as a foreign-key reference.
         /// </summary>
-        [Property(xmiId: "EAID_66754ACF_D3E7_4105_B193_C558BF782058", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_66754ACF_D3E7_4105_B193_C558BF782058", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string Alpha2Code { get; set; }
 
         /// <summary>
@@ -37,13 +37,13 @@ namespace Mycelium.Forge.Common
         /// readable alternative to alpha2, used in contexts (like some ISO and shipping standards) that prefer
         /// it.
         /// </summary>
-        [Property(xmiId: "EAID_A43279BE_D2FF_46df_886C_F3AA4A6DDAF5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_A43279BE_D2FF_46df_886C_F3AA4A6DDAF5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string Alpha3Code { get; set; }
 
         /// <summary>
         /// The country's full official name (e.g. "The Neterlands"), used for display purposes.
         /// </summary>
-        [Property(xmiId: "EAID_1C566C14_B1D0_4046_A2B0_78434ACD1F62", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_1C566C14_B1D0_4046_A2B0_78434ACD1F62", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         string Name { get; set; }
 
         /// <summary>
@@ -51,13 +51,13 @@ namespace Mycelium.Forge.Common
         /// string rather than an integer so leading zeros (like "032" for Argentina) aren't silently dropped.
         /// Useful for interoperating with older or numeric-only systems.
         /// </summary>
-        [Property(xmiId: "EAID_1F1F6D7B_7983_497f_A3EF_DC0B785AA91C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_1F1F6D7B_7983_497f_A3EF_DC0B785AA91C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string NumericCode { get; set; }
 
         /// <summary>
         /// The unique identifier of the owning Forge.
         /// </summary>
-        [Property(xmiId: "EAID_src695154_E9D7_48d8_887D_FAFCDDA173E1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_src695154_E9D7_48d8_887D_FAFCDDA173E1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         Guid Owner { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace Mycelium.Forge.Common
         /// Indicates whether the tag is part of the Forge's curated global tag set rather than an ad-hoc,
         /// user-created label.
         /// </summary>
-        [Property(xmiId: "EAID_99DCF2DF_5692_4f89_88DD_F3CEB21DA1D5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_99DCF2DF_5692_4f89_88DD_F3CEB21DA1D5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "ITag.IsCurated")]
         public int IsCurated { get; set; }
 
@@ -38,14 +38,14 @@ namespace Mycelium.Forge.Common
         /// the tag's text value, stored as a String. Unique after normalisation; what's displayed and matched
         /// against in search/autocomplete
         /// </summary>
-        [Property(xmiId: "EAID_969CFA62_079A_4551_A43D_88F5EA5FF592", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null)]
+        [Property(xmiId: "EAID_969CFA62_079A_4551_A43D_88F5EA5FF592", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "ITag.Name")]
         public string Name { get; set; }
 
         /// <summary>
         /// The unique identifier of the owning Forge.
         /// </summary>
-        [Property(xmiId: "EAID_src13B896_A2F7_494b_8A14_ABD1D4CD5362", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null)]
+        [Property(xmiId: "EAID_src13B896_A2F7_494b_8A14_ABD1D4CD5362", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "ITag.Owner")]
         public Guid Owner { get; set; }
     }

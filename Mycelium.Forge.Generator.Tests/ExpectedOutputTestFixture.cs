@@ -17,6 +17,7 @@ namespace Mycelium.Forge.Generator.Tests
     using Mycelium.Forge.Generator.Generators;
 
     using uml4net.Reporting.Generators;
+    using uml4net.StructuredClassifiers;
 
     /// <summary>
     /// Follows the uml4net code generation tutorial's own verification pattern
@@ -55,6 +56,7 @@ namespace Mycelium.Forge.Generator.Tests
 
             var interestingClasses = GeneratorSetupFixture.XmiReaderResult.Packages
                 .SelectMany(package => modelInspector.QueryInterestingClasses(package))
+                .OfType<IClass>()
                 .Distinct()
                 .ToList();
 
@@ -64,17 +66,20 @@ namespace Mycelium.Forge.Generator.Tests
             var actualAbstract = interestingClasses
                 .Where(x => x.IsAbstract).Select(x => x.Name).OrderBy(x => x).ToArray();
 
-            Assert.That(actualConcrete, Is.EqualTo([.. ConcreteInterestingClasses.OrderBy(x => x)]),
-                $"ModelInspector.QueryInterestingClasses() no longer reports the same concrete classes as " +
-                $"{nameof(ConcreteInterestingClasses)} in this fixture (see 'actual'/'expected' above). The " +
-                $"Forge model most likely changed - update {nameof(ConcreteInterestingClasses)} and the " +
-                "corresponding Expected/AutoGenDto golden files to match.");
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(actualConcrete, Is.EqualTo([.. ConcreteInterestingClasses.OrderBy(x => x)]),
+                    $"ModelInspector.QueryInterestingClasses() no longer reports the same concrete classes as " +
+                    $"{nameof(ConcreteInterestingClasses)} in this fixture (see 'actual'/'expected' above). The " +
+                    $"Forge model most likely changed - update {nameof(ConcreteInterestingClasses)} and the " +
+                    "corresponding Expected/AutoGenDto golden files to match.");
 
-            Assert.That(actualAbstract, Is.EqualTo([.. AbstractInterestingClasses.OrderBy(x => x)]),
-                $"ModelInspector.QueryInterestingClasses() no longer reports the same abstract classes as " +
-                $"{nameof(AbstractInterestingClasses)} in this fixture (see 'actual'/'expected' above). The " +
-                $"Forge model most likely changed - update {nameof(AbstractInterestingClasses)} and the " +
-                "corresponding Expected/AutoGenDto golden files to match.");
+                Assert.That(actualAbstract, Is.EqualTo([.. AbstractInterestingClasses.OrderBy(x => x)]),
+                    $"ModelInspector.QueryInterestingClasses() no longer reports the same abstract classes as " +
+                    $"{nameof(AbstractInterestingClasses)} in this fixture (see 'actual'/'expected' above). The " +
+                    $"Forge model most likely changed - update {nameof(AbstractInterestingClasses)} and the " +
+                    "corresponding Expected/AutoGenDto golden files to match.");
+            }
         }
 
         [TestCaseSource(nameof(ConcreteInterestingClasses))]
