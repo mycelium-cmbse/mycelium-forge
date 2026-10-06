@@ -1,0 +1,49 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ConfirmPackageActionDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        @if (!string.IsNullOrWhiteSpace(this.Description))
+        {
+            <p class="text-sm leading-xs text-muted-foreground">
+                @(this.Description)
+            </p>
+        }
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="confirm-package-action-input"
+                          Class="form-field-label">
+                To confirm, type "@(this.PackageName)" below:
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="confirm-package-action-input"
+                         @bind-Value="this.ConfirmationInput"
+                         Placeholder="@(this.PackageName)"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  Disabled="@(this.IsConfirmDisabled())"
+                  OnClick="@(this.OnConfirmClicked)"
+                  Class="btn-destructive-outline">
+            @(this.ActionButtonText)
+        </BbButton>
+    </Footer>
+</DialogComponent>

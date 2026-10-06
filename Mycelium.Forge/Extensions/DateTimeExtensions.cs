@@ -25,14 +25,54 @@ namespace Mycelium.Forge.Extensions
         }
 
         /// <summary>
-        /// Formats the specified elapsed value and time unit into a human-readable relative time string.
+        /// Formats the specified duration value and time unit into a relative time unit string.
         /// </summary>
-        /// <param name="value">The number of units elapsed.</param>
+        /// <param name="value">The number of units.</param>
         /// <param name="unit">The name of the time unit (e.g., 'minute', 'hour', 'day', 'week', 'month', 'year').</param>
-        /// <returns>A string formatted as '{value} {unit}(s) ago'.</returns>
-        private static string FormatTimeAgoUnit(int value, string unit)
+        /// <returns>A string formatted as '{value} {unit}(s)'.</returns>
+        private static string FormatTimeUnit(int value, string unit)
         {
-            return value <= 1 ? $"1 {unit} ago" : $"{value} {unit}s ago";
+            return value <= 1 ? $"1 {unit}" : $"{value} {unit}s";
+        }
+
+        /// <summary>
+        /// Formats a time span duration into a relative unit description string.
+        /// </summary>
+        /// <param name="duration">The time span duration to format.</param>
+        /// <returns>A string describing the relative duration in human-readable units.</returns>
+        private static string FormatRelativeDuration(TimeSpan duration)
+        {
+            if (duration.TotalSeconds < 60)
+            {
+                return "just now";
+            }
+
+            if (duration.TotalMinutes < 60)
+            {
+                return FormatTimeUnit((int)duration.TotalMinutes, "minute");
+            }
+
+            if (duration.TotalHours < 24)
+            {
+                return FormatTimeUnit((int)duration.TotalHours, "hour");
+            }
+
+            if (duration.TotalDays < 7)
+            {
+                return FormatTimeUnit((int)duration.TotalDays, "day");
+            }
+
+            if (duration.TotalDays < 30)
+            {
+                return FormatTimeUnit((int)(duration.TotalDays / 7), "week");
+            }
+
+            if (duration.TotalDays < 365)
+            {
+                return FormatTimeUnit((int)(duration.TotalDays / 30), "month");
+            }
+
+            return FormatTimeUnit((int)(duration.TotalDays / 365), "year");
         }
 
         /// <param name="dateTime">The date and time to format.</param>
@@ -55,42 +95,34 @@ namespace Mycelium.Forge.Extensions
             /// <returns>A string describing the elapsed time relative to the reference time.</returns>
             public string ToTimeAgo(DateTime relativeTo)
             {
-                var utcDateTime = ToUtc(dateTime);
-                var utcRelativeTo = ToUtc(relativeTo);
+                var elapsed = ToUtc(relativeTo) - ToUtc(dateTime);
+                var durationText = FormatRelativeDuration(elapsed);
 
-                var elapsed = utcRelativeTo - utcDateTime;
+                return durationText == "just now" ? durationText : $"{durationText} ago";
+            }
 
-                if (elapsed.TotalSeconds < 60)
-                {
-                    return "just now";
-                }
+            /// <summary>
+            /// Formats a <see cref="DateTime" /> into a human-readable relative future time span string compared to the current UTC
+            /// time.
+            /// </summary>
+            /// <returns>A string describing the remaining time relative to now (e.g., 'just now', '2 weeks', '1 month').</returns>
+            public string ToTimeToCome()
+            {
+                return dateTime.ToTimeToCome(DateTime.UtcNow);
+            }
 
-                if (elapsed.TotalMinutes < 60)
-                {
-                    return FormatTimeAgoUnit((int)elapsed.TotalMinutes, "minute");
-                }
+            /// <summary>
+            /// Formats a <see cref="DateTime" /> into a human-readable relative future time span string compared to a specified
+            /// reference
+            /// date and time.
+            /// </summary>
+            /// <param name="relativeTo">The reference date and time to calculate the relative duration against.</param>
+            /// <returns>A string describing the remaining time relative to the reference time.</returns>
+            public string ToTimeToCome(DateTime relativeTo)
+            {
+                var remaining = ToUtc(dateTime) - ToUtc(relativeTo);
 
-                if (elapsed.TotalHours < 24)
-                {
-                    return FormatTimeAgoUnit((int)elapsed.TotalHours, "hour");
-                }
-
-                if (elapsed.TotalDays < 7)
-                {
-                    return FormatTimeAgoUnit((int)elapsed.TotalDays, "day");
-                }
-
-                if (elapsed.TotalDays < 30)
-                {
-                    return FormatTimeAgoUnit((int)(elapsed.TotalDays / 7), "week");
-                }
-
-                if (elapsed.TotalDays < 365)
-                {
-                    return FormatTimeAgoUnit((int)(elapsed.TotalDays / 30), "month");
-                }
-
-                return FormatTimeAgoUnit((int)(elapsed.TotalDays / 365), "year");
+                return FormatRelativeDuration(remaining);
             }
         }
     }

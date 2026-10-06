@@ -13,7 +13,6 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Common;
-    using Mycelium.Forge.Models.Organization;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
     /// <summary>
@@ -23,7 +22,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
     public partial class OrganizationSettings : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the organization identifier or scope slug supplied from the URL route.
+        /// Gets or sets the organization short name supplied from the URL route.
         /// </summary>
         [Parameter]
         public string Id { get; set; } = string.Empty;
@@ -35,86 +34,75 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         public IOrganizationSettingsViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Handles changing the assigned role of an organization member.
+        /// Handles changing the assigned role of an organization member asynchronously.
         /// </summary>
         /// <param name="member">The member whose role is changing.</param>
         /// <param name="role">The selected new role for the member.</param>
-        public void OnChangeMemberRole(OrganizationMemberModel member, OrganizationInvitationKind role)
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnChangeMemberRole(IAccount member, OrganizationInvitationKind role)
         {
-            if (member == null)
-            {
-                return;
-            }
-
-            this.ViewModel.ChangeMemberRole(member, role);
+            await this.ViewModel.ChangeMemberRole(member, role);
         }
 
         /// <summary>
-        /// Handles the action to remove a member from the organization.
+        /// Handles the action to remove a member from the organization asynchronously.
         /// </summary>
         /// <param name="member">The member to remove.</param>
-        public void OnRemoveMember(OrganizationMemberModel member)
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnRemoveMember(IAccount member)
         {
-            if (member == null)
-            {
-                return;
-            }
-
-            this.ViewModel.RemoveMember(member);
+            await this.ViewModel.RemoveMember(member);
         }
 
         /// <summary>
-        /// Handles the action to resend a pending membership invitation.
+        /// Handles the action to resend a pending membership invitation asynchronously.
         /// </summary>
         /// <param name="invitation">The invitation to resend.</param>
-        public void OnResendInvitation(OrganizationInvitationModel invitation)
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnResendInvitation(IOrganizationInvitation invitation)
         {
-            if (invitation == null)
-            {
-                return;
-            }
-
-            this.ViewModel.ResendInvitation(invitation);
+            await this.ViewModel.ResendInvitation(invitation);
         }
 
         /// <summary>
-        /// Handles the action to revoke a pending membership invitation.
+        /// Handles the action to revoke a pending membership invitation asynchronously.
         /// </summary>
         /// <param name="invitation">The invitation to revoke.</param>
-        public void OnRevokeInvitation(OrganizationInvitationModel invitation)
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnRevokeInvitation(IOrganizationInvitation invitation)
         {
-            if (invitation == null)
-            {
-                return;
-            }
-
-            this.ViewModel.RevokeInvitation(invitation);
+            await this.ViewModel.RevokeInvitation(invitation);
         }
 
         /// <summary>
-        /// Handles the action to initiate an organization transfer.
+        /// Handles the action to initiate an organization transfer asynchronously.
         /// </summary>
-        public void OnTransferOrganization()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnTransferOrganization()
         {
-            this.ViewModel.TransferOrganization();
+            await this.ViewModel.TransferOrganization();
         }
 
         /// <summary>
-        /// Handles component parameter updates and initializes the view model with the organization identifier.
+        /// Resolves the role of the specified member in the organization.
         /// </summary>
-        protected override void OnParametersSet()
+        /// <param name="member">The member account.</param>
+        /// <returns>The organization invitation kind representing the role.</returns>
+        public OrganizationInvitationKind GetMemberRole(IAccount member)
         {
-            base.OnParametersSet();
-
-            this.ViewModel.InitializeViewModel(this.Id);
+            return this.ViewModel.Organization.Administrator.Contains(member.Id)
+                ? OrganizationInvitationKind.ADMINISTRATOR
+                : OrganizationInvitationKind.MEMBER;
         }
 
         /// <summary>
         /// Gets the breadcrumb navigation items for the organization settings page.
         /// </summary>
         /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
-        private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        public IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
         {
+            var scope = this.ViewModel.Organization.ShortName;
+
             return
             [
                 new BreadcrumbItem
@@ -124,14 +112,28 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
                 },
                 new BreadcrumbItem
                 {
-                    Name = this.ViewModel.Organization.Scope,
-                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Organization.Scope)
+                    Name = $"@{scope}",
+                    Link = PageRoutes.GetOrganizationRoute(scope)
                 },
                 new BreadcrumbItem
                 {
                     Name = "Settings"
                 }
             ];
+        }
+
+        /// <summary>
+        /// Handles component parameter updates and initializes the view model with the organization identifier asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        protected override async Task OnParametersSetAsync()
+        {
+            await base.OnParametersSetAsync();
+
+            if (!string.IsNullOrWhiteSpace(this.Id))
+            {
+                await this.ViewModel.InitializeViewModel(this.Id);
+            }
         }
     }
 }

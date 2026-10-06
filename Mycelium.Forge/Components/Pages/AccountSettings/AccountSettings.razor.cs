@@ -11,10 +11,9 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 {
     using BlazorBlueprint.Components;
 
-    using ErrorOr;
-
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
     using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.DialogResults;
@@ -36,6 +35,26 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         [Inject]
         public IAccountSettingsViewModel ViewModel { get; set; }
+
+        /// <summary>
+        /// Determines whether the current user is an administrator of the specified organization.
+        /// </summary>
+        /// <param name="organization">The organization to evaluate.</param>
+        /// <returns><c>true</c> if the user is an administrator; otherwise, <c>false</c>.</returns>
+        public bool IsAdmin(IOrganization organization)
+        {
+            return organization.Administrator.Contains(this.ViewModel.Profile.Id);
+        }
+
+        /// <summary>
+        /// Gets the role label for the current user in the organization.
+        /// </summary>
+        /// <param name="organization">The organization to evaluate.</param>
+        /// <returns>A string representing the role.</returns>
+        public string GetRole(IOrganization organization)
+        {
+            return this.IsAdmin(organization) ? "Administrator" : "Member";
+        }
 
         /// <summary>
         /// Handles the action to change the user's username.
@@ -62,14 +81,6 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         }
 
         /// <summary>
-        /// Handles the action to edit the user's company affiliation.
-        /// </summary>
-        public void OnEditCompany()
-        {
-            // Implementation pending future backend support.
-        }
-
-        /// <summary>
         /// Handles the action to edit the user's location.
         /// </summary>
         public void OnEditLocation()
@@ -86,20 +97,12 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         }
 
         /// <summary>
-        /// Handles the action to edit the user's biography.
-        /// </summary>
-        public void OnEditBiography()
-        {
-            // Implementation pending future backend support.
-        }
-
-        /// <summary>
         /// Handles the action to create or transfer organization memberships.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnCreateOrganization()
         {
-            var onResult = new EventCallbackFactory().Create(this, (CreateOrganizationResult result) => this.HandleCreateOrganization(result));
+            var onResult = new EventCallbackFactory().Create(this, async (CreateOrganizationResult result) => await this.HandleCreateOrganization(result));
 
             var parameters = new Dictionary<string, object>
             {
@@ -119,18 +122,19 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// Handles the result when an organization is created.
         /// </summary>
         /// <param name="result">The create organization result details.</param>
-        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the outcome of the create organization operation.</returns>
-        public ErrorOr<Success> HandleCreateOrganization(CreateOrganizationResult result)
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task HandleCreateOrganization(CreateOrganizationResult result)
         {
-            return this.ViewModel.CreateOrganization(result);
+            await this.ViewModel.CreateOrganization(result);
         }
 
         /// <summary>
         /// Handles the action to deactivate the user account.
         /// </summary>
-        public void OnDeactivateAccount()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnDeactivateAccount()
         {
-            this.ViewModel.DeactivateAccount();
+            await this.ViewModel.DeactivateAccount();
         }
 
         /// <summary>
@@ -150,18 +154,19 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 
             if (result.Confirmed)
             {
-                this.ViewModel.DeleteAccount();
+                await this.ViewModel.DeleteAccount();
             }
         }
 
         /// <summary>
-        /// Initializes the component and view model state.
+        /// Initializes the component and view model state asynchronously.
         /// </summary>
-        protected override void OnInitialized()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        protected override async Task OnInitializedAsync()
         {
-            base.OnInitialized();
+            await base.OnInitializedAsync();
 
-            this.ViewModel.InitializeViewModel();
+            await this.ViewModel.InitializeViewModel();
         }
 
         /// <summary>

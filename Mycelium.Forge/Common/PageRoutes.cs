@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Common
 {
+    using Mycelium.Forge.Extensions;
+
     /// <summary>
     /// Defines application route path constants used for navigation and link generation.
     /// </summary>
@@ -118,7 +120,7 @@ namespace Mycelium.Forge.Common
         /// <returns>The formatted package route path.</returns>
         public static string GetPackageRoute(string scope, string packageName, string tab = null)
         {
-            var cleanScope = (scope ?? string.Empty).TrimStart('@');
+            var cleanScope = scope.CleanScope();
 
             if (string.IsNullOrWhiteSpace(tab))
             {
@@ -152,7 +154,7 @@ namespace Mycelium.Forge.Common
         /// <returns>The formatted organization route path.</returns>
         public static string GetOrganizationRoute(string shortName)
         {
-            var cleanShortName = (shortName ?? string.Empty).TrimStart('@');
+            var cleanShortName = shortName.CleanScope();
             return $"/organizations/{cleanShortName}";
         }
 
@@ -164,7 +166,7 @@ namespace Mycelium.Forge.Common
         /// <returns>The formatted package settings route path.</returns>
         public static string GetPackageSettingsRoute(string scope, string packageName)
         {
-            var cleanScope = (scope ?? string.Empty).TrimStart('@');
+            var cleanScope = scope.CleanScope();
             return $"/packages/{cleanScope}/{packageName}/settings";
         }
 
@@ -175,7 +177,7 @@ namespace Mycelium.Forge.Common
         /// <returns>The formatted organization settings route path.</returns>
         public static string GetOrganizationSettingsRoute(string id)
         {
-            var cleanId = (id ?? string.Empty).TrimStart('@');
+            var cleanId = id.CleanScope();
             return $"/organizations/{cleanId}/settings";
         }
 
@@ -188,7 +190,7 @@ namespace Mycelium.Forge.Common
         /// <returns>The formatted package download route path.</returns>
         public static string GetPackageDownloadRoute(string scope, string packageName, string version)
         {
-            var cleanScope = (scope ?? string.Empty).TrimStart('@');
+            var cleanScope = scope.CleanScope();
             return $"/api/packages/{cleanScope}/{packageName}/{version}/download";
         }
 

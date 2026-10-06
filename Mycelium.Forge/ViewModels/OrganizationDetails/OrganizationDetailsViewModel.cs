@@ -96,7 +96,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
             try
             {
                 var userContext = await this.userService.GetUserContext();
-                var cleanShortName = (shortName ?? string.Empty).TrimStart('@');
+                var cleanShortName = shortName.CleanScope();
 
                 var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, cleanShortName, cancellationToken);
 
@@ -107,10 +107,8 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
 
                 this.Organization = organizationResult.Value;
 
-                this.IsUserAdmin = userContext.HasPermission(PermissionKind.ManageOrganizations) ||
-                                   (userContext.IsAuthenticated &&
-                                    userContext.AccountId.HasValue &&
-                                    this.Organization.Administrator.Contains(userContext.AccountId.Value));
+                var isOrgAdmin = userContext.IsAuthenticated && userContext.AccountId is { } accountId && this.Organization.Administrator.Contains(accountId);
+                this.IsUserAdmin = userContext.HasPermission(PermissionKind.ManageOrganizations) || isOrgAdmin;
 
                 var packages = await this.packageService.ReadOrEmpty(userContext, this.Organization.OwnedPackage, token: cancellationToken);
 

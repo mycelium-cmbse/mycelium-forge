@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettings.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,11 +9,14 @@
 
 namespace Mycelium.Forge.Components.Pages.PackageSettings
 {
+    using BlazorBlueprint.Components;
+
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Pages.PackageSettings.Dialogs;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
-    using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
     /// <summary>
@@ -40,106 +43,188 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         public IPackageSettingsViewModel ViewModel { get; set; }
 
         /// <summary>
+        /// Gets or sets the dialog service used to display modal dialogs.
+        /// </summary>
+        [Inject]
+        public DialogService DialogService { get; set; }
+
+        /// <summary>
+        /// Gets or sets the navigation manager instance.
+        /// </summary>
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
+
+        /// <summary>
         /// Handles the action to add a new maintainer to the package.
         /// </summary>
         public void OnAddMaintainer()
         {
-            // Implementation pending future maintainer management support.
+            // Implementation pending future backend support.
         }
 
         /// <summary>
         /// Handles opening the options menu for the specified maintainer.
         /// </summary>
-        /// <param name="maintainer">The target maintainer model.</param>
-        public void OnMaintainerMenu(PackageMaintainerModel maintainer)
+        /// <param name="maintainer">The target maintainer account.</param>
+        public void OnMaintainerMenu(IAccount maintainer)
         {
-            // Implementation pending future maintainer options support.
+            // Implementation pending future backend support.
         }
 
         /// <summary>
-        /// Selects the specified visibility option for the package and saves the model.
+        /// Selects the specified visibility option for the package and saves the update asynchronously.
         /// </summary>
         /// <param name="visibility">The visibility kind to set.</param>
-        public void OnSelectVisibility(VisibilityKind visibility)
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnSelectVisibility(VisibilityKind visibility)
         {
-            if (this.ViewModel.Package == null)
+            await this.ViewModel.SetVisibility(visibility);
+        }
+
+        /// <summary>
+        /// Prompts confirmation to unlist the specified package version.
+        /// </summary>
+        /// <param name="version">The package version to unlist.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnUnlistVersion(IPackageVersion version)
+        {
+            var onResult = new EventCallbackFactory().Create(this, async () => { await this.ViewModel.UnlistVersion(version); });
+
+            var parameters = new Dictionary<string, object>
             {
-                return;
-            }
+                { nameof(ConfirmPackageActionDialog.PackageName), this.ViewModel.Package.Name },
+                { nameof(ConfirmPackageActionDialog.Title), $"Unlist version {version.Version}" },
+                { nameof(ConfirmPackageActionDialog.Description), $"Unlisting version {version.Version} hides it from search and discovery while keeping existing installations working." },
+                { nameof(ConfirmPackageActionDialog.ActionButtonText), "Unlist version" },
+                { nameof(ConfirmPackageActionDialog.OnResult), onResult }
+            };
 
-            this.ViewModel.Package.Package.Visibility = visibility;
-            this.ViewModel.SavePackage();
-        }
-
-        /// <summary>
-        /// Unlists the specified package version and saves the model.
-        /// </summary>
-        /// <param name="version">The package version model to unlist.</param>
-        public void OnUnlistVersion(PackageVersionModel version)
-        {
-            if (version == null)
+            var options = new DialogOpenOptions
             {
-                return;
-            }
+                Title = $"Unlist version {version.Version}"
+            };
 
-            version.IsUnlisted = true;
-            this.ViewModel.SavePackage();
+            await this.DialogService.OpenAsync<ConfirmPackageActionDialog>(parameters, options);
         }
 
         /// <summary>
-        /// Relists the specified unlisted package version and saves the model.
+        /// Relists the specified unlisted package version asynchronously.
         /// </summary>
-        /// <param name="version">The package version model to relist.</param>
-        public void OnRelistVersion(PackageVersionModel version)
+        /// <param name="version">The package version to relist.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnRelistVersion(IPackageVersion version)
         {
-            if (version == null)
+            await this.ViewModel.RelistVersion(version);
+        }
+
+        /// <summary>
+        /// Deprecates the specified package version asynchronously.
+        /// </summary>
+        /// <param name="version">The package version to deprecate.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnDeprecateVersion(IPackageVersion version)
+        {
+            await this.ViewModel.DeprecateVersion(version);
+        }
+
+        /// <summary>
+        /// Opens the confirmation dialog to transfer package ownership.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnTransferOwnership()
+        {
+            var onResult = new EventCallbackFactory().Create(this, async (string targetScope) =>
             {
-                return;
-            }
+                if (string.IsNullOrWhiteSpace(targetScope))
+                {
+                    return;
+                }
 
-            version.IsUnlisted = false;
-            this.ViewModel.SavePackage();
-        }
+                var result = await this.ViewModel.TransferOwnership(targetScope);
 
-        /// <summary>
-        /// Deprecates the specified package version and saves the model.
-        /// </summary>
-        /// <param name="version">The package version model to deprecate.</param>
-        public void OnDeprecateVersion(PackageVersionModel version)
-        {
-            if (version == null)
+                if (!result.IsError)
+                {
+                    this.NavigationManager.NavigateTo(PageRoutes.GetPackageRoute(targetScope, this.ViewModel.Package.ShortName), true);
+                }
+            });
+
+            var parameters = new Dictionary<string, object>
             {
-                return;
-            }
+                { nameof(TransferPackageOwnershipDialog.PackageName), this.ViewModel.Package.Name },
+                { nameof(TransferPackageOwnershipDialog.CurrentOwner), this.ViewModel.Owner.ShortName },
+                { nameof(TransferPackageOwnershipDialog.OnResult), onResult }
+            };
 
-            version.IsDeprecated = true;
-            this.ViewModel.SavePackage();
+            var options = new DialogOpenOptions
+            {
+                Title = "Transfer package ownership"
+            };
+
+            await this.DialogService.OpenAsync<TransferPackageOwnershipDialog>(parameters, options);
         }
 
         /// <summary>
-        /// Handles the action to transfer ownership of the package.
+        /// Opens the confirmation dialog to permanently delete the package.
         /// </summary>
-        public void OnTransferOwnership()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnDeletePackage()
         {
-            // Implementation pending future ownership transfer support.
+            var onResult = new EventCallbackFactory().Create(this, async () =>
+            {
+                var result = await this.ViewModel.DeletePackage();
+
+                if (!result.IsError)
+                {
+                    this.NavigationManager.NavigateTo(PageRoutes.Packages);
+                }
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(ConfirmPackageActionDialog.PackageName), this.ViewModel.Package.Name },
+                { nameof(ConfirmPackageActionDialog.Title), "Delete package" },
+                { nameof(ConfirmPackageActionDialog.Description), "This will permanently delete the package and all its versions. Existing consumers will break." },
+                { nameof(ConfirmPackageActionDialog.ActionButtonText), "Delete package" },
+                { nameof(ConfirmPackageActionDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Delete package"
+            };
+
+            await this.DialogService.OpenAsync<ConfirmPackageActionDialog>(parameters, options);
         }
 
         /// <summary>
-        /// Handles component parameter updates and initializes the view model with the route parameters.
+        /// Determines whether the specified version is the latest published release.
         /// </summary>
-        protected override void OnParametersSet()
+        /// <param name="version">The package version to evaluate.</param>
+        /// <returns><c>true</c> if the version is the newest release; otherwise, <c>false</c>.</returns>
+        public bool IsLatestVersion(IPackageVersion version)
         {
-            base.OnParametersSet();
+            return this.ViewModel.Versions.Count > 0 && this.ViewModel.Versions[0].Id == version.Id;
+        }
 
-            this.ViewModel.InitializeViewModel(this.PackageName, this.Scope);
+        /// <summary>
+        /// Formats the publication timestamp into a human-readable relative time string.
+        /// </summary>
+        /// <param name="version">The package version to evaluate.</param>
+        /// <returns>The formatted relative time string.</returns>
+        public string GetPublishedAgo(IPackageVersion version)
+        {
+            return version.PublicationDate.ToTimeAgo();
         }
 
         /// <summary>
         /// Gets the breadcrumb navigation items for the package settings page.
         /// </summary>
         /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
-        private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        public IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
         {
+            var publisher = this.ViewModel.Owner.ShortName;
+            var packageName = this.ViewModel.Package.Name;
+
             return
             [
                 new BreadcrumbItem
@@ -149,19 +234,30 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
                 },
                 new BreadcrumbItem
                 {
-                    Name = this.ViewModel.Package.Publisher,
-                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Package.Publisher)
+                    Name = $"@{publisher}",
+                    Link = PageRoutes.GetOrganizationRoute(publisher)
                 },
                 new BreadcrumbItem
                 {
-                    Name = this.ViewModel.Package.Name,
-                    Link = PageRoutes.GetPackageRoute(this.ViewModel.Package.Publisher, this.ViewModel.Package.Name)
+                    Name = packageName,
+                    Link = PageRoutes.GetPackageRoute(publisher, packageName)
                 },
                 new BreadcrumbItem
                 {
                     Name = "Settings"
                 }
             ];
+        }
+
+        /// <summary>
+        /// Handles component parameter updates and initializes the view model with the route parameters asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        protected override async Task OnParametersSetAsync()
+        {
+            await base.OnParametersSetAsync();
+
+            await this.ViewModel.InitializeViewModel(this.PackageName, this.Scope);
         }
     }
 }

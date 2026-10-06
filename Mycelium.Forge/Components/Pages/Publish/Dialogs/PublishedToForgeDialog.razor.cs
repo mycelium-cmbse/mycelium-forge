@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishedToForgeDialog.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Package;
 
     /// <summary>
@@ -169,7 +170,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
                 return PageRoutes.GetPackageRoute(publisherRoute, this.Package.Package.ShortName);
             }
 
-            var cleanScope = (this.Scope ?? "starion").TrimStart('@');
+            var cleanScope = (this.Scope ?? "starion").CleanScope();
             var cleanPackageName = this.PackageName ?? string.Empty;
 
             if (!string.IsNullOrEmpty(cleanPackageName))
