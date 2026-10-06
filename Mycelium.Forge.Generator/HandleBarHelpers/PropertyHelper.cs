@@ -63,6 +63,16 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return @class.QueryDtoClassProperties();
             });
 
+            handlebars.RegisterHelper("Property.QueryIsIndexable", (context, _) =>
+            {
+                if (context.Value is not IProperty property)
+                {
+                    throw new ArgumentException("supposed to be IProperty");
+                }
+
+                return property.QueryIsIndexable();
+            });
+
             // Writes XML documentation for a property, providing a default summary for owner properties
             handlebars.RegisterHelper("Property.WriteDocumentation", (in writer, in options, in context, in arguments) =>
             {

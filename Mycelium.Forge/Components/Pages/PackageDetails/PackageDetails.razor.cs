@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetails.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -151,6 +151,11 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+
+            if (string.IsNullOrEmpty(this.Scope) || string.IsNullOrEmpty(this.PackageName))
+            {
+                return;
+            }
 
             if (!string.IsNullOrWhiteSpace(this.Tab) && this.ContentTabs.Contains(this.Tab.ToLowerInvariant()))
             {

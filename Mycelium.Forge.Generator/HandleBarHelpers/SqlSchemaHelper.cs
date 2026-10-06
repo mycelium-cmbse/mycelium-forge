@@ -36,6 +36,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingConstraints", WriteBasicTableThingConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints", WriteManyToManyTableDefinitionsAndConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteNormalReferenceConstraints", WriteNormalReferenceConstraints);
+            handlebars.RegisterHelper("Forge.SQL.WriteIndexableValuePropertyIndexes", WriteIndexableValuePropertyIndexes);
             handlebars.RegisterHelper("Forge.SQL.DeleteBaseTableTriggerFunctions", DeleteBaseTableTriggerFunctions);
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingDeleteTriggers", WriteBasicTableThingDeleteTriggers);
             handlebars.RegisterHelper("Forge.SQL.WriteBaseTableDeleteTriggers", WriteBaseTableDeleteTriggers);
@@ -189,6 +190,67 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             }
 
             writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Writes indexes for value properties marked as indexable (<see cref="PropertyExtension.QueryIsIndexable" />).
+        /// </summary>
+        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        private static void WriteIndexableValuePropertyIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
+        {
+            if (context.Value is not IClass @class)
+            {
+                throw new ArgumentException("Forge.SQL.WriteIndexableValuePropertyIndexes - context is supposed to be IClass");
+            }
+
+            if (@class.IsThingClass())
+            {
+                return;
+            }
+
+            var indexableValueProperties = @class.OwnedAttribute
+                .Where(x => x.QueryIsDataType() && x.QueryIsIndexable())
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            if (indexableValueProperties.Count == 0)
+            {
+                return;
+            }
+
+            var stringBuilder = new StringBuilder();
+            var whereClause = QueryIndexWhereClause(@class);
+
+            foreach (var property in indexableValueProperties)
+            {
+                stringBuilder.AppendLine($"CREATE INDEX \"idx_{@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()}\" ON \"Forge\".\"Thing\" ((\"data\" ->> '{property.QuerySqlAttributeName()}')){whereClause};");
+            }
+
+            writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Queries the SQL WHERE clause for an index on an <see cref="IClass" /> based on its concrete subclasses.
+        /// </summary>
+        /// <param name="class">The subject <see cref="IClass" />.</param>
+        /// <returns>The SQL WHERE clause string, or empty if unrestricted.</returns>
+        private static string QueryIndexWhereClause(IClass @class)
+        {
+            if (!@class.IsAbstract)
+            {
+                return $" WHERE \"classKind\" = '{@class.Name}'";
+            }
+
+            var concreteSubclasses = @class.QueryConcreteSubclasses();
+
+            return concreteSubclasses.Count switch
+            {
+                0 => string.Empty,
+                1 => $" WHERE \"classKind\" = '{concreteSubclasses[0].Name}'",
+                _ => $" WHERE \"classKind\" IN ('{string.Join("', '", concreteSubclasses.Select(x => x.Name))}')"
+            };
         }
 
         /// <summary>
