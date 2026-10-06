@@ -58,6 +58,7 @@ namespace Mycelium.Forge.Extensions
         {
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddMemoryCache();
+            builder.Services.AddFusionCache();
             builder.Services.AddForgeDal();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

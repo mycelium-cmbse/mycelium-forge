@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageMetaDataServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,10 +26,8 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Integration test suite for <see cref="PackageMetaDataService" /> verifying end-to-end read behavior
-    /// against a real PostgreSQL instance provided by Testcontainers.
-    /// </summary>
+    using ZiggyCreatures.Caching.Fusion;
+
     [TestFixture]
     [Category("Database")]
     public class PackageMetaDataServiceIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -46,11 +44,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
         private Guid privatePackageMetaDataId;
         private Guid privatePackageVersionId;
 
-        /// <summary>
-        /// Verifies that <see cref="PackageMetaDataService.ReadAsync(IUserContext, CancellationToken, Guid[])" />
-        /// enforces visibility rules across public, internal, and private packages for different caller roles.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -114,78 +107,42 @@ namespace Mycelium.Forge.Orm.Tests.Services
             }
         }
 
-        /// <summary>
-        /// Wires up DAOs, the services under test, user contexts, and prerequisite database records before each test.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
             var databaseSourceMock = new Mock<IDatabaseSource>();
 
-            databaseSourceMock
-                .Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
-                .Returns(async () =>
-                {
-                    var connection = new NpgsqlConnection(this.ConnectionString);
-                    await connection.OpenAsync();
-                    return connection;
-                });
+            databaseSourceMock.Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>())).Returns(async () =>
+            {
+                var connection = new NpgsqlConnection(this.ConnectionString);
+                await connection.OpenAsync();
+                return connection;
+            });
 
-            var organizationDao = new OrganizationDao(
-                this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
+            var fusionCache = new FusionCache(new FusionCacheOptions());
+
+            var organizationDao = new OrganizationDao(this.TestLoggerFactory.CreateLogger<OrganizationDao>(), this.Serializer, fusionCache);
 
             var orgPermissionService = new OrganizationPermissionService();
 
-            var organizationService = new OrganizationService(
-                organizationDao,
-                new OrganizationValidator(),
-                orgPermissionService,
-                new OrganizationComparer(),
-                this.TestLoggerFactory.CreateLogger<OrganizationService>(),
-                databaseSourceMock.Object);
+            var organizationService = new OrganizationService(organizationDao, new OrganizationValidator(), orgPermissionService, new OrganizationComparer(), this.TestLoggerFactory.CreateLogger<OrganizationService>(), databaseSourceMock.Object);
 
-            var packageDao = new PackageDao(
-                this.TestLoggerFactory.CreateLogger<PackageDao>(),
-                this.Serializer);
+            var packageDao = new PackageDao(this.TestLoggerFactory.CreateLogger<PackageDao>(), this.Serializer, fusionCache);
 
             var packagePermissionService = new PackagePermissionService(organizationService);
 
-            var packageService = new PackageService(
-                packageDao,
-                new PackageValidator(),
-                packagePermissionService,
-                new PackageComparer(),
-                this.TestLoggerFactory.CreateLogger<PackageService>(),
-                databaseSourceMock.Object);
+            var packageService = new PackageService(packageDao, new PackageValidator(), packagePermissionService, new PackageComparer(), this.TestLoggerFactory.CreateLogger<PackageService>(), databaseSourceMock.Object);
 
-            var packageVersionDao = new PackageVersionDao(
-                this.TestLoggerFactory.CreateLogger<PackageVersionDao>(),
-                this.Serializer);
+            var packageVersionDao = new PackageVersionDao(this.TestLoggerFactory.CreateLogger<PackageVersionDao>(), this.Serializer, fusionCache);
 
             var packageVersionPermissionService = new PackageVersionPermissionService(packageService, packagePermissionService);
 
-            this.packageVersionService = new PackageVersionService(
-                packageVersionDao,
-                new PackageVersionValidator(),
-                packageVersionPermissionService,
-                new PackageVersionComparer(),
-                this.TestLoggerFactory.CreateLogger<PackageVersionService>(),
-                databaseSourceMock.Object);
+            this.packageVersionService = new PackageVersionService(packageVersionDao, new PackageVersionValidator(), packageVersionPermissionService, new PackageVersionComparer(), this.TestLoggerFactory.CreateLogger<PackageVersionService>(), databaseSourceMock.Object);
 
-            var packageMetaDataDao = new PackageMetaDataDao(
-                this.TestLoggerFactory.CreateLogger<PackageMetaDataDao>(),
-                this.Serializer);
+            var packageMetaDataDao = new PackageMetaDataDao(this.TestLoggerFactory.CreateLogger<PackageMetaDataDao>(), this.Serializer, fusionCache);
 
             var packageMetaDataPermissionService = new PackageMetaDataPermissionService(this.packageVersionService, packageVersionPermissionService);
 
-            this.service = new PackageMetaDataService(
-                packageMetaDataDao,
-                new PackageMetaDataValidator(),
-                packageMetaDataPermissionService,
-                new PackageMetaDataComparer(),
-                this.TestLoggerFactory.CreateLogger<PackageMetaDataService>(),
-                databaseSourceMock.Object);
+            this.service = new PackageMetaDataService(packageMetaDataDao, new PackageMetaDataValidator(), packageMetaDataPermissionService, new PackageMetaDataComparer(), this.TestLoggerFactory.CreateLogger<PackageMetaDataService>(), databaseSourceMock.Object);
 
             var sameOrgMemberId = Guid.NewGuid();
             var otherOrgMemberId = Guid.NewGuid();
@@ -225,31 +182,15 @@ namespace Mycelium.Forge.Orm.Tests.Services
             await this.SeedDatabaseAsync(organizationDao, packageDao, packageVersionDao, packageMetaDataDao, sameOrgMemberId, otherOrgMemberId, orgAdminId);
         }
 
-        /// <summary>
-        /// Seeds the database with prerequisite records required by the tests.
-        /// </summary>
-        /// <param name="organizationDao">The <see cref="OrganizationDao" /> used to insert organizations.</param>
-        /// <param name="packageDao">The <see cref="PackageDao" /> used to insert packages.</param>
-        /// <param name="packageVersionDao">The <see cref="PackageVersionDao" /> used to insert package versions.</param>
-        /// <param name="packageMetaDataDao">The <see cref="PackageMetaDataDao" /> used to insert package metadata.</param>
-        /// <param name="sameOrgMemberId">The ID of the account in the owning organization.</param>
-        /// <param name="otherOrgMemberId">The ID of the account in another organization.</param>
-        /// <param name="orgAdminId">The ID of the account who administers the owning organization and owns the packages.</param>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
-        private async Task SeedDatabaseAsync(
-            OrganizationDao organizationDao,
-            PackageDao packageDao,
-            PackageVersionDao packageVersionDao,
-            PackageMetaDataDao packageMetaDataDao,
-            Guid sameOrgMemberId,
-            Guid otherOrgMemberId,
-            Guid orgAdminId)
+        private async Task SeedDatabaseAsync(OrganizationDao organizationDao, PackageDao packageDao, PackageVersionDao packageVersionDao, PackageMetaDataDao packageMetaDataDao, Guid sameOrgMemberId, Guid otherOrgMemberId, Guid orgAdminId)
         {
-            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);
-            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer);
-            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer);
-            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer);
-            var packageTypeDao = new PackageTypeDao(this.TestLoggerFactory.CreateLogger<PackageTypeDao>(), this.Serializer);
+            var fusionCache = new FusionCache(new FusionCacheOptions());
+
+            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer, fusionCache);
+            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer, fusionCache);
+            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer, fusionCache);
+            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer, fusionCache);
+            var packageTypeDao = new PackageTypeDao(this.TestLoggerFactory.CreateLogger<PackageTypeDao>(), this.Serializer, fusionCache);
 
             var forgeId = Guid.NewGuid();
             var now = DateTime.UtcNow;

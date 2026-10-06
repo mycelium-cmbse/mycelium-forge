@@ -28,6 +28,8 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
     using NUnit.Framework;
 
+    using ZiggyCreatures.Caching.Fusion;
+
     [TestFixture]
     [Category("Database")]
     public class OrganizationServiceIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -107,9 +109,9 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
         protected override async Task PostSetup()
         {
-            var organizationDao = new OrganizationDao(
-                this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
+            var fusionCache = new FusionCache(new FusionCacheOptions());
+
+            var organizationDao = new OrganizationDao(this.TestLoggerFactory.CreateLogger<OrganizationDao>(), this.Serializer, fusionCache);
 
             var orgPermissionService = new OrganizationPermissionService();
 
@@ -124,13 +126,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     return connection;
                 });
 
-            this.service = new OrganizationService(
-                organizationDao,
-                new OrganizationValidator(),
-                orgPermissionService,
-                new OrganizationComparer(),
-                this.TestLoggerFactory.CreateLogger<OrganizationService>(),
-                databaseSourceMock.Object);
+            this.service = new OrganizationService(organizationDao, new OrganizationValidator(), orgPermissionService, new OrganizationComparer(), this.TestLoggerFactory.CreateLogger<OrganizationService>(), databaseSourceMock.Object);
 
             this.adminAccountId = Guid.NewGuid();
             this.memberAccountId = Guid.NewGuid();
@@ -156,10 +152,12 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
         private async Task SeedDatabaseAsync(OrganizationDao organizationDao, Guid adminAccount)
         {
-            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);
-            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer);
-            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer);
-            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer);
+            var fusionCache = new FusionCache(new FusionCacheOptions());
+
+            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer, fusionCache);
+            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer, fusionCache);
+            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer, fusionCache);
+            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer, fusionCache);
 
             var forgeId = Guid.NewGuid();
 
