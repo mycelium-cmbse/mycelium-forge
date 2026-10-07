@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AccountMenu.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -53,7 +53,7 @@ namespace Mycelium.Forge.Components.Common
         public async Task OnSignOut()
         {
             await this.UserService.SetCurrentUser(null);
-            this.NavigationManager.NavigateTo(PageRoutes.Logout, forceLoad: true);
+            this.NavigationManager.NavigateTo(PageRoutes.Logout, true);
         }
 
         /// <summary>

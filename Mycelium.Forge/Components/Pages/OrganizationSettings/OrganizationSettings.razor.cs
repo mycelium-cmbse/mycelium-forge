@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Components.Pages.OrganizationSettings
 {
+    using BlazorBlueprint.Components;
+
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
@@ -34,72 +36,30 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         public IOrganizationSettingsViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Handles changing the assigned role of an organization member asynchronously.
+        /// Gets or sets the dialog service used to display modal dialogs.
         /// </summary>
-        /// <param name="member">The member whose role is changing.</param>
-        /// <param name="role">The selected new role for the member.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnChangeMemberRole(IAccount member, OrganizationInvitationKind role)
-        {
-            await this.ViewModel.ChangeMemberRole(member, role);
-        }
+        [Inject]
+        public DialogService DialogService { get; set; }
 
         /// <summary>
-        /// Handles the action to remove a member from the organization asynchronously.
-        /// </summary>
-        /// <param name="member">The member to remove.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnRemoveMember(IAccount member)
-        {
-            await this.ViewModel.RemoveMember(member);
-        }
-
-        /// <summary>
-        /// Handles the action to resend a pending membership invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to resend.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnResendInvitation(IOrganizationInvitation invitation)
-        {
-            await this.ViewModel.ResendInvitation(invitation);
-        }
-
-        /// <summary>
-        /// Handles the action to revoke a pending membership invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to revoke.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnRevokeInvitation(IOrganizationInvitation invitation)
-        {
-            await this.ViewModel.RevokeInvitation(invitation);
-        }
-
-        /// <summary>
-        /// Handles the action to initiate an organization transfer asynchronously.
+        /// Handles component parameter updates and initializes the view model with the organization identifier asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnTransferOrganization()
+        protected override async Task OnParametersSetAsync()
         {
-            await this.ViewModel.TransferOrganization();
-        }
+            await base.OnParametersSetAsync();
 
-        /// <summary>
-        /// Resolves the role of the specified member in the organization.
-        /// </summary>
-        /// <param name="member">The member account.</param>
-        /// <returns>The organization invitation kind representing the role.</returns>
-        public OrganizationInvitationKind GetMemberRole(IAccount member)
-        {
-            return this.ViewModel.Organization.Administrator.Contains(member.Id)
-                ? OrganizationInvitationKind.ADMINISTRATOR
-                : OrganizationInvitationKind.MEMBER;
+            if (!string.IsNullOrWhiteSpace(this.Id))
+            {
+                await this.ViewModel.InitializeViewModel(this.Id);
+            }
         }
 
         /// <summary>
         /// Gets the breadcrumb navigation items for the organization settings page.
         /// </summary>
         /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
-        public IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
+        private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
         {
             var scope = this.ViewModel.Organization.ShortName;
 
@@ -123,17 +83,85 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         }
 
         /// <summary>
-        /// Handles component parameter updates and initializes the view model with the organization identifier asynchronously.
+        /// Handles changing the assigned role of an organization member asynchronously.
+        /// </summary>
+        /// <param name="member">The member whose role is changing.</param>
+        /// <param name="role">The selected new role for the member.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnChangeMemberRole(IAccount member, OrganizationInvitationKind role)
+        {
+            await this.ViewModel.ChangeMemberRole(member, role);
+        }
+
+        /// <summary>
+        /// Handles the action to remove a member from the organization asynchronously.
+        /// </summary>
+        /// <param name="member">The member to remove.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnRemoveMember(IAccount member)
+        {
+            var dialogOptions = new ConfirmDialogOptions
+            {
+                Destructive = true
+            };
+
+            var dialogResult = await this.DialogService.ConfirmAsync("Member Removal", "Are you sure you want to remove this member from the organization?", dialogOptions);
+
+            if (dialogResult.Confirmed)
+            {
+                await this.ViewModel.RemoveMember(member);
+            }
+        }
+
+        /// <summary>
+        /// Handles the action to resend a pending membership invitation asynchronously.
+        /// </summary>
+        /// <param name="invitation">The invitation to resend.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnResendInvitation(IOrganizationInvitation invitation)
+        {
+            await this.ViewModel.ResendInvitation(invitation);
+        }
+
+        /// <summary>
+        /// Handles the action to revoke a pending membership invitation asynchronously.
+        /// </summary>
+        /// <param name="invitation">The invitation to revoke.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnRevokeInvitation(IOrganizationInvitation invitation)
+        {
+            await this.ViewModel.RevokeInvitation(invitation);
+        }
+
+        /// <summary>
+        /// Handles the action to initiate an organization transfer asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        protected override async Task OnParametersSetAsync()
+        private async Task OnTransferOrganization()
         {
-            await base.OnParametersSetAsync();
+            await this.ViewModel.TransferOrganization();
+        }
 
-            if (!string.IsNullOrWhiteSpace(this.Id))
-            {
-                await this.ViewModel.InitializeViewModel(this.Id);
-            }
+        /// <summary>
+        /// Resolves the role of the specified member in the organization.
+        /// </summary>
+        /// <param name="member">The member account.</param>
+        /// <returns>The organization invitation kind representing the role.</returns>
+        private OrganizationInvitationKind GetMemberRole(IAccount member)
+        {
+            return this.ViewModel.Organization.Administrator.Contains(member.Id)
+                ? OrganizationInvitationKind.ADMINISTRATOR
+                : OrganizationInvitationKind.MEMBER;
+        }
+
+        /// <summary>
+        /// Determines whether the specified member account corresponds to the currently logged in user.
+        /// </summary>
+        /// <param name="member">The member account to check.</param>
+        /// <returns><c>true</c> if the member is the current user; otherwise, <c>false</c>.</returns>
+        private bool IsCurrentUser(IAccount member)
+        {
+            return member.Id == this.ViewModel.CurrentUserId;
         }
     }
 }

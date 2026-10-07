@@ -15,7 +15,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Models.Package;
 
     /// <summary>
     /// Represents a modal dialog component confirming the successful publication of a package to Mycelium Forge.
@@ -35,28 +34,22 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
-        /// Gets or sets the published package model.
-        /// </summary>
-        [Parameter]
-        public PackageModel Package { get; set; }
-
-        /// <summary>
         /// Gets or sets the publishing scope or owner identifier.
         /// </summary>
         [Parameter]
-        public string Scope { get; set; } = "@starion";
+        public string Scope { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the published package name.
         /// </summary>
         [Parameter]
-        public string PackageName { get; set; } = "ECSS-MM-PWR";
+        public string PackageName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the published package version string.
         /// </summary>
         [Parameter]
-        public string Version { get; set; } = "1.3.0";
+        public string Version { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the modal dialog title.
@@ -94,23 +87,14 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
         /// <returns>The scoped package name representation.</returns>
         public string GetPackageFullName()
         {
-            if (this.Package != null && !string.IsNullOrEmpty(this.Package.FullName))
+            var cleanScope = this.Scope.CleanScope();
+
+            if (!string.IsNullOrEmpty(cleanScope) && !string.IsNullOrEmpty(this.PackageName))
             {
-                return this.Package.FullName;
+                return $"@{cleanScope}/{this.PackageName}";
             }
 
-            if (!string.IsNullOrEmpty(this.Scope) && !string.IsNullOrEmpty(this.PackageName))
-            {
-                var normalizedScope = this.Scope.StartsWith("@", StringComparison.OrdinalIgnoreCase)
-                    ? this.Scope
-                    : $"@{this.Scope}";
-
-                return $"{normalizedScope}/{this.PackageName}";
-            }
-
-            return !string.IsNullOrEmpty(this.PackageName)
-                ? this.PackageName
-                : "@starion/ECSS-MM-PWR";
+            return this.PackageName ?? string.Empty;
         }
 
         /// <summary>
@@ -119,21 +103,14 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
         /// <returns>The formatted version string.</returns>
         public string GetFormattedVersion()
         {
-            if (this.Package != null && !string.IsNullOrEmpty(this.Package.Version))
+            if (string.IsNullOrEmpty(this.Version))
             {
-                return this.Package.Version.StartsWith("v", StringComparison.OrdinalIgnoreCase)
-                    ? this.Package.Version
-                    : $"v{this.Package.Version}";
+                return string.Empty;
             }
 
-            if (!string.IsNullOrEmpty(this.Version))
-            {
-                return this.Version.StartsWith("v", StringComparison.OrdinalIgnoreCase)
-                    ? this.Version
-                    : $"v{this.Version}";
-            }
-
-            return "v1.3.0";
+            return this.Version.StartsWith("v", StringComparison.OrdinalIgnoreCase)
+                ? this.Version
+                : $"v{this.Version}";
         }
 
         /// <summary>
@@ -164,18 +141,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
                 return this.PackageHref;
             }
 
-            if (this.Package?.Package != null && !string.IsNullOrEmpty(this.Package.Package.ShortName))
-            {
-                var publisherRoute = string.IsNullOrEmpty(this.Package.Publisher) ? "starion" : this.Package.Publisher;
-                return PageRoutes.GetPackageRoute(publisherRoute, this.Package.Package.ShortName);
-            }
+            var cleanScope = this.Scope.CleanScope();
 
-            var cleanScope = (this.Scope ?? "starion").CleanScope();
-            var cleanPackageName = this.PackageName ?? string.Empty;
-
-            if (!string.IsNullOrEmpty(cleanPackageName))
+            if (!string.IsNullOrEmpty(this.PackageName))
             {
-                return PageRoutes.GetPackageRoute(cleanScope, cleanPackageName);
+                return PageRoutes.GetPackageRoute(cleanScope, this.PackageName);
             }
 
             return PageRoutes.Packages;

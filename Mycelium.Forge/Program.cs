@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -188,6 +188,8 @@ namespace Mycelium.Forge
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+
+            await app.InitializeServices();
 
             await app.RunAsync();
 

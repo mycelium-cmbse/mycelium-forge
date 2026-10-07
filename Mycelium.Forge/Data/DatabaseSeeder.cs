@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeeder.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -63,6 +63,11 @@ namespace Mycelium.Forge.Data
         private readonly ILogger<DatabaseSeeder> logger;
 
         /// <summary>
+        /// The domain service for <see cref="IOrganizationInvitation" /> entities.
+        /// </summary>
+        private readonly IOrganizationInvitationService organizationInvitationService;
+
+        /// <summary>
         /// The domain service for <see cref="IOrganization" /> entities.
         /// </summary>
         private readonly IOrganizationService organizationService;
@@ -100,6 +105,7 @@ namespace Mycelium.Forge.Data
         /// <param name="packageTypeService">The domain service for <see cref="IPackageType" /> entities.</param>
         /// <param name="accountService">The domain service for <see cref="IAccount" /> entities.</param>
         /// <param name="organizationService">The domain service for <see cref="IOrganization" /> entities.</param>
+        /// <param name="organizationInvitationService">The domain service for <see cref="IOrganizationInvitation" /> entities.</param>
         /// <param name="packageService">The domain service for <see cref="IPackage" /> entities.</param>
         /// <param name="packageVersionService">The domain service for <see cref="IPackageVersion" /> entities.</param>
         /// <param name="packageMetaDataService">The domain service for <see cref="IPackageMetaData" /> entities.</param>
@@ -115,6 +121,7 @@ namespace Mycelium.Forge.Data
             IPackageTypeService packageTypeService,
             IAccountService accountService,
             IOrganizationService organizationService,
+            IOrganizationInvitationService organizationInvitationService,
             IPackageService packageService,
             IPackageVersionService packageVersionService,
             IPackageMetaDataService packageMetaDataService,
@@ -130,6 +137,7 @@ namespace Mycelium.Forge.Data
             ArgumentNullException.ThrowIfNull(packageTypeService);
             ArgumentNullException.ThrowIfNull(accountService);
             ArgumentNullException.ThrowIfNull(organizationService);
+            ArgumentNullException.ThrowIfNull(organizationInvitationService);
             ArgumentNullException.ThrowIfNull(packageService);
             ArgumentNullException.ThrowIfNull(packageVersionService);
             ArgumentNullException.ThrowIfNull(packageMetaDataService);
@@ -145,6 +153,7 @@ namespace Mycelium.Forge.Data
             this.packageTypeService = packageTypeService;
             this.accountService = accountService;
             this.organizationService = organizationService;
+            this.organizationInvitationService = organizationInvitationService;
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
             this.packageMetaDataService = packageMetaDataService;
@@ -187,6 +196,7 @@ namespace Mycelium.Forge.Data
                                          await this.SeedThing(seederUserContext, transaction, this.packageTypeService, SeedData.PackageTypes, cancellationToken) &&
                                          await this.SeedThing(seederUserContext, transaction, this.accountService, SeedData.Accounts, cancellationToken) &&
                                          await this.SeedThing(seederUserContext, transaction, this.organizationService, SeedData.Organizations, cancellationToken) &&
+                                         await this.SeedThing(seederUserContext, transaction, this.organizationInvitationService, SeedData.OrganizationInvitations, cancellationToken) &&
                                          await this.SeedThing(seederUserContext, transaction, this.packageService, SeedData.Packages, cancellationToken) &&
                                          await this.SeedThing(seederUserContext, transaction, this.packageVersionService, SeedData.PackageVersions, cancellationToken) &&
                                          await this.SeedThing(seederUserContext, transaction, this.packageMetaDataService, SeedData.PackageMetaDatas, cancellationToken) &&

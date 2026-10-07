@@ -90,6 +90,28 @@ namespace Mycelium.Forge.Components.Common
         public RenderFragment<TValue> ItemTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the select component is disabled.
+        /// </summary>
+        [Parameter]
+        public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a predicate function determining whether a specific item is disabled.
+        /// </summary>
+        [Parameter]
+        public Func<TValue, bool> DisabledExpression { get; set; }
+
+        /// <summary>
+        /// Determines whether the specified item is disabled.
+        /// </summary>
+        /// <param name="item">The select item value.</param>
+        /// <returns><c>true</c> if the item is disabled; otherwise, <c>false</c>.</returns>
+        public bool IsItemDisabled(TValue item)
+        {
+            return this.DisabledExpression != null && this.DisabledExpression(item);
+        }
+
+        /// <summary>
         /// Handles changes to the selected value and invokes the <see cref="ValueChanged" /> event callback.
         /// </summary>
         /// <param name="newValue">The newly selected value.</param>

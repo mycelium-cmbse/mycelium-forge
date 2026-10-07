@@ -36,6 +36,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         private readonly IDatabaseSource databaseSource;
 
         /// <summary>
+        /// The (injected) <see cref="ILogger{PackageDetailsViewModel}" /> used for diagnostic logging.
+        /// </summary>
+        private readonly ILogger<PackageDetailsViewModel> logger;
+
+        /// <summary>
         /// The (injected) <see cref="IMemoryCache" /> used to cache package details and metadata.
         /// </summary>
         private readonly IMemoryCache memoryCache;
@@ -88,7 +93,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="memoryCache">The (injected) <see cref="IMemoryCache" />.</param>
         /// <param name="packagePermissionService">The (injected) <see cref="IPackagePermissionService" />.</param>
-        public PackageDetailsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService, IAccountService accountService, IUserService userService, IMemoryCache memoryCache, IPackagePermissionService packagePermissionService)
+        /// <param name="logger">The (injected) <see cref="ILogger{PackageDetailsViewModel}" />.</param>
+        public PackageDetailsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService, IAccountService accountService, IUserService userService, IMemoryCache memoryCache, IPackagePermissionService packagePermissionService, ILogger<PackageDetailsViewModel> logger)
         {
             this.databaseSource = databaseSource;
             this.packageService = packageService;
@@ -100,6 +106,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             this.userService = userService;
             this.memoryCache = memoryCache;
             this.packagePermissionService = packagePermissionService;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -186,6 +193,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             if (cachedData.Package == null)
             {
+                this.logger.LogWarning("Package {Scope}/{Name} not found during details initialization", scope, packageName);
                 return;
             }
 
@@ -197,7 +205,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             this.Maintainers = cachedData.Maintainers;
             this.MetaDatas = cachedData.MetaDatas;
 
-            await this.ComputeIsUserAdmin(userContext);
+            var updatePermissionResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Package);
+            this.IsUserAdmin = updatePermissionResult.IsSuccess;
 
             var isVersionsTab = string.Equals(tab, PackageTabConstants.Versions, StringComparison.OrdinalIgnoreCase);
 
@@ -211,26 +220,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                     this.MetaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, metaDataIds)).ToList();
                     cachedData.MetaDatas = this.MetaDatas;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Computes whether the current authenticated user has administrative or update privileges for the package.
-        /// </summary>
-        /// <param name="userContext">The contextual user information.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous computation.</returns>
-        private async Task ComputeIsUserAdmin(IUserContext userContext)
-        {
-            if (userContext.IsAuthenticated && userContext.AccountId.HasValue)
-            {
-                var accountId = userContext.AccountId.Value;
-                var isOwnerOrMaintainer = this.Package.Owner == accountId || this.Package.PackageOwner.Contains(accountId) || this.Package.PackageMaintainer.Contains(accountId);
-                var updateResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Package);
-                this.IsUserAdmin = isOwnerOrMaintainer || !updateResult.IsError;
-            }
-            else
-            {
-                this.IsUserAdmin = false;
             }
         }
 

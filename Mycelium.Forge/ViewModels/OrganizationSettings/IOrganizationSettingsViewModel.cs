@@ -27,6 +27,16 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         OrganizationInvitationKind CurrentUserRole { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage the organization.
+        /// </summary>
+        bool CanManageOrganization { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique identifier of the currently authenticated user.
+        /// </summary>
+        Guid CurrentUserId { get; set; }
+
+        /// <summary>
         /// Gets or sets the collection of members belonging to the organization.
         /// </summary>
         IReadOnlyList<IAccount> Members { get; set; }

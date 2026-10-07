@@ -9,9 +9,9 @@
 
 @attribute [Route(PageRoutes.PackageSettings)]
 @attribute [Authorize]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(false))
 
-@if (this.ViewModel.Package == null)
+@if (this.ViewModel.Package == null || !this.ViewModel.CanManagePackage)
 {
     return;
 }
@@ -35,7 +35,7 @@
                           Variant="ButtonVariant.Outline"
                           Size="ButtonSize.Small"
                           Type="ButtonType.Button"
-                          OnClick="@(this.OnAddMaintainer)"
+                          OnClick="@(OnAddMaintainer)"
                           Class="shrink-0">
                     <LucideIcon Name="plus"
                                 Size="14"
@@ -50,7 +50,7 @@
                     <PackageCollaboratorRow @key="owner.Id"
                                             Account="@owner"
                                             Role="Owner"
-                                            OnMenu="@(this.OnMaintainerMenu)"/>
+                                            OnMenu="@(OnMaintainerMenu)"/>
                 }
 
                 @foreach (var maintainer in this.ViewModel.Maintainers)
@@ -58,7 +58,7 @@
                     <PackageCollaboratorRow @key="maintainer.Id"
                                             Account="@maintainer"
                                             Role="Maintainer"
-                                            OnMenu="@(this.OnMaintainerMenu)"/>
+                                            OnMenu="@(OnMaintainerMenu)"/>
                 }
             </div>
 
@@ -150,7 +150,7 @@
                         <div class="flex-1"></div>
 
                         <span class="text-muted-foreground shrink-0">
-                            @(this.GetPublishedAgo(version))
+                            @(version.PublicationDate.ToTimeAgo())
                         </span>
 
                         @if (!version.Listed)

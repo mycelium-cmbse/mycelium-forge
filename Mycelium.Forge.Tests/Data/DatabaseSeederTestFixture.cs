@@ -36,6 +36,7 @@ namespace Mycelium.Forge.Tests.Data
         private Mock<IPackageTypeService> packageTypeServiceMock;
         private Mock<IAccountService> accountServiceMock;
         private Mock<IOrganizationService> organizationServiceMock;
+        private Mock<IOrganizationInvitationService> organizationInvitationServiceMock;
         private Mock<IPackageService> packageServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
         private Mock<IPackageMetaDataService> packageMetaDataServiceMock;
@@ -55,6 +56,7 @@ namespace Mycelium.Forge.Tests.Data
             this.packageTypeServiceMock = new Mock<IPackageTypeService>();
             this.accountServiceMock = new Mock<IAccountService>();
             this.organizationServiceMock = new Mock<IOrganizationService>();
+            this.organizationInvitationServiceMock = new Mock<IOrganizationInvitationService>();
             this.packageServiceMock = new Mock<IPackageService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
             this.packageMetaDataServiceMock = new Mock<IPackageMetaDataService>();
@@ -101,6 +103,10 @@ namespace Mycelium.Forge.Tests.Data
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
 
+            this.organizationInvitationServiceMock
+                .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result.Created);
+
             this.packageServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
@@ -127,6 +133,7 @@ namespace Mycelium.Forge.Tests.Data
                 this.packageTypeServiceMock.Object,
                 this.accountServiceMock.Object,
                 this.organizationServiceMock.Object,
+                this.organizationInvitationServiceMock.Object,
                 this.packageServiceMock.Object,
                 this.packageVersionServiceMock.Object,
                 this.packageMetaDataServiceMock.Object,
@@ -152,6 +159,7 @@ namespace Mycelium.Forge.Tests.Data
                 this.packageTypeServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageType>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.accountServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IAccount>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.organizationServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>()), Times.Once);
+                this.organizationInvitationServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageVersionServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageMetaDataServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageMetaData>>(), It.IsAny<CancellationToken>()), Times.Once);

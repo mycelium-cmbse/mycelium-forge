@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 {
+    using System;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -16,17 +17,12 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
     using Bunit;
 
-    using ErrorOr;
-
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings;
-    using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.Models.Organization;
-    using Mycelium.Forge.Models.Profile;
     using Mycelium.Forge.ViewModels.AccountSettings;
 
     [TestFixture]
@@ -35,6 +31,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         private BunitContext context;
         private Mock<IAccountSettingsViewModel> viewModelMock;
         private DialogService dialogService;
+        private Account testAccount;
+        private Organization adminOrganization;
+        private Organization memberOrganization;
 
         [SetUp]
         public void SetUp()
@@ -47,24 +46,38 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
             this.viewModelMock = new Mock<IAccountSettingsViewModel>();
 
-            var account = new Account
+            var accountId = Guid.NewGuid();
+
+            this.testAccount = new Account
             {
+                Id = accountId,
                 Name = "Alex Rivera",
                 ShortName = "alex.rivera",
                 Email = "alex.rivera@example.com",
                 Origin = "Darmstadt, Germany",
-                Website = "https://stariongroup.eu"
+                Website = "https://stariongroup.eu",
+                IsVerified = true
             };
 
-            var profile = new UserProfileModel(account, "Starion Group", "MBSE engineer and space enthusiast.");
+            this.adminOrganization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Name = "Starion Group",
+                ShortName = "starion",
+                Administrator = [accountId]
+            };
 
-            this.viewModelMock.Setup(x => x.Profile).Returns(profile);
+            this.memberOrganization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Name = "European Space Agency",
+                ShortName = "esa",
+                Member = [accountId]
+            };
 
-            this.viewModelMock.Setup(x => x.Organizations).Returns(
-            [
-                new AccountOrganizationMembershipModel(new Organization { Name = "Starion Group", ShortName = "starion" }, OrganizationInvitationKind.ADMINISTRATOR),
-                new AccountOrganizationMembershipModel(new Organization { Name = "European Space Agency", ShortName = "esa" })
-            ]);
+            this.viewModelMock.Setup(x => x.Profile).Returns(this.testAccount);
+            this.viewModelMock.Setup(x => x.Location).Returns("Darmstadt, Germany");
+            this.viewModelMock.Setup(x => x.Organizations).Returns([this.adminOrganization, this.memberOrganization]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
             this.dialogService = this.context.Services.GetRequiredService<DialogService>();
@@ -74,22 +87,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
-        }
-
-        [Test]
-        public void VerifyHandleCreateOrganization()
-        {
-            var result = new CreateOrganizationResult { OrganizationName = "New Org", Scope = "@neworg" };
-            this.viewModelMock.Setup(x => x.CreateOrganization(result)).Returns(Result.Success);
-
-            var accountSettingsPage = this.context.Render<AccountSettings>();
-            var handleResult = accountSettingsPage.Instance.HandleCreateOrganization(result);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(handleResult.IsError, Is.False);
-                this.viewModelMock.Verify(x => x.CreateOrganization(result), Times.Once);
-            }
         }
 
         [Test]
@@ -104,14 +101,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         }
 
         [Test]
-        public async Task VerifyOnDeactivateAccount()
+        public void VerifyOnDeactivateAccount()
         {
             var accountSettingsPage = this.context.Render<AccountSettings>();
             var deactivateButton = accountSettingsPage.Find("#account-settings-deactivate-button");
 
-            await accountSettingsPage.InvokeAsync(() => deactivateButton.ClickAsync());
+            _ = accountSettingsPage.InvokeAsync(() => deactivateButton.ClickAsync());
 
-            this.viewModelMock.Verify(x => x.DeactivateAccount(), Times.Once);
+            Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -138,6 +135,21 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         }
 
         [Test]
+        public void VerifyOrganizations()
+        {
+            var accountSettingsPage = this.context.Render<AccountSettings>();
+
+            var badges = accountSettingsPage.FindAll("#account-settings-organizations .badge-role");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(badges, Has.Count.EqualTo(2));
+                Assert.That(badges[0].TextContent.Trim(), Is.EqualTo("Administrator"));
+                Assert.That(badges[1].TextContent.Trim(), Is.EqualTo("Member"));
+            }
+        }
+
+        [Test]
         public void VerifyStubMethods()
         {
             var accountSettingsPage = this.context.Render<AccountSettings>();
@@ -145,20 +157,16 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             var changeUsernameBtn = accountSettingsPage.Find("#account-settings-change-username-button");
             var changeEmailBtn = accountSettingsPage.Find("#account-settings-change-email-button");
             var editDisplayNameBtn = accountSettingsPage.Find("#account-settings-edit-displayname-button");
-            var editCompanyBtn = accountSettingsPage.Find("#account-settings-edit-company-button");
             var editLocationBtn = accountSettingsPage.Find("#account-settings-edit-location-button");
             var editWebsiteBtn = accountSettingsPage.Find("#account-settings-edit-website-button");
-            var editBiographyBtn = accountSettingsPage.Find("#account-settings-edit-biography-button");
 
             Assert.That(async () =>
             {
                 await accountSettingsPage.InvokeAsync(() => changeUsernameBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => changeEmailBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => editDisplayNameBtn.ClickAsync());
-                await accountSettingsPage.InvokeAsync(() => editCompanyBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => editLocationBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => editWebsiteBtn.ClickAsync());
-                await accountSettingsPage.InvokeAsync(() => editBiographyBtn.ClickAsync());
             }, Throws.Nothing);
         }
     }

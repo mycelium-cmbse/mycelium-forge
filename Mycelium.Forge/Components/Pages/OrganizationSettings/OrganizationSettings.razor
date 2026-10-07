@@ -9,9 +9,9 @@
 
 @attribute [Route(PageRoutes.OrganizationSettings)]
 @attribute [Authorize]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(false))
 
-@if (this.ViewModel.Organization == null)
+@if (this.ViewModel.Organization == null || !this.ViewModel.CanManageOrganization)
 {
     return;
 }
@@ -76,8 +76,9 @@
                             <ForgeSelect TValue="OrganizationInvitationKind"
                                          Value="@(this.GetMemberRole(member))"
                                          ValueChanged="@(role => this.OnChangeMemberRole(member, role))"
+                                         Disabled="@(this.IsCurrentUser(member))"
                                          Items="@(this.ViewModel.RoleOptions)"
-                                         DisplayTextSelector="@(role => role.ToLowerCaseFirst())"
+                                         DisplayTextSelector="@(role => role.ToUpperCaseFirst())"
                                          TriggerClass="!h-7 !px-2.5 !py-1 !text-xs !leading-2xs !gap-1.5"
                                          ItemClass="!text-xs !leading-2xs"/>
                         </div>

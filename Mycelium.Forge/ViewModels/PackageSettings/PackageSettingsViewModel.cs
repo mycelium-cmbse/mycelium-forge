@@ -71,11 +71,6 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         private readonly IUserService userService;
 
         /// <summary>
-        /// The current authenticated user account identifier resolved on initialization.
-        /// </summary>
-        private Guid currentUserId;
-
-        /// <summary>
         /// The authenticated user context resolved on initialization.
         /// </summary>
         private IUserContext userContext;
@@ -151,13 +146,12 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             this.userContext = await this.userService.GetUserContext();
             var packageResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scope, packageName);
 
-            if (packageResult.IsError || packageResult.Value == null || !this.userContext.AccountId.HasValue)
+            if (packageResult.IsError)
             {
                 this.logger.LogWarning("Package {Scope}/{Name} not found during settings initialization", scope, packageName);
                 return;
             }
 
-            this.currentUserId = this.userContext.AccountId.Value;
             this.Package = packageResult.Value;
 
             var ownerTask = this.scopeService.ReadOrNull(this.userContext, this.Package.Owner);
@@ -172,10 +166,9 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             this.Owners = ownersTask.Result;
             this.Versions = [.. versionsTask.Result.OrderByDescending(v => v.PublicationDate)];
 
-            var isOwnerOrMaintainer = this.Package.Owner == this.currentUserId || this.Package.PackageOwner.Contains(this.currentUserId) || this.Package.PackageMaintainer.Contains(this.currentUserId);
-            var updateResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.userContext, this.Package);
-            this.CanManagePackage = isOwnerOrMaintainer || !updateResult.IsError;
+            var canUpdatePackageResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.userContext, this.Package);
 
+            this.CanManagePackage = canUpdatePackageResult.IsSuccess;
             this.CanDeletePackage = this.userContext.HasPermission(PermissionKind.DeletePackage);
         }
 
@@ -192,13 +185,14 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             if (result.IsError)
             {
-                var errorMessage = "Failed to update package visibility.";
+                const string errorMessage = "Failed to update package visibility.";
+
                 this.logger.LogError(errorMessage);
                 this.notificationService.AddNotification(errorMessage, "Visibility Update Failed", NotificationType.Error);
                 return;
             }
 
-            this.notificationService.AddNotification($"Package visibility updated to {visibility}.", "Visibility Updated", NotificationType.Success);
+            this.notificationService.AddNotification($"Package visibility updated to {visibility.ToUpperCaseFirst()}.", "Visibility Updated", NotificationType.Success);
         }
 
         /// <summary>
@@ -214,7 +208,8 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             if (result.IsError)
             {
-                var errorMessage = $"Failed to unlist version {version.Version}.";
+                const string errorMessage = "Failed to unlist version.";
+
                 this.logger.LogError(errorMessage);
                 this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
                 return;
@@ -236,7 +231,8 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             if (result.IsError)
             {
-                var errorMessage = $"Failed to relist version {version.Version}.";
+                const string errorMessage = "Failed to relist version.";
+
                 this.logger.LogError(errorMessage);
                 this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
                 return;
@@ -258,7 +254,8 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             if (result.IsError)
             {
-                var errorMessage = $"Failed to deprecate version {version.Version}.";
+                const string errorMessage = "Failed to deprecate version.";
+
                 this.logger.LogError(errorMessage);
                 this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
                 return;
@@ -273,40 +270,10 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <param name="targetScope">The target scope short name.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
-        public async Task<ErrorOr<Success>> TransferOwnership(string targetScope, CancellationToken token = default)
+        public Task<ErrorOr<Success>> TransferOwnership(string targetScope, CancellationToken token = default)
         {
-            const string errorMessage = "Failed to transfer package ownership.";
-            var scopesResult = await this.scopeService.ReadAsync(this.userContext, token);
-
-            if (scopesResult.IsError)
-            {
-                this.logger.LogError(errorMessage);
-                this.notificationService.AddNotification(errorMessage, "Transfer Failed", NotificationType.Error);
-                return scopesResult.Errors;
-            }
-
-            var target = scopesResult.Value.FirstOrDefault(s => string.Equals(s.ShortName, targetScope.Trim(), StringComparison.OrdinalIgnoreCase));
-
-            if (target == null)
-            {
-                var message = $"Target scope '{targetScope}' was not found.";
-                this.logger.LogWarning(message);
-                this.notificationService.AddNotification(message, "Scope Not Found", NotificationType.Error);
-                return Error.NotFound(description: message);
-            }
-
-            this.Package.Owner = target.Id;
-            var updateResult = await this.packageService.UpdateAsync(this.userContext, [this.Package], token);
-
-            if (updateResult.IsError)
-            {
-                this.logger.LogError(errorMessage);
-                this.notificationService.AddNotification(errorMessage, "Transfer Failed", NotificationType.Error);
-                return updateResult.Errors;
-            }
-
-            this.notificationService.AddNotification($"Package ownership transferred to {targetScope}.", "Ownership Transferred", NotificationType.Success);
-            return Result.Success;
+            // TODO: Implement the logic to transfer package ownership to the specified target scope.
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
 
         /// <summary>
@@ -316,11 +283,12 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A task indicating the success or failure of the operation.</returns>
         public async Task<ErrorOr<Success>> DeletePackage(CancellationToken token = default)
         {
-            const string errorMessage = "Failed to delete package.";
             var deleteResult = await this.packageService.DeleteAsync(this.userContext, [this.Package.Id], token);
 
             if (deleteResult.IsError)
             {
+                const string errorMessage = "Failed to delete package.";
+
                 this.logger.LogError(errorMessage);
                 this.notificationService.AddNotification(errorMessage, "Delete Failed", NotificationType.Error);
                 return deleteResult.Errors;

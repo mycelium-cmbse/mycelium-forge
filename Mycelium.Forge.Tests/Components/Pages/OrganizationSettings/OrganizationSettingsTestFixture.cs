@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
 {
+    using System;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -21,8 +22,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
     using Moq;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.OrganizationSettings;
-    using Mycelium.Forge.Models.Organization;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
     [TestFixture]
@@ -30,8 +31,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
     {
         private BunitContext context;
         private Mock<IOrganizationSettingsViewModel> viewModelMock;
-        private OrganizationMemberModel testMember;
-        private OrganizationInvitationModel testInvitation;
+        private Organization testOrganization;
+        private Account testMember;
+        private OrganizationInvitation testInvitation;
+
+        private DialogService dialogService;
 
         [SetUp]
         public void SetUp()
@@ -44,25 +48,45 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
 
             this.viewModelMock = new Mock<IOrganizationSettingsViewModel>();
 
-            var org = new OrganizationModel(
-                new Organization { Name = "Starion Group", ShortName = "starion", Origin = "Systems engineering" })
+            var orgId = Guid.NewGuid();
+            var memberId = Guid.NewGuid();
+
+            this.testOrganization = new Organization
             {
-                MemberSinceYear = 2023
+                Id = orgId,
+                Name = "Starion Group",
+                ShortName = "starion",
+                Origin = "Systems engineering",
+                Administrator = [memberId],
+                OwnedPackage = [Guid.NewGuid()]
             };
 
-            this.testMember = new OrganizationMemberModel(
-                new Account { Name = "Alex Rivera", ShortName = "alex.rivera" },
-                OrganizationInvitationKind.ADMINISTRATOR);
+            this.testMember = new Account
+            {
+                Id = memberId,
+                Name = "Alex Rivera",
+                ShortName = "alex.rivera"
+            };
 
-            this.testInvitation = new OrganizationInvitationModel("a.novak@esa.int", OrganizationInvitationKind.ADMINISTRATOR, "Sent 2 days ago");
+            this.testInvitation = new OrganizationInvitation
+            {
+                Id = Guid.NewGuid(),
+                Organization = orgId,
+                Target = Guid.NewGuid(),
+                OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR,
+                Status = InvitationStatusKind.PENDING,
+                ExperiesAt = DateTime.UtcNow.AddDays(2)
+            };
 
-            this.viewModelMock.Setup(x => x.Organization).Returns(org);
+            this.viewModelMock.Setup(x => x.Organization).Returns(this.testOrganization);
             this.viewModelMock.Setup(x => x.CurrentUserRole).Returns(OrganizationInvitationKind.ADMINISTRATOR);
+            this.viewModelMock.Setup(x => x.CanManageOrganization).Returns(true);
             this.viewModelMock.Setup(x => x.Members).Returns([this.testMember]);
             this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testInvitation]);
             this.viewModelMock.Setup(x => x.RoleOptions).Returns([OrganizationInvitationKind.ADMINISTRATOR, OrganizationInvitationKind.MEMBER]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
+            this.dialogService = this.context.Services.GetRequiredService<DialogService>();
         }
 
         [TearDown]
@@ -72,20 +96,32 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         }
 
         [Test]
-        public void VerifyChangeMemberRole()
+        public async Task VerifyChangeMemberRole()
         {
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
+            var select = orgSettingsPage.FindComponent<ForgeSelect<OrganizationInvitationKind>>();
 
-            orgSettingsPage.Instance.OnChangeMemberRole(this.testMember, OrganizationInvitationKind.MEMBER);
+            await orgSettingsPage.InvokeAsync(() => select.Instance.ValueChanged.InvokeAsync(OrganizationInvitationKind.MEMBER));
 
             this.viewModelMock.Verify(x => x.ChangeMemberRole(this.testMember, OrganizationInvitationKind.MEMBER), Times.Once);
         }
 
         [Test]
+        public void VerifyGetBreadcrumbItems()
+        {
+            var orgSettingsPage = this.context.Render<OrganizationSettings>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgSettingsPage.Markup, Does.Contain("@starion"));
+                Assert.That(orgSettingsPage.Markup, Does.Contain("Settings"));
+            }
+        }
+
+        [Test]
         public void VerifyOnParametersSet()
         {
-            var orgSettingsPage = this.context.Render<OrganizationSettings>(parameters => parameters
-                .Add(p => p.Id, "starion"));
+            var orgSettingsPage = this.context.Render<OrganizationSettings>(parameters => parameters.Add(p => p.Id, "starion"));
 
             using (Assert.EnterMultipleScope())
             {
@@ -95,14 +131,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         }
 
         [Test]
-        public async Task VerifyRemoveMember()
+        public void VerifyRemoveMember()
         {
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
             var removeButton = orgSettingsPage.Find(".org-remove-member-button");
 
-            await orgSettingsPage.InvokeAsync(() => removeButton.ClickAsync());
+            _ = orgSettingsPage.InvokeAsync(() => removeButton.ClickAsync());
 
-            this.viewModelMock.Verify(x => x.RemoveMember(this.testMember), Times.Once);
+            Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
         }
 
         [Test]

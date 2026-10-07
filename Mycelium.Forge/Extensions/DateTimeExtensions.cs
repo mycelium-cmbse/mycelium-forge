@@ -42,14 +42,9 @@ namespace Mycelium.Forge.Extensions
         /// <returns>A string describing the relative duration in human-readable units.</returns>
         private static string FormatRelativeDuration(TimeSpan duration)
         {
-            if (duration.TotalSeconds < 60)
-            {
-                return "just now";
-            }
-
             if (duration.TotalMinutes < 60)
             {
-                return FormatTimeUnit((int)duration.TotalMinutes, "minute");
+                return FormatTimeUnit((int)Math.Max(1, duration.TotalMinutes), "minute");
             }
 
             if (duration.TotalHours < 24)
@@ -96,16 +91,20 @@ namespace Mycelium.Forge.Extensions
             public string ToTimeAgo(DateTime relativeTo)
             {
                 var elapsed = ToUtc(relativeTo) - ToUtc(dateTime);
-                var durationText = FormatRelativeDuration(elapsed);
 
-                return durationText == "just now" ? durationText : $"{durationText} ago";
+                if (elapsed.TotalSeconds < 60)
+                {
+                    return "just now";
+                }
+
+                return $"{FormatRelativeDuration(elapsed)} ago";
             }
 
             /// <summary>
             /// Formats a <see cref="DateTime" /> into a human-readable relative future time span string compared to the current UTC
             /// time.
             /// </summary>
-            /// <returns>A string describing the remaining time relative to now (e.g., 'just now', '2 weeks', '1 month').</returns>
+            /// <returns>A string describing the remaining time relative to now (e.g., 'less than a minute', '2 weeks', '1 month').</returns>
             public string ToTimeToCome()
             {
                 return dateTime.ToTimeToCome(DateTime.UtcNow);
@@ -121,6 +120,11 @@ namespace Mycelium.Forge.Extensions
             public string ToTimeToCome(DateTime relativeTo)
             {
                 var remaining = ToUtc(dateTime) - ToUtc(relativeTo);
+
+                if (remaining.TotalSeconds < 60)
+                {
+                    return "less than a minute";
+                }
 
                 return FormatRelativeDuration(remaining);
             }
