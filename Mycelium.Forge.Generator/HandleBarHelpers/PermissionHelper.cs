@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -113,12 +113,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
         private static void RegisterFieldsAndConstructors(IHandlebars handlebars)
         {
-            handlebars.RegisterHelper("Permission.WriteFieldsAndConstructors", (writer, context, _) =>
+            handlebars.RegisterHelper("Permission.WriteFieldsAndConstructors", (writer, _, arguments) =>
             {
-                if (context.Value is not IClass @class)
-                {
-                    throw new ArgumentException("Context must be an IClass", nameof(context));
-                }
+                var @class = arguments.QuerySingle<IClass>("Permission.WriteFieldsAndConstructors");
 
                 entityPermissions.TryGetValue(@class.Name, out var definition);
                 entityBehaviors.TryGetValue(@class.Name, out var behavior);
@@ -415,12 +412,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// </param>
         private static void RegisterOperationHelper(IHandlebars handlebars, string helperName, Operations operation, Action<StringBuilder, IClass, EntityPermissionDefinition, EntityBehaviorDefinition, IBehaviorTypeHelper, bool> behaviorAction, Action<StringBuilder, IClass, EntityPermissionDefinition, bool> fallbackAction)
         {
-            handlebars.RegisterHelper(helperName, (writer, context, _) =>
+            handlebars.RegisterHelper(helperName, (writer, _, arguments) =>
             {
-                if (context.Value is not IClass @class)
-                {
-                    throw new ArgumentException("Context must be an IClass", nameof(context));
-                }
+                var @class = arguments.QuerySingle<IClass>(helperName);
 
                 entityPermissions.TryGetValue(@class.Name, out var definition);
                 entityBehaviors.TryGetValue(@class.Name, out var behavior);
@@ -450,9 +444,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="operation">The permission operation.</param>
         private static void RegisterAsyncModifier(IHandlebars handlebars, string helperName, Operations operation)
         {
-            handlebars.RegisterHelper(helperName, (writer, context, _) =>
+            handlebars.RegisterHelper(helperName, (writer, _, arguments) =>
             {
-                if (context.Value is IClass @class && IsAsyncMethod(@class, operation))
+                var @class = arguments.QuerySingle<IClass>(helperName);
+
+                if (IsAsyncMethod(@class, operation))
                 {
                     writer.WriteSafeString("async ");
                 }

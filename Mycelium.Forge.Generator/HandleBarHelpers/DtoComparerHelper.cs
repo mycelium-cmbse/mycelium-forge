@@ -37,10 +37,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             handlebars.RegisterHelper("forge.DtoComparer.WriteComparisonIfApplicable", (writer, _, arguments) =>
             {
-                if (arguments.Length == 0 || arguments[0] is not IProperty property)
-                {
-                    throw new HandlebarsException("{{#forge.DtoComparer.WriteComparisonIfApplicable}} helper must have at least one IProperty argument");
-                }
+                var property = arguments.QueryFirst<IProperty>("forge.DtoComparer.WriteComparisonIfApplicable");
 
                 if (property.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
                 {

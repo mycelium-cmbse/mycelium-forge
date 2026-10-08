@@ -36,6 +36,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingConstraints", WriteBasicTableThingConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints", WriteManyToManyTableDefinitionsAndConstraints);
             handlebars.RegisterHelper("Forge.SQL.WriteNormalReferenceConstraints", WriteNormalReferenceConstraints);
+            handlebars.RegisterHelper("Forge.SQL.WriteIndexableValuePropertyIndexes", WriteIndexableValuePropertyIndexes);
             handlebars.RegisterHelper("Forge.SQL.DeleteBaseTableTriggerFunctions", DeleteBaseTableTriggerFunctions);
             handlebars.RegisterHelper("Forge.SQL.WriteBasicTableThingDeleteTriggers", WriteBasicTableThingDeleteTriggers);
             handlebars.RegisterHelper("Forge.SQL.WriteBaseTableDeleteTriggers", WriteBaseTableDeleteTriggers);
@@ -49,10 +50,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteBasicTableDefinitions(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteBasicTableDefinitions - context is supposed to be IClass");
-            }
+            var @class = arguments.QuerySingle<IClass>("Forge.SQL.WriteBasicTableDefinitions");
 
             if (@class.IsThingClass())
             {
@@ -91,10 +89,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteBasicTableThingConstraints(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteBasicTableThingConstraints - context is supposed to be IClass");
-            }
+            var @class = arguments.QuerySingle<IClass>("Forge.SQL.WriteBasicTableThingConstraints");
 
             if (@class.IsThingClass())
             {
@@ -115,10 +110,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteManyToManyTableDefinitionsAndConstraints(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints - context is supposed to be IClass");
-            }
+            var @class = arguments.QuerySingle<IClass>("Forge.SQL.WriteManyToManyTableDefinitionsAndConstraints");
 
             if (@class.IsThingClass())
             {
@@ -168,10 +160,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteNormalReferenceConstraints(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteNormalReferenceConstraints - context is supposed to be IClass");
-            }
+            var @class = arguments.QuerySingle<IClass>("Forge.SQL.WriteNormalReferenceConstraints");
 
             if (@class.IsThingClass())
             {
@@ -192,6 +181,64 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         }
 
         /// <summary>
+        /// Writes indexes for value properties marked as indexable (<see cref="PropertyExtension.QueryIsIndexable" />).
+        /// </summary>
+        /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        private static void WriteIndexableValuePropertyIndexes(EncodedTextWriter writer, Context context, Arguments arguments)
+        {
+            var @class = arguments.QuerySingle<IClass>("Forge.SQL.WriteIndexableValuePropertyIndexes");
+
+            if (@class.IsThingClass())
+            {
+                return;
+            }
+
+            var indexableValueProperties = @class.OwnedAttribute
+                .Where(x => x.QueryIsDataType() && x.QueryIsIndexable())
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            if (indexableValueProperties.Count == 0)
+            {
+                return;
+            }
+
+            var stringBuilder = new StringBuilder();
+            var whereClause = QueryIndexWhereClause(@class);
+
+            foreach (var property in indexableValueProperties)
+            {
+                stringBuilder.AppendLine($"CREATE INDEX \"idx_{@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()}\" ON \"Forge\".\"Thing\" ((\"data\" ->> '{property.QuerySqlAttributeName()}')){whereClause};");
+            }
+
+            writer.WriteSafeString(stringBuilder);
+        }
+
+        /// <summary>
+        /// Queries the SQL WHERE clause for an index on an <see cref="IClass" /> based on its concrete subclasses.
+        /// </summary>
+        /// <param name="class">The subject <see cref="IClass" />.</param>
+        /// <returns>The SQL WHERE clause string, or empty if unrestricted.</returns>
+        private static string QueryIndexWhereClause(IClass @class)
+        {
+            if (!@class.IsAbstract)
+            {
+                return $" WHERE \"classKind\" = '{@class.Name}'";
+            }
+
+            var concreteSubclasses = @class.QueryConcreteSubclasses();
+
+            return concreteSubclasses.Count switch
+            {
+                0 => string.Empty,
+                1 => $" WHERE \"classKind\" = '{concreteSubclasses[0].Name}'",
+                _ => $" WHERE \"classKind\" IN ('{string.Join("', '", concreteSubclasses.Select(x => x.Name))}')"
+            };
+        }
+
+        /// <summary>
         /// Writes delete trigger functions for base tables.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
@@ -199,10 +246,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void DeleteBaseTableTriggerFunctions(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IEnumerable<IClass> classes)
-            {
-                throw new ArgumentException("Forge.SQL.DeleteBaseTableTriggerFunctions - context is supposed to be IEnumerable<IClass>");
-            }
+            var classes = arguments.QuerySingle<IEnumerable<IClass>>("Forge.SQL.DeleteBaseTableTriggerFunctions");
 
             var stringBuilder = new StringBuilder();
 
@@ -235,10 +279,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteBasicTableThingDeleteTriggers(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteBasicTableThingDeleteTriggers - context is supposed to be IClass");
-            }
+            var @class = arguments.QuerySingle<IClass>("Forge.SQL.WriteBasicTableThingDeleteTriggers");
 
             if (@class.IsThingClass())
             {
@@ -265,10 +306,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteBaseTableDeleteTriggers(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException("Forge.SQL.WriteBaseTableDeleteTriggers - context is supposed to be IClass");
-            }
+            var @class = arguments.QuerySingle<IClass>("Forge.SQL.WriteBaseTableDeleteTriggers");
 
             if (@class.IsThingClass())
             {

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PropertyNameHelper.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -31,12 +31,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// </param>
         public static void RegisterPropertyNameHelper(this IHandlebars handlebars)
         {
-            handlebars.RegisterHelper("Property.WritePropertyName", (writer, context, arguments) =>
+            handlebars.RegisterHelper("Property.WritePropertyName", (writer, _, arguments) =>
             {
-                if (arguments.Length != 1 || arguments[0] is not IProperty property)
-                {
-                    throw new HandlebarsException("{{#Property.WritePropertyName}} helper must have exactly one IProperty argument");
-                }
+                var property = arguments.QuerySingle<IProperty>("Property.WritePropertyName");
 
                 var propertyName = property.Name.CapitalizeFirstLetter();
 
@@ -52,14 +49,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             // iterating the rest of a class's properties, so the ordinary "id" property returned by
             // Class.QueryAllProperties must be skipped in that loop - otherwise the same value is
             // written/read twice, once as "@id" and once as a redundant "id".
-            handlebars.RegisterHelper("Property.IsThingId", (context, arguments) =>
+            handlebars.RegisterHelper("Property.IsThingId", (_, arguments) =>
             {
-                if (arguments.Length != 1 || arguments[0] is not IProperty property)
-                {
-                    throw new HandlebarsException("{{#Property.IsThingId}} helper must have exactly one IProperty argument");
-                }
+                var property = arguments.QuerySingle<IProperty>("Property.IsThingId");
 
-                return property.Name.Equals("id", System.StringComparison.OrdinalIgnoreCase);
+                return property.Name.Equals("id", StringComparison.OrdinalIgnoreCase);
             });
 
             // Property.QueryIsString (uml4net core) tests whether the property's UML *type* is
@@ -70,12 +64,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             // which UML type produced it). Mirrors the check this project's own DTO generation already
             // relies on for the same reason (uml4net.Extensions.PropertyExtensions.QueryIsNullableAndNotString,
             // used by HandleBarHelpers/PropertyHelper.cs) rather than the core QueryIsString helper.
-            handlebars.RegisterHelper("Property.QueryIsCSharpString", (context, arguments) =>
+            handlebars.RegisterHelper("Property.QueryIsCSharpString", (_, arguments) =>
             {
-                if (arguments.Length != 1 || arguments[0] is not IProperty property)
-                {
-                    throw new HandlebarsException("{{#Property.QueryIsCSharpString}} helper must have exactly one IProperty argument");
-                }
+                var property = arguments.QuerySingle<IProperty>("Property.QueryIsCSharpString");
 
                 return property.QueryCSharpTypeName() == "string";
             });
@@ -84,12 +75,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             // containing "int" or "double"/"real" respectively - "byte" (e.g. APIKey.SecretHash,
             // List<byte>) matches neither, so the JSON deserializer template's numeric branches need
             // an explicit byte case of their own.
-            handlebars.RegisterHelper("Property.QueryIsByte", (context, arguments) =>
+            handlebars.RegisterHelper("Property.QueryIsByte", (_, arguments) =>
             {
-                if (arguments.Length != 1 || arguments[0] is not IProperty property)
-                {
-                    throw new HandlebarsException("{{#Property.QueryIsByte}} helper must have exactly one IProperty argument");
-                }
+                var property = arguments.QuerySingle<IProperty>("Property.QueryIsByte");
 
                 return property.QueryCSharpTypeName() == "byte";
             });

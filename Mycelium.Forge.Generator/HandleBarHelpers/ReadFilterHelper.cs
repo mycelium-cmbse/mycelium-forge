@@ -26,11 +26,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     public static partial class ReadFilterHelper
     {
         /// <summary>
-        /// The error message used when the Handlebars context is not an <see cref="IClass" />.
-        /// </summary>
-        private const string ContextMustBeIClass = "context is supposed to be an IClass";
-
-        /// <summary>
         /// Registry of behavior type helpers keyed by behavior type name.
         /// </summary>
         private static readonly Dictionary<string, IBehaviorTypeHelper> BehaviorTypeHelpers = new()
@@ -115,14 +110,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Writes the implementation of <c>FromUserContext</c> for the current entity class.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteFilterFromUserContext(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("ReadFilter.WriteFilterFromUserContext");
 
             var predicate = BuildVisibilityPredicate(@class);
 

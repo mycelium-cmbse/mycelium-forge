@@ -56,7 +56,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => template("not-a-collection"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => template("not-a-collection"), Throws.TypeOf<HandlebarsException>());
 
                 var allClasses = GeneratorSetupFixture.XmiReaderResult.Packages
                     .SelectMany(package => package.QueryPackages())
@@ -88,7 +88,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
 
                 var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Is.Empty);
@@ -110,7 +110,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
 
                 var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Is.Empty);
@@ -133,7 +133,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
 
                 var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Is.Empty);
@@ -153,7 +153,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
 
                 var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Is.Empty);
@@ -175,7 +175,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
 
                 var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Is.Empty);
@@ -199,7 +199,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => template("not-a-class"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
 
                 var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Is.Empty);

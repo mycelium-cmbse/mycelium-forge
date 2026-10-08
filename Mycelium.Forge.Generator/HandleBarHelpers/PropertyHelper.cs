@@ -42,34 +42,32 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             ArgumentNullException.ThrowIfNull(handlebars);
 
             // uml4net's QueryOwnedAttributeOrdered misses reverse composite association ends; unions owned attributes with owner properties
-            handlebars.RegisterHelper("Class.QueryDtoInterfaceProperties", (context, _) =>
+            handlebars.RegisterHelper("Class.QueryDtoInterfaceProperties", (_, arguments) =>
             {
-                if (context.Value is not IClass @class)
-                {
-                    throw new ArgumentException("supposed to be IClass");
-                }
+                var @class = arguments.QuerySingle<IClass>("Class.QueryDtoInterfaceProperties");
 
                 return @class.QueryDtoInterfaceProperties();
             });
 
             // uml4net's QueryAllProperties misses reverse composite association ends; unions full hierarchy properties with superclass owner properties
-            handlebars.RegisterHelper("Class.QueryDtoClassProperties", (context, _) =>
+            handlebars.RegisterHelper("Class.QueryDtoClassProperties", (_, arguments) =>
             {
-                if (context.Value is not IClass @class)
-                {
-                    throw new ArgumentException("supposed to be IClass");
-                }
+                var @class = arguments.QuerySingle<IClass>("Class.QueryDtoClassProperties");
 
                 return @class.QueryDtoClassProperties();
+            });
+
+            handlebars.RegisterHelper("Property.QueryIsIndexable", (_, arguments) =>
+            {
+                var property = arguments.QuerySingle<IProperty>("Property.QueryIsIndexable");
+
+                return property.QueryIsIndexable();
             });
 
             // Writes XML documentation for a property, providing a default summary for owner properties
             handlebars.RegisterHelper("Property.WriteDocumentation", (in writer, in options, in context, in arguments) =>
             {
-                if (context.Value is not IProperty property)
-                {
-                    throw new ArgumentException("supposed to be IProperty");
-                }
+                var property = arguments.QuerySingle<IProperty>("Property.WriteDocumentation");
 
                 if (property.OwnedComment.Count == 0 && property.Name.Equals("owner", StringComparison.OrdinalIgnoreCase))
                 {
@@ -89,12 +87,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             });
 
             // Writes [Implements] attribute on DTO class properties referencing the declaring interface
-            handlebars.RegisterHelper("Decorator.WriteImplementsAttribute", (writer, context, _) =>
+            handlebars.RegisterHelper("Decorator.WriteImplementsAttribute", (writer, _, arguments) =>
             {
-                if (context.Value is not IProperty property)
-                {
-                    throw new ArgumentException("supposed to be IProperty");
-                }
+                var property = arguments.QuerySingle<IProperty>("Decorator.WriteImplementsAttribute");
 
                 var propertyName = property.Name.CapitalizeFirstLetter();
 
@@ -107,12 +102,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 writer.WriteSafeString($"[Implements(implementation: \"I{className}.{propertyName}\")]{Environment.NewLine}");
             });
 
-            handlebars.RegisterHelper("Property.WriteForDTOInterface", (writer, context, _) =>
+            handlebars.RegisterHelper("Property.WriteForDTOInterface", (writer, _, arguments) =>
             {
-                if (context.Value is not IProperty property)
-                {
-                    throw new ArgumentException("supposed to be IProperty");
-                }
+                var property = arguments.QuerySingle<IProperty>("Property.WriteForDTOInterface");
 
                 var sb = new StringBuilder();
 
@@ -153,8 +145,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     throw new HandlebarsException("{{#Property.WriteForDTOClass}} helper must have exactly two arguments");
                 }
 
-                var property = (IProperty)parameters[0];
-                var classContext = (IClass)parameters[1];
+                var property = parameters.QueryFirst<IProperty>("Property.WriteForDTOClass");
+                var classContext = parameters[1] as IClass ?? throw new HandlebarsException("Property.WriteForDTOClass requires an IClass second argument.");
 
                 var sb = new StringBuilder();
                 var propertyName = property.Name.CapitalizeFirstLetter();

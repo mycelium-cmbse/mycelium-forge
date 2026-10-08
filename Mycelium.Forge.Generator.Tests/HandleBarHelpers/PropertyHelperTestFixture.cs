@@ -79,10 +79,10 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(writeInterfacePropertyResult, Does.Contain("Guid Owner { get; set; }"));
                 Assert.That(writeClassPropertyResult, Does.Contain("public Guid Owner { get; set; }"));
                 Assert.That(writeOwnerDocumentationResult, Does.Contain("The unique identifier of the owning Forge."));
-                Assert.That(() => interfacePropertiesTemplate("not-a-class"), Throws.TypeOf<ArgumentException>());
-                Assert.That(() => classPropertiesTemplate("not-a-class"), Throws.TypeOf<ArgumentException>());
-                Assert.That(() => writeInterfacePropertyTemplate("not-a-property"), Throws.TypeOf<ArgumentException>());
-                Assert.That(() => writeDocumentationTemplate("not-a-property"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => interfacePropertiesTemplate("not-a-class"), Throws.TypeOf<HandlebarsException>());
+                Assert.That(() => classPropertiesTemplate("not-a-class"), Throws.TypeOf<HandlebarsException>());
+                Assert.That(() => writeInterfacePropertyTemplate("not-a-property"), Throws.TypeOf<HandlebarsException>());
+                Assert.That(() => writeDocumentationTemplate("not-a-property"), Throws.TypeOf<HandlebarsException>());
             }
         }
 
@@ -98,7 +98,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => implementsTemplate("not-a-property"), Throws.TypeOf<ArgumentException>());
+                Assert.That(() => implementsTemplate("not-a-property"), Throws.TypeOf<HandlebarsException>());
                 Assert.That(idResult, Does.Contain("[Implements(implementation: \"IThing.Id\")]"));
                 Assert.That(ownerResult, Does.Contain("[Implements(implementation: \"IAccount.Owner\")]"));
             }
