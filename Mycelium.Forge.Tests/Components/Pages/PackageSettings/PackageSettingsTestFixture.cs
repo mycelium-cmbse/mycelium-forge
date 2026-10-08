@@ -18,12 +18,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
     using Bunit;
 
+    using ErrorOr;
+
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageSettings;
+    using Mycelium.Forge.Components.Pages.PackageSettings.Dialogs;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
     [TestFixture]
@@ -31,7 +34,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
     {
         private BunitContext context;
         private Mock<IPackageSettingsViewModel> viewModelMock;
-        private DialogService dialogService;
+        private IRenderedComponent<BbDialogProvider> dialogProvider;
         private Package testPackage;
         private Organization testOwner;
         private Account ownerAccount;
@@ -116,12 +119,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             this.viewModelMock.Setup(x => x.CanDeletePackage).Returns(true);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
-            this.dialogService = this.context.Services.GetRequiredService<DialogService>();
+            this.dialogProvider = this.context.Render<BbDialogProvider>();
         }
 
         [TearDown]
         public async Task TearDown()
         {
+            this.dialogProvider.Dispose();
             await this.context.DisposeAsync();
         }
 
@@ -150,15 +154,19 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         }
 
         [Test]
-        public void VerifyOnDeletePackage()
+        public async Task VerifyOnDeletePackage()
         {
+            this.viewModelMock.Setup(x => x.DeletePackage(It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+
             var packageSettingsPage = this.context.Render<PackageSettings>();
             var deleteButton = packageSettingsPage.Find("#package-settings-delete-button");
 
-            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = packageSettingsPage.InvokeAsync(() => deleteButton.ClickAsync());
 
-            Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
+            var dialog = this.dialogProvider.FindComponent<ConfirmPackageActionDialog>();
+            await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync());
+
+            this.viewModelMock.Verify(x => x.DeletePackage(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -187,15 +195,19 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         }
 
         [Test]
-        public void VerifyOnTransferOwnership()
+        public async Task VerifyOnTransferOwnership()
         {
+            this.viewModelMock.Setup(x => x.TransferOwnership("new-org", It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+
             var packageSettingsPage = this.context.Render<PackageSettings>();
             var transferButton = packageSettingsPage.Find("#package-settings-transfer-button");
 
-            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = packageSettingsPage.InvokeAsync(() => transferButton.ClickAsync());
 
-            Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
+            var dialog = this.dialogProvider.FindComponent<TransferPackageOwnershipDialog>();
+            await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync("new-org"));
+
+            this.viewModelMock.Verify(x => x.TransferOwnership("new-org", It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -238,13 +250,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var unlistBtn = packageSettingsPage.Find(".package-unlist-version-button");
             var relistBtn = packageSettingsPage.Find(".package-relist-version-button");
 
-            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = packageSettingsPage.InvokeAsync(() => unlistBtn.ClickAsync());
             await packageSettingsPage.InvokeAsync(() => relistBtn.ClickAsync());
 
+            var dialog = this.dialogProvider.FindComponent<ConfirmPackageActionDialog>();
+            await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync());
+
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
+                this.viewModelMock.Verify(x => x.UnlistVersion(this.activeVersion), Times.Once);
                 this.viewModelMock.Verify(x => x.RelistVersion(this.unlistedVersion, It.IsAny<CancellationToken>()), Times.Once);
             }
         }

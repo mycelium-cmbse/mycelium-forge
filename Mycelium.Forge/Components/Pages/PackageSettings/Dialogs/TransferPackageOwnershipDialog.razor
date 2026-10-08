@@ -39,14 +39,16 @@
         </BbField>
     </ChildContent>
     <Footer>
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="transfer-package-cancel-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCancelClicked)">
             Cancel
         </BbButton>
 
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="transfer-package-submit-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   Disabled="@(this.IsTransferDisabled())"

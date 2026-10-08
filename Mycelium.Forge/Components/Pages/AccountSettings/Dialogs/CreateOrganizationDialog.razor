@@ -71,14 +71,16 @@
         </BbField>
     </ChildContent>
     <Footer>
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="create-org-cancel-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCancelClicked)">
             Cancel
         </BbButton>
 
-        <BbButton Variant="ButtonVariant.Default"
+        <BbButton id="create-org-submit-button"
+                  Variant="ButtonVariant.Default"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCreateOrganizationClicked)">

@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -35,8 +36,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         private Organization testOrganization;
         private Account testMember;
         private OrganizationInvitation testInvitation;
-
-        private DialogService dialogService;
+        private IRenderedComponent<BbDialogProvider> dialogProvider;
 
         [SetUp]
         public void SetUp()
@@ -88,12 +88,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             this.viewModelMock.Setup(x => x.RoleOptions).Returns([OrganizationRole.Administrator, OrganizationRole.Member]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
-            this.dialogService = this.context.Services.GetRequiredService<DialogService>();
+            this.dialogProvider = this.context.Render<BbDialogProvider>();
         }
 
         [TearDown]
         public async Task TearDown()
         {
+            this.dialogProvider.Dispose();
             await this.context.DisposeAsync();
         }
 
@@ -133,15 +134,17 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         }
 
         [Test]
-        public void VerifyRemoveMember()
+        public async Task VerifyRemoveMember()
         {
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
             var removeButton = orgSettingsPage.Find(".org-remove-member-button");
 
-            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = orgSettingsPage.InvokeAsync(() => removeButton.ClickAsync());
 
-            Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
+            var continueButton = this.dialogProvider.FindAll("button").First(b => b.TextContent.Trim() == "Continue");
+            await this.dialogProvider.InvokeAsync(() => continueButton.ClickAsync());
+
+            this.viewModelMock.Verify(x => x.RemoveMember(this.testMember), Times.Once);
         }
 
         [Test]

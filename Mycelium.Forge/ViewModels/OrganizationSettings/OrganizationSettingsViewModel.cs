@@ -219,7 +219,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             {
                 const string errorMessage = "Failed to update member role.";
                 this.logger.LogError(errorMessage + " Account: {AccountId}", member.Id);
-                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
+                this.notificationService.AddNotification(errorMessage, "Role Update Error", NotificationType.Error);
                 return;
             }
 
@@ -242,7 +242,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             {
                 const string errorMessage = "Failed to remove member from organization.";
                 this.logger.LogError(errorMessage + " Account: {AccountId}", member.Id);
-                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
+                this.notificationService.AddNotification(errorMessage, "Removal Error", NotificationType.Error);
                 return;
             }
 
@@ -264,7 +264,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             {
                 const string errorMessage = "Failed to resend invitation.";
                 this.logger.LogError(errorMessage + " Invitation: {InvitationId}", invitation.Id);
-                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
+                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
                 return;
             }
 
@@ -284,7 +284,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             {
                 const string errorMessage = "Failed to revoke invitation.";
                 this.logger.LogError(errorMessage + " Invitation: {InvitationId}", invitation.Id);
-                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
+                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
                 return;
             }
 

@@ -80,7 +80,11 @@ namespace Mycelium.Forge.Services
 
             this.ForgeId = result.Value[0].Id;
             this.isInitialized = true;
-            this.logger.LogInformation("Forge context initialized with Forge ID: {ForgeId}", this.ForgeId);
+
+            if (this.logger.IsEnabled(LogLevel.Information))
+            {
+                this.logger.LogInformation("Forge context initialized with Forge ID: {ForgeId}", this.ForgeId);
+            }
         }
     }
 }
