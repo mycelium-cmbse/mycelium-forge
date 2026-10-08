@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeeder.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -191,17 +191,24 @@ namespace Mycelium.Forge.Data
                 };
 
                 var seedingSuccess = await this.databaseSource.ExecuteInTransactionAsync(
-                    async transaction => await this.SeedThing(seederUserContext, transaction, this.forgeService, [SeedData.Forge], cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.countryService, SeedData.Countries, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.packageTypeService, SeedData.PackageTypes, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.accountService, SeedData.Accounts, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.organizationService, SeedData.Organizations, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.organizationInvitationService, SeedData.OrganizationInvitations, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.packageService, SeedData.Packages, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.packageVersionService, SeedData.PackageVersions, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.packageMetaDataService, SeedData.PackageMetaDatas, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.packageInvitationService, SeedData.PackageInvitations, cancellationToken) &&
-                                         await this.SeedThing(seederUserContext, transaction, this.apiKeyService, SeedData.ApiKeys, cancellationToken),
+                    async transaction =>
+                    {
+                        // Defer foreign key constraints until transaction commit to resolve circular references (e.g., Forge <-> Account) during seeding.
+                        await using var deferCommand = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
+                        await deferCommand.ExecuteNonQueryAsync(cancellationToken);
+
+                        return await this.SeedThing(seederUserContext, transaction, this.forgeService, [SeedData.Forge], cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.countryService, SeedData.Countries, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.packageTypeService, SeedData.PackageTypes, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.accountService, SeedData.Accounts, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.organizationService, SeedData.Organizations, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.organizationInvitationService, SeedData.OrganizationInvitations, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.packageService, SeedData.Packages, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.packageVersionService, SeedData.PackageVersions, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.packageMetaDataService, SeedData.PackageMetaDatas, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.packageInvitationService, SeedData.PackageInvitations, cancellationToken) &&
+                               await this.SeedThing(seederUserContext, transaction, this.apiKeyService, SeedData.ApiKeys, cancellationToken);
+                    },
                     cancellationToken);
 
                 if (!seedingSuccess)

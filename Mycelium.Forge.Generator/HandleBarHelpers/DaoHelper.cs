@@ -345,7 +345,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName).Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.QueryIsDataType())
-                .Where(x => !x.QueryIsMemberOfManyToMany())
+                .Where(x => !x.QueryIsManyToMany())
                 .Where(x => x.Type is IClass targetClass && (targetClass.HasThingClass() || targetClass.IsThingClass()))
                 .OrderBy(x => x.Name)
                 .ToList();
@@ -354,7 +354,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName))
                 .Distinct()
                 .Where(x => !x.QueryIsDataType())
-                .Where(x => x.QueryIsMemberOfManyToMany())
+                .Where(x => x.QueryIsManyToMany())
                 .OrderBy(x => x.Name)
                 .ToList();
 
@@ -550,7 +550,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 .SelectMany(x => x.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName).Union(x.QueryOppositeCompositeProperties()))
                 .Distinct()
                 .Where(x => !x.IsDerived && !x.IsDerivedUnion && !x.IsThingAttribute())
-                .Where(x => x.QueryIsDataType() || x.QueryIsMemberOfManyToMany() || (x.Type is IClass targetClass && (targetClass.HasThingClass() || targetClass.IsThingClass())))
+                .Where(x => x.QueryIsDataType() || x.QueryIsManyToMany() || (x.Type is IClass targetClass && (targetClass.HasThingClass() || targetClass.IsThingClass())))
                 .OrderBy(x => x.Name)
                 .ToList();
 
