@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Dal.Extensions
     /// <summary>
     /// Provides extension methods for <see cref="IDatabaseSource" /> instances.
     /// </summary>
-    internal static class DatabaseSourceExtensions
+    public static class DatabaseSourceExtensions
     {
         /// <param name="databaseSource">The database source connection provider.</param>
         extension(IDatabaseSource databaseSource)
@@ -44,42 +44,39 @@ namespace Mycelium.Forge.Dal.Extensions
             /// A <see cref="ErrorOr{TValue}" /> containing an <see cref="ImmutableList{TThing}" /> of permitted entities or
             /// an error.
             /// </returns>
-            internal async Task<ErrorOr<ImmutableList<TThing>>> ReadWithFilterAsync<TThing>(Func<NpgsqlTransaction, CancellationToken, Task<ErrorOr<ImmutableList<TThing>>>> readDaoAsync,
+            public async Task<ErrorOr<ImmutableList<TThing>>> ReadWithFilterAsync<TThing>(Func<NpgsqlTransaction, CancellationToken, Task<ErrorOr<ImmutableList<TThing>>>> readDaoAsync,
                 IPermissionService<TThing> permissionService, IUserContext userContext, ILogger logger, CancellationToken token = default) where TThing : IThing
             {
-                try
-                {
-                    await using var connection = await databaseSource.OpenNewConnectionAsync(token);
-                    await using var transaction = await connection.BeginTransactionAsync(token);
+                ArgumentNullException.ThrowIfNull(readDaoAsync);
+                ArgumentNullException.ThrowIfNull(permissionService);
+                ArgumentNullException.ThrowIfNull(userContext);
+                ArgumentNullException.ThrowIfNull(logger);
 
-                    var readResult = await readDaoAsync.Invoke(transaction, token);
-
-                    if (readResult.IsError)
+                return await databaseSource.ExecuteInTransactionAsync<ImmutableList<TThing>>(
+                    async transaction =>
                     {
-                        await transaction.RollbackAsync(token);
-                        return readResult.Errors;
-                    }
+                        var readResult = await readDaoAsync.Invoke(transaction, token);
 
-                    List<TThing> permittedItems = [];
-
-                    foreach (var item in readResult.Value)
-                    {
-                        var permissionResult = await permissionService.IsAllowedToRead(userContext, item, transaction);
-
-                        if (!permissionResult.IsError)
+                        if (readResult.IsError)
                         {
-                            permittedItems.Add(item);
+                            return readResult.Errors;
                         }
-                    }
 
-                    await transaction.CommitAsync(token);
-                    return permittedItems.ToImmutableList();
-                }
-                catch (Exception exception)
-                {
-                    logger.LogError(exception, "ReadWithFilterAsync for {EntityName} failed with an error", typeof(TThing).Name);
-                    return Error.Failure(description: exception.Message);
-                }
+                        List<TThing> permittedItems = [];
+
+                        foreach (var item in readResult.Value)
+                        {
+                            var permissionResult = await permissionService.IsAllowedToRead(userContext, item, transaction);
+
+                            if (!permissionResult.IsError)
+                            {
+                                permittedItems.Add(item);
+                            }
+                        }
+
+                        return permittedItems.ToImmutableList();
+                    },
+                    token);
             }
         }
     }

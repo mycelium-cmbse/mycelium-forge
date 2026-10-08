@@ -137,6 +137,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IAccount>(this.maintainer)));
             this.packageMetaDataServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageMetaData>(this.metaData)));
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Error.Unauthorized());
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Unauthorized());
 
             this.viewModel = new PackageDetailsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.packageMetaDataServiceMock.Object, this.packageTypeServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.memoryCache, this.packagePermissionServiceMock.Object, this.loggerMock.Object);
         }

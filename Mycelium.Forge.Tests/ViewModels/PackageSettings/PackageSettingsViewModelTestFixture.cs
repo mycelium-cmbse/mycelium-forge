@@ -139,7 +139,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>()))
                 .ReturnsAsync(Result.Success);
-            
+
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToDelete(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>()))
                 .ReturnsAsync(Result.Success);
 
@@ -239,7 +239,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
 
             // Permission service throws or fails:
-            this.databaseSourceMock.Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException());
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure());
 
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
 

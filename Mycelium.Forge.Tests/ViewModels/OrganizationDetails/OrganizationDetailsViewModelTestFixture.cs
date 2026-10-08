@@ -159,7 +159,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
             this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 
             // Scenario 3: Happy path with admin by membership
-            await this.viewModel.InitializeViewModel("@starion");
+            await this.viewModel.InitializeViewModel("starion");
 
             using (Assert.EnterMultipleScope())
             {
@@ -180,6 +180,9 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.regularUserContext);
 
             this.organizationPermissionServiceMock.Setup(x => x.IsAllowedToUpdate(this.regularUserContext, It.IsAny<IOrganization>(), It.IsAny<IOrganization>(), It.IsAny<NpgsqlTransaction>()))
+                .ReturnsAsync(Error.Forbidden());
+
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Error.Forbidden());
 
             await this.viewModel.InitializeViewModel("starion");

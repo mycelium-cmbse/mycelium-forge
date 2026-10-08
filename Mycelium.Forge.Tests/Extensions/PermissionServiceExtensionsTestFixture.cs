@@ -13,12 +13,16 @@ namespace Mycelium.Forge.Tests.Extensions
     using System.Threading;
     using System.Threading.Tasks;
 
+    using ErrorOr;
+
     using Moq;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.AutoGenPermissionService;
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Extensions;
+
+    using Npgsql;
 
     [TestFixture]
     public class PermissionServiceExtensionsTestFixture
@@ -40,14 +44,21 @@ namespace Mycelium.Forge.Tests.Extensions
         [Test]
         public async Task VerifyIsAllowedToDelete()
         {
+            this.serviceMock
+                .Setup(x => x.IsAllowedToDelete(this.userContext, this.package, It.IsAny<NpgsqlTransaction>()))
+                .ReturnsAsync(Result.Success);
+
+            var successResult = await this.serviceMock.Object.IsAllowedToDelete(this.databaseSourceMock.Object, this.userContext, this.package, CancellationToken.None);
+
             this.databaseSourceMock
-                .Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("Failed to open connection"));
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Error.Failure(description: "Failed to open connection"));
 
             var failureResult = await this.serviceMock.Object.IsAllowedToDelete(this.databaseSourceMock.Object, this.userContext, this.package, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(successResult.IsSuccess, Is.True);
                 Assert.That(failureResult.IsError, Is.True);
                 Assert.That(failureResult.FirstError.Description, Is.EqualTo("Failed to open connection"));
             }
@@ -56,14 +67,21 @@ namespace Mycelium.Forge.Tests.Extensions
         [Test]
         public async Task VerifyIsAllowedToUpdate()
         {
+            this.serviceMock
+                .Setup(x => x.IsAllowedToUpdate(this.userContext, this.package, this.package, It.IsAny<NpgsqlTransaction>()))
+                .ReturnsAsync(Result.Success);
+
+            var successResult = await this.serviceMock.Object.IsAllowedToUpdate(this.databaseSourceMock.Object, this.userContext, this.package, CancellationToken.None);
+
             this.databaseSourceMock
-                .Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("Failed to open connection"));
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Error.Failure(description: "Failed to open connection"));
 
             var failureResult = await this.serviceMock.Object.IsAllowedToUpdate(this.databaseSourceMock.Object, this.userContext, this.package, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(successResult.IsSuccess, Is.True);
                 Assert.That(failureResult.IsError, Is.True);
                 Assert.That(failureResult.FirstError.Description, Is.EqualTo("Failed to open connection"));
             }

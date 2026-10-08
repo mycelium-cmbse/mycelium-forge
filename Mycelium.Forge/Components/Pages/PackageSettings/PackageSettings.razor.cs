@@ -61,6 +61,11 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         {
             await base.OnParametersSetAsync();
 
+            if (string.IsNullOrWhiteSpace(this.PackageName) || string.IsNullOrWhiteSpace(this.Scope))
+            {
+                return;
+            }
+
             await this.ViewModel.InitializeViewModel(this.PackageName, this.Scope);
         }
 

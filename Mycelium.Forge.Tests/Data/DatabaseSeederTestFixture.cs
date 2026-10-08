@@ -80,8 +80,8 @@ namespace Mycelium.Forge.Tests.Data
                 .ReturnsAsync(true);
 
             this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<bool>>>(), It.IsAny<CancellationToken>()))
-                .Returns<Func<NpgsqlTransaction, Task<bool>>, CancellationToken>((action, _) => action(null!));
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<bool>>>>(), It.IsAny<CancellationToken>()))
+                .Returns<Func<NpgsqlTransaction, Task<ErrorOr<bool>>>, CancellationToken>((action, _) => action(null!));
 
             this.databaseSourceMock
                 .Setup(x => x.DeferConstraintsAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>()))
@@ -217,14 +217,14 @@ namespace Mycelium.Forge.Tests.Data
                 .ReturnsAsync(Result.Created);
 
             this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<bool>>>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<bool>>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
             var transactionFalseResult = await this.databaseSeeder.SeedAsync(CancellationToken.None);
             Assert.That(transactionFalseResult, Is.False);
 
             this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<bool>>>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<bool>>>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Simulated transaction error"));
 
             var transactionExceptionResult = await this.databaseSeeder.SeedAsync(CancellationToken.None);

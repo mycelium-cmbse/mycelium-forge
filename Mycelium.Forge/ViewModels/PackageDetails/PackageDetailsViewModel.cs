@@ -193,7 +193,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             if (cachedData.Package == null)
             {
-                this.logger.LogWarning("Package {Scope}/{Name} not found during details initialization", scope, packageName);
+                this.logger.LogWarning("Package {Scope}/{Name} not found during details initialization", scope.SanitizeForLog(), packageName.SanitizeForLog());
                 return;
             }
 

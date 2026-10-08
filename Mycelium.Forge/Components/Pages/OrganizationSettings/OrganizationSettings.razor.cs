@@ -50,10 +50,12 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         {
             await base.OnParametersSetAsync();
 
-            if (!string.IsNullOrWhiteSpace(this.Id))
+            if (string.IsNullOrWhiteSpace(this.Id))
             {
-                await this.ViewModel.InitializeViewModel(this.Id);
+                return;
             }
+
+            await this.ViewModel.InitializeViewModel(this.Id);
         }
 
         /// <summary>
