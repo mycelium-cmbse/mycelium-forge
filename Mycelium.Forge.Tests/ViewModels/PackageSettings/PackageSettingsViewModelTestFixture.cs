@@ -26,7 +26,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
     using Mycelium.Forge.Dal.AutoGenPermissionService;
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Dal.Services;
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
@@ -138,6 +138,9 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             this.packagePermissionServiceMock = new Mock<IPackagePermissionService>();
 
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>()))
+                .ReturnsAsync(Result.Success);
+            
+            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToDelete(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>()))
                 .ReturnsAsync(Result.Success);
 
             this.viewModel = new PackageSettingsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.packagePermissionServiceMock.Object, this.notificationServiceMock.Object, this.loggerMock.Object);

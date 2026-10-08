@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSeeder.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -194,8 +194,7 @@ namespace Mycelium.Forge.Data
                     async transaction =>
                     {
                         // Defer foreign key constraints until transaction commit to resolve circular references (e.g., Forge <-> Account) during seeding.
-                        await using var deferCommand = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
-                        await deferCommand.ExecuteNonQueryAsync(cancellationToken);
+                        await this.databaseSource.DeferConstraintsAsync(transaction, cancellationToken);
 
                         return await this.SeedThing(seederUserContext, transaction, this.forgeService, [SeedData.Forge], cancellationToken) &&
                                await this.SeedThing(seederUserContext, transaction, this.countryService, SeedData.Countries, cancellationToken) &&

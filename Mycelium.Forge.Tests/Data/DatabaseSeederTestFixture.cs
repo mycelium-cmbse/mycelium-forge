@@ -83,6 +83,10 @@ namespace Mycelium.Forge.Tests.Data
                 .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<bool>>>(), It.IsAny<CancellationToken>()))
                 .Returns<Func<NpgsqlTransaction, Task<bool>>, CancellationToken>((action, _) => action(null!));
 
+            this.databaseSourceMock
+                .Setup(x => x.DeferConstraintsAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             this.forgeServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IForge>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
@@ -154,6 +158,7 @@ namespace Mycelium.Forge.Tests.Data
             {
                 Assert.That(successResult, Is.True);
                 this.databaseMigratorMock.Verify(x => x.ResetDatabaseAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+                this.databaseSourceMock.Verify(x => x.DeferConstraintsAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.forgeServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IForge>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.countryServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<ICountry>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageTypeServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageType>>(), It.IsAny<CancellationToken>()), Times.Once);

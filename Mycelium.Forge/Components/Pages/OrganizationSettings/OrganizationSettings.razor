@@ -73,7 +73,7 @@
                         </div>
 
                         <div class="w-[230px] shrink-0">
-                            <ForgeSelect TValue="OrganizationInvitationKind"
+                            <ForgeSelect TValue="OrganizationRole"
                                          Value="@(this.GetMemberRole(member))"
                                          ValueChanged="@(role => this.OnChangeMemberRole(member, role))"
                                          Disabled="@(this.IsCurrentUser(member))"
@@ -86,6 +86,7 @@
                         <BbButton Variant="ButtonVariant.Outline"
                                   Size="ButtonSize.Small"
                                   Type="ButtonType.Button"
+                                  Disabled="@(this.IsCurrentUser(member))"
                                   OnClick="() => this.OnRemoveMember(member)"
                                   Class="org-remove-member-button shrink-0">
                             Remove
@@ -111,8 +112,8 @@
                 {
                     <div @key="invitation.Id"
                          class="flex flex-col sm:flex-row sm:items-center gap-3 py-2.25 w-full">
-                        <span class="w-[280px] shrink-0 text-sm leading-xs font-medium text-foreground truncate min-w-0">
-                            @(invitation.Target)
+                        <span class="max-w-[280px] shrink-0 text-sm leading-xs font-medium text-foreground truncate min-w-0">
+                            @(this.GetInvitationTargetName(invitation))
                         </span>
 
                         <BbBadge Variant="BadgeVariant.Secondary"

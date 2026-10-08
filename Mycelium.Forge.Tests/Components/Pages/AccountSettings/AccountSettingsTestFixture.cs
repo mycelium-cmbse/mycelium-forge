@@ -95,6 +95,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             var accountSettingsPage = this.context.Render<AccountSettings>();
             var transferButton = accountSettingsPage.Find("#account-settings-transfer-org-button");
 
+            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = accountSettingsPage.InvokeAsync(() => transferButton.ClickAsync());
 
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
@@ -106,6 +107,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             var accountSettingsPage = this.context.Render<AccountSettings>();
             var deactivateButton = accountSettingsPage.Find("#account-settings-deactivate-button");
 
+            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = accountSettingsPage.InvokeAsync(() => deactivateButton.ClickAsync());
 
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
@@ -117,6 +119,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             var accountSettingsPage = this.context.Render<AccountSettings>();
             var deleteButton = accountSettingsPage.Find("#account-settings-delete-button");
 
+            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = accountSettingsPage.InvokeAsync(() => deleteButton.ClickAsync());
 
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));

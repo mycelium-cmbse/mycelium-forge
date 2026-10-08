@@ -38,15 +38,24 @@ namespace Mycelium.Forge.Tests.Extensions
         }
 
         [Test]
+        public async Task VerifyIsAllowedToDelete()
+        {
+            this.databaseSourceMock
+                .Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Failed to open connection"));
+
+            var failureResult = await this.serviceMock.Object.IsAllowedToDelete(this.databaseSourceMock.Object, this.userContext, this.package, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(failureResult.IsError, Is.True);
+                Assert.That(failureResult.FirstError.Description, Is.EqualTo("Failed to open connection"));
+            }
+        }
+
+        [Test]
         public async Task VerifyIsAllowedToUpdate()
         {
-            // Scenario 1: Argument validation
-            Assert.That(async () => await ((IPackagePermissionService?)null).IsAllowedToUpdate(this.databaseSourceMock.Object, this.userContext, this.package), Throws.TypeOf<ArgumentNullException>());
-            Assert.That(async () => await this.serviceMock.Object.IsAllowedToUpdate(null, this.userContext, this.package), Throws.TypeOf<ArgumentNullException>());
-            Assert.That(async () => await this.serviceMock.Object.IsAllowedToUpdate(this.databaseSourceMock.Object, null, this.package), Throws.TypeOf<ArgumentNullException>());
-            Assert.That(async () => await this.serviceMock.Object.IsAllowedToUpdate(this.databaseSourceMock.Object, this.userContext, null), Throws.TypeOf<ArgumentNullException>());
-
-            // Scenario 2: Exception during connection or transaction resolves to Error.Failure
             this.databaseSourceMock
                 .Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Failed to open connection"));

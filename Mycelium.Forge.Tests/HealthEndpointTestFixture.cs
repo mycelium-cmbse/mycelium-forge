@@ -1,18 +1,25 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="HealthEndpointTestFixture.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
 namespace Mycelium.Forge.Tests
 {
+    using System;
     using System.Net;
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Mvc.Testing;
+    using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Extensions.DependencyInjection;
+
+    using Moq;
+
+    using Mycelium.Forge.Services;
 
     /// <summary>
     /// Verifies that the host boots and serves the orchestrator probes required by SSS-FB-OBS-H4D.
@@ -25,7 +32,11 @@ namespace Mycelium.Forge.Tests
         [SetUp]
         public void SetUp()
         {
-            this.factory = new WebApplicationFactory<Program>();
+            var forgeContextMock = new Mock<IForgeContext>();
+            forgeContextMock.Setup(x => x.ForgeId).Returns(Guid.NewGuid());
+
+            this.factory = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(builder => { builder.ConfigureTestServices(services => { services.AddSingleton(forgeContextMock.Object); }); });
         }
 
         [TearDown]

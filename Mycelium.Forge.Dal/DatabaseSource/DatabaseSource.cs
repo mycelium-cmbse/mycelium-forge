@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSource.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -76,6 +76,20 @@ namespace Mycelium.Forge.Dal.DatabaseSource
 
             await transaction.RollbackAsync(cancellationToken);
             return false;
+        }
+
+        /// <summary>
+        /// Asynchronously defers all deferrable foreign key constraints until transaction commit.
+        /// </summary>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task DeferConstraintsAsync(NpgsqlTransaction transaction, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(transaction);
+
+            await using var deferCommand = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
+            await deferCommand.ExecuteNonQueryAsync(cancellationToken);
         }
     }
 }

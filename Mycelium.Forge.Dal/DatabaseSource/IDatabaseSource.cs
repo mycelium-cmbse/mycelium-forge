@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IDatabaseSource.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,9 +26,23 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         /// <summary>
         /// Asynchronously executes an action within a database transaction, committing on success or rolling back on failure.
         /// </summary>
-        /// <param name="action">The asynchronous action to execute within the transaction, returning <see langword="true" /> to commit or <see langword="false" /> to roll back.</param>
+        /// <param name="action">
+        /// The asynchronous action to execute within the transaction, returning <see langword="true" /> to
+        /// commit or <see langword="false" /> to roll back.
+        /// </param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task resolving to <see langword="true" /> if the operation was executed and committed successfully; otherwise <see langword="false" />.</returns>
+        /// <returns>
+        /// A task resolving to <see langword="true" /> if the operation was executed and committed successfully;
+        /// otherwise <see langword="false" />.
+        /// </returns>
         Task<bool> ExecuteInTransactionAsync(Func<NpgsqlTransaction, Task<bool>> action, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously defers all deferrable foreign key constraints until transaction commit.
+        /// </summary>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task DeferConstraintsAsync(NpgsqlTransaction transaction, CancellationToken cancellationToken = default);
     }
 }

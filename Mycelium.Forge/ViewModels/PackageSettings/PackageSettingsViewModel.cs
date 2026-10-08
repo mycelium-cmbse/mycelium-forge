@@ -16,8 +16,8 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
     using Mycelium.Forge.Dal.AutoGenPermissionService;
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Dal.Services;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Model;
     using Mycelium.Forge.Services;
 
     /// <summary>
@@ -158,18 +158,17 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             var maintainersTask = this.accountService.ReadOrEmpty(this.userContext, this.Package.PackageMaintainer);
             var ownersTask = this.accountService.ReadOrEmpty(this.userContext, this.Package.PackageOwner);
             var versionsTask = this.packageVersionService.ReadOrEmpty(this.userContext, this.Package.Version);
+            var canUpdatePackageTask = this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.userContext, this.Package);
+            var canDeletePackageTask = this.packagePermissionService.IsAllowedToDelete(this.databaseSource, this.userContext, this.Package);
 
-            await Task.WhenAll(ownerTask, maintainersTask, ownersTask, versionsTask);
+            await Task.WhenAll(ownerTask, maintainersTask, ownersTask, versionsTask, canUpdatePackageTask, canDeletePackageTask);
 
             this.Owner = ownerTask.Result;
             this.Maintainers = maintainersTask.Result;
             this.Owners = ownersTask.Result;
             this.Versions = [.. versionsTask.Result.OrderByDescending(v => v.PublicationDate)];
-
-            var canUpdatePackageResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.userContext, this.Package);
-
-            this.CanManagePackage = canUpdatePackageResult.IsSuccess;
-            this.CanDeletePackage = this.userContext.HasPermission(PermissionKind.DeletePackage);
+            this.CanManagePackage = canUpdatePackageTask.Result.IsSuccess;
+            this.CanDeletePackage = canDeletePackageTask.Result.IsSuccess;
         }
 
         /// <summary>

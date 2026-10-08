@@ -11,7 +11,7 @@ namespace Mycelium.Forge.Extensions
 {
     using BlazorBlueprint.Components;
 
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Enums;
 
     /// <summary>
     /// Provides extension methods for converting <see cref="NotificationType" /> values to BlazorBlueprint UI representations.

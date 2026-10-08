@@ -19,7 +19,8 @@ namespace Mycelium.Forge.Tests.Components.Common
     using Microsoft.Extensions.DependencyInjection;
 
     using Mycelium.Forge.Components.Common;
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Models.Notification;
     using Mycelium.Forge.Services;
 
     [TestFixture]

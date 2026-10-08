@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.ViewModels.OrganizationSettings
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
 
     /// <summary>
     /// Defines the view model contract for managing organization settings, members, and team roles.
@@ -24,7 +25,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the current user's role within the organization.
         /// </summary>
-        OrganizationInvitationKind CurrentUserRole { get; set; }
+        OrganizationRole CurrentUserRole { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to manage the organization.
@@ -49,7 +50,12 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the available role options for organization members.
         /// </summary>
-        IReadOnlyList<OrganizationInvitationKind> RoleOptions { get; set; }
+        IReadOnlyList<OrganizationRole> RoleOptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of accounts that have been invited to join the organization.
+        /// </summary>
+        IReadOnlyList<IAccount> InvitedAccounts { get; set; }
 
         /// <summary>
         /// Initializes the view model state for the specified organization short name asynchronously.
@@ -64,7 +70,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <param name="member">The member whose role is being updated.</param>
         /// <param name="newRole">The new role to assign to the member.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task ChangeMemberRole(IAccount member, OrganizationInvitationKind newRole);
+        Task ChangeMemberRole(IAccount member, OrganizationRole newRole);
 
         /// <summary>
         /// Removes the specified member from the organization asynchronously.

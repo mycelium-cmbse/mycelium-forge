@@ -143,17 +143,24 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The combined CSS class string.</returns>
         public string GetTriggerClass()
         {
-            const string commonTriggerClass = "px-3 bg-card border border-border flex items-center text-sm leading-xs cursor-pointer focus:outline-none";
+            const string common = "px-3 border border-border flex items-center text-sm leading-xs focus:outline-none";
 
-            var styleClass = this.FilterStyle
-                ? "h-8 rounded-lg hover:border-input gap-1.5 font-normal transition-colors"
-                : "h-10 w-full rounded-md justify-between gap-2 text-foreground";
+            var layout = this.FilterStyle
+                ? "h-8 rounded-lg gap-1.5 font-normal"
+                : "h-10 w-full rounded-md justify-between gap-2";
 
-            var baseClass = $"{commonTriggerClass} {styleClass}";
+            var state = (this.Disabled, this.FilterStyle) switch
+            {
+                (true, _) => "bg-muted text-muted-foreground cursor-not-allowed",
+                (false, true) => "bg-card cursor-pointer hover:border-input transition-colors",
+                (false, false) => "bg-card cursor-pointer text-foreground"
+            };
+
+            var baseClass = $"{common} {layout} {state}";
 
             return string.IsNullOrWhiteSpace(this.TriggerClass)
                 ? baseClass
-                : $"{baseClass} {this.TriggerClass}";
+                : $"{baseClass} {this.TriggerClass.Trim()}";
         }
 
         /// <summary>

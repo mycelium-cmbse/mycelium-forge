@@ -24,6 +24,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.OrganizationSettings;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
     [TestFixture]
@@ -79,11 +80,12 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             };
 
             this.viewModelMock.Setup(x => x.Organization).Returns(this.testOrganization);
-            this.viewModelMock.Setup(x => x.CurrentUserRole).Returns(OrganizationInvitationKind.ADMINISTRATOR);
+            this.viewModelMock.Setup(x => x.CurrentUserRole).Returns(OrganizationRole.Administrator);
             this.viewModelMock.Setup(x => x.CanManageOrganization).Returns(true);
             this.viewModelMock.Setup(x => x.Members).Returns([this.testMember]);
             this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testInvitation]);
-            this.viewModelMock.Setup(x => x.RoleOptions).Returns([OrganizationInvitationKind.ADMINISTRATOR, OrganizationInvitationKind.MEMBER]);
+            this.viewModelMock.Setup(x => x.InvitedAccounts).Returns([]);
+            this.viewModelMock.Setup(x => x.RoleOptions).Returns([OrganizationRole.Administrator, OrganizationRole.Member]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
             this.dialogService = this.context.Services.GetRequiredService<DialogService>();
@@ -99,11 +101,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         public async Task VerifyChangeMemberRole()
         {
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
-            var select = orgSettingsPage.FindComponent<ForgeSelect<OrganizationInvitationKind>>();
+            var select = orgSettingsPage.FindComponent<ForgeSelect<OrganizationRole>>();
 
-            await orgSettingsPage.InvokeAsync(() => select.Instance.ValueChanged.InvokeAsync(OrganizationInvitationKind.MEMBER));
+            await orgSettingsPage.InvokeAsync(() => select.Instance.ValueChanged.InvokeAsync(OrganizationRole.Member));
 
-            this.viewModelMock.Verify(x => x.ChangeMemberRole(this.testMember, OrganizationInvitationKind.MEMBER), Times.Once);
+            this.viewModelMock.Verify(x => x.ChangeMemberRole(this.testMember, OrganizationRole.Member), Times.Once);
         }
 
         [Test]
@@ -136,6 +138,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
             var removeButton = orgSettingsPage.Find(".org-remove-member-button");
 
+            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = orgSettingsPage.InvokeAsync(() => removeButton.ClickAsync());
 
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));

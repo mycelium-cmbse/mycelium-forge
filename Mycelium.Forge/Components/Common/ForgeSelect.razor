@@ -26,7 +26,7 @@
                 <span class="text-muted-foreground font-normal">@(this.Label)</span>
             }
 
-            <span class="text-foreground font-medium truncate">@(this.GetDisplayText(this.Value))</span>
+            <span class="@(this.Disabled ? "text-muted-foreground" : "text-foreground") font-medium truncate">@(this.GetDisplayText(this.Value))</span>
 
             <LucideIcon Name="chevron-down"
                         Size="14"

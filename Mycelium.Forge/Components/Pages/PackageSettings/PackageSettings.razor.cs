@@ -121,7 +121,10 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task OnSelectVisibility(VisibilityKind visibility)
         {
-            await this.ViewModel.SetVisibility(visibility);
+            if (this.ViewModel.Package.Visibility != visibility)
+            {
+                await this.ViewModel.SetVisibility(visibility);
+            }
         }
 
         /// <summary>

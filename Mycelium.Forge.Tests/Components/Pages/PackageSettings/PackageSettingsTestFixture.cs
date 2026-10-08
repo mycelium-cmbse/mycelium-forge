@@ -155,6 +155,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var packageSettingsPage = this.context.Render<PackageSettings>();
             var deleteButton = packageSettingsPage.Find("#package-settings-delete-button");
 
+            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = packageSettingsPage.InvokeAsync(() => deleteButton.ClickAsync());
 
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
@@ -191,6 +192,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var packageSettingsPage = this.context.Render<PackageSettings>();
             var transferButton = packageSettingsPage.Find("#package-settings-transfer-button");
 
+            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = packageSettingsPage.InvokeAsync(() => transferButton.ClickAsync());
 
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
@@ -236,6 +238,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var unlistBtn = packageSettingsPage.Find(".package-unlist-version-button");
             var relistBtn = packageSettingsPage.Find(".package-relist-version-button");
 
+            // Fire-and-forget is intentional: opening the modal awaits DialogService.OpenAsync until dismissed; awaiting here would deadlock the test.
             _ = packageSettingsPage.InvokeAsync(() => unlistBtn.ClickAsync());
             await packageSettingsPage.InvokeAsync(() => relistBtn.ClickAsync());
 

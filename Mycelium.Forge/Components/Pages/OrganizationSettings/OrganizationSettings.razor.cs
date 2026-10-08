@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
@@ -88,9 +89,14 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// <param name="member">The member whose role is changing.</param>
         /// <param name="role">The selected new role for the member.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnChangeMemberRole(IAccount member, OrganizationInvitationKind role)
+        private async Task OnChangeMemberRole(IAccount member, OrganizationRole role)
         {
-            await this.ViewModel.ChangeMemberRole(member, role);
+            var currentRole = this.GetMemberRole(member);
+
+            if (role != currentRole)
+            {
+                await this.ViewModel.ChangeMemberRole(member, role);
+            }
         }
 
         /// <summary>
@@ -146,12 +152,12 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// Resolves the role of the specified member in the organization.
         /// </summary>
         /// <param name="member">The member account.</param>
-        /// <returns>The organization invitation kind representing the role.</returns>
-        private OrganizationInvitationKind GetMemberRole(IAccount member)
+        /// <returns>The organization role representing the role.</returns>
+        private OrganizationRole GetMemberRole(IAccount member)
         {
             return this.ViewModel.Organization.Administrator.Contains(member.Id)
-                ? OrganizationInvitationKind.ADMINISTRATOR
-                : OrganizationInvitationKind.MEMBER;
+                ? OrganizationRole.Administrator
+                : OrganizationRole.Member;
         }
 
         /// <summary>
@@ -162,6 +168,17 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         private bool IsCurrentUser(IAccount member)
         {
             return member.Id == this.ViewModel.CurrentUserId;
+        }
+
+        /// <summary>
+        /// Gets the display name of the target account associated with a given organization invitation.
+        /// </summary>
+        /// <param name="invitation">The organization invitation.</param>
+        /// <returns>The display name of the target account.</returns>
+        private string GetInvitationTargetName(IOrganizationInvitation invitation)
+        {
+            var target = this.ViewModel.InvitedAccounts.FirstOrDefault(a => a.Id == invitation.Target);
+            return target?.ShortName ?? "Unknown";
         }
     }
 }
