@@ -142,6 +142,8 @@ namespace Mycelium.Forge
 
             builder.Services.AddBlazorBlueprintComponents();
 
+            builder.Services.Configure<ShortcutCommandsOptions>(builder.Configuration.GetSection(ShortcutCommandsOptions.SectionName));
+
             RxAppBuilder.CreateReactiveUIBuilder().BuildApp();
 
             builder.RegisterDatabase();

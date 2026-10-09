@@ -74,20 +74,22 @@
                         Class="shrink-0"/>
         </button>
 
+        @if (!this.IsHomePage())
+        {
+            <form method="get"
+                  action="@PageRoutes.Packages"
+                  class="shrink-0">
+                <SearchInput Placeholder="Search models and packages…"
+                             ShowShortcut="true"
+                             IconSize="16"
+                             InputClass="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground placeholder:truncate truncate text-ellipsis border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"
+                             KbdClass="hidden sm:inline-flex items-center px-1.5 py-0.5 text-3xs leading-4xs font-medium text-muted-foreground bg-card border border-border rounded shrink-0"
+                             Class="w-[220px] !h-8 !px-2.5 !gap-2 shrink-0"/>
+            </form>
+        }
+
         <AuthorizeView>
             <Authorized>
-                @if (!this.IsHomePage())
-                {
-                    <SearchInput Value="@(this.SearchQuery)"
-                                 ValueChanged="@(this.OnSearchInputChanged)"
-                                 Placeholder="Search models and packages…"
-                                 ShowShortcut="true"
-                                 IconSize="16"
-                                 InputClass="w-full bg-transparent text-sm leading-xs text-foreground placeholder:text-muted-foreground placeholder:truncate truncate text-ellipsis border-0 shadow-none focus-visible:ring-0 focus:outline-none p-0 h-auto"
-                                 KbdClass="hidden sm:inline-flex items-center px-1.5 py-0.5 text-3xs leading-4xs font-medium text-muted-foreground bg-card border border-border rounded shrink-0"
-                                 Class="!w-[220px] !h-8 !px-2.5 !gap-2 shrink-0"/>
-                }
-
                 <BbButton Variant="ButtonVariant.Default"
                           Size="ButtonSize.Small"
                           Href="@PageRoutes.Publish"
