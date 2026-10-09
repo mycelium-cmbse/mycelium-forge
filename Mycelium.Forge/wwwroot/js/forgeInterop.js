@@ -116,7 +116,7 @@
         const searchInput = document.querySelector('.search-input-focusable');
         const shortcutKey = searchInput?.dataset.shortcutKey;
 
-        if (!shortcutKey || event.key.toLowerCase() !== shortcutKey.toLowerCase()) {
+        if (event.key.toLowerCase() !== shortcutKey?.toLowerCase()) {
             return;
         }
 
