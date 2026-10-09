@@ -1,0 +1,60 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="TransferPackageOwnershipDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        <p class="text-sm leading-xs text-muted-foreground">
+            Transferring ownership moves this package to another account or organization. The recipient must accept the transfer before it is completed.
+        </p>
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="transfer-target-scope-input"
+                          Class="form-field-label">
+                New owner
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="transfer-target-scope-input"
+                         @bind-Value="this.TargetScope"
+                         Placeholder="e.g. acme-corp or johndoe"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="transfer-confirm-package-name-input">
+                To confirm, type "@(this.PackageName)" below:
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="transfer-confirm-package-name-input"
+                         @bind-Value="this.ConfirmationPackageName"
+                         Placeholder="@(this.PackageName)"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton id="transfer-package-cancel-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton id="transfer-package-submit-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  Disabled="@(this.IsTransferDisabled())"
+                  OnClick="@(this.OnTransferClicked)"
+                  Class="btn-destructive-outline">
+            Transfer ownership
+        </BbButton>
+    </Footer>
+</DialogComponent>

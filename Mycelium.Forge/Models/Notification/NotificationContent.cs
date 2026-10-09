@@ -7,8 +7,10 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Model
+namespace Mycelium.Forge.Models.Notification
 {
+    using Mycelium.Forge.Enums;
+
     /// <summary>
     /// Represents a notification record containing a message, an optional title, and a notification type.
     /// </summary>

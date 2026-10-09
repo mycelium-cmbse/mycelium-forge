@@ -60,6 +60,15 @@ namespace Mycelium.Forge.Extensions
 
                 return $"{parts[0][0]}{parts[^1][0]}".ToUpperInvariant();
             }
+
+            /// <summary>
+            /// Cleans the specified scope string by trimming whitespace, removing leading '@' characters, and converting to lowercase.
+            /// </summary>
+            /// <returns>The sanitized scope string, or an empty string if the input is null or whitespace.</returns>
+            public string CleanScope()
+            {
+                return (value ?? string.Empty).Trim().TrimStart('@').ToLowerInvariant();
+            }
         }
     }
 }

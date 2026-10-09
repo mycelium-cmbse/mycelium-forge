@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IDatabaseSource.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Dal.DatabaseSource
 {
+    using ErrorOr;
+
     using Npgsql;
 
     /// <summary>
@@ -24,11 +26,21 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         Task<NpgsqlConnection> OpenNewConnectionAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Asynchronously executes an action within a database transaction, committing on success or rolling back on failure.
+        /// Asynchronously executes an operation within an isolated connection and database transaction,
+        /// committing on success or rolling back on error or unhandled exception.
         /// </summary>
-        /// <param name="action">The asynchronous action to execute within the transaction, returning <see langword="true" /> to commit or <see langword="false" /> to roll back.</param>
+        /// <typeparam name="TValue">The return value type wrapped by <see cref="ErrorOr{TValue}" />.</typeparam>
+        /// <param name="action">The asynchronous operation to execute within the transaction.</param>
+        /// <param name="cancellationToken">The cancellation token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task" /> representing the result of the operation or an error.</returns>
+        Task<ErrorOr<TValue>> ExecuteInTransactionAsync<TValue>(Func<NpgsqlTransaction, Task<ErrorOr<TValue>>> action, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously defers all deferrable foreign key constraints until transaction commit.
+        /// </summary>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A task resolving to <see langword="true" /> if the operation was executed and committed successfully; otherwise <see langword="false" />.</returns>
-        Task<bool> ExecuteInTransactionAsync(Func<NpgsqlTransaction, Task<bool>> action, CancellationToken cancellationToken = default);
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task DeferConstraintsAsync(NpgsqlTransaction transaction, CancellationToken cancellationToken = default);
     }
 }

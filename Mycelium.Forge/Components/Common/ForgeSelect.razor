@@ -11,7 +11,8 @@
 
 <BlazorBlueprint.Primitives.Select.BbSelect TValue="TValue"
                                             Value="@(this.Value)"
-                                            ValueChanged="@(this.OnValueChanged)">
+                                            ValueChanged="@(this.OnValueChanged)"
+                                            Disabled="@(this.Disabled)">
     <BlazorBlueprint.Primitives.Select.BbSelectTrigger id="@(string.IsNullOrWhiteSpace(this.Id) ? null : this.Id)"
                                                        class="@(this.GetTriggerClass())">
         @if (this.TriggerContent != null)
@@ -25,7 +26,7 @@
                 <span class="text-muted-foreground font-normal">@(this.Label)</span>
             }
 
-            <span class="text-foreground font-medium truncate">@(this.GetDisplayText(this.Value))</span>
+            <span class="@(this.Disabled ? "text-muted-foreground" : "text-foreground") font-medium truncate">@(this.GetDisplayText(this.Value))</span>
 
             <LucideIcon Name="chevron-down"
                         Size="14"
@@ -48,6 +49,7 @@
                 <BlazorBlueprint.Primitives.Select.BbSelectItem @key="item"
                                                                 Value="@item"
                                                                 Text="@(this.GetDisplayText(item))"
+                                                                Disabled="@(this.IsItemDisabled(item))"
                                                                 class="@(this.GetItemClass(item))">
                     @(this.ItemTemplate(item))
                 </BlazorBlueprint.Primitives.Select.BbSelectItem>
@@ -57,6 +59,7 @@
                 <BlazorBlueprint.Primitives.Select.BbSelectItem @key="item"
                                                                 Value="@item"
                                                                 Text="@(this.GetDisplayText(item))"
+                                                                Disabled="@(this.IsItemDisabled(item))"
                                                                 class="@(this.GetItemClass(item))"/>
             }
         }

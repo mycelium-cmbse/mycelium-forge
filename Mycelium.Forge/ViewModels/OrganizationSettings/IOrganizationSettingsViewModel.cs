@@ -10,7 +10,7 @@
 namespace Mycelium.Forge.ViewModels.OrganizationSettings
 {
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Models.Organization;
+    using Mycelium.Forge.Enums;
 
     /// <summary>
     /// Defines the view model contract for managing organization settings, members, and team roles.
@@ -20,62 +20,83 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the organization profile details.
         /// </summary>
-        OrganizationModel Organization { get; set; }
+        IOrganization Organization { get; set; }
 
         /// <summary>
         /// Gets or sets the current user's role within the organization.
         /// </summary>
-        OrganizationInvitationKind CurrentUserRole { get; set; }
+        OrganizationRole CurrentUserRole { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage the organization.
+        /// </summary>
+        bool CanManageOrganization { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique identifier of the currently authenticated user.
+        /// </summary>
+        Guid CurrentUserId { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of members belonging to the organization.
         /// </summary>
-        List<OrganizationMemberModel> Members { get; set; }
+        IReadOnlyList<IAccount> Members { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of pending invitations for the organization.
         /// </summary>
-        List<OrganizationInvitationModel> PendingInvitations { get; set; }
+        IReadOnlyList<IOrganizationInvitation> PendingInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the available role options for organization members.
         /// </summary>
-        List<OrganizationInvitationKind> RoleOptions { get; set; }
+        IReadOnlyList<OrganizationRole> RoleOptions { get; set; }
 
         /// <summary>
-        /// Initializes the view model state for the specified organization identifier or scope.
+        /// Gets or sets the collection of accounts that have been invited to join the organization.
         /// </summary>
-        /// <param name="id">The unique identifier or slug handle of the organization.</param>
-        void InitializeViewModel(string id);
+        IReadOnlyList<IAccount> InvitedAccounts { get; set; }
 
         /// <summary>
-        /// Changes the role of the specified organization member.
+        /// Initializes the view model state for the specified organization short name asynchronously.
+        /// </summary>
+        /// <param name="shortName">The short name of the organization.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
+        Task InitializeViewModel(string shortName);
+
+        /// <summary>
+        /// Changes the role of the specified organization member asynchronously.
         /// </summary>
         /// <param name="member">The member whose role is being updated.</param>
         /// <param name="newRole">The new role to assign to the member.</param>
-        void ChangeMemberRole(OrganizationMemberModel member, OrganizationInvitationKind newRole);
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task ChangeMemberRole(IAccount member, OrganizationRole newRole);
 
         /// <summary>
-        /// Removes the specified member from the organization.
+        /// Removes the specified member from the organization asynchronously.
         /// </summary>
         /// <param name="member">The member to remove.</param>
-        void RemoveMember(OrganizationMemberModel member);
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task RemoveMember(IAccount member);
 
         /// <summary>
-        /// Resends the specified pending invitation.
+        /// Resends the specified pending invitation asynchronously.
         /// </summary>
         /// <param name="invitation">The invitation to resend.</param>
-        void ResendInvitation(OrganizationInvitationModel invitation);
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task ResendInvitation(IOrganizationInvitation invitation);
 
         /// <summary>
-        /// Revokes the specified pending invitation.
+        /// Revokes the specified pending invitation asynchronously.
         /// </summary>
         /// <param name="invitation">The invitation to revoke.</param>
-        void RevokeInvitation(OrganizationInvitationModel invitation);
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task RevokeInvitation(IOrganizationInvitation invitation);
 
         /// <summary>
-        /// Handles initiating an organization transfer.
+        /// Handles initiating an organization transfer asynchronously.
         /// </summary>
-        void TransferOrganization();
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task TransferOrganization();
     }
 }

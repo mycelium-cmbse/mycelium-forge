@@ -133,31 +133,11 @@ namespace Mycelium.Forge.Dal.Services
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <param name="iids">An optional array of unique identifiers to read.</param>
         /// <returns>A <see cref="ErrorOr{TValue}" /> containing an <see cref="ImmutableList{T}" /> of permitted instances.</returns>
-        public async Task<ErrorOr<ImmutableList<IScope>>> ReadAsync(IUserContext userContext, CancellationToken token, Guid[] iids = null)
+        public Task<ErrorOr<ImmutableList<IScope>>> ReadAsync(IUserContext userContext, CancellationToken token, Guid[] iids = null)
         {
             ArgumentNullException.ThrowIfNull(userContext);
 
-            try
-            {
-                await using var connection = await this.databaseSource.OpenNewConnectionAsync(token);
-                await using var transaction = await connection.BeginTransactionAsync(token);
-
-                var result = await this.ReadAsync(userContext, transaction, token, iids);
-
-                if (result.IsError)
-                {
-                    await transaction.RollbackAsync(token);
-                    return result.Errors;
-                }
-
-                await transaction.CommitAsync(token);
-                return result.Value;
-            }
-            catch (Exception exception)
-            {
-                this.logger.LogError(exception, "ReadAsync for Scope failed with an error");
-                return Error.Failure(description: exception.Message);
-            }
+            return this.databaseSource.ExecuteInTransactionAsync(transaction => this.ReadAsync(userContext, transaction, token, iids), token);
         }
 
         /// <summary>

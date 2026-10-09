@@ -237,8 +237,9 @@ namespace Mycelium.Forge.Dal.Tests.Services
             }
 
             // Case: Standalone connection exception handled gracefully
-            this.databaseSourceMock.Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("Connection failed"));
+            this.databaseSourceMock
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<ImmutableList<IScope>>>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Error.Failure(description: "Connection failed"));
 
             var connectionFailResult = await this.service.ReadAsync(this.userContext, CancellationToken.None);
 

@@ -191,6 +191,8 @@ namespace Mycelium.Forge
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
 
+            await app.InitializeServices();
+
             await app.RunAsync();
 
             return 0;

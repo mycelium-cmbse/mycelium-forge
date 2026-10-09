@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSourceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Dal.Tests.DatabaseSource
 {
-    using System;
-
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Orm;
 
@@ -63,7 +61,7 @@ namespace Mycelium.Forge.Dal.Tests.DatabaseSource
 
             var databaseSource = new DatabaseSource(config);
 
-            Assert.That(async () => await databaseSource.ExecuteInTransactionAsync(null, CancellationToken.None), Throws.ArgumentNullException);
+            Assert.That(async () => await databaseSource.ExecuteInTransactionAsync<bool>(null, CancellationToken.None), Throws.ArgumentNullException);
         }
     }
 }

@@ -77,6 +77,7 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IJsInterop, JsInterop>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IForgeContext, ForgeContext>();
 
             return builder;
         }
@@ -106,6 +107,17 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddTransient<IDocumentationViewModel, DocumentationViewModel>();
 
             return builder;
+        }
+
+        /// <summary>
+        /// Initializes singleton application services asynchronously after the host is built.
+        /// </summary>
+        /// <param name="app">The configured <see cref="WebApplication" /> host.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous initialization operation.</returns>
+        public static async Task InitializeServices(this WebApplication app)
+        {
+            var forgeContext = app.Services.GetRequiredService<IForgeContext>();
+            await forgeContext.InitializeAsync();
         }
     }
 }

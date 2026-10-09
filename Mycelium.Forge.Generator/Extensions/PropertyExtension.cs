@@ -98,10 +98,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType() || property.QueryIsEnumerable())
-                {
-                    return false;
-                }
+            if (property.Type == null || property.QueryIsManyToMany() || property.QueryIsDataType() || property.QueryIsEnumerable())
+            {
+                return false;
+            }
 
                 if (property.Opposite == null || property.Opposite.QueryIsEnumerable() || property.Opposite.Class == null)
                 {
@@ -117,6 +117,22 @@ namespace Mycelium.Forge.Generator.Extensions
             }
 
             /// <summary>
+            /// Calculates whether a property is a member of a many-to-many relationship or requires a junction table.
+            /// </summary>
+            /// <returns>True if the property uses a many-to-many junction table, false otherwise.</returns>
+            public bool QueryIsManyToMany()
+            {
+                ArgumentNullException.ThrowIfNull(property);
+
+                if (property.QueryIsMemberOfManyToMany())
+                {
+                    return true;
+                }
+
+                return property.QueryIsEnumerable() && property.Type != null && !property.QueryIsDataType() && !property.IsComposite && property.SubsettedProperty.Count > 0;
+            }
+
+            /// <summary>
             /// Calculates whether the opposite property needs an attribute on the SQL table.
             /// </summary>
             /// <returns>True if the SQL table needs an attribute, false otherwise.</returns>
@@ -124,7 +140,7 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                if (property.Type == null || property.QueryIsMemberOfManyToMany() || property.QueryIsDataType() || property.QueryIsEnumerable() || property.Opposite == null)
+                if (property.Type == null || property.QueryIsManyToMany() || property.QueryIsDataType() || property.QueryIsEnumerable() || property.Opposite == null)
                 {
                     return false;
                 }
@@ -150,10 +166,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                if (!property.QueryIsMemberOfManyToMany())
-                {
-                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-                }
+            if (!property.QueryIsManyToMany())
+            {
+                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+            }
 
                 var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
                 var typeName = property.Type?.Name ?? string.Empty;
@@ -169,10 +185,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                if (!property.QueryIsMemberOfManyToMany())
-                {
-                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-                }
+            if (!property.QueryIsManyToMany())
+            {
+                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+            }
 
                 return property.Type?.Name.CapitalizeFirstLetter() ?? string.Empty;
             }
@@ -185,10 +201,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                if (!property.QueryIsMemberOfManyToMany())
-                {
-                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-                }
+            if (!property.QueryIsManyToMany())
+            {
+                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+            }
 
                 return $"target{property.QueryManyToManyTargetPropertyTypeName()}";
             }
@@ -201,10 +217,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                if (!property.QueryIsMemberOfManyToMany())
-                {
-                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-                }
+            if (!property.QueryIsManyToMany())
+            {
+                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+            }
 
                 var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
                 return ownerName.CapitalizeFirstLetter();
@@ -218,10 +234,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                if (!property.QueryIsMemberOfManyToMany())
-                {
-                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-                }
+            if (!property.QueryIsManyToMany())
+            {
+                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+            }
 
                 return $"source{property.QueryManyToManySourcePropertyTypeName()}";
             }

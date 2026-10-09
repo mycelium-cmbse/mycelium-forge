@@ -11,7 +11,8 @@ namespace Mycelium.Forge.Services
 {
     using DynamicData;
 
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Models.Notification;
 
     /// <summary>
     /// Provides notification management and reactive notification stream operations.

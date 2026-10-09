@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Orm.Tests.Services
 {
+    using System.Collections.Immutable;
+
     using ErrorOr;
 
     using Microsoft.Extensions.Logging;
@@ -122,6 +124,26 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     var connection = new NpgsqlConnection(this.ConnectionString);
                     await connection.OpenAsync();
                     return connection;
+                });
+
+            databaseSourceMock
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<ImmutableList<IOrganization>>>>>(), It.IsAny<CancellationToken>()))
+                .Returns(async (Func<NpgsqlTransaction, Task<ErrorOr<ImmutableList<IOrganization>>>> action, CancellationToken token) =>
+                {
+                    await using var connection = new NpgsqlConnection(this.ConnectionString);
+                    await connection.OpenAsync(token);
+                    await using var transaction = await connection.BeginTransactionAsync(token);
+
+                    var result = await action(transaction);
+
+                    if (result.IsError)
+                    {
+                        await transaction.RollbackAsync(token);
+                        return result.Errors;
+                    }
+
+                    await transaction.CommitAsync(token);
+                    return result;
                 });
 
             this.service = new OrganizationService(

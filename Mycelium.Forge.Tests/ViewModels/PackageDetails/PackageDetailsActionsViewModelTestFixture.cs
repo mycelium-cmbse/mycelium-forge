@@ -14,7 +14,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
     using Moq;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.PackageDetails;

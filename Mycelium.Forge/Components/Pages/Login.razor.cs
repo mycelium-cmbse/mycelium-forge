@@ -12,8 +12,8 @@ namespace Mycelium.Forge.Components.Pages
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Model;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Login;
 

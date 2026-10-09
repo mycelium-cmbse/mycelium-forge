@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SignUp.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,7 +12,7 @@ namespace Mycelium.Forge.Components.Pages
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.SignUp;
 

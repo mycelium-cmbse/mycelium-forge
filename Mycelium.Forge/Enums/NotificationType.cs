@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Model
+namespace Mycelium.Forge.Enums
 {
     /// <summary>
     /// Specifies the severity type of a notification message.

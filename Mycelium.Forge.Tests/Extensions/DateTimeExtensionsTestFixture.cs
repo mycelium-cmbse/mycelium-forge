@@ -54,5 +54,44 @@ namespace Mycelium.Forge.Tests.Extensions
                 Assert.That(actualParameterless, Is.Not.Empty);
             }
         }
+
+        [Test]
+        [TestCase("2026-08-25T12:00:00Z", "less than a minute")]
+        [TestCase("2026-08-25T12:00:30Z", "less than a minute")]
+        [TestCase("2026-08-25T12:00:59Z", "less than a minute")]
+        [TestCase("2026-08-25T12:01:00Z", "1 minute")]
+        [TestCase("2026-08-25T12:02:00Z", "2 minutes")]
+        [TestCase("2026-08-25T12:59:00Z", "59 minutes")]
+        [TestCase("2026-08-25T13:00:00Z", "1 hour")]
+        [TestCase("2026-08-25T14:00:00Z", "2 hours")]
+        [TestCase("2026-08-26T11:00:00Z", "23 hours")]
+        [TestCase("2026-08-26T12:00:00Z", "1 day")]
+        [TestCase("2026-08-27T12:00:00Z", "2 days")]
+        [TestCase("2026-08-31T12:00:00Z", "6 days")]
+        [TestCase("2026-09-01T12:00:00Z", "1 week")]
+        [TestCase("2026-09-08T12:00:00Z", "2 weeks")]
+        [TestCase("2026-09-22T12:00:00Z", "4 weeks")]
+        [TestCase("2026-09-24T12:00:00Z", "1 month")]
+        [TestCase("2026-10-25T12:00:00Z", "2 months")]
+        [TestCase("2027-08-20T12:00:00Z", "12 months")]
+        [TestCase("2027-08-25T12:00:00Z", "1 year")]
+        [TestCase("2028-08-25T12:00:00Z", "2 years")]
+        public void VerifyToTimeToCome(DateTime targetDateTime, string expected)
+        {
+            var referenceTimeUtc = new DateTime(2026, 8, 25, 12, 0, 0, DateTimeKind.Utc);
+            var referenceTimeLocal = referenceTimeUtc.ToLocalTime();
+            var targetTimeLocal = targetDateTime.ToLocalTime();
+
+            var actualUtc = targetDateTime.ToTimeToCome(referenceTimeUtc);
+            var actualLocal = targetTimeLocal.ToTimeToCome(referenceTimeLocal);
+            var actualParameterless = DateTime.UtcNow.AddMinutes(5).ToTimeToCome();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(actualUtc, Is.EqualTo(expected));
+                Assert.That(actualLocal, Is.EqualTo(expected));
+                Assert.That(actualParameterless, Is.Not.Empty);
+            }
+        }
     }
 }
