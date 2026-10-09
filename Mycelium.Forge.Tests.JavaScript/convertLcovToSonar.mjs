@@ -1,92 +1,19 @@
 // ------------------------------------------------------------------------------------------------
 // <copyright file="convertLcovToSonar.mjs" company="Starion Group S.A.">
-// 
+//
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-// 
+//
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-import {
-    existsSync,
-    readFileSync,
-    realpathSync,
-    statSync,
-    writeFileSync
-} from 'node:fs';
-import {
-    isAbsolute,
-    posix,
-    relative,
-    resolve,
-    sep,
-    win32
-} from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { isAbsolute, normalize, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const maximumSafeInteger = BigInt(Number.MAX_SAFE_INTEGER);
-
 /**
- * Converts LCOV format coverage data into Sonar generic coverage XML.
- * @param {string} lcov - The raw LCOV coverage report string.
- * @param {object} [options={}] - Options for conversion including repositoryRoot.
- * @returns {string} The Sonar generic coverage XML string.
- */
-export function convertLcovToSonarXml(lcov, options = {}) {
-    const records = parseLcov(lcov, options);
-    const output = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<coverage version="1">'
-    ];
-
-    for (const record of records.toSorted((left, right) => compareText(left.path, right.path))) {
-        output.push(`  <file path="${escapeXmlAttribute(record.path)}">`);
-
-        for (const [lineNumber, covered] of [...record.lines.entries()].toSorted(compareLineEntries)) {
-            const branches = record.branches.get(lineNumber);
-            let branchAttributes = '';
-
-            if (branches !== undefined) {
-                const coveredBranches = [...branches.values()].filter(Boolean).length;
-                branchAttributes = ` branchesToCover="${branches.size}" coveredBranches="${coveredBranches}"`;
-            }
-
-            output.push(
-                `    <lineToCover lineNumber="${lineNumber}" covered="${covered}"${branchAttributes} />`
-            );
-        }
-
-        output.push('  </file>');
-    }
-
-    output.push('</coverage>');
-    return `${output.join('\n')}\n`;
-}
-
-/**
- * Parses LCOV data into source coverage records.
- * @param {string} lcov - The raw LCOV string.
- * @param {object} [options={}] - Parser options.
- * @returns {Array<object>} The parsed records.
- */
-export function parseLcov(lcov, options = {}) {
-    if (typeof lcov !== 'string') {
-        throw new TypeError('LCOV input must be a string.');
-    }
-
-    const parser = createLcovParser(options.repositoryRoot ?? process.cwd());
-    const inputLines = lcov.replace(/^\uFEFF/, '').split(/\r?\n/);
-
-    for (const [index, line] of inputLines.entries()) {
-        parseLcovLine(parser, line, index + 1);
-    }
-
-    return completeLcovParsing(parser);
-}
-
-/**
- * Escapes characters for XML attributes.
- * @param {string} value - The input string to escape.
+ * Escapes special XML characters in attribute values.
+ * @param {string} value The string to escape.
  * @returns {string} The escaped string.
  */
 export function escapeXmlAttribute(value) {
@@ -99,254 +26,136 @@ export function escapeXmlAttribute(value) {
 }
 
 /**
- * Reads an LCOV file, converts it, and writes out Sonar generic coverage XML.
- * @param {string} inputPath - Path to input LCOV file.
- * @param {string} outputPath - Path to output XML file.
- * @param {object} [options={}] - Conversion options.
- * @returns {string} The generated XML content.
+ * Normalizes file paths to POSIX format relative to repository root.
+ * @param {string} filePath The path to normalize.
+ * @returns {string} The normalized path.
  */
-export function convertLcovFile(inputPath, outputPath, options = {}) {
-    const lcov = readFileSync(inputPath, 'utf8');
-    const xml = convertLcovToSonarXml(lcov, options);
-    writeFileSync(outputPath, xml, 'utf8');
-    return xml;
+function normalizePath(filePath) {
+    return normalize(filePath).replaceAll('\\', '/').replace(/^\.\//, '');
 }
 
-function createLcovParser(repositoryRootPath) {
-    const repositoryRoot = resolve(repositoryRootPath);
-
-    if (!existsSync(repositoryRoot) || !statSync(repositoryRoot).isDirectory()) {
-        throw new Error(`Repository root does not exist: ${repositoryRoot}`);
+/**
+ * Converts LCOV coverage string to SonarQube generic coverage XML.
+ * @param {string} lcov The raw LCOV string.
+ * @returns {string} The Sonar generic coverage XML.
+ */
+export function convertLcovToSonarXml(lcov) {
+    if (typeof lcov !== 'string') {
+        throw new TypeError('LCOV input must be a string.');
     }
 
-    return {
-        currentRecord: undefined,
-        realRepositoryRoot: realpathSync(repositoryRoot),
-        records: [],
-        repositoryRoot,
-        seenSources: new Set()
-    };
-}
+    const records = new Map();
+    let currentRecord = null;
 
-function parseLcovLine(parser, line, reportLineNumber) {
-    if (line.startsWith('SF:')) {
-        startSourceRecord(parser, line.slice('SF:'.length), reportLineNumber);
-        return;
-    }
+    const lines = lcov.replace(/^\uFEFF/, '').split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) {
+            continue;
+        }
 
-    if (line.startsWith('DA:')) {
-        addLineCoverage(parser, line, reportLineNumber);
-        return;
-    }
+        if (line.startsWith('SF:')) {
+            const rawPath = line.slice(3).trim();
+            if (isAbsolute(rawPath)) {
+                throw new Error(`LCOV line ${i + 1}: absolute SF path is not allowed: ${rawPath}`);
+            }
 
-    if (line.startsWith('BRDA:')) {
-        addBranchCoverage(parser, line, reportLineNumber);
-        return;
-    }
+            const normalized = normalizePath(rawPath);
+            currentRecord = records.get(normalized) ?? { lines: new Map(), branches: new Map() };
+            records.set(normalized, currentRecord);
+        } else if (line.startsWith('DA:')) {
+            if (!currentRecord) {
+                throw new Error(`LCOV line ${i + 1}: DA appears outside an SF record.`);
+            }
 
-    if (line === 'end_of_record') {
-        finishSourceRecord(parser, reportLineNumber);
-    }
-}
+            const [lineNumStr, countStr] = line.slice(3).split(',');
+            const lineNumber = parseInt(lineNumStr, 10);
+            const count = parseInt(countStr, 10);
 
-function startSourceRecord(parser, sourcePath, reportLineNumber) {
-    if (parser.currentRecord !== undefined) {
-        throw new Error(`LCOV line ${reportLineNumber}: source record is missing end_of_record.`);
-    }
+            if (!Number.isInteger(lineNumber) || lineNumber <= 0 || !Number.isInteger(count) || count < 0) {
+                throw new Error(`LCOV line ${i + 1}: malformed DA record: ${line}`);
+            }
 
-    const source = resolveSource(
-        sourcePath,
-        parser.repositoryRoot,
-        parser.realRepositoryRoot,
-        reportLineNumber
-    );
-    const duplicateKey = getDuplicateSourceKey(source.realPath);
+            currentRecord.lines.set(lineNumber, (currentRecord.lines.get(lineNumber) ?? false) || count > 0);
+        } else if (line.startsWith('BRDA:')) {
+            if (!currentRecord) {
+                throw new Error(`LCOV line ${i + 1}: BRDA appears outside an SF record.`);
+            }
 
-    if (parser.seenSources.has(duplicateKey)) {
-        throw new Error(`LCOV line ${reportLineNumber}: duplicate source record for ${source.path}.`);
-    }
+            const [lineNumStr, blockStr, branchStr, takenStr] = line.slice(5).split(',');
+            const lineNumber = parseInt(lineNumStr, 10);
+            const block = parseInt(blockStr, 10);
+            const branch = parseInt(branchStr, 10);
+            const covered = takenStr !== '-' && parseInt(takenStr, 10) > 0;
 
-    parser.seenSources.add(duplicateKey);
-    parser.currentRecord = {
-        branches: new Map(),
-        lines: new Map(),
-        path: source.path
-    };
-}
+            if (!Number.isInteger(lineNumber) || !Number.isInteger(block) || !Number.isInteger(branch)) {
+                throw new Error(`LCOV line ${i + 1}: malformed BRDA record: ${line}`);
+            }
 
-function addLineCoverage(parser, line, reportLineNumber) {
-    requireCurrentRecord(parser.currentRecord, reportLineNumber, 'DA');
-    parseLineCoverage(parser.currentRecord, line, reportLineNumber);
-}
-
-function addBranchCoverage(parser, line, reportLineNumber) {
-    requireCurrentRecord(parser.currentRecord, reportLineNumber, 'BRDA');
-    parseBranchCoverage(parser.currentRecord, line, reportLineNumber);
-}
-
-function finishSourceRecord(parser, reportLineNumber) {
-    requireCurrentRecord(parser.currentRecord, reportLineNumber, 'end_of_record');
-    finalizeRecord(parser.currentRecord, reportLineNumber);
-    parser.records.push(parser.currentRecord);
-    parser.currentRecord = undefined;
-}
-
-function completeLcovParsing(parser) {
-    if (parser.currentRecord !== undefined) {
-        throw new Error('LCOV input ended before end_of_record.');
-    }
-
-    if (parser.records.length === 0) {
-        throw new Error('LCOV input contains no source records.');
-    }
-
-    return parser.records;
-}
-
-function getDuplicateSourceKey(realPath) {
-    return process.platform === 'win32' ? realPath.toLowerCase() : realPath;
-}
-
-function resolveSource(sourcePath, repositoryRoot, realRepositoryRoot, reportLineNumber) {
-    if (sourcePath.length === 0) {
-        throw new Error(`LCOV line ${reportLineNumber}: SF path is empty.`);
-    }
-
-    if (
-        isAbsolute(sourcePath)
-        || posix.isAbsolute(sourcePath)
-        || win32.isAbsolute(sourcePath)
-        || sourcePath.startsWith('file:')
-    ) {
-        throw new Error(`LCOV line ${reportLineNumber}: absolute SF path is not allowed: ${sourcePath}`);
-    }
-
-    const normalizedPath = posix.normalize(sourcePath.replaceAll('\\', '/'));
-    const resolvedPath = resolve(repositoryRoot, ...normalizedPath.split('/'));
-
-    if (isOutside(repositoryRoot, resolvedPath)) {
-        throw new Error(`LCOV line ${reportLineNumber}: SF path is outside the repository: ${sourcePath}`);
-    }
-
-    if (!existsSync(resolvedPath) || !statSync(resolvedPath).isFile()) {
-        throw new Error(`LCOV line ${reportLineNumber}: SF source file does not exist: ${normalizedPath}`);
-    }
-
-    const realPath = realpathSync(resolvedPath);
-
-    if (isOutside(realRepositoryRoot, realPath)) {
-        throw new Error(`LCOV line ${reportLineNumber}: SF path resolves outside the repository: ${sourcePath}`);
-    }
-
-    return { path: normalizedPath, realPath };
-}
-
-function parseLineCoverage(record, line, reportLineNumber) {
-    const fields = line.slice('DA:'.length).split(',');
-
-    if (fields.length < 2 || fields.length > 3) {
-        throw new Error(`LCOV line ${reportLineNumber}: malformed DA record.`);
-    }
-
-    const lineNumber = parseLineNumber(fields[0], 'DA line number', reportLineNumber);
-    const executionCount = parseUnsignedInteger(fields[1], 'DA execution count', reportLineNumber);
-    const covered = executionCount > 0n;
-    record.lines.set(lineNumber, (record.lines.get(lineNumber) ?? false) || covered);
-}
-
-function parseBranchCoverage(record, line, reportLineNumber) {
-    const fields = line.slice('BRDA:'.length).split(',');
-
-    if (fields.length !== 4) {
-        throw new Error(`LCOV line ${reportLineNumber}: malformed BRDA record.`);
-    }
-
-    const lineNumber = parseLineNumber(fields[0], 'BRDA line number', reportLineNumber);
-    const blockNumber = parseUnsignedInteger(fields[1], 'BRDA block number', reportLineNumber);
-    const branchNumber = parseUnsignedInteger(fields[2], 'BRDA branch number', reportLineNumber);
-    const covered = fields[3] === '-'
-        ? false
-        : parseUnsignedInteger(fields[3], 'BRDA taken count', reportLineNumber) > 0n;
-    const branchKey = `${blockNumber}:${branchNumber}`;
-    const branches = record.branches.get(lineNumber) ?? new Map();
-
-    branches.set(branchKey, (branches.get(branchKey) ?? false) || covered);
-    record.branches.set(lineNumber, branches);
-}
-
-function finalizeRecord(record, reportLineNumber) {
-    if (record.lines.size === 0) {
-        throw new Error(`LCOV line ${reportLineNumber}: source record ${record.path} has no DA entries.`);
-    }
-
-    for (const branchLine of record.branches.keys()) {
-        if (!record.lines.has(branchLine)) {
-            throw new Error(
-                `LCOV line ${reportLineNumber}: BRDA line ${branchLine} has no matching DA entry in ${record.path}.`
-            );
+            const branchMap = currentRecord.branches.get(lineNumber) ?? new Map();
+            branchMap.set(`${block}:${branch}`, (branchMap.get(`${block}:${branch}`) ?? false) || covered);
+            currentRecord.branches.set(lineNumber, branchMap);
+        } else if (line === 'end_of_record') {
+            currentRecord = null;
         }
     }
-}
 
-function requireCurrentRecord(record, reportLineNumber, recordType) {
-    if (record === undefined) {
-        throw new Error(`LCOV line ${reportLineNumber}: ${recordType} appears outside an SF record.`);
-    }
-}
+    const output = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<coverage version="1">'
+    ];
 
-function parseLineNumber(value, fieldName, reportLineNumber) {
-    const parsed = parseUnsignedInteger(value, fieldName, reportLineNumber);
+    const sortedPaths = [...records.keys()].sort((a, b) => a.localeCompare(b));
+    for (const filePath of sortedPaths) {
+        const record = records.get(filePath);
+        output.push(`  <file path="${escapeXmlAttribute(filePath)}">`);
 
-    if (parsed === 0n || parsed > maximumSafeInteger) {
-        throw new Error(`LCOV line ${reportLineNumber}: malformed ${fieldName}: ${value}`);
-    }
+        const sortedLines = [...record.lines.keys()].sort((a, b) => a - b);
+        for (const lineNum of sortedLines) {
+            const covered = record.lines.get(lineNum);
+            const branches = record.branches.get(lineNum);
+            let branchAttr = '';
 
-    return Number(parsed);
-}
+            if (branches && branches.size > 0) {
+                const coveredCount = [...branches.values()].filter(Boolean).length;
+                branchAttr = ` branchesToCover="${branches.size}" coveredBranches="${coveredCount}"`;
+            }
 
-function parseUnsignedInteger(value, fieldName, reportLineNumber) {
-    if (!/^\d+$/.test(value)) {
-        throw new Error(`LCOV line ${reportLineNumber}: malformed ${fieldName}: ${value}`);
-    }
+            output.push(`    <lineToCover lineNumber="${lineNum}" covered="${covered}"${branchAttr} />`);
+        }
 
-    return BigInt(value);
-}
-
-function isOutside(rootPath, candidatePath) {
-    const relativePath = relative(rootPath, candidatePath);
-    return relativePath === '..'
-        || relativePath.startsWith(`..${sep}`)
-        || isAbsolute(relativePath);
-}
-
-function compareText(left, right) {
-    if (left < right) {
-        return -1;
+        output.push('  </file>');
     }
 
-    if (left > right) {
-        return 1;
-    }
-
-    return 0;
+    output.push('</coverage>');
+    return `${output.join('\n')}\n`;
 }
 
-function compareLineEntries([left], [right]) {
-    return left - right;
+/**
+ * Reads an LCOV file, converts it, and writes out Sonar generic coverage XML.
+ * @param {string} inputPath Path to the input LCOV file.
+ * @param {string} outputPath Path to the output XML file.
+ * @returns {string} The generated XML content.
+ */
+export function convertLcovFile(inputPath, outputPath) {
+    const lcov = readFileSync(inputPath, 'utf8');
+    const xml = convertLcovToSonarXml(lcov);
+    writeFileSync(outputPath, xml, 'utf8');
+    return xml;
 }
 
 const isMainModule = process.argv[1] !== undefined
     && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
 
 if (isMainModule) {
-    const [inputPath, outputPath, ...unexpectedArguments] = process.argv.slice(2);
+    const [inputPath, outputPath, ...unexpected] = process.argv.slice(2);
 
-    if (inputPath === undefined || outputPath === undefined || unexpectedArguments.length > 0) {
+    if (!inputPath || !outputPath || unexpected.length > 0) {
         console.error('Usage: node convertLcovToSonar.mjs <input-lcov> <output-xml>');
         process.exitCode = 1;
     } else {
         try {
-            convertLcovFile(inputPath, outputPath, { repositoryRoot: process.cwd() });
+            convertLcovFile(inputPath, outputPath);
             console.log(`Generated Sonar generic coverage report: ${outputPath}`);
         } catch (error) {
             console.error(error instanceof Error ? error.message : error);
