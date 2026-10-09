@@ -52,7 +52,7 @@ jobs:
           GENERATED='**/AutoGenDto/**/*.cs,**/AutoGenEnum/**/*.cs,**/AutoGenEnumProvider/**/*.cs,**/AutoGenSerializer/**/*.cs,**/AutoGenDeSerializer/**/*.cs,**/AutoGenDtoComparer/**/*.cs'
           TESTS='**/*.Tests/**/*.cs'
           JS_TESTS='**/Mycelium.Forge.Tests.JavaScript/**'
-          dotnet sonarscanner begin /k:"mycelium-cmbse_mycelium-forge" /o:"mycelium-cmbse" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml /d:sonar.javascript.lcov.reportPaths=lcov.info /d:sonar.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.cpd.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.coverage.exclusions="$TESTS,$JS_TESTS"
+          dotnet sonarscanner begin /k:"mycelium-cmbse_mycelium-forge" /o:"mycelium-cmbse" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml /d:sonar.javascript.lcov.reportPaths="$GITHUB_WORKSPACE/lcov.info" /d:sonar.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.cpd.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.coverage.exclusions="$TESTS,$JS_TESTS"
 
       - name: Build
         run: dotnet build Mycelium.Forge.sln --no-restore --no-incremental /p:ContinuousIntegrationBuild=true
