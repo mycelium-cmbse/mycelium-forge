@@ -52,7 +52,7 @@ jobs:
           GENERATED='**/AutoGenDto/**/*.cs,**/AutoGenEnum/**/*.cs,**/AutoGenEnumProvider/**/*.cs,**/AutoGenSerializer/**/*.cs,**/AutoGenDeSerializer/**/*.cs,**/AutoGenDtoComparer/**/*.cs'
           TESTS='**/*.Tests/**/*.cs'
           JS_TESTS='**/Mycelium.Forge.Tests.JavaScript/**'
-          dotnet sonarscanner begin /k:"mycelium-cmbse_mycelium-forge" /o:"mycelium-cmbse" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml /d:sonar.javascript.lcov.reportPaths="$GITHUB_WORKSPACE/lcov.info" /d:sonar.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.cpd.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.coverage.exclusions="$TESTS,$JS_TESTS"
+          dotnet sonarscanner begin /k:"mycelium-cmbse_mycelium-forge" /o:"mycelium-cmbse" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml /d:sonar.coverageReportPaths="sonar-js-coverage.xml" /d:sonar.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.cpd.exclusions="$GENERATED,**/wwwroot/css/app.css" /d:sonar.coverage.exclusions="$TESTS,$JS_TESTS"
 
       - name: Build
         run: dotnet build Mycelium.Forge.sln --no-restore --no-incremental /p:ContinuousIntegrationBuild=true
@@ -62,14 +62,16 @@ jobs:
       - name: Run Tests and Compute Coverage
         run: dotnet-coverage collect 'dotnet test Mycelium.Forge.sln --no-restore --no-build --verbosity normal --filter "TestCategory!=EndToEnd&TestCategory!=IgnoreOnCI"' -f xml -o "coverage.xml"
 
-      # node:test covers the hand-written wwwroot/js/forgeInterop.js (zero npm dependencies); it emits lcov.info for SonarCloud.
+      # node:test covers the hand-written wwwroot/js/forgeInterop.js (zero npm dependencies); it emits lcov.info and converts it to Sonar generic coverage XML.
       - name: Setup Node (JS tests only)
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24'
 
       - name: Run JS Tests and Compute Coverage
-        run: node --test --experimental-test-coverage --test-coverage-include=Mycelium.Forge/wwwroot/js/forgeInterop.js --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info "Mycelium.Forge.Tests.JavaScript/**/*.test.mjs"
+        run: |
+          node --test --experimental-test-coverage --test-coverage-include=Mycelium.Forge/wwwroot/js/forgeInterop.js --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info "Mycelium.Forge.Tests.JavaScript/**/*.test.mjs"
+          node Mycelium.Forge.Tests.JavaScript/convertLcovToSonar.mjs lcov.info sonar-js-coverage.xml
 
       - name: Sonarqube end
         env:
