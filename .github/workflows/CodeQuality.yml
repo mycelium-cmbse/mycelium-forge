@@ -71,7 +71,7 @@ jobs:
       - name: Run JS Tests and Compute Coverage
         run: |
           node --test --experimental-test-coverage --test-coverage-include=Mycelium.Forge/wwwroot/js/forgeInterop.js --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info "Mycelium.Forge.Tests.JavaScript/**/*.test.mjs"
-          node Mycelium.Forge.Tests.JavaScript/convertLcovToSonar.mjs lcov.info sonar-js-coverage.xml
+          node Mycelium.Forge.Tests.JavaScript/Converters/lcovToSonarConverter.mjs lcov.info sonar-js-coverage.xml
 
       - name: Sonarqube end
         env:

@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------------------------
-// <copyright file="convertLcovToSonar.mjs" company="Starion Group S.A.">
+// <copyright file="lcovToSonarConverter.mjs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -151,7 +151,7 @@ if (isMainModule) {
     const [inputPath, outputPath, ...unexpected] = process.argv.slice(2);
 
     if (!inputPath || !outputPath || unexpected.length > 0) {
-        console.error('Usage: node convertLcovToSonar.mjs <input-lcov> <output-xml>');
+        console.error('Usage: node lcovToSonarConverter.mjs <input-lcov> <output-xml>');
         process.exitCode = 1;
     } else {
         try {

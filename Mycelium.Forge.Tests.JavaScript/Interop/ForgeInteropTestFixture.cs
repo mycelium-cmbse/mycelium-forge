@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Tests.JavaScript
+namespace Mycelium.Forge.Tests.JavaScript.Interop
 {
     using System.Diagnostics;
     using System.Text;

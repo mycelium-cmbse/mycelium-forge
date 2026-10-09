@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, it, mock } from 'node:test';
-import { setupBrowser } from './browserTestSetup.mjs';
+import { setupBrowser } from '../Utils/browserTestSetup.mjs';
 
-const SCRIPT_URL = new URL('../Mycelium.Forge/wwwroot/js/forgeInterop.js', import.meta.url);
+const SCRIPT_URL = new URL('../../Mycelium.Forge/wwwroot/js/forgeInterop.js', import.meta.url);
 
 describe('forgeInterop', () => {
     let browser;
