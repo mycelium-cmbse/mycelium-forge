@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="SearchInput.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -19,10 +19,11 @@
              Placeholder="@(this.Placeholder)"
              aria-label="@(this.AriaLabel)"
              UpdateTiming="@(this.UpdateTiming)"
-             Class="@(this.InputClass)"/>
+             data-shortcut-key="@(this.ShortcutKey)"
+             Class="@($"{FocusableInputClass} {this.InputClass}")"/>
     @if (this.ShowShortcut)
     {
-        <BbKbd Keys="Ctrl+K"
+        <BbKbd Keys="@($"Ctrl+{this.ShortcutKey}")"
                Class="@(this.KbdClass)"/>
     }
 </div>

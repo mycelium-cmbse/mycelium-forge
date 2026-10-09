@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -34,6 +34,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Dal.Tests", "Mycelium.Forge.Dal.Tests\Mycelium.Forge.Dal.Tests.csproj", "{3FFB9AD6-BC53-4B5F-A00A-07F2AD7B59DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.DesignTokens", "Mycelium.DesignTokens\Mycelium.DesignTokens.csproj", "{8AAD152F-C597-4794-8B32-DD8EB9E0891D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Tests.JavaScript", "Mycelium.Forge.Tests.JavaScript\Mycelium.Forge.Tests.JavaScript.csproj", "{2EDD1223-280C-4162-BF7A-A64107D127BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -237,6 +239,18 @@ Global
 		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|x64.Build.0 = Release|Any CPU
 		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|x86.ActiveCfg = Release|Any CPU
 		{8AAD152F-C597-4794-8B32-DD8EB9E0891D}.Release|x86.Build.0 = Release|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Debug|x64.Build.0 = Debug|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Debug|x86.Build.0 = Debug|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|x64.ActiveCfg = Release|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|x64.Build.0 = Release|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|x86.ActiveCfg = Release|Any CPU
+		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

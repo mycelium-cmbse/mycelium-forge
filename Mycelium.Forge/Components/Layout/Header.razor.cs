@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Header.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -36,11 +36,6 @@ namespace Mycelium.Forge.Components.Layout
         /// </summary>
         [Inject]
         public IThemeService ThemeService { get; set; }
-
-        /// <summary>
-        /// Gets or sets the bound search query value in the header search input.
-        /// </summary>
-        public string SearchQuery { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the currently selected documentation language code.
@@ -141,15 +136,6 @@ namespace Mycelium.Forge.Components.Layout
             var normalizedDocs = PageRoutes.Documentation.Overview.TrimStart('/');
 
             return currentPath.StartsWith(normalizedDocs, StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Handles changes to the header search input value.
-        /// </summary>
-        /// <param name="value">The updated search query value.</param>
-        public void OnSearchInputChanged(string value)
-        {
-            this.SearchQuery = value;
         }
 
         /// <summary>

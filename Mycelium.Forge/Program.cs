@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -141,6 +141,8 @@ namespace Mycelium.Forge
                 .AddInteractiveServerComponents();
 
             builder.Services.AddBlazorBlueprintComponents();
+
+            builder.Services.Configure<ShortcutCommandsOptions>(builder.Configuration.GetSection(ShortcutCommandsOptions.SectionName));
 
             RxAppBuilder.CreateReactiveUIBuilder().BuildApp();
 

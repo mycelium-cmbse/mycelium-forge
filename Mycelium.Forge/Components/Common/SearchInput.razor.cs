@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SearchInput.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Components.Common
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
+    using Microsoft.Extensions.Options;
 
     using Mycelium.Forge.Common;
 
@@ -20,6 +21,22 @@ namespace Mycelium.Forge.Components.Common
     /// </summary>
     public partial class SearchInput : ComponentBase
     {
+        /// <summary>
+        /// The CSS class applied to identify focusable search inputs.
+        /// </summary>
+        public const string FocusableInputClass = "search-input-focusable";
+
+        /// <summary>
+        /// Gets or sets the configured shortcut commands.
+        /// </summary>
+        [Inject]
+        public IOptions<ShortcutCommandsOptions> ShortcutCommands { get; set; }
+
+        /// <summary>
+        /// Gets the key that focuses the search input, as configured in the application settings.
+        /// </summary>
+        public string ShortcutKey => this.ShortcutCommands.Value.GetSearchKey();
+
         /// <summary>
         /// Gets or sets the name of the search query query-string parameter.
         /// </summary>

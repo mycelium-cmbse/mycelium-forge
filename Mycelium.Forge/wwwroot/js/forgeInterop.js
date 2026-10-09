@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     const THEME_STORAGE_KEY = 'forge_theme';
     const DARK_THEME = 'dark';
     const LIGHT_THEME = 'light';
@@ -102,6 +102,32 @@
         }
     };
 
+    /**
+     * Handles global keyboard shortcuts, focusing and selecting the search input when Ctrl or Cmd is pressed
+     * together with the key configured in the input's data-shortcut-key attribute.
+     * @param {KeyboardEvent} event - The keyboard event.
+     * @returns {void}
+     */
+    function handleSearchShortcut(event) {
+        if (!(event.ctrlKey || event.metaKey) || typeof event.key !== 'string') {
+            return;
+        }
+
+        const searchInput = document.querySelector('.search-input-focusable');
+        const shortcutKey = searchInput?.dataset.shortcutKey;
+
+        if (event.key.toLowerCase() !== shortcutKey?.toLowerCase()) {
+            return;
+        }
+
+        event.preventDefault();
+        searchInput.focus();
+
+        if (typeof searchInput.select === 'function') {
+            searchInput.select();
+        }
+    }
+
     // Apply theme immediately on script evaluation to prevent flash of unstyled content.
     applyTheme(resolveDarkMode());
 
@@ -110,6 +136,8 @@
     // defer registration until then — but guard with readyState in case the script loads late
     // (i.e. DOMContentLoaded has already fired by the time this runs).
     if (typeof document !== 'undefined') {
+        document.addEventListener('keydown', handleSearchShortcut);
+
         const registerEnhancedLoad = function () {
             window.Blazor?.addEventListener('enhancedload', function () {
                 applyTheme(resolveDarkMode());

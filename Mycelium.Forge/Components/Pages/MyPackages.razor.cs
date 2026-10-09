@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Components.Pages
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Package;
     using Mycelium.Forge.ViewModels.MyPackages;
 
@@ -127,7 +128,7 @@ namespace Mycelium.Forge.Components.Pages
 
             await this.ViewModel.InitializeViewModel();
 
-            this.Disposables.Add(this.ViewModel.WhenAnyValue(x => x.IsLoading).Subscribe(_ => this.InvokeAsync(this.StateHasChanged)));
+            this.Disposables.Add(this.ViewModel.WhenAnyValue(x => x.IsLoading).SubscribeAsync(_ => this.InvokeAsync(this.StateHasChanged)));
         }
     }
 }
