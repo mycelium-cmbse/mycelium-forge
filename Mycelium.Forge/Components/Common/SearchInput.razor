@@ -19,10 +19,11 @@
              Placeholder="@(this.Placeholder)"
              aria-label="@(this.AriaLabel)"
              UpdateTiming="@(this.UpdateTiming)"
+             data-shortcut-key="@(this.ShortcutKey)"
              Class="@($"{FocusableInputClass} {this.InputClass}")"/>
     @if (this.ShowShortcut)
     {
-        <BbKbd Keys="Ctrl+K"
+        <BbKbd Keys="@($"Ctrl+{this.ShortcutKey}")"
                Class="@(this.KbdClass)"/>
     }
 </div>

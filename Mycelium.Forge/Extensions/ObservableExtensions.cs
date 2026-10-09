@@ -16,16 +16,19 @@ namespace Mycelium.Forge.Extensions
     /// </summary>
     public static class ObservableExtensions
     {
-        /// <summary>
-        /// Subscribes to an <see cref="IObservable{T}" /> with async capabilities.
-        /// </summary>
-        /// <typeparam name="T">The type of the elements in the source sequence.</typeparam>
         /// <param name="source">The source <see cref="IObservable{T}" />.</param>
-        /// <param name="onNextAsync">The asynchronous handler invoked for each element.</param>
-        /// <returns>The created <see cref="IDisposable" />.</returns>
-        public static IDisposable SubscribeAsync<T>(this IObservable<T> source, Func<T, Task> onNextAsync)
+        /// <typeparam name="T">The type of the elements in the source sequence.</typeparam>
+        extension<T>(IObservable<T> source)
         {
-            return source.Select(x => Observable.FromAsync(() => onNextAsync(x))).Concat().Subscribe();
+            /// <summary>
+            /// Subscribes to an <see cref="IObservable{T}" /> with async capabilities.
+            /// </summary>
+            /// <param name="onNextAsync">The asynchronous handler invoked for each element.</param>
+            /// <returns>The created <see cref="IDisposable" />.</returns>
+            public IDisposable SubscribeAsync(Func<T, Task> onNextAsync)
+            {
+                return source.Select(x => Observable.FromAsync(() => onNextAsync(x))).Concat().Subscribe();
+            }
         }
     }
 }

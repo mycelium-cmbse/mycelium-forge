@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     const THEME_STORAGE_KEY = 'forge_theme';
     const DARK_THEME = 'dark';
     const LIGHT_THEME = 'light';
@@ -103,18 +103,20 @@
     };
 
     /**
-     * Handles global keyboard shortcuts, focusing and selecting the search input when Ctrl+K or Cmd+K is pressed.
+     * Handles global keyboard shortcuts, focusing and selecting the search input when Ctrl or Cmd is pressed
+     * together with the key configured in the input's data-shortcut-key attribute.
      * @param {KeyboardEvent} event - The keyboard event.
      * @returns {void}
      */
     function handleSearchShortcut(event) {
-        if (!(event.ctrlKey || event.metaKey) || (event.key !== 'k' && event.key !== 'K')) {
+        if (!(event.ctrlKey || event.metaKey) || typeof event.key !== 'string') {
             return;
         }
 
         const searchInput = document.querySelector('.search-input-focusable');
+        const shortcutKey = searchInput?.dataset.shortcutKey;
 
-        if (!searchInput) {
+        if (!shortcutKey || event.key.toLowerCase() !== shortcutKey.toLowerCase()) {
             return;
         }
 
