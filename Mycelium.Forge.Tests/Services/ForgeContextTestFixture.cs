@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Tests.Services
 {
     using System;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace Mycelium.Forge.Tests.Services
     using Mycelium.Forge.Services;
 
     [TestFixture]
+    [SuppressMessage("Performance", "CA1873:Avoid potentially expensive logging", Justification = "Moq expression tree in unit test.")]
     public class ForgeContextTestFixture
     {
         private Mock<IForgeService> forgeServiceMock;
