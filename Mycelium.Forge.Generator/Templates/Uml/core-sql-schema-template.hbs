@@ -48,6 +48,11 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
 {{#Forge.SQL.WriteNormalReferenceConstraints class}}
 {{/each}}
 
+-- Indexable Value Properties
+{{#each this as | class |}}
+{{#Forge.SQL.WriteIndexableValuePropertyIndexes class}}
+{{/each}}
+
 CREATE OR REPLACE FUNCTION "Forge".thing_delete()
 RETURNS trigger
 LANGUAGE plpgsql

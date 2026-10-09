@@ -27,17 +27,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// </param>
         public static void RegisterTypeNameHelper(this IHandlebars handlebars)
         {
-            handlebars.RegisterHelper("EnumerationLiteral.Write", (writer, context, arguments) =>
+            handlebars.RegisterHelper("EnumerationLiteral.Write", (writer, _, arguments) =>
             {
-                if (arguments.Length != 1)
-                {
-                    throw new HandlebarsException("{{#EnumerationLiteral.Write}} helper must have exactly one argument");
-                }
-
-                if (arguments.Single() is not EnumerationLiteral enumerationLiteral)
-                {
-                    throw new HandlebarsException("{{#EnumerationLiteral.Write}} argument must be an EnumerationLiteral");
-                }
+                var enumerationLiteral = arguments.QuerySingle<EnumerationLiteral>("EnumerationLiteral.Write");
 
                 var name = enumerationLiteral.Name.CapitalizeFirstLetter();
 

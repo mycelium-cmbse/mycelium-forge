@@ -152,7 +152,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         {
             await base.OnInitializedAsync();
 
-            if (string.IsNullOrWhiteSpace(this.PackageName) || string.IsNullOrWhiteSpace(this.Scope))
+            if (string.IsNullOrEmpty(this.Scope) || string.IsNullOrEmpty(this.PackageName))
             {
                 return;
             }

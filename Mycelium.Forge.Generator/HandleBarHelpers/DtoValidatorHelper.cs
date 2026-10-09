@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DtoValidatorHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -29,24 +29,21 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             ArgumentNullException.ThrowIfNull(handlebars);
 
-            handlebars.RegisterHelper("DtoValidator.WriteRulesIfApplicable", (writer, context, _) =>
+            handlebars.RegisterHelper("DtoValidator.WriteRulesIfApplicable", (writer, _, arguments) =>
             {
-                WriteRulesIfApplicable(writer, context);
+                WriteRulesIfApplicable(writer, arguments);
             });
         }
 
         /// <summary>
-        /// Writes the validation rule for the property in the Handlebars context, if applicable.
+        /// Writes the validation rule for the property, if applicable.
         /// </summary>
         /// <param name="writer">The output text writer.</param>
-        /// <param name="context">The Handlebars context containing an <see cref="IProperty" />.</param>
-        /// <exception cref="ArgumentException">Thrown when context value is not an <see cref="IProperty" />.</exception>
-        private static void WriteRulesIfApplicable(EncodedTextWriter writer, Context context)
+        /// <param name="arguments">The Handlebars helper arguments containing an <see cref="IProperty" />.</param>
+        /// <exception cref="HandlebarsException">Thrown when arguments do not contain exactly one <see cref="IProperty" />.</exception>
+        private static void WriteRulesIfApplicable(EncodedTextWriter writer, Arguments arguments)
         {
-            if (context.Value is not IProperty property)
-            {
-                throw new ArgumentException("DtoValidator.WriteRulesIfApplicable - context is supposed to be an IProperty");
-            }
+            var property = arguments.QuerySingle<IProperty>("DtoValidator.WriteRulesIfApplicable");
 
             var rule = GenerateValidationRule(property);
 

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DaoHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,11 +26,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     public static class DaoHelper
     {
         /// <summary>
-        /// The error message used when the Handlebars context is not an <see cref="IClass" />.
-        /// </summary>
-        private const string ContextMustBeIClass = "context is supposed to be an IClass";
-
-        /// <summary>
         /// Registers the DAO Handlebars helpers with the specified Handlebars context.
         /// </summary>
         /// <param name="handlebars">The <see cref="IHandlebars" /> context.</param>
@@ -51,14 +46,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Writes the INSERT statements for the root Thing and superclass tables for <c>CreateAsync</c>.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void CreateAsyncWriteValueTypeAndSingleReferenceProperties(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("Dao.CreateAsyncWriteValueTypeAndSingleReferenceProperties");
 
             var valueTypeAndSingleReferenceProperties = new StringBuilder();
 
@@ -97,14 +89,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Writes NpgsqlCommand parameter bindings for all single reference properties.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void CreateAndUpdateAsyncWriteCommandParameters(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("Dao.CreateAndUpdateAsyncWriteCommandParameters");
 
             var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
             var commandParametersToWrite = new StringBuilder();
@@ -146,14 +135,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Appends multi-reference property INSERT statements to the SQL builder in <c>CreateAsync</c>.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void CreateAsyncAppendMultiReferencePropertiesToSqlBuilder(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("Dao.CreateAsyncAppendMultiReferencePropertiesToSqlBuilder");
 
             var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
             var result = new StringBuilder();
@@ -204,14 +190,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Writes UPDATE statements for the root Thing and superclass tables for <c>UpdateAsync</c>.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void UpdateAsyncWriteValueTypeAndSingleReferenceProperties(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("Dao.UpdateAsyncWriteValueTypeAndSingleReferenceProperties");
 
             var valueTypeAndSingleReferenceProperties = new StringBuilder();
 
@@ -256,14 +239,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Appends multi-reference property MERGE/DELETE statements to the SQL builder in <c>UpdateAsync</c>.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void UpdateAsyncAppendMultiReferencePropertiesToSqlBuilder(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("Dao.UpdateAsyncAppendMultiReferencePropertiesToSqlBuilder");
 
             var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
             var result = new StringBuilder();
@@ -321,14 +301,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Generates the SELECT query SQL for <c>ReadAsync</c>.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void ReadAsyncWriteReadSql(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("Dao.ReadAsyncWriteReadSQL");
 
             var hierarchyClasses = @class.QueryThingHierarchyClasses();
             var sql = new StringBuilder();
@@ -535,14 +512,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Writes DTO property mappings from the DataReader into the object initializer of <c>MapToDto</c>.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
-        /// <param name="context">The Handlebars <see cref="Context" /> containing an <see cref="IClass" />.</param>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
         /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
         private static void WriteMapToDto(EncodedTextWriter writer, Context context, Arguments arguments)
         {
-            if (context.Value is not IClass @class)
-            {
-                throw new ArgumentException(ContextMustBeIClass, nameof(context));
-            }
+            var @class = arguments.QuerySingle<IClass>("Dao.WriteMapToDto");
 
             var hierarchyClasses = @class.QueryThingHierarchyClasses();
 

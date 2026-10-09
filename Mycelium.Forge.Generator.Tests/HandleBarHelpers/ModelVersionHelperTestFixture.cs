@@ -53,11 +53,13 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
             var templateArg = this.handlebars.Compile("{{Forge.ModelVersion \"3.0.0\"}}");
             var templateNoArg = this.handlebars.Compile("{{Forge.ModelVersion}}");
+            var templateInvalidArg = this.handlebars.Compile("{{Forge.ModelVersion 123}}");
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(templateArg(new { }), Is.EqualTo("3.0.0"));
                 Assert.That(templateNoArg(new { }), Is.EqualTo("1.0.0-fallback"));
+                Assert.That(() => templateInvalidArg(new { }), Throws.TypeOf<HandlebarsException>());
             }
         }
     }

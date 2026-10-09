@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreEnumGenerator.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -10,6 +10,8 @@
 namespace Mycelium.Forge.Generator.Generators
 {
     using HandlebarsDotNet;
+
+    using Mycelium.Forge.Generator.HandleBarHelpers;
 
     using uml4net.Extensions;
     using uml4net.HandleBars;
@@ -79,10 +81,7 @@ namespace Mycelium.Forge.Generator.Generators
             // reserved-keyword-aware variant, which is out of scope for this model.
             this.Handlebars.RegisterHelper("EnumerationLiteral.Write", (writer, _, parameters) =>
             {
-                if (parameters.Length != 1 || parameters[0] is not IEnumerationLiteral enumerationLiteral)
-                {
-                    throw new HandlebarsException("{{#EnumerationLiteral.Write}} helper must have exactly one argument");
-                }
+                var enumerationLiteral = parameters.QuerySingle<IEnumerationLiteral>("EnumerationLiteral.Write");
 
                 writer.WriteSafeString(enumerationLiteral.Name.CapitalizeFirstLetter());
             });

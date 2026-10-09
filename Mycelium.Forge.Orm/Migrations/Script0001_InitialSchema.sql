@@ -1,4 +1,4 @@
-------------------------------------------------------------------------------------------------
+﻿------------------------------------------------------------------------------------------------
 -- <copyright file="schema.sql" company="Starion Group S.A.">
 --
 --   Copyright 2026 Starion Group S.A.
@@ -365,6 +365,19 @@ ALTER TABLE "Forge"."ProfileType" ADD CONSTRAINT "ProfileType_owner_FK_Source" F
 CREATE INDEX "idx_ProfileType_owner" ON "Forge"."ProfileType" ("owner");
 ALTER TABLE "Forge"."Scope" ADD CONSTRAINT "Scope_primaryAddress_FK_Source" FOREIGN KEY ("primaryAddress") REFERENCES "Forge"."Address" ("id") ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX "idx_Scope_primaryAddress" ON "Forge"."Scope" ("primaryAddress");
+
+-- Indexable Value Properties
+CREATE INDEX "idx_APIKey_expiresAt" ON "Forge"."Thing" (("data" ->> 'expiresAt')) WHERE "classKind" = 'APIKey';
+CREATE INDEX "idx_APIKey_lastUsedAt" ON "Forge"."Thing" (("data" ->> 'lastUsedAt')) WHERE "classKind" = 'APIKey';
+CREATE INDEX "idx_APIKey_name" ON "Forge"."Thing" (("data" ->> 'name')) WHERE "classKind" = 'APIKey';
+CREATE INDEX "idx_Country_name" ON "Forge"."Thing" (("data" ->> 'name')) WHERE "classKind" = 'Country';
+CREATE INDEX "idx_Namespace_name" ON "Forge"."Thing" (("data" ->> 'name')) WHERE "classKind" IN ('Account', 'Forge', 'Organization', 'Package');
+CREATE INDEX "idx_Namespace_shortName" ON "Forge"."Thing" (("data" ->> 'shortName')) WHERE "classKind" IN ('Account', 'Forge', 'Organization', 'Package');
+CREATE INDEX "idx_Package_description" ON "Forge"."Thing" (("data" ->> 'description')) WHERE "classKind" = 'Package';
+CREATE INDEX "idx_PackageType_name" ON "Forge"."Thing" (("data" ->> 'name')) WHERE "classKind" = 'PackageType';
+CREATE INDEX "idx_Scope_email" ON "Forge"."Thing" (("data" ->> 'email')) WHERE "classKind" IN ('Account', 'Organization');
+CREATE INDEX "idx_Scope_origin" ON "Forge"."Thing" (("data" ->> 'origin')) WHERE "classKind" IN ('Account', 'Organization');
+CREATE INDEX "idx_Scope_status" ON "Forge"."Thing" (("data" ->> 'status')) WHERE "classKind" IN ('Account', 'Organization');
 
 CREATE OR REPLACE FUNCTION "Forge".thing_delete()
 RETURNS trigger
