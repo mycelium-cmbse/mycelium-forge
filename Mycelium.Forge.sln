@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -36,6 +36,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.DesignTokens", "Mycelium.DesignTokens\Mycelium.DesignTokens.csproj", "{8AAD152F-C597-4794-8B32-DD8EB9E0891D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Tests.JavaScript", "Mycelium.Forge.Tests.JavaScript\Mycelium.Forge.Tests.JavaScript.csproj", "{2EDD1223-280C-4162-BF7A-A64107D127BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Storage", "Mycelium.Forge.Storage\Mycelium.Forge.Storage.csproj", "{CF127A3C-0518-437D-A65D-63CDC9621F9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Storage.Tests", "Mycelium.Forge.Storage.Tests\Mycelium.Forge.Storage.Tests.csproj", "{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -251,6 +255,30 @@ Global
 		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|x64.Build.0 = Release|Any CPU
 		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|x86.ActiveCfg = Release|Any CPU
 		{2EDD1223-280C-4162-BF7A-A64107D127BD}.Release|x86.Build.0 = Release|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Debug|x64.Build.0 = Debug|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Debug|x86.Build.0 = Debug|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Release|x64.ActiveCfg = Release|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Release|x64.Build.0 = Release|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF127A3C-0518-437D-A65D-63CDC9621F9A}.Release|x86.Build.0 = Release|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Debug|x64.Build.0 = Debug|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Debug|x86.Build.0 = Debug|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|x64.ActiveCfg = Release|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|x64.Build.0 = Release|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
