@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Storage.Stores
 {
     using System.Net;
+    using System.Security.Cryptography;
 
     using Amazon.S3;
     using Amazon.S3.Model;
@@ -97,35 +98,41 @@ namespace Mycelium.Forge.Storage.Stores
         }
 
         /// <summary>
-        /// Asynchronously stores an artifact stream under its content hash, skipping upload if already present.
+        /// Asynchronously stores an artifact stream under its computed content hash, skipping upload if already present.
         /// </summary>
         /// <remarks>
         /// For artifacts exceeding single-part upload limits or multi-gigabyte files, this operation can be extended
         /// to leverage S3 multipart upload (InitiateMultipartUpload, UploadPart, CompleteMultipartUpload).
         /// </remarks>
-        /// <param name="contentHash">The expected content hash of the artifact.</param>
         /// <param name="contentStream">The stream containing artifact bytes.</param>
-        /// <param name="contentLength">The total byte length of the artifact stream.</param>
         /// <param name="contentType">The optional MIME type of the artifact.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A result containing the stored content hash, or an error if storage fails.</returns>
-        public async Task<ErrorOr<string>> StoreArtifactAsync(string contentHash, Stream contentStream, long contentLength, string contentType = null, CancellationToken token = default)
+        public async Task<ErrorOr<string>> StoreArtifactAsync(Stream contentStream, string contentType = null, CancellationToken token = default)
         {
-            if (string.IsNullOrWhiteSpace(contentHash))
-            {
-                return Error.Validation(nameof(contentHash), "Content hash cannot be null or empty.");
-            }
-
             if (contentStream == null)
             {
                 return Error.Validation(nameof(contentStream), "Content stream cannot be null.");
             }
 
-            var key = this.NormalizeContentHash(contentHash);
+            var key = string.Empty;
             var bucketName = this.options.Value.BucketName;
 
             try
             {
+                if (contentStream.CanSeek)
+                {
+                    contentStream.Position = 0;
+                }
+
+                var hashBytes = await SHA256.HashDataAsync(contentStream, token);
+                key = this.NormalizeContentHash(Convert.ToHexStringLower(hashBytes));
+
+                if (contentStream.CanSeek)
+                {
+                    contentStream.Position = 0;
+                }
+
                 var existsResult = await this.ExistsAsync(key, token);
 
                 if (existsResult is { IsError: false, Value: true })
@@ -137,6 +144,8 @@ namespace Mycelium.Forge.Storage.Stores
 
                 var isHttps = this.options.Value.ServiceUrl != null &&
                               this.options.Value.ServiceUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+
+                var contentLength = contentStream.CanSeek ? contentStream.Length : 0;
 
                 var putRequest = new PutObjectRequest
                 {

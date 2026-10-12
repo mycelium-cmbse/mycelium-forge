@@ -25,19 +25,17 @@ namespace Mycelium.Forge.Storage.Stores
         Task<ErrorOr<Stream>> GetArtifactAsync(string contentHash, CancellationToken token = default);
 
         /// <summary>
-        /// Asynchronously stores an artifact stream under its content hash, skipping upload if already present.
+        /// Asynchronously stores an artifact stream under its computed content hash, skipping upload if already present.
         /// </summary>
         /// <remarks>
         /// For artifacts exceeding single-part upload limits or multi-gigabyte files, this operation can be extended
         /// to leverage S3 multipart upload (InitiateMultipartUpload, UploadPart, CompleteMultipartUpload).
         /// </remarks>
-        /// <param name="contentHash">The expected content hash of the artifact.</param>
         /// <param name="contentStream">The stream containing artifact bytes.</param>
-        /// <param name="contentLength">The total byte length of the artifact stream.</param>
         /// <param name="contentType">The optional MIME type of the artifact.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A result containing the stored content hash, or an error if storage fails.</returns>
-        Task<ErrorOr<string>> StoreArtifactAsync(string contentHash, Stream contentStream, long contentLength, string contentType = null, CancellationToken token = default);
+        Task<ErrorOr<string>> StoreArtifactAsync(Stream contentStream, string contentType = null, CancellationToken token = default);
 
         /// <summary>
         /// Asynchronously checks whether an artifact exists in storage by its content hash.
