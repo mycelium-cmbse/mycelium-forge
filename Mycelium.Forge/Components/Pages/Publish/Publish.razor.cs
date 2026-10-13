@@ -27,6 +27,11 @@ namespace Mycelium.Forge.Components.Pages.Publish
     public partial class Publish : ComponentBase
     {
         /// <summary>
+        /// Gets or sets the uploaded package archive file for validation and publishing.
+        /// </summary>
+        private IBrowserFile uploadedPackage;
+
+        /// <summary>
         /// Gets or sets the view model for the package publishing page.
         /// </summary>
         [Inject]
@@ -54,11 +59,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// Gets or sets the zero-based active wizard step index.
         /// </summary>
         public int ActiveStep { get; set; }
-
-        /// <summary>
-        /// Gets or sets the uploaded package archive file for validation and publishing.
-        /// </summary>
-        private IBrowserFile uploadedPackage;
 
         /// <summary>
         /// Gets the CSS classes for the validation status outcome badge.
@@ -94,17 +94,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public string GetPublishButtonText()
         {
             return $"Validate & publish v{this.ViewModel.Metadata.Version}";
-        }
-
-        /// <summary>
-        /// Handles completing the upload step and advancing to package metadata.
-        /// </summary>
-        /// <param name="file">The uploaded file.</param>
-        public void OnUploadStepContinued(IBrowserFile file)
-        {
-            this.uploadedPackage = file;
-            this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
-            this.ActiveStep = 1;
         }
 
         /// <summary>
@@ -229,6 +218,33 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             base.OnInitialized();
             this.ViewModel.InitializeViewModel();
+        }
+
+        /// <summary>
+        /// Handles completing the upload step and advancing to package metadata.
+        /// </summary>
+        /// <param name="file">The uploaded file.</param>
+        private void OnUploadStepContinued(IBrowserFile file)
+        {
+            this.uploadedPackage = file;
+            this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
+            this.ActiveStep = 1;
+        }
+
+        /// <summary>
+        /// Determines whether the specified step can be opened based on the current state.
+        /// </summary>
+        /// <param name="stepNumber">The step number.</param>
+        /// <returns><c>true</c> if the step can be opened; otherwise, <c>false</c>.</returns>
+        private bool CanOpenStep(int stepNumber)
+        {
+            // Step 0 (Upload) can always be opened; Step 1 (Metadata) can only be opened if a package has been uploaded. Other steps are still to be implemented
+            return stepNumber switch
+            {
+                0 => true,
+                1 => this.CanOpenStep(0) && this.uploadedPackage != null,
+                _ => false
+            };
         }
     }
 }
