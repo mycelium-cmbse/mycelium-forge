@@ -224,17 +224,15 @@ namespace Mycelium.Forge.Storage.Tests.Stores
         [Test]
         public async Task VerifyStoreArtifactAsync()
         {
-            var emptyResult = await this.artifactStore.StoreArtifactAsync(string.Empty, new MemoryStream(), 0, null, CancellationToken.None);
-            Assert.That(emptyResult.IsError, Is.True);
-
-            var nullStreamResult = await this.artifactStore.StoreArtifactAsync("hash", null, 0, null, CancellationToken.None);
+            var nullStreamResult = await this.artifactStore.StoreArtifactAsync(null, null, CancellationToken.None);
             Assert.That(nullStreamResult.IsError, Is.True);
 
-            const string existingHash = "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd";
+            var existingBytes = "any-data"u8.ToArray();
+            var existingHash = Convert.ToHexStringLower(SHA256.HashData(existingBytes));
             this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.BucketName == "test-bucket" && r.Key == existingHash), It.IsAny<CancellationToken>())).ReturnsAsync(new GetObjectMetadataResponse());
 
-            using var existingStream = new MemoryStream([.. "any-data"u8]);
-            var deduplicatedResult = await this.artifactStore.StoreArtifactAsync(existingHash, existingStream, existingStream.Length, null, CancellationToken.None);
+            using var existingStream = new MemoryStream(existingBytes);
+            var deduplicatedResult = await this.artifactStore.StoreArtifactAsync(existingStream, null, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
@@ -250,7 +248,7 @@ namespace Mycelium.Forge.Storage.Tests.Stores
             this.amazonS3Mock.Setup(x => x.PutObjectAsync(It.Is<PutObjectRequest>(r => r.BucketName == "test-bucket" && r.Key == expectedHash), It.IsAny<CancellationToken>())).ReturnsAsync(new PutObjectResponse());
 
             using var uploadStream = new MemoryStream(bytes);
-            var storeResult = await this.artifactStore.StoreArtifactAsync(expectedHash, uploadStream, bytes.Length, "application/octet-stream", CancellationToken.None);
+            var storeResult = await this.artifactStore.StoreArtifactAsync(uploadStream, "application/octet-stream", CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
@@ -258,28 +256,18 @@ namespace Mycelium.Forge.Storage.Tests.Stores
                 Assert.That(storeResult.Value, Is.EqualTo(expectedHash));
             }
 
-            var faultyHash = "deadbeef" + new string('0', 56);
-            this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.Key == faultyHash), It.IsAny<CancellationToken>())).ThrowsAsync(new AmazonS3Exception("Not Found") { StatusCode = HttpStatusCode.NotFound });
-            this.amazonS3Mock.Setup(x => x.PutObjectAsync(It.Is<PutObjectRequest>(r => r.Key == faultyHash), It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException("Upload failed"));
+            var failBytes = "fail-bytes"u8.ToArray();
+            var failHash = Convert.ToHexStringLower(SHA256.HashData(failBytes));
+            this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.Key == failHash), It.IsAny<CancellationToken>())).ThrowsAsync(new AmazonS3Exception("Not Found") { StatusCode = HttpStatusCode.NotFound });
+            this.amazonS3Mock.Setup(x => x.PutObjectAsync(It.Is<PutObjectRequest>(r => r.Key == failHash), It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException("Upload failed"));
 
-            using var failStream = new MemoryStream(bytes);
-            var failureResult = await this.artifactStore.StoreArtifactAsync(faultyHash, failStream, bytes.Length, null, CancellationToken.None);
+            using var failStream = new MemoryStream(failBytes);
+            var failureResult = await this.artifactStore.StoreArtifactAsync(failStream, null, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(failureResult.IsError, Is.True);
                 Assert.That(failureResult.FirstError.Type, Is.EqualTo(ErrorType.Failure));
-            }
-
-            this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.Key == "not-valid-hex"), It.IsAny<CancellationToken>())).ThrowsAsync(new AmazonS3Exception("Not Found") { StatusCode = HttpStatusCode.NotFound });
-
-            using var invalidHexStream = new MemoryStream(bytes);
-            var invalidHexResult = await this.artifactStore.StoreArtifactAsync("not-valid-hex", invalidHexStream, bytes.Length, null, CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(invalidHexResult.IsError, Is.True);
-                Assert.That(invalidHexResult.FirstError.Type, Is.EqualTo(ErrorType.Failure));
             }
         }
     }

@@ -32,7 +32,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             {
                 Assert.That(this.viewModel.Metadata, Is.Not.Null);
                 Assert.That(this.viewModel.Metadata.PackageName, Is.EqualTo("ECSS-MM-PWR"));
-                Assert.That(this.viewModel.Steps, Has.Count.EqualTo(3));
                 Assert.That(this.viewModel.ValidationChecks, Has.Count.EqualTo(6));
                 Assert.That(this.viewModel.ScopeOptions, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.LicenseOptions, Has.Count.GreaterThan(0));

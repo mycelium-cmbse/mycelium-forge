@@ -26,11 +26,6 @@ namespace Mycelium.Forge.ViewModels.Publish
         PublishPackageMetadataModel Metadata { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of wizard workflow steps.
-        /// </summary>
-        List<PublishStepModel> Steps { get; set; }
-
-        /// <summary>
         /// Gets or sets the list of pre-publishing validation rule evaluation results.
         /// </summary>
         List<ValidationCheckModel> ValidationChecks { get; set; }

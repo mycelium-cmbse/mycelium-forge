@@ -1,0 +1,138 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PublishUploadStep.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full flex flex-col lg:flex-row items-start gap-6">
+    <ForgeCard Class="w-full lg:flex-1 p-6 gap-4">
+        <ForgeFileUpload OnSelectedFilesChanged="@(this.HandleFilesSelected)"
+                         Accept="@(this.AcceptedExtensions)"
+                         Class="w-full"/>
+
+        <div class="flex items-center gap-2 w-full">
+            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ACCEPTED
+            </span>
+            @foreach (var format in this.acceptedFormats.Values)
+            {
+                <BbBadge @key="format"
+                         Variant="BadgeVariant.Secondary"
+                         Class="badge-format">
+                    @(format)
+                </BbBadge>
+            }
+        </div>
+
+        <p class="text-xs leading-2xs font-normal text-muted-foreground w-full">
+            Only packages up to @(this.maxAllowedFileSize.FormatFileSize()) are supported.
+        </p>
+
+        @if (this.HasSelectedFile)
+        {
+            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                SELECTED FILE
+            </span>
+
+            <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
+                <LucideIcon Name="package"
+                            Size="16"
+                            Class="text-muted-foreground shrink-0"/>
+
+                <div class="flex flex-col gap-1 flex-1 min-w-0">
+                    <div class="flex items-center gap-2.5">
+                        <span class="font-mono text-sm leading-normal text-foreground truncate">
+                            @(this.SelectedFile.Name)
+                        </span>
+                        <BbBadge Variant="BadgeVariant.Secondary"
+                                 Class="badge-format">
+                            @(this.GetSelectedFileFormat())
+                        </BbBadge>
+                    </div>
+                    <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                        @(this.SelectedFile.Size.FormatFileSize()) &bull; Detected @(this.GetSelectedFileFormat())
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-2 w-full">
+                <LucideIcon Name="circle-check"
+                            Size="14"
+                            Class="text-success-vivid shrink-0 mt-0.5"/>
+                <p class="text-xs leading-2xs font-normal text-foreground-muted flex-1">
+                    Format detected from the archive manifest. Name, version, licence and dependencies are read from it on the next step, not typed by hand.
+                </p>
+            </div>
+        }
+    </ForgeCard>
+
+    <ForgeCard Class="w-full lg:w-96 p-5 gap-3 shrink-0">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            BEFORE YOU UPLOAD
+        </span>
+
+        <div class="flex items-start gap-2.5 w-full">
+            <div class="w-4 h-5 flex items-center justify-center shrink-0">
+                <LucideIcon Name="circle-check"
+                            Size="14"
+                            Class="text-muted-foreground shrink-0"/>
+            </div>
+            <p class="text-sm leading-xs font-normal text-foreground-muted flex-1">
+                Fast client-side validation before anything is uploaded.
+            </p>
+        </div>
+
+        <div class="flex items-start gap-2.5 w-full">
+            <div class="w-4 h-5 flex items-center justify-center shrink-0">
+                <LucideIcon Name="circle-check"
+                            Size="14"
+                            Class="text-muted-foreground shrink-0"/>
+            </div>
+            <p class="text-sm leading-xs font-normal text-foreground-muted flex-1">
+                Format and metadata detected automatically from the archive.
+            </p>
+        </div>
+
+        <div class="flex items-start gap-2.5 w-full">
+            <div class="w-4 h-5 flex items-center justify-center shrink-0">
+                <LucideIcon Name="circle-check"
+                            Size="14"
+                            Class="text-muted-foreground shrink-0"/>
+            </div>
+            <p class="text-sm leading-xs font-normal text-foreground-muted flex-1">
+                Full control over scope, visibility and version before publishing.
+            </p>
+        </div>
+
+        <div class="w-full h-px bg-border shrink-0 my-0.5"></div>
+
+        <p class="text-xs leading-2xs font-normal text-muted-foreground w-full">
+            Publishing from a pipeline? Use forge publish with a key scoped to publish only.
+        </p>
+
+        <BbButton Variant="ButtonVariant.Link"
+                  Href="/docs/publishing"
+                  Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline">
+            <span>Publishing guide &rarr;</span>
+        </BbButton>
+    </ForgeCard>
+</div>
+
+<div class="w-full flex items-center justify-between gap-2.5 pt-2">
+    <p class="text-xs leading-2xs font-normal text-muted-foreground flex-1">
+        Nothing is published until you confirm on the last step.
+    </p>
+
+    <div class="flex items-center gap-2.5 shrink-0">
+        <BbButton Variant="ButtonVariant.Default"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.HandleContinue)"
+                  Disabled="@(!this.HasSelectedFile)"
+                  id="publish-continue-button">
+            Continue to metadata
+        </BbButton>
+    </div>
+</div>

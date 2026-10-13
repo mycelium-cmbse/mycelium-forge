@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Publish.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,12 +12,12 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.Forms;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Model;
-    using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
@@ -51,42 +51,14 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public DialogService DialogService { get; set; }
 
         /// <summary>
-        /// Gets the CSS classes for the step bubble circle indicator.
+        /// Gets or sets the zero-based active wizard step index.
         /// </summary>
-        /// <param name="step">The wizard step model.</param>
-        /// <returns>The computed CSS class string for the step bubble.</returns>
-        public static string GetStepBubbleClass(PublishStepModel step)
-        {
-            const string baseClass = "w-5.5 h-5.5 rounded-full flex items-center justify-center shrink-0";
-
-            return step.IsCurrent
-                ? $"{baseClass} bg-primary"
-                : $"{baseClass} bg-secondary";
-        }
+        public int ActiveStep { get; set; }
 
         /// <summary>
-        /// Gets the CSS classes for the step number label within the bubble.
+        /// Gets or sets the uploaded package archive file for validation and publishing.
         /// </summary>
-        /// <param name="step">The wizard step model.</param>
-        /// <returns>The computed CSS class string for the step number.</returns>
-        public static string GetStepNumberClass(PublishStepModel step)
-        {
-            return step.IsCurrent
-                ? "text-2xs leading-3xs font-semibold text-primary-foreground"
-                : "text-2xs leading-3xs font-semibold text-muted-foreground";
-        }
-
-        /// <summary>
-        /// Gets the CSS classes for the step title text.
-        /// </summary>
-        /// <param name="step">The wizard step model.</param>
-        /// <returns>The computed CSS class string for the step title.</returns>
-        public static string GetStepTitleClass(PublishStepModel step)
-        {
-            return step.IsCurrent
-                ? "text-sm leading-xs font-semibold text-foreground"
-                : "text-sm leading-xs font-medium text-muted-foreground";
-        }
+        private IBrowserFile uploadedPackage;
 
         /// <summary>
         /// Gets the CSS classes for the validation status outcome badge.
@@ -125,11 +97,23 @@ namespace Mycelium.Forge.Components.Pages.Publish
         }
 
         /// <summary>
+        /// Handles completing the upload step and advancing to package metadata.
+        /// </summary>
+        /// <param name="file">The uploaded file.</param>
+        public void OnUploadStepContinued(IBrowserFile file)
+        {
+            this.uploadedPackage = file;
+            this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
+            this.ActiveStep = 1;
+        }
+
+        /// <summary>
         /// Handles replacing the currently loaded package archive artefact.
         /// </summary>
         public void OnReplaceArtefact()
         {
             this.ViewModel.InitializeViewModel();
+            this.ActiveStep = 0;
         }
 
         /// <summary>

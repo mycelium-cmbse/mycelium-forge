@@ -47,7 +47,7 @@ namespace Mycelium.Forge.Storage.Tests.Stores
             var deleteHash = Convert.ToHexStringLower(SHA256.HashData(deletePayload));
 
             using var uploadStream = new MemoryStream(deletePayload);
-            await this.ArtifactStore.StoreArtifactAsync(deleteHash, uploadStream, deletePayload.Length, "application/octet-stream", CancellationToken.None);
+            await this.ArtifactStore.StoreArtifactAsync(uploadStream, "application/octet-stream", CancellationToken.None);
 
             var deleteResult = await this.ArtifactStore.DeleteArtifactAsync(deleteHash, CancellationToken.None);
 
@@ -73,7 +73,7 @@ namespace Mycelium.Forge.Storage.Tests.Stores
         public async Task VerifyExistsAsync()
         {
             using var uploadStream = new MemoryStream(this.testPayloadBytes);
-            await this.ArtifactStore.StoreArtifactAsync(this.testContentHash, uploadStream, this.testPayloadBytes.Length, "application/octet-stream", CancellationToken.None);
+            await this.ArtifactStore.StoreArtifactAsync(uploadStream, "application/octet-stream", CancellationToken.None);
 
             var existsResult = await this.ArtifactStore.ExistsAsync(this.testContentHash, CancellationToken.None);
 
@@ -99,7 +99,7 @@ namespace Mycelium.Forge.Storage.Tests.Stores
         public async Task VerifyGetArtifactAsync()
         {
             using var uploadStream = new MemoryStream(this.testPayloadBytes);
-            await this.ArtifactStore.StoreArtifactAsync(this.testContentHash, uploadStream, this.testPayloadBytes.Length, "application/octet-stream", CancellationToken.None);
+            await this.ArtifactStore.StoreArtifactAsync(uploadStream, "application/octet-stream", CancellationToken.None);
 
             var getResult = await this.ArtifactStore.GetArtifactAsync(this.testContentHash, CancellationToken.None);
 
@@ -131,7 +131,7 @@ namespace Mycelium.Forge.Storage.Tests.Stores
         public async Task VerifyListArtifactHashesAsync()
         {
             using var uploadStream = new MemoryStream(this.testPayloadBytes);
-            await this.ArtifactStore.StoreArtifactAsync(this.testContentHash, uploadStream, this.testPayloadBytes.Length, "application/octet-stream", CancellationToken.None);
+            await this.ArtifactStore.StoreArtifactAsync(uploadStream, "application/octet-stream", CancellationToken.None);
 
             var listResult = await this.ArtifactStore.ListArtifactHashesAsync(null, 100, CancellationToken.None);
 
@@ -146,7 +146,7 @@ namespace Mycelium.Forge.Storage.Tests.Stores
         public async Task VerifyStoreArtifactAsync()
         {
             using var uploadStream = new MemoryStream(this.testPayloadBytes);
-            var storeResult = await this.ArtifactStore.StoreArtifactAsync(this.testContentHash, uploadStream, this.testPayloadBytes.Length, "application/octet-stream", CancellationToken.None);
+            var storeResult = await this.ArtifactStore.StoreArtifactAsync(uploadStream, "application/octet-stream", CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
@@ -155,7 +155,7 @@ namespace Mycelium.Forge.Storage.Tests.Stores
             }
 
             using var duplicateStream = new MemoryStream(this.testPayloadBytes);
-            var deduplicatedResult = await this.ArtifactStore.StoreArtifactAsync(this.testContentHash, duplicateStream, this.testPayloadBytes.Length, "application/octet-stream", CancellationToken.None);
+            var deduplicatedResult = await this.ArtifactStore.StoreArtifactAsync(duplicateStream, "application/octet-stream", CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
@@ -163,8 +163,8 @@ namespace Mycelium.Forge.Storage.Tests.Stores
                 Assert.That(deduplicatedResult.Value, Is.EqualTo(this.testContentHash));
             }
 
-            var emptyResult = await this.ArtifactStore.StoreArtifactAsync(string.Empty, new MemoryStream(), 0, null, CancellationToken.None);
-            Assert.That(emptyResult.IsError, Is.True);
+            var nullResult = await this.ArtifactStore.StoreArtifactAsync(null, null, CancellationToken.None);
+            Assert.That(nullResult.IsError, Is.True);
         }
     }
 }

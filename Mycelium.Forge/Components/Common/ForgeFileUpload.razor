@@ -10,7 +10,8 @@
 <div class="@(this.GetContainerClass())"
      @ondragenter="@(this.HandleDragEnter)"
      @ondragleave="@(this.HandleDragLeave)"
-     @ondrop="@(this.HandleDrop)">
+     @ondrop="@(this.HandleDrop)"
+     @ondragover:preventDefault>
     <InputFile class="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
                accept="@(string.IsNullOrEmpty(this.Accept) ? null : this.Accept)"
                multiple="@(this.Multiple)"

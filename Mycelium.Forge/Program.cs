@@ -137,8 +137,12 @@ namespace Mycelium.Forge
             // Every component is statically server-rendered. No interactive render mode is
             // registered: InteractiveServer is ruled out by horizontal scaling, and no screen
             // requires a component runtime (docs/design.md DD-02, section 7.4).
+            // When using Autofac with Blazor Server, SignalR's default implicit DI parameter binding
+            // causes stream parameters to be treated as container dependencies, dropping incoming file
+            // chunks. Disabling implicit parameter injection ensures binary streams are read directly.
             builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents();
+                .AddInteractiveServerComponents()
+                .AddHubOptions(options => { options.DisableImplicitFromServicesParameters = true; });
 
             builder.Services.AddBlazorBlueprintComponents();
 

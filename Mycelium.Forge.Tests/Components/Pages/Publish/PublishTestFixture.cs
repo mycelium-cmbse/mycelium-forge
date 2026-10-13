@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -18,6 +18,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
 
     using ErrorOr;
 
+    using Microsoft.AspNetCore.Components.Forms;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
@@ -47,6 +49,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.context.Services.AddBlazorBlueprintComponents();
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
 
+            var configurationManager = new ConfigurationManager();
+            configurationManager["MaximumUploadFileSizeInMB"] = "100";
+            this.context.Services.AddSingleton<IConfiguration>(configurationManager);
+
             this.viewModelMock = new Mock<IPublishViewModel>();
 
             this.viewModelMock.Setup(x => x.Metadata).Returns(new PublishPackageMetadataModel
@@ -63,13 +69,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
                 Tags = "mission-model, power",
                 Description = "ECSS mission model: Power subsystem."
             });
-
-            this.viewModelMock.Setup(x => x.Steps).Returns(
-            [
-                new PublishStepModel(1, "Package metadata", true),
-                new PublishStepModel(2, "Validation"),
-                new PublishStepModel(3, "Review & publish")
-            ]);
 
             this.viewModelMock.Setup(x => x.ValidationChecks).Returns(
             [
@@ -158,8 +157,30 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         public void VerifyOnReplaceArtefact()
         {
             var publishPage = this.context.Render<Publish>();
+            publishPage.Instance.ActiveStep = 1;
             publishPage.Instance.OnReplaceArtefact();
-            this.viewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
+
+            using (Assert.EnterMultipleScope())
+            {
+                this.viewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
+                Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(0));
+            }
+        }
+
+        [Test]
+        public void VerifyOnUploadStepContinued()
+        {
+            var publishPage = this.context.Render<Publish>();
+            var fileMock = new Mock<IBrowserFile>();
+            fileMock.Setup(x => x.Name).Returns("test-file.kpar");
+
+            publishPage.Instance.OnUploadStepContinued(fileMock.Object);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(publishPage.Instance.ViewModel.Metadata.ArtefactFileName, Is.EqualTo("test-file.kpar"));
+                Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(1));
+            }
         }
 
         [Test]
@@ -168,6 +189,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.viewModelMock.Setup(x => x.Publish()).Returns(Result.Success);
 
             var publishPage = this.context.Render<Publish>();
+            publishPage.Instance.ActiveStep = 1;
+            publishPage.Render();
 
             var publishButton = publishPage.Find("#publish-submit-button");
             Assert.That(publishButton, Is.Not.Null);

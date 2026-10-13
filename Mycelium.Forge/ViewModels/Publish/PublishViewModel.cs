@@ -27,11 +27,6 @@ namespace Mycelium.Forge.ViewModels.Publish
         public PublishPackageMetadataModel Metadata { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the list of wizard workflow steps.
-        /// </summary>
-        public List<PublishStepModel> Steps { get; set; } = [];
-
-        /// <summary>
         /// Gets or sets the list of pre-publishing validation rule evaluation results.
         /// </summary>
         public List<ValidationCheckModel> ValidationChecks { get; set; } = [];
@@ -107,13 +102,6 @@ namespace Mycelium.Forge.ViewModels.Publish
                 Metamodel = "SysML v2 (2025-02)",
                 Tags = "mission-model, power"
             };
-
-            this.Steps =
-            [
-                new PublishStepModel(1, "Package metadata", true),
-                new PublishStepModel(2, "Validation"),
-                new PublishStepModel(3, "Review & publish")
-            ];
 
             this.ValidationChecks =
             [
