@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetails.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -189,7 +189,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 },
                 new BreadcrumbItem
                 {
-                    Name = this.ViewModel.Package.Name
+                    Name = this.ViewModel.Package.ShortName
                 }
             ];
         }
