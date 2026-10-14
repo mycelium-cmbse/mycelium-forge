@@ -27,8 +27,15 @@ namespace Mycelium.Forge.Api
         {
             app.MapPost(ApiRoutes.UploadFileForStage, async (HttpRequest request, IFileUploadStagingService stagingService, CancellationToken token) =>
                 {
-                    var uploadToken = await stagingService.StageAsync(request.Body, token);
-                    return Results.Ok(new { uploadToken });
+                    try
+                    {
+                        var uploadToken = await stagingService.StageAsync(request.Body, token);
+                        return Results.Ok(new { uploadToken });
+                    }
+                    catch (Exception exception)
+                    {
+                        return Results.Problem(statusCode: StatusCodes.Status413PayloadTooLarge, title: "Payload Too Large", detail: exception.Message);
+                    }
                 })
                 .WithName("UploadPackage")
                 .RequireAuthorization();

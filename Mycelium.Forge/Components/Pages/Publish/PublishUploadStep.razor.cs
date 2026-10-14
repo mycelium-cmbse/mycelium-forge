@@ -31,14 +31,19 @@ namespace Mycelium.Forge.Components.Pages.Publish
         };
 
         /// <summary>
-        /// The maximum allowed upload file size in bytes.
+        /// The maximum allowed upload file size in megabytes.
         /// </summary>
-        private long maxAllowedFileSize;
+        private long maxAllowedFileSizeInMb;
 
         /// <summary>
         /// The currently selected browser file.
         /// </summary>
         private IBrowserFile selectedFile;
+
+        /// <summary>
+        /// The maximum allowed upload file size in bytes.
+        /// </summary>
+        private long MaxAllowedFileSize => this.maxAllowedFileSizeInMb * 1024 * 1024;
 
         /// <summary>
         /// Gets or sets the application configuration.
@@ -76,7 +81,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
             base.OnInitialized();
 
             var configuredSizeInMb = this.Configuration.GetValue<long?>(ConfigurationConstants.MaximumUploadFileSizeInMb);
-            this.maxAllowedFileSize = (configuredSizeInMb ?? 250L) * 1024 * 1024;
+            this.maxAllowedFileSizeInMb = configuredSizeInMb ?? 250L;
         }
 
         /// <summary>

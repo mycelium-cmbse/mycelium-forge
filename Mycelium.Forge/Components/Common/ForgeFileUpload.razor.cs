@@ -18,6 +18,16 @@ namespace Mycelium.Forge.Components.Common
     public partial class ForgeFileUpload : ComponentBase
     {
         /// <summary>
+        /// The default maximum allowed file size in megabytes.
+        /// </summary>
+        public const long DefaultMaxFileSizeInMb = 30;
+
+        /// <summary>
+        /// Backing field holding the current validation error message.
+        /// </summary>
+        private string errorMessage = string.Empty;
+
+        /// <summary>
         /// Backing field indicating whether a drag operation is currently hovering over the dropzone.
         /// </summary>
         private bool isDraggingOver;
@@ -111,6 +121,17 @@ namespace Mycelium.Forge.Components.Common
         public EventCallback<IReadOnlyList<IBrowserFile>> OnSelectedFilesChanged { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum allowed file size in megabytes.
+        /// </summary>
+        [Parameter]
+        public long MaxFileSizeInMb { get; set; } = DefaultMaxFileSizeInMb;
+
+        /// <summary>
+        /// Gets the maximum allowed file size in bytes, computed from the configured megabyte limit.
+        /// </summary>
+        private long MaxFileSize => this.MaxFileSizeInMb * 1024 * 1024;
+
+        /// <summary>
         /// Gets the computed CSS class string for the outer dropzone container.
         /// </summary>
         /// <returns>The CSS class string.</returns>
@@ -120,15 +141,20 @@ namespace Mycelium.Forge.Components.Common
 
             if (this.Disabled)
             {
-                return $"{baseClass} border-input opacity-60 cursor-not-allowed {this.Class}".Trim();
+                return $"{baseClass} border-input opacity-60 cursor-not-allowed {this.Class}";
             }
 
             if (this.isDraggingOver)
             {
-                return $"{baseClass} border-primary bg-accent/30 {this.Class}".Trim();
+                return $"{baseClass} border-primary bg-accent/30 {this.Class}";
             }
 
-            return $"{baseClass} border-input hover:border-primary {this.Class}".Trim();
+            if (!string.IsNullOrEmpty(this.errorMessage))
+            {
+                return $"{baseClass} border-destructive hover:border-destructive {this.Class}";
+            }
+
+            return $"{baseClass} border-input hover:border-primary {this.Class}";
         }
 
         /// <summary>
@@ -143,9 +169,29 @@ namespace Mycelium.Forge.Components.Common
                 return;
             }
 
-            this.selectedFiles = this.Multiple ? args.GetMultipleFiles(this.MaxAllowedFiles) : [args.File];
+            var rawFiles = this.Multiple ? args.GetMultipleFiles(this.MaxAllowedFiles) : [args.File];
+            var validFiles = new List<IBrowserFile>();
+            var hasOversizedFile = false;
 
-            await this.OnFilesSubmitted.InvokeAsync(args);
+            foreach (var file in rawFiles)
+            {
+                if (file.Size > this.MaxFileSize)
+                {
+                    hasOversizedFile = true;
+                    continue;
+                }
+
+                validFiles.Add(file);
+            }
+
+            this.errorMessage = hasOversizedFile ? $"File exceeds the maximum size of {this.MaxFileSizeInMb} MB." : string.Empty;
+            this.selectedFiles = validFiles;
+
+            if (validFiles.Count > 0)
+            {
+                await this.OnFilesSubmitted.InvokeAsync(args);
+            }
+
             await this.OnSelectedFilesChanged.InvokeAsync(this.selectedFiles);
         }
 
@@ -154,10 +200,13 @@ namespace Mycelium.Forge.Components.Common
         /// </summary>
         private void HandleDragEnter()
         {
-            if (!this.Disabled)
+            if (this.Disabled)
             {
-                this.isDraggingOver = true;
+                return;
             }
+
+            this.isDraggingOver = true;
+            this.errorMessage = string.Empty;
         }
 
         /// <summary>
