@@ -15,6 +15,7 @@ namespace Mycelium.Forge
 
     using Carter;
 
+    using Microsoft.AspNetCore.Diagnostics.HealthChecks;
     using Microsoft.AspNetCore.HttpOverrides;
 
     using Mycelium.Forge.Common;
@@ -23,6 +24,7 @@ namespace Mycelium.Forge
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Orm;
+    using Mycelium.Forge.Services;
 
     using OpenTelemetry.Resources;
     using OpenTelemetry.Trace;
@@ -51,6 +53,11 @@ namespace Mycelium.Forge
         /// The service name reported to the observability pipeline.
         /// </summary>
         private const string ServiceName = "Mycelium.Forge";
+
+        /// <summary>
+        /// The tag associated with readiness health checks.
+        /// </summary>
+        private const string ReadinessTag = "ready";
 
         /// <summary>
         /// Configures and starts the Mycelium Forge host.
@@ -128,8 +135,9 @@ namespace Mycelium.Forge
                     .AddAspNetCoreInstrumentation()
                     .AddOtlpExporter());
 
-            // SSS-FB-OBS-H4D: liveness and readiness probes for the orchestrator.
-            builder.Services.AddHealthChecks();
+            // Registers ForgeReadinessHealthCheck under the "ready" tag to evaluate IForgeContext.IsInitialized.
+            builder.Services.AddHealthChecks()
+                .AddCheck<ForgeReadinessHealthCheck>("forge_ready", tags: [ReadinessTag]);
 
             // The Forge HTTP API (SSS-FG-REG-A5E, D6F, Q7G, M8H) is routed through Carter modules.
             builder.Services.AddCarter();
@@ -183,15 +191,22 @@ namespace Mycelium.Forge
 
             app.MapStaticAssets();
 
-            app.MapHealthChecks("/healthz");
-            app.MapHealthChecks("/ready");
+            // Liveness probe. Validates that the web server process is alive. Excludes "ready" so unseeded databases do not cause container restart loops.
+            app.MapHealthChecks("/healthz", new HealthCheckOptions
+            {
+                Predicate = check => !check.Tags.Contains(ReadinessTag)
+            });
+
+            // Readiness probe. Checks that ForgeContext is initialized before load balancers route user traffic to the instance.
+            app.MapHealthChecks("/ready", new HealthCheckOptions
+            {
+                Predicate = check => check.Tags.Contains(ReadinessTag)
+            });
 
             app.MapCarter();
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
-
-            await app.InitializeServices();
 
             await app.RunAsync();
 

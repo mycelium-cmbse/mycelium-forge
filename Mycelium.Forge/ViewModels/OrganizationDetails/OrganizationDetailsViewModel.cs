@@ -117,7 +117,8 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
 
                 if (organizationResult.IsError || organizationResult.Value == null)
                 {
-                    this.logger.LogWarning("Organization with short name {ShortName} not found during details initialization", shortName.SanitizeForLog());
+                    var errors = organizationResult.IsError ? organizationResult.Errors.ToJoinedDescriptions() : "Not found";
+                    this.logger.LogWarning("Organization with short name {ShortName} not found during details initialization: {Errors}", shortName.SanitizeForLog(), errors);
                     return;
                 }
 

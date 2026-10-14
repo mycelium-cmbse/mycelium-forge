@@ -266,6 +266,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             if (packageResult.IsError || packageResult.Value == null)
             {
+                if (packageResult.IsError)
+                {
+                    this.logger.LogWarning("Package {Scope}/{Name} read error: {Errors}", scope.SanitizeForLog(), packageName.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
+                }
+
                 return new PackageDetailsCacheModel();
             }
 

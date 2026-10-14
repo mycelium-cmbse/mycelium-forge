@@ -21,22 +21,21 @@ namespace Mycelium.Forge.Tests
 
     using Mycelium.Forge.Services;
 
-    /// <summary>
-    /// Verifies that the host boots and serves the orchestrator probes required by SSS-FB-OBS-H4D.
-    /// </summary>
     [TestFixture]
     public class HealthEndpointTestFixture
     {
+        private Mock<IForgeContext> forgeContextMock;
         private WebApplicationFactory<Program> factory;
 
         [SetUp]
         public void SetUp()
         {
-            var forgeContextMock = new Mock<IForgeContext>();
-            forgeContextMock.Setup(x => x.ForgeId).Returns(Guid.NewGuid());
+            this.forgeContextMock = new Mock<IForgeContext>();
+            this.forgeContextMock.Setup(x => x.ForgeId).Returns(Guid.NewGuid());
+            this.forgeContextMock.Setup(x => x.IsInitialized).Returns(true);
 
             this.factory = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(builder => { builder.ConfigureTestServices(services => { services.AddSingleton(forgeContextMock.Object); }); });
+                .WithWebHostBuilder(builder => { builder.ConfigureTestServices(services => { services.AddSingleton(this.forgeContextMock.Object); }); });
         }
 
         [TearDown]
@@ -50,9 +49,13 @@ namespace Mycelium.Forge.Tests
         {
             var client = this.factory.CreateClient();
 
-            var response = await client.GetAsync("/healthz");
+            this.forgeContextMock.Setup(x => x.IsInitialized).Returns(false);
+            var uninitializedResponse = await client.GetAsync("/healthz");
+            Assert.That(uninitializedResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            this.forgeContextMock.Setup(x => x.IsInitialized).Returns(true);
+            var initializedResponse = await client.GetAsync("/healthz");
+            Assert.That(initializedResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
@@ -60,9 +63,13 @@ namespace Mycelium.Forge.Tests
         {
             var client = this.factory.CreateClient();
 
-            var response = await client.GetAsync("/ready");
+            this.forgeContextMock.Setup(x => x.IsInitialized).Returns(false);
+            var notReadyResponse = await client.GetAsync("/ready");
+            Assert.That(notReadyResponse.StatusCode, Is.EqualTo(HttpStatusCode.ServiceUnavailable));
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            this.forgeContextMock.Setup(x => x.IsInitialized).Returns(true);
+            var readyResponse = await client.GetAsync("/ready");
+            Assert.That(readyResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
     }
 }

@@ -104,6 +104,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
             var select = orgSettingsPage.FindComponent<ForgeSelect<OrganizationRole>>();
 
+            Assert.That(select.Instance.Disabled, Is.True);
+
+            this.testOrganization.Administrator = [this.testMember.Id, Guid.NewGuid()];
+            orgSettingsPage.Render();
+
+            select = orgSettingsPage.FindComponent<ForgeSelect<OrganizationRole>>();
+
+            Assert.That(select.Instance.Disabled, Is.False);
+
             await orgSettingsPage.InvokeAsync(() => select.Instance.ValueChanged.InvokeAsync(OrganizationRole.Member));
 
             this.viewModelMock.Verify(x => x.ChangeMemberRole(this.testMember, OrganizationRole.Member), Times.Once);
@@ -137,14 +146,41 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         public async Task VerifyRemoveMember()
         {
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
-            var removeButton = orgSettingsPage.Find(".org-remove-member-button");
+            var removeButton = orgSettingsPage.FindComponents<BbButton>().First(b => b.Instance.Class != null && b.Instance.Class.Contains("org-remove-member-button"));
 
-            _ = orgSettingsPage.InvokeAsync(() => removeButton.ClickAsync());
+            Assert.That(removeButton.Instance.Disabled, Is.True);
+
+            this.testOrganization.Administrator = [this.testMember.Id, Guid.NewGuid()];
+            orgSettingsPage.Render();
+
+            removeButton = orgSettingsPage.FindComponents<BbButton>().First(b => b.Instance.Class != null && b.Instance.Class.Contains("org-remove-member-button"));
+
+            Assert.That(removeButton.Instance.Disabled, Is.False);
+
+            var buttonElement = orgSettingsPage.Find(".org-remove-member-button");
+            _ = orgSettingsPage.InvokeAsync(() => buttonElement.ClickAsync());
 
             var continueButton = this.dialogProvider.FindAll("button").First(b => b.TextContent.Trim() == "Continue");
             await this.dialogProvider.InvokeAsync(() => continueButton.ClickAsync());
 
             this.viewModelMock.Verify(x => x.RemoveMember(this.testMember), Times.Once);
+        }
+
+        [Test]
+        public void VerifyRenderingWhenUnauthorizedOrNull()
+        {
+            this.viewModelMock.Setup(x => x.Organization).Returns((IOrganization)null!);
+            var nullPage = this.context.Render<OrganizationSettings>();
+
+            this.viewModelMock.Setup(x => x.Organization).Returns(this.testOrganization);
+            this.viewModelMock.Setup(x => x.CanManageOrganization).Returns(false);
+            var unauthorizedPage = this.context.Render<OrganizationSettings>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(nullPage.Markup.Trim(), Has.Length.LessThan(5));
+                Assert.That(unauthorizedPage.Markup.Trim(), Has.Length.LessThan(5));
+            }
         }
 
         [Test]

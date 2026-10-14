@@ -76,7 +76,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
         {
             var publisher = this.ViewModel.Owner.ShortName;
-            var packageName = this.ViewModel.Package.Name;
+            var packageName = this.ViewModel.Package.ShortName;
 
             return
             [

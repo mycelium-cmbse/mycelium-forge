@@ -11,12 +11,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
     using BlazorBlueprint.Primitives.Extensions;
 
     using Bunit;
+
+    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -25,7 +28,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
+    using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Models.DialogResults;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.AccountSettings;
 
     [TestFixture]
@@ -82,6 +87,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             this.viewModelMock.Setup(x => x.Location).Returns("Darmstadt, Germany");
             this.viewModelMock.Setup(x => x.Organizations).Returns([this.adminOrganization, this.memberOrganization]);
 
+            var scopeServiceMock = new Mock<IScopeService>();
+            scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Not found"));
+
+            var userServiceMock = new Mock<IUserService>();
+            userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(new UserContext());
+
+            this.context.Services.AddSingleton(scopeServiceMock.Object);
+            this.context.Services.AddSingleton(userServiceMock.Object);
             this.context.Services.AddSingleton(this.viewModelMock.Object);
             this.dialogProvider = this.context.Render<BbDialogProvider>();
         }

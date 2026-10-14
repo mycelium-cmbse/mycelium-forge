@@ -184,7 +184,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.version.IsDeprecated, Is.True);
+                Assert.That(this.version.IsDeprecated, Is.False);
                 this.notificationServiceMock.Verify(x => x.AddNotification("Failed to deprecate version.", "Error", NotificationType.Error), Times.Once);
             }
 
@@ -262,7 +262,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.version.Listed, Is.True);
+                Assert.That(this.version.Listed, Is.False);
                 this.notificationServiceMock.Verify(x => x.AddNotification("Failed to relist version.", "Error", NotificationType.Error), Times.Once);
             }
 
@@ -287,7 +287,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.viewModel.Package.Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
+                Assert.That(this.viewModel.Package.Visibility, Is.EqualTo(VisibilityKind.PRIVATE));
                 this.notificationServiceMock.Verify(x => x.AddNotification("Failed to update package visibility.", "Visibility Update Failed", NotificationType.Error), Times.Once);
             }
 
@@ -308,7 +308,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         {
             var result = await this.viewModel.TransferOwnership("new-owner", CancellationToken.None);
 
-            Assert.That(result.IsError, Is.False);
+            Assert.That(result.IsError, Is.True);
         }
 
         [Test]
@@ -323,7 +323,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.version.Listed, Is.False);
+                Assert.That(this.version.Listed, Is.True);
                 this.notificationServiceMock.Verify(x => x.AddNotification("Failed to unlist version.", "Error", NotificationType.Error), Times.Once);
             }
 

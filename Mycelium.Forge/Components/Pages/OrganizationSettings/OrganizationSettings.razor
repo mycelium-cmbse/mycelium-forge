@@ -76,7 +76,7 @@
                             <ForgeSelect TValue="OrganizationRole"
                                          Value="@(this.GetMemberRole(member))"
                                          ValueChanged="@(role => this.OnChangeMemberRole(member, role))"
-                                         Disabled="@(this.IsCurrentUser(member))"
+                                         Disabled="@(this.IsRoleChangeDisabled(member))"
                                          Items="@(this.ViewModel.RoleOptions)"
                                          DisplayTextSelector="@(role => role.ToUpperCaseFirst())"
                                          TriggerClass="!h-7 !px-2.5 !py-1 !text-xs !leading-2xs !gap-1.5"
@@ -86,7 +86,7 @@
                         <BbButton Variant="ButtonVariant.Outline"
                                   Size="ButtonSize.Small"
                                   Type="ButtonType.Button"
-                                  Disabled="@(this.IsCurrentUser(member))"
+                                  Disabled="@(this.IsRemoveDisabled(member))"
                                   OnClick="() => this.OnRemoveMember(member)"
                                   Class="org-remove-member-button shrink-0">
                             Remove
@@ -122,7 +122,7 @@
                         </BbBadge>
 
                         <span class="flex-1 text-xs leading-2xs font-normal text-muted-foreground truncate min-w-0">
-                            Expires in @(invitation.ExperiesAt.ToTimeToCome())
+                            @(invitation.ExperiesAt <= DateTime.UtcNow ? "Expired" : $"Expires in {invitation.ExperiesAt.ToTimeToCome()}")
                         </span>
 
                         <BbButton Variant="ButtonVariant.Outline"

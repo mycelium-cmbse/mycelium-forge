@@ -103,6 +103,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                    property.QueryIsString() ||
                    typeName == nameof(DateTime) ||
                    typeName == "DateOnly" ||
+                   typeName.Equals("Guid", StringComparison.OrdinalIgnoreCase) ||
                    property.QueryIsEnumerable();
         }
     }

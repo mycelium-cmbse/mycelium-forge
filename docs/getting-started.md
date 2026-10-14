@@ -1,4 +1,4 @@
-# Getting started
+﻿# Getting started
 
 How to go from a clean clone of `mycelium-forge` to a running, debuggable instance of Forge on your
 own machine. This walks through **JetBrains Rider** as the reference IDE, with a plain-`docker compose`
@@ -115,7 +115,7 @@ docker compose up
 ```
 
 This builds the app image and brings up everything: Postgres, Garage, Keycloak, the one-shot migrator,
-and the app itself, in dependency order (the app doesn't start until the migrator finishes
+the database seeder, and the app itself, in dependency order (the app doesn't start until the seeder finishes
 successfully). Once it settles, browse to **http://localhost:8080**.
 
 Run it a second time and it's a clean no-op — the migrator sees nothing new to apply and the app

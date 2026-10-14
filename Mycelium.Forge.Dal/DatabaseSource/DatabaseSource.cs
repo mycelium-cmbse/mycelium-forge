@@ -11,6 +11,8 @@ namespace Mycelium.Forge.Dal.DatabaseSource
 {
     using ErrorOr;
 
+    using Microsoft.Extensions.Logging;
+
     using Mycelium.Forge.Orm;
 
     using Npgsql;
@@ -27,14 +29,22 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         private readonly DatabaseConfig databaseConfig;
 
         /// <summary>
+        /// The logger instance.
+        /// </summary>
+        private readonly ILogger<DatabaseSource> logger;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseSource" /> class.
         /// </summary>
         /// <param name="databaseConfig">The <see cref="DatabaseConfig" /> used to build connection strings.</param>
-        public DatabaseSource(DatabaseConfig databaseConfig)
+        /// <param name="logger">The logger for diagnostic messages.</param>
+        public DatabaseSource(DatabaseConfig databaseConfig, ILogger<DatabaseSource> logger)
         {
             ArgumentNullException.ThrowIfNull(databaseConfig);
+            ArgumentNullException.ThrowIfNull(logger);
 
             this.databaseConfig = databaseConfig;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -81,6 +91,7 @@ namespace Mycelium.Forge.Dal.DatabaseSource
             }
             catch (Exception exception)
             {
+                this.logger.LogError(exception, "An unexpected exception occurred during database transaction execution.");
                 return Error.Failure(description: exception.Message);
             }
         }

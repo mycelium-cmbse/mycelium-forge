@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -141,11 +142,13 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             {
                 Assert.That(failureOperationResult.IsError, Is.True);
                 Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(0));
-                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
-            // Scenario 2: Happy path
-            this.organizationServiceMock.Setup(x => x.CreateAsync(this.authenticatedContext, It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
+            // Scenario 2: Happy path with argument capture and property assertions
+            IEnumerable<IOrganization> capturedOrganizations = [];
+
+            this.organizationServiceMock.Setup(x => x.CreateAsync(this.authenticatedContext, It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>())).Callback<IUserContext, IEnumerable<IOrganization>, CancellationToken>((_, orgs, _) => capturedOrganizations = orgs).ReturnsAsync(Result.Created);
 
             var successOperationResult = await this.viewModel.CreateOrganization(result);
 
@@ -155,6 +158,19 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.Organizations[0].Name, Is.EqualTo("New Org"));
                 Assert.That(this.viewModel.Organizations[0].ShortName, Is.EqualTo("neworg"));
+
+                var createdOrg = (Organization)capturedOrganizations.First();
+                var accountId = this.authenticatedContext.AccountId.GetValueOrDefault();
+
+                Assert.That(createdOrg.Id, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(createdOrg.Owner, Is.EqualTo(this.forgeContextMock.Object.ForgeId));
+                Assert.That(createdOrg.Administrator, Has.Count.EqualTo(1));
+                Assert.That(createdOrg.Administrator, Does.Contain(accountId));
+                Assert.That(createdOrg.Member, Has.Count.EqualTo(1));
+                Assert.That(createdOrg.Member, Does.Contain(accountId));
+                Assert.That(createdOrg.Email, Is.EqualTo("billing@neworg.com"));
+                Assert.That(createdOrg.BillingEmail, Is.EqualTo("billing@neworg.com"));
+                Assert.That(createdOrg.ShortName, Is.EqualTo("neworg"));
             }
         }
 

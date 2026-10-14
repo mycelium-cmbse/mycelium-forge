@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Dal.Extensions
     using Microsoft.Extensions.Logging;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Dal.PermissionService;
 
@@ -59,6 +60,7 @@ namespace Mycelium.Forge.Dal.Extensions
 
                         if (readResult.IsError)
                         {
+                            logger.LogError("DAO read operation failed: {Errors}", readResult.Errors.ToJoinedDescriptions());
                             return readResult.Errors;
                         }
 

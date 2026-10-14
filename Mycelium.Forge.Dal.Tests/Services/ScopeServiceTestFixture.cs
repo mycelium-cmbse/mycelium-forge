@@ -27,9 +27,6 @@ namespace Mycelium.Forge.Dal.Tests.Services
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Test fixture for <see cref="ScopeService" />.
-    /// </summary>
     [TestFixture]
     public class ScopeServiceTestFixture
     {
@@ -40,9 +37,6 @@ namespace Mycelium.Forge.Dal.Tests.Services
         private ScopeService service;
         private IUserContext userContext;
 
-        /// <summary>
-        /// Sets up mock dependencies and test instances before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -66,9 +60,6 @@ namespace Mycelium.Forge.Dal.Tests.Services
             };
         }
 
-        /// <summary>
-        /// Verifies the <see cref="ScopeService" /> constructor and its parameter null checks.
-        /// </summary>
         [Test]
         public void VerifyConstructor()
         {
@@ -89,10 +80,6 @@ namespace Mycelium.Forge.Dal.Tests.Services
             }
         }
 
-        /// <summary>
-        /// Verifies all scenarios for reading scopes asynchronously.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -247,6 +234,59 @@ namespace Mycelium.Forge.Dal.Tests.Services
             {
                 Assert.That(connectionFailResult.IsError, Is.True);
                 Assert.That(connectionFailResult.Errors[0].Description, Does.Contain("Connection failed"));
+            }
+        }
+
+        [Test]
+        public async Task VerifyReadByShortNameAsync()
+        {
+            var org = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
+            var account = new Account { Id = Guid.NewGuid(), Name = "Acc", ShortName = "acc" };
+
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.service.ReadByShortNameAsync(null, "org", CancellationToken.None));
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "org", It.IsAny<CancellationToken>())).ReturnsAsync(org);
+
+            var orgSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, "org", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgSuccessResult.IsError, Is.False);
+                Assert.That(orgSuccessResult.Value.ShortName, Is.EqualTo("org"));
+                this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "fail", It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Database failure"));
+
+            var orgFailureResult = await this.service.ReadByShortNameAsync(this.userContext, "fail", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgFailureResult.IsError, Is.True);
+                Assert.That(orgFailureResult.FirstError.Description, Is.EqualTo("Database failure"));
+                this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "acc", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Org not found"));
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "acc", It.IsAny<CancellationToken>())).ReturnsAsync(account);
+
+            var accountSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, "acc", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(accountSuccessResult.IsError, Is.False);
+                Assert.That(accountSuccessResult.Value.ShortName, Is.EqualTo("acc"));
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "none", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Org not found"));
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "none", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Account not found"));
+
+            var notFoundResult = await this.service.ReadByShortNameAsync(this.userContext, "none", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(notFoundResult.IsError, Is.True);
+                Assert.That(notFoundResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
             }
         }
     }

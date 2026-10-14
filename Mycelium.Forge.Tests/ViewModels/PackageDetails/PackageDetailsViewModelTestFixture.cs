@@ -188,7 +188,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Package, Is.EqualTo(this.package));
-                this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+                this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(2));
             }
         }
     }

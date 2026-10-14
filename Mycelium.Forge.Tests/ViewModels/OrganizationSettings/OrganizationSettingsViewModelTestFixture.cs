@@ -133,7 +133,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.viewModel.Organization.Administrator, Does.Not.Contain(this.memberAccount.Id));
+                Assert.That(this.viewModel.Organization.Administrator, Does.Contain(this.memberAccount.Id));
                 Assert.That(this.viewModel.Organization.Member, Does.Contain(this.memberAccount.Id));
                 this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }

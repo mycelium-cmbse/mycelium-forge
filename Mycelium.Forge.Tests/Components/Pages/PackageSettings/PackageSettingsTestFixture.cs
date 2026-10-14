@@ -20,6 +20,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
     using ErrorOr;
 
+    using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
@@ -156,7 +157,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         [Test]
         public async Task VerifyOnDeletePackage()
         {
-            this.viewModelMock.Setup(x => x.DeletePackage(It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
+            var initialUri = navigationManager.Uri;
+
+            this.viewModelMock.Setup(x => x.DeletePackage(It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Delete failed"));
 
             var packageSettingsPage = this.context.Render<PackageSettings>();
             var deleteButton = packageSettingsPage.Find("#package-settings-delete-button");
@@ -166,7 +170,21 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var dialog = this.dialogProvider.FindComponent<ConfirmPackageActionDialog>();
             await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync());
 
-            this.viewModelMock.Verify(x => x.DeletePackage(It.IsAny<CancellationToken>()), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                this.viewModelMock.Verify(x => x.DeletePackage(It.IsAny<CancellationToken>()), Times.Once);
+                Assert.That(navigationManager.Uri, Is.EqualTo(initialUri));
+            }
+
+            this.viewModelMock.Setup(x => x.DeletePackage(It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+
+            await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync());
+
+            using (Assert.EnterMultipleScope())
+            {
+                this.viewModelMock.Verify(x => x.DeletePackage(It.IsAny<CancellationToken>()), Times.Exactly(2));
+                Assert.That(navigationManager.Uri, Does.EndWith(PageRoutes.Packages));
+            }
         }
 
         [Test]
@@ -217,12 +235,17 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var nullPage = this.context.Render<PackageSettings>();
 
             this.viewModelMock.Setup(x => x.Package).Returns(this.testPackage);
+            this.viewModelMock.Setup(x => x.CanManagePackage).Returns(false);
+            var unauthorizedPage = this.context.Render<PackageSettings>();
+
+            this.viewModelMock.Setup(x => x.CanManagePackage).Returns(true);
             this.viewModelMock.Setup(x => x.CanDeletePackage).Returns(false);
             var customPage = this.context.Render<PackageSettings>();
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(nullPage.Markup.Trim(), Has.Length.LessThan(5));
+                Assert.That(unauthorizedPage.Markup.Trim(), Has.Length.LessThan(5));
                 Assert.That(customPage.Markup, Does.Contain("Deleting a package"));
                 Assert.That(customPage.Markup, Does.Contain("Organization"));
             }

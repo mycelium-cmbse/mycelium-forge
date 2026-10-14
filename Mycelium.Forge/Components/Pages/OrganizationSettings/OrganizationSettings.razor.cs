@@ -173,6 +173,37 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         }
 
         /// <summary>
+        /// Determines whether changing the assigned role of the specified member is disabled.
+        /// </summary>
+        /// <param name="member">The member account.</param>
+        /// <returns><c>true</c> if changing the member role is disabled; otherwise, <c>false</c>.</returns>
+        private bool IsRoleChangeDisabled(IAccount member)
+        {
+            return this.IsCurrentUser(member) || this.IsSoleAdministrator(member);
+        }
+
+        /// <summary>
+        /// Determines whether removing the specified member from the organization is disabled.
+        /// </summary>
+        /// <param name="member">The member account.</param>
+        /// <returns><c>true</c> if removing the member is disabled; otherwise, <c>false</c>.</returns>
+        private bool IsRemoveDisabled(IAccount member)
+        {
+            return this.IsCurrentUser(member) || this.IsSoleAdministrator(member);
+        }
+
+        /// <summary>
+        /// Determines whether the specified member is the sole administrator of the organization.
+        /// </summary>
+        /// <param name="member">The member account.</param>
+        /// <returns><c>true</c> if the member is the sole administrator; otherwise, <c>false</c>.</returns>
+        private bool IsSoleAdministrator(IAccount member)
+        {
+            return this.ViewModel.Organization.Administrator.Count == 1 &&
+                   this.ViewModel.Organization.Administrator.Contains(member.Id);
+        }
+
+        /// <summary>
         /// Gets the display name of the target account associated with a given organization invitation.
         /// </summary>
         /// <param name="invitation">The organization invitation.</param>

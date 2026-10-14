@@ -158,7 +158,8 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             if (orgResult.IsError || !this.userContext.AccountId.HasValue)
             {
-                this.logger.LogWarning("Organization {ShortName} not found", shortName.SanitizeForLog());
+                var errors = orgResult.IsError ? orgResult.Errors.ToJoinedDescriptions() : "Account ID missing in user context";
+                this.logger.LogWarning("Organization {ShortName} not found: {Errors}", shortName.SanitizeForLog(), errors);
                 return;
             }
 
@@ -196,6 +197,9 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task ChangeMemberRole(IAccount member, OrganizationRole newRole)
         {
+            var originalAdministrators = this.Organization.Administrator.ToList();
+            var originalMembers = this.Organization.Member.ToList();
+
             if (newRole == OrganizationRole.Administrator)
             {
                 if (!this.Organization.Administrator.Contains(member.Id))
@@ -217,8 +221,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             if (updateResult.IsError)
             {
+                this.Organization.Administrator = originalAdministrators;
+                this.Organization.Member = originalMembers;
+
                 const string errorMessage = "Failed to update member role.";
-                this.logger.LogError(errorMessage + " Account: {AccountId}", member.Id);
+                this.logger.LogError(errorMessage + " Account: {AccountId} Errors: {Errors}", member.Id, updateResult.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Role Update Error", NotificationType.Error);
                 return;
             }
@@ -233,6 +240,9 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task RemoveMember(IAccount member)
         {
+            var originalAdministrators = this.Organization.Administrator.ToList();
+            var originalMembers = this.Organization.Member.ToList();
+
             this.Organization.Member.Remove(member.Id);
             this.Organization.Administrator.Remove(member.Id);
 
@@ -240,8 +250,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             if (updateResult.IsError)
             {
+                this.Organization.Administrator = originalAdministrators;
+                this.Organization.Member = originalMembers;
+
                 const string errorMessage = "Failed to remove member from organization.";
-                this.logger.LogError(errorMessage + " Account: {AccountId}", member.Id);
+                this.logger.LogError(errorMessage + " Account: {AccountId} Errors: {Errors}", member.Id, updateResult.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Removal Error", NotificationType.Error);
                 return;
             }
@@ -257,13 +270,16 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task ResendInvitation(IOrganizationInvitation invitation)
         {
+            var originalExpiresAt = invitation.ExperiesAt;
             invitation.ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays);
             var updateResult = await this.organizationInvitationService.UpdateAsync(this.userContext, [invitation], CancellationToken.None);
 
             if (updateResult.IsError)
             {
+                invitation.ExperiesAt = originalExpiresAt;
+
                 const string errorMessage = "Failed to resend invitation.";
-                this.logger.LogError(errorMessage + " Invitation: {InvitationId}", invitation.Id);
+                this.logger.LogError(errorMessage + " Invitation: {InvitationId} Errors: {Errors}", invitation.Id, updateResult.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
                 return;
             }

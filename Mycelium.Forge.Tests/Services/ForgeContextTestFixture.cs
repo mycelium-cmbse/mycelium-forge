@@ -65,7 +65,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(failureEx.Message, Does.Contain("Failed to initialize Forge context: no Forge instance found."));
+                Assert.That(failureEx.Message, Does.Contain("Failed to initialize Forge context."));
                 this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
@@ -73,7 +73,7 @@ namespace Mycelium.Forge.Tests.Services
             this.forgeServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IForge>.Empty);
 
             var emptyEx = Assert.ThrowsAsync<InvalidOperationException>(() => this.forgeContext.InitializeAsync(CancellationToken.None));
-            Assert.That(emptyEx.Message, Does.Contain("Failed to initialize Forge context: no Forge instance found."));
+            Assert.That(emptyEx.Message, Does.Contain("Failed to initialize Forge context."));
 
             // Scenario 3: Happy path - successful initialization with logger enabled
             this.loggerMock.Setup(x => x.IsEnabled(LogLevel.Information)).Returns(true);

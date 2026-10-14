@@ -11,7 +11,7 @@
 @attribute [Authorize]
 @rendermode @(new InteractiveServerRenderMode(false))
 
-@if (this.ViewModel.Package == null || !this.ViewModel.CanManagePackage)
+@if (this.ViewModel.Package == null || this.ViewModel.Owner == null || !this.ViewModel.CanManagePackage)
 {
     return;
 }

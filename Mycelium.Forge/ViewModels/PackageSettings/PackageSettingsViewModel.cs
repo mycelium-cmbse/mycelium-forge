@@ -149,7 +149,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             if (packageResult.IsError)
             {
-                this.logger.LogWarning("Package {Scope}/{Name} not found during settings initialization", scope.SanitizeForLog(), packageName.SanitizeForLog());
+                this.logger.LogWarning("Package {Scope}/{Name} not found during settings initialization: {Errors}", scope.SanitizeForLog(), packageName.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
                 return;
             }
 
@@ -180,14 +180,16 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task SetVisibility(VisibilityKind visibility, CancellationToken token = default)
         {
+            var originalVisibility = this.Package.Visibility;
             this.Package.Visibility = visibility;
             var result = await this.packageService.UpdateAsync(this.userContext, [this.Package], token);
 
             if (result.IsError)
             {
+                this.Package.Visibility = originalVisibility;
                 const string errorMessage = "Failed to update package visibility.";
 
-                this.logger.LogError(errorMessage);
+                this.logger.LogError(errorMessage + " Errors: {Errors}", result.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Visibility Update Failed", NotificationType.Error);
                 return;
             }
@@ -203,14 +205,16 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task UnlistVersion(IPackageVersion version, CancellationToken token = default)
         {
+            var originalListed = version.Listed;
             version.Listed = false;
             var result = await this.packageVersionService.UpdateAsync(this.userContext, [version], token);
 
             if (result.IsError)
             {
+                version.Listed = originalListed;
                 const string errorMessage = "Failed to unlist version.";
 
-                this.logger.LogError(errorMessage);
+                this.logger.LogError(errorMessage + " Errors: {Errors}", result.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
                 return;
             }
@@ -226,14 +230,16 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task RelistVersion(IPackageVersion version, CancellationToken token = default)
         {
+            var originalListed = version.Listed;
             version.Listed = true;
             var result = await this.packageVersionService.UpdateAsync(this.userContext, [version], token);
 
             if (result.IsError)
             {
+                version.Listed = originalListed;
                 const string errorMessage = "Failed to relist version.";
 
-                this.logger.LogError(errorMessage);
+                this.logger.LogError(errorMessage + " Errors: {Errors}", result.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
                 return;
             }
@@ -249,14 +255,16 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task DeprecateVersion(IPackageVersion version, CancellationToken token = default)
         {
+            var originalDeprecated = version.IsDeprecated;
             version.IsDeprecated = true;
             var result = await this.packageVersionService.UpdateAsync(this.userContext, [version], token);
 
             if (result.IsError)
             {
+                version.IsDeprecated = originalDeprecated;
                 const string errorMessage = "Failed to deprecate version.";
 
-                this.logger.LogError(errorMessage);
+                this.logger.LogError(errorMessage + " Errors: {Errors}", result.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
                 return;
             }
@@ -273,7 +281,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         public Task<ErrorOr<Success>> TransferOwnership(string targetScope, CancellationToken token = default)
         {
             // TODO: Implement the logic to transfer package ownership to the specified target scope.
-            return Task.FromResult<ErrorOr<Success>>(Result.Success);
+            return Task.FromResult<ErrorOr<Success>>(Error.Failure(description: "Not implemented"));
         }
 
         /// <summary>
