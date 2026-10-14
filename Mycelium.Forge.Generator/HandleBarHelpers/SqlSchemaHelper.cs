@@ -84,7 +84,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         }
 
         /// <summary>
-        /// Writes the Thing foreign key constraint for an <see cref="IClass" />.
+        /// Writes the immediate-parent foreign key constraint for an <see cref="IClass" />: every class's table
+        /// links to its own direct generalization parent's table via <c>id</c> - <c>Thing</c> for a class that
+        /// generalizes from Thing directly, or an intermediate abstract ancestor's table (e.g. <c>Scope</c>)
+        /// otherwise - rather than always linking straight to <c>Thing</c>, so that ancestor actually gets a real
+        /// row for every concrete descendant. Chaining single-parent links this way still reaches <c>Thing</c>
+        /// at the top for every class, one hop at a time.
         /// </summary>
         /// <param name="writer">The <see cref="EncodedTextWriter" />.</param>
         /// <param name="context">The Handlebars <see cref="Context" />.</param>
@@ -101,8 +106,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return;
             }
 
+            var parentTableName = @class.QueryImmediateGeneralClass().QuerySqlTableName();
+
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" ADD CONSTRAINT \"{@class.QuerySqlTableName()}_Thing_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Thing\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;");
+            stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" ADD CONSTRAINT \"{@class.QuerySqlTableName()}_{parentTableName}_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"{parentTableName}\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;");
 
             writer.WriteSafeString(stringBuilder);
         }

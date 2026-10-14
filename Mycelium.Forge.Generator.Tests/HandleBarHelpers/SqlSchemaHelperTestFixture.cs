@@ -84,7 +84,9 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         }
 
         /// <summary>
-        /// Verifies that WriteBasicTableThingConstraints renders FK constraints and guards invalid context.
+        /// Verifies that WriteBasicTableThingConstraints renders the immediate-parent FK constraint - straight
+        /// to Thing for a class that generalizes from Thing directly, or to an intermediate abstract ancestor's
+        /// table otherwise - and guards invalid context.
         /// </summary>
         [Test]
         public void VerifyWriteBasicTableThingConstraints()
@@ -98,8 +100,11 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Is.Empty);
 
+                var addressResult = template(GetClass("Address"));
+                Assert.That(addressResult, Does.Contain("ALTER TABLE \"Forge\".\"Address\" ADD CONSTRAINT \"Address_Thing_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Thing\" (\"id\")"), "Address generalizes from Thing directly");
+
                 var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT \"Account_Thing_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Thing\" (\"id\")"));
+                Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT \"Account_Scope_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Scope\" (\"id\")"), "Account generalizes from the abstract Scope, not Thing directly");
             }
         }
 

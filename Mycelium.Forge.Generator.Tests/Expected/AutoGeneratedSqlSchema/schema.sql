@@ -20,6 +20,7 @@ CREATE TABLE "Forge"."Thing" (
     "id" uuid NOT NULL,
     "classKind" text,
     "data" JSONB,
+    "owner" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -27,6 +28,26 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_vacuum_scale_factor = 0.0);
 ALTER TABLE "Forge"."Thing" SET (autovacuum_vacuum_threshold = 2500);
 ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_scale_factor = 0.0);
 ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
+
+-- Self-referential composite ownership: every Thing has exactly one composite owner (the model's own
+-- "owner" convention; UML composition guarantees at most one per instance), materialized as a single
+-- shared, NOT NULL column on Thing itself. Forge is the sole exception - it's the composite root, so
+-- its own row is its own owner instead of some other Thing's id (see the constraints below). A
+-- composite child's concrete subtype table already cascades from its own owner column to its
+-- immediate parent's subtype table, but that alone never reaches back up to the child's own Thing row
+-- - REFERENCES here does, and because it's self-referential, deleting one Thing row cascades to every
+-- descendant's Thing row in one shot however deep the composite tree goes, each in turn cascading down
+-- to its own concrete subtype row via that table's own ..._Thing_FK_Source constraint.
+ALTER TABLE "Forge"."Thing" ADD CONSTRAINT "Thing_owner_FK_Source" FOREIGN KEY ("owner") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+CREATE INDEX "idx_Thing_owner" ON "Forge"."Thing" ("owner");
+
+-- Forge is the composite root, so it owns itself rather than any other Thing - this check keeps every
+-- other class from doing the same. Multiple independent Forge deployments run this same generated
+-- schema, so a deployment's own Forge id can't be baked in here; this unique index just keeps each
+-- deployment's database to exactly one Forge row (Forge.allInstances()->size() = 1 in the model),
+-- whatever id that row ends up carrying.
+ALTER TABLE "Forge"."Thing" ADD CONSTRAINT "Thing_owner_not_self_except_Forge" CHECK ("classKind" = 'Forge' OR "owner" <> "id");
+CREATE UNIQUE INDEX "idx_Thing_singleton_Forge" ON "Forge"."Thing" ((1)) WHERE "classKind" = 'Forge';
 
 -- Table definitions
 CREATE TABLE "Forge"."Account" (
@@ -222,24 +243,28 @@ ALTER TABLE "Forge"."Scope" SET (autovacuum_analyze_scale_factor = 0.0);
 ALTER TABLE "Forge"."Scope" SET (autovacuum_analyze_threshold = 2500);
 
 
--- Thing foreign key constraints
-ALTER TABLE "Forge"."Account" ADD CONSTRAINT "Account_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+-- Immediate-parent foreign key constraints: each class's table links via id to its own direct
+-- generalization parent's table (Thing itself, or an intermediate abstract ancestor's table such as
+-- Scope or Namespace), so every ancestor with its own columns or that is targeted by a reference
+-- elsewhere gets a real row for every concrete descendant, not an empty table. Chaining these
+-- single-parent links still reaches Thing at the top for every class, one hop at a time.
+ALTER TABLE "Forge"."Account" ADD CONSTRAINT "Account_Scope_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Scope" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."Address" ADD CONSTRAINT "Address_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."APIKey" ADD CONSTRAINT "APIKey_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."Country" ADD CONSTRAINT "Country_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-ALTER TABLE "Forge"."Forge" ADD CONSTRAINT "Forge_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE "Forge"."Forge" ADD CONSTRAINT "Forge_Namespace_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Namespace" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."Invitation" ADD CONSTRAINT "Invitation_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."Namespace" ADD CONSTRAINT "Namespace_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-ALTER TABLE "Forge"."Organization" ADD CONSTRAINT "Organization_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-ALTER TABLE "Forge"."OrganizationInvitation" ADD CONSTRAINT "OrganizationInvitation_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-ALTER TABLE "Forge"."Package" ADD CONSTRAINT "Package_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-ALTER TABLE "Forge"."PackageInvitation" ADD CONSTRAINT "PackageInvitation_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE "Forge"."Organization" ADD CONSTRAINT "Organization_Scope_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Scope" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE "Forge"."OrganizationInvitation" ADD CONSTRAINT "OrganizationInvitation_Invitation_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Invitation" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE "Forge"."Package" ADD CONSTRAINT "Package_Namespace_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Namespace" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE "Forge"."PackageInvitation" ADD CONSTRAINT "PackageInvitation_Invitation_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Invitation" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."PackageMetaData" ADD CONSTRAINT "PackageMetaData_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."PackageType" ADD CONSTRAINT "PackageType_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."PackageVersion" ADD CONSTRAINT "PackageVersion_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."ProfileLink" ADD CONSTRAINT "ProfileLink_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE "Forge"."ProfileType" ADD CONSTRAINT "ProfileType_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-ALTER TABLE "Forge"."Scope" ADD CONSTRAINT "Scope_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE "Forge"."Scope" ADD CONSTRAINT "Scope_Namespace_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Namespace" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 
 -- Many to Many link tables including Foreign Key Constraints
 CREATE TABLE "Forge"."Organization_administrator__Account" (
@@ -428,8 +453,9 @@ CREATE INDEX "idx_Thing_ProfileType_logoBlobReference" ON "Forge"."Thing" (("dat
 CREATE INDEX "idx_Thing_ProfileType_name" ON "Forge"."Thing" (("data"->>'name')) WHERE "classKind" = 'ProfileType';
 CREATE INDEX "idx_Thing_APIKey_secretHash" ON "Forge"."Thing" USING gin (("data"->'secretHash') jsonb_path_ops) WHERE "classKind" = 'APIKey';
 
--- Runtime role delete privileges: every deletion goes through Thing, whose downward
--- ..._Thing_FK_Source ON DELETE CASCADE constraints already clean up every table sharing that id.
+-- Runtime role delete privileges: every deletion goes through Thing, whose immediate-parent
+-- ON DELETE CASCADE constraints already clean up every table sharing that id, one generalization
+-- hop at a time (including any intermediate abstract ancestor's own table, e.g. Scope or Namespace).
 -- USAGE is required just to reach any object in the schema; SELECT ("id") is required because a
 -- DELETE ... WHERE id = $1 statement reads the id column to evaluate the WHERE clause.
 GRANT USAGE ON SCHEMA "Forge" TO forge_runtime;

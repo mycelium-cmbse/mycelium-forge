@@ -67,6 +67,54 @@ namespace Mycelium.Forge.Generator.Extensions
         }
 
         /// <summary>
+        /// Queries the class's own immediate parent for table-inheritance purposes: every class's own table
+        /// links to this one via <c>id</c> rather than always to <c>Thing</c> directly, so an abstract ancestor
+        /// with its own columns or that is targeted by a reference elsewhere (e.g. <c>Scope</c>) actually gets a
+        /// real row for every concrete descendant, not just an empty table no row's <c>classKind</c> ever
+        /// matches. Chaining single-parent links this way (rather than linking every class straight to
+        /// <c>Thing</c>) still reaches <c>Thing</c> at the top for every class, one hop at a time.
+        /// </summary>
+        /// <param name="class">The class to query the immediate parent for.</param>
+        /// <returns>The class's immediate parent.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when <paramref name="class"/> has no generalization at all, or has more than one
+        /// non-<c>Thing</c> direct generalization edge and so has no single unambiguous immediate parent.
+        /// </exception>
+        public static IClass QueryImmediateGeneralClass(this IClass @class)
+        {
+            ArgumentNullException.ThrowIfNull(@class);
+
+            var generals = @class.SuperClass;
+
+            if (generals.Count == 1)
+            {
+                return generals[0];
+            }
+
+            if (generals.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"'{@class.Name}' has no generalization - every class in the schema must ultimately generalize from Thing.");
+            }
+
+            // More than one direct generalization edge on a class that isn't using genuine multiple
+            // inheritance is almost always a modeling mistake - e.g. a redundant direct edge straight to
+            // Thing left alongside a more specific ancestor that already implies Thing transitively. Prefer
+            // whichever edge is not Thing itself, since Thing is always reachable some other way whenever
+            // more than one edge exists.
+            var nonThingGenerals = generals.Where(x => !x.IsThingClass()).ToList();
+
+            if (nonThingGenerals.Count != 1)
+            {
+                throw new InvalidOperationException(
+                    $"'{@class.Name}' has {generals.Count} generalization edges, so it has no single unambiguous " +
+                    "immediate parent for table-inheritance purposes - resolve this in the model.");
+            }
+
+            return nonThingGenerals[0];
+        }
+
+        /// <summary>
         /// Gets the SQL table name for this class.
         /// </summary>
         /// <param name="class">The <see cref="IClass" />.</param>

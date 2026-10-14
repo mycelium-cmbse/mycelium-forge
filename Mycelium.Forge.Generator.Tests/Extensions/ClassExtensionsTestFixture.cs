@@ -111,6 +111,34 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         }
 
         /// <summary>
+        /// Verifies that <see cref="GeneratorClassExtensions.QueryImmediateGeneralClass" /> returns the single
+        /// direct parent for a normal class, prefers the non-Thing edge when a class has more than one direct
+        /// generalization (the model's own Package having a redundant direct-to-Thing edge alongside its real
+        /// Namespace parent), and throws when there is no single unambiguous immediate parent.
+        /// </summary>
+        [Test]
+        public void VerifyQueryImmediateGeneralClass()
+        {
+            var packageClass = GetClass("Package");
+            var namespaceClass = GetClass("Namespace");
+            var noGeneralizationClass = new Class { Name = "Standalone" };
+            var ambiguousClass = new Class { Name = "Ambiguous" };
+            ambiguousClass.SuperClass.Add(this.accountClass);
+            ambiguousClass.SuperClass.Add(this.organizationClass);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => GeneratorClassExtensions.QueryImmediateGeneralClass(null!), Throws.TypeOf<ArgumentNullException>());
+                Assert.That(GeneratorClassExtensions.QueryImmediateGeneralClass(this.accountClass).Name, Is.EqualTo("Scope"));
+                Assert.That(GeneratorClassExtensions.QueryImmediateGeneralClass(this.scopeClass).Name, Is.EqualTo("Namespace"));
+                Assert.That(GeneratorClassExtensions.QueryImmediateGeneralClass(packageClass).Name, Is.EqualTo("Namespace"), "Package has a redundant direct edge to Thing alongside its real Namespace parent");
+                Assert.That(GeneratorClassExtensions.QueryImmediateGeneralClass(namespaceClass).Name, Is.EqualTo("Thing"));
+                Assert.That(() => GeneratorClassExtensions.QueryImmediateGeneralClass(noGeneralizationClass), Throws.TypeOf<InvalidOperationException>());
+                Assert.That(() => GeneratorClassExtensions.QueryImmediateGeneralClass(ambiguousClass), Throws.TypeOf<InvalidOperationException>());
+            }
+        }
+
+        /// <summary>
         /// Verifies that <see cref="GeneratorClassExtensions.QueryOwnedManyToManyProperties" /> returns many-to-many properties.
         /// </summary>
         [Test]
