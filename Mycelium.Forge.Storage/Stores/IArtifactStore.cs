@@ -28,8 +28,9 @@ namespace Mycelium.Forge.Storage.Stores
         /// Asynchronously stores an artifact stream under its computed content hash, skipping upload if already present.
         /// </summary>
         /// <remarks>
-        /// For artifacts exceeding single-part upload limits or multi-gigabyte files, this operation can be extended
-        /// to leverage S3 multipart upload (InitiateMultipartUpload, UploadPart, CompleteMultipartUpload).
+        /// Callers must provide a seekable stream. Single-part upload via PutObject is used since standard S3 supports payloads up
+        /// to 5 GB (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html), safely covering the 250 MB
+        /// limit without multipart complexity.
         /// </remarks>
         /// <param name="contentStream">The stream containing artifact bytes.</param>
         /// <param name="contentType">The optional MIME type of the artifact.</param>

@@ -115,6 +115,12 @@ namespace Mycelium.Forge
 
             builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                var configuredSizeInMb = builder.Configuration.GetValue<long?>(ConfigurationConstants.MaximumUploadFileSizeInMb);
+                options.Limits.MaxRequestBodySize = configuredSizeInMb * 1024 * 1024;
+            });
+
             // SSS-FB-OBS-S1A: every server log line is emitted as a structured JSON record.
             builder.Host.UseSerilog((context, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration)

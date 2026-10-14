@@ -28,6 +28,12 @@ namespace Mycelium.Forge.Components.Common
         private IReadOnlyList<IBrowserFile> selectedFiles = [];
 
         /// <summary>
+        /// Gets or sets the HTML ID applied to the underlying input file element.
+        /// </summary>
+        [Parameter]
+        public string InputId { get; set; } = "forge-file-input";
+
+        /// <summary>
         /// Gets a value indicating whether multiple files can be selected simultaneously based on the allowed file count.
         /// </summary>
         private bool Multiple => this.MaxAllowedFiles > 1;

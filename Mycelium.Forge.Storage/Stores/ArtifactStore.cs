@@ -101,8 +101,9 @@ namespace Mycelium.Forge.Storage.Stores
         /// Asynchronously stores an artifact stream under its computed content hash, skipping upload if already present.
         /// </summary>
         /// <remarks>
-        /// For artifacts exceeding single-part upload limits or multi-gigabyte files, this operation can be extended
-        /// to leverage S3 multipart upload (InitiateMultipartUpload, UploadPart, CompleteMultipartUpload).
+        /// Callers must provide a seekable stream. Single-part upload via PutObject is used since standard S3 supports payloads up
+        /// to 5 GB (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html), safely covering the 250 MB
+        /// limit without multipart complexity.
         /// </remarks>
         /// <param name="contentStream">The stream containing artifact bytes.</param>
         /// <param name="contentType">The optional MIME type of the artifact.</param>
@@ -115,23 +116,22 @@ namespace Mycelium.Forge.Storage.Stores
                 return Error.Validation(nameof(contentStream), "Content stream cannot be null.");
             }
 
+            if (!contentStream.CanSeek)
+            {
+                return Error.Validation(nameof(contentStream), "Content stream must be seekable. Non-seekable streams must be buffered by the caller before storing.");
+            }
+
+            contentStream.Position = 0;
+            var streamToUpload = contentStream;
             var key = string.Empty;
             var bucketName = this.options.Value.BucketName;
 
             try
             {
-                if (contentStream.CanSeek)
-                {
-                    contentStream.Position = 0;
-                }
-
-                var hashBytes = await SHA256.HashDataAsync(contentStream, token);
+                var hashBytes = await SHA256.HashDataAsync(streamToUpload, token);
                 key = this.NormalizeContentHash(Convert.ToHexStringLower(hashBytes));
 
-                if (contentStream.CanSeek)
-                {
-                    contentStream.Position = 0;
-                }
+                streamToUpload.Position = 0;
 
                 var existsResult = await this.ExistsAsync(key, token);
 
@@ -145,13 +145,13 @@ namespace Mycelium.Forge.Storage.Stores
                 var isHttps = this.options.Value.ServiceUrl != null &&
                               this.options.Value.ServiceUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
 
-                var contentLength = contentStream.CanSeek ? contentStream.Length : 0;
+                var contentLength = streamToUpload.Length;
 
                 var putRequest = new PutObjectRequest
                 {
                     BucketName = bucketName,
                     Key = key,
-                    InputStream = contentStream,
+                    InputStream = streamToUpload,
                     AutoCloseStream = false,
                     ContentType = string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType,
                     DisablePayloadSigning = isHttps,

@@ -12,6 +12,8 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Forms;
 
+    using Mycelium.Forge.Common;
+
     /// <summary>
     /// Represents the first step (upload) component of the package publishing wizard.
     /// </summary>
@@ -34,6 +36,11 @@ namespace Mycelium.Forge.Components.Pages.Publish
         private long maxAllowedFileSize;
 
         /// <summary>
+        /// The currently selected browser file.
+        /// </summary>
+        private IBrowserFile selectedFile;
+
+        /// <summary>
         /// Gets or sets the application configuration.
         /// </summary>
         [Inject]
@@ -47,7 +54,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <summary>
         /// Gets a value indicating whether a file is currently selected.
         /// </summary>
-        private bool HasSelectedFile => this.SelectedFile != null;
+        private bool HasSelectedFile => this.selectedFile != null;
 
         /// <summary>
         /// Gets or sets the callback invoked when the user proceeds to the next step.
@@ -56,10 +63,10 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public EventCallback<IBrowserFile> OnContinue { get; set; }
 
         /// <summary>
-        /// Gets or sets the currently selected browser file.
+        /// Gets or sets the HTML ID applied to the dropzone file input element.
         /// </summary>
         [Parameter]
-        public IBrowserFile SelectedFile { get; set; }
+        public string InputId { get; set; } = "publish-package-file-input";
 
         /// <summary>
         /// Initializes the component lifecycle and resolves configured upload limits.
@@ -68,10 +75,8 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             base.OnInitialized();
 
-            const string maxFileSizeConfiguration = "MaximumUploadFileSizeInMB";
-            var configuredSizeInMb = this.Configuration.GetValue<long>(maxFileSizeConfiguration);
-
-            this.maxAllowedFileSize = (configuredSizeInMb > 0 ? configuredSizeInMb : 100L) * 1024 * 1024;
+            var configuredSizeInMb = this.Configuration.GetValue<long?>(ConfigurationConstants.MaximumUploadFileSizeInMb);
+            this.maxAllowedFileSize = (configuredSizeInMb ?? 250L) * 1024 * 1024;
         }
 
         /// <summary>
@@ -80,7 +85,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <returns>The human-readable format name or file extension.</returns>
         private string GetSelectedFileFormat()
         {
-            var fileExtension = Path.GetExtension(this.SelectedFile.Name);
+            var fileExtension = Path.GetExtension(this.selectedFile.Name);
             var extension = !string.IsNullOrEmpty(fileExtension) ? fileExtension : "unknown";
 
             // If format is a recognized model extension, return the corresponding format name; otherwise, return the file extension.
@@ -97,7 +102,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             if (files is { Count: > 0 })
             {
-                this.SelectedFile = files[0];
+                this.selectedFile = files[0];
             }
         }
 
@@ -107,7 +112,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task HandleContinue()
         {
-            await this.OnContinue.InvokeAsync(this.SelectedFile);
+            await this.OnContinue.InvokeAsync(this.selectedFile);
         }
     }
 }

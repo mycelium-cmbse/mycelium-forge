@@ -56,6 +56,17 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public DialogService DialogService { get; set; }
 
         /// <summary>
+        /// Gets or sets the file upload service.
+        /// </summary>
+        [Inject]
+        public IFileUploadService FileUploadService { get; set; }
+
+        /// <summary>
+        /// Gets the HTML ID for the file input element.
+        /// </summary>
+        public string UploadInputId => "publish-package-file-input";
+
+        /// <summary>
         /// Gets or sets the zero-based active wizard step index.
         /// </summary>
         public int ActiveStep { get; set; }
@@ -101,6 +112,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         public void OnReplaceArtefact()
         {
+            this.uploadedPackage = null;
             this.ViewModel.InitializeViewModel();
             this.ActiveStep = 0;
         }
@@ -183,6 +195,21 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task PublishPackage()
         {
+            /*
+            TODO: This is a working demonstration of file upload over https. Needs to be uncommented when the publish page is fully implemented and ready for publishing packages.
+            The real implementation is probably different than this, considering that in the component side, we will probably only need to send the file to the server (through FileUploadStagingService), 
+            and the viewmodel will handle the rest of the publishing process (validation, metadata, etc.). The file upload service contains the steps of how to upload a file over https, and can be used
+            as inspiration.
+
+            var uploadResult = await this.FileUploadService.UploadFileOverHttps(this.UploadInputId);
+
+            if (uploadResult.IsError)
+            {
+                this.NotificationService.AddNotification(uploadResult.FirstError.Description, "Error", NotificationType.Error);
+                return;
+            }
+            */
+
             var result = this.ViewModel.Publish();
 
             if (result.IsError)
@@ -212,23 +239,23 @@ namespace Mycelium.Forge.Components.Pages.Publish
         }
 
         /// <summary>
+        /// Handles completing the upload step and advancing to package metadata.
+        /// </summary>
+        /// <param name="file">The uploaded file.</param>
+        public void OnUploadStepContinued(IBrowserFile file)
+        {
+            this.uploadedPackage = file;
+            this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
+            this.ActiveStep = 1;
+        }
+
+        /// <summary>
         /// Initializes the component lifecycle and populates the view model state.
         /// </summary>
         protected override void OnInitialized()
         {
             base.OnInitialized();
             this.ViewModel.InitializeViewModel();
-        }
-
-        /// <summary>
-        /// Handles completing the upload step and advancing to package metadata.
-        /// </summary>
-        /// <param name="file">The uploaded file.</param>
-        private void OnUploadStepContinued(IBrowserFile file)
-        {
-            this.uploadedPackage = file;
-            this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
-            this.ActiveStep = 1;
         }
 
         /// <summary>
@@ -245,6 +272,17 @@ namespace Mycelium.Forge.Components.Pages.Publish
                 1 => this.CanOpenStep(0) && this.uploadedPackage != null,
                 _ => false
             };
+        }
+
+        /// <summary>
+        /// Computes the CSS class string for displaying or hiding a step container.
+        /// </summary>
+        /// <param name="stepIndex">The zero-based index of the step.</param>
+        /// <param name="activeClasses">The CSS classes applied when the step is active.</param>
+        /// <returns>The CSS class string.</returns>
+        public string GetStepClass(int stepIndex, string activeClasses = "w-full")
+        {
+            return this.ActiveStep == stepIndex ? activeClasses : "hidden";
         }
     }
 }

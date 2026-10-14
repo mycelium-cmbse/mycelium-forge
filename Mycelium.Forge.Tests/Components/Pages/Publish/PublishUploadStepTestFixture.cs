@@ -108,6 +108,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             var badges = uploadStepComponent.FindComponents<BbBadge>();
             var continueButton = uploadStepComponent.Find("#publish-continue-button");
             var publishingGuideLink = uploadStepComponent.FindComponent<BbButton>();
+            var defaultInput = uploadStepComponent.Find("#publish-package-file-input");
+
+            var customStepComponent = this.context.Render<PublishUploadStep>(parameters => { parameters.Add(x => x.InputId, "custom-input-id"); });
+            var customInput = customStepComponent.Find("#custom-input-id");
 
             using (Assert.EnterMultipleScope())
             {
@@ -120,6 +124,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
                 Assert.That(uploadStepComponent.Markup, Does.Contain("BEFORE YOU UPLOAD"));
                 Assert.That(continueButton.HasAttribute("disabled"), Is.True);
                 Assert.That(publishingGuideLink, Is.Not.Null);
+                Assert.That(defaultInput, Is.Not.Null);
+                Assert.That(customInput, Is.Not.Null);
             }
         }
     }

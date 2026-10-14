@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';
+﻿import assert from 'node:assert/strict';
 import { beforeEach, describe, it, mock } from 'node:test';
 import { setupBrowser } from '../Utils/browserTestSetup.mjs';
 
@@ -134,5 +134,68 @@ describe('forgeInterop', () => {
         browser.readyState = 'complete';
         browser.loadScript();
         assert.equal(typeof window.forgeInterop, 'object');
+    });
+
+    it('uploadLargeFile', async () => {
+        browser.loadScript();
+
+        await assert.rejects(async () => window.forgeInterop.uploadLargeFile('missing-input', '/api/upload'));
+
+        browser.elements['empty-input'] = { files: [] };
+        await assert.rejects(async () => window.forgeInterop.uploadLargeFile('empty-input', '/api/upload'));
+
+        const fakeFile = { name: 'test-model.kpar' };
+        browser.elements['file-input'] = { files: [fakeFile] };
+        browser.searchInput = { value: 'fake-af-token' };
+
+        globalThis.fetch = mock.fn(async () => ({
+            ok: false,
+            redirected: false,
+            status: 400,
+            text: async () => 'Bad request payload'
+        }));
+
+        await assert.rejects(async () => window.forgeInterop.uploadLargeFile('file-input', '/api/upload'));
+
+        globalThis.fetch = mock.fn(async () => ({
+            ok: false,
+            redirected: true,
+            status: 302,
+            text: async () => ''
+        }));
+
+        await assert.rejects(async () => window.forgeInterop.uploadLargeFile('file-input', '/api/upload'));
+
+        globalThis.fetch = mock.fn(async () => ({
+            ok: true,
+            redirected: false,
+            headers: {
+                get: (h) => (h.toLowerCase() === 'content-type' ? 'text/html' : null)
+            },
+            text: async () => '<html>Error</html>'
+        }));
+
+        await assert.rejects(async () => window.forgeInterop.uploadLargeFile('file-input', '/api/upload'));
+
+        globalThis.fetch = mock.fn(async (url, init) => {
+            assert.equal(url, '/api/upload');
+            assert.equal(init.method, 'POST');
+            assert.equal(init.body, fakeFile);
+            assert.equal(init.headers['Content-Type'], 'application/octet-stream');
+            assert.equal(init.headers['X-File-Name'], 'test-model.kpar');
+            assert.equal(init.headers['RequestVerificationToken'], 'fake-af-token');
+
+            return {
+                ok: true,
+                redirected: false,
+                headers: {
+                    get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : null)
+                },
+                json: async () => ({ uploadToken: 'abc-token-123' })
+            };
+        });
+
+        const token = await window.forgeInterop.uploadLargeFile('file-input', '/api/upload');
+        assert.equal(token, 'abc-token-123');
     });
 });

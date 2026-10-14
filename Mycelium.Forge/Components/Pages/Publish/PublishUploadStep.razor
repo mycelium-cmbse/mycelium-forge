@@ -11,6 +11,7 @@
     <ForgeCard Class="w-full lg:flex-1 p-6 gap-4">
         <ForgeFileUpload OnSelectedFilesChanged="@(this.HandleFilesSelected)"
                          Accept="@(this.AcceptedExtensions)"
+                         InputId="@(this.InputId)"
                          Class="w-full"/>
 
         <div class="flex items-center gap-2 w-full">
@@ -45,7 +46,7 @@
                 <div class="flex flex-col gap-1 flex-1 min-w-0">
                     <div class="flex items-center gap-2.5">
                         <span class="font-mono text-sm leading-normal text-foreground truncate">
-                            @(this.SelectedFile.Name)
+                            @(this.selectedFile.Name)
                         </span>
                         <BbBadge Variant="BadgeVariant.Secondary"
                                  Class="badge-format">
@@ -53,7 +54,7 @@
                         </BbBadge>
                     </div>
                     <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                        @(this.SelectedFile.Size.FormatFileSize()) &bull; Detected @(this.GetSelectedFileFormat())
+                        @(this.selectedFile.Size.FormatFileSize()) &bull; Detected @(this.GetSelectedFileFormat())
                     </span>
                 </div>
             </div>

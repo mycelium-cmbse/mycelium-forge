@@ -88,8 +88,13 @@ namespace Mycelium.Forge.Tests.Extensions
 
             using var app = this.builder.Build();
             var memoryCache = app.Services.GetService<IMemoryCache>();
+            var stagingService = app.Services.GetService<IFileUploadStagingService>();
 
-            Assert.That(memoryCache, Is.Not.Null);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(memoryCache, Is.Not.Null);
+                Assert.That(stagingService, Is.Not.Null);
+            }
         }
 
         /// <summary>

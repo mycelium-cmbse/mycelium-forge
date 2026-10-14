@@ -7,6 +7,7 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 @attribute [Route(PageRoutes.Publish)]
+@attribute [Authorize]
 @rendermode InteractiveServer
 
 <PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
@@ -20,21 +21,33 @@
     <p class="text-base leading-normal text-muted-foreground">
         Publish a library or a model so others can discover, version and, where the format allows it, import it into their projects.
     </p>
+    <AntiforgeryToken/>
 </div>
 
 <BbStepper @bind-ActiveStep="this.ActiveStep"
            Clickable="true"
            Class="w-full"
-           IndicatorClass="stepper-bar"
-           ContentClass="w-full">
-<BbStep Title="Upload" Disabled="@(!this.CanOpenStep(0))">
-    <PublishUploadStep OnContinue="@(this.OnUploadStepContinued)"
-                       SelectedFile="@(this.uploadedPackage)"/>
-</BbStep>
+           IndicatorClass="stepper-bar">
+    <BbStep Title="Upload"
+            Disabled="@(!this.CanOpenStep(0))"/>
 
-<BbStep Title="Package metadata" Disabled="@(!this.CanOpenStep(1))">
+    <BbStep Title="Package metadata"
+            Disabled="@(!this.CanOpenStep(1))"/>
+
+    <BbStep Title="Validation"
+            Disabled="@(!this.CanOpenStep(2))"/>
+
+    <BbStep Title="Review & publish"
+            Disabled="@(!this.CanOpenStep(3))"/>
+</BbStepper>
+
+<div class="@(this.GetStepClass(0))">
+    <PublishUploadStep OnContinue="@(this.OnUploadStepContinued)"
+                       InputId="@(this.UploadInputId)"/>
+</div>
+
+<div class="@(this.GetStepClass(1, "w-full flex flex-col lg:flex-row items-start gap-6"))">
 @* This step content will be moved to a specific component in a future PR dedicated to this page. *@
-<div class="w-full flex flex-col lg:flex-row items-start gap-6">
 <ForgeCard Class="lg:flex-1 p-6 gap-4">
     <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2">
         <div class="flex items-center gap-2.5 w-full">
@@ -263,13 +276,11 @@
     </BbButton>
 </ForgeCard>
 </div>
-</BbStep>
 
-<BbStep Title="Validation"
-        Disabled="@(!this.CanOpenStep(2))"/>
+<div class="@(this.GetStepClass(2))">
+</div>
 
-<BbStep Title="Review & publish"
-        Disabled="@(!this.CanOpenStep(3))"/>
-</BbStepper>
+<div class="@(this.GetStepClass(3))">
+</div>
 </div>
 </div>
