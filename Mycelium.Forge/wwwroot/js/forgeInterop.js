@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     const THEME_STORAGE_KEY = 'forge_theme';
     const DARK_THEME = 'dark';
     const LIGHT_THEME = 'light';
@@ -111,7 +111,7 @@
          */
         uploadLargeFile: async function (inputId, targetUrl, contentType = 'application/octet-stream') {
             const inputElement = document.getElementById(inputId);
-            if (!inputElement || !inputElement.files || inputElement.files.length === 0) {
+            if (!inputElement?.files || inputElement.files.length === 0) {
                 throw new Error('No package file is selected for upload.');
             }
 
@@ -127,7 +127,7 @@
             // See: https://learn.microsoft.com/aspnet/core/blazor/security/server/interactive-server-antiforgery
             const antiforgeryInput = document.querySelector('input[name="__RequestVerificationToken"]');
 
-            if (antiforgeryInput && antiforgeryInput.value) {
+            if (antiforgeryInput?.value) {
                 headers['RequestVerificationToken'] = antiforgeryInput.value;
             }
 

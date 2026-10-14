@@ -15,8 +15,8 @@ namespace Mycelium.Forge.Common
     public static class ApiRoutes
     {
         /// <summary>
-        /// The route path for package archive uploads.
+        /// The route path for staging package archive uploads.
         /// </summary>
-        public const string PackageUpload = "/api/v1/packages/upload";
+        public const string UploadFileForStage = "/api/v1/upload/stage";
     }
 }

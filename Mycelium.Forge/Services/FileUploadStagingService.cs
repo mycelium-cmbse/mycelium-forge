@@ -37,6 +37,11 @@ namespace Mycelium.Forge.Services
         private readonly string stagingDirectory;
 
         /// <summary>
+        /// Backing field indicating whether this instance has been disposed.
+        /// </summary>
+        private bool disposed;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FileUploadStagingService" /> class.
         /// </summary>
         /// <param name="logger">The logger for diagnostic output.</param>
@@ -78,7 +83,11 @@ namespace Mycelium.Forge.Services
             }
 
             this.stagedFiles.TryAdd(uploadToken, filePath);
-            this.logger.LogDebug("Staged incoming package upload {UploadToken} to {FilePath}", uploadToken, filePath);
+
+            if (this.logger.IsEnabled(LogLevel.Debug))
+            {
+                this.logger.LogDebug("Staged incoming package upload {UploadToken} to {FilePath}", uploadToken, filePath);
+            }
 
             return uploadToken;
         }
@@ -118,7 +127,11 @@ namespace Mycelium.Forge.Services
             try
             {
                 File.Delete(filePath);
-                this.logger.LogDebug("Cleaned up staged package upload {UploadToken} at {FilePath}", uploadToken, filePath);
+
+                if (this.logger.IsEnabled(LogLevel.Debug))
+                {
+                    this.logger.LogDebug("Cleaned up staged package upload {UploadToken} at {FilePath}", uploadToken, filePath);
+                }
             }
             catch (Exception exception)
             {
@@ -131,12 +144,34 @@ namespace Mycelium.Forge.Services
         /// </summary>
         public void Dispose()
         {
-            foreach (var uploadToken in this.stagedFiles.Keys)
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// <see langword="true" /> to release both managed and unmanaged resources; <see langword="false" /> to release only unmanaged resources.
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
             {
-                this.Cleanup(uploadToken);
+                return;
             }
 
-            this.DeleteStagingDirectory();
+            if (disposing)
+            {
+                foreach (var uploadToken in this.stagedFiles.Keys)
+                {
+                    this.Cleanup(uploadToken);
+                }
+
+                this.DeleteStagingDirectory();
+            }
+
+            this.disposed = true;
         }
 
         /// <summary>

@@ -215,7 +215,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             using (Assert.EnterMultipleScope())
             {
                 this.viewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
-                Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(0));
+                Assert.That(publishPage.Instance.ActiveStep, Is.Zero);
             }
         }
 

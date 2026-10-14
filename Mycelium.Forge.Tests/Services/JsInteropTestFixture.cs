@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Tests.Services
 
     using Moq;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Services;
 
     [TestFixture]
@@ -89,7 +90,7 @@ namespace Mycelium.Forge.Tests.Services
                 .Setup(x => x.InvokeAsync<string>("forgeInterop.uploadLargeFile", It.IsAny<object[]>()))
                 .ReturnsAsync("token-guid");
 
-            var result = await this.jsInterop.UploadLargeFile("file-input-id", "/api/v1/packages/upload");
+            var result = await this.jsInterop.UploadLargeFile("file-input-id", ApiRoutes.UploadFileForStage);
 
             using (Assert.EnterMultipleScope())
             {

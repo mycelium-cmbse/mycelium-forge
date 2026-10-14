@@ -122,7 +122,7 @@ namespace Mycelium.Forge.Services
 
             try
             {
-                uploadToken = await this.jsInterop.UploadLargeFile(inputId, ApiRoutes.PackageUpload, contentType);
+                uploadToken = await this.jsInterop.UploadLargeFile(inputId, ApiRoutes.UploadFileForStage, contentType);
                 await using var stagedStream = this.uploadStagingService.OpenStagedFile(uploadToken);
                 return await this.artifactStore.StoreArtifactAsync(stagedStream, contentType, cancellationToken);
             }

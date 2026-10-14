@@ -22,6 +22,7 @@ namespace Mycelium.Forge.Tests.Services
 
     using Moq;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.Storage.Stores;
 
@@ -121,7 +122,7 @@ namespace Mycelium.Forge.Tests.Services
 
             // Case 2: JsInterop throws exception
             this.jsInteropMock
-                .Setup(x => x.UploadLargeFile("upload-input", "/api/v1/packages/upload", "application/octet-stream"))
+                .Setup(x => x.UploadLargeFile("upload-input", ApiRoutes.UploadFileForStage, "application/octet-stream"))
                 .ThrowsAsync(new InvalidOperationException("Browser upload failed."));
 
             var jsExceptionResult = await this.fileUploadService.UploadFileOverHttps("upload-input");
@@ -134,7 +135,7 @@ namespace Mycelium.Forge.Tests.Services
 
             // Case 3: Staging service throws exception
             this.jsInteropMock
-                .Setup(x => x.UploadLargeFile("upload-input", "/api/v1/packages/upload", "application/octet-stream"))
+                .Setup(x => x.UploadLargeFile("upload-input", ApiRoutes.UploadFileForStage, "application/octet-stream"))
                 .ReturnsAsync("valid-upload-token");
 
             this.uploadStagingServiceMock

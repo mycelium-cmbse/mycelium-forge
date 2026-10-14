@@ -72,7 +72,7 @@ namespace Mycelium.Forge.Storage.Stores
                 return Error.Validation(nameof(contentHash), "Content hash cannot be null or empty.");
             }
 
-            var key = this.NormalizeContentHash(contentHash);
+            var key = NormalizeContentHash(contentHash);
             var bucketName = this.options.Value.BucketName;
 
             var request = new GetObjectRequest
@@ -129,7 +129,7 @@ namespace Mycelium.Forge.Storage.Stores
             try
             {
                 var hashBytes = await SHA256.HashDataAsync(streamToUpload, token);
-                key = this.NormalizeContentHash(Convert.ToHexStringLower(hashBytes));
+                key = NormalizeContentHash(Convert.ToHexStringLower(hashBytes));
 
                 streamToUpload.Position = 0;
 
@@ -187,7 +187,7 @@ namespace Mycelium.Forge.Storage.Stores
                 return Error.Validation(nameof(contentHash), "Content hash cannot be null or empty.");
             }
 
-            var key = this.NormalizeContentHash(contentHash);
+            var key = NormalizeContentHash(contentHash);
             var bucketName = this.options.Value.BucketName;
 
             var request = new GetObjectMetadataRequest
@@ -225,7 +225,7 @@ namespace Mycelium.Forge.Storage.Stores
                 return Error.Validation(nameof(contentHash), "Content hash cannot be null or empty.");
             }
 
-            var key = this.NormalizeContentHash(contentHash);
+            var key = NormalizeContentHash(contentHash);
             var bucketName = this.options.Value.BucketName;
 
             var request = new DeleteObjectRequest
@@ -288,7 +288,7 @@ namespace Mycelium.Forge.Storage.Stores
         /// </summary>
         /// <param name="contentHash">The raw content hash string.</param>
         /// <returns>The normalized content hash string.</returns>
-        private string NormalizeContentHash(string contentHash)
+        private static string NormalizeContentHash(string contentHash)
         {
             return contentHash.Trim().ToLowerInvariant();
         }

@@ -64,7 +64,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <summary>
         /// Gets the HTML ID for the file input element.
         /// </summary>
-        public string UploadInputId => "publish-package-file-input";
+        public static string UploadInputId => "publish-package-file-input";
 
         /// <summary>
         /// Gets or sets the zero-based active wizard step index.

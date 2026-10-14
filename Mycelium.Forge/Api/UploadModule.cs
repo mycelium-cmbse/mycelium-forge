@@ -25,7 +25,7 @@ namespace Mycelium.Forge.Api
         /// <param name="app">The endpoint route builder the routes are registered on.</param>
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost(ApiRoutes.PackageUpload, async (HttpRequest request, IFileUploadStagingService stagingService, CancellationToken token) =>
+            app.MapPost(ApiRoutes.UploadFileForStage, async (HttpRequest request, IFileUploadStagingService stagingService, CancellationToken token) =>
                 {
                     var uploadToken = await stagingService.StageAsync(request.Body, token);
                     return Results.Ok(new { uploadToken });
