@@ -140,8 +140,6 @@ namespace Mycelium.Forge.Storage.Stores
                     return key;
                 }
 
-                await this.amazonS3Client.EnsureBucketExistsAsync(bucketName);
-
                 var isHttps = this.options.Value.ServiceUrl != null &&
                               this.options.Value.ServiceUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
 
