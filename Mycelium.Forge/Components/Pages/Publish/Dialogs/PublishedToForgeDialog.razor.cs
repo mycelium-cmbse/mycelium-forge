@@ -40,10 +40,10 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
         public string Scope { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the published package name.
+        /// Gets or sets the published package short name.
         /// </summary>
         [Parameter]
-        public string PackageName { get; set; } = string.Empty;
+        public string PackageShortname { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the published package version string.
@@ -89,12 +89,12 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
         {
             var cleanScope = this.Scope.CleanScope();
 
-            if (!string.IsNullOrEmpty(cleanScope) && !string.IsNullOrEmpty(this.PackageName))
+            if (!string.IsNullOrEmpty(cleanScope) && !string.IsNullOrEmpty(this.PackageShortname))
             {
-                return $"@{cleanScope}/{this.PackageName}";
+                return $"@{cleanScope}/{this.PackageShortname}";
             }
 
-            return this.PackageName ?? string.Empty;
+            return this.PackageShortname ?? string.Empty;
         }
 
         /// <summary>
@@ -143,9 +143,9 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
 
             var cleanScope = this.Scope.CleanScope();
 
-            if (!string.IsNullOrEmpty(this.PackageName))
+            if (!string.IsNullOrEmpty(this.PackageShortname))
             {
-                return PageRoutes.GetPackageRoute(cleanScope, this.PackageName);
+                return PageRoutes.GetPackageRoute(cleanScope, this.PackageShortname);
             }
 
             return PageRoutes.Packages;

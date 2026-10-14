@@ -161,7 +161,7 @@ namespace Mycelium.Forge.Dal.Services
 
             if (!organizationResult.IsError)
             {
-                return ErrorOrFactory.From<IScope>(organizationResult.Value);
+                return await ErrorOrFactory.FromAsync<IScope>(organizationResult.Value);
             }
 
             if (organizationResult.Errors.Exists(e => e.Type != ErrorType.NotFound))
@@ -173,7 +173,7 @@ namespace Mycelium.Forge.Dal.Services
 
             if (!accountResult.IsError)
             {
-                return ErrorOrFactory.From<IScope>(accountResult.Value);
+                return await ErrorOrFactory.FromAsync<IScope>(accountResult.Value);
             }
 
             if (accountResult.Errors.Exists(e => e.Type != ErrorType.NotFound))

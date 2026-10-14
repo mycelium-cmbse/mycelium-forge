@@ -54,12 +54,12 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         bool CanDeletePackage { get; set; }
 
         /// <summary>
-        /// Initializes the package settings view model state for the specified package name and scope asynchronously.
+        /// Initializes the package settings view model state for the specified package short name and scope asynchronously.
         /// </summary>
-        /// <param name="packageName">The name of the package.</param>
+        /// <param name="packageShortname">The short name of the package.</param>
         /// <param name="scope">The owning scope or publisher identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        Task InitializeViewModel(string packageName, string scope);
+        Task InitializeViewModel(string packageShortname, string scope);
 
         /// <summary>
         /// Updates the package visibility setting asynchronously.

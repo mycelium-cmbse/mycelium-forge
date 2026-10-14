@@ -137,19 +137,19 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         public bool CanDeletePackage { get; set; }
 
         /// <summary>
-        /// Initializes the package settings view model state for the specified package name and scope asynchronously.
+        /// Initializes the package settings view model state for the specified package short name and scope asynchronously.
         /// </summary>
-        /// <param name="packageName">The name of the package.</param>
+        /// <param name="packageShortname">The short name of the package.</param>
         /// <param name="scope">The owning scope or publisher identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        public async Task InitializeViewModel(string packageName, string scope)
+        public async Task InitializeViewModel(string packageShortname, string scope)
         {
             this.userContext = await this.userService.GetUserContext();
-            var packageResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scope, packageName);
+            var packageResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scope, packageShortname);
 
             if (packageResult.IsError)
             {
-                this.logger.LogWarning("Package {Scope}/{Name} not found during settings initialization: {Errors}", scope.SanitizeForLog(), packageName.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
+                this.logger.LogWarning("Package {Scope}/{Name} not found during settings initialization: {Errors}", scope.SanitizeForLog(), packageShortname.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
                 return;
             }
 

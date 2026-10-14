@@ -87,12 +87,12 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         bool IsUserAdmin { get; set; }
 
         /// <summary>
-        /// Initializes the package view model state for the specified package name and scope asynchronously.
+        /// Initializes the package view model state for the specified package short name and scope asynchronously.
         /// </summary>
-        /// <param name="packageName">The name of the package.</param>
+        /// <param name="packageShortname">The short name of the package.</param>
         /// <param name="scope">The owning scope or publisher of the package.</param>
         /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        Task InitializeViewModel(string packageName, string scope, string tab = null);
+        Task InitializeViewModel(string packageShortname, string scope, string tab = null);
     }
 }

@@ -66,7 +66,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.Description, string.Empty);
                 parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageName, "ECSS-MM-PWR");
+                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
                 parameters.Add(x => x.Version, "v1.3.0");
             });
 
@@ -123,7 +123,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.Scope, "starion");
-                parameters.Add(x => x.PackageName, "ECSS-MM-PWR");
+                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
             });
 
             var withScopeNoAt = dialog1.Instance.GetPackageFullName();
@@ -132,7 +132,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageName, "ECSS-MM-PWR");
+                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
             });
 
             var withScopeWithAt = dialog2.Instance.GetPackageFullName();
@@ -141,7 +141,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.Scope, string.Empty);
-                parameters.Add(x => x.PackageName, "MyPackage");
+                parameters.Add(x => x.PackageShortname, "MyPackage");
             });
 
             var withPackageNameOnly = dialog3.Instance.GetPackageFullName();
@@ -150,7 +150,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.Scope, string.Empty);
-                parameters.Add(x => x.PackageName, string.Empty);
+                parameters.Add(x => x.PackageShortname, string.Empty);
             });
 
             var defaultResult = dialog4.Instance.GetPackageFullName();
@@ -180,7 +180,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.PackageHref, string.Empty);
                 parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageName, "ECSS-MM-PWR");
+                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
             });
 
             var builtHref = dialog2.Instance.GetPackageHref();
@@ -190,7 +190,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.PackageHref, string.Empty);
                 parameters.Add(x => x.Scope, string.Empty);
-                parameters.Add(x => x.PackageName, string.Empty);
+                parameters.Add(x => x.PackageShortname, string.Empty);
             });
 
             var fallbackHref = dialog3.Instance.GetPackageHref();
@@ -240,7 +240,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
                 parameters.Add(x => x.OnViewPackage, onViewPackage);
                 parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageName, "ECSS-MM-PWR");
+                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
             });
 
             await dialog.InvokeAsync(() => dialog.Instance.OnViewPackageClicked());

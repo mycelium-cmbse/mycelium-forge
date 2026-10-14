@@ -231,7 +231,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         {
             var component = this.context.Render<PackageDetails>(parameters => parameters
                 .Add(p => p.Scope, "starion")
-                .Add(p => p.PackageName, "ecss-mm-pwr")
+                .Add(p => p.PackageShortname, "ecss-mm-pwr")
                 .Add(p => p.Tab, PackageTabConstants.Contents));
 
             using (Assert.EnterMultipleScope())
@@ -242,7 +242,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
 
             var defaultComponent = this.context.Render<PackageDetails>(parameters => parameters
                 .Add(p => p.Scope, "starion")
-                .Add(p => p.PackageName, "ecss-mm-pwr"));
+                .Add(p => p.PackageShortname, "ecss-mm-pwr"));
 
             using (Assert.EnterMultipleScope())
             {
@@ -284,7 +284,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
 
             var component = this.context.Render<PackageDetails>(parameters => parameters
                 .Add(p => p.Scope, "starion")
-                .Add(p => p.PackageName, "ecss-mm-pwr"));
+                .Add(p => p.PackageShortname, "ecss-mm-pwr"));
 
             component.Instance.SelectContentTab(PackageTabConstants.Dependencies);
 

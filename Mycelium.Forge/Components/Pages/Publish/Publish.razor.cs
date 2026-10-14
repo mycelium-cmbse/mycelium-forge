@@ -224,7 +224,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
             var parameters = new Dictionary<string, object>
             {
                 { nameof(PublishedToForgeDialog.Scope), scope },
-                { nameof(PublishedToForgeDialog.PackageName), packageName },
+                { nameof(PublishedToForgeDialog.PackageShortname), packageName },
                 { nameof(PublishedToForgeDialog.Version), version }
             };
 

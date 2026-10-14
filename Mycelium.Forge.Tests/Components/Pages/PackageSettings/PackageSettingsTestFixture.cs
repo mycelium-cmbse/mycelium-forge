@@ -192,7 +192,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         {
             var packageSettingsPage = this.context.Render<PackageSettings>(parameters => parameters
                 .Add(p => p.Scope, "@starion")
-                .Add(p => p.PackageName, "ECSS-MM-PWR"));
+                .Add(p => p.PackageShortname, "ECSS-MM-PWR"));
 
             using (Assert.EnterMultipleScope())
             {

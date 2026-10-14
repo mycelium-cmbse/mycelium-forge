@@ -133,7 +133,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         [Test]
         public void VerifyOnParametersSet()
         {
-            var orgSettingsPage = this.context.Render<OrganizationSettings>(parameters => parameters.Add(p => p.Id, "starion"));
+            var orgSettingsPage = this.context.Render<OrganizationSettings>(parameters => parameters.Add(p => p.ShortName, "starion"));
 
             using (Assert.EnterMultipleScope())
             {

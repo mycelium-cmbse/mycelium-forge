@@ -28,7 +28,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// Gets or sets the organization short name supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string Id { get; set; } = string.Empty;
+        public string ShortName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the view model for the organization settings page.
@@ -50,12 +50,12 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         {
             await base.OnParametersSetAsync();
 
-            if (string.IsNullOrWhiteSpace(this.Id))
+            if (string.IsNullOrWhiteSpace(this.ShortName))
             {
                 return;
             }
 
-            await this.ViewModel.InitializeViewModel(this.Id);
+            await this.ViewModel.InitializeViewModel(this.ShortName);
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetails.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -34,10 +34,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         public string Scope { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the package name supplied from the URL route.
+        /// Gets or sets the package short name supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string PackageName { get; set; } = string.Empty;
+        public string PackageShortname { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the content tab supplied from the URL route.
@@ -76,7 +76,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         public void SelectContentTab(string tab)
         {
             this.SelectedContentTab = tab;
-            var targetRoute = PageRoutes.GetPackageRoute(this.Scope, this.PackageName, tab);
+            var targetRoute = PageRoutes.GetPackageRoute(this.Scope, this.PackageShortname, tab);
             this.NavigationManager.NavigateTo(targetRoute);
         }
 
@@ -152,7 +152,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         {
             await base.OnInitializedAsync();
 
-            if (string.IsNullOrEmpty(this.Scope) || string.IsNullOrEmpty(this.PackageName))
+            if (string.IsNullOrEmpty(this.Scope) || string.IsNullOrEmpty(this.PackageShortname))
             {
                 return;
             }
@@ -166,7 +166,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 this.SelectedContentTab = PackageTabConstants.Overview;
             }
 
-            await this.ViewModel.InitializeViewModel(this.PackageName, this.Scope, this.SelectedContentTab);
+            await this.ViewModel.InitializeViewModel(this.PackageShortname, this.Scope, this.SelectedContentTab);
         }
 
         /// <summary>

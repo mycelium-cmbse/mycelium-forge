@@ -180,23 +180,20 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public bool IsUserAdmin { get; set; }
 
         /// <summary>
-        /// Initializes the package view model state for the specified package name and scope asynchronously.
+        /// Initializes the package view model state for the specified package short name and scope asynchronously.
         /// </summary>
-        /// <param name="packageName">The name of the package.</param>
+        /// <param name="packageShortname">The short name of the package.</param>
         /// <param name="scope">The owning scope or publisher of the package.</param>
         /// <param name="tab">The optional content tab identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
-        public async Task InitializeViewModel(string packageName, string scope, string tab = null)
+        public async Task InitializeViewModel(string packageShortname, string scope, string tab = null)
         {
-            var normalizedPackageName = packageName.Trim().ToLowerInvariant();
-            var normalizedScope = scope.Trim().ToLowerInvariant();
-
             var userContext = await this.userService.GetUserContext();
-            var cachedData = await this.GetOrLoadPackageDataAsync(userContext, normalizedPackageName, normalizedScope);
+            var cachedData = await this.GetOrLoadPackageDataAsync(userContext, packageShortname, scope);
 
             if (cachedData.Package == null)
             {
-                this.logger.LogWarning("Package {Scope}/{Name} not found during details initialization", scope.SanitizeForLog(), packageName.SanitizeForLog());
+                this.logger.LogWarning("Package {Scope}/{Name} not found during details initialization", scope.SanitizeForLog(), packageShortname.SanitizeForLog());
                 return;
             }
 
@@ -231,44 +228,44 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="scope">The scope short name.</param>
-        /// <param name="packageName">The package name.</param>
+        /// <param name="packageShortname">The package short name.</param>
         /// <returns>The cache key string.</returns>
-        private static string GetCacheKey(IUserContext userContext, string scope, string packageName)
+        private static string GetCacheKey(IUserContext userContext, string scope, string packageShortname)
         {
             var userIdentifier = userContext.IsAuthenticated && userContext.AccountId.HasValue
                 ? userContext.AccountId.Value
                 : Guid.Empty;
 
-            return $"pkg-details:{scope}:{packageName}:{userIdentifier}";
+            return $"pkg-details:{scope}:{packageShortname}:{userIdentifier}";
         }
 
         /// <summary>
         /// Retrieves the package details data from cache or database asynchronously.
         /// </summary>
         /// <param name="userContext">The user context.</param>
-        /// <param name="packageName">The package name.</param>
+        /// <param name="packageShortname">The package short name.</param>
         /// <param name="scope">The scope short name.</param>
         /// <returns>A <see cref="Task" /> containing the cached package details model.</returns>
         /// <remarks>
         /// Caching package details data reduces repeated database queries across distinct tab route navigations and requests for
         /// the same package.
         /// </remarks>
-        private async Task<PackageDetailsCacheModel> GetOrLoadPackageDataAsync(IUserContext userContext, string packageName, string scope)
+        private async Task<PackageDetailsCacheModel> GetOrLoadPackageDataAsync(IUserContext userContext, string packageShortname, string scope)
         {
-            var cacheKey = GetCacheKey(userContext, scope, packageName);
+            var cacheKey = GetCacheKey(userContext, scope, packageShortname);
 
             if (this.memoryCache.TryGetValue(cacheKey, out PackageDetailsCacheModel cachedData))
             {
                 return cachedData;
             }
 
-            var packageResult = await this.packageService.ReadByCoordinateAsync(userContext, scope, packageName);
+            var packageResult = await this.packageService.ReadByCoordinateAsync(userContext, scope, packageShortname);
 
             if (packageResult.IsError || packageResult.Value == null)
             {
                 if (packageResult.IsError)
                 {
-                    this.logger.LogWarning("Package {Scope}/{Name} read error: {Errors}", scope.SanitizeForLog(), packageName.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
+                    this.logger.LogWarning("Package {Scope}/{Name} read error: {Errors}", scope.SanitizeForLog(), packageShortname.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
                 }
 
                 return new PackageDetailsCacheModel();

@@ -30,10 +30,10 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         public string Scope { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the package name supplied from the URL route.
+        /// Gets or sets the package short name supplied from the URL route.
         /// </summary>
         [Parameter]
-        public string PackageName { get; set; } = string.Empty;
+        public string PackageShortname { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the view model for the package settings page.
@@ -61,12 +61,12 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         {
             await base.OnParametersSetAsync();
 
-            if (string.IsNullOrWhiteSpace(this.PackageName) || string.IsNullOrWhiteSpace(this.Scope))
+            if (string.IsNullOrWhiteSpace(this.PackageShortname) || string.IsNullOrWhiteSpace(this.Scope))
             {
                 return;
             }
 
-            await this.ViewModel.InitializeViewModel(this.PackageName, this.Scope);
+            await this.ViewModel.InitializeViewModel(this.PackageShortname, this.Scope);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         private IEnumerable<BreadcrumbItem> GetBreadcrumbItems()
         {
             var publisher = this.ViewModel.Owner.ShortName;
-            var packageName = this.ViewModel.Package.ShortName;
+            var packageShortname = this.ViewModel.Package.ShortName;
 
             return
             [
@@ -92,8 +92,8 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
                 },
                 new BreadcrumbItem
                 {
-                    Name = packageName,
-                    Link = PageRoutes.GetPackageRoute(publisher, packageName)
+                    Name = packageShortname,
+                    Link = PageRoutes.GetPackageRoute(publisher, packageShortname)
                 },
                 new BreadcrumbItem
                 {
