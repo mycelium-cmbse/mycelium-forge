@@ -39,7 +39,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.CreatedAt).NotEmpty();
             this.RuleFor(x => x.DefaultPackageVisibility).NotNull();
             this.RuleFor(x => x.Email).NotEmpty();
-            this.RuleFor(x => x.Id).NotNull();
+            this.RuleFor(x => x.Id).NotEmpty();
             this.RuleFor(x => x.Member).NotEmpty();
             this.RuleFor(x => x.ModifiedAt).NotEmpty();
             this.RuleFor(x => x.Name).NotEmpty();

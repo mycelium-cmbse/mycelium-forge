@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Components.Common
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Models.Notification;
     using Mycelium.Forge.Services;
 
     /// <summary>

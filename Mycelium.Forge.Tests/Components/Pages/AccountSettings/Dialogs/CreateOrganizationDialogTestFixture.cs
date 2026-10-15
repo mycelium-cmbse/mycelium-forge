@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -16,18 +17,26 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
 
     using Bunit;
 
+    using ErrorOr;
+
     using Microsoft.AspNetCore.Components;
+    using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
+    using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Models.DialogResults;
+    using Mycelium.Forge.Services;
 
     [TestFixture]
     public class CreateOrganizationDialogTestFixture
     {
         private BunitContext context;
         private Mock<IDialogReference> dialogReferenceMock;
+        private Mock<IScopeService> scopeServiceMock;
+        private Mock<IUserService> userServiceMock;
 
         [SetUp]
         public void SetUp()
@@ -41,6 +50,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             this.dialogReferenceMock = new Mock<IDialogReference>();
             this.dialogReferenceMock.Setup(x => x.CloseAsync(It.IsAny<DialogResult>())).Returns(Task.CompletedTask);
             this.dialogReferenceMock.Setup(x => x.CancelAsync()).Returns(Task.CompletedTask);
+
+            this.scopeServiceMock = new Mock<IScopeService>();
+            this.userServiceMock = new Mock<IUserService>();
+
+            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Not found"));
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(new UserContext());
+
+            this.context.Services.AddSingleton(this.scopeServiceMock.Object);
+            this.context.Services.AddSingleton(this.userServiceMock.Object);
         }
 
         [TearDown]
@@ -91,7 +109,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
         [Test]
         public async Task VerifyOnCreateOrganizationClicked()
         {
-            CreateOrganizationResult? capturedResult = null;
+            CreateOrganizationResult capturedResult = null!;
             var onResult = new EventCallbackFactory().Create(this, (CreateOrganizationResult r) => { capturedResult = r; });
 
             var dialog = this.context.Render<CreateOrganizationDialog>(parameters =>
@@ -105,16 +123,29 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
 
             Assert.That(capturedResult, Is.Null);
 
-            // All valid -> success
+            // Scope conflict -> validation fails
             dialog.Instance.OnOrganizationNameChanged("Starion Group");
             dialog.Instance.OnScopeChanged("@starion");
             dialog.Instance.OnBillingEmailChanged("billing@starion.eu");
-            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
 
-            Assert.That(capturedResult, Is.Not.Null);
+            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "starion", It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IScope>(new Organization { ShortName = "starion" }));
+
+            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(capturedResult, Is.Null);
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.Scope)), Is.True);
+            }
+
+            // All valid and unique -> success
+            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "starion", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Not found"));
+
+            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(capturedResult, Is.Not.Null);
                 Assert.That(capturedResult.OrganizationName, Is.EqualTo("Starion Group"));
                 Assert.That(capturedResult.Scope, Is.EqualTo("@starion"));
                 Assert.That(capturedResult.BillingEmail, Is.EqualTo("billing@starion.eu"));

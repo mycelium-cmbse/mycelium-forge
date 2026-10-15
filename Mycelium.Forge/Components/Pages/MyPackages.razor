@@ -9,7 +9,7 @@
 
 @attribute [Route(PageRoutes.MyPackages)]
 @attribute [Authorize]
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@rendermode @(new InteractiveServerRenderMode(false))
 @using BlazorBlueprint.Primitives.Table
 @inherits DisposableComponent
 

@@ -13,6 +13,9 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
 
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Dal.AutoGenDtoValidator;
+    using Mycelium.Forge.Dal.Services;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
 
@@ -21,6 +24,18 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
     /// </summary>
     public partial class CreateOrganizationDialog : ComponentBase
     {
+        /// <summary>
+        /// Gets or sets the (injected) <see cref="IScopeService" /> used for uniqueness validation.
+        /// </summary>
+        [Inject]
+        public IScopeService ScopeService { get; set; }
+
+        /// <summary>
+        /// Gets or sets the (injected) <see cref="IUserService" /> used to resolve the user context.
+        /// </summary>
+        [Inject]
+        public IUserService UserService { get; set; }
+
         /// <summary>
         /// Gets or sets the cascading dialog reference used to control and close the dialog.
         /// </summary>
@@ -109,14 +124,26 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnCreateOrganizationClicked()
         {
+            var cleanScope = this.Scope.CleanScope();
+            var isScopeValid = !string.IsNullOrWhiteSpace(cleanScope) && OrganizationValidator.ScopeFormatRegex().IsMatch(cleanScope);
+
             var isValid = this.ValidationManager
                 .Check(nameof(this.OrganizationName), !string.IsNullOrWhiteSpace(this.OrganizationName), "Organization name is required.")
-                .Check(nameof(this.Scope), !string.IsNullOrWhiteSpace(this.Scope), "Scope is required.")
+                .Check(nameof(this.Scope), isScopeValid, "Scope must start with an alphanumeric character and contain only lowercase alphanumeric characters, dots, and hyphens.")
                 .Check(nameof(this.BillingEmail), !string.IsNullOrWhiteSpace(this.BillingEmail), "Billing email is required.")
                 .IsValid;
 
             if (!isValid)
             {
+                return;
+            }
+
+            var userContext = await this.UserService.GetUserContext();
+            var existingScopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, cleanScope, CancellationToken.None);
+
+            if (!existingScopeResult.IsError)
+            {
+                this.ValidationManager.Check(nameof(this.Scope), false, $"A scope with short name '{cleanScope}' already exists.");
                 return;
             }
 

@@ -153,7 +153,7 @@ namespace Mycelium.Forge.Generator.Extensions
                 ArgumentNullException.ThrowIfNull(@class);
 
                 var results = @class.OwnedAttribute
-                    .Where(x => x.QueryIsMemberOfManyToMany())
+                    .Where(x => x.QueryIsManyToMany())
                     .OrderBy(x => x.Name)
                     .Distinct()
                     .ToList();
@@ -295,7 +295,7 @@ namespace Mycelium.Forge.Generator.Extensions
 
                 return @class
                     .QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(derivesFrom)
-                    .Where(x => x.QueryIsMemberOfManyToMany())
+                    .Where(x => x.QueryIsManyToMany())
                     .ToList();
             }
 

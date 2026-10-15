@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="Routes.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -12,15 +12,12 @@
     re-execution configured in Program.cs, which re-issues the request against /not-found.
  *@
 
-@using Microsoft.AspNetCore.Components.Authorization
-@using Mycelium.Forge.Components.Common
-
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <SignInRequired />
+                    <SignInRequired/>
                 </NotAuthorized>
             </AuthorizeRouteView>
 
@@ -30,4 +27,4 @@
     </Router>
 </CascadingAuthenticationState>
 
-<BbProviders />
+<BbProviders/>

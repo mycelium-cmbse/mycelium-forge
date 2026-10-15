@@ -1,0 +1,40 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PackageCollaboratorRow.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="flex items-center gap-2.5 w-full">
+    <CollaboratorAvatar Name="@(this.Account.Name)"
+                        Size="w-7.5 h-7.5"/>
+
+    <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
+        <div class="flex items-center gap-1.5">
+            <span class="text-sm leading-xs font-semibold text-foreground truncate">
+                @(this.Account.Name)
+            </span>
+            @if (this.Account.IsVerified)
+            {
+                <LucideIcon Name="badge-check"
+                            Size="14"
+                            Class="text-primary shrink-0"/>
+            }
+        </div>
+        <span class="text-2xs leading-3xs font-normal text-muted-foreground truncate">
+            @(this.Role)
+        </span>
+    </div>
+
+    <BbButton Variant="ButtonVariant.Ghost"
+              Size="ButtonSize.IconSmall"
+              OnClick="@(() => this.OnMenu.InvokeAsync(this.Account))"
+              AriaLabel="Options"
+              Class="package-maintainer-menu-button shrink-0">
+        <LucideIcon Name="ellipsis-vertical"
+                    Size="18"
+                    Class="text-muted-foreground shrink-0"/>
+    </BbButton>
+</div>

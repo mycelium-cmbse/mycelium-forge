@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSource.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,6 +9,10 @@
 
 namespace Mycelium.Forge.Dal.DatabaseSource
 {
+    using ErrorOr;
+
+    using Microsoft.Extensions.Logging;
+
     using Mycelium.Forge.Orm;
 
     using Npgsql;
@@ -25,14 +29,22 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         private readonly DatabaseConfig databaseConfig;
 
         /// <summary>
+        /// The logger instance.
+        /// </summary>
+        private readonly ILogger<DatabaseSource> logger;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseSource" /> class.
         /// </summary>
         /// <param name="databaseConfig">The <see cref="DatabaseConfig" /> used to build connection strings.</param>
-        public DatabaseSource(DatabaseConfig databaseConfig)
+        /// <param name="logger">The logger for diagnostic messages.</param>
+        public DatabaseSource(DatabaseConfig databaseConfig, ILogger<DatabaseSource> logger)
         {
             ArgumentNullException.ThrowIfNull(databaseConfig);
+            ArgumentNullException.ThrowIfNull(logger);
 
             this.databaseConfig = databaseConfig;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -48,34 +60,52 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         }
 
         /// <summary>
-        /// Asynchronously executes an action within a database transaction, committing on success or rolling back on failure.
+        /// Asynchronously executes an operation within an isolated connection and database transaction,
+        /// committing on success or rolling back on error or unhandled exception.
         /// </summary>
-        /// <param name="action">
-        /// The asynchronous action to execute within the transaction, returning <see langword="true" /> to
-        /// commit or <see langword="false" /> to roll back.
-        /// </param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>
-        /// A task resolving to <see langword="true" /> if the operation was executed and committed successfully;
-        /// otherwise <see langword="false" />.
-        /// </returns>
-        public async Task<bool> ExecuteInTransactionAsync(Func<NpgsqlTransaction, Task<bool>> action, CancellationToken cancellationToken = default)
+        /// <typeparam name="TValue">The return value type wrapped by <see cref="ErrorOr{TValue}" />.</typeparam>
+        /// <param name="action">The asynchronous operation to execute within the transaction.</param>
+        /// <param name="cancellationToken">The cancellation token used to cancel the operation.</param>
+        /// <returns>A <see cref="Task" /> representing the result of the operation or an error.</returns>
+        public async Task<ErrorOr<TValue>> ExecuteInTransactionAsync<TValue>(Func<NpgsqlTransaction, Task<ErrorOr<TValue>>> action, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(action);
 
-            await using var connection = await this.OpenNewConnectionAsync(cancellationToken);
-            await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
-
-            var success = await action.Invoke(transaction);
-
-            if (success)
+            try
             {
-                await transaction.CommitAsync(cancellationToken);
-                return true;
-            }
+                await using var connection = await this.OpenNewConnectionAsync(cancellationToken);
+                await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
-            await transaction.RollbackAsync(cancellationToken);
-            return false;
+                var result = await action.Invoke(transaction);
+
+                if (result.IsError)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    return result.Errors;
+                }
+
+                await transaction.CommitAsync(cancellationToken);
+                return result;
+            }
+            catch (Exception exception)
+            {
+                this.logger.LogError(exception, "An unexpected exception occurred during database transaction execution.");
+                return Error.Failure(description: exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously defers all deferrable foreign key constraints until transaction commit.
+        /// </summary>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task DeferConstraintsAsync(NpgsqlTransaction transaction, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(transaction);
+
+            await using var deferCommand = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
+            await deferCommand.ExecuteNonQueryAsync(cancellationToken);
         }
     }
 }

@@ -1,20 +1,27 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ForwardedHeadersTestFixture.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
 namespace Mycelium.Forge.Tests
 {
+    using System;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.Testing;
+    using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Extensions.DependencyInjection;
+
+    using Moq;
+
+    using Mycelium.Forge.Services;
 
     /// <summary>
     /// Verifies that a request forwarded from a TLS-terminating reverse proxy is honoured instead of
@@ -28,6 +35,9 @@ namespace Mycelium.Forge.Tests
         [SetUp]
         public void SetUp()
         {
+            var forgeContextMock = new Mock<IForgeContext>();
+            forgeContextMock.Setup(x => x.ForgeId).Returns(Guid.NewGuid());
+
             // UseHttpsRedirection/UseHsts only run outside Development (Program.cs), so the
             // redirect behaviour this fixture is guarding against only exists in Production.
             // https_port is set explicitly because the in-memory test server has no HTTPS endpoint
@@ -37,6 +47,8 @@ namespace Mycelium.Forge.Tests
                 {
                     builder.UseEnvironment("Production");
                     builder.UseSetting("https_port", "443");
+
+                    builder.ConfigureTestServices(services => { services.AddSingleton(forgeContextMock.Object); });
                 });
         }
 

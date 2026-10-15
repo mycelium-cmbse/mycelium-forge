@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="BbProviders.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -8,11 +8,11 @@
 ------------------------------------------------------------------------------------------------ *@
 @rendermode InteractiveServer
 
-<BbPortalHost />
-<BbDialogProvider />
+<BbPortalHost/>
+<BbDialogProvider/>
 @*
     NotificationComponent is placed here at the root router level to serve toast notifications across all layouts (MainLayout, AuthLayout, etc.).
     Per manual testing (Network WS traffic verification) and research done, all InteractiveServer islands on a page share a single SignalR WebSocket 
     connection (circuit) managed by blazor.web.js.
 *@
-<NotificationComponent />
+<NotificationComponent/>

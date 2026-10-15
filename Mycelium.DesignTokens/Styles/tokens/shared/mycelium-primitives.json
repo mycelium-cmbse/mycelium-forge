@@ -30,13 +30,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              1,
-              0.9294,
-              0.9294
+              0.9765,
+              0.949,
+              0.9333
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the thermal Ownership, derived from its base stripe. Carries color/ownership/thermal/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:36",
@@ -53,13 +53,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.749,
-              0.251,
-              0.251
+              0.549,
+              0.2745,
+              0.1294
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the thermal Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:38",
@@ -101,13 +101,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              1,
-              0.949,
-              0.851
+              0.9765,
+              0.9686,
+              0.9333
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the power Ownership, derived from its base stripe. Carries color/ownership/power/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:32",
@@ -124,13 +124,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.698,
-              0.451,
-              0.051
+              0.5294,
+              0.4314,
+              0.1255
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the power Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:34",
@@ -172,13 +172,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.9294,
-              0.949,
-              0.9686
+              0.9529,
+              0.9529,
+              0.9569
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the structure Ownership, derived from its base stripe. Carries color/ownership/structure/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:48",
@@ -195,13 +195,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.302,
-              0.4,
-              0.549
+              0.3176,
+              0.3333,
+              0.3647
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the structure Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:50",
@@ -243,13 +243,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.9098,
-              0.949,
-              1
+              0.9333,
+              0.9725,
+              0.9765
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the aocs Ownership, derived from its base stripe. Carries color/ownership/aocs/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:28",
@@ -266,13 +266,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.1686,
-              0.4,
-              0.7882
+              0.1255,
+              0.4706,
+              0.5294
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the aocs Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:30",
@@ -314,13 +314,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.9216,
-              0.9686,
-              0.9216
+              0.9451,
+              0.9333,
+              0.9765
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the comms Ownership, derived from its base stripe. Carries color/ownership/comms/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:40",
@@ -337,13 +337,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.2,
-              0.549,
-              0.302
+              0.2588,
+              0.1294,
+              0.549
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the comms Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:42",
@@ -385,13 +385,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              1,
-              0.9216,
-              0.9216
+              0.9725,
+              0.9373,
+              0.9373
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the propulsion Ownership, derived from its base stripe. Carries color/ownership/propulsion/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:52",
@@ -408,13 +408,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.8,
-              0.251,
-              0.149
+              0.5255,
+              0.1569,
+              0.1569
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the propulsion Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:54",
@@ -443,6 +443,52 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7:44",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "bg": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.9333,
+              0.9765,
+              0.9608
+            ],
+            "alpha": 1
+          },
+          "$description": "Chip background for the software Ownership, derived from its base stripe. Carries color/ownership/software/fg at 4.5:1 or better.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63832",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "fg": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.1137,
+              0.4941,
+              0.3686
+            ],
+            "alpha": 1
+          },
+          "$description": "Chip label for the software Ownership, derived from its base stripe.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63833",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -481,13 +527,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.9608,
-              0.9216,
-              0.9882
+              0.9765,
+              0.9333,
+              0.9529
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the payload Ownership, derived from its base stripe. Carries color/ownership/payload/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:44",
@@ -504,13 +550,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.549,
-              0.302,
-              0.749
+              0.5451,
+              0.1333,
+              0.3373
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the payload Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:46",
@@ -552,13 +598,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
+              0.9765,
               0.949,
-              0.949,
-              0.949
+              0.9333
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the mechanisms Ownership, derived from its base stripe. Carries color/ownership/mechanisms/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:60",
@@ -575,13 +621,13 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.349,
-              0.349,
-              0.4
+              0.549,
+              0.2902,
+              0.1294
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the mechanisms Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7908:62",
@@ -617,24 +663,22 @@
               "codeSyntax": {}
             }
           }
-        }
-      },
-      "avionics": {
+        },
         "bg": {
           "$type": "color",
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.9216,
-              0.9608,
-              0.9882
+              0.9373,
+              0.9373,
+              0.9725
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip background for the data-handling Ownership, derived from its base stripe. Carries color/ownership/data-handling/fg at 4.5:1 or better.",
           "$extensions": {
             "figma": {
-              "variableId": "VariableID:7908:56",
+              "variableId": "VariableID:8972:63834",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -648,64 +692,87 @@
           "$value": {
             "colorSpace": "srgb",
             "components": [
-              0.2,
-              0.451,
-              0.651
-            ],
-            "alpha": 1
-          },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
-          "$extensions": {
-            "figma": {
-              "variableId": "VariableID:7908:58",
-              "collection": "VariableCollectionId:7:2",
-              "scopes": [
-                "ALL_SCOPES"
-              ],
-              "codeSyntax": {}
-            }
-          }
-        }
-      },
-      "gnc": {
-        "bg": {
-          "$type": "color",
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
-              0.9098,
-              0.949,
-              0.9882
-            ],
-            "alpha": 1
-          },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
-          "$extensions": {
-            "figma": {
-              "variableId": "VariableID:7908:64",
-              "collection": "VariableCollectionId:7:2",
-              "scopes": [
-                "ALL_SCOPES"
-              ],
-              "codeSyntax": {}
-            }
-          }
-        },
-        "fg": {
-          "$type": "color",
-          "$value": {
-            "colorSpace": "srgb",
-            "components": [
+              0.1686,
               0.149,
-              0.4,
-              0.651
+              0.5333
             ],
             "alpha": 1
           },
-          "$description": "Ownership chip colour, derived from the reference prototypes.",
+          "$description": "Chip label for the data-handling Ownership, derived from its base stripe.",
           "$extensions": {
             "figma": {
-              "variableId": "VariableID:7908:66",
+              "variableId": "VariableID:8972:63835",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        }
+      },
+      "system": {
+        "bg": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.9333,
+              0.9333,
+              0.9765
+            ],
+            "alpha": 1
+          },
+          "$description": "Chip background for the system Ownership, derived from its base stripe. Carries color/ownership/system/fg at 4.5:1 or better.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63836",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "fg": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.1294,
+              0.1373,
+              0.549
+            ],
+            "alpha": 1
+          },
+          "$description": "Chip label for the system Ownership, derived from its base stripe.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63837",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "base": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.3882,
+              0.4,
+              0.9451
+            ],
+            "alpha": 1
+          },
+          "$description": "Stripe colour of the SYS system-rollup Ownership. Was color/ui/system before the family was made symmetric.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63838",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -1158,6 +1225,52 @@
               "codeSyntax": {}
             }
           }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0863,
+              0.1137,
+              0.1451
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/structure/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63818",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5647,
+              0.6941,
+              0.8745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/structure/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63819",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "attributes": {
@@ -1222,6 +1335,52 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:16:7",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0863,
+              0.1137,
+              0.1451
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/attributes/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63806",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5647,
+              0.6941,
+              0.8745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/attributes/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63807",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -1300,6 +1459,52 @@
               "codeSyntax": {}
             }
           }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0863,
+              0.1451,
+              0.1294
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/connections/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63810",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5647,
+              0.8745,
+              0.8471
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/connections/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63811",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "behavior": {
@@ -1364,6 +1569,52 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:16:13",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.1451,
+              0.1333,
+              0.0863
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/behavior/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63808",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8745,
+              0.698,
+              0.5647
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/behavior/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63809",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -1442,6 +1693,52 @@
               "codeSyntax": {}
             }
           }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0863,
+              0.1098,
+              0.1451
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/requirements/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63816",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5647,
+              0.6471,
+              0.8745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/requirements/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63817",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "verification": {
@@ -1506,6 +1803,52 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:16:19",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0941,
+              0.0863,
+              0.1451
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/verification/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63822",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.6784,
+              0.5647,
+              0.8745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/verification/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63823",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -1584,6 +1927,52 @@
               "codeSyntax": {}
             }
           }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0863,
+              0.098,
+              0.1451
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/allocations/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63804",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5843,
+              0.5647,
+              0.8745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/allocations/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63805",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "metadata": {
@@ -1648,6 +2037,52 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:16:25",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0863,
+              0.1137,
+              0.1451
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/metadata/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63814",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5647,
+              0.6706,
+              0.8745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/metadata/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63815",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -1726,6 +2161,52 @@
               "codeSyntax": {}
             }
           }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.1451,
+              0.1333,
+              0.0863
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/library/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63812",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8745,
+              0.6824,
+              0.5647
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/library/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63813",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "variation": {
@@ -1790,6 +2271,52 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:16:31",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "surface-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.1137,
+              0.0863,
+              0.1451
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/variation/surface. Sits at card elevation with a trace of the category hue.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63820",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "header-dark": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.7294,
+              0.5647,
+              0.8745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark counterpart of color/sysml/variation/header. Lightened so the category label reads on the dark surface.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63821",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -2493,6 +3020,29 @@
           }
         }
       },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0824,
+            0.2431,
+            0.2157
+          ],
+          "alpha": 1
+        },
+        "$description": "Between teal/800 and teal/950. Carries accent-strong in Bloom Dark.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8972:63839",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
       "950": {
         "$type": "color",
         "$value": {
@@ -2533,6 +3083,29 @@
         "$extensions": {
           "figma": {
             "variableId": "VariableID:7862:59",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9647,
+            0.8706,
+            0.8078
+          ],
+          "alpha": 1
+        },
+        "$description": "Between copper/50 and copper/300. Carries accent-strong in Forge Light.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8972:63840",
             "collection": "VariableCollectionId:7:2",
             "scopes": [
               "ALL_SCOPES"
@@ -2654,6 +3227,29 @@
           }
         }
       },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2784,
+            0.1294,
+            0.0784
+          ],
+          "alpha": 1
+        },
+        "$description": "Between copper/800 and copper/950. Carries accent-strong in Forge Dark.",
+        "$extensions": {
+          "figma": {
+            "variableId": "VariableID:8972:63841",
+            "collection": "VariableCollectionId:7:2",
+            "scopes": [
+              "ALL_SCOPES"
+            ],
+            "codeSyntax": {}
+          }
+        }
+      },
       "950": {
         "$type": "color",
         "$value": {
@@ -2695,6 +3291,29 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7862:62",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8706,
+              0.451,
+              0.451
+            ],
+            "alpha": 1
+          },
+          "$description": "Light step of the status hue, used as the status foreground in dark mode.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63825",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -2748,6 +3367,29 @@
               "codeSyntax": {}
             }
           }
+        },
+        "950": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.1137,
+              0.0549,
+              0.0549
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark subtle tint. Pairs with color/status/danger/300 as its foreground.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63824",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "warning": {
@@ -2766,6 +3408,29 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7862:64",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8706,
+              0.7098,
+              0.451
+            ],
+            "alpha": 1
+          },
+          "$description": "Light step of the status hue, used as the status foreground in dark mode.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63827",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -2819,6 +3484,29 @@
               "codeSyntax": {}
             }
           }
+        },
+        "950": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.1137,
+              0.0902,
+              0.0549
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark subtle tint. Pairs with color/status/warning/300 as its foreground.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63826",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "success": {
@@ -2837,6 +3525,29 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7907:37",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.451,
+              0.8706,
+              0.5725
+            ],
+            "alpha": 1
+          },
+          "$description": "Light step of the status hue, used as the status foreground in dark mode.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63829",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -2913,6 +3624,29 @@
               "codeSyntax": {}
             }
           }
+        },
+        "950": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0549,
+              0.1137,
+              0.0745
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark subtle tint. Pairs with color/status/success/300 as its foreground.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63828",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       },
       "info": {
@@ -2931,6 +3665,29 @@
           "$extensions": {
             "figma": {
               "variableId": "VariableID:7862:67",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.451,
+              0.6078,
+              0.8706
+            ],
+            "alpha": 1
+          },
+          "$description": "Light step of the status hue, used as the status foreground in dark mode.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63831",
               "collection": "VariableCollectionId:7:2",
               "scopes": [
                 "ALL_SCOPES"
@@ -2984,33 +3741,33 @@
               "codeSyntax": {}
             }
           }
+        },
+        "950": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0549,
+              0.0784,
+              0.1137
+            ],
+            "alpha": 1
+          },
+          "$description": "Dark subtle tint. Pairs with color/status/info/300 as its foreground.",
+          "$extensions": {
+            "figma": {
+              "variableId": "VariableID:8972:63830",
+              "collection": "VariableCollectionId:7:2",
+              "scopes": [
+                "ALL_SCOPES"
+              ],
+              "codeSyntax": {}
+            }
+          }
         }
       }
     },
     "ui": {
-      "system": {
-        "$type": "color",
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            0.3882,
-            0.4,
-            0.9451
-          ],
-          "alpha": 1
-        },
-        "$description": "Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token.",
-        "$extensions": {
-          "figma": {
-            "variableId": "VariableID:7862:68",
-            "collection": "VariableCollectionId:7:2",
-            "scopes": [
-              "ALL_SCOPES"
-            ],
-            "codeSyntax": {}
-          }
-        }
-      },
       "mode-cd": {
         "$type": "color",
         "$value": {
@@ -6651,7 +7408,8 @@
           "variableId": "VariableID:8081:127385",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6669,7 +7427,8 @@
           "variableId": "VariableID:7:66",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6687,7 +7446,8 @@
           "variableId": "VariableID:8081:127387",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6705,7 +7465,8 @@
           "variableId": "VariableID:7:68",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6723,7 +7484,8 @@
           "variableId": "VariableID:8081:127389",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6741,7 +7503,8 @@
           "variableId": "VariableID:7:70",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6759,7 +7522,8 @@
           "variableId": "VariableID:8081:127391",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6777,7 +7541,8 @@
           "variableId": "VariableID:7:71",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6795,7 +7560,8 @@
           "variableId": "VariableID:8081:127393",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6813,7 +7579,8 @@
           "variableId": "VariableID:7:72",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6831,7 +7598,8 @@
           "variableId": "VariableID:8081:127395",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6849,7 +7617,8 @@
           "variableId": "VariableID:7:73",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6867,7 +7636,8 @@
           "variableId": "VariableID:8081:127397",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6885,7 +7655,8 @@
           "variableId": "VariableID:7862:78",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6903,7 +7674,8 @@
           "variableId": "VariableID:8101:54581",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6921,7 +7693,8 @@
           "variableId": "VariableID:7:74",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6939,7 +7712,8 @@
           "variableId": "VariableID:8101:54583",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6957,7 +7731,8 @@
           "variableId": "VariableID:7862:79",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6975,7 +7750,8 @@
           "variableId": "VariableID:7862:80",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -6993,7 +7769,8 @@
           "variableId": "VariableID:8081:127399",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7011,7 +7788,8 @@
           "variableId": "VariableID:8101:54585",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7029,7 +7807,8 @@
           "variableId": "VariableID:7:75",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7047,7 +7826,8 @@
           "variableId": "VariableID:8472:7287",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7065,7 +7845,8 @@
           "variableId": "VariableID:8081:127401",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7083,7 +7864,8 @@
           "variableId": "VariableID:8081:127403",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7101,7 +7883,8 @@
           "variableId": "VariableID:7:76",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7119,7 +7902,8 @@
           "variableId": "VariableID:8081:127405",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7137,7 +7921,8 @@
           "variableId": "VariableID:8101:54587",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7155,7 +7940,8 @@
           "variableId": "VariableID:8081:127407",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7173,7 +7959,8 @@
           "variableId": "VariableID:7862:81",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7191,7 +7978,8 @@
           "variableId": "VariableID:8081:127409",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7209,7 +7997,8 @@
           "variableId": "VariableID:7862:82",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7227,7 +8016,8 @@
           "variableId": "VariableID:8101:54589",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7245,7 +8035,8 @@
           "variableId": "VariableID:8101:54591",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7263,7 +8054,8 @@
           "variableId": "VariableID:8101:54593",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7281,7 +8073,8 @@
           "variableId": "VariableID:8081:127411",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7299,7 +8092,8 @@
           "variableId": "VariableID:8101:54595",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7317,7 +8111,8 @@
           "variableId": "VariableID:7862:83",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7335,7 +8130,8 @@
           "variableId": "VariableID:8101:54597",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7353,7 +8149,8 @@
           "variableId": "VariableID:8101:54599",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7371,7 +8168,8 @@
           "variableId": "VariableID:8101:54601",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7389,7 +8187,8 @@
           "variableId": "VariableID:8101:54603",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7407,7 +8206,8 @@
           "variableId": "VariableID:8112:54589",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7425,7 +8225,8 @@
           "variableId": "VariableID:8112:54593",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7443,7 +8244,8 @@
           "variableId": "VariableID:8112:54585",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
@@ -7461,49 +8263,77 @@
           "variableId": "VariableID:8112:54587",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
       }
     },
     "overlap-6": {
-      "$type": "number",
-      "$value": -6,
+      "$type": "dimension",
+      "$value": {
+        "value": -6,
+        "unit": "px"
+      },
       "$description": "Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8112:54581",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
       }
     },
     "overlap-5": {
-      "$type": "number",
-      "$value": -5,
+      "$type": "dimension",
+      "$value": {
+        "value": -5,
+        "unit": "px"
+      },
       "$description": "Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8112:54583",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "WIDTH_HEIGHT",
+            "GAP"
           ],
           "codeSyntax": {}
         }
       }
     },
     "overlap-8": {
-      "$type": "number",
-      "$value": -8,
+      "$type": "dimension",
+      "$value": {
+        "value": -8,
+        "unit": "px"
+      },
       "$description": "Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8112:54591",
+          "collection": "VariableCollectionId:7:2",
+          "scopes": [
+            "WIDTH_HEIGHT",
+            "GAP"
+          ],
+          "codeSyntax": {}
+        }
+      }
+    },
+    "overlap-4": {
+      "$type": "number",
+      "$value": -4,
+      "$description": "Negative gap for a 20px avatar cluster: 4px of overlap still leaves both initials readable.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8988:4519",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
             "ALL_SCOPES"
@@ -7526,7 +8356,7 @@
           "variableId": "VariableID:8081:127363",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7544,7 +8374,7 @@
           "variableId": "VariableID:7862:69",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7562,7 +8392,7 @@
           "variableId": "VariableID:7862:70",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7580,7 +8410,7 @@
           "variableId": "VariableID:7862:71",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7598,7 +8428,7 @@
           "variableId": "VariableID:8081:127365",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7616,7 +8446,7 @@
           "variableId": "VariableID:7862:72",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7634,7 +8464,7 @@
           "variableId": "VariableID:8081:127367",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7652,7 +8482,7 @@
           "variableId": "VariableID:7862:73",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7670,7 +8500,7 @@
           "variableId": "VariableID:8081:127369",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7688,7 +8518,7 @@
           "variableId": "VariableID:7862:74",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7706,7 +8536,7 @@
           "variableId": "VariableID:8081:127371",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7724,7 +8554,7 @@
           "variableId": "VariableID:7862:75",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7742,7 +8572,7 @@
           "variableId": "VariableID:8081:127373",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7760,7 +8590,7 @@
           "variableId": "VariableID:7862:76",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7778,7 +8608,7 @@
           "variableId": "VariableID:8081:127375",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7796,7 +8626,7 @@
           "variableId": "VariableID:7862:77",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7814,7 +8644,7 @@
           "variableId": "VariableID:8081:127377",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7832,7 +8662,7 @@
           "variableId": "VariableID:8081:127379",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7850,7 +8680,7 @@
           "variableId": "VariableID:8081:127381",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7868,7 +8698,7 @@
           "variableId": "VariableID:8081:127383",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7886,52 +8716,61 @@
           "variableId": "VariableID:8101:54605",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
       }
     },
     "full": {
-      "$type": "number",
-      "$value": 999,
+      "$type": "dimension",
+      "$value": {
+        "value": 999,
+        "unit": "px"
+      },
       "$description": "Scale primitive, value in px, derived from the reference prototypes.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:7:83",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
       }
     },
     "1-5": {
-      "$type": "number",
-      "$value": 1.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 1.5,
+        "unit": "px"
+      },
       "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8103:2",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
       }
     },
     "2-5": {
-      "$type": "number",
-      "$value": 2.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 2.5,
+        "unit": "px"
+      },
       "$description": "Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8114:18890",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "CORNER_RADIUS"
           ],
           "codeSyntax": {}
         }
@@ -7951,7 +8790,7 @@
           "variableId": "VariableID:8114:18892",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -7969,7 +8808,7 @@
           "variableId": "VariableID:8081:127413",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -7987,7 +8826,7 @@
           "variableId": "VariableID:7862:84",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8005,7 +8844,7 @@
           "variableId": "VariableID:7862:85",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8023,7 +8862,7 @@
           "variableId": "VariableID:7862:86",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8041,7 +8880,7 @@
           "variableId": "VariableID:7862:87",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8059,7 +8898,7 @@
           "variableId": "VariableID:7862:88",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8077,7 +8916,7 @@
           "variableId": "VariableID:7862:89",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8095,7 +8934,7 @@
           "variableId": "VariableID:7862:90",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8113,7 +8952,7 @@
           "variableId": "VariableID:7862:91",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8131,7 +8970,7 @@
           "variableId": "VariableID:8081:127415",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8149,7 +8988,7 @@
           "variableId": "VariableID:7862:92",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8167,7 +9006,7 @@
           "variableId": "VariableID:8101:54607",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8185,7 +9024,7 @@
           "variableId": "VariableID:7862:93",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8203,7 +9042,7 @@
           "variableId": "VariableID:7862:94",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8221,7 +9060,7 @@
           "variableId": "VariableID:7862:95",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8239,7 +9078,7 @@
           "variableId": "VariableID:8101:54609",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8257,7 +9096,7 @@
           "variableId": "VariableID:8101:54611",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8275,7 +9114,7 @@
           "variableId": "VariableID:7862:96",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8293,7 +9132,7 @@
           "variableId": "VariableID:8081:127417",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
@@ -8311,94 +9150,127 @@
           "variableId": "VariableID:8081:127419",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
       }
     },
     "9-5": {
-      "$type": "number",
-      "$value": 9.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 9.5,
+        "unit": "px"
+      },
       "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8103:4",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
       }
     },
     "10-5": {
-      "$type": "number",
-      "$value": 10.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 10.5,
+        "unit": "px"
+      },
       "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8103:6",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
       }
     },
     "11-5": {
-      "$type": "number",
-      "$value": 11.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 11.5,
+        "unit": "px"
+      },
       "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8103:8",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
       }
     },
     "12-5": {
-      "$type": "number",
-      "$value": 12.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 12.5,
+        "unit": "px"
+      },
       "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8103:10",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
       }
     },
     "13-5": {
-      "$type": "number",
-      "$value": 13.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 13.5,
+        "unit": "px"
+      },
       "$description": "Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8103:12",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
-            "ALL_SCOPES"
+            "FONT_SIZE"
           ],
           "codeSyntax": {}
         }
       }
     },
     "5-5": {
-      "$type": "number",
-      "$value": 5.5,
+      "$type": "dimension",
+      "$value": {
+        "value": 5.5,
+        "unit": "px"
+      },
       "$description": "Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token.",
       "$extensions": {
         "figma": {
           "variableId": "VariableID:8114:18894",
+          "collection": "VariableCollectionId:7:2",
+          "scopes": [
+            "FONT_SIZE"
+          ],
+          "codeSyntax": {}
+        }
+      }
+    },
+    "8-5": {
+      "$type": "number",
+      "$value": 8.5,
+      "$description": "Initials of a 20px presence avatar in a dense stack.",
+      "$extensions": {
+        "figma": {
+          "variableId": "VariableID:8988:63928",
           "collection": "VariableCollectionId:7:2",
           "scopes": [
             "ALL_SCOPES"

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="NotificationServiceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,7 +9,8 @@
 
 namespace Mycelium.Forge.Tests.Services
 {
-    using Mycelium.Forge.Model;
+    using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Models.Notification;
     using Mycelium.Forge.Services;
 
     [TestFixture]

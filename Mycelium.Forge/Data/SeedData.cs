@@ -12,7 +12,6 @@ namespace Mycelium.Forge.Data
     using System.Diagnostics.CodeAnalysis;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Common.Extensions;
 
     /// <summary>
     /// Provides centralized development seed data entities for database persistence.
@@ -590,6 +589,34 @@ namespace Mycelium.Forge.Data
 
             PackageInvitations = Accounts.Select(CreatePackageInvitation).ToList();
 
+            OrganizationInvitations =
+            [
+                new OrganizationInvitation
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = RegisAccount.Id,
+                    Organization = StarionOrganization.Id,
+                    Target = NovakAccount.Id,
+                    OrganizationInvitationKind = OrganizationInvitationKind.MEMBER,
+                    Status = InvitationStatusKind.PENDING,
+                    ExperiesAt = DateTime.UtcNow.AddDays(7),
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow
+                },
+                new OrganizationInvitation
+                {
+                    Id = Guid.NewGuid(),
+                    Owner = RegisAccount.Id,
+                    Organization = StarionOrganization.Id,
+                    Target = StefanAccount.Id,
+                    OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR,
+                    Status = InvitationStatusKind.PENDING,
+                    ExperiesAt = DateTime.UtcNow.AddDays(7),
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow
+                }
+            ];
+
             ApiKeys =
             [
                 new APIKey
@@ -778,6 +805,11 @@ namespace Mycelium.Forge.Data
         /// Gets the master list of seeded package invitations.
         /// </summary>
         public static IReadOnlyList<PackageInvitation> PackageInvitations { get; }
+
+        /// <summary>
+        /// Gets the master list of seeded organization invitations.
+        /// </summary>
+        public static IReadOnlyList<OrganizationInvitation> OrganizationInvitations { get; }
 
         /// <summary>
         /// Gets the master list of API keys.

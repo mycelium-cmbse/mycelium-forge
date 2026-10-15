@@ -75,12 +75,14 @@ namespace Mycelium.Forge.Extensions
                 builder.Services.AddAuthorization();
                 builder.Services.AddCascadingAuthenticationState();
 
-                builder.Services.AddScoped<IThemeService, ThemeService>();
-                builder.Services.AddScoped<IScopeService, ScopeService>();
-                builder.Services.AddScoped<IUserService, UserService>();
-                builder.Services.AddScoped<IJsInterop, JsInterop>();
-                builder.Services.AddScoped<INotificationService, NotificationService>();
-                builder.Services.AddSingleton<IFileUploadStagingService, FileUploadStagingService>();
+            builder.Services.AddScoped<IThemeService, ThemeService>();
+            builder.Services.AddScoped<IScopeService, ScopeService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IJsInterop, JsInterop>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IFileUploadStagingService, FileUploadStagingService>();
+            builder.Services.AddSingleton<IForgeContext, ForgeContext>();
+            builder.Services.AddHostedService<ForgeInitializationHostedService>();
 
                 return builder;
             }

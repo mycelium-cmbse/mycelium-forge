@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="NotificationTypeExtensionsTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -11,8 +11,8 @@ namespace Mycelium.Forge.Tests.Extensions
 {
     using BlazorBlueprint.Components;
 
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Model;
 
     [TestFixture]
     public class NotificationTypeExtensionsTestFixture

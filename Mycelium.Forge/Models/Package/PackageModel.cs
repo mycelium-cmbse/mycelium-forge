@@ -145,16 +145,6 @@ namespace Mycelium.Forge.Models.Package
         public string License { get; set; } = "Apache-2.0";
 
         /// <summary>
-        /// Gets or sets the collection of maintainers for the package.
-        /// </summary>
-        public IReadOnlyList<PackageMaintainerModel> Maintainers { get; set; } = [];
-
-        /// <summary>
-        /// Gets the collection of release versions for the package.
-        /// </summary>
-        public IReadOnlyList<PackageVersionModel> Versions { get; set; } = [];
-
-        /// <summary>
         /// Gets the default caret-prefixed version constraint expression based on the release version.
         /// </summary>
         /// <returns>The formatted default version constraint string.</returns>

@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Dal.Services
 {
+    using ErrorOr;
+
     using Mycelium.Forge.Common;
 
     /// <summary>
@@ -16,5 +18,13 @@ namespace Mycelium.Forge.Dal.Services
     /// </summary>
     public interface IScopeService : IReadService<IScope>
     {
+        /// <summary>
+        /// Asynchronously reads a single <see cref="IScope" /> instance matching the specified scope short name.
+        /// </summary>
+        /// <param name="userContext">The contextual user information and assigned roles.</param>
+        /// <param name="shortName">The short name of the scope.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>A <see cref="ErrorOr{TValue}" /> containing the permitted <see cref="IScope" /> or an error.</returns>
+        Task<ErrorOr<IScope>> ReadByShortNameAsync(IUserContext userContext, string shortName, CancellationToken token = default);
     }
 }

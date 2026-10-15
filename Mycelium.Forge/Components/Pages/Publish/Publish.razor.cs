@@ -17,7 +17,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
     using Mycelium.Forge.Enums;
-    using Mycelium.Forge.Model;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
@@ -215,7 +214,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
             var parameters = new Dictionary<string, object>
             {
                 { nameof(PublishedToForgeDialog.Scope), scope },
-                { nameof(PublishedToForgeDialog.PackageName), packageName },
+                { nameof(PublishedToForgeDialog.PackageShortname), packageName },
                 { nameof(PublishedToForgeDialog.Version), version }
             };
 

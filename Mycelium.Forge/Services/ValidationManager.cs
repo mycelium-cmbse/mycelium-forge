@@ -24,8 +24,7 @@ namespace Mycelium.Forge.Services
         /// </summary>
         /// <param name="propertyName">The name of the property to query.</param>
         /// <returns>An enumerable of error messages, or an empty collection if none exist.</returns>
-        public IEnumerable<string> this[string propertyName] =>
-            this.errors.TryGetValue(propertyName, out var list) ? list : [];
+        public IEnumerable<string> this[string propertyName] => this.errors.TryGetValue(propertyName, out var list) ? list : [];
 
         /// <summary>
         /// Gets a value indicating whether all managed fields are valid with zero errors.
