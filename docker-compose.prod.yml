@@ -1,4 +1,4 @@
-# Production deployment (current state): runs the published Mycelium.Forge image against a real
+﻿# Production deployment (current state): runs the published Mycelium.Forge image against a real
 # PostgreSQL instance. Program.cs's normal startup path still doesn't touch PostgreSQL, Garage or
 # Keycloak itself (only the standalone `migrate` command reads ConnectionStrings:Default) - but
 # schema.sql is worth applying now, so postgres + the one-shot migrator are wired up for real, the
@@ -54,6 +54,11 @@ services:
     image: ${IMAGE:-ghcr.io/mycelium-cmbse/mycelium-forge}:${TAG:-latest}
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      DatabaseConnection__Host: postgres
+      DatabaseConnection__Port: "5432"
+      DatabaseConnection__Database: forge
+      DatabaseConnection__Username: forge
+      DatabaseConnection__Password: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
     ports:
       # Bound to localhost only - the image serves plain HTTP, so a reverse proxy on the same host
       # terminates TLS and forwards here. Don't expose this port to the internet directly.

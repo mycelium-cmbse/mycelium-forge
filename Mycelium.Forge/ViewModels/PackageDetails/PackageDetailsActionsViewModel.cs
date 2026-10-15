@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsActionsViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,8 +10,8 @@
 namespace Mycelium.Forge.ViewModels.PackageDetails
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Model;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
 

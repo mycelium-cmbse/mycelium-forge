@@ -27,7 +27,8 @@
         </div>
     </ChildContent>
     <Footer>
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="published-to-forge-close-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCloseClicked)"
@@ -35,7 +36,8 @@
             Close
         </BbButton>
 
-        <BbButton Variant="ButtonVariant.Default"
+        <BbButton id="published-to-forge-view-button"
+                  Variant="ButtonVariant.Default"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnViewPackageClicked)"

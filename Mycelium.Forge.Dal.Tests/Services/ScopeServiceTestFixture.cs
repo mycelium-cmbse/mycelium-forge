@@ -27,9 +27,6 @@ namespace Mycelium.Forge.Dal.Tests.Services
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Test fixture for <see cref="ScopeService" />.
-    /// </summary>
     [TestFixture]
     public class ScopeServiceTestFixture
     {
@@ -40,9 +37,6 @@ namespace Mycelium.Forge.Dal.Tests.Services
         private ScopeService service;
         private IUserContext userContext;
 
-        /// <summary>
-        /// Sets up mock dependencies and test instances before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -52,11 +46,7 @@ namespace Mycelium.Forge.Dal.Tests.Services
             this.loggerMock = new Mock<ILogger<ScopeService>>();
             this.loggerMock.Setup(x => x.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
-            this.service = new ScopeService(
-                this.organizationServiceMock.Object,
-                this.accountServiceMock.Object,
-                this.databaseSourceMock.Object,
-                this.loggerMock.Object);
+            this.service = new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, this.databaseSourceMock.Object, this.loggerMock.Object);
 
             this.userContext = new UserContext
             {
@@ -66,9 +56,6 @@ namespace Mycelium.Forge.Dal.Tests.Services
             };
         }
 
-        /// <summary>
-        /// Verifies the <see cref="ScopeService" /> constructor and its parameter null checks.
-        /// </summary>
         [Test]
         public void VerifyConstructor()
         {
@@ -79,20 +66,12 @@ namespace Mycelium.Forge.Dal.Tests.Services
                 Assert.That(() => new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, null, this.loggerMock.Object), Throws.ArgumentNullException);
                 Assert.That(() => new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, this.databaseSourceMock.Object, null), Throws.ArgumentNullException);
 
-                var instance = new ScopeService(
-                    this.organizationServiceMock.Object,
-                    this.accountServiceMock.Object,
-                    this.databaseSourceMock.Object,
-                    this.loggerMock.Object);
+                var instance = new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, this.databaseSourceMock.Object, this.loggerMock.Object);
 
                 Assert.That(instance, Is.Not.Null);
             }
         }
 
-        /// <summary>
-        /// Verifies all scenarios for reading scopes asynchronously.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -104,9 +83,9 @@ namespace Mycelium.Forge.Dal.Tests.Services
             // Null checks
             using (Assert.EnterMultipleScope())
             {
-                Assert.ThrowsAsync<ArgumentNullException>(async () => await this.service.ReadAsync(null, dummyTransaction, CancellationToken.None));
-                Assert.ThrowsAsync<ArgumentNullException>(async () => await this.service.ReadAsync(this.userContext, null, CancellationToken.None));
-                Assert.ThrowsAsync<ArgumentNullException>(async () => await this.service.ReadAsync(null, CancellationToken.None));
+                Assert.That(async () => await this.service.ReadAsync(null, dummyTransaction, CancellationToken.None), Throws.ArgumentNullException);
+                Assert.That(async () => await this.service.ReadAsync(this.userContext, null, CancellationToken.None), Throws.ArgumentNullException);
+                Assert.That(async () => await this.service.ReadAsync(null, CancellationToken.None), Throws.ArgumentNullException);
             }
 
             // Case: Both services return errors
@@ -237,8 +216,9 @@ namespace Mycelium.Forge.Dal.Tests.Services
             }
 
             // Case: Standalone connection exception handled gracefully
-            this.databaseSourceMock.Setup(x => x.OpenNewConnectionAsync(It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("Connection failed"));
+            this.databaseSourceMock
+                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<ImmutableList<IScope>>>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Error.Failure(description: "Connection failed"));
 
             var connectionFailResult = await this.service.ReadAsync(this.userContext, CancellationToken.None);
 
@@ -246,6 +226,59 @@ namespace Mycelium.Forge.Dal.Tests.Services
             {
                 Assert.That(connectionFailResult.IsError, Is.True);
                 Assert.That(connectionFailResult.Errors[0].Description, Does.Contain("Connection failed"));
+            }
+        }
+
+        [Test]
+        public async Task VerifyReadByShortNameAsync()
+        {
+            var org = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
+            var account = new Account { Id = Guid.NewGuid(), Name = "Acc", ShortName = "acc" };
+
+            Assert.That(async () => await this.service.ReadByShortNameAsync(null, "org", CancellationToken.None), Throws.ArgumentNullException);
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "org", It.IsAny<CancellationToken>())).ReturnsAsync(org);
+
+            var orgSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, "org", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgSuccessResult.IsError, Is.False);
+                Assert.That(orgSuccessResult.Value.ShortName, Is.EqualTo("org"));
+                this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "fail", It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Database failure"));
+
+            var orgFailureResult = await this.service.ReadByShortNameAsync(this.userContext, "fail", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgFailureResult.IsError, Is.True);
+                Assert.That(orgFailureResult.FirstError.Description, Is.EqualTo("Database failure"));
+                this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "acc", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Org not found"));
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "acc", It.IsAny<CancellationToken>())).ReturnsAsync(account);
+
+            var accountSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, "acc", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(accountSuccessResult.IsError, Is.False);
+                Assert.That(accountSuccessResult.Value.ShortName, Is.EqualTo("acc"));
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "none", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Org not found"));
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "none", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Account not found"));
+
+            var notFoundResult = await this.service.ReadByShortNameAsync(this.userContext, "none", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(notFoundResult.IsError, Is.True);
+                Assert.That(notFoundResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
             }
         }
     }

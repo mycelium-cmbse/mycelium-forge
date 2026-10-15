@@ -11,9 +11,8 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
 {
     using ErrorOr;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.DialogResults;
-    using Mycelium.Forge.Models.Organization;
-    using Mycelium.Forge.Models.Profile;
 
     /// <summary>
     /// Defines the view model contract for the user account settings and profile page.
@@ -21,41 +20,43 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
     public interface IAccountSettingsViewModel
     {
         /// <summary>
-        /// Gets or sets the user profile details.
+        /// Gets or sets the user profile account DTO.
         /// </summary>
-        UserProfileModel Profile { get; set; }
+        IAccount Profile { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of organization memberships associated with the user account.
+        /// Gets or sets the collection of organizations associated with the user account.
         /// </summary>
-        List<AccountOrganizationMembershipModel> Organizations { get; set; }
+        IReadOnlyList<IOrganization> Organizations { get; set; }
 
         /// <summary>
-        /// Initializes the view model state and populates initial user profile and organization data.
+        /// Gets or sets the primary address location string.
         /// </summary>
-        void InitializeViewModel();
+        string Location { get; set; }
 
         /// <summary>
-        /// Updates the user profile with the specified profile details.
+        /// Initializes the view model state and populates initial user profile and organization data asynchronously.
         /// </summary>
-        /// <param name="profile">The updated <see cref="UserProfileModel" /> data.</param>
-        void UpdateProfile(UserProfileModel profile);
+        /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
+        Task InitializeViewModel();
 
         /// <summary>
-        /// Creates a new organization associated with the user account.
+        /// Creates a new organization associated with the user account asynchronously.
         /// </summary>
         /// <param name="result">The organization creation data.</param>
-        /// <returns>A <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
-        ErrorOr<Success> CreateOrganization(CreateOrganizationResult result);
+        /// <returns>A task indicating the success or failure of the operation.</returns>
+        Task<ErrorOr<Success>> CreateOrganization(CreateOrganizationResult result);
 
         /// <summary>
-        /// Handles the deactivation of the current user account.
+        /// Handles the deactivation of the current user account asynchronously.
         /// </summary>
-        void DeactivateAccount();
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task DeactivateAccount();
 
         /// <summary>
-        /// Handles the deletion of the current user account.
+        /// Handles the deletion of the current user account asynchronously.
         /// </summary>
-        void DeleteAccount();
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task DeleteAccount();
     }
 }

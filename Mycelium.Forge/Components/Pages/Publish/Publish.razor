@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="Publish.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -6,8 +6,6 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
-
-@using Mycelium.Forge.Models.Validation
 @attribute [Route(PageRoutes.Publish)]
 @rendermode InteractiveServer
 
@@ -176,7 +174,7 @@
                          ValueChanged="@(this.OnVisibilityChanged)"
                          Items="@(this.ViewModel.VisibilityOptions)"
                          id="publish-visibility"
-                         DisplayTextSelector="@(x => x.ToLowerCaseFirst())"/>
+                         DisplayTextSelector="@(x => x.ToUpperCaseFirst())"/>
         </BbFieldContent>
         <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
             Public: anyone can find and download it. Organization: visible to members of the owning scope. Private: only Maintainers and Accounts granted the Reader role. New packages default to private.
@@ -277,6 +275,6 @@
         <span>@(this.GetPublishButtonText())</span>
     </BbButton>
 </ForgeCard>
-    </div>
+</div>
 </div>
 </div>

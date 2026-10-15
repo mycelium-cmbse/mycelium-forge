@@ -77,6 +77,8 @@ namespace Mycelium.Forge.Extensions
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IJsInterop, JsInterop>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IForgeContext, ForgeContext>();
+            builder.Services.AddHostedService<ForgeInitializationHostedService>();
 
             return builder;
         }

@@ -28,7 +28,6 @@ namespace Mycelium.Forge.Extensions
             /// returning an empty collection if an error occurs or if no identifiers are specified when required.
             /// </summary>
             /// <typeparam name="T">The domain entity type implementing <see cref="IThing" />.</typeparam>
-            /// <param name="service">The <see cref="IReadService{T}" /> instance.</param>
             /// <param name="userContext">The contextual user information and assigned roles.</param>
             /// <param name="iids">An optional collection of unique identifiers to read.</param>
             /// <param name="emptyWhenNoIds">

@@ -14,16 +14,23 @@ namespace Mycelium.Forge.Extensions
     /// </summary>
     public static class EnumExtensions
     {
-        /// <summary>
-        /// Converts the enumeration value to a string representation with lowercase characters.
-        /// </summary>
         /// <param name="value">The enumeration value to convert.</param>
-        /// <returns>The string representation of the enumeration value formatted with lowercase characters.</returns>
-        public static string ToLowerCaseFirst(this Enum value)
+        extension(Enum value)
         {
-            return value == null
-                ? string.Empty
-                : value.ToString().ToUpperCaseFirst();
+            /// <summary>
+            /// Converts the enumeration value to a string representation with the first character in uppercase and remaining
+            /// characters in lowercase.
+            /// </summary>
+            /// <returns>
+            /// The string representation of the enumeration value formatted with first letter capitalized and remaining
+            /// characters lowercase.
+            /// </returns>
+            public string ToUpperCaseFirst()
+            {
+                return value == null
+                    ? string.Empty
+                    : value.ToString().ToUpperCaseFirst();
+            }
         }
     }
 }

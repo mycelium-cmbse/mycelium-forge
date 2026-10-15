@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="AddToProjectDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -49,14 +49,16 @@
                     Class="p-2.5 px-3 rounded-md gap-2"/>
     </ChildContent>
     <Footer>
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="add-to-project-cancel-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCancelClicked)">
             Cancel
         </BbButton>
 
-        <BbButton Variant="ButtonVariant.Default"
+        <BbButton id="add-to-project-submit-button"
+                  Variant="ButtonVariant.Default"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnAddDependencyClicked)">

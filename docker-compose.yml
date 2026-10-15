@@ -100,6 +100,17 @@ services:
       postgres:
         condition: service_healthy
 
+  seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["seed"]
+    environment:
+      <<: *database-environment
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+
   app:
     build:
       context: .
@@ -110,7 +121,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      migrator:
+      seeder:
         condition: service_completed_successfully
       garage:
         condition: service_healthy

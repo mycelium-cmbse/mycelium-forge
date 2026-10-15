@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="DatabaseSourceTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,22 +9,26 @@
 
 namespace Mycelium.Forge.Dal.Tests.DatabaseSource
 {
-    using System;
+    using Microsoft.Extensions.Logging;
+
+    using Moq;
 
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Orm;
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Test fixture for <see cref="DatabaseSource" />.
-    /// </summary>
     [TestFixture]
     public class DatabaseSourceTestFixture
     {
-        /// <summary>
-        /// Verifies the <see cref="DatabaseSource" /> constructor.
-        /// </summary>
+        private Mock<ILogger<DatabaseSource>> loggerMock;
+
+        [SetUp]
+        public void SetUp()
+        {
+            this.loggerMock = new Mock<ILogger<DatabaseSource>>();
+        }
+
         [Test]
         public void VerifyConstructor()
         {
@@ -37,18 +41,16 @@ namespace Mycelium.Forge.Dal.Tests.DatabaseSource
                 Password = "password"
             };
 
-            var databaseSource = new DatabaseSource(config);
+            var databaseSource = new DatabaseSource(config, this.loggerMock.Object);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => new DatabaseSource(null), Throws.ArgumentNullException);
+                Assert.That(() => new DatabaseSource(null, this.loggerMock.Object), Throws.ArgumentNullException);
+                Assert.That(() => new DatabaseSource(config, null), Throws.ArgumentNullException);
                 Assert.That(databaseSource, Is.Not.Null);
             }
         }
 
-        /// <summary>
-        /// Verifies the <see cref="DatabaseSource.ExecuteInTransactionAsync" /> method.
-        /// </summary>
         [Test]
         public void VerifyExecuteInTransactionAsync()
         {
@@ -61,9 +63,9 @@ namespace Mycelium.Forge.Dal.Tests.DatabaseSource
                 Password = "password"
             };
 
-            var databaseSource = new DatabaseSource(config);
+            var databaseSource = new DatabaseSource(config, this.loggerMock.Object);
 
-            Assert.That(async () => await databaseSource.ExecuteInTransactionAsync(null, CancellationToken.None), Throws.ArgumentNullException);
+            Assert.That(async () => await databaseSource.ExecuteInTransactionAsync<bool>(null, CancellationToken.None), Throws.ArgumentNullException);
         }
     }
 }

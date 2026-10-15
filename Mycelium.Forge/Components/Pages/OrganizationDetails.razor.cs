@@ -37,6 +37,12 @@ namespace Mycelium.Forge.Components.Pages
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
+
+            if (string.IsNullOrWhiteSpace(this.ShortName))
+            {
+                return;
+            }
+
             await this.ViewModel.InitializeViewModel(this.ShortName);
         }
     }

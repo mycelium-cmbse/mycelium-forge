@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="CreateApiKeyDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -77,14 +77,16 @@
         </BbField>
     </ChildContent>
     <Footer>
-        <BbButton Variant="ButtonVariant.Outline"
+        <BbButton id="create-api-key-cancel-button"
+                  Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCancelClicked)">
             Cancel
         </BbButton>
 
-        <BbButton Variant="ButtonVariant.Default"
+        <BbButton id="create-api-key-submit-button"
+                  Variant="ButtonVariant.Default"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
                   OnClick="@(this.OnCreateKeyClicked)">

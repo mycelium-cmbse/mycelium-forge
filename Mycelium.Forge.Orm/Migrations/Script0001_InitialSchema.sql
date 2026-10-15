@@ -241,6 +241,22 @@ ALTER TABLE "Forge"."ProfileType" ADD CONSTRAINT "ProfileType_Thing_FK_Source" F
 ALTER TABLE "Forge"."Scope" ADD CONSTRAINT "Scope_Thing_FK_Source" FOREIGN KEY ("id") REFERENCES "Forge"."Thing" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 
 -- Many to Many link tables including Foreign Key Constraints
+CREATE TABLE "Forge"."Forge_administrator__Account" (
+    "sourceForge" uuid NOT NULL,
+    "targetAccount" uuid NOT NULL,
+    PRIMARY KEY ("sourceForge", "targetAccount")
+);
+
+ALTER TABLE "Forge"."Forge_administrator__Account" SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE "Forge"."Forge_administrator__Account" SET (autovacuum_vacuum_threshold = 2500);
+ALTER TABLE "Forge"."Forge_administrator__Account" SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE "Forge"."Forge_administrator__Account" SET (autovacuum_analyze_threshold = 2500);
+
+ALTER TABLE "Forge"."Forge_administrator__Account" ADD CONSTRAINT "Forge_FK_Source" FOREIGN KEY ("sourceForge") REFERENCES "Forge"."Forge" ("id") ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX "idx_Forge_administrator_sourceForge" ON "Forge"."Forge_administrator__Account" ("sourceForge");
+ALTER TABLE "Forge"."Forge_administrator__Account" ADD CONSTRAINT "Account_FK_Target" FOREIGN KEY ("targetAccount") REFERENCES "Forge"."Account" ("id") ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX "idx_Forge_administrator_targetAccount" ON "Forge"."Forge_administrator__Account" ("targetAccount");
+
 CREATE TABLE "Forge"."Organization_administrator__Account" (
     "sourceOrganization" uuid NOT NULL,
     "targetAccount" uuid NOT NULL,

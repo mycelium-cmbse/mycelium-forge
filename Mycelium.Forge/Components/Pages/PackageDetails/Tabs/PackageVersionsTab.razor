@@ -6,8 +6,6 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
-
-@using Mycelium.Forge.Common
 @if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
@@ -63,17 +61,17 @@
                             @if (this.IsLatestVersion(ver))
                             {
                                 <ForgeBadge Text="Latest"
-                                            Class="badge-lifecycle-open" />
+                                            Class="badge-lifecycle-open"/>
                             }
                             else if (!ver.Listed)
                             {
                                 <ForgeBadge Text="Unlisted"
-                                            Class="badge-lifecycle-archived" />
+                                            Class="badge-lifecycle-archived"/>
                             }
                             else if (ver.IsDeprecated)
                             {
                                 <ForgeBadge Text="Deprecated"
-                                            Class="badge-lifecycle-archived" />
+                                            Class="badge-lifecycle-archived"/>
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 text-muted-foreground p-0">
@@ -99,7 +97,7 @@
                             @if (!ver.Listed)
                             {
                                 <ForgeBadge Text="Unlisted"
-                                            Class="badge-lifecycle-archived" />
+                                            Class="badge-lifecycle-archived"/>
                             }
                             else
                             {

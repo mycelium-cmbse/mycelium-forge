@@ -38,7 +38,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.AddressLine1).NotEmpty();
             this.RuleFor(x => x.Country).NotEmpty();
             this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Id).NotNull();
+            this.RuleFor(x => x.Id).NotEmpty();
             this.RuleFor(x => x.Locality).NotEmpty();
             this.RuleFor(x => x.ModifiedAt).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();

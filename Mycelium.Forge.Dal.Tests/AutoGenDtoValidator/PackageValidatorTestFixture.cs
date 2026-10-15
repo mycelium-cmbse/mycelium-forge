@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageValidatorTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -14,27 +14,17 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Test fixture for <see cref="PackageValidator" />.
-    /// </summary>
     [TestFixture]
     public class PackageValidatorTestFixture
     {
         private PackageValidator validator;
 
-        /// <summary>
-        /// Sets up the test fixture before each test.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
             this.validator = new PackageValidator();
         }
 
-        /// <summary>
-        /// Verifies the <see cref="PackageValidator.ValidateDto" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyValidateDto()
         {
@@ -77,10 +67,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
             }
         }
 
-        /// <summary>
-        /// Verifies the <see cref="PackageValidator.ValidateFields" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyValidateFields()
         {
@@ -90,13 +76,27 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 ShortName = string.Empty
             };
 
+            var packageWithPackageType = new Package
+            {
+                PackageType = Guid.NewGuid()
+            };
+
+            var packageWithEmptyPackageType = new Package
+            {
+                PackageType = Guid.Empty
+            };
+
             var nameResult = await this.validator.ValidateFields(packageWithValidNameOnly, x => x.Name);
             var shortNameResult = await this.validator.ValidateFields(packageWithValidNameOnly, x => x.ShortName);
+            var validPackageTypeResult = await this.validator.ValidateFields(packageWithPackageType, x => x.PackageType);
+            var invalidPackageTypeResult = await this.validator.ValidateFields(packageWithEmptyPackageType, x => x.PackageType);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(nameResult.IsError, Is.False);
                 Assert.That(shortNameResult.IsError, Is.True);
+                Assert.That(validPackageTypeResult.IsError, Is.False);
+                Assert.That(invalidPackageTypeResult.IsError, Is.True);
             }
         }
     }

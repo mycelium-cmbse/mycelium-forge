@@ -36,7 +36,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         public PackageMetaDataValidator()
         {
             this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Id).NotNull();
+            this.RuleFor(x => x.Id).NotEmpty();
             this.RuleFor(x => x.ModifiedAt).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
             this.AddCustomValidation();
