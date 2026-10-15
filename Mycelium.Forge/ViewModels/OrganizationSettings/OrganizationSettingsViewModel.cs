@@ -314,7 +314,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public Task TransferOrganization()
         {
-            // TODO: Implement organization transfer logic.
             return Task.CompletedTask;
         }
     }

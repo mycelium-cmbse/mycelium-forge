@@ -134,14 +134,11 @@
                 <span class="section-label flex-1">
                     ORGANIZATIONS
                 </span>
-                @* TODO: Align with designer why "Transfer" button opens the dialog to create a new organization *@
-                <BbButton id="account-settings-transfer-org-button"
-                          Variant="ButtonVariant.Outline"
+                <BbButton id="account-settings-create-org-button"
                           Size="ButtonSize.Small"
                           Type="ButtonType.Button"
-                          OnClick="@(this.OnCreateOrganization)"
-                          Class="btn-destructive-outline h-7 text-xs px-2.5 shrink-0">
-                    Transfer
+                          OnClick="@(this.OnCreateOrganization)">
+                    Create Organization
                 </BbButton>
             </div>
 

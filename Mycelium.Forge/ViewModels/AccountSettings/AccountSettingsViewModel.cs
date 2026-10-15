@@ -79,8 +79,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" />.</param>
         /// <param name="forgeContext">The (injected) <see cref="IForgeContext" />.</param>
         /// <param name="notificationService">The (injected) <see cref="INotificationService" />.</param>
-        public AccountSettingsViewModel(ILogger<AccountSettingsViewModel> logger, IUserService userService, IAccountService accountService, IAddressService addressService,
-            IOrganizationService organizationService, IForgeContext forgeContext, INotificationService notificationService)
+        public AccountSettingsViewModel(ILogger<AccountSettingsViewModel> logger, IUserService userService, IAccountService accountService, IAddressService addressService, IOrganizationService organizationService, IForgeContext forgeContext, INotificationService notificationService)
         {
             this.accountService = accountService;
             this.addressService = addressService;
@@ -187,7 +186,6 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public Task DeactivateAccount()
         {
-            // TODO: Implement account deactivation logic.
             return Task.CompletedTask;
         }
 
@@ -197,7 +195,6 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public Task DeleteAccount()
         {
-            // TODO: Implement account deletion logic.
             return Task.CompletedTask;
         }
     }

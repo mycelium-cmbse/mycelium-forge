@@ -280,7 +280,6 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A task indicating the success or failure of the operation.</returns>
         public Task<ErrorOr<Success>> TransferOwnership(string targetScope, CancellationToken token = default)
         {
-            // TODO: Implement the logic to transfer package ownership to the specified target scope.
             return Task.FromResult<ErrorOr<Success>>(Error.Failure(description: "Not implemented"));
         }
 

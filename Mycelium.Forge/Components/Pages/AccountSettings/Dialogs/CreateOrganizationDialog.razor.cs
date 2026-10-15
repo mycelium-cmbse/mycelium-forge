@@ -9,12 +9,11 @@
 
 namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
 {
-    using System.Text.RegularExpressions;
-
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Dal.AutoGenDtoValidator;
     using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.DialogResults;
@@ -126,7 +125,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         public async Task OnCreateOrganizationClicked()
         {
             var cleanScope = this.Scope.CleanScope();
-            var isScopeValid = !string.IsNullOrWhiteSpace(cleanScope) && ScopeFormatRegex().IsMatch(cleanScope);
+            var isScopeValid = !string.IsNullOrWhiteSpace(cleanScope) && OrganizationValidator.ScopeFormatRegex().IsMatch(cleanScope);
 
             var isValid = this.ValidationManager
                 .Check(nameof(this.OrganizationName), !string.IsNullOrWhiteSpace(this.OrganizationName), "Organization name is required.")
@@ -162,12 +161,5 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
                 await this.DialogReference.CloseAsync(DialogResult.Ok(result));
             }
         }
-
-        /// <summary>
-        /// Regular expression used to validate organization scope format.
-        /// </summary>
-        /// <returns>A compiled <see cref="Regex" /> instance.</returns>
-        [GeneratedRegex("^[a-z0-9][a-z0-9.-]*$", RegexOptions.None, 1000)]
-        private static partial Regex ScopeFormatRegex();
     }
 }

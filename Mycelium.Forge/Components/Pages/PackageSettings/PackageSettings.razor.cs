@@ -107,7 +107,6 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// </summary>
         private static void OnAddMaintainer()
         {
-            // TODO: Implement add maintainer logic.
         }
 
         /// <summary>
@@ -116,7 +115,6 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <param name="maintainer">The target maintainer account.</param>
         private static void OnMaintainerMenu(IAccount maintainer)
         {
-            // TODO: Implement maintainer options menu logic.
         }
 
         /// <summary>

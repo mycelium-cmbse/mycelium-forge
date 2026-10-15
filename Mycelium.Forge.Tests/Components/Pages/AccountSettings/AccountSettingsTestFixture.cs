@@ -110,7 +110,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         public async Task VerifyOnCreateOrganization()
         {
             var accountSettingsPage = this.context.Render<AccountSettings>();
-            var transferButton = accountSettingsPage.Find("#account-settings-transfer-org-button");
+            var transferButton = accountSettingsPage.Find("#account-settings-create-org-button");
 
             _ = accountSettingsPage.InvokeAsync(() => transferButton.ClickAsync());
 

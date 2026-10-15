@@ -67,9 +67,7 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         /// <param name="action">The asynchronous operation to execute within the transaction.</param>
         /// <param name="cancellationToken">The cancellation token used to cancel the operation.</param>
         /// <returns>A <see cref="Task" /> representing the result of the operation or an error.</returns>
-        public async Task<ErrorOr<TValue>> ExecuteInTransactionAsync<TValue>(
-            Func<NpgsqlTransaction, Task<ErrorOr<TValue>>> action,
-            CancellationToken cancellationToken = default)
+        public async Task<ErrorOr<TValue>> ExecuteInTransactionAsync<TValue>(Func<NpgsqlTransaction, Task<ErrorOr<TValue>>> action, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(action);
 

@@ -112,7 +112,6 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         private static void OnChangeUsername()
         {
-            // TODO: Implement username change logic.
         }
 
         /// <summary>
@@ -120,7 +119,6 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         private static void OnChangeEmail()
         {
-            // TODO: Implement email change logic.
         }
 
         /// <summary>
@@ -128,7 +126,6 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         private static void OnEditDisplayName()
         {
-            // TODO: Implement display name editing logic.
         }
 
         /// <summary>
@@ -136,7 +133,6 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         private static void OnEditLocation()
         {
-            // TODO: Implement location editing logic.
         }
 
         /// <summary>
@@ -144,7 +140,6 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// </summary>
         private static void OnEditWebsite()
         {
-            // TODO: Implement website editing logic.
         }
 
         /// <summary>

@@ -61,19 +61,13 @@ namespace Mycelium.Forge.Tests.Services
             // Scenario 1: Forge service returns an error
             this.forgeServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(Error.Failure("Service error"));
 
-            var failureEx = Assert.ThrowsAsync<InvalidOperationException>(() => this.forgeContext.InitializeAsync(CancellationToken.None));
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(failureEx.Message, Does.Contain("Failed to initialize Forge context."));
-                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
-            }
+            Assert.That(async () => await this.forgeContext.InitializeAsync(CancellationToken.None), Throws.InvalidOperationException.With.Message.Contain("Failed to initialize Forge context."));
+            this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 
             // Scenario 2: Forge service returns empty list
             this.forgeServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IForge>.Empty);
 
-            var emptyEx = Assert.ThrowsAsync<InvalidOperationException>(() => this.forgeContext.InitializeAsync(CancellationToken.None));
-            Assert.That(emptyEx.Message, Does.Contain("Failed to initialize Forge context."));
+            Assert.That(async () => await this.forgeContext.InitializeAsync(CancellationToken.None), Throws.InvalidOperationException.With.Message.Contain("Failed to initialize Forge context."));
 
             // Scenario 3: Happy path - successful initialization with logger enabled
             this.loggerMock.Setup(x => x.IsEnabled(LogLevel.Information)).Returns(true);
