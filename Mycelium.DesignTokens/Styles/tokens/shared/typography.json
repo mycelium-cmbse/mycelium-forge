@@ -382,6 +382,35 @@
               "textDecoration": "NONE"
             }
           }
+        },
+        "prose-12": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 19,
+              "unit": "px"
+            }
+          },
+          "$description": "Hypha assistant prose and labels.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:dde21e37e2f05105e3132037ad4ccd8d4d42c459,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
         }
       },
       "label": {
@@ -591,8 +620,8 @@
           }
         }
       },
-      "raw": {
-        "inter-regular-12": {
+      "ui": {
+        "regular-12": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -607,7 +636,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 3070 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-12 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:90cd00572bc6ebb0dd68e0077616e0d18269b533,",
@@ -618,7 +647,7 @@
             }
           }
         },
-        "inter-regular-11": {
+        "regular-11": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -633,7 +662,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 2463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-11 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:a948c750ea644f4ce7f16e44e04c4a66283b9afa,",
@@ -644,7 +673,7 @@
             }
           }
         },
-        "inter-regular-13": {
+        "regular-13": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -659,7 +688,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 2142 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-13 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:89d21b2f00388f07bba5e421cc781d1651e3acfb,",
@@ -670,7 +699,7 @@
             }
           }
         },
-        "inter-medium-12": {
+        "medium-12": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -685,7 +714,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 2129 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-12 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:ca4917d385c1b201b0742e4db63b82f342a28767,",
@@ -696,7 +725,7 @@
             }
           }
         },
-        "inter-semi-bold-11": {
+        "semibold-11": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -711,7 +740,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 1402 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-11 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:8c1fea55938bbd6af8ca0183aac9596f9bbeba00,",
@@ -722,7 +751,7 @@
             }
           }
         },
-        "jetbrains-mono-bold-10": {
+        "mono-bold-10": {
           "$type": "typography",
           "$value": {
             "fontFamily": "JetBrains Mono",
@@ -737,7 +766,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 1410 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-bold-10 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:6114228549f47a8353297d90f2bfa3559e060f86,",
@@ -748,7 +777,7 @@
             }
           }
         },
-        "inter-medium-13": {
+        "medium-13": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -763,7 +792,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 1452 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-13 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:4775816d80c9ef8427315fad3905436017702f26,",
@@ -774,7 +803,7 @@
             }
           }
         },
-        "inter-semi-bold-13": {
+        "semibold-13": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -789,7 +818,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 964 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-13 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:ebc8a218de1ee0fa24d2dab4e8e9ddb60184a1e7,",
@@ -800,7 +829,7 @@
             }
           }
         },
-        "inter-semi-bold-10": {
+        "semibold-10": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -815,7 +844,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 736 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-10 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:2acb8ab90d7e8fb557b543e1e650e623a156cc65,",
@@ -826,7 +855,7 @@
             }
           }
         },
-        "inter-medium-11": {
+        "medium-11": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -841,7 +870,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 745 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-11 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:30c3a30bef35c07b43f839f4236918853b683efc,",
@@ -852,7 +881,7 @@
             }
           }
         },
-        "inter-regular-10": {
+        "regular-10": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -867,7 +896,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 797 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-10 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:dc121a4526754637f2150b2e853bc52b2e1206ec,",
@@ -878,7 +907,7 @@
             }
           }
         },
-        "inter-semi-bold-9": {
+        "semibold-9": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -893,7 +922,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-9 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:0cb1d813536188f65d0f8afdf3a5c39d43e59656,",
@@ -904,7 +933,7 @@
             }
           }
         },
-        "jetbrains-mono-regular-10": {
+        "mono-regular-10": {
           "$type": "typography",
           "$value": {
             "fontFamily": "JetBrains Mono",
@@ -919,7 +948,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 540 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-10 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:a899d71f98f7b35746d2170a61d2105d861ae6a1,",
@@ -930,7 +959,7 @@
             }
           }
         },
-        "inter-medium-10": {
+        "medium-10": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -945,7 +974,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 434 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-10 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:d913fa783af2691acace00eb9676ceb665a880a0,",
@@ -956,7 +985,7 @@
             }
           }
         },
-        "inter-semi-bold-12": {
+        "semibold-12": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -971,7 +1000,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 445 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-12 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:a3898970b3b93c8d5ad9e411e0ffee500dc7eafa,",
@@ -982,7 +1011,7 @@
             }
           }
         },
-        "jetbrains-mono-regular-11": {
+        "mono-regular-11": {
           "$type": "typography",
           "$value": {
             "fontFamily": "JetBrains Mono",
@@ -997,7 +1026,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 270 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-11 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:ed9cb9ce4d19caa1a702e16b127f720bd90ea194,",
@@ -1008,36 +1037,7 @@
             }
           }
         },
-        "inter-semi-bold-9-lh16-ls0-1": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 9,
-              "unit": "px"
-            },
-            "fontWeight": 600,
-            "letterSpacing": {
-              "value": 0.1,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 16,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:d4daf8343183ace2687e8fa20b352536247a031c,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-semi-bold-15": {
+        "semibold-15": {
           "$type": "typography",
           "$value": {
             "fontFamily": "Inter",
@@ -1052,7 +1052,7 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
+          "$description": "Dense interface text at the natural line height. The ui family is what the design actually uses: 274 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-15 on 2026-09-15 without moving any text.",
           "$extensions": {
             "figma": {
               "styleId": "S:28f2f0e6beecb1092e4b762cb9f7a1ff6bce1fd4,",
@@ -1062,7 +1062,9 @@
               "textDecoration": "NONE"
             }
           }
-        },
+        }
+      },
+      "raw": {
         "jetbrains-mono-regular-12": {
           "$type": "typography",
           "$value": {
@@ -1371,35 +1373,6 @@
           "$extensions": {
             "figma": {
               "styleId": "S:ae67923f180ae902bbb93de256e0a122681288f5,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-semi-bold-10-lh14-ls0-5": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 10,
-              "unit": "px"
-            },
-            "fontWeight": 600,
-            "letterSpacing": {
-              "value": 0.5,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 14,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, no line height of its own. It exists so a node can carry a token without the layout moving. Fold it into the semantic scale when the layout is revisited.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:8700466054decf40db960eb40a6eceb0fea9b032,",
               "paragraphSpacing": 0,
               "paragraphIndent": 0,
               "textCase": "ORIGINAL",
@@ -1800,32 +1773,6 @@
             }
           }
         },
-        "inter-semi-bold-40": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 40,
-              "unit": "px"
-            },
-            "fontWeight": 600,
-            "letterSpacing": {
-              "value": 0,
-              "unit": "px"
-            },
-            "lineHeight": 1.2
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:31a9697317cadead6ae9ce02a3903118384cc286,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
         "inter-bold-18": {
           "$type": "typography",
           "$value": {
@@ -2214,10 +2161,9 @@
             },
             "lineHeight": 1.2
           },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
           "$extensions": {
             "figma": {
-              "styleId": "S:a2214560f6a5471626489a5f826937eb43ab3856,",
+              "styleId": "S:48f4581693756c216eb8e1812f3c0e466f588d70,",
               "paragraphSpacing": 0,
               "paragraphIndent": 0,
               "textCase": "ORIGINAL",
@@ -2244,93 +2190,6 @@
           "$extensions": {
             "figma": {
               "styleId": "S:cb622a03452d1665e989efbce001573ce651c867,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-13-82400131225586-lh20-73600196838379-ls0-12": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 13.824,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.12,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 20.736,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:4540fec69cb74996fae7edd9b5f2a575547b0385,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-12-480000495910645-lh18-720001220703125-ls0-1": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 12.48,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.1,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 18.72,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:c9f1746bb3c56d0d734b91b8b9867cd5d4f6a59e,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-11-520000457763672-lh17-280000686645508-ls0-1": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 11.52,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.1,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 17.28,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:e2c86d3c7656676a9dff026887009be02889847d,",
               "paragraphSpacing": 0,
               "paragraphIndent": 0,
               "textCase": "ORIGINAL",
@@ -2789,93 +2648,6 @@
           "$extensions": {
             "figma": {
               "styleId": "S:bd09dc1da75361e01c3c51b504a6949ca2e58b89,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-11-197440147399902-lh16-796159744262695-ls0-1": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 11.1974,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.1,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 16.7962,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:5ad43136a954f243107351994bb768a587ecc576,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-10-108799934387207-lh15-163200378417969-ls0-08": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 10.1088,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.08,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 15.1632,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:3b47edf3233ee20961674755cb6c556a8c5bc01d,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-9-331199645996094-lh13-99679946899414-ls0-08": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 9.3312,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.08,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 13.9968,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:b0c59fda12c69f3d241ba9039337a123e23a1b69,",
               "paragraphSpacing": 0,
               "paragraphIndent": 0,
               "textCase": "ORIGINAL",
@@ -3493,148 +3265,6 @@
             }
           }
         },
-        "inter-medium-14-lh20-73600196838379-ls0-11999999731779099": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 14,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.12,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 20.736,
-              "unit": "px"
-            }
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:7500827768624f63ef286e6a75142e415c170f91,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-12-lh18-720001220703125-ls0-10000000149011612": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 12,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.1,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 18.72,
-              "unit": "px"
-            }
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:32423ed5862ebc77709bdd0bf49dc962384efbf7,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-12-lh17-280000686645508-ls0-10000000149011612": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 12,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.1,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 17.28,
-              "unit": "px"
-            }
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:26a125965e1492b736c14313bd4c14d651173672,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "jetbrains-mono-regular-12-5-lh18": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "JetBrains Mono",
-            "fontSize": {
-              "value": 12.5,
-              "unit": "px"
-            },
-            "fontWeight": 400,
-            "letterSpacing": {
-              "value": 0,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 18,
-              "unit": "px"
-            }
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:9b8dbbd2bba607d90d4819728e7907d75bb4c4f6,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-regular-14-5": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 14.5,
-              "unit": "px"
-            },
-            "fontWeight": 400,
-            "letterSpacing": {
-              "value": 0,
-              "unit": "px"
-            },
-            "lineHeight": 1.2
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:8295ea388e0607e970b7261af86681f2382af0e4,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
         "jetbrains-mono-bold-11": {
           "$type": "typography",
           "$value": {
@@ -3654,32 +3284,6 @@
           "$extensions": {
             "figma": {
               "styleId": "S:492bb82de1ec3a05b48f0a162f66007e30550157,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-semi-bold-21": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 21,
-              "unit": "px"
-            },
-            "fontWeight": 600,
-            "letterSpacing": {
-              "value": 0,
-              "unit": "px"
-            },
-            "lineHeight": 1.2
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:07dda09cfd06aa2131f9d82ad432b6d2c52bc419,",
               "paragraphSpacing": 0,
               "paragraphIndent": 0,
               "textCase": "ORIGINAL",
@@ -3732,119 +3336,6 @@
           "$extensions": {
             "figma": {
               "styleId": "S:6bcb7f8c3bbe946a5cbef58b12d5c3bd70476937,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-semi-bold-36": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 36,
-              "unit": "px"
-            },
-            "fontWeight": 600,
-            "letterSpacing": {
-              "value": 0,
-              "unit": "px"
-            },
-            "lineHeight": 1.2
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:f19fddd26594a2482607ad048e74c49523b776f8,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-8-90999984741211-lh13-604887962341309-ls0-08099999278783798": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 8.91,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.081,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 13.6049,
-              "unit": "px"
-            }
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:4388566b1e48949fc0a1c43c927d177f12aa4942,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-8-09999942779541-lh12-282191276550293-ls0-06479999423027039": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 8.1,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.0648,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 12.2822,
-              "unit": "px"
-            }
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:58081184de6ef962524598252ccce874921b74ee,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-8-09999942779541-lh11-337407112121582-ls0-06479999423027039": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 8.1,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.0648,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 11.3374,
-              "unit": "px"
-            }
-          },
-          "$description": "Derived from screens. Off-scale size, see TODO-Bloom.md.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:d7b8abe94618bd3811647e400f06d4f02b30d847,",
               "paragraphSpacing": 0,
               "paragraphIndent": 0,
               "textCase": "ORIGINAL",
@@ -3906,93 +3397,6 @@
             }
           }
         },
-        "inter-medium-7-217099189758301-lh11-01995849609375-ls0-07": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 7.2171,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.07,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 11.02,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:286fe07f9f59b637fc71f6d8c1bad55c85220402,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-6-560998916625977-lh9-94857406616211-ls0-05": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 6.561,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.05,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 9.9486,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:5babceeac1a5002b11f86e4f2ed6bbaa53c5c2cb,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
-        "inter-medium-6-560998916625977-lh9-18329906463623-ls0-05": {
-          "$type": "typography",
-          "$value": {
-            "fontFamily": "Inter",
-            "fontSize": {
-              "value": 6.561,
-              "unit": "px"
-            },
-            "fontWeight": 500,
-            "letterSpacing": {
-              "value": 0.05,
-              "unit": "px"
-            },
-            "lineHeight": {
-              "value": 9.1833,
-              "unit": "px"
-            }
-          },
-          "$description": "Mechanical style: font plus size, created so this node carries a token without the layout moving.",
-          "$extensions": {
-            "figma": {
-              "styleId": "S:8de846b8a0820da7b30d7af79eef0f042ef0efd4,",
-              "paragraphSpacing": 0,
-              "paragraphIndent": 0,
-              "textCase": "ORIGINAL",
-              "textDecoration": "NONE"
-            }
-          }
-        },
         "inter-semibold-11-5": {
           "$type": "typography",
           "$value": {
@@ -4038,6 +3442,748 @@
           "$extensions": {
             "figma": {
               "styleId": "S:1f08a2f7cc46011ebc112df734e8306667a4777e,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-10-5-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:4ec91ec744147aedf9e290e72cc8091a7d438a54,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:481183eaeb8c8e314472443fd6158e4d70625be3,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-12-lh18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:fbd5df66e6c01e22b2d98a6ce043c0398a2981b3,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-8-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 8.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2ea4a988c78c7ceeff375958fdfb178e42266f98,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-11-lh15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 15,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c04f1b4f6188ce7410a8f07710fb377b7e160d46,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-11-5-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3bcb5bb204acb03b08f4d33ec9de09a5049b0ae8,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-10-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:98ff6441f236c56558cfed1514a86fe57dd18a78,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-10-lh15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 15,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:74df80d6d939ef82f7edd793ac5b5f88bf547262,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-12-5-lh18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c05c72fb408b3bf1af3c3124297f5a4c6b589d9c,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-11-5-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:b6096f7dd7462f8bb98680086664777519c58d12,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-10-5-lh15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 15,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:d9e83843a63bbd2af46c399401d6c3a828ab1a92,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-9-5-ls0-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 9.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.5,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:2287b1dd1c5a068fd7e8ec1ee87f0132999d3419,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11-ls0-30000001192092896": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.3,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:0b30e39cea1cac668945db780a1fc8e513caacdb,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-10-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3695bc78da69083e73c9f8a4153a5bde2a7b6671,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-10-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:c9462c38159b9a849bdda45dc26db5e7812aa015,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-medium-10-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:3bb2739f3934905dbe6d097d730664a7104e0e73,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11-ls0-3": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0.3,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:70607cd8fc0cc89949a965b426746a836b71ee02,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11-5-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:7034f4e2666a4c3db4336293b4721b53a1cd37cd,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-regular-11-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:dc3d15a77963c35281806a5c2fab30a34d4b00a7,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-10-5-lh14": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 14,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:f3be32bd3b7f35d2cf3eb52eef3b13d5cf0af0a0,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-12-5-lh18": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12.5,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 18,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:a8311bfd11e8f8b53db5e5f569a3e202a9cc3605,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-10-5": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 10.5,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": 1.2
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:4f92df921d81e9068726685588a55aa57687ead4,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11-lh15": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 15,
+              "unit": "px"
+            }
+          },
+          "$extensions": {
+            "figma": {
+              "styleId": "S:9d231944caebe3fd5e90d158151172194295be06,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-11-lh16": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 11,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 16,
+              "unit": "px"
+            }
+          },
+          "$description": "Hypha assistant prose and labels.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:29ccc1e8e78b1b99eb68a7aa14cc74aca0f3b5f7,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-semi-bold-14-lh20": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 14,
+              "unit": "px"
+            },
+            "fontWeight": 600,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 20,
+              "unit": "px"
+            }
+          },
+          "$description": "Hypha assistant prose and labels.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:9149430321318b602e7b711175034d2ef18ebce8,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "inter-regular-12-lh20": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "Inter",
+            "fontSize": {
+              "value": 12,
+              "unit": "px"
+            },
+            "fontWeight": 400,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 20,
+              "unit": "px"
+            }
+          },
+          "$description": "Hypha assistant prose and labels.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:aa2e850743d6367c026f59caa3cc70cd185551e2,",
+              "paragraphSpacing": 0,
+              "paragraphIndent": 0,
+              "textCase": "ORIGINAL",
+              "textDecoration": "NONE"
+            }
+          }
+        },
+        "jetbrains-mono-medium-13-lh20": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "JetBrains Mono",
+            "fontSize": {
+              "value": 13,
+              "unit": "px"
+            },
+            "fontWeight": 500,
+            "letterSpacing": {
+              "value": 0,
+              "unit": "px"
+            },
+            "lineHeight": {
+              "value": 20,
+              "unit": "px"
+            }
+          },
+          "$description": "Hypha assistant prose and labels.",
+          "$extensions": {
+            "figma": {
+              "styleId": "S:e4c367ff6362bee27a650ac87c80c2656eda7000,",
               "paragraphSpacing": 0,
               "paragraphIndent": 0,
               "textCase": "ORIGINAL",

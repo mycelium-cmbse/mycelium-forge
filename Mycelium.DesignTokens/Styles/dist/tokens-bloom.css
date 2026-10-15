@@ -5,35 +5,38 @@
 
 :root {
   --color-ownership-thermal-base: #ea580c; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-thermal-bg: #ffeded; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-thermal-fg: #bf4040; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-thermal-bg: #f9f2ee; /** Chip background for the thermal Ownership, derived from its base stripe. Carries color/ownership/thermal/fg at 4.5:1 or better. */
+  --color-ownership-thermal-fg: #8c4621; /** Chip label for the thermal Ownership, derived from its base stripe. */
   --color-ownership-power-base: #eab308; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-power-bg: #fff2d9; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-power-fg: #b2730d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-power-bg: #f9f7ee; /** Chip background for the power Ownership, derived from its base stripe. Carries color/ownership/power/fg at 4.5:1 or better. */
+  --color-ownership-power-fg: #876e20; /** Chip label for the power Ownership, derived from its base stripe. */
   --color-ownership-structure-base: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-structure-bg: #edf2f7; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-structure-fg: #4d668c; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-structure-bg: #f3f3f4; /** Chip background for the structure Ownership, derived from its base stripe. Carries color/ownership/structure/fg at 4.5:1 or better. */
+  --color-ownership-structure-fg: #51555d; /** Chip label for the structure Ownership, derived from its base stripe. */
   --color-ownership-aocs-base: #06b6d4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-aocs-bg: #e8f2ff; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-aocs-fg: #2b66c9; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-aocs-bg: #eef8f9; /** Chip background for the aocs Ownership, derived from its base stripe. Carries color/ownership/aocs/fg at 4.5:1 or better. */
+  --color-ownership-aocs-fg: #207887; /** Chip label for the aocs Ownership, derived from its base stripe. */
   --color-ownership-comms-base: #8b5cf6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-comms-bg: #ebf7eb; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-comms-fg: #338c4d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-comms-bg: #f1eef9; /** Chip background for the comms Ownership, derived from its base stripe. Carries color/ownership/comms/fg at 4.5:1 or better. */
+  --color-ownership-comms-fg: #42218c; /** Chip label for the comms Ownership, derived from its base stripe. */
   --color-ownership-propulsion-base: #dc2626; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-propulsion-bg: #ffebeb; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-propulsion-fg: #cc4026; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-propulsion-bg: #f8efef; /** Chip background for the propulsion Ownership, derived from its base stripe. Carries color/ownership/propulsion/fg at 4.5:1 or better. */
+  --color-ownership-propulsion-fg: #862828; /** Chip label for the propulsion Ownership, derived from its base stripe. */
   --color-ownership-software-base: #10b981; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-software-bg: #eef9f5; /** Chip background for the software Ownership, derived from its base stripe. Carries color/ownership/software/fg at 4.5:1 or better. */
+  --color-ownership-software-fg: #1d7e5e; /** Chip label for the software Ownership, derived from its base stripe. */
   --color-ownership-payload-base: #ec4899; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-payload-bg: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-payload-fg: #8c4dbf; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-payload-bg: #f9eef3; /** Chip background for the payload Ownership, derived from its base stripe. Carries color/ownership/payload/fg at 4.5:1 or better. */
+  --color-ownership-payload-fg: #8b2256; /** Chip label for the payload Ownership, derived from its base stripe. */
   --color-ownership-mechanisms-base: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-mechanisms-bg: #f2f2f2; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-mechanisms-fg: #595966; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-mechanisms-bg: #f9f2ee; /** Chip background for the mechanisms Ownership, derived from its base stripe. Carries color/ownership/mechanisms/fg at 4.5:1 or better. */
+  --color-ownership-mechanisms-fg: #8c4a21; /** Chip label for the mechanisms Ownership, derived from its base stripe. */
   --color-ownership-data-handling-base: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-avionics-bg: #ebf5fc; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-avionics-fg: #3373a6; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-gnc-bg: #e8f2fc; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-gnc-fg: #2666a6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-data-handling-bg: #efeff8; /** Chip background for the data-handling Ownership, derived from its base stripe. Carries color/ownership/data-handling/fg at 4.5:1 or better. */
+  --color-ownership-data-handling-fg: #2b2688; /** Chip label for the data-handling Ownership, derived from its base stripe. */
+  --color-ownership-system-bg: #eeeef9; /** Chip background for the system Ownership, derived from its base stripe. Carries color/ownership/system/fg at 4.5:1 or better. */
+  --color-ownership-system-fg: #21238c; /** Chip label for the system Ownership, derived from its base stripe. */
+  --color-ownership-system-base: #6366f1; /** Stripe colour of the SYS system-rollup Ownership. Was color/ui/system before the family was made symmetric. */
   --color-collaborator-c01: #ef4444; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-collaborator-c02: #f97316; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-collaborator-c03: #f59e0b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
@@ -53,33 +56,53 @@
   --color-sysml-structure-header: #475569; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-structure-surface: #f8fafc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-structure-border: #cbd5e1; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-surface-dark: #161d25; /** Dark counterpart of color/sysml/structure/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-structure-header-dark: #90b1df; /** Dark counterpart of color/sysml/structure/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-attributes-header: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-attributes-surface: #f1f5f9; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-attributes-border: #e2e8f0; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-surface-dark: #161d25; /** Dark counterpart of color/sysml/attributes/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-attributes-header-dark: #90b1df; /** Dark counterpart of color/sysml/attributes/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-connections-header: #0d9488; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-connections-surface: #f0fdfa; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-connections-border: #99f6e4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-surface-dark: #162521; /** Dark counterpart of color/sysml/connections/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-connections-header-dark: #90dfd8; /** Dark counterpart of color/sysml/connections/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-behavior-header: #b45309; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-behavior-surface: #fffbeb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-behavior-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-surface-dark: #252216; /** Dark counterpart of color/sysml/behavior/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-behavior-header-dark: #dfb290; /** Dark counterpart of color/sysml/behavior/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-requirements-header: #1d4ed8; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-requirements-surface: #eff6ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-requirements-border: #93c5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-surface-dark: #161c25; /** Dark counterpart of color/sysml/requirements/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-requirements-header-dark: #90a5df; /** Dark counterpart of color/sysml/requirements/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-verification-header: #7c3aed; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-verification-surface: #f5f3ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-verification-border: #c4b5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-surface-dark: #181625; /** Dark counterpart of color/sysml/verification/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-verification-header-dark: #ad90df; /** Dark counterpart of color/sysml/verification/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-allocations-header: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-allocations-surface: #eef2ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-allocations-border: #a5b4fc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-surface-dark: #161925; /** Dark counterpart of color/sysml/allocations/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-allocations-header-dark: #9590df; /** Dark counterpart of color/sysml/allocations/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-metadata-header: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-metadata-surface: #f9fafb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-metadata-border: #d1d5db; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-surface-dark: #161d25; /** Dark counterpart of color/sysml/metadata/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-metadata-header-dark: #90abdf; /** Dark counterpart of color/sysml/metadata/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-library-header: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-library-surface: #fef3c7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-library-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-surface-dark: #252216; /** Dark counterpart of color/sysml/library/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-library-header-dark: #dfae90; /** Dark counterpart of color/sysml/library/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-variation-header: #9333ea; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-variation-surface: #faf5ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-variation-border: #d8b4fe; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-surface-dark: #1d1625; /** Dark counterpart of color/sysml/variation/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-variation-header-dark: #ba90df; /** Dark counterpart of color/sysml/variation/header. Lightened so the category label reads on the dark surface. */
   --color-gray-0: #ffffff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-gray-50: #fbfcfe; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-gray-100: #f7fafc; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
@@ -110,28 +133,38 @@
   --color-teal-500: #0f9e8c; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-teal-600: #0f766e; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-teal-800: #115e59; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-900: #153e37; /** Between teal/800 and teal/950. Carries accent-strong in Bloom Dark. */
   --color-teal-950: #12241f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-50: #faece3; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-100: #f6dece; /** Between copper/50 and copper/300. Carries accent-strong in Forge Light. */
   --color-copper-300: #e8a87c;
   --color-copper-400: #d88255; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-500: #a34a24; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-600: #8a3e1f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-800: #5c2712;
+  --color-copper-900: #472114; /** Between copper/800 and copper/950. Carries accent-strong in Forge Dark. */
   --color-copper-950: #311b12; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-danger-50: #fff2f2; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-300: #de7373; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-danger-500: #d44545; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-danger-700: #b91c1c; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-danger-950: #1d0e0e; /** Dark subtle tint. Pairs with color/status/danger/300 as its foreground. */
   --color-status-warning-50: #fff7e0; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-warning-300: #deb573; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-warning-500: #b2730d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-warning-600: #b45309; /** Primitive derived from the reference prototypes. */
+  --color-status-warning-950: #1d170e; /** Dark subtle tint. Pairs with color/status/warning/300 as its foreground. */
   --color-status-success-50: #f0fdf4; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-success-300: #73de92; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-success-500: #338c4d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-success-600: #16a34a; /** Primitive derived from the reference prototypes. */
   --color-status-success-700: #15803d; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-success-950: #0e1d13; /** Dark subtle tint. Pairs with color/status/success/300 as its foreground. */
   --color-status-info-50: #e8f2ff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-300: #739bde; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-info-500: #2b66c9; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-info-700: #2563eb; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
-  --color-ui-system: #6366f1; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-950: #0e141d; /** Dark subtle tint. Pairs with color/status/info/300 as its foreground. */
   --color-ui-mode-cd: #734fa6; /** Ownership chip colour, derived from the reference prototypes. */
   --color-ui-mode-cd-subtle: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
   --color-drift-166534: #166534; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
@@ -338,6 +371,7 @@
   --spacing-overlap-6: -6px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
   --spacing-overlap-5: -5px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
   --spacing-overlap-8: -8px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-4: -4px; /** Negative gap for a 20px avatar cluster: 4px of overlap still leaves both initials readable. */
   --radius-1: 1px; /** Scale step derived from real usage in the prototypes. */
   --radius-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
   --radius-3: 3px; /** Scale primitive, value in px, derived from the reference prototypes. */
@@ -389,6 +423,7 @@
   --text-12-5: 12.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
   --text-13-5: 13.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
   --text-5-5: 5.5px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-8-5: 8.5px; /** Initials of a 20px presence avatar in a dense stack. */
   --shadow-xs: 0px 1px 3px 0px rgb(6% 9% 16% / 0.05); /** Hairline lift. Segmented controls, small toggles. */
   --shadow-md: 0px 2px 8px 0px rgb(6% 9% 16% / 0.06); /** Card elevation. The default panel and card shadow. */
   --shadow-lg: 0px 4px 16px -2px rgb(6% 9% 16% / 0.06); /** Sticky or primary card. One step above shadow/md. */
@@ -410,6 +445,7 @@
   --typography-typography-body-sm-medium: 500 12px/18px Inter; /** Row text with emphasis. */
   --typography-typography-body-xs: 500 11px/16px Inter; /** Helper text under an input, stereotypes. */
   --typography-typography-body-prose-13: 400 13px/21px Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --typography-typography-body-prose-12: 400 12px/19px Inter; /** Hypha assistant prose and labels. */
   --typography-typography-label-md: 500 14px/20px Inter; /** Form label. */
   --typography-typography-label-sm: 500 12px/16px Inter; /** Compact label, chip text. */
   --typography-typography-label-xs: 600 10px/14px Inter; /** ALL CAPS section label, count pill. */
@@ -417,6 +453,23 @@
   --typography-typography-mono-sm: 400 12px/18px 'JetBrains Mono'; /** Numeric table cells, versions. */
   --typography-typography-mono-xs: 500 11px/16px 'JetBrains Mono'; /** Compact mono, badges and hashes. */
   --typography-typography-mono-code-11-5: 400 11.5px/19px 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --typography-typography-ui-regular-12: 400 12px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 3070 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-12 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-regular-11: 400 11px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-regular-13: 400 13px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2142 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-13 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-12: 500 12px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2129 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-12 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-11: 600 11px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1402 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-mono-bold-10: 700 10px/1.2 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1410 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-bold-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-13: 500 13px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1452 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-13 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-13: 600 13px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 964 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-13 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-10: 600 10px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 736 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-11: 500 11px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 745 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-regular-10: 400 10px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 797 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-9: 600 9px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-9 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-mono-regular-10: 400 10px/1.2 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 540 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-10: 500 10px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 434 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-12: 600 12px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 445 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-12 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-mono-regular-11: 400 11px/1.2 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 270 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-15: 600 15px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 274 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-15 on 2026-09-15 without moving any text. */
   --background: var(--color-gray-100);
   --foreground: var(--color-gray-800);
   --foreground-muted: var(--color-gray-700);
@@ -436,46 +489,48 @@
   --primary-foreground: var(--color-gray-0);
   --accent: var(--color-teal-50);
   --accent-foreground: var(--color-gray-800);
-  --destructive: var(--color-status-danger-500);
-  --destructive-subtle: var(--color-status-danger-50);
+  --destructive: var(--color-status-danger-500); /** The destructive status colour. Lightens in dark mode so it reads on destructive-subtle. */
+  --destructive-subtle: var(--color-status-danger-50); /** Tinted surface behind a destructive message. Mode-aware. */
   --destructive-foreground: var(--color-gray-0);
-  --warning: var(--color-status-warning-500);
-  --warning-subtle: var(--color-status-warning-50);
-  --success: var(--color-status-success-500);
-  --info: var(--color-status-info-500);
-  --info-subtle: var(--color-status-info-50);
+  --warning: var(--color-status-warning-500); /** The warning status colour. Lightens in dark mode so it reads on warning-subtle. */
+  --warning-subtle: var(--color-status-warning-50); /** Tinted surface behind a warning message. Mode-aware. */
+  --success: var(--color-status-success-500); /** The success status colour. Lightens in dark mode so it reads on success-subtle. */
+  --info: var(--color-status-info-500); /** The info status colour. Lightens in dark mode so it reads on info-subtle. */
+  --info-subtle: var(--color-status-info-50); /** Tinted surface behind a info message. Mode-aware. */
   --ring: var(--color-status-info-500);
-  --ownership-system: var(--color-ui-system);
+  --ownership-system-base: var(--color-ownership-system-base); /** Stripe colour of the SYS system-rollup Ownership. */
+  --ownership-system-bg: var(--color-ownership-system-bg); /** Chip background for the system Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-system-fg: var(--color-ownership-system-fg); /** Chip label for the system Ownership. Clears 4.5:1 on its own background. */
   --ownership-thermal-base: var(--color-ownership-thermal-base);
-  --ownership-thermal-bg: var(--color-ownership-thermal-bg);
-  --ownership-thermal-fg: var(--color-ownership-thermal-fg);
+  --ownership-thermal-bg: var(--color-ownership-thermal-bg); /** Chip background for the thermal Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-thermal-fg: var(--color-ownership-thermal-fg); /** Chip label for the thermal Ownership. Clears 4.5:1 on its own background. */
   --ownership-power-base: var(--color-ownership-power-base);
-  --ownership-power-bg: var(--color-ownership-power-bg);
-  --ownership-power-fg: var(--color-ownership-power-fg);
+  --ownership-power-bg: var(--color-ownership-power-bg); /** Chip background for the power Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-power-fg: var(--color-ownership-power-fg); /** Chip label for the power Ownership. Clears 4.5:1 on its own background. */
   --ownership-structure-base: var(--color-ownership-structure-base);
-  --ownership-structure-bg: var(--color-ownership-structure-bg);
-  --ownership-structure-fg: var(--color-ownership-structure-fg);
+  --ownership-structure-bg: var(--color-ownership-structure-bg); /** Chip background for the structure Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-structure-fg: var(--color-ownership-structure-fg); /** Chip label for the structure Ownership. Clears 4.5:1 on its own background. */
   --ownership-aocs-base: var(--color-ownership-aocs-base);
-  --ownership-aocs-bg: var(--color-ownership-aocs-bg);
-  --ownership-aocs-fg: var(--color-ownership-aocs-fg);
+  --ownership-aocs-bg: var(--color-ownership-aocs-bg); /** Chip background for the aocs Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-aocs-fg: var(--color-ownership-aocs-fg); /** Chip label for the aocs Ownership. Clears 4.5:1 on its own background. */
   --ownership-comms-base: var(--color-ownership-comms-base);
-  --ownership-comms-bg: var(--color-ownership-comms-bg);
-  --ownership-comms-fg: var(--color-ownership-comms-fg);
+  --ownership-comms-bg: var(--color-ownership-comms-bg); /** Chip background for the comms Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-comms-fg: var(--color-ownership-comms-fg); /** Chip label for the comms Ownership. Clears 4.5:1 on its own background. */
   --ownership-propulsion-base: var(--color-ownership-propulsion-base);
-  --ownership-propulsion-bg: var(--color-ownership-propulsion-bg);
-  --ownership-propulsion-fg: var(--color-ownership-propulsion-fg);
+  --ownership-propulsion-bg: var(--color-ownership-propulsion-bg); /** Chip background for the propulsion Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-propulsion-fg: var(--color-ownership-propulsion-fg); /** Chip label for the propulsion Ownership. Clears 4.5:1 on its own background. */
   --ownership-software-base: var(--color-ownership-software-base);
+  --ownership-software-bg: var(--color-ownership-software-bg); /** Chip background for the software Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-software-fg: var(--color-ownership-software-fg); /** Chip label for the software Ownership. Clears 4.5:1 on its own background. */
   --ownership-payload-base: var(--color-ownership-payload-base);
-  --ownership-payload-bg: var(--color-ownership-payload-bg);
-  --ownership-payload-fg: var(--color-ownership-payload-fg);
+  --ownership-payload-bg: var(--color-ownership-payload-bg); /** Chip background for the payload Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-payload-fg: var(--color-ownership-payload-fg); /** Chip label for the payload Ownership. Clears 4.5:1 on its own background. */
   --ownership-mechanisms-base: var(--color-ownership-mechanisms-base);
-  --ownership-mechanisms-bg: var(--color-ownership-mechanisms-bg);
-  --ownership-mechanisms-fg: var(--color-ownership-mechanisms-fg);
+  --ownership-mechanisms-bg: var(--color-ownership-mechanisms-bg); /** Chip background for the mechanisms Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-mechanisms-fg: var(--color-ownership-mechanisms-fg); /** Chip label for the mechanisms Ownership. Clears 4.5:1 on its own background. */
   --ownership-data-handling-base: var(--color-ownership-data-handling-base);
-  --ownership-avionics-bg: var(--color-ownership-avionics-bg);
-  --ownership-avionics-fg: var(--color-ownership-avionics-fg);
-  --ownership-gnc-bg: var(--color-ownership-gnc-bg);
-  --ownership-gnc-fg: var(--color-ownership-gnc-fg);
+  --ownership-data-handling-bg: var(--color-ownership-data-handling-bg); /** Chip background for the data-handling Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-data-handling-fg: var(--color-ownership-data-handling-fg); /** Chip label for the data-handling Ownership. Clears 4.5:1 on its own background. */
   --collaborator-c01: var(--color-collaborator-c01);
   --collaborator-c02: var(--color-collaborator-c02);
   --collaborator-c03: var(--color-collaborator-c03);
@@ -492,46 +547,46 @@
   --lifecycle-open: var(--color-lifecycle-open);
   --lifecycle-review: var(--color-lifecycle-review);
   --lifecycle-archived: var(--color-lifecycle-archived);
-  --sysml-structure-header: var(--color-sysml-structure-header);
-  --sysml-structure-surface: var(--color-sysml-structure-surface);
-  --sysml-structure-border: var(--color-sysml-structure-border);
-  --sysml-attributes-header: var(--color-sysml-attributes-header);
-  --sysml-attributes-surface: var(--color-sysml-attributes-surface);
-  --sysml-attributes-border: var(--color-sysml-attributes-border);
-  --sysml-connections-header: var(--color-sysml-connections-header);
-  --sysml-connections-surface: var(--color-sysml-connections-surface);
-  --sysml-connections-border: var(--color-sysml-connections-border);
-  --sysml-behavior-header: var(--color-sysml-behavior-header);
-  --sysml-behavior-surface: var(--color-sysml-behavior-surface);
-  --sysml-behavior-border: var(--color-sysml-behavior-border);
-  --sysml-requirements-header: var(--color-sysml-requirements-header);
-  --sysml-requirements-surface: var(--color-sysml-requirements-surface);
-  --sysml-requirements-border: var(--color-sysml-requirements-border);
-  --sysml-verification-header: var(--color-sysml-verification-header);
-  --sysml-verification-surface: var(--color-sysml-verification-surface);
-  --sysml-verification-border: var(--color-sysml-verification-border);
-  --sysml-allocations-header: var(--color-sysml-allocations-header);
-  --sysml-allocations-surface: var(--color-sysml-allocations-surface);
-  --sysml-allocations-border: var(--color-sysml-allocations-border);
-  --sysml-metadata-header: var(--color-sysml-metadata-header);
-  --sysml-metadata-surface: var(--color-sysml-metadata-surface);
-  --sysml-metadata-border: var(--color-sysml-metadata-border);
-  --sysml-library-header: var(--color-sysml-library-header);
-  --sysml-library-surface: var(--color-sysml-library-surface);
-  --sysml-library-border: var(--color-sysml-library-border);
-  --sysml-variation-header: var(--color-sysml-variation-header);
-  --sysml-variation-surface: var(--color-sysml-variation-surface);
-  --sysml-variation-border: var(--color-sysml-variation-border);
+  --sysml-structure-header: var(--color-sysml-structure-header); /** Category label of the structure SysML card. Mode-aware. */
+  --sysml-structure-surface: var(--color-sysml-structure-surface); /** Card surface of the structure SysML category. Mode-aware. */
+  --sysml-structure-border: var(--color-sysml-structure-border); /** Border of the structure SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-attributes-header: var(--color-sysml-attributes-header); /** Category label of the attributes SysML card. Mode-aware. */
+  --sysml-attributes-surface: var(--color-sysml-attributes-surface); /** Card surface of the attributes SysML category. Mode-aware. */
+  --sysml-attributes-border: var(--color-sysml-attributes-border); /** Border of the attributes SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-connections-header: var(--color-sysml-connections-header); /** Category label of the connections SysML card. Mode-aware. */
+  --sysml-connections-surface: var(--color-sysml-connections-surface); /** Card surface of the connections SysML category. Mode-aware. */
+  --sysml-connections-border: var(--color-sysml-connections-border); /** Border of the connections SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-behavior-header: var(--color-sysml-behavior-header); /** Category label of the behavior SysML card. Mode-aware. */
+  --sysml-behavior-surface: var(--color-sysml-behavior-surface); /** Card surface of the behavior SysML category. Mode-aware. */
+  --sysml-behavior-border: var(--color-sysml-behavior-border); /** Border of the behavior SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-requirements-header: var(--color-sysml-requirements-header); /** Category label of the requirements SysML card. Mode-aware. */
+  --sysml-requirements-surface: var(--color-sysml-requirements-surface); /** Card surface of the requirements SysML category. Mode-aware. */
+  --sysml-requirements-border: var(--color-sysml-requirements-border); /** Border of the requirements SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-verification-header: var(--color-sysml-verification-header); /** Category label of the verification SysML card. Mode-aware. */
+  --sysml-verification-surface: var(--color-sysml-verification-surface); /** Card surface of the verification SysML category. Mode-aware. */
+  --sysml-verification-border: var(--color-sysml-verification-border); /** Border of the verification SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-allocations-header: var(--color-sysml-allocations-header); /** Category label of the allocations SysML card. Mode-aware. */
+  --sysml-allocations-surface: var(--color-sysml-allocations-surface); /** Card surface of the allocations SysML category. Mode-aware. */
+  --sysml-allocations-border: var(--color-sysml-allocations-border); /** Border of the allocations SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-metadata-header: var(--color-sysml-metadata-header); /** Category label of the metadata SysML card. Mode-aware. */
+  --sysml-metadata-surface: var(--color-sysml-metadata-surface); /** Card surface of the metadata SysML category. Mode-aware. */
+  --sysml-metadata-border: var(--color-sysml-metadata-border); /** Border of the metadata SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-library-header: var(--color-sysml-library-header); /** Category label of the library SysML card. Mode-aware. */
+  --sysml-library-surface: var(--color-sysml-library-surface); /** Card surface of the library SysML category. Mode-aware. */
+  --sysml-library-border: var(--color-sysml-library-border); /** Border of the library SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-variation-header: var(--color-sysml-variation-header); /** Category label of the variation SysML card. Mode-aware. */
+  --sysml-variation-surface: var(--color-sysml-variation-surface); /** Card surface of the variation SysML category. Mode-aware. */
+  --sysml-variation-border: var(--color-sysml-variation-border); /** Border of the variation SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
   --foreground-strong: var(--color-gray-850);
   --foreground-deep: var(--color-gray-1000);
   --foreground-subtle: var(--color-gray-600);
   --placeholder: var(--color-gray-500);
   --primary-subtle: var(--color-teal-300);
   --primary-deep: var(--color-teal-800);
-  --accent-strong: var(--color-teal-100);
+  --accent-strong: var(--color-teal-100); /** A stronger accent tint than accent. Follows the product accent: teal on Bloom, copper on Forge. */
   --destructive-strong: var(--color-status-danger-700);
   --success-strong: var(--color-status-success-700);
-  --success-subtle: var(--color-status-success-50);
+  --success-subtle: var(--color-status-success-50); /** Tinted surface behind a success message. Mode-aware. */
   --info-strong: var(--color-status-info-700);
   --mode-cd: var(--color-ui-mode-cd);
   --mode-cd-subtle: var(--color-ui-mode-cd-subtle);
@@ -552,39 +607,45 @@
   --docs-code-foreground: var(--color-green-100); /** Code sample text. The code surface is dark in both themes, so this token does not change with the mode. */
   --docs-code-background: var(--color-gray-900); /** Code sample surface. Dark in both themes by design, so the pale code text always reads. */
   --scrim: var(--color-gray-1050); /** Backdrop behind a modal or overlay. */
+  --foreground-inverse-muted: var(--color-gray-150); /** Secondary text on a SysML node header: the guillemet kind designator and its icon. The header inverts between modes (dark #475569 in light mode, light #90b1df in dark mode), so this token inverts with it: gray/150 on the dark header at 6.90:1, gray/850 on the light header at 6.65:1. Both sit just below the element name, which is card at 7.58 and 7.99, so the hierarchy is carried without dropping to a grey that reads as disabled. */
+  --secondary: var(--color-gray-150); /** Surface of a secondary control. Same value as muted today, but a different role: muted is a de-emphasised area, secondary is a control. BlazorBlueprint expects this name for its theming. */
+  --secondary-foreground: var(--color-gray-800); /** Label on a secondary control. Same value as foreground today. Paired with secondary for BlazorBlueprint theming. */
 }
 
 .dark {
   --color-ownership-thermal-base: #ea580c; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-thermal-bg: #ffeded; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-thermal-fg: #bf4040; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-thermal-bg: #f9f2ee; /** Chip background for the thermal Ownership, derived from its base stripe. Carries color/ownership/thermal/fg at 4.5:1 or better. */
+  --color-ownership-thermal-fg: #8c4621; /** Chip label for the thermal Ownership, derived from its base stripe. */
   --color-ownership-power-base: #eab308; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-power-bg: #fff2d9; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-power-fg: #b2730d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-power-bg: #f9f7ee; /** Chip background for the power Ownership, derived from its base stripe. Carries color/ownership/power/fg at 4.5:1 or better. */
+  --color-ownership-power-fg: #876e20; /** Chip label for the power Ownership, derived from its base stripe. */
   --color-ownership-structure-base: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-structure-bg: #edf2f7; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-structure-fg: #4d668c; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-structure-bg: #f3f3f4; /** Chip background for the structure Ownership, derived from its base stripe. Carries color/ownership/structure/fg at 4.5:1 or better. */
+  --color-ownership-structure-fg: #51555d; /** Chip label for the structure Ownership, derived from its base stripe. */
   --color-ownership-aocs-base: #06b6d4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-aocs-bg: #e8f2ff; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-aocs-fg: #2b66c9; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-aocs-bg: #eef8f9; /** Chip background for the aocs Ownership, derived from its base stripe. Carries color/ownership/aocs/fg at 4.5:1 or better. */
+  --color-ownership-aocs-fg: #207887; /** Chip label for the aocs Ownership, derived from its base stripe. */
   --color-ownership-comms-base: #8b5cf6; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-comms-bg: #ebf7eb; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-comms-fg: #338c4d; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-comms-bg: #f1eef9; /** Chip background for the comms Ownership, derived from its base stripe. Carries color/ownership/comms/fg at 4.5:1 or better. */
+  --color-ownership-comms-fg: #42218c; /** Chip label for the comms Ownership, derived from its base stripe. */
   --color-ownership-propulsion-base: #dc2626; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-propulsion-bg: #ffebeb; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-propulsion-fg: #cc4026; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-propulsion-bg: #f8efef; /** Chip background for the propulsion Ownership, derived from its base stripe. Carries color/ownership/propulsion/fg at 4.5:1 or better. */
+  --color-ownership-propulsion-fg: #862828; /** Chip label for the propulsion Ownership, derived from its base stripe. */
   --color-ownership-software-base: #10b981; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-ownership-software-bg: #eef9f5; /** Chip background for the software Ownership, derived from its base stripe. Carries color/ownership/software/fg at 4.5:1 or better. */
+  --color-ownership-software-fg: #1d7e5e; /** Chip label for the software Ownership, derived from its base stripe. */
   --color-ownership-payload-base: #ec4899; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-payload-bg: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-payload-fg: #8c4dbf; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-payload-bg: #f9eef3; /** Chip background for the payload Ownership, derived from its base stripe. Carries color/ownership/payload/fg at 4.5:1 or better. */
+  --color-ownership-payload-fg: #8b2256; /** Chip label for the payload Ownership, derived from its base stripe. */
   --color-ownership-mechanisms-base: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-mechanisms-bg: #f2f2f2; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-mechanisms-fg: #595966; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-mechanisms-bg: #f9f2ee; /** Chip background for the mechanisms Ownership, derived from its base stripe. Carries color/ownership/mechanisms/fg at 4.5:1 or better. */
+  --color-ownership-mechanisms-fg: #8c4a21; /** Chip label for the mechanisms Ownership, derived from its base stripe. */
   --color-ownership-data-handling-base: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
-  --color-ownership-avionics-bg: #ebf5fc; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-avionics-fg: #3373a6; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-gnc-bg: #e8f2fc; /** Ownership chip colour, derived from the reference prototypes. */
-  --color-ownership-gnc-fg: #2666a6; /** Ownership chip colour, derived from the reference prototypes. */
+  --color-ownership-data-handling-bg: #efeff8; /** Chip background for the data-handling Ownership, derived from its base stripe. Carries color/ownership/data-handling/fg at 4.5:1 or better. */
+  --color-ownership-data-handling-fg: #2b2688; /** Chip label for the data-handling Ownership, derived from its base stripe. */
+  --color-ownership-system-bg: #eeeef9; /** Chip background for the system Ownership, derived from its base stripe. Carries color/ownership/system/fg at 4.5:1 or better. */
+  --color-ownership-system-fg: #21238c; /** Chip label for the system Ownership, derived from its base stripe. */
+  --color-ownership-system-base: #6366f1; /** Stripe colour of the SYS system-rollup Ownership. Was color/ui/system before the family was made symmetric. */
   --color-collaborator-c01: #ef4444; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-collaborator-c02: #f97316; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-collaborator-c03: #f59e0b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
@@ -604,33 +665,53 @@
   --color-sysml-structure-header: #475569; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-structure-surface: #f8fafc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-structure-border: #cbd5e1; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-structure-surface-dark: #161d25; /** Dark counterpart of color/sysml/structure/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-structure-header-dark: #90b1df; /** Dark counterpart of color/sysml/structure/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-attributes-header: #64748b; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-attributes-surface: #f1f5f9; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-attributes-border: #e2e8f0; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-attributes-surface-dark: #161d25; /** Dark counterpart of color/sysml/attributes/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-attributes-header-dark: #90b1df; /** Dark counterpart of color/sysml/attributes/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-connections-header: #0d9488; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-connections-surface: #f0fdfa; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-connections-border: #99f6e4; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-connections-surface-dark: #162521; /** Dark counterpart of color/sysml/connections/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-connections-header-dark: #90dfd8; /** Dark counterpart of color/sysml/connections/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-behavior-header: #b45309; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-behavior-surface: #fffbeb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-behavior-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-behavior-surface-dark: #252216; /** Dark counterpart of color/sysml/behavior/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-behavior-header-dark: #dfb290; /** Dark counterpart of color/sysml/behavior/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-requirements-header: #1d4ed8; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-requirements-surface: #eff6ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-requirements-border: #93c5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-requirements-surface-dark: #161c25; /** Dark counterpart of color/sysml/requirements/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-requirements-header-dark: #90a5df; /** Dark counterpart of color/sysml/requirements/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-verification-header: #7c3aed; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-verification-surface: #f5f3ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-verification-border: #c4b5fd; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-verification-surface-dark: #181625; /** Dark counterpart of color/sysml/verification/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-verification-header-dark: #ad90df; /** Dark counterpart of color/sysml/verification/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-allocations-header: #4f46e5; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-allocations-surface: #eef2ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-allocations-border: #a5b4fc; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-allocations-surface-dark: #161925; /** Dark counterpart of color/sysml/allocations/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-allocations-header-dark: #9590df; /** Dark counterpart of color/sysml/allocations/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-metadata-header: #6b7280; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-metadata-surface: #f9fafb; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-metadata-border: #d1d5db; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-metadata-surface-dark: #161d25; /** Dark counterpart of color/sysml/metadata/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-metadata-header-dark: #90abdf; /** Dark counterpart of color/sysml/metadata/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-library-header: #92400e; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-library-surface: #fef3c7; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-library-border: #fcd34d; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-library-surface-dark: #252216; /** Dark counterpart of color/sysml/library/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-library-header-dark: #dfae90; /** Dark counterpart of color/sysml/library/header. Lightened so the category label reads on the dark surface. */
   --color-sysml-variation-header: #9333ea; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-variation-surface: #faf5ff; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
   --color-sysml-variation-border: #d8b4fe; /** Domain primitive. Keeps the Mycelium namespace on purpose: shadcn has no equivalent. Apply through the matching semantic token. */
+  --color-sysml-variation-surface-dark: #1d1625; /** Dark counterpart of color/sysml/variation/surface. Sits at card elevation with a trace of the category hue. */
+  --color-sysml-variation-header-dark: #ba90df; /** Dark counterpart of color/sysml/variation/header. Lightened so the category label reads on the dark surface. */
   --color-gray-0: #ffffff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-gray-50: #fbfcfe; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-gray-100: #f7fafc; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
@@ -661,28 +742,38 @@
   --color-teal-500: #0f9e8c; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-teal-600: #0f766e; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-teal-800: #115e59; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-teal-900: #153e37; /** Between teal/800 and teal/950. Carries accent-strong in Bloom Dark. */
   --color-teal-950: #12241f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-50: #faece3; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-copper-100: #f6dece; /** Between copper/50 and copper/300. Carries accent-strong in Forge Light. */
   --color-copper-300: #e8a87c;
   --color-copper-400: #d88255; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-500: #a34a24; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-600: #8a3e1f; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-copper-800: #5c2712;
+  --color-copper-900: #472114; /** Between copper/800 and copper/950. Carries accent-strong in Forge Dark. */
   --color-copper-950: #311b12; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-danger-50: #fff2f2; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-danger-300: #de7373; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-danger-500: #d44545; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-danger-700: #b91c1c; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-danger-950: #1d0e0e; /** Dark subtle tint. Pairs with color/status/danger/300 as its foreground. */
   --color-status-warning-50: #fff7e0; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-warning-300: #deb573; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-warning-500: #b2730d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-warning-600: #b45309; /** Primitive derived from the reference prototypes. */
+  --color-status-warning-950: #1d170e; /** Dark subtle tint. Pairs with color/status/warning/300 as its foreground. */
   --color-status-success-50: #f0fdf4; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-success-300: #73de92; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-success-500: #338c4d; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-success-600: #16a34a; /** Primitive derived from the reference prototypes. */
   --color-status-success-700: #15803d; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
+  --color-status-success-950: #0e1d13; /** Dark subtle tint. Pairs with color/status/success/300 as its foreground. */
   --color-status-info-50: #e8f2ff; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-300: #739bde; /** Light step of the status hue, used as the status foreground in dark mode. */
   --color-status-info-500: #2b66c9; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
   --color-status-info-700: #2563eb; /** Primitive derived from the reference prototypes. Never apply directly, use a semantic token. */
-  --color-ui-system: #6366f1; /** Primitive derived from the reference prototypes (pages 09 / 10 / 08). Never apply directly, use a semantic token. */
+  --color-status-info-950: #0e141d; /** Dark subtle tint. Pairs with color/status/info/300 as its foreground. */
   --color-ui-mode-cd: #734fa6; /** Ownership chip colour, derived from the reference prototypes. */
   --color-ui-mode-cd-subtle: #f5ebfc; /** Ownership chip colour, derived from the reference prototypes. */
   --color-drift-166534: #166534; /** DRIFT. 7 uses, no role assigned. Merge it into a role token or promote it; do not apply it to a new screen. */
@@ -889,6 +980,7 @@
   --spacing-overlap-6: -6px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
   --spacing-overlap-5: -5px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
   --spacing-overlap-8: -8px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-4: -4px; /** Negative gap for a 20px avatar cluster: 4px of overlap still leaves both initials readable. */
   --radius-1: 1px; /** Scale step derived from real usage in the prototypes. */
   --radius-2: 2px; /** Scale primitive, value in px, derived from the reference prototypes. */
   --radius-3: 3px; /** Scale primitive, value in px, derived from the reference prototypes. */
@@ -940,6 +1032,7 @@
   --text-12-5: 12.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
   --text-13-5: 13.5px; /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
   --text-5-5: 5.5px; /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-8-5: 8.5px; /** Initials of a 20px presence avatar in a dense stack. */
   --shadow-xs: 0px 1px 3px 0px rgb(6% 9% 16% / 0.05); /** Hairline lift. Segmented controls, small toggles. */
   --shadow-md: 0px 2px 8px 0px rgb(6% 9% 16% / 0.06); /** Card elevation. The default panel and card shadow. */
   --shadow-lg: 0px 4px 16px -2px rgb(6% 9% 16% / 0.06); /** Sticky or primary card. One step above shadow/md. */
@@ -961,6 +1054,7 @@
   --typography-typography-body-sm-medium: 500 12px/18px Inter; /** Row text with emphasis. */
   --typography-typography-body-xs: 500 11px/16px Inter; /** Helper text under an input, stereotypes. */
   --typography-typography-body-prose-13: 400 13px/21px Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --typography-typography-body-prose-12: 400 12px/19px Inter; /** Hypha assistant prose and labels. */
   --typography-typography-label-md: 500 14px/20px Inter; /** Form label. */
   --typography-typography-label-sm: 500 12px/16px Inter; /** Compact label, chip text. */
   --typography-typography-label-xs: 600 10px/14px Inter; /** ALL CAPS section label, count pill. */
@@ -968,6 +1062,23 @@
   --typography-typography-mono-sm: 400 12px/18px 'JetBrains Mono'; /** Numeric table cells, versions. */
   --typography-typography-mono-xs: 500 11px/16px 'JetBrains Mono'; /** Compact mono, badges and hashes. */
   --typography-typography-mono-code-11-5: 400 11.5px/19px 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --typography-typography-ui-regular-12: 400 12px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 3070 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-12 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-regular-11: 400 11px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-regular-13: 400 13px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2142 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-13 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-12: 500 12px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2129 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-12 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-11: 600 11px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1402 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-mono-bold-10: 700 10px/1.2 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1410 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-bold-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-13: 500 13px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1452 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-13 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-13: 600 13px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 964 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-13 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-10: 600 10px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 736 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-11: 500 11px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 745 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-regular-10: 400 10px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 797 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-9: 600 9px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-9 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-mono-regular-10: 400 10px/1.2 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 540 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-medium-10: 500 10px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 434 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-10 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-12: 600 12px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 445 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-12 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-mono-regular-11: 400 11px/1.2 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 270 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-11 on 2026-09-15 without moving any text. */
+  --typography-typography-ui-semibold-15: 600 15px/1.2 Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 274 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-15 on 2026-09-15 without moving any text. */
   --background: var(--color-gray-1050);
   --foreground: var(--color-gray-200);
   --foreground-muted: var(--color-gray-400);
@@ -987,46 +1098,48 @@
   --primary-foreground: var(--color-gray-0);
   --accent: var(--color-teal-950);
   --accent-foreground: var(--color-gray-200);
-  --destructive: var(--color-status-danger-500);
-  --destructive-subtle: var(--color-status-danger-50);
+  --destructive: var(--color-status-danger-300); /** The destructive status colour. Lightens in dark mode so it reads on destructive-subtle. */
+  --destructive-subtle: var(--color-status-danger-950); /** Tinted surface behind a destructive message. Mode-aware. */
   --destructive-foreground: var(--color-gray-0);
-  --warning: var(--color-status-warning-500);
-  --warning-subtle: var(--color-status-warning-50);
-  --success: var(--color-status-success-500);
-  --info: var(--color-status-info-500);
-  --info-subtle: var(--color-status-info-50);
-  --ring: var(--color-status-info-500);
-  --ownership-system: var(--color-ui-system);
+  --warning: var(--color-status-warning-300); /** The warning status colour. Lightens in dark mode so it reads on warning-subtle. */
+  --warning-subtle: var(--color-status-warning-950); /** Tinted surface behind a warning message. Mode-aware. */
+  --success: var(--color-status-success-300); /** The success status colour. Lightens in dark mode so it reads on success-subtle. */
+  --info: var(--color-status-info-300); /** The info status colour. Lightens in dark mode so it reads on info-subtle. */
+  --info-subtle: var(--color-status-info-950); /** Tinted surface behind a info message. Mode-aware. */
+  --ring: var(--color-status-info-300);
+  --ownership-system-base: var(--color-ownership-system-base); /** Stripe colour of the SYS system-rollup Ownership. */
+  --ownership-system-bg: var(--color-ownership-system-bg); /** Chip background for the system Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-system-fg: var(--color-ownership-system-fg); /** Chip label for the system Ownership. Clears 4.5:1 on its own background. */
   --ownership-thermal-base: var(--color-ownership-thermal-base);
-  --ownership-thermal-bg: var(--color-ownership-thermal-bg);
-  --ownership-thermal-fg: var(--color-ownership-thermal-fg);
+  --ownership-thermal-bg: var(--color-ownership-thermal-bg); /** Chip background for the thermal Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-thermal-fg: var(--color-ownership-thermal-fg); /** Chip label for the thermal Ownership. Clears 4.5:1 on its own background. */
   --ownership-power-base: var(--color-ownership-power-base);
-  --ownership-power-bg: var(--color-ownership-power-bg);
-  --ownership-power-fg: var(--color-ownership-power-fg);
+  --ownership-power-bg: var(--color-ownership-power-bg); /** Chip background for the power Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-power-fg: var(--color-ownership-power-fg); /** Chip label for the power Ownership. Clears 4.5:1 on its own background. */
   --ownership-structure-base: var(--color-ownership-structure-base);
-  --ownership-structure-bg: var(--color-ownership-structure-bg);
-  --ownership-structure-fg: var(--color-ownership-structure-fg);
+  --ownership-structure-bg: var(--color-ownership-structure-bg); /** Chip background for the structure Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-structure-fg: var(--color-ownership-structure-fg); /** Chip label for the structure Ownership. Clears 4.5:1 on its own background. */
   --ownership-aocs-base: var(--color-ownership-aocs-base);
-  --ownership-aocs-bg: var(--color-ownership-aocs-bg);
-  --ownership-aocs-fg: var(--color-ownership-aocs-fg);
+  --ownership-aocs-bg: var(--color-ownership-aocs-bg); /** Chip background for the aocs Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-aocs-fg: var(--color-ownership-aocs-fg); /** Chip label for the aocs Ownership. Clears 4.5:1 on its own background. */
   --ownership-comms-base: var(--color-ownership-comms-base);
-  --ownership-comms-bg: var(--color-ownership-comms-bg);
-  --ownership-comms-fg: var(--color-ownership-comms-fg);
+  --ownership-comms-bg: var(--color-ownership-comms-bg); /** Chip background for the comms Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-comms-fg: var(--color-ownership-comms-fg); /** Chip label for the comms Ownership. Clears 4.5:1 on its own background. */
   --ownership-propulsion-base: var(--color-ownership-propulsion-base);
-  --ownership-propulsion-bg: var(--color-ownership-propulsion-bg);
-  --ownership-propulsion-fg: var(--color-ownership-propulsion-fg);
+  --ownership-propulsion-bg: var(--color-ownership-propulsion-bg); /** Chip background for the propulsion Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-propulsion-fg: var(--color-ownership-propulsion-fg); /** Chip label for the propulsion Ownership. Clears 4.5:1 on its own background. */
   --ownership-software-base: var(--color-ownership-software-base);
+  --ownership-software-bg: var(--color-ownership-software-bg); /** Chip background for the software Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-software-fg: var(--color-ownership-software-fg); /** Chip label for the software Ownership. Clears 4.5:1 on its own background. */
   --ownership-payload-base: var(--color-ownership-payload-base);
-  --ownership-payload-bg: var(--color-ownership-payload-bg);
-  --ownership-payload-fg: var(--color-ownership-payload-fg);
+  --ownership-payload-bg: var(--color-ownership-payload-bg); /** Chip background for the payload Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-payload-fg: var(--color-ownership-payload-fg); /** Chip label for the payload Ownership. Clears 4.5:1 on its own background. */
   --ownership-mechanisms-base: var(--color-ownership-mechanisms-base);
-  --ownership-mechanisms-bg: var(--color-ownership-mechanisms-bg);
-  --ownership-mechanisms-fg: var(--color-ownership-mechanisms-fg);
+  --ownership-mechanisms-bg: var(--color-ownership-mechanisms-bg); /** Chip background for the mechanisms Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-mechanisms-fg: var(--color-ownership-mechanisms-fg); /** Chip label for the mechanisms Ownership. Clears 4.5:1 on its own background. */
   --ownership-data-handling-base: var(--color-ownership-data-handling-base);
-  --ownership-avionics-bg: var(--color-ownership-avionics-bg);
-  --ownership-avionics-fg: var(--color-ownership-avionics-fg);
-  --ownership-gnc-bg: var(--color-ownership-gnc-bg);
-  --ownership-gnc-fg: var(--color-ownership-gnc-fg);
+  --ownership-data-handling-bg: var(--color-ownership-data-handling-bg); /** Chip background for the data-handling Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --ownership-data-handling-fg: var(--color-ownership-data-handling-fg); /** Chip label for the data-handling Ownership. Clears 4.5:1 on its own background. */
   --collaborator-c01: var(--color-collaborator-c01);
   --collaborator-c02: var(--color-collaborator-c02);
   --collaborator-c03: var(--color-collaborator-c03);
@@ -1043,46 +1156,46 @@
   --lifecycle-open: var(--color-lifecycle-open);
   --lifecycle-review: var(--color-lifecycle-review);
   --lifecycle-archived: var(--color-lifecycle-archived);
-  --sysml-structure-header: var(--color-sysml-structure-header);
-  --sysml-structure-surface: var(--color-sysml-structure-surface);
-  --sysml-structure-border: var(--color-sysml-structure-border);
-  --sysml-attributes-header: var(--color-sysml-attributes-header);
-  --sysml-attributes-surface: var(--color-sysml-attributes-surface);
-  --sysml-attributes-border: var(--color-sysml-attributes-border);
-  --sysml-connections-header: var(--color-sysml-connections-header);
-  --sysml-connections-surface: var(--color-sysml-connections-surface);
-  --sysml-connections-border: var(--color-sysml-connections-border);
-  --sysml-behavior-header: var(--color-sysml-behavior-header);
-  --sysml-behavior-surface: var(--color-sysml-behavior-surface);
-  --sysml-behavior-border: var(--color-sysml-behavior-border);
-  --sysml-requirements-header: var(--color-sysml-requirements-header);
-  --sysml-requirements-surface: var(--color-sysml-requirements-surface);
-  --sysml-requirements-border: var(--color-sysml-requirements-border);
-  --sysml-verification-header: var(--color-sysml-verification-header);
-  --sysml-verification-surface: var(--color-sysml-verification-surface);
-  --sysml-verification-border: var(--color-sysml-verification-border);
-  --sysml-allocations-header: var(--color-sysml-allocations-header);
-  --sysml-allocations-surface: var(--color-sysml-allocations-surface);
-  --sysml-allocations-border: var(--color-sysml-allocations-border);
-  --sysml-metadata-header: var(--color-sysml-metadata-header);
-  --sysml-metadata-surface: var(--color-sysml-metadata-surface);
-  --sysml-metadata-border: var(--color-sysml-metadata-border);
-  --sysml-library-header: var(--color-sysml-library-header);
-  --sysml-library-surface: var(--color-sysml-library-surface);
-  --sysml-library-border: var(--color-sysml-library-border);
-  --sysml-variation-header: var(--color-sysml-variation-header);
-  --sysml-variation-surface: var(--color-sysml-variation-surface);
-  --sysml-variation-border: var(--color-sysml-variation-border);
+  --sysml-structure-header: var(--color-sysml-structure-header-dark); /** Category label of the structure SysML card. Mode-aware. */
+  --sysml-structure-surface: var(--color-sysml-structure-surface-dark); /** Card surface of the structure SysML category. Mode-aware. */
+  --sysml-structure-border: var(--color-sysml-structure-border); /** Border of the structure SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-attributes-header: var(--color-sysml-attributes-header-dark); /** Category label of the attributes SysML card. Mode-aware. */
+  --sysml-attributes-surface: var(--color-sysml-attributes-surface-dark); /** Card surface of the attributes SysML category. Mode-aware. */
+  --sysml-attributes-border: var(--color-sysml-attributes-border); /** Border of the attributes SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-connections-header: var(--color-sysml-connections-header-dark); /** Category label of the connections SysML card. Mode-aware. */
+  --sysml-connections-surface: var(--color-sysml-connections-surface-dark); /** Card surface of the connections SysML category. Mode-aware. */
+  --sysml-connections-border: var(--color-sysml-connections-border); /** Border of the connections SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-behavior-header: var(--color-sysml-behavior-header-dark); /** Category label of the behavior SysML card. Mode-aware. */
+  --sysml-behavior-surface: var(--color-sysml-behavior-surface-dark); /** Card surface of the behavior SysML category. Mode-aware. */
+  --sysml-behavior-border: var(--color-sysml-behavior-border); /** Border of the behavior SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-requirements-header: var(--color-sysml-requirements-header-dark); /** Category label of the requirements SysML card. Mode-aware. */
+  --sysml-requirements-surface: var(--color-sysml-requirements-surface-dark); /** Card surface of the requirements SysML category. Mode-aware. */
+  --sysml-requirements-border: var(--color-sysml-requirements-border); /** Border of the requirements SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-verification-header: var(--color-sysml-verification-header-dark); /** Category label of the verification SysML card. Mode-aware. */
+  --sysml-verification-surface: var(--color-sysml-verification-surface-dark); /** Card surface of the verification SysML category. Mode-aware. */
+  --sysml-verification-border: var(--color-sysml-verification-border); /** Border of the verification SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-allocations-header: var(--color-sysml-allocations-header-dark); /** Category label of the allocations SysML card. Mode-aware. */
+  --sysml-allocations-surface: var(--color-sysml-allocations-surface-dark); /** Card surface of the allocations SysML category. Mode-aware. */
+  --sysml-allocations-border: var(--color-sysml-allocations-border); /** Border of the allocations SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-metadata-header: var(--color-sysml-metadata-header-dark); /** Category label of the metadata SysML card. Mode-aware. */
+  --sysml-metadata-surface: var(--color-sysml-metadata-surface-dark); /** Card surface of the metadata SysML category. Mode-aware. */
+  --sysml-metadata-border: var(--color-sysml-metadata-border); /** Border of the metadata SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-library-header: var(--color-sysml-library-header-dark); /** Category label of the library SysML card. Mode-aware. */
+  --sysml-library-surface: var(--color-sysml-library-surface-dark); /** Card surface of the library SysML category. Mode-aware. */
+  --sysml-library-border: var(--color-sysml-library-border); /** Border of the library SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --sysml-variation-header: var(--color-sysml-variation-header-dark); /** Category label of the variation SysML card. Mode-aware. */
+  --sysml-variation-surface: var(--color-sysml-variation-surface-dark); /** Card surface of the variation SysML category. Mode-aware. */
+  --sysml-variation-border: var(--color-sysml-variation-border); /** Border of the variation SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
   --foreground-strong: var(--color-gray-200);
   --foreground-deep: var(--color-gray-200);
   --foreground-subtle: var(--color-gray-450);
   --placeholder: var(--color-gray-450);
   --primary-subtle: var(--color-teal-300);
   --primary-deep: var(--color-teal-800);
-  --accent-strong: var(--color-teal-100);
+  --accent-strong: var(--color-teal-900); /** A stronger accent tint than accent. Follows the product accent: teal on Bloom, copper on Forge. */
   --destructive-strong: var(--color-status-danger-700);
   --success-strong: var(--color-status-success-700);
-  --success-subtle: var(--color-status-success-50);
+  --success-subtle: var(--color-status-success-950); /** Tinted surface behind a success message. Mode-aware. */
   --info-strong: var(--color-status-info-700);
   --mode-cd: var(--color-ui-mode-cd);
   --mode-cd-subtle: var(--color-ui-mode-cd-subtle);
@@ -1103,4 +1216,7 @@
   --docs-code-foreground: var(--color-green-100); /** Code sample text. The code surface is dark in both themes, so this token does not change with the mode. */
   --docs-code-background: var(--color-gray-900); /** Code sample surface. Dark in both themes by design, so the pale code text always reads. */
   --scrim: var(--color-gray-1050); /** Backdrop behind a modal or overlay. */
+  --foreground-inverse-muted: var(--color-gray-850); /** Secondary text on a SysML node header: the guillemet kind designator and its icon. The header inverts between modes (dark #475569 in light mode, light #90b1df in dark mode), so this token inverts with it: gray/150 on the dark header at 6.90:1, gray/850 on the light header at 6.65:1. Both sit just below the element name, which is card at 7.58 and 7.99, so the hierarchy is carried without dropping to a grey that reads as disabled. */
+  --secondary: var(--color-gray-900); /** Surface of a secondary control. Same value as muted today, but a different role: muted is a de-emphasised area, secondary is a control. BlazorBlueprint expects this name for its theming. */
+  --secondary-foreground: var(--color-gray-200); /** Label on a secondary control. Same value as foreground today. Paired with secondary for BlazorBlueprint theming. */
 }

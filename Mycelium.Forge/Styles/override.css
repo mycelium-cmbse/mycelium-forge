@@ -2,15 +2,9 @@
  * Imported into tailwind.css to provide unified styling across Forge components.
  */
 
-/* Fallback domain ownership semantic tokens missing from upstream DTCG (Figma) export.
- * Declared here until Figma variable collections are updated with these chips.
- */
-
 /* BlazorBlueprint theming tokens manual override */
 :root {
     --radius: var(--radius-8);
-    --secondary: var(--color-gray-150);
-    --secondary-foreground: var(--color-gray-800);
     --chart-1: var(--color-copper-400);
     --chart-2: var(--color-teal-500);
     --chart-3: var(--color-gray-700);
@@ -36,15 +30,9 @@
     --alert-danger: var(--destructive);
     --alert-danger-foreground: var(--destructive-strong);
     --alert-danger-bg: var(--docs-callout-danger-bg);
-    --ownership-software-bg: #ebf7eb;
-    --ownership-software-fg: #338c4d;
-    --ownership-data-handling-bg: #eef2ff;
-    --ownership-data-handling-fg: #4f46e5;
 }
 
 .dark {
-    --secondary: var(--color-gray-750);
-    --secondary-foreground: var(--color-gray-0);
     --chart-1: var(--color-status-info-500);
     --chart-2: var(--color-teal-300);
     --chart-3: var(--color-copper-300);
@@ -70,10 +58,6 @@
     --alert-danger: var(--destructive);
     --alert-danger-foreground: var(--destructive-strong);
     --alert-danger-bg: var(--docs-callout-danger-bg);
-    --ownership-software-bg: #ebf7eb;
-    --ownership-software-fg: #338c4d;
-    --ownership-data-handling-bg: #eef2ff;
-    --ownership-data-handling-fg: #4f46e5;
 }
 
 /* Base button styling defaults */
@@ -153,7 +137,12 @@ input::placeholder {
 }
 
 /* Dialog container padding override for BlazorBlueprint dialogs */
-div[role="dialog"][aria-labelledby*="bb-dialog"] {
+div[role="dialog"] {
     padding: 0;
     overflow: hidden;
+}
+
+div[role="dialog"],
+div[role="alertdialog"] {
+    border-color: var(--border);
 }
