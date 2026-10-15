@@ -53,6 +53,7 @@
   --spacing-overlap-6: -6px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
   --spacing-overlap-5: -5px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
   --spacing-overlap-8: -8px; /** Negative spacing: a deliberate overlap, such as stacked presence avatars. Named overlap so it never reads as a mistake. */
+  --spacing-overlap-4: -4px; /** Negative gap for a 20px avatar cluster: 4px of overlap still leaves both initials readable. */
   --radius-1: var(--radius-1); /** Scale step derived from real usage in the prototypes. */
   --radius-2: var(--radius-2); /** Scale primitive, value in px, derived from the reference prototypes. */
   --radius-3: var(--radius-3); /** Scale primitive, value in px, derived from the reference prototypes. */
@@ -104,6 +105,7 @@
   --text-12-5: var(--text-12-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
   --text-13-5: var(--text-13-5); /** Half step. The hyphen stands for the decimal point, so radius/1-5 is 1.5px. It exists because the design really uses it, not because the scale wanted it. */
   --text-5-5: var(--text-5-5); /** Rounded from a fractional value left by a rescale() on the diagram zoom control. The change is under half a pixel; the point is that the value is now a token. */
+  --text-8-5: var(--text-8-5); /** Initials of a 20px presence avatar in a dense stack. */
   --shadow-xs: var(--shadow-xs); /** Hairline lift. Segmented controls, small toggles. */
   --shadow-md: var(--shadow-md); /** Card elevation. The default panel and card shadow. */
   --shadow-lg: var(--shadow-lg); /** Sticky or primary card. One step above shadow/md. */
@@ -164,6 +166,10 @@
   --leading-body-prose-13: 21px; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
   --font-weight-body-prose-13: 400; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
   --font-body-prose-13: Inter; /** Paragraph of a legal document on the Forge site. 13/21 gives about 78 characters on a 760px measure. */
+  --text-body-prose-12: 12px; /** Hypha assistant prose and labels. */
+  --leading-body-prose-12: 19px; /** Hypha assistant prose and labels. */
+  --font-weight-body-prose-12: 400; /** Hypha assistant prose and labels. */
+  --font-body-prose-12: Inter; /** Hypha assistant prose and labels. */
   --text-label-md: 14px; /** Form label. */
   --leading-label-md: 20px; /** Form label. */
   --font-weight-label-md: 500; /** Form label. */
@@ -192,6 +198,57 @@
   --leading-mono-code-11-5: 19px; /** Code preview inside the kpar archive browser and the forum code blocks. */
   --font-weight-mono-code-11-5: 400; /** Code preview inside the kpar archive browser and the forum code blocks. */
   --font-mono-code-11-5: 'JetBrains Mono'; /** Code preview inside the kpar archive browser and the forum code blocks. */
+  --text-ui-regular-12: 12px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 3070 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-12 on 2026-09-15 without moving any text. */
+  --font-weight-ui-regular-12: 400; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 3070 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-12 on 2026-09-15 without moving any text. */
+  --font-ui-regular-12: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 3070 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-12 on 2026-09-15 without moving any text. */
+  --text-ui-regular-11: 11px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-11 on 2026-09-15 without moving any text. */
+  --font-weight-ui-regular-11: 400; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-11 on 2026-09-15 without moving any text. */
+  --font-ui-regular-11: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-11 on 2026-09-15 without moving any text. */
+  --text-ui-regular-13: 13px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2142 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-13 on 2026-09-15 without moving any text. */
+  --font-weight-ui-regular-13: 400; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2142 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-13 on 2026-09-15 without moving any text. */
+  --font-ui-regular-13: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2142 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-13 on 2026-09-15 without moving any text. */
+  --text-ui-medium-12: 12px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2129 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-12 on 2026-09-15 without moving any text. */
+  --font-weight-ui-medium-12: 500; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2129 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-12 on 2026-09-15 without moving any text. */
+  --font-ui-medium-12: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 2129 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-12 on 2026-09-15 without moving any text. */
+  --text-ui-semibold-11: 11px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1402 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-11 on 2026-09-15 without moving any text. */
+  --font-weight-ui-semibold-11: 600; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1402 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-11 on 2026-09-15 without moving any text. */
+  --font-ui-semibold-11: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1402 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-11 on 2026-09-15 without moving any text. */
+  --text-ui-mono-bold-10: 10px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1410 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-bold-10 on 2026-09-15 without moving any text. */
+  --font-weight-ui-mono-bold-10: 700; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1410 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-bold-10 on 2026-09-15 without moving any text. */
+  --font-ui-mono-bold-10: 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1410 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-bold-10 on 2026-09-15 without moving any text. */
+  --text-ui-medium-13: 13px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1452 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-13 on 2026-09-15 without moving any text. */
+  --font-weight-ui-medium-13: 500; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1452 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-13 on 2026-09-15 without moving any text. */
+  --font-ui-medium-13: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 1452 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-13 on 2026-09-15 without moving any text. */
+  --text-ui-semibold-13: 13px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 964 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-13 on 2026-09-15 without moving any text. */
+  --font-weight-ui-semibold-13: 600; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 964 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-13 on 2026-09-15 without moving any text. */
+  --font-ui-semibold-13: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 964 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-13 on 2026-09-15 without moving any text. */
+  --text-ui-semibold-10: 10px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 736 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-10 on 2026-09-15 without moving any text. */
+  --font-weight-ui-semibold-10: 600; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 736 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-10 on 2026-09-15 without moving any text. */
+  --font-ui-semibold-10: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 736 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-10 on 2026-09-15 without moving any text. */
+  --text-ui-medium-11: 11px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 745 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-11 on 2026-09-15 without moving any text. */
+  --font-weight-ui-medium-11: 500; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 745 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-11 on 2026-09-15 without moving any text. */
+  --font-ui-medium-11: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 745 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-11 on 2026-09-15 without moving any text. */
+  --text-ui-regular-10: 10px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 797 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-10 on 2026-09-15 without moving any text. */
+  --font-weight-ui-regular-10: 400; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 797 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-10 on 2026-09-15 without moving any text. */
+  --font-ui-regular-10: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 797 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-regular-10 on 2026-09-15 without moving any text. */
+  --text-ui-semibold-9: 9px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-9 on 2026-09-15 without moving any text. */
+  --font-weight-ui-semibold-9: 600; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-9 on 2026-09-15 without moving any text. */
+  --font-ui-semibold-9: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 463 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-9 on 2026-09-15 without moving any text. */
+  --text-ui-mono-regular-10: 10px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 540 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-10 on 2026-09-15 without moving any text. */
+  --font-weight-ui-mono-regular-10: 400; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 540 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-10 on 2026-09-15 without moving any text. */
+  --font-ui-mono-regular-10: 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 540 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-10 on 2026-09-15 without moving any text. */
+  --text-ui-medium-10: 10px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 434 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-10 on 2026-09-15 without moving any text. */
+  --font-weight-ui-medium-10: 500; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 434 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-10 on 2026-09-15 without moving any text. */
+  --font-ui-medium-10: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 434 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-medium-10 on 2026-09-15 without moving any text. */
+  --text-ui-semibold-12: 12px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 445 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-12 on 2026-09-15 without moving any text. */
+  --font-weight-ui-semibold-12: 600; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 445 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-12 on 2026-09-15 without moving any text. */
+  --font-ui-semibold-12: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 445 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-12 on 2026-09-15 without moving any text. */
+  --text-ui-mono-regular-11: 11px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 270 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-11 on 2026-09-15 without moving any text. */
+  --font-weight-ui-mono-regular-11: 400; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 270 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-11 on 2026-09-15 without moving any text. */
+  --font-ui-mono-regular-11: 'JetBrains Mono'; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 270 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/jetbrains-mono-regular-11 on 2026-09-15 without moving any text. */
+  --text-ui-semibold-15: 15px; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 274 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-15 on 2026-09-15 without moving any text. */
+  --font-weight-ui-semibold-15: 600; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 274 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-15 on 2026-09-15 without moving any text. */
+  --font-ui-semibold-15: Inter; /** Dense interface text at the natural line height. The ui family is what the design actually uses: 274 texts on this one. Distinct from typography/body/*, which sets an explicit pixel line height for prose. Promoted from typography/raw/inter-semi-bold-15 on 2026-09-15 without moving any text. */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--foreground-muted);
@@ -211,46 +268,48 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-subtle: var(--destructive-subtle);
+  --color-destructive: var(--destructive); /** The destructive status colour. Lightens in dark mode so it reads on destructive-subtle. */
+  --color-destructive-subtle: var(--destructive-subtle); /** Tinted surface behind a destructive message. Mode-aware. */
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-warning: var(--warning);
-  --color-warning-subtle: var(--warning-subtle);
-  --color-success: var(--success);
-  --color-info: var(--info);
-  --color-info-subtle: var(--info-subtle);
+  --color-warning: var(--warning); /** The warning status colour. Lightens in dark mode so it reads on warning-subtle. */
+  --color-warning-subtle: var(--warning-subtle); /** Tinted surface behind a warning message. Mode-aware. */
+  --color-success: var(--success); /** The success status colour. Lightens in dark mode so it reads on success-subtle. */
+  --color-info: var(--info); /** The info status colour. Lightens in dark mode so it reads on info-subtle. */
+  --color-info-subtle: var(--info-subtle); /** Tinted surface behind a info message. Mode-aware. */
   --color-ring: var(--ring);
-  --color-ownership-system: var(--ownership-system);
+  --color-ownership-system-base: var(--ownership-system-base); /** Stripe colour of the SYS system-rollup Ownership. */
+  --color-ownership-system-bg: var(--ownership-system-bg); /** Chip background for the system Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-system-fg: var(--ownership-system-fg); /** Chip label for the system Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-thermal-base: var(--ownership-thermal-base);
-  --color-ownership-thermal-bg: var(--ownership-thermal-bg);
-  --color-ownership-thermal-fg: var(--ownership-thermal-fg);
+  --color-ownership-thermal-bg: var(--ownership-thermal-bg); /** Chip background for the thermal Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-thermal-fg: var(--ownership-thermal-fg); /** Chip label for the thermal Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-power-base: var(--ownership-power-base);
-  --color-ownership-power-bg: var(--ownership-power-bg);
-  --color-ownership-power-fg: var(--ownership-power-fg);
+  --color-ownership-power-bg: var(--ownership-power-bg); /** Chip background for the power Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-power-fg: var(--ownership-power-fg); /** Chip label for the power Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-structure-base: var(--ownership-structure-base);
-  --color-ownership-structure-bg: var(--ownership-structure-bg);
-  --color-ownership-structure-fg: var(--ownership-structure-fg);
+  --color-ownership-structure-bg: var(--ownership-structure-bg); /** Chip background for the structure Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-structure-fg: var(--ownership-structure-fg); /** Chip label for the structure Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-aocs-base: var(--ownership-aocs-base);
-  --color-ownership-aocs-bg: var(--ownership-aocs-bg);
-  --color-ownership-aocs-fg: var(--ownership-aocs-fg);
+  --color-ownership-aocs-bg: var(--ownership-aocs-bg); /** Chip background for the aocs Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-aocs-fg: var(--ownership-aocs-fg); /** Chip label for the aocs Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-comms-base: var(--ownership-comms-base);
-  --color-ownership-comms-bg: var(--ownership-comms-bg);
-  --color-ownership-comms-fg: var(--ownership-comms-fg);
+  --color-ownership-comms-bg: var(--ownership-comms-bg); /** Chip background for the comms Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-comms-fg: var(--ownership-comms-fg); /** Chip label for the comms Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-propulsion-base: var(--ownership-propulsion-base);
-  --color-ownership-propulsion-bg: var(--ownership-propulsion-bg);
-  --color-ownership-propulsion-fg: var(--ownership-propulsion-fg);
+  --color-ownership-propulsion-bg: var(--ownership-propulsion-bg); /** Chip background for the propulsion Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-propulsion-fg: var(--ownership-propulsion-fg); /** Chip label for the propulsion Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-software-base: var(--ownership-software-base);
+  --color-ownership-software-bg: var(--ownership-software-bg); /** Chip background for the software Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-software-fg: var(--ownership-software-fg); /** Chip label for the software Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-payload-base: var(--ownership-payload-base);
-  --color-ownership-payload-bg: var(--ownership-payload-bg);
-  --color-ownership-payload-fg: var(--ownership-payload-fg);
+  --color-ownership-payload-bg: var(--ownership-payload-bg); /** Chip background for the payload Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-payload-fg: var(--ownership-payload-fg); /** Chip label for the payload Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-mechanisms-base: var(--ownership-mechanisms-base);
-  --color-ownership-mechanisms-bg: var(--ownership-mechanisms-bg);
-  --color-ownership-mechanisms-fg: var(--ownership-mechanisms-fg);
+  --color-ownership-mechanisms-bg: var(--ownership-mechanisms-bg); /** Chip background for the mechanisms Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-mechanisms-fg: var(--ownership-mechanisms-fg); /** Chip label for the mechanisms Ownership. Clears 4.5:1 on its own background. */
   --color-ownership-data-handling-base: var(--ownership-data-handling-base);
-  --color-ownership-avionics-bg: var(--ownership-avionics-bg);
-  --color-ownership-avionics-fg: var(--ownership-avionics-fg);
-  --color-ownership-gnc-bg: var(--ownership-gnc-bg);
-  --color-ownership-gnc-fg: var(--ownership-gnc-fg);
+  --color-ownership-data-handling-bg: var(--ownership-data-handling-bg); /** Chip background for the data-handling Ownership. Derived from its base stripe so stripe and chip share one hue. The same value in all four modes: an Ownership colour identifies a domain, it is not a theme surface. */
+  --color-ownership-data-handling-fg: var(--ownership-data-handling-fg); /** Chip label for the data-handling Ownership. Clears 4.5:1 on its own background. */
   --color-collaborator-c01: var(--collaborator-c01);
   --color-collaborator-c02: var(--collaborator-c02);
   --color-collaborator-c03: var(--collaborator-c03);
@@ -267,46 +326,46 @@
   --color-lifecycle-open: var(--lifecycle-open);
   --color-lifecycle-review: var(--lifecycle-review);
   --color-lifecycle-archived: var(--lifecycle-archived);
-  --color-sysml-structure-header: var(--sysml-structure-header);
-  --color-sysml-structure-surface: var(--sysml-structure-surface);
-  --color-sysml-structure-border: var(--sysml-structure-border);
-  --color-sysml-attributes-header: var(--sysml-attributes-header);
-  --color-sysml-attributes-surface: var(--sysml-attributes-surface);
-  --color-sysml-attributes-border: var(--sysml-attributes-border);
-  --color-sysml-connections-header: var(--sysml-connections-header);
-  --color-sysml-connections-surface: var(--sysml-connections-surface);
-  --color-sysml-connections-border: var(--sysml-connections-border);
-  --color-sysml-behavior-header: var(--sysml-behavior-header);
-  --color-sysml-behavior-surface: var(--sysml-behavior-surface);
-  --color-sysml-behavior-border: var(--sysml-behavior-border);
-  --color-sysml-requirements-header: var(--sysml-requirements-header);
-  --color-sysml-requirements-surface: var(--sysml-requirements-surface);
-  --color-sysml-requirements-border: var(--sysml-requirements-border);
-  --color-sysml-verification-header: var(--sysml-verification-header);
-  --color-sysml-verification-surface: var(--sysml-verification-surface);
-  --color-sysml-verification-border: var(--sysml-verification-border);
-  --color-sysml-allocations-header: var(--sysml-allocations-header);
-  --color-sysml-allocations-surface: var(--sysml-allocations-surface);
-  --color-sysml-allocations-border: var(--sysml-allocations-border);
-  --color-sysml-metadata-header: var(--sysml-metadata-header);
-  --color-sysml-metadata-surface: var(--sysml-metadata-surface);
-  --color-sysml-metadata-border: var(--sysml-metadata-border);
-  --color-sysml-library-header: var(--sysml-library-header);
-  --color-sysml-library-surface: var(--sysml-library-surface);
-  --color-sysml-library-border: var(--sysml-library-border);
-  --color-sysml-variation-header: var(--sysml-variation-header);
-  --color-sysml-variation-surface: var(--sysml-variation-surface);
-  --color-sysml-variation-border: var(--sysml-variation-border);
+  --color-sysml-structure-header: var(--sysml-structure-header); /** Category label of the structure SysML card. Mode-aware. */
+  --color-sysml-structure-surface: var(--sysml-structure-surface); /** Card surface of the structure SysML category. Mode-aware. */
+  --color-sysml-structure-border: var(--sysml-structure-border); /** Border of the structure SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-attributes-header: var(--sysml-attributes-header); /** Category label of the attributes SysML card. Mode-aware. */
+  --color-sysml-attributes-surface: var(--sysml-attributes-surface); /** Card surface of the attributes SysML category. Mode-aware. */
+  --color-sysml-attributes-border: var(--sysml-attributes-border); /** Border of the attributes SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-connections-header: var(--sysml-connections-header); /** Category label of the connections SysML card. Mode-aware. */
+  --color-sysml-connections-surface: var(--sysml-connections-surface); /** Card surface of the connections SysML category. Mode-aware. */
+  --color-sysml-connections-border: var(--sysml-connections-border); /** Border of the connections SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-behavior-header: var(--sysml-behavior-header); /** Category label of the behavior SysML card. Mode-aware. */
+  --color-sysml-behavior-surface: var(--sysml-behavior-surface); /** Card surface of the behavior SysML category. Mode-aware. */
+  --color-sysml-behavior-border: var(--sysml-behavior-border); /** Border of the behavior SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-requirements-header: var(--sysml-requirements-header); /** Category label of the requirements SysML card. Mode-aware. */
+  --color-sysml-requirements-surface: var(--sysml-requirements-surface); /** Card surface of the requirements SysML category. Mode-aware. */
+  --color-sysml-requirements-border: var(--sysml-requirements-border); /** Border of the requirements SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-verification-header: var(--sysml-verification-header); /** Category label of the verification SysML card. Mode-aware. */
+  --color-sysml-verification-surface: var(--sysml-verification-surface); /** Card surface of the verification SysML category. Mode-aware. */
+  --color-sysml-verification-border: var(--sysml-verification-border); /** Border of the verification SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-allocations-header: var(--sysml-allocations-header); /** Category label of the allocations SysML card. Mode-aware. */
+  --color-sysml-allocations-surface: var(--sysml-allocations-surface); /** Card surface of the allocations SysML category. Mode-aware. */
+  --color-sysml-allocations-border: var(--sysml-allocations-border); /** Border of the allocations SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-metadata-header: var(--sysml-metadata-header); /** Category label of the metadata SysML card. Mode-aware. */
+  --color-sysml-metadata-surface: var(--sysml-metadata-surface); /** Card surface of the metadata SysML category. Mode-aware. */
+  --color-sysml-metadata-border: var(--sysml-metadata-border); /** Border of the metadata SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-library-header: var(--sysml-library-header); /** Category label of the library SysML card. Mode-aware. */
+  --color-sysml-library-surface: var(--sysml-library-surface); /** Card surface of the library SysML category. Mode-aware. */
+  --color-sysml-library-border: var(--sysml-library-border); /** Border of the library SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
+  --color-sysml-variation-header: var(--sysml-variation-header); /** Category label of the variation SysML card. Mode-aware. */
+  --color-sysml-variation-surface: var(--sysml-variation-surface); /** Card surface of the variation SysML category. Mode-aware. */
+  --color-sysml-variation-border: var(--sysml-variation-border); /** Border of the variation SysML card. DELIBERATELY the same value in all four modes: a mid-tone border reads on both the light and the dark surface, so splitting it would add a token that says nothing. Do not "fix" this. */
   --color-foreground-strong: var(--foreground-strong);
   --color-foreground-deep: var(--foreground-deep);
   --color-foreground-subtle: var(--foreground-subtle);
   --color-placeholder: var(--placeholder);
   --color-primary-subtle: var(--primary-subtle);
   --color-primary-deep: var(--primary-deep);
-  --color-accent-strong: var(--accent-strong);
+  --color-accent-strong: var(--accent-strong); /** A stronger accent tint than accent. Follows the product accent: teal on Bloom, copper on Forge. */
   --color-destructive-strong: var(--destructive-strong);
   --color-success-strong: var(--success-strong);
-  --color-success-subtle: var(--success-subtle);
+  --color-success-subtle: var(--success-subtle); /** Tinted surface behind a success message. Mode-aware. */
   --color-info-strong: var(--info-strong);
   --color-mode-cd: var(--mode-cd);
   --color-mode-cd-subtle: var(--mode-cd-subtle);
@@ -323,4 +382,7 @@
   --color-docs-code-foreground: var(--docs-code-foreground); /** Code sample text. The code surface is dark in both themes, so this token does not change with the mode. */
   --color-docs-code-background: var(--docs-code-background); /** Code sample surface. Dark in both themes by design, so the pale code text always reads. */
   --color-scrim: var(--scrim); /** Backdrop behind a modal or overlay. */
+  --color-foreground-inverse-muted: var(--foreground-inverse-muted); /** Secondary text on a SysML node header: the guillemet kind designator and its icon. The header inverts between modes (dark #475569 in light mode, light #90b1df in dark mode), so this token inverts with it: gray/150 on the dark header at 6.90:1, gray/850 on the light header at 6.65:1. Both sit just below the element name, which is card at 7.58 and 7.99, so the hierarchy is carried without dropping to a grey that reads as disabled. */
+  --color-secondary: var(--secondary); /** Surface of a secondary control. Same value as muted today, but a different role: muted is a de-emphasised area, secondary is a control. BlazorBlueprint expects this name for its theming. */
+  --color-secondary-foreground: var(--secondary-foreground); /** Label on a secondary control. Same value as foreground today. Paired with secondary for BlazorBlueprint theming. */
 }
