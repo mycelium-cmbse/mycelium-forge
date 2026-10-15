@@ -37,7 +37,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
     {
         private BunitContext context;
         private Mock<IPublishViewModel> viewModelMock;
-        private Mock<IFileUploadService> fileUploadServiceMock;
         private DialogService dialogService;
         private NotificationService notificationService;
 
@@ -83,9 +82,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.viewModelMock.Setup(x => x.MetamodelOptions).Returns(["SysML v2 (2025-02)"]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
-
-            this.fileUploadServiceMock = new Mock<IFileUploadService>();
-            this.context.Services.AddSingleton(this.fileUploadServiceMock.Object);
 
             this.notificationService = new NotificationService();
             this.context.Services.AddSingleton<INotificationService>(this.notificationService);

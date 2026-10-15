@@ -122,6 +122,13 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// <returns>A <see cref="ErrorOr{Success}" /> indicating success or failure of the publish operation.</returns>
         public ErrorOr<Success> Publish()
         {
+            // TODO: Package publishing workflow to implement:
+            // What to use:
+            // 1. IFileUploadStagingService to retrieve the staged package payload and cleanup staged temporary files.
+            // 2. IArtifactStore.StoreArtifact to persist the uploaded package artifact to backend storage (i.e., using S3 client).
+            // 3. Database transaction / repository to persist package, release, and metadata DTOs referencing the stored artifact SHA256 identifier.
+            // 4. Cleanup staged temporary files upon completion or on any error.
+
             this.IsPublishing = true;
             this.IsPublishing = false;
             return Result.Success;

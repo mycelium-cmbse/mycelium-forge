@@ -56,12 +56,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public DialogService DialogService { get; set; }
 
         /// <summary>
-        /// Gets or sets the file upload service.
-        /// </summary>
-        [Inject]
-        public IFileUploadService FileUploadService { get; set; }
-
-        /// <summary>
         /// Gets the HTML ID for the file input element.
         /// </summary>
         public static string UploadInputId => "publish-package-file-input";
@@ -196,18 +190,14 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public async Task PublishPackage()
         {
             /*
-            TODO: This is a working demonstration of file upload over https. Needs to be uncommented when the publish page is fully implemented and ready for publishing packages.
-            The real implementation is probably different than this, considering that in the component side, we will probably only need to send the file to the server (through FileUploadStagingService), 
-            and the viewmodel will handle the rest of the publishing process (validation, metadata, etc.). The file upload service contains the steps of how to upload a file over https, and can be used
-            as inspiration.
-
-            var uploadResult = await this.FileUploadService.UploadFileOverHttps(this.UploadInputId);
-
-            if (uploadResult.IsError)
-            {
-                this.NotificationService.AddNotification(uploadResult.FirstError.Description, "Error", NotificationType.Error);
-                return;
-            }
+            TODO: Publish package workflow:
+            1. Validate the DTOs (metadata, version, etc.) in the UI component so that any invalid data is reported to the user before submitting to the viewmodel.
+            2. If DTOs are valid, stage the package file by sending it from the client to the server via HTTP POST (i.e., using JavaScript interop to upload directly to /api/v1/upload/stage to avoid transferring large files up to 250MB over WebSockets).
+            3. Execute the viewmodel publish command passing the staged file reference and (possibly) the metadata
+            4. The viewmodel handles the publishing process:
+               a. Persists the artifact using IArtifactStore.StoreArtifact.
+               b. Executes the database transaction to persist the package and release DTOs referencing the artifact.
+               c. Ensures staged files are cleaned up upon successful completion or on any error.
             */
 
             var result = this.ViewModel.Publish();
@@ -250,6 +240,17 @@ namespace Mycelium.Forge.Components.Pages.Publish
         }
 
         /// <summary>
+        /// Computes the CSS class string for displaying or hiding a step container.
+        /// </summary>
+        /// <param name="stepIndex">The zero-based index of the step.</param>
+        /// <param name="activeClasses">The CSS classes applied when the step is active.</param>
+        /// <returns>The CSS class string.</returns>
+        public string GetStepClass(int stepIndex, string activeClasses = "w-full")
+        {
+            return this.ActiveStep == stepIndex ? activeClasses : "hidden";
+        }
+
+        /// <summary>
         /// Initializes the component lifecycle and populates the view model state.
         /// </summary>
         protected override void OnInitialized()
@@ -272,17 +273,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
                 1 => this.CanOpenStep(0) && this.uploadedPackage != null,
                 _ => false
             };
-        }
-
-        /// <summary>
-        /// Computes the CSS class string for displaying or hiding a step container.
-        /// </summary>
-        /// <param name="stepIndex">The zero-based index of the step.</param>
-        /// <param name="activeClasses">The CSS classes applied when the step is active.</param>
-        /// <returns>The CSS class string.</returns>
-        public string GetStepClass(int stepIndex, string activeClasses = "w-full")
-        {
-            return this.ActiveStep == stepIndex ? activeClasses : "hidden";
         }
     }
 }
