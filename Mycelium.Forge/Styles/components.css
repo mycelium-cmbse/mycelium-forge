@@ -1,4 +1,4 @@
-﻿/* Semantic component styling for Mycelium Forge */
+/* Semantic component styling for Mycelium Forge */
 
 .sidebar-group-header {
   display: flex;
@@ -109,7 +109,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--spacing-2) var(--spacing-6);
-  border-radius: var(--radius-sm) !important;
+  border-radius: var(--radius-sm);
   background-color: var(--card);
   border: 1px solid var(--border-subtle);
   flex-shrink: 0;
@@ -123,7 +123,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--spacing-2) var(--spacing-6);
-  border-radius: var(--radius-xs) !important;
+  border-radius: var(--radius-xs);
   font-size: var(--text-3xs);
   line-height: var(--leading-4xs);
   font-weight: 500;
@@ -136,7 +136,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--spacing-2) var(--spacing-9);
-  border-radius: var(--radius-md) !important;
+  border-radius: var(--radius-md);
   font-size: var(--text-2xs);
   line-height: var(--leading-3xs);
   font-weight: 500;
@@ -148,7 +148,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--spacing-4) var(--spacing-10);
-  border-radius: var(--radius-md) !important;
+  border-radius: var(--radius-md);
   font-size: var(--text-xs);
   line-height: var(--leading-2xs);
   font-weight: 500;
