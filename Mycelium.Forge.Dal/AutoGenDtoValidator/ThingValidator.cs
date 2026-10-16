@@ -35,7 +35,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.CreatedAt).NotEmpty();
             this.RuleFor(x => x.Id).NotEmpty();
             this.RuleFor(x => x.ModifiedAt).NotEmpty();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="IThing"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

@@ -37,7 +37,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             {{#each (Class.QueryDtoInterfaceProperties this) as | property |}}
             {{#DtoValidator.WriteRulesIfApplicable property}}
             {{/each}}
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="{{#if this.IsAbstract}}I{{/if}}{{this.Name}}"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

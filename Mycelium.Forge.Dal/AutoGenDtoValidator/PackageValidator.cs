@@ -41,7 +41,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.Version).Must(value => value is { Count: >= 1 });
             this.RuleForEach(x => x.Version).NotEmpty();
             this.RuleFor(x => x.Visibility).NotNull();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="Package"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

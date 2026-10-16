@@ -36,7 +36,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.Name).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.NumericCode).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Owner).NotEmpty();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="Country"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

@@ -31,9 +31,8 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// <summary>
         /// Adds custom validation rules for the <see cref="INamespace" /> entity.
         /// </summary>
-        protected override void AddCustomValidation()
+        partial void AddCustomValidation()
         {
-            base.AddCustomValidation();
             this.RuleFor(x => x.ShortName).Matches(ShortNameFormatRegex()).WithMessage("Short name must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.");
         }
     }

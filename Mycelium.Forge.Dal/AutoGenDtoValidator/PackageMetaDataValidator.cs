@@ -32,7 +32,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         public PackageMetaDataValidator()
         {
             this.RuleFor(x => x.Owner).NotEmpty();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="PackageMetaData"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

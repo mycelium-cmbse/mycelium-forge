@@ -40,7 +40,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.PrimaryAddress).Must(value => !value.HasValue || value.Value != Guid.Empty);
             this.RuleForEach(x => x.ProfileLink).NotEmpty();
             this.RuleFor(x => x.Status).NotNull();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="IScope"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

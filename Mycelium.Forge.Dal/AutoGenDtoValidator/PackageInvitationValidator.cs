@@ -35,7 +35,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.Package).NotEmpty();
             this.RuleFor(x => x.PackageInvitationKind).NotNull();
             this.RuleFor(x => x.Target).NotEmpty();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="PackageInvitation"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

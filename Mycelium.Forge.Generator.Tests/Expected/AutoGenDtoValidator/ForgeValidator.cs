@@ -41,7 +41,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleForEach(x => x.PackageType).NotEmpty();
             this.RuleForEach(x => x.ProfileType).NotEmpty();
             this.RuleForEach(x => x.Tag).NotEmpty();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="Forge"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

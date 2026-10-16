@@ -37,7 +37,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleFor(x => x.Owner).NotEmpty();
             this.RuleFor(x => x.PublicationDate).NotEmpty();
             this.RuleFor(x => x.Version).Must(value => !string.IsNullOrWhiteSpace(value));
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="PackageVersion"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

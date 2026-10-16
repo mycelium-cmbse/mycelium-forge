@@ -38,7 +38,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleForEach(x => x.Permissions).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.RevokedAt).NotEmpty();
             this.RuleFor(x => x.SecretHash).Must(value => value is { Count: >= 1 });
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="APIKey"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 

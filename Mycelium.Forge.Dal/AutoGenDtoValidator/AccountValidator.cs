@@ -35,7 +35,13 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
             this.RuleForEach(x => x.OwnedOrganizationInvitation).NotEmpty();
             this.RuleFor(x => x.OwnedPackageInvitation).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
+            this.AddCustomValidation();
         }
+
+        /// <summary>
+        /// Adds possibilities for custom validation rules for the <see cref="Account"/> entity.
+        /// </summary>
+        partial void AddCustomValidation();
     }
 }
 
