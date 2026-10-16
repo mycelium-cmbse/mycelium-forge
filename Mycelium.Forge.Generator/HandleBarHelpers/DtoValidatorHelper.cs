@@ -75,13 +75,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return "DtoValidatorBase<T>";
             }
 
-            var directParents = @class.Generalization.Select(g => g.General).OfType<IClass>().Where(p => p.IsThingClass() || p.HasThingClass()).ToList();
+            var directParents = @class.Generalization.Select(generalization => generalization.General).OfType<IClass>().Where(parentClass => parentClass.IsThingClass() || parentClass.HasThingClass()).ToList();
 
             var parent = directParents.Count switch
             {
                 0 => throw new InvalidOperationException($"Class {@class.Name} has no parent in the Thing hierarchy."),
                 1 => directParents[0],
-                _ => directParents.OrderByDescending(p => p.QueryAllGeneralClassifiers().Count).First()
+                _ => directParents.OrderByDescending(parentClass => parentClass.QueryAllGeneralClassifiers().Count).First()
             };
 
             var parentName = parent.Name.CapitalizeFirstLetter();
@@ -102,41 +102,42 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             }
 
             var propertyName = property.Name.CapitalizeFirstLetter();
+            var typeName = property.QueryCSharpTypeName();
+            var isGuid = !property.QueryIsDataType() || typeName.Equals(nameof(Guid), StringComparison.OrdinalIgnoreCase);
+            var isString = property.QueryIsString() || typeName.Equals(nameof(String), StringComparison.OrdinalIgnoreCase);
 
             if (property.QueryIsEnumerable())
             {
-                var sb = new StringBuilder();
+                var stringBuilder = new StringBuilder();
 
                 if (property.Lower > 0)
                 {
-                    sb.AppendLine($"            this.RuleFor(x => x.{propertyName}).Must(value => value is {{ Count: >= {property.Lower} }});");
+                    stringBuilder.AppendLine($"            this.RuleFor(x => x.{propertyName}).Must(value => value is {{ Count: >= {property.Lower} }});");
                 }
 
-                if (!property.QueryIsDataType() || property.QueryCSharpTypeName().Equals("Guid", StringComparison.OrdinalIgnoreCase))
+                if (isGuid)
                 {
-                    sb.AppendLine($"            this.RuleForEach(x => x.{propertyName}).NotEmpty();");
+                    stringBuilder.AppendLine($"            this.RuleForEach(x => x.{propertyName}).NotEmpty();");
                 }
-                else if (property.QueryIsString() || property.QueryCSharpTypeName().Equals("string", StringComparison.OrdinalIgnoreCase))
+                else if (isString)
                 {
-                    sb.AppendLine($"            this.RuleForEach(x => x.{propertyName}).Must(value => !string.IsNullOrWhiteSpace(value));");
+                    stringBuilder.AppendLine($"            this.RuleForEach(x => x.{propertyName}).Must(value => !string.IsNullOrWhiteSpace(value));");
                 }
 
-                return sb.ToString();
+                return stringBuilder.ToString();
             }
 
-            if (!property.QueryIsDataType() || property.QueryCSharpTypeName().Equals("Guid", StringComparison.OrdinalIgnoreCase))
+            if (isGuid)
             {
                 return property.Lower == 0 ? $"            this.RuleFor(x => x.{propertyName}).Must(value => !value.HasValue || value.Value != Guid.Empty);{Environment.NewLine}" : $"            this.RuleFor(x => x.{propertyName}).NotEmpty();{Environment.NewLine}";
             }
 
-            var typeName = property.QueryCSharpTypeName();
-
-            if (property.QueryIsString() || typeName.Equals("string", StringComparison.OrdinalIgnoreCase))
+            if (isString)
             {
                 return property.Lower >= 1 ? $"            this.RuleFor(x => x.{propertyName}).Must(value => !string.IsNullOrWhiteSpace(value));{Environment.NewLine}" : string.Empty;
             }
 
-            if (typeName is nameof(DateTime) or "DateOnly")
+            if (typeName is nameof(DateTime) or nameof(DateOnly))
             {
                 return property.Lower >= 1 ? $"            this.RuleFor(x => x.{propertyName}).NotEmpty();{Environment.NewLine}" : string.Empty;
             }

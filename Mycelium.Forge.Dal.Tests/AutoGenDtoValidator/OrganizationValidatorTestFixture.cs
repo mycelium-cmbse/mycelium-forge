@@ -86,7 +86,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
             var emptyGuidAdminOrg = new Organization { Administrator = [Guid.Empty] };
             var validAdminOrg = new Organization { Administrator = [Guid.NewGuid()] };
             var invalidRegexOrg = new Organization { ShortName = "INVALID_SCOPE" };
-            var validRegexOrg = new Organization { ShortName = "valid-scope.1" };
+            var validRegexOrg = new Organization { ShortName = "valid-scope-1" };
 
             var emailResult = await this.validator.ValidateFields(organizationWithEmailOnly, x => x.Email);
             var nameResult = await this.validator.ValidateFields(organizationWithEmailOnly, x => x.Name);

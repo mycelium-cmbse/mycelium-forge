@@ -20,45 +20,25 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
 
-{{#if this.IsAbstract}}
     /// <summary>
-    /// DTO validator class for the <see cref="I{{this.Name}}"/> class.
+    /// DTO validator class for the <see cref="{{#if this.IsAbstract}}I{{/if}}{{this.Name}}"/> class.
     /// </summary>
+{{#if this.IsAbstract}}
     /// <typeparam name="T">The <see cref="I{{this.Name}}"/> type to validate.</typeparam>
 {{/if}}
-{{#unless this.IsAbstract}}
-    /// <summary>
-    /// DTO validator class for the <see cref="{{this.Name}}"/> class.
-    /// </summary>
-{{/unless}}
     [GeneratedCode("Mycelium.Forge.Generator", "{{Forge.ModelVersion}}")]
-{{#if this.IsAbstract}}
-    public abstract partial class {{this.Name}}Validator<T> : {{DtoValidator.BaseClass this}} where T : class, I{{this.Name}}
+    public {{#if this.IsAbstract}}abstract {{/if}}partial class {{this.Name}}Validator{{#if this.IsAbstract}}<T>{{/if}} : {{DtoValidator.BaseClass this}}{{#if this.IsAbstract}} where T : class, I{{this.Name}}{{/if}}
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="{{this.Name}}Validator{T}"/> class.
+        /// Initializes a new instance of the <see cref="{{this.Name}}Validator{{#if this.IsAbstract}}{T}{{/if}}"/> class.
         /// </summary>
-        protected {{this.Name}}Validator()
+        {{#if this.IsAbstract}}protected{{else}}public{{/if}} {{this.Name}}Validator()
         {
             {{#each (Class.QueryDtoInterfaceProperties this) as | property |}}
             {{#DtoValidator.WriteRulesIfApplicable property}}
             {{/each}}
         }
     }
-{{else}}
-    public partial class {{this.Name}}Validator : {{DtoValidator.BaseClass this}}
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="{{this.Name}}Validator"/> class.
-        /// </summary>
-        public {{this.Name}}Validator()
-        {
-            {{#each (Class.QueryDtoInterfaceProperties this) as | property |}}
-            {{#DtoValidator.WriteRulesIfApplicable property}}
-            {{/each}}
-        }
-    }
-{{/if}}
 }
 
 // ------------------------------------------------------------------------------------------------

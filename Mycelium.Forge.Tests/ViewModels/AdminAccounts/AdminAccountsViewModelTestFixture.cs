@@ -29,7 +29,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AdminAccounts
         {
             this.viewModel.InitializeViewModel();
 
-            this.viewModel.ApplyFilters("r.andre", AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All);
+            this.viewModel.ApplyFilters("r-andre", AdminAccountsViewModel.AllStatusFilter, VerificationFilterOption.All);
             var nameCount = this.viewModel.FilteredAccounts.Count;
 
             this.viewModel.ApplyFilters(string.Empty, nameof(ScopeStatusKind.ACTIVE), VerificationFilterOption.All);

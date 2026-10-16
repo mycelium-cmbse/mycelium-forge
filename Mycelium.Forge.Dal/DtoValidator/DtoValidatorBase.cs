@@ -27,8 +27,14 @@ namespace Mycelium.Forge.Dal.DtoValidator
         /// <summary>
         /// Initializes a new instance of the <see cref="DtoValidatorBase{T}" /> class.
         /// </summary>
+        /// <remarks>
+        /// Calls <see cref="AddCustomValidation" /> to allow derived and partial validator classes to register custom
+        /// FluentValidation rules during instantiation.
+        /// </remarks>
         protected DtoValidatorBase()
         {
+            // Safe virtual invocation, rule registration does not depend on uninitialized state.
+            // ReSharper disable once VirtualMemberCallInConstructor
             this.AddCustomValidation();
         }
 
@@ -62,7 +68,11 @@ namespace Mycelium.Forge.Dal.DtoValidator
         /// <summary>
         /// Adds possibilities for custom validation rules.
         /// </summary>
-        public virtual void AddCustomValidation()
+        /// <remarks>
+        /// Overriding implementations in handwritten partial validator classes should register custom rules
+        /// and call <c>base.AddCustomValidation()</c> to preserve rules defined across the inheritance chain.
+        /// </remarks>
+        protected virtual void AddCustomValidation()
         {
         }
     }

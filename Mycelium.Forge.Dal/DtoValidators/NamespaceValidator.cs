@@ -22,19 +22,19 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     public abstract partial class NamespaceValidator<T> where T : class, INamespace
     {
         /// <summary>
-        /// Regular expression used to validate scope format.
+        /// Regular expression used to validate namespace short name format.
         /// </summary>
         /// <returns>A compiled <see cref="Regex" /> instance.</returns>
-        [GeneratedRegex("^[a-z0-9][a-z0-9.-]*$", RegexOptions.None, 1000)]
-        public static partial Regex ScopeFormatRegex();
+        [GeneratedRegex("^[a-z0-9]([a-z0-9-]*[a-z0-9])?$", RegexOptions.None, 1000)]
+        public static partial Regex ShortNameFormatRegex();
 
         /// <summary>
         /// Adds custom validation rules for the <see cref="INamespace" /> entity.
         /// </summary>
-        public override void AddCustomValidation()
+        protected override void AddCustomValidation()
         {
             base.AddCustomValidation();
-            this.RuleFor(x => x.ShortName).Matches(ScopeFormatRegex()).WithMessage("Scope must start with an alphanumeric character and contain only lowercase alphanumeric characters, dots, and hyphens.");
+            this.RuleFor(x => x.ShortName).Matches(ShortNameFormatRegex()).WithMessage("Short name must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.");
         }
     }
 }

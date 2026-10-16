@@ -90,7 +90,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
             var emptyGuidOwnerPackage = new Package { PackageOwner = [Guid.Empty] };
             var validOwnerPackage = new Package { PackageOwner = [Guid.NewGuid()] };
             var invalidRegexPackage = new Package { ShortName = "INVALID_NAME" };
-            var validRegexPackage = new Package { ShortName = "valid-pkg.1" };
+            var validRegexPackage = new Package { ShortName = "valid-pkg-1" };
 
             var nameResult = await this.validator.ValidateFields(packageWithValidNameOnly, x => x.Name);
             var shortNameResult = await this.validator.ValidateFields(packageWithValidNameOnly, x => x.ShortName);

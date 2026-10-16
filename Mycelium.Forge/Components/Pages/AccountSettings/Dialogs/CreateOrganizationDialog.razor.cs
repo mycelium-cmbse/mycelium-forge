@@ -125,11 +125,11 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         public async Task OnCreateOrganizationClicked()
         {
             var cleanScope = this.Scope.CleanScope();
-            var isScopeValid = !string.IsNullOrWhiteSpace(cleanScope) && OrganizationValidator.ScopeFormatRegex().IsMatch(cleanScope);
+            var isScopeValid = !string.IsNullOrWhiteSpace(cleanScope) && OrganizationValidator.ShortNameFormatRegex().IsMatch(cleanScope);
 
             var isValid = this.ValidationManager
                 .Check(nameof(this.OrganizationName), !string.IsNullOrWhiteSpace(this.OrganizationName), "Organization name is required.")
-                .Check(nameof(this.Scope), isScopeValid, "Scope must start with an alphanumeric character and contain only lowercase alphanumeric characters, dots, and hyphens.")
+                .Check(nameof(this.Scope), isScopeValid, "Scope must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.")
                 .Check(nameof(this.BillingEmail), !string.IsNullOrWhiteSpace(this.BillingEmail), "Billing email is required.")
                 .IsValid;
 
