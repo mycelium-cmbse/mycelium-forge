@@ -188,16 +188,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task PublishPackage()
         {
-            /*
-            TODO: Publish package workflow:
-            1. Validate the DTOs (metadata, version, etc.) in the UI component so that any invalid data is reported to the user before submitting to the viewmodel.
-            2. If DTOs are valid, stage the package file by sending it from the client to the server via HTTP POST (i.e., using JavaScript interop to upload directly to /api/v1/upload/stage to avoid transferring large files up to 250MB over WebSockets).
-            3. Execute the viewmodel publish command passing the staged file reference and (possibly) the metadata
-            4. The viewmodel handles the publishing process:
-               a. Persists the artifact using IArtifactStore.StoreArtifact.
-               b. Executes the database transaction to persist the package and release DTOs referencing the artifact.
-               c. Ensures staged files are cleaned up upon successful completion or on any error.
-            */
+            // Issue #180: Implement package publishing workflow.
 
             var result = this.ViewModel.Publish();
 

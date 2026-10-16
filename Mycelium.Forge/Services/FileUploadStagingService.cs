@@ -71,14 +71,13 @@ namespace Mycelium.Forge.Services
                 await using var fileStream = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None, BufferSize, FileOptions.Asynchronous);
                 await inputStream.CopyToAsync(fileStream, BufferSize, token);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
                 }
 
-                this.logger.LogWarning(exception, "Package upload staging aborted or cancelled for token {UploadToken}", uploadToken);
                 throw;
             }
 
