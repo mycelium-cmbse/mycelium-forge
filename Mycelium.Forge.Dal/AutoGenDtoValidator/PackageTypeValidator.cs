@@ -14,62 +14,33 @@
 namespace Mycelium.Forge.Dal.AutoGenDtoValidator
 {
     using System.CodeDom.Compiler;
-    using System.Linq.Expressions;
-
-    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
-    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="PackageType"/> class.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public sealed partial class PackageTypeValidator : DtoValidatorBase<IPackageType>
+    public partial class PackageTypeValidator : ThingValidator<IPackageType>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageTypeValidator"/> class.
         /// </summary>
         public PackageTypeValidator()
         {
-            this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Description).NotEmpty();
-            this.RuleFor(x => x.Id).NotEmpty();
-            this.RuleFor(x => x.ModifiedAt).NotEmpty();
-            this.RuleFor(x => x.Name).NotEmpty();
+            this.RuleFor(x => x.Description).Must(value => !string.IsNullOrWhiteSpace(value));
+            this.RuleFor(x => x.Name).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Owner).NotEmpty();
             this.AddCustomValidation();
         }
 
         /// <summary>
-        /// Asynchronously checks if a DTO contains valid data.
+        /// Adds possibilities for custom validation rules for the <see cref="PackageType"/> entity.
         /// </summary>
-        /// <param name="dto">The <see cref="IPackageType"/> to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateDto(IPackageType dto)
-        {
-            var validationResult = await this.ValidateAsync(dto);
-            return validationResult.ToErrorOr();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data for the specified fields.
-        /// </summary>
-        /// <param name="dto">The <see cref="IPackageType"/> to validate.</param>
-        /// <param name="fields">The fields to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateFields(IPackageType dto, params Expression<Func<IPackageType, object>>[] fields)
-        {
-            var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-            return validationResult.ToErrorOr();
-        }
+        partial void AddCustomValidation();
     }
 }
 

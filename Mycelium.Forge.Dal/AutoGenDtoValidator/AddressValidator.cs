@@ -14,63 +14,34 @@
 namespace Mycelium.Forge.Dal.AutoGenDtoValidator
 {
     using System.CodeDom.Compiler;
-    using System.Linq.Expressions;
-
-    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
-    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="Address"/> class.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public sealed partial class AddressValidator : DtoValidatorBase<IAddress>
+    public partial class AddressValidator : ThingValidator<IAddress>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AddressValidator"/> class.
         /// </summary>
         public AddressValidator()
         {
-            this.RuleFor(x => x.AddressLine1).NotEmpty();
+            this.RuleFor(x => x.AddressLine1).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Country).NotEmpty();
-            this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Id).NotEmpty();
-            this.RuleFor(x => x.Locality).NotEmpty();
-            this.RuleFor(x => x.ModifiedAt).NotEmpty();
+            this.RuleFor(x => x.Locality).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Owner).NotEmpty();
             this.AddCustomValidation();
         }
 
         /// <summary>
-        /// Asynchronously checks if a DTO contains valid data.
+        /// Adds possibilities for custom validation rules for the <see cref="Address"/> entity.
         /// </summary>
-        /// <param name="dto">The <see cref="IAddress"/> to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateDto(IAddress dto)
-        {
-            var validationResult = await this.ValidateAsync(dto);
-            return validationResult.ToErrorOr();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data for the specified fields.
-        /// </summary>
-        /// <param name="dto">The <see cref="IAddress"/> to validate.</param>
-        /// <param name="fields">The fields to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateFields(IAddress dto, params Expression<Func<IAddress, object>>[] fields)
-        {
-            var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-            return validationResult.ToErrorOr();
-        }
+        partial void AddCustomValidation();
     }
 }
 

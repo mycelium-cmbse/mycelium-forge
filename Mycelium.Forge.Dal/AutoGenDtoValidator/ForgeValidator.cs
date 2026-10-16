@@ -14,64 +14,40 @@
 namespace Mycelium.Forge.Dal.AutoGenDtoValidator
 {
     using System.CodeDom.Compiler;
-    using System.Linq.Expressions;
-
-    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
-    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="Forge"/> class.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public sealed partial class ForgeValidator : DtoValidatorBase<IForge>
+    public partial class ForgeValidator : NamespaceValidator<IForge>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ForgeValidator"/> class.
         /// </summary>
         public ForgeValidator()
         {
-            this.RuleFor(x => x.Account).NotEmpty();
-            this.RuleFor(x => x.Administrator).NotEmpty();
-            this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Description).NotEmpty();
-            this.RuleFor(x => x.Id).NotEmpty();
-            this.RuleFor(x => x.ModifiedAt).NotEmpty();
-            this.RuleFor(x => x.Name).NotEmpty();
-            this.RuleFor(x => x.ShortName).NotEmpty();
+            this.RuleFor(x => x.Account).Must(value => value is { Count: >= 1 });
+            this.RuleForEach(x => x.Account).NotEmpty();
+            this.RuleFor(x => x.Administrator).Must(value => value is { Count: >= 1 });
+            this.RuleForEach(x => x.Administrator).NotEmpty();
+            this.RuleForEach(x => x.Country).NotEmpty();
+            this.RuleFor(x => x.Description).Must(value => !string.IsNullOrWhiteSpace(value));
+            this.RuleForEach(x => x.Organization).NotEmpty();
+            this.RuleForEach(x => x.PackageType).NotEmpty();
+            this.RuleForEach(x => x.ProfileType).NotEmpty();
+            this.RuleForEach(x => x.Tag).NotEmpty();
             this.AddCustomValidation();
         }
 
         /// <summary>
-        /// Asynchronously checks if a DTO contains valid data.
+        /// Adds possibilities for custom validation rules for the <see cref="Forge"/> entity.
         /// </summary>
-        /// <param name="dto">The <see cref="IForge"/> to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateDto(IForge dto)
-        {
-            var validationResult = await this.ValidateAsync(dto);
-            return validationResult.ToErrorOr();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data for the specified fields.
-        /// </summary>
-        /// <param name="dto">The <see cref="IForge"/> to validate.</param>
-        /// <param name="fields">The fields to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateFields(IForge dto, params Expression<Func<IForge, object>>[] fields)
-        {
-            var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-            return validationResult.ToErrorOr();
-        }
+        partial void AddCustomValidation();
     }
 }
 

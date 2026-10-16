@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreDtoValidatorGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -20,8 +20,8 @@ namespace Mycelium.Forge.Generator.Generators
     using PropertyHelper = uml4net.HandleBars.PropertyHelper;
 
     /// <summary>
-    /// A UML Handlebars based DTO Validator code generator. For every non-abstract <see cref="IClass" /> in the
-    /// model it emits a DTO validator class inheriting from <c>DtoValidatorBase</c>.
+    /// A UML Handlebars based DTO Validator code generator. For every <see cref="IClass" /> in the
+    /// Thing hierarchy it emits a DTO validator class in the validator inheritance hierarchy.
     /// </summary>
     public class UmlCoreDtoValidatorGenerator : UmlHandleBarsGenerator
     {
@@ -119,7 +119,7 @@ namespace Mycelium.Forge.Generator.Generators
         private async Task GenerateDtoValidatorsInternalAsync(XmiReaderResult xmiReaderResult, DirectoryInfo outputDirectory)
         {
             var template = this.Templates[DtoValidatorTemplateName];
-            var classes = QueryAllClasses(xmiReaderResult).Where(x => x.IsConcreteThingClass()).ToList();
+            var classes = QueryAllClasses(xmiReaderResult).Where(x => x.IsThingClass() || x.HasThingClass()).ToList();
 
             foreach (var @class in classes)
             {
