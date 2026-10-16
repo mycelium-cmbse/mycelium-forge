@@ -44,8 +44,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 Visibility = VisibilityKind.PUBLIC
             };
 
-            var validResult = await this.validator.ValidateDto(validPackage);
-
             var invalidPackage = new Package
             {
                 Id = Guid.Empty,
@@ -58,6 +56,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 PackageType = Guid.Empty
             };
 
+            var validResult = await this.validator.ValidateDto(validPackage);
             var invalidResult = await this.validator.ValidateDto(invalidPackage);
 
             using (Assert.EnterMultipleScope())
@@ -86,10 +85,23 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 PackageType = Guid.Empty
             };
 
+            var whitespaceDescPackage = new Package { Description = "   " };
+            var emptyOwnerPackage = new Package { PackageOwner = [] };
+            var emptyGuidOwnerPackage = new Package { PackageOwner = [Guid.Empty] };
+            var validOwnerPackage = new Package { PackageOwner = [Guid.NewGuid()] };
+            var invalidRegexPackage = new Package { ShortName = "INVALID_NAME" };
+            var validRegexPackage = new Package { ShortName = "valid-pkg.1" };
+
             var nameResult = await this.validator.ValidateFields(packageWithValidNameOnly, x => x.Name);
             var shortNameResult = await this.validator.ValidateFields(packageWithValidNameOnly, x => x.ShortName);
             var validPackageTypeResult = await this.validator.ValidateFields(packageWithPackageType, x => x.PackageType);
             var invalidPackageTypeResult = await this.validator.ValidateFields(packageWithEmptyPackageType, x => x.PackageType);
+            var whitespaceDescResult = await this.validator.ValidateFields(whitespaceDescPackage, x => x.Description);
+            var emptyOwnerResult = await this.validator.ValidateFields(emptyOwnerPackage, x => x.PackageOwner);
+            var emptyGuidOwnerResult = await this.validator.ValidateFields(emptyGuidOwnerPackage, x => x.PackageOwner);
+            var validOwnerResult = await this.validator.ValidateFields(validOwnerPackage, x => x.PackageOwner);
+            var invalidRegexResult = await this.validator.ValidateFields(invalidRegexPackage, x => x.ShortName);
+            var validRegexResult = await this.validator.ValidateFields(validRegexPackage, x => x.ShortName);
 
             using (Assert.EnterMultipleScope())
             {
@@ -97,6 +109,12 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 Assert.That(shortNameResult.IsError, Is.True);
                 Assert.That(validPackageTypeResult.IsError, Is.False);
                 Assert.That(invalidPackageTypeResult.IsError, Is.True);
+                Assert.That(whitespaceDescResult.IsError, Is.True);
+                Assert.That(emptyOwnerResult.IsError, Is.True);
+                Assert.That(emptyGuidOwnerResult.IsError, Is.True);
+                Assert.That(validOwnerResult.IsError, Is.False);
+                Assert.That(invalidRegexResult.IsError, Is.True);
+                Assert.That(validRegexResult.IsError, Is.False);
             }
         }
     }

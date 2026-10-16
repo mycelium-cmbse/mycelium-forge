@@ -14,67 +14,33 @@
 namespace Mycelium.Forge.Dal.AutoGenDtoValidator
 {
     using System.CodeDom.Compiler;
-    using System.Linq.Expressions;
-
-    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
-    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="Package"/> class.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public sealed partial class PackageValidator : DtoValidatorBase<IPackage>
+    public partial class PackageValidator : NamespaceValidator<IPackage>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageValidator"/> class.
         /// </summary>
         public PackageValidator()
         {
-            this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Description).NotEmpty();
-            this.RuleFor(x => x.Id).NotEmpty();
+            this.RuleFor(x => x.Description).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Listed).NotNull();
-            this.RuleFor(x => x.ModifiedAt).NotEmpty();
-            this.RuleFor(x => x.Name).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
-            this.RuleFor(x => x.PackageOwner).NotEmpty();
+            this.RuleForEach(x => x.PackageMaintainer).NotEmpty();
+            this.RuleFor(x => x.PackageOwner).Must(value => value is { Count: >= 1 });
+            this.RuleForEach(x => x.PackageOwner).NotEmpty();
             this.RuleFor(x => x.PackageType).NotEmpty();
-            this.RuleFor(x => x.ShortName).NotEmpty();
-            this.RuleFor(x => x.Version).NotEmpty();
+            this.RuleFor(x => x.Version).Must(value => value is { Count: >= 1 });
+            this.RuleForEach(x => x.Version).NotEmpty();
             this.RuleFor(x => x.Visibility).NotNull();
-            this.AddCustomValidation();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data.
-        /// </summary>
-        /// <param name="dto">The <see cref="IPackage"/> to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateDto(IPackage dto)
-        {
-            var validationResult = await this.ValidateAsync(dto);
-            return validationResult.ToErrorOr();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data for the specified fields.
-        /// </summary>
-        /// <param name="dto">The <see cref="IPackage"/> to validate.</param>
-        /// <param name="fields">The fields to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateFields(IPackage dto, params Expression<Func<IPackage, object>>[] fields)
-        {
-            var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-            return validationResult.ToErrorOr();
         }
     }
 }

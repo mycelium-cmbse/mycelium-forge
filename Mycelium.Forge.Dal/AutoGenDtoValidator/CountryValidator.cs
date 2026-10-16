@@ -14,63 +14,28 @@
 namespace Mycelium.Forge.Dal.AutoGenDtoValidator
 {
     using System.CodeDom.Compiler;
-    using System.Linq.Expressions;
-
-    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
-    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="Country"/> class.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public sealed partial class CountryValidator : DtoValidatorBase<ICountry>
+    public partial class CountryValidator : ThingValidator<ICountry>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CountryValidator"/> class.
         /// </summary>
         public CountryValidator()
         {
-            this.RuleFor(x => x.Alpha2Code).NotEmpty();
-            this.RuleFor(x => x.Alpha3Code).NotEmpty();
-            this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Id).NotEmpty();
-            this.RuleFor(x => x.ModifiedAt).NotEmpty();
-            this.RuleFor(x => x.Name).NotEmpty();
-            this.RuleFor(x => x.NumericCode).NotEmpty();
+            this.RuleFor(x => x.Alpha2Code).Must(value => !string.IsNullOrWhiteSpace(value));
+            this.RuleFor(x => x.Alpha3Code).Must(value => !string.IsNullOrWhiteSpace(value));
+            this.RuleFor(x => x.Name).Must(value => !string.IsNullOrWhiteSpace(value));
+            this.RuleFor(x => x.NumericCode).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Owner).NotEmpty();
-            this.AddCustomValidation();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data.
-        /// </summary>
-        /// <param name="dto">The <see cref="ICountry"/> to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateDto(ICountry dto)
-        {
-            var validationResult = await this.ValidateAsync(dto);
-            return validationResult.ToErrorOr();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data for the specified fields.
-        /// </summary>
-        /// <param name="dto">The <see cref="ICountry"/> to validate.</param>
-        /// <param name="fields">The fields to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateFields(ICountry dto, params Expression<Func<ICountry, object>>[] fields)
-        {
-            var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-            return validationResult.ToErrorOr();
         }
     }
 }
