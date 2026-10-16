@@ -108,41 +108,73 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             if (property.QueryIsEnumerable())
             {
-                var stringBuilder = new StringBuilder();
-
-                if (property.Lower > 0)
-                {
-                    stringBuilder.AppendLine($"            this.RuleFor(x => x.{propertyName}).Must(value => value is {{ Count: >= {property.Lower} }});");
-                }
-
-                if (isGuid)
-                {
-                    stringBuilder.AppendLine($"            this.RuleForEach(x => x.{propertyName}).NotEmpty();");
-                }
-                else if (isString)
-                {
-                    stringBuilder.AppendLine($"            this.RuleForEach(x => x.{propertyName}).Must(value => !string.IsNullOrWhiteSpace(value));");
-                }
-
-                return stringBuilder.ToString();
+                return GenerateEnumerableValidationRule(property, propertyName, isGuid, isString);
             }
 
+            return GenerateScalarValidationRule(property, propertyName, typeName, isGuid, isString);
+        }
+
+        /// <summary>
+        /// Generates the FluentValidation rule string for an enumerable property.
+        /// </summary>
+        /// <param name="property">The <see cref="IProperty" /> to generate a rule for.</param>
+        /// <param name="propertyName">The capitalized property name.</param>
+        /// <param name="isGuid">A value indicating whether the property is a GUID type.</param>
+        /// <param name="isString">A value indicating whether the property is a string type.</param>
+        /// <returns>The generated rule code string.</returns>
+        private static string GenerateEnumerableValidationRule(IProperty property, string propertyName, bool isGuid, bool isString)
+        {
+            var stringBuilder = new StringBuilder();
+
+            if (property.Lower > 0)
+            {
+                stringBuilder.AppendLine($"            this.RuleFor(x => x.{propertyName}).Must(value => value is {{ Count: >= {property.Lower} }});");
+            }
+
+            if (isGuid)
+            {
+                stringBuilder.AppendLine($"            this.RuleForEach(x => x.{propertyName}).NotEmpty();");
+            }
+            else if (isString)
+            {
+                stringBuilder.AppendLine($"            this.RuleForEach(x => x.{propertyName}).Must(value => !string.IsNullOrWhiteSpace(value));");
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Generates the FluentValidation rule string for a scalar property.
+        /// </summary>
+        /// <param name="property">The <see cref="IProperty" /> to generate a rule for.</param>
+        /// <param name="propertyName">The capitalized property name.</param>
+        /// <param name="typeName">The C# type name of the property.</param>
+        /// <param name="isGuid">A value indicating whether the property is a GUID type.</param>
+        /// <param name="isString">A value indicating whether the property is a string type.</param>
+        /// <returns>The generated rule code string.</returns>
+        private static string GenerateScalarValidationRule(IProperty property, string propertyName, string typeName, bool isGuid, bool isString)
+        {
             if (isGuid)
             {
                 return property.Lower == 0 ? $"            this.RuleFor(x => x.{propertyName}).Must(value => !value.HasValue || value.Value != Guid.Empty);{Environment.NewLine}" : $"            this.RuleFor(x => x.{propertyName}).NotEmpty();{Environment.NewLine}";
             }
 
+            if (property.Lower < 1)
+            {
+                return string.Empty;
+            }
+
             if (isString)
             {
-                return property.Lower >= 1 ? $"            this.RuleFor(x => x.{propertyName}).Must(value => !string.IsNullOrWhiteSpace(value));{Environment.NewLine}" : string.Empty;
+                return $"            this.RuleFor(x => x.{propertyName}).Must(value => !string.IsNullOrWhiteSpace(value));{Environment.NewLine}";
             }
 
             if (typeName is nameof(DateTime) or nameof(DateOnly))
             {
-                return property.Lower >= 1 ? $"            this.RuleFor(x => x.{propertyName}).NotEmpty();{Environment.NewLine}" : string.Empty;
+                return $"            this.RuleFor(x => x.{propertyName}).NotEmpty();{Environment.NewLine}";
             }
 
-            return property.Lower >= 1 ? $"            this.RuleFor(x => x.{propertyName}).NotNull();{Environment.NewLine}" : string.Empty;
+            return $"            this.RuleFor(x => x.{propertyName}).NotNull();{Environment.NewLine}";
         }
 
         /// <summary>
