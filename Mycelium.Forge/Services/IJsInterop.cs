@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IJsInterop.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -33,5 +33,18 @@ namespace Mycelium.Forge.Services
         /// <param name="isDark"><c>true</c> to enable dark mode; <c>false</c> for light mode.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         Task SetDarkMode(bool isDark);
+
+        /// <summary>
+        /// Streams a large file directly from the file input DOM element to the specified HTTP upload endpoint over HTTP POST.
+        /// </summary>
+        /// <remarks>
+        /// This method shall be used particularly for large files to stream payload bytes over HTTP, avoiding overloading the
+        /// SignalR WebSocket circuit.
+        /// </remarks>
+        /// <param name="inputId">The ID of the file input element containing the selected file.</param>
+        /// <param name="targetUrl">The target HTTP upload URL.</param>
+        /// <param name="contentType">The MIME content type header for the binary upload payload.</param>
+        /// <returns>A <see cref="Task{String}" /> containing the upload token returned by the server.</returns>
+        Task<string> UploadLargeFile(string inputId, string targetUrl, string contentType = "application/octet-stream");
     }
 }

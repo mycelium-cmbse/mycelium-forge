@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Tests.Services
 
     using Moq;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Services;
 
     [TestFixture]
@@ -80,6 +81,22 @@ namespace Mycelium.Forge.Tests.Services
             await this.jsInterop.SetDarkMode(true);
 
             this.jsRuntimeMock.Verify(x => x.InvokeAsync<IJSVoidResult>("forgeInterop.setDarkMode", It.Is<object[]>(args => args.Length == 1 && (bool)args[0] == true)), Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyUploadLargeFile()
+        {
+            this.jsRuntimeMock
+                .Setup(x => x.InvokeAsync<string>("forgeInterop.uploadLargeFile", It.IsAny<object[]>()))
+                .ReturnsAsync("token-guid");
+
+            var result = await this.jsInterop.UploadLargeFile("file-input-id", ApiRoutes.UploadFileForStage);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result, Is.EqualTo("token-guid"));
+                this.jsRuntimeMock.Verify(x => x.InvokeAsync<string>("forgeInterop.uploadLargeFile", It.IsAny<object[]>()), Times.Once);
+            }
         }
     }
 }

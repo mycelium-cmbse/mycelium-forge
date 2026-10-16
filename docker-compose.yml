@@ -10,6 +10,15 @@ x-database-environment: &database-environment
   DatabaseConnection__Username: forge
   DatabaseConnection__Password: forge-dev-password
 
+# Define shared storage environment variables (DD-21)
+x-storage-environment: &storage-environment
+  ArtifactStore__ServiceUrl: http://garage:3900
+  ArtifactStore__Region: garage
+  ArtifactStore__BucketName: forge-artefacts
+  ArtifactStore__AccessKey: GKdevlocal000000000
+  ArtifactStore__SecretKey: dev0000000000000000000000000000000000000000000000000000000000
+  ArtifactStore__ForcePathStyle: "true"
+
 services:
   postgres:
     # DD-23: PostgreSQL 18 is the floor; this pins the compose file's image accordingly.
@@ -117,7 +126,7 @@ services:
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      <<: *database-environment
+      <<: [*database-environment, *storage-environment]
     ports:
       - "8080:8080"
     depends_on:
@@ -144,7 +153,7 @@ services:
     volumes:
       - .:/workspaces/mycelium-forge:cached
     environment:
-      <<: *database-environment
+      <<: [*database-environment, *storage-environment]
 
 volumes:
   postgres-data:

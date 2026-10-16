@@ -7,12 +7,13 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 @attribute [Route(PageRoutes.Publish)]
+@attribute [Authorize]
 @rendermode InteractiveServer
 
 <PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
 
 <div class="w-full bg-background min-h-screen py-10 select-none">
-<div class="max-w-[1100px] w-full mx-auto px-6 flex flex-col gap-6">
+<div class="max-w-6xl w-full mx-auto px-6 flex flex-col gap-6">
 <div class="flex flex-col gap-1.5 w-full">
     <h1 class="text-3xl leading-3xl font-semibold text-foreground tracking-tight">
         Publish to Forge
@@ -20,30 +21,33 @@
     <p class="text-base leading-normal text-muted-foreground">
         Publish a library or a model so others can discover, version and, where the format allows it, import it into their projects.
     </p>
+    <AntiforgeryToken/>
 </div>
 
-<div class="w-full h-12.5 px-5 py-3.5 rounded-lg bg-card border border-border flex items-center gap-3">
-    @foreach (var step in this.ViewModel.Steps)
-    {
-        <div @key="step.Number" class="flex items-center gap-2">
-            <div class="@(GetStepBubbleClass(step))">
-                <span class="@(GetStepNumberClass(step))">
-                    @(step.Number)
-                </span>
-            </div>
-            <span class="@(GetStepTitleClass(step))">
-                @(step.Title)
-            </span>
-        </div>
+<BbStepper @bind-ActiveStep="this.ActiveStep"
+           Clickable="true"
+           Class="w-full"
+           IndicatorClass="stepper-bar">
+    <BbStep Title="Upload"
+            Disabled="@(!this.CanOpenStep(0))"/>
 
-        @if (step.Number < this.ViewModel.Steps.Count)
-        {
-            <div class="w-10 h-px bg-border shrink-0"></div>
-        }
-    }
+    <BbStep Title="Package metadata"
+            Disabled="@(!this.CanOpenStep(1))"/>
+
+    <BbStep Title="Validation"
+            Disabled="@(!this.CanOpenStep(2))"/>
+
+    <BbStep Title="Review & publish"
+            Disabled="@(!this.CanOpenStep(3))"/>
+</BbStepper>
+
+<div class="@(this.GetStepClass(0))">
+    <PublishUploadStep OnContinue="@(this.OnUploadStepContinued)"
+                       InputId="@(UploadInputId)"/>
 </div>
 
-<div class="w-full flex flex-col lg:flex-row items-start gap-6">
+<div class="@(this.GetStepClass(1, "w-full flex flex-col lg:flex-row items-start gap-6"))">
+@* This step content will be moved to a specific component in a future PR dedicated to this page. *@
 <ForgeCard Class="lg:flex-1 p-6 gap-4">
     <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2">
         <div class="flex items-center gap-2.5 w-full">
@@ -67,58 +71,53 @@
                 Replace
             </BbButton>
         </div>
+
         <p class="text-xs leading-2xs font-normal text-muted-foreground">
             Format detected from the archive. The metadata below is read from the kpar manifest, so it is shown for confirmation rather than entry.
         </p>
     </div>
 
-    <h2 class="text-md leading-sm font-semibold text-foreground">
-        Package metadata
-    </h2>
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-scope"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            SCOPE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="string"
+                         Value="@(this.ViewModel.Metadata.Scope)"
+                         ValueChanged="@(this.OnScopeChanged)"
+                         Items="@(this.ViewModel.ScopeOptions)"
+                         id="publish-scope">
+                <TriggerContent>
+                    <div class="flex items-center gap-1.5 flex-1 truncate">
+                        <span>@(this.ViewModel.Metadata.Scope)</span>
+                        @if (this.ViewModel.Metadata.IsScopeVerified)
+                        {
+                            <LucideIcon Name="badge-check"
+                                        Size="14"
+                                        Class="text-primary shrink-0"/>
+                        }
+                    </div>
+                    <LucideIcon Name="chevron-down"
+                                Size="16"
+                                Class="text-muted-foreground shrink-0"/>
+                </TriggerContent>
+            </ForgeSelect>
+        </BbFieldContent>
+    </BbField>
 
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
-        <BbField Class="w-full sm:w-[220px] shrink-0 flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-scope"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                SCOPE
-            </BbFieldLabel>
-            <BbFieldContent>
-                <ForgeSelect TValue="string"
-                             Value="@(this.ViewModel.Metadata.Scope)"
-                             ValueChanged="@(this.OnScopeChanged)"
-                             Items="@(this.ViewModel.ScopeOptions)"
-                             id="publish-scope">
-                    <TriggerContent>
-                        <div class="flex items-center gap-1.5 truncate">
-                            <span>@(this.ViewModel.Metadata.Scope)</span>
-                            @if (this.ViewModel.Metadata.IsScopeVerified)
-                            {
-                                <LucideIcon Name="badge-check"
-                                            Size="14"
-                                            Class="text-primary shrink-0"/>
-                            }
-                        </div>
-                        <LucideIcon Name="chevron-down"
-                                    Size="16"
-                                    Class="text-muted-foreground shrink-0"/>
-                    </TriggerContent>
-                </ForgeSelect>
-            </BbFieldContent>
-        </BbField>
-
-        <BbField Class="w-full sm:flex-1 flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-package-name"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                PACKAGE NAME
-            </BbFieldLabel>
-            <BbFieldContent>
-                <BbInput id="publish-package-name"
-                         Value="@(this.ViewModel.Metadata.PackageName)"
-                         ValueChanged="@(this.OnPackageNameChanged)"
-                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-            </BbFieldContent>
-        </BbField>
-    </div>
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-package-name"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            PACKAGE NAME
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput id="publish-package-name"
+                     Value="@(this.ViewModel.Metadata.PackageName)"
+                     ValueChanged="@(this.OnPackageNameChanged)"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+        </BbFieldContent>
+    </BbField>
 
     <BbField Class="w-full flex flex-col gap-1.5">
         <BbFieldLabel For="publish-version"
@@ -209,7 +208,7 @@
     </BbField>
 </ForgeCard>
 
-<ForgeCard Class="lg:w-[380px] shrink-0 p-5 gap-3.5">
+<ForgeCard Class="lg:w-96 shrink-0 p-5 gap-3.5">
     <h2 class="text-md leading-sm font-semibold text-foreground">
         Pre-publish validation
     </h2>
@@ -217,7 +216,8 @@
     <div class="flex flex-col gap-3 w-full">
         @foreach (var check in this.ViewModel.ValidationChecks)
         {
-            <BbMarker @key="check.Title" Class="flex items-center gap-2 w-full">
+            <BbMarker @key="check.Title"
+                      Class="flex items-center gap-2 w-full">
                 <BbMarkerIcon>
                     @if (check.Status == ValidationStatus.Pass)
                     {
@@ -275,6 +275,12 @@
         <span>@(this.GetPublishButtonText())</span>
     </BbButton>
 </ForgeCard>
+</div>
+
+<div class="@(this.GetStepClass(2))">
+</div>
+
+<div class="@(this.GetStepClass(3))">
 </div>
 </div>
 </div>

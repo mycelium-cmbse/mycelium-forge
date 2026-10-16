@@ -6,6 +6,7 @@
 
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
+
 @if (this.Versions == null || this.Versions.Count == 0)
 {
     return;
@@ -90,7 +91,7 @@
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-24 shrink-0 text-muted-foreground p-0">
-                            @(ver.GetFormattedSize())
+                            @(ver.SizeInBytes.FormatFileSize())
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <div class="flex-1"></div>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-20 shrink-0 text-right p-0">

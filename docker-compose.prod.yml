@@ -59,6 +59,12 @@ services:
       DatabaseConnection__Database: forge
       DatabaseConnection__Username: forge
       DatabaseConnection__Password: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      ArtifactStore__ServiceUrl: http://garage:3900
+      ArtifactStore__Region: garage
+      ArtifactStore__BucketName: forge-artefacts
+      ArtifactStore__AccessKey: ${ARTIFACT_STORE_ACCESS_KEY:?set ARTIFACT_STORE_ACCESS_KEY in .env.prod}
+      ArtifactStore__SecretKey: ${ARTIFACT_STORE_SECRET_KEY:?set ARTIFACT_STORE_SECRET_KEY in .env.prod}
+      ArtifactStore__ForcePathStyle: "true"
     ports:
       # Bound to localhost only - the image serves plain HTTP, so a reverse proxy on the same host
       # terminates TLS and forwards here. Don't expose this port to the internet directly.

@@ -146,3 +146,41 @@ div[role="dialog"],
 div[role="alertdialog"] {
     border-color: var(--border);
 }
+
+/* Stepper bar styling overrides to align with Figma design specifications */
+.stepper-bar {
+  padding: 14px 20px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.stepper-bar li {
+  align-items: center;
+}
+
+.stepper-bar li > button,
+.stepper-bar li > span:not([aria-hidden]) {
+  flex-direction: row;
+}
+
+.stepper-bar li > button > span:first-child,
+.stepper-bar li > span:not([aria-hidden]) > span:first-child {
+  width: 22px;
+  height: 22px;
+  border: none;
+  font-size: var(--text-2xs);
+}
+
+.stepper-bar li[aria-current="step"] ~ li > button > span:first-child,
+.stepper-bar li[aria-current="step"] ~ li > span:not([aria-hidden]) > span:first-child {
+  background-color: var(--secondary);
+  color: var(--muted-foreground);
+}
+
+.stepper-bar li > span[aria-hidden] {
+  margin-top: 0;
+  height: 1px;
+}
+
+

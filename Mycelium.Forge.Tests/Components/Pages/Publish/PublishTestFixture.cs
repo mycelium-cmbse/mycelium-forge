@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -18,6 +18,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
 
     using ErrorOr;
 
+    using Microsoft.AspNetCore.Components.Forms;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
@@ -47,6 +49,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.context.Services.AddBlazorBlueprintComponents();
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
 
+            var configurationManager = new ConfigurationManager();
+            configurationManager["MaximumUploadFileSizeInMB"] = "100";
+            this.context.Services.AddSingleton<IConfiguration>(configurationManager);
+
             this.viewModelMock = new Mock<IPublishViewModel>();
 
             this.viewModelMock.Setup(x => x.Metadata).Returns(new PublishPackageMetadataModel
@@ -64,13 +70,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
                 Description = "ECSS mission model: Power subsystem."
             });
 
-            this.viewModelMock.Setup(x => x.Steps).Returns(
-            [
-                new PublishStepModel(1, "Package metadata", true),
-                new PublishStepModel(2, "Validation"),
-                new PublishStepModel(3, "Review & publish")
-            ]);
-
             this.viewModelMock.Setup(x => x.ValidationChecks).Returns(
             [
                 new ValidationCheckModel("Schema validation"),
@@ -83,6 +82,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.viewModelMock.Setup(x => x.MetamodelOptions).Returns(["SysML v2 (2025-02)"]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
+
             this.notificationService = new NotificationService();
             this.context.Services.AddSingleton<INotificationService>(this.notificationService);
 
@@ -93,6 +93,53 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
+        }
+
+        [Test]
+        public void VerifyCanOpenStep()
+        {
+            var publishPage = this.context.Render<Publish>();
+            var steps = publishPage.FindComponents<BbStep>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(steps[0].Instance.Disabled, Is.False);
+                Assert.That(steps[1].Instance.Disabled, Is.True);
+                Assert.That(steps[2].Instance.Disabled, Is.True);
+                Assert.That(steps[3].Instance.Disabled, Is.True);
+            }
+
+            var fileMock = new Mock<IBrowserFile>();
+            fileMock.Setup(x => x.Name).Returns("test.kpar");
+            publishPage.Instance.OnUploadStepContinued(fileMock.Object);
+            publishPage.Render();
+
+            steps = publishPage.FindComponents<BbStep>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(steps[0].Instance.Disabled, Is.False);
+                Assert.That(steps[1].Instance.Disabled, Is.False);
+                Assert.That(steps[2].Instance.Disabled, Is.True);
+                Assert.That(steps[3].Instance.Disabled, Is.True);
+            }
+        }
+
+        [Test]
+        public void VerifyGetStepClass()
+        {
+            var publishPage = this.context.Render<Publish>();
+
+            var activeClass = publishPage.Instance.GetStepClass(0);
+            var inactiveClass = publishPage.Instance.GetStepClass(1);
+            var customActiveClass = publishPage.Instance.GetStepClass(0, "custom-class");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(activeClass, Is.EqualTo("w-full"));
+                Assert.That(inactiveClass, Is.EqualTo("hidden"));
+                Assert.That(customActiveClass, Is.EqualTo("custom-class"));
+            }
         }
 
         [Test]
@@ -158,8 +205,30 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         public void VerifyOnReplaceArtefact()
         {
             var publishPage = this.context.Render<Publish>();
+            publishPage.Instance.ActiveStep = 1;
             publishPage.Instance.OnReplaceArtefact();
-            this.viewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
+
+            using (Assert.EnterMultipleScope())
+            {
+                this.viewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
+                Assert.That(publishPage.Instance.ActiveStep, Is.Zero);
+            }
+        }
+
+        [Test]
+        public void VerifyOnUploadStepContinued()
+        {
+            var publishPage = this.context.Render<Publish>();
+            var fileMock = new Mock<IBrowserFile>();
+            fileMock.Setup(x => x.Name).Returns("test-file.kpar");
+
+            publishPage.Instance.OnUploadStepContinued(fileMock.Object);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(publishPage.Instance.ViewModel.Metadata.ArtefactFileName, Is.EqualTo("test-file.kpar"));
+                Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(1));
+            }
         }
 
         [Test]
@@ -168,6 +237,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.viewModelMock.Setup(x => x.Publish()).Returns(Result.Success);
 
             var publishPage = this.context.Render<Publish>();
+            publishPage.Instance.ActiveStep = 1;
+            publishPage.Render();
 
             var publishButton = publishPage.Find("#publish-submit-button");
             Assert.That(publishButton, Is.Not.Null);

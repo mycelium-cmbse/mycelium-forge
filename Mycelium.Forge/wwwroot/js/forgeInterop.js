@@ -99,6 +99,61 @@
             } catch (error) {
                 console.warn('Storage access failed while writing theme preference:', error);
             }
+        },
+
+        /**
+         * Streams a large file directly from the file input DOM element to the specified HTTP upload endpoint over HTTP fetch,
+         * bypassing the SignalR WebSocket circuit to prevent message size limits and connection degradation.
+         * @param {string} inputId - The ID of the file input element.
+         * @param {string} targetUrl - The target HTTP upload URL.
+         * @param {string} [contentType='application/octet-stream'] - The MIME content type header.
+         * @returns {Promise<string>} The upload token returned by the server.
+         */
+        uploadLargeFile: async function (inputId, targetUrl, contentType = 'application/octet-stream') {
+            const inputElement = document.getElementById(inputId);
+            if (!inputElement?.files || inputElement.files.length === 0) {
+                throw new Error('No package file is selected for upload.');
+            }
+
+            const file = inputElement.files[0];
+
+            const headers = {
+                'Content-Type': contentType,
+                'X-File-Name': encodeURIComponent(file.name)
+            };
+
+            // In Blazor InteractiveServer, HttpContext is unavailable during WebSocket circuit invocations.
+            // The antiforgery token is rendered into the DOM by <AntiforgeryToken /> and read here directly.
+            // See: https://learn.microsoft.com/aspnet/core/blazor/security/server/interactive-server-antiforgery
+            const antiforgeryInput = document.querySelector('input[name="__RequestVerificationToken"]');
+
+            if (antiforgeryInput?.value) {
+                headers['RequestVerificationToken'] = antiforgeryInput.value;
+            }
+
+            const response = await fetch(targetUrl, {
+                method: 'POST',
+                body: file,
+                headers: headers
+            });
+
+            if (!response.ok || response.redirected) {
+                const errorText = await response.text();
+
+                throw new Error(response.redirected
+                    ? `Upload failed: request was redirected (status ${response.status}).`
+                    : (errorText || `Upload failed with status code ${response.status}`));
+            }
+
+            const responseContentType = response.headers.get('content-type') || '';
+
+            if (!responseContentType.includes('application/json')) {
+                const responseText = await response.text();
+                throw new Error(`Upload failed: expected JSON response but received ${responseContentType || 'non-JSON'} content: ${responseText.slice(0, 100)}`);
+            }
+
+            const data = await response.json();
+            return data.uploadToken;
         }
     };
 

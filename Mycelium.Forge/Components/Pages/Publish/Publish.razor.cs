@@ -12,11 +12,11 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.Forms;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
     using Mycelium.Forge.Enums;
-    using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
@@ -25,6 +25,11 @@ namespace Mycelium.Forge.Components.Pages.Publish
     /// </summary>
     public partial class Publish : ComponentBase
     {
+        /// <summary>
+        /// Gets or sets the uploaded package archive file for validation and publishing.
+        /// </summary>
+        private IBrowserFile uploadedPackage;
+
         /// <summary>
         /// Gets or sets the view model for the package publishing page.
         /// </summary>
@@ -50,42 +55,14 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public DialogService DialogService { get; set; }
 
         /// <summary>
-        /// Gets the CSS classes for the step bubble circle indicator.
+        /// Gets the HTML ID for the file input element.
         /// </summary>
-        /// <param name="step">The wizard step model.</param>
-        /// <returns>The computed CSS class string for the step bubble.</returns>
-        public static string GetStepBubbleClass(PublishStepModel step)
-        {
-            const string baseClass = "w-5.5 h-5.5 rounded-full flex items-center justify-center shrink-0";
-
-            return step.IsCurrent
-                ? $"{baseClass} bg-primary"
-                : $"{baseClass} bg-secondary";
-        }
+        public static string UploadInputId => "publish-package-file-input";
 
         /// <summary>
-        /// Gets the CSS classes for the step number label within the bubble.
+        /// Gets or sets the zero-based active wizard step index.
         /// </summary>
-        /// <param name="step">The wizard step model.</param>
-        /// <returns>The computed CSS class string for the step number.</returns>
-        public static string GetStepNumberClass(PublishStepModel step)
-        {
-            return step.IsCurrent
-                ? "text-2xs leading-3xs font-semibold text-primary-foreground"
-                : "text-2xs leading-3xs font-semibold text-muted-foreground";
-        }
-
-        /// <summary>
-        /// Gets the CSS classes for the step title text.
-        /// </summary>
-        /// <param name="step">The wizard step model.</param>
-        /// <returns>The computed CSS class string for the step title.</returns>
-        public static string GetStepTitleClass(PublishStepModel step)
-        {
-            return step.IsCurrent
-                ? "text-sm leading-xs font-semibold text-foreground"
-                : "text-sm leading-xs font-medium text-muted-foreground";
-        }
+        public int ActiveStep { get; set; }
 
         /// <summary>
         /// Gets the CSS classes for the validation status outcome badge.
@@ -128,7 +105,9 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         public void OnReplaceArtefact()
         {
+            this.uploadedPackage = null;
             this.ViewModel.InitializeViewModel();
+            this.ActiveStep = 0;
         }
 
         /// <summary>
@@ -209,6 +188,8 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task PublishPackage()
         {
+            // Issue #180: Implement package publishing workflow.
+
             var result = this.ViewModel.Publish();
 
             if (result.IsError)
@@ -238,12 +219,50 @@ namespace Mycelium.Forge.Components.Pages.Publish
         }
 
         /// <summary>
+        /// Handles completing the upload step and advancing to package metadata.
+        /// </summary>
+        /// <param name="file">The uploaded file.</param>
+        public void OnUploadStepContinued(IBrowserFile file)
+        {
+            this.uploadedPackage = file;
+            this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
+            this.ActiveStep = 1;
+        }
+
+        /// <summary>
+        /// Computes the CSS class string for displaying or hiding a step container.
+        /// </summary>
+        /// <param name="stepIndex">The zero-based index of the step.</param>
+        /// <param name="activeClasses">The CSS classes applied when the step is active.</param>
+        /// <returns>The CSS class string.</returns>
+        public string GetStepClass(int stepIndex, string activeClasses = "w-full")
+        {
+            return this.ActiveStep == stepIndex ? activeClasses : "hidden";
+        }
+
+        /// <summary>
         /// Initializes the component lifecycle and populates the view model state.
         /// </summary>
         protected override void OnInitialized()
         {
             base.OnInitialized();
             this.ViewModel.InitializeViewModel();
+        }
+
+        /// <summary>
+        /// Determines whether the specified step can be opened based on the current state.
+        /// </summary>
+        /// <param name="stepNumber">The step number.</param>
+        /// <returns><c>true</c> if the step can be opened; otherwise, <c>false</c>.</returns>
+        private bool CanOpenStep(int stepNumber)
+        {
+            // Step 0 (Upload) can always be opened; Step 1 (Metadata) can only be opened if a package has been uploaded. Other steps are still to be implemented
+            return stepNumber switch
+            {
+                0 => true,
+                1 => this.CanOpenStep(0) && this.uploadedPackage != null,
+                _ => false
+            };
         }
     }
 }
