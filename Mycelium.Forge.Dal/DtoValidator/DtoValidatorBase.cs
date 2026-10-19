@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Dal.DtoValidator
     using FluentValidation;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// Abstract base class for DTO validators.
@@ -30,7 +31,11 @@ namespace Mycelium.Forge.Dal.DtoValidator
         /// <returns>
         /// A new <see cref="ErrorOr{Success}" /> indicating whether validation was successful.
         /// </returns>
-        public abstract Task<ErrorOr<Success>> ValidateDto(T dto);
+        public virtual async Task<ErrorOr<Success>> ValidateDto(T dto)
+        {
+            var validationResult = await this.ValidateAsync(dto);
+            return validationResult.ToErrorOr();
+        }
 
         /// <summary>
         /// Asynchronously checks if a DTO contains valid data for the specified fields.
@@ -40,13 +45,10 @@ namespace Mycelium.Forge.Dal.DtoValidator
         /// <returns>
         /// A new <see cref="ErrorOr{Success}" /> indicating whether validation was successful.
         /// </returns>
-        public abstract Task<ErrorOr<Success>> ValidateFields(T dto, params Expression<Func<T, object>>[] fields);
-
-        /// <summary>
-        /// Adds possibilities for custom validation rules.
-        /// </summary>
-        public virtual void AddCustomValidation()
+        public virtual async Task<ErrorOr<Success>> ValidateFields(T dto, params Expression<Func<T, object>>[] fields)
         {
+            var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
+            return validationResult.ToErrorOr();
         }
     }
 }

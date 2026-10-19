@@ -14,62 +14,33 @@
 namespace Mycelium.Forge.Dal.AutoGenDtoValidator
 {
     using System.CodeDom.Compiler;
-    using System.Linq.Expressions;
-
-    using ErrorOr;
 
     using FluentValidation;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.DtoValidator;
-    using Mycelium.Forge.Dal.Extensions;
 
     /// <summary>
     /// DTO validator class for the <see cref="ProfileLink"/> class.
     /// </summary>
     [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public sealed partial class ProfileLinkValidator : DtoValidatorBase<IProfileLink>
+    public partial class ProfileLinkValidator : ThingValidator<IProfileLink>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileLinkValidator"/> class.
         /// </summary>
         public ProfileLinkValidator()
         {
-            this.RuleFor(x => x.CreatedAt).NotEmpty();
-            this.RuleFor(x => x.Id).NotEmpty();
-            this.RuleFor(x => x.ModifiedAt).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
             this.RuleFor(x => x.ProfileType).NotEmpty();
-            this.RuleFor(x => x.Uri).NotEmpty();
+            this.RuleFor(x => x.Uri).Must(value => !string.IsNullOrWhiteSpace(value));
             this.AddCustomValidation();
         }
 
         /// <summary>
-        /// Asynchronously checks if a DTO contains valid data.
+        /// Adds possibilities for custom validation rules for the <see cref="ProfileLink"/> entity.
         /// </summary>
-        /// <param name="dto">The <see cref="IProfileLink"/> to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateDto(IProfileLink dto)
-        {
-            var validationResult = await this.ValidateAsync(dto);
-            return validationResult.ToErrorOr();
-        }
-
-        /// <summary>
-        /// Asynchronously checks if a DTO contains valid data for the specified fields.
-        /// </summary>
-        /// <param name="dto">The <see cref="IProfileLink"/> to validate.</param>
-        /// <param name="fields">The fields to validate.</param>
-        /// <returns>
-        /// A new <see cref="ErrorOr{Success}"/> indicating whether the validation was successful.
-        /// </returns>
-        public override async Task<ErrorOr<Success>> ValidateFields(IProfileLink dto, params Expression<Func<IProfileLink, object>>[] fields)
-        {
-            var validationResult = await this.ValidateAsync(dto, options => options.IncludeProperties(fields));
-            return validationResult.ToErrorOr();
-        }
+        partial void AddCustomValidation();
     }
 }
 
