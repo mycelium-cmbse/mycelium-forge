@@ -12,13 +12,12 @@ namespace Mycelium.Forge.Orm.Filters
     using Mycelium.Forge.Common;
 
     /// <summary>
-    /// Defines a factory for constructing SQL read visibility filters for <typeparamref name="T" /> entities.
+    /// Defines a factory for constructing SQL read visibility filters for domain entities.
     /// </summary>
-    /// <typeparam name="T">The domain entity type implementing <see cref="IThing" />.</typeparam>
-    public interface IReadFilter<T> where T : IThing
+    public interface IReadFilter
     {
         /// <summary>
-        /// Creates an <see cref="ISqlFilter" /> for <typeparamref name="T" /> instances based on the specified user context.
+        /// Creates an <see cref="ISqlFilter" /> for domain entity instances based on the specified user context.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles for authorization evaluation.</param>
         /// <returns>An <see cref="ISqlFilter" /> containing the SQL visibility predicate and parameter bindings.</returns>

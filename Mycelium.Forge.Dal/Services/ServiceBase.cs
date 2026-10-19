@@ -65,9 +65,9 @@ namespace Mycelium.Forge.Dal.Services
         protected readonly IPermissionService<T> PermissionService;
 
         /// <summary>
-        /// The (injected) <see cref="IReadFilter{T}" /> read filter provider.
+        /// The (injected) <see cref="IReadFilter" /> read filter provider.
         /// </summary>
-        protected readonly IReadFilter<T> ReadFilter;
+        protected readonly IReadFilter ReadFilter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase{T}" /> class.
@@ -78,8 +78,8 @@ namespace Mycelium.Forge.Dal.Services
         /// <param name="dtoComparer">The (injected) <see cref="IDtoComparer{T}" /> DTO comparer.</param>
         /// <param name="logger">The (injected) <see cref="ILogger" /> logger.</param>
         /// <param name="databaseSource">The (injected) <see cref="IDatabaseSource" /> database connection provider.</param>
-        /// <param name="readFilter">The (injected) <see cref="IReadFilter{T}" /> read filter provider.</param>
-        protected ServiceBase(IDao<T> dao, IDtoValidator<T> dtoValidator, IPermissionService<T> permissionService, IDtoComparer<T> dtoComparer, ILogger logger, IDatabaseSource databaseSource, IReadFilter<T> readFilter)
+        /// <param name="readFilter">The (injected) <see cref="IReadFilter" /> read filter provider.</param>
+        protected ServiceBase(IDao<T> dao, IDtoValidator<T> dtoValidator, IPermissionService<T> permissionService, IDtoComparer<T> dtoComparer, ILogger logger, IDatabaseSource databaseSource, IReadFilter readFilter)
         {
             this.Dao = dao;
             this.DtoValidator = dtoValidator;
@@ -136,7 +136,7 @@ namespace Mycelium.Forge.Dal.Services
                     return permissionResult.Errors;
                 }
 
-                var createResult = await this.Dao.CreateAsync(transaction, token, dto);
+                var createResult = await this.Dao.CreateAsync(transaction, dto, token);
 
                 if (createResult.IsError)
                 {
@@ -323,7 +323,7 @@ namespace Mycelium.Forge.Dal.Services
 
                 ServiceHelper.LogChanges(this.Logger, this.DtoComparer, existing, dto);
 
-                var updateResult = await this.Dao.UpdateAsync(transaction, token, dto);
+                var updateResult = await this.Dao.UpdateAsync(transaction, dto, token);
 
                 if (updateResult.IsError)
                 {
@@ -430,7 +430,7 @@ namespace Mycelium.Forge.Dal.Services
                 entitiesToDelete.Add(existing);
             }
 
-            var deleteResult = await this.Dao.DeleteAsync(transaction, token, entitiesToDelete);
+            var deleteResult = await this.Dao.DeleteAsync(transaction, entitiesToDelete, token);
 
             if (deleteResult.IsError)
             {
@@ -487,11 +487,11 @@ namespace Mycelium.Forge.Dal.Services
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
-        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <param name="propertyName">The name of the property to query.</param>
         /// <param name="values">An optional array of index values to read.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="ErrorOr{TValue}" /> containing an <see cref="ImmutableList{T}" /> of permitted instances.</returns>
-        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync(IUserContext userContext, NpgsqlTransaction transaction, CancellationToken token, string propertyName, string[] values)
+        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync(IUserContext userContext, NpgsqlTransaction transaction, string propertyName, string[] values, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(userContext);
 
@@ -542,11 +542,11 @@ namespace Mycelium.Forge.Dal.Services
         /// connection and transaction.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
-        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <param name="propertyName">The name of the property to query.</param>
         /// <param name="values">An optional array of index values to read.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="ErrorOr{TValue}" /> containing an <see cref="ImmutableList{T}" /> of permitted instances.</returns>
-        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync(IUserContext userContext, CancellationToken token, string propertyName, string[] values)
+        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync(IUserContext userContext, string propertyName, string[] values, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(userContext);
 
@@ -557,7 +557,7 @@ namespace Mycelium.Forge.Dal.Services
                 await using var connection = await this.DatabaseSource.OpenNewConnectionAsync(token);
                 await using var transaction = await connection.BeginTransactionAsync(token);
 
-                var result = await this.ReadByIndexAsync(userContext, transaction, token, propertyName, values);
+                var result = await this.ReadByIndexAsync(userContext, transaction, propertyName, values, token);
 
                 if (result.IsError)
                 {

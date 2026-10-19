@@ -184,17 +184,17 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             var forgeId = Guid.NewGuid();
 
-            await this.Insert(transaction => forgeDao.CreateAsync(transaction, CancellationToken.None, new Forge
+            await this.Insert(transaction => forgeDao.CreateAsync(transaction, new Forge
             {
                 Id = forgeId,
                 Name = "TestForge",
                 ShortName = "test-forge",
                 Description = "Integration test forge"
-            }));
+            }, CancellationToken.None));
 
             var countryId = Guid.NewGuid();
 
-            await this.Insert(transaction => countryDao.CreateAsync(transaction, CancellationToken.None, new Country
+            await this.Insert(transaction => countryDao.CreateAsync(transaction, new Country
             {
                 Id = countryId,
                 Owner = forgeId,
@@ -202,7 +202,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 Alpha3Code = "PRT",
                 Name = "Portugal",
                 NumericCode = "620"
-            }));
+            }, CancellationToken.None));
 
             var addressId1 = Guid.NewGuid();
             var addressId2 = Guid.NewGuid();
@@ -212,7 +212,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 await using var setConstraints = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
                 await setConstraints.ExecuteNonQueryAsync();
 
-                var r1 = await addressDao.CreateAsync(transaction, CancellationToken.None, new Address
+                var r1 = await addressDao.CreateAsync(transaction, new Address
                 {
                     Id = addressId1,
                     Owner = this.memberAccountId,
@@ -221,14 +221,14 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Locality = "Lisbon",
                     PostalCode = "1000-001",
                     Region = "LX"
-                });
+                }, CancellationToken.None);
 
                 if (r1.IsError)
                 {
                     return r1;
                 }
 
-                var r2 = await addressDao.CreateAsync(transaction, CancellationToken.None, new Address
+                var r2 = await addressDao.CreateAsync(transaction, new Address
                 {
                     Id = addressId2,
                     Owner = adminAccount,
@@ -237,14 +237,14 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     Locality = "Porto",
                     PostalCode = "4000-001",
                     Region = "PT"
-                });
+                }, CancellationToken.None);
 
                 if (r2.IsError)
                 {
                     return r2;
                 }
 
-                var r3 = await accountDao.CreateAsync(transaction, CancellationToken.None, new Account
+                var r3 = await accountDao.CreateAsync(transaction, new Account
                 {
                     Id = this.memberAccountId,
                     Owner = forgeId,
@@ -256,14 +256,14 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     DefaultPackageVisibility = VisibilityKind.PUBLIC,
                     Status = ScopeStatusKind.ACTIVE,
                     Origin = "https://example.com"
-                });
+                }, CancellationToken.None);
 
                 if (r3.IsError)
                 {
                     return r3;
                 }
 
-                return await accountDao.CreateAsync(transaction, CancellationToken.None, new Account
+                return await accountDao.CreateAsync(transaction, new Account
                 {
                     Id = adminAccount,
                     Owner = forgeId,
@@ -275,14 +275,14 @@ namespace Mycelium.Forge.Orm.Tests.Services
                     DefaultPackageVisibility = VisibilityKind.PUBLIC,
                     Status = ScopeStatusKind.ACTIVE,
                     Origin = "https://example.com"
-                });
+                }, CancellationToken.None);
             });
 
             this.publicOrgId = Guid.NewGuid();
             this.privateOrgId = Guid.NewGuid();
             var now = DateTime.UtcNow;
 
-            await this.Insert(transaction => organizationDao.CreateAsync(transaction, CancellationToken.None, new Organization
+            await this.Insert(transaction => organizationDao.CreateAsync(transaction, new Organization
             {
                 Id = this.publicOrgId,
                 Owner = forgeId,
@@ -298,9 +298,9 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 Member = [adminAccount],
                 CreatedAt = now,
                 ModifiedAt = now
-            }));
+            }, CancellationToken.None));
 
-            await this.Insert(transaction => organizationDao.CreateAsync(transaction, CancellationToken.None, new Organization
+            await this.Insert(transaction => organizationDao.CreateAsync(transaction, new Organization
             {
                 Id = this.privateOrgId,
                 Owner = forgeId,
@@ -316,7 +316,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 Member = [adminAccount, this.memberAccountId],
                 CreatedAt = now,
                 ModifiedAt = now
-            }));
+            }, CancellationToken.None));
         }
     }
 }

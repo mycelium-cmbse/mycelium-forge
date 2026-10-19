@@ -28,13 +28,13 @@ namespace Mycelium.Forge.Orm
         /// Asynchronously creates (persists) a new instance of <typeparamref name="T" /> in the database.
         /// </summary>
         /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
-        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the Create operation.</param>
         /// <param name="item">The entity that is to be persisted.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the Create operation.</param>
         /// <returns>
         /// Returns a successful <see cref="Result.Created" /> when persisted successfully, or a failed
         /// <see cref="Error" /> if not successful.
         /// </returns>
-        Task<ErrorOr<Created>> CreateAsync(NpgsqlTransaction transaction, CancellationToken token, T item);
+        Task<ErrorOr<Created>> CreateAsync(NpgsqlTransaction transaction, T item, CancellationToken token);
 
         /// <summary>
         /// Asynchronously reads <typeparamref name="T" /> instances from the database.
@@ -60,24 +60,24 @@ namespace Mycelium.Forge.Orm
         /// Asynchronously updates (persists) an instance of <typeparamref name="T" /> in the database.
         /// </summary>
         /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
-        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the Update operation.</param>
         /// <param name="item">The entity that is to be updated.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the Update operation.</param>
         /// <returns>
         /// Returns a successful <see cref="Result.Updated" /> when updated successfully, or a failed <see cref="Error" />
         /// if not successful.
         /// </returns>
-        Task<ErrorOr<Updated>> UpdateAsync(NpgsqlTransaction transaction, CancellationToken token, T item);
+        Task<ErrorOr<Updated>> UpdateAsync(NpgsqlTransaction transaction, T item, CancellationToken token);
 
         /// <summary>
         /// Asynchronously deletes the provided <typeparamref name="T" /> instances from the database.
         /// </summary>
         /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
-        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <param name="dtos">The collection of entities that are to be deleted from the database.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>
         /// Returns a successful <see cref="Result.Deleted" /> when deleted successfully, or a failed <see cref="Error" />
         /// if not successful.
         /// </returns>
-        Task<ErrorOr<Deleted>> DeleteAsync(NpgsqlTransaction transaction, CancellationToken token, IEnumerable<T> dtos);
+        Task<ErrorOr<Deleted>> DeleteAsync(NpgsqlTransaction transaction, IEnumerable<T> dtos, CancellationToken token);
     }
 }
