@@ -124,7 +124,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
 
             // Scope conflict -> validation fails
             dialog.Instance.OnOrganizationNameChanged("Starion Group");
-            dialog.Instance.OnScopeChanged("@starion");
+            dialog.Instance.OnScopeChanged("starion");
             dialog.Instance.OnBillingEmailChanged("billing@starion.eu");
 
             this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IScope>(new Organization { ShortName = "starion" }));
@@ -146,7 +146,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             {
                 Assert.That(capturedResult, Is.Not.Null);
                 Assert.That(capturedResult.OrganizationName, Is.EqualTo("Starion Group"));
-                Assert.That(capturedResult.Scope, Is.EqualTo("@starion"));
+                Assert.That(capturedResult.Scope, Is.EqualTo("starion"));
                 Assert.That(capturedResult.BillingEmail, Is.EqualTo("billing@starion.eu"));
                 this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Once);
             }

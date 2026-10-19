@@ -52,9 +52,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// </summary>
         /// <param name="entityDefinitions">The dictionary of entity permission definitions.</param>
         /// <param name="behaviorDefinitions">The dictionary of entity behavior definitions.</param>
-        public static void SetConfigurations(
-            Dictionary<string, EntityPermissionDefinition> entityDefinitions,
-            Dictionary<string, EntityBehaviorDefinition> behaviorDefinitions = null)
+        public static void SetConfigurations(Dictionary<string, EntityPermissionDefinition> entityDefinitions, Dictionary<string, EntityBehaviorDefinition> behaviorDefinitions = null)
         {
             entityPermissions = entityDefinitions ?? [];
             entityBehaviors = behaviorDefinitions ?? [];

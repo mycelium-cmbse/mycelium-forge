@@ -226,10 +226,12 @@ namespace Mycelium.Forge.Dal.Tests.Services
         {
             var org = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
             var account = new Account { Id = Guid.NewGuid(), Name = "Acc", ShortName = "acc" };
+            string[] expectedOrg = ["org"];
+            string[] expectedAcc = ["acc"];
 
             Assert.That(async () => await this.service.ReadByShortNameAsync(null, CancellationToken.None, ["org"]), Throws.ArgumentNullException);
 
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(new[] { "org" })))).ReturnsAsync(ImmutableList.Create<IOrganization>(org));
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(expectedOrg)))).ReturnsAsync(ImmutableList.Create<IOrganization>(org));
 
             var orgSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["org"]);
 
@@ -253,8 +255,8 @@ namespace Mycelium.Forge.Dal.Tests.Services
                 Assert.That(batchResult.Value[1].ShortName, Is.EqualTo("acc"));
             }
 
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(new[] { "acc" })))).ReturnsAsync(ImmutableList<IOrganization>.Empty);
-            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(new[] { "acc" })))).ReturnsAsync(ImmutableList.Create<IAccount>(account));
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(expectedAcc)))).ReturnsAsync(ImmutableList<IOrganization>.Empty);
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(expectedAcc)))).ReturnsAsync(ImmutableList.Create<IAccount>(account));
 
             var accountSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["acc"]);
 

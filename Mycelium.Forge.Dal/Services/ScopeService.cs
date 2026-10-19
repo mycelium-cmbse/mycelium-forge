@@ -94,7 +94,7 @@ namespace Mycelium.Forge.Dal.Services
             }
 
             var remainingIds = iids is { Length: > 0 } ? new HashSet<Guid>(iids) : null;
-            var scopes = new List<IScope>();
+            List<IScope> scopes = [];
 
             var organizationResult = await ReadFromServiceAsync(this.organizationService, userContext, transaction, remainingIds, scopes, token);
 

@@ -255,11 +255,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var ownerChecksSql = string.Join("\r\n                        OR ", ownerChecks);
             var bypassSql = string.Join(" OR ", config.BypassPermissions.Select(p => $"@can{p} = true"));
 
-            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop =>
-            {
-                var propCamel = prop.LowerCaseFirstLetter();
-                return $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{propCamel}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"owner\" AND \"targetAccount\" = @callerAccountId)";
-            });
+            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop => $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{prop.LowerCaseFirstLetter()}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"owner\" AND \"targetAccount\" = @callerAccountId)");
 
             var scopeLinksSql = string.Join("\r\n                                        OR ", scopeLinkChecks);
 

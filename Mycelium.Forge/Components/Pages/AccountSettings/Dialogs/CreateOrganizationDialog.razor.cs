@@ -15,7 +15,6 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
 
     using Mycelium.Forge.Dal.AutoGenDtoValidator;
     using Mycelium.Forge.Dal.Services;
-    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
 
@@ -124,8 +123,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnCreateOrganizationClicked()
         {
-            var cleanScope = this.Scope.CleanScope();
-            var isScopeValid = !string.IsNullOrWhiteSpace(cleanScope) && OrganizationValidator.ShortNameFormatRegex().IsMatch(cleanScope);
+            var isScopeValid = !string.IsNullOrWhiteSpace(this.Scope) && OrganizationValidator.ShortNameFormatRegex().IsMatch(this.Scope);
 
             var isValid = this.ValidationManager
                 .Check(nameof(this.OrganizationName), !string.IsNullOrWhiteSpace(this.OrganizationName), "Organization name is required.")
@@ -139,11 +137,17 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
             }
 
             var userContext = await this.UserService.GetUserContext();
-            var existingScopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, CancellationToken.None, [cleanScope]);
+            var existingScopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, CancellationToken.None, [this.Scope]);
 
-            if (!existingScopeResult.IsError && existingScopeResult.Value.Count > 0)
+            if (existingScopeResult.IsError)
             {
-                this.ValidationManager.Check(nameof(this.Scope), false, $"A scope with short name '{cleanScope}' already exists.");
+                this.ValidationManager.Check(nameof(this.Scope), false, "Failed to verify scope availability. Please try again.");
+                return;
+            }
+
+            if (existingScopeResult.Value.Count > 0)
+            {
+                this.ValidationManager.Check(nameof(this.Scope), false, $"A scope with short name '{this.Scope}' already exists.");
                 return;
             }
 
