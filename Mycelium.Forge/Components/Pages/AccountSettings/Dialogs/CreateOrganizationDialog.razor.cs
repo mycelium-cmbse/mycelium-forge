@@ -139,9 +139,9 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
             }
 
             var userContext = await this.UserService.GetUserContext();
-            var existingScopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, cleanScope, CancellationToken.None);
+            var existingScopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, CancellationToken.None, [cleanScope]);
 
-            if (!existingScopeResult.IsError)
+            if (!existingScopeResult.IsError && existingScopeResult.Value.Count > 0)
             {
                 this.ValidationManager.Check(nameof(this.Scope), false, $"A scope with short name '{cleanScope}' already exists.");
                 return;

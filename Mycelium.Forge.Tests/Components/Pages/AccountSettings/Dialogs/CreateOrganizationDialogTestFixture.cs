@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
 {
+    using System.Collections.Immutable;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -16,8 +17,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
     using BlazorBlueprint.Primitives.Extensions;
 
     using Bunit;
-
-    using ErrorOr;
 
     using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +53,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             this.scopeServiceMock = new Mock<IScopeService>();
             this.userServiceMock = new Mock<IUserService>();
 
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Not found"));
+            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList<IScope>.Empty);
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(new UserContext());
 
             this.context.Services.AddSingleton(this.scopeServiceMock.Object);
@@ -128,7 +127,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             dialog.Instance.OnScopeChanged("@starion");
             dialog.Instance.OnBillingEmailChanged("billing@starion.eu");
 
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "starion", It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IScope>(new Organization { ShortName = "starion" }));
+            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IScope>(new Organization { ShortName = "starion" }));
 
             await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
 
@@ -139,7 +138,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             }
 
             // All valid and unique -> success
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "starion", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Not found"));
+            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList<IScope>.Empty);
 
             await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
 

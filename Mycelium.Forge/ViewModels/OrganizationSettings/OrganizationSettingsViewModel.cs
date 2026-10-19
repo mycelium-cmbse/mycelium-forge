@@ -154,16 +154,16 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         {
             this.userContext = await this.userService.GetUserContext();
 
-            var orgResult = await this.organizationService.ReadByShortNameAsync(this.userContext, shortName);
+            var orgResult = await this.organizationService.ReadByShortNameAsync(this.userContext, CancellationToken.None, [shortName]);
 
-            if (orgResult.IsError || !this.userContext.AccountId.HasValue)
+            if (orgResult.IsError || orgResult.Value.Count == 0 || !this.userContext.AccountId.HasValue)
             {
-                var errors = orgResult.IsError ? orgResult.Errors.ToJoinedDescriptions() : "Account ID missing in user context";
+                var errors = orgResult.IsError ? orgResult.Errors.ToJoinedDescriptions() : "Organization not found or Account ID missing in user context";
                 this.logger.LogWarning("Organization {ShortName} not found: {Errors}", shortName.SanitizeForLog(), errors);
                 return;
             }
 
-            this.Organization = orgResult.Value;
+            this.Organization = orgResult.Value[0];
             this.CurrentUserId = this.userContext.AccountId.Value;
 
             this.CurrentUserRole = this.Organization.Administrator.Contains(this.userContext.AccountId.Value)

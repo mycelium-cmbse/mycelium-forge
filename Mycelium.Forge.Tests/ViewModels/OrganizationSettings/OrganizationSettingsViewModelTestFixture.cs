@@ -107,7 +107,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             };
 
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.adminUserContext);
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.adminUserContext, "starion", It.IsAny<CancellationToken>())).ReturnsAsync(this.org);
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("starion")))).ReturnsAsync(ImmutableList.Create<IOrganization>(this.org));
             this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.adminAccount, this.memberAccount));
             this.organizationInvitationServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganizationInvitation>(this.matchingInvitation, this.acceptedInvitation, this.otherOrgInvitation));
 
@@ -143,7 +143,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         public async Task VerifyInitializeViewModel()
         {
             // Scenario 1: Organization not found
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.adminUserContext, "unknown", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("unknown")))).ReturnsAsync(ImmutableList<IOrganization>.Empty);
 
             await this.viewModel.InitializeViewModel("unknown");
 
@@ -167,7 +167,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
 
             // Scenario 3: User is Member, not Administrator
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.memberUserContext);
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.memberUserContext, "starion", It.IsAny<CancellationToken>())).ReturnsAsync(this.org);
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.memberUserContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("starion")))).ReturnsAsync(ImmutableList.Create<IOrganization>(this.org));
             this.accountServiceMock.Setup(x => x.ReadAsync(this.memberUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.adminAccount, this.memberAccount));
             this.organizationInvitationServiceMock.Setup(x => x.ReadAsync(this.memberUserContext, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganizationInvitation>(this.matchingInvitation));
 

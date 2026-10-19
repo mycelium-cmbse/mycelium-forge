@@ -72,10 +72,11 @@ namespace Mycelium.Forge.Orm.Tests.Filters
         [Test]
         public void VerifyFromUserContext()
         {
-            var anonymousFilter = PackageReadFilter.FromUserContext(this.anonymousUserContext);
-            var accountFilter = PackageReadFilter.FromUserContext(this.accountUserContext);
-            var orgAdminFilter = PackageReadFilter.FromUserContext(this.orgAdminUserContext);
-            var adminFilter = PackageReadFilter.FromUserContext(this.adminUserContext);
+            var readFilter = new PackageReadFilter();
+            var anonymousFilter = readFilter.FromUserContext(this.anonymousUserContext);
+            var accountFilter = readFilter.FromUserContext(this.accountUserContext);
+            var orgAdminFilter = readFilter.FromUserContext(this.orgAdminUserContext);
+            var adminFilter = readFilter.FromUserContext(this.adminUserContext);
 
             using var anonymousCommand = new NpgsqlCommand();
             anonymousFilter.ApplyParameters(anonymousCommand);

@@ -59,17 +59,9 @@ namespace Mycelium.Forge.Dal.Tests.Services
         [Test]
         public void VerifyConstructor()
         {
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(() => new ScopeService(null, this.accountServiceMock.Object, this.databaseSourceMock.Object, this.loggerMock.Object), Throws.ArgumentNullException);
-                Assert.That(() => new ScopeService(this.organizationServiceMock.Object, null, this.databaseSourceMock.Object, this.loggerMock.Object), Throws.ArgumentNullException);
-                Assert.That(() => new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, null, this.loggerMock.Object), Throws.ArgumentNullException);
-                Assert.That(() => new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, this.databaseSourceMock.Object, null), Throws.ArgumentNullException);
+            var instance = new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, this.databaseSourceMock.Object, this.loggerMock.Object);
 
-                var instance = new ScopeService(this.organizationServiceMock.Object, this.accountServiceMock.Object, this.databaseSourceMock.Object, this.loggerMock.Object);
-
-                Assert.That(instance, Is.Not.Null);
-            }
+            Assert.That(instance, Is.Not.Null);
         }
 
         [Test]
@@ -235,50 +227,86 @@ namespace Mycelium.Forge.Dal.Tests.Services
             var org = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
             var account = new Account { Id = Guid.NewGuid(), Name = "Acc", ShortName = "acc" };
 
-            Assert.That(async () => await this.service.ReadByShortNameAsync(null, "org", CancellationToken.None), Throws.ArgumentNullException);
+            Assert.That(async () => await this.service.ReadByShortNameAsync(null, CancellationToken.None, ["org"]), Throws.ArgumentNullException);
 
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "org", It.IsAny<CancellationToken>())).ReturnsAsync(org);
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(new[] { "org" })))).ReturnsAsync(ImmutableList.Create<IOrganization>(org));
 
-            var orgSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, "org", CancellationToken.None);
+            var orgSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["org"]);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(orgSuccessResult.IsError, Is.False);
-                Assert.That(orgSuccessResult.Value.ShortName, Is.EqualTo("org"));
-                this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+                Assert.That(orgSuccessResult.Value[0].ShortName, Is.EqualTo("org"));
+                this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>()), Times.Never());
             }
 
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "fail", It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Database failure"));
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("org") && ((IEnumerable<string>)a).Contains("acc")))).ReturnsAsync(ImmutableList.Create<IOrganization>(org));
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Length == 1 && a[0] == "acc"))).ReturnsAsync(ImmutableList.Create<IAccount>(account));
 
-            var orgFailureResult = await this.service.ReadByShortNameAsync(this.userContext, "fail", CancellationToken.None);
+            var batchResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["org", "acc"]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(batchResult.IsError, Is.False);
+                Assert.That(batchResult.Value, Has.Count.EqualTo(2));
+                Assert.That(batchResult.Value[0].ShortName, Is.EqualTo("org"));
+                Assert.That(batchResult.Value[1].ShortName, Is.EqualTo("acc"));
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(new[] { "acc" })))).ReturnsAsync(ImmutableList<IOrganization>.Empty);
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(new[] { "acc" })))).ReturnsAsync(ImmutableList.Create<IAccount>(account));
+
+            var accountSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["acc"]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(accountSuccessResult.IsError, Is.False);
+                Assert.That(accountSuccessResult.Value[0].ShortName, Is.EqualTo("acc"));
+            }
+
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<ImmutableList<IScope>>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IScope>(org, account));
+
+            var emptyBatchResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, []);
+            var nullBatchResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(emptyBatchResult.IsError, Is.False);
+                Assert.That(emptyBatchResult.Value, Has.Count.EqualTo(2));
+                Assert.That(nullBatchResult.IsError, Is.False);
+                Assert.That(nullBatchResult.Value, Has.Count.EqualTo(2));
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("none")))).ReturnsAsync(ImmutableList<IOrganization>.Empty);
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("none")))).ReturnsAsync(ImmutableList<IAccount>.Empty);
+
+            var notFoundResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["none"]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(notFoundResult.IsError, Is.False);
+                Assert.That(notFoundResult.Value, Is.Empty);
+            }
+
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("fail")))).ReturnsAsync(Error.Failure(description: "Database failure"));
+
+            var orgFailureResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["fail"]);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(orgFailureResult.IsError, Is.True);
                 Assert.That(orgFailureResult.FirstError.Description, Is.EqualTo("Database failure"));
-                this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
             }
 
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "acc", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Org not found"));
-            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "acc", It.IsAny<CancellationToken>())).ReturnsAsync(account);
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("acc-fail")))).ReturnsAsync(ImmutableList<IOrganization>.Empty);
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("acc-fail")))).ReturnsAsync(Error.Failure(description: "Account failure"));
 
-            var accountSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, "acc", CancellationToken.None);
+            var accountFailureResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["acc-fail"]);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(accountSuccessResult.IsError, Is.False);
-                Assert.That(accountSuccessResult.Value.ShortName, Is.EqualTo("acc"));
-            }
-
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "none", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Org not found"));
-            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "none", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Account not found"));
-
-            var notFoundResult = await this.service.ReadByShortNameAsync(this.userContext, "none", CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(notFoundResult.IsError, Is.True);
-                Assert.That(notFoundResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
+                Assert.That(accountFailureResult.IsError, Is.True);
+                Assert.That(accountFailureResult.FirstError.Description, Is.EqualTo("Account failure"));
             }
         }
     }

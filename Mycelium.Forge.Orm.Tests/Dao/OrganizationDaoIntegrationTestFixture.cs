@@ -43,7 +43,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
         public async Task VerifyReadAsync()
         {
             var anonymousContext = UserContext.CreateAnonymous();
-            var anonymousFilter = OrganizationReadFilter.FromUserContext(anonymousContext);
+            var readFilter = new OrganizationReadFilter();
+            var anonymousFilter = readFilter.FromUserContext(anonymousContext);
 
             var memberUserContext = new UserContext
             {
@@ -52,7 +53,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 CurrentRoles = [RoleKind.Account]
             };
 
-            var memberFilter = OrganizationReadFilter.FromUserContext(memberUserContext);
+            var memberFilter = readFilter.FromUserContext(memberUserContext);
 
             await using var transaction = await this.Connection.BeginTransactionAsync();
 

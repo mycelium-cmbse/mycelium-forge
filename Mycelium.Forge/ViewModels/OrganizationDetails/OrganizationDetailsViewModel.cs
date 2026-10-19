@@ -113,16 +113,16 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
             {
                 var userContext = await this.userService.GetUserContext();
 
-                var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, shortName, cancellationToken);
+                var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, cancellationToken, [shortName]);
 
-                if (organizationResult.IsError || organizationResult.Value == null)
+                if (organizationResult.IsError || organizationResult.Value.Count == 0)
                 {
                     var errors = organizationResult.IsError ? organizationResult.Errors.ToJoinedDescriptions() : "Not found";
                     this.logger.LogWarning("Organization with short name {ShortName} not found during details initialization: {Errors}", shortName.SanitizeForLog(), errors);
                     return;
                 }
 
-                this.Organization = organizationResult.Value;
+                this.Organization = organizationResult.Value[0];
 
                 var updatePermissionResult = await this.organizationPermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Organization, cancellationToken);
                 this.IsUserAdmin = updatePermissionResult.IsSuccess;

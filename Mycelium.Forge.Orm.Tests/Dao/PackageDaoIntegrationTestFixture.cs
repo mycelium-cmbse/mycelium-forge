@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDaoIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -175,8 +175,9 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
             };
 
-            var orgBFilter = PackageReadFilter.FromUserContext(orgBUserContext);
-            var orgAFilter = PackageReadFilter.FromUserContext(orgAUserContext);
+            var readFilter = new PackageReadFilter();
+            var orgBFilter = readFilter.FromUserContext(orgBUserContext);
+            var orgAFilter = readFilter.FromUserContext(orgAUserContext);
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
