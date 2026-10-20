@@ -80,7 +80,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
         /// <returns><see langword="true" /> if transfer should be disabled; otherwise, <see langword="false" />.</returns>
         public bool IsTransferDisabled()
         {
-            return string.IsNullOrWhiteSpace(this.TargetAccount) || !string.Equals(this.ConfirmationOrganizationName, this.OrganizationName);
+            return string.IsNullOrWhiteSpace(this.TargetAccount) || !string.Equals(this.ConfirmationOrganizationName, this.OrganizationName, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
 
             var isValid = this.ValidationManager
                 .Check(nameof(this.TargetAccount), isTargetValid, "Target account must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.")
-                .Check(nameof(this.ConfirmationOrganizationName), string.Equals(this.ConfirmationOrganizationName, this.OrganizationName), "Confirmation name does not match.")
+                .Check(nameof(this.ConfirmationOrganizationName), string.Equals(this.ConfirmationOrganizationName, this.OrganizationName, StringComparison.Ordinal), "Confirmation name does not match.")
                 .IsValid;
 
             if (!isValid)

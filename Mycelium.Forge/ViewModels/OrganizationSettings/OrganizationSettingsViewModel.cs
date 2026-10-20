@@ -113,6 +113,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         public IOrganization Organization { get; set; }
 
         /// <summary>
+        /// Gets or sets the current user's role within the organization.
+        /// </summary>
+        public OrganizationRole CurrentUserRole { get; set; } = OrganizationRole.Member;
+
+        /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to manage the organization.
         /// </summary>
         public bool CanManageOrganization { get; set; }
@@ -163,8 +168,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             this.Organization = orgResult.Value;
             this.CurrentUserId = this.UserContext.AccountId.Value;
 
-            var updatePermissionResult = await this.organizationPermissionService.IsAllowedToUpdate(this.databaseSource, this.UserContext, this.Organization);
-            this.CanManageOrganization = updatePermissionResult.IsSuccess;
+            await this.ComputeCurrentUserPermissions();
 
             var invitationsResult = await this.organizationInvitationService.ReadAsync(this.UserContext, CancellationToken.None);
 
@@ -298,18 +302,18 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// Transfers ownership of the organization to the specified recipient account asynchronously.
         /// </summary>
         /// <param name="recipient">The recipient account to transfer ownership to.</param>
-        /// <param name="token">The cancellation token.</param>
         /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
-        public async Task<ErrorOr<Success>> TransferOrganization(IAccount recipient, CancellationToken token = default)
+        public async Task<ErrorOr<Success>> TransferOrganization(IAccount recipient)
         {
             var originalAdministrators = this.Organization.Administrator.ToList();
             var originalMembers = this.Organization.Member.ToList();
 
+            // Administrator subsets Member in the domain schema and seed data, so CurrentUserId remains in Member. Check Organization DTO summary.
             this.Organization.Administrator.AddIfNotExisting(recipient.Id);
             this.Organization.Member.AddIfNotExisting(recipient.Id);
             this.Organization.Administrator.Remove(this.CurrentUserId);
-
-            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [this.Organization], token);
+            
+            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [this.Organization], CancellationToken.None);
 
             if (updateResult.IsError)
             {
@@ -322,8 +326,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
                 return updateResult.Errors;
             }
 
-            var permissionResult = await this.organizationPermissionService.IsAllowedToUpdate(this.databaseSource, this.UserContext, this.Organization, token);
-            this.CanManageOrganization = permissionResult.IsSuccess;
+            await this.ComputeCurrentUserPermissions();
 
             if (this.Members.All(m => m.Id != recipient.Id))
             {
@@ -332,6 +335,20 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             this.notificationService.AddNotification($"Organization ownership transferred to {recipient.Name}.", "Ownership Transferred", NotificationType.Success);
             return Result.Success;
+        }
+
+        /// <summary>
+        /// Computes and sets the current user's role and management permissions for the organization.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task ComputeCurrentUserPermissions()
+        {
+            this.CurrentUserRole = this.Organization.Administrator.Contains(this.CurrentUserId)
+                ? OrganizationRole.Administrator
+                : OrganizationRole.Member;
+
+            var permissionResult = await this.organizationPermissionService.IsAllowedToUpdate(this.databaseSource, this.UserContext, this.Organization);
+            this.CanManageOrganization = permissionResult.IsSuccess;
         }
     }
 }

@@ -11,7 +11,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
 {
     using System;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -91,6 +90,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             this.testUserContext = new UserContext { AccountId = adminId, CurrentRoles = [RoleKind.OrganizationAdministrator, RoleKind.Account] };
 
             this.viewModelMock.Setup(x => x.Organization).Returns(this.testOrganization);
+            this.viewModelMock.Setup(x => x.CurrentUserRole).Returns(OrganizationRole.Administrator);
             this.viewModelMock.Setup(x => x.CanManageOrganization).Returns(true);
             this.viewModelMock.Setup(x => x.CurrentUserId).Returns(adminId);
             this.viewModelMock.Setup(x => x.UserContext).Returns(this.testUserContext);
@@ -226,7 +226,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         public async Task VerifyTransferOrganization()
         {
             var recipient = new Account { Id = Guid.NewGuid(), Name = "Recipient User" };
-            this.viewModelMock.Setup(x => x.TransferOrganization(recipient, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            this.viewModelMock.Setup(x => x.TransferOrganization(recipient)).ReturnsAsync(Result.Success);
 
             // Case 1: Button is not rendered when transferring ownership is disabled
             this.viewModelMock.Setup(x => x.CanManageOrganization).Returns(false);
@@ -246,7 +246,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             var dialog = this.dialogProvider.FindComponent<TransferOrganizationOwnershipDialog>();
             await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync(recipient));
 
-            this.viewModelMock.Verify(x => x.TransferOrganization(recipient, It.IsAny<CancellationToken>()), Times.Once);
+            this.viewModelMock.Verify(x => x.TransferOrganization(recipient), Times.Once);
         }
     }
 }

@@ -25,6 +25,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         IOrganization Organization { get; set; }
 
         /// <summary>
+        /// Gets or sets the current user's role within the organization.
+        /// </summary>
+        OrganizationRole CurrentUserRole { get; set; }
+
+        /// <summary>
         /// Gets the current user context.
         /// </summary>
         IUserContext UserContext { get; }
@@ -99,8 +104,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// Transfers ownership of the organization to the specified recipient account asynchronously.
         /// </summary>
         /// <param name="recipient">The recipient account to transfer ownership to.</param>
-        /// <param name="token">The cancellation token.</param>
         /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
-        Task<ErrorOr<Success>> TransferOrganization(IAccount recipient, CancellationToken token = default);
+        Task<ErrorOr<Success>> TransferOrganization(IAccount recipient);
     }
 }

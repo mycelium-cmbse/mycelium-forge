@@ -16,6 +16,9 @@ namespace Mycelium.Forge.Common.Extensions
     /// </summary>
     public static class CollectionExtensions
     {
+        /// <summary>
+        /// Provides extension methods for <see cref="ICollection{T}" />.
+        /// </summary>
         /// <param name="collection">The collection to operate on.</param>
         /// <typeparam name="T">The type of elements in the collection.</typeparam>
         extension<T>(ICollection<T> collection)

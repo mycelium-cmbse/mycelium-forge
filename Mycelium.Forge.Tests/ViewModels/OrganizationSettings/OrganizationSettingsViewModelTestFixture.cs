@@ -51,6 +51,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         private OrganizationInvitation acceptedInvitation;
         private OrganizationInvitation otherOrgInvitation;
         private UserContext adminUserContext;
+        private UserContext memberUserContext;
 
         [SetUp]
         public void SetUp()
@@ -106,6 +107,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             };
 
             this.adminUserContext = new UserContext { AccountId = adminId };
+            this.memberUserContext = new UserContext { AccountId = memberId };
 
             this.organizationPermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IOrganization>(), It.IsAny<IOrganization>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((func, _) => func(null!));
@@ -157,16 +159,27 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
-            // Scenario 2: Happy path
+            // Scenario 2: Happy path where user is Administrator
             await this.viewModel.InitializeViewModel("starion");
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Organization, Is.EqualTo(this.org));
+                Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Administrator));
                 Assert.That(this.viewModel.Members, Has.Count.EqualTo(2));
                 Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.RoleOptions, Has.Count.EqualTo(2));
             }
+
+            // Scenario 3: User is Member, not Administrator
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.memberUserContext);
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.memberUserContext, "starion", It.IsAny<CancellationToken>())).ReturnsAsync(this.org);
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.memberUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.adminAccount, this.memberAccount));
+            this.organizationInvitationServiceMock.Setup(x => x.ReadAsync(this.memberUserContext, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganizationInvitation>(this.matchingInvitation));
+
+            await this.viewModel.InitializeViewModel("starion");
+
+            Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Member));
         }
 
         [Test]
@@ -265,6 +278,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(successResult.IsError, Is.False);
+                Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Member));
                 Assert.That(this.viewModel.Organization.Administrator, Does.Contain(newRecipient.Id));
                 Assert.That(this.viewModel.Organization.Administrator, Does.Not.Contain(this.adminUserContext.AccountId!.Value));
                 Assert.That(this.viewModel.Members, Does.Contain(newRecipient));
