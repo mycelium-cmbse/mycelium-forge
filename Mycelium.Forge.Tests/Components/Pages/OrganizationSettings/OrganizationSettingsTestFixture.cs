@@ -228,13 +228,16 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             var recipient = new Account { Id = Guid.NewGuid(), Name = "Recipient User" };
             this.viewModelMock.Setup(x => x.TransferOrganization(recipient)).ReturnsAsync(Result.Success);
 
-            // Case 1: Button is not rendered when transferring ownership is disabled
-            this.viewModelMock.Setup(x => x.CanManageOrganization).Returns(false);
+            // Case 1: Button is not rendered when user is not admin and lacks TransferOrganizationAdministration permission
+            var nonAdminContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            this.viewModelMock.Setup(x => x.CurrentUserId).Returns(nonAdminContext.AccountId!.Value);
+            this.viewModelMock.Setup(x => x.UserContext).Returns(nonAdminContext);
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
             Assert.That(orgSettingsPage.FindAll("#org-settings-transfer-button"), Has.Count.EqualTo(0));
 
-            // Case 2: Button is rendered when transferring ownership is enabled
-            this.viewModelMock.Setup(x => x.CanManageOrganization).Returns(true);
+            // Case 2: Button is rendered when user is an administrator
+            this.viewModelMock.Setup(x => x.CurrentUserId).Returns(this.testMember.Id);
+            this.viewModelMock.Setup(x => x.UserContext).Returns(this.testUserContext);
             orgSettingsPage.Render();
 
             var transferButton = orgSettingsPage.Find("#org-settings-transfer-button");

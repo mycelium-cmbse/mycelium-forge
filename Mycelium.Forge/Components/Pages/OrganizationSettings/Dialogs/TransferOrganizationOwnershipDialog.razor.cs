@@ -75,21 +75,12 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
         public ValidationManager ValidationManager { get; } = new();
 
         /// <summary>
-        /// Determines whether the transfer action button is disabled.
-        /// </summary>
-        /// <returns><see langword="true" /> if transfer should be disabled; otherwise, <see langword="false" />.</returns>
-        public bool IsTransferDisabled()
-        {
-            return string.IsNullOrWhiteSpace(this.TargetAccount) || !string.Equals(this.ConfirmationOrganizationName, this.OrganizationName, StringComparison.Ordinal);
-        }
-
-        /// <summary>
         /// Handles changes to the target account input and clears previous validation errors.
         /// </summary>
         /// <param name="value">The updated target account input.</param>
         public void OnTargetAccountChanged(string value)
         {
-            this.TargetAccount = value;
+            this.TargetAccount = value ?? string.Empty;
             this.ValidationManager.ClearError(nameof(this.TargetAccount));
         }
 
@@ -99,7 +90,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
         /// <param name="value">The updated confirmation organization name input.</param>
         public void OnConfirmationNameChanged(string value)
         {
-            this.ConfirmationOrganizationName = value;
+            this.ConfirmationOrganizationName = value ?? string.Empty;
             this.ValidationManager.ClearError(nameof(this.ConfirmationOrganizationName));
         }
 
@@ -124,11 +115,6 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnTransferClicked()
         {
-            if (this.IsTransferDisabled())
-            {
-                return;
-            }
-
             var isTargetValid = !string.IsNullOrWhiteSpace(this.TargetAccount) && AccountValidator.ShortNameFormatRegex().IsMatch(this.TargetAccount);
 
             var isValid = this.ValidationManager
@@ -142,7 +128,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
             }
 
             var userContext = await this.UserService.GetUserContext();
-            var accountResult = await this.AccountService.ReadByShortNameAsync(userContext, this.TargetAccount);
+            var accountResult = await this.AccountService.ReadByShortNameAsync(userContext, this.TargetAccount, CancellationToken.None);
 
             if (accountResult.IsError)
             {

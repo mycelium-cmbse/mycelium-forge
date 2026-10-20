@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -71,38 +72,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
         }
 
         [Test]
-        public void VerifyIsTransferDisabled()
-        {
-            var dialog = this.context.Render<TransferOrganizationOwnershipDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.OrganizationName, "Starion Group");
-            });
-
-            var disabledInitially = dialog.Instance.IsTransferDisabled();
-
-            dialog.Instance.OnTargetAccountChanged("new-owner");
-            dialog.Instance.OnConfirmationNameChanged("wrong-name");
-            var disabledWithWrongName = dialog.Instance.IsTransferDisabled();
-
-            dialog.Instance.OnTargetAccountChanged(string.Empty);
-            dialog.Instance.OnConfirmationNameChanged("Starion Group");
-            var disabledWithEmptyTarget = dialog.Instance.IsTransferDisabled();
-
-            dialog.Instance.OnTargetAccountChanged("new-owner");
-            dialog.Instance.OnConfirmationNameChanged("Starion Group");
-            var enabledWhenValid = dialog.Instance.IsTransferDisabled();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(disabledInitially, Is.True);
-                Assert.That(disabledWithWrongName, Is.True);
-                Assert.That(disabledWithEmptyTarget, Is.True);
-                Assert.That(enabledWhenValid, Is.False);
-            }
-        }
-
-        [Test]
         public async Task VerifyOnCancelClicked()
         {
             var onCancelCalled = false;
@@ -125,6 +94,36 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
         }
 
         [Test]
+        public async Task VerifyOnInputsChanged()
+        {
+            var dialog = this.context.Render<TransferOrganizationOwnershipDialog>(parameters => { parameters.AddCascadingValue(this.dialogReferenceMock.Object); });
+
+            var inputs = dialog.FindComponents<BbInput>();
+            var targetInput = inputs.First(i => i.Instance.Id == "transfer-org-target-input");
+            var confirmInput = inputs.First(i => i.Instance.Id == "transfer-org-confirm-name-input");
+
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("new-owner"));
+            var targetWithValue = dialog.Instance.TargetAccount;
+
+            dialog.Instance.OnTargetAccountChanged(null!);
+            var targetWithNull = dialog.Instance.TargetAccount;
+
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
+            var confirmWithValue = dialog.Instance.ConfirmationOrganizationName;
+
+            dialog.Instance.OnConfirmationNameChanged(null!);
+            var confirmWithNull = dialog.Instance.ConfirmationOrganizationName;
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(targetWithValue, Is.EqualTo("new-owner"));
+                Assert.That(targetWithNull, Is.EqualTo(string.Empty));
+                Assert.That(confirmWithValue, Is.EqualTo("Starion Group"));
+                Assert.That(confirmWithNull, Is.EqualTo(string.Empty));
+            }
+        }
+
+        [Test]
         public async Task VerifyOnTransferClicked()
         {
             IAccount receivedAccount = null!;
@@ -137,36 +136,53 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
                 parameters.Add(x => x.OnResult, onResult);
             });
 
-            // Scenario 1: Disabled transfer does not execute
-            dialog.Instance.OnTargetAccountChanged(string.Empty);
-            dialog.Instance.OnConfirmationNameChanged("Starion Group");
-            dialog.Render();
-            await dialog.InvokeAsync(() => dialog.Find("#transfer-org-submit-button").ClickAsync());
+            var inputs = dialog.FindComponents<BbInput>();
+            var targetInput = inputs.First(i => i.Instance.Id == "transfer-org-target-input");
+            var confirmInput = inputs.First(i => i.Instance.Id == "transfer-org-confirm-name-input");
+            var submitButton = dialog.Find("#transfer-org-submit-button");
+
+            // Scenario 1: Empty inputs -> validation fails
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync(string.Empty));
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync(string.Empty));
+            await dialog.InvokeAsync(() => submitButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(receivedAccount, Is.Null);
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetAccount)), Is.True);
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.ConfirmationOrganizationName)), Is.True);
                 this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Never);
             }
 
             // Scenario 2: Invalid account shortname format
-            dialog.Instance.OnTargetAccountChanged("@invalid-name");
-            dialog.Instance.OnConfirmationNameChanged("Starion Group");
-            dialog.Render();
-            await dialog.InvokeAsync(() => dialog.Find("#transfer-org-submit-button").ClickAsync());
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("@invalid-name"));
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
+            await dialog.InvokeAsync(() => submitButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(receivedAccount, Is.Null);
                 Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetAccount)), Is.True);
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.ConfirmationOrganizationName)), Is.False);
             }
 
-            // Scenario 3: Account not found
+            // Scenario 3: Confirmation mismatch
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("newowner"));
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Wrong Name"));
+            await dialog.InvokeAsync(() => submitButton.ClickAsync());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(receivedAccount, Is.Null);
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetAccount)), Is.False);
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.ConfirmationOrganizationName)), Is.True);
+            }
+
+            // Scenario 4: Account not found
             this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "unknown", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
-            dialog.Instance.OnTargetAccountChanged("unknown");
-            dialog.Instance.OnConfirmationNameChanged("Starion Group");
-            dialog.Render();
-            await dialog.InvokeAsync(() => dialog.Find("#transfer-org-submit-button").ClickAsync());
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("unknown"));
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
+            await dialog.InvokeAsync(() => submitButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
@@ -174,13 +190,12 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
                 Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetAccount)), Is.True);
             }
 
-            // Scenario 4: Self transfer
+            // Scenario 5: Self transfer
             var selfAccount = new Account { Id = this.currentUserId, ShortName = "self" };
             this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "self", It.IsAny<CancellationToken>())).ReturnsAsync(selfAccount);
-            dialog.Instance.OnTargetAccountChanged("self");
-            dialog.Instance.OnConfirmationNameChanged("Starion Group");
-            dialog.Render();
-            await dialog.InvokeAsync(() => dialog.Find("#transfer-org-submit-button").ClickAsync());
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("self"));
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
+            await dialog.InvokeAsync(() => submitButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
@@ -188,13 +203,12 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
                 Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetAccount)), Is.True);
             }
 
-            // Scenario 5: Valid transfer
+            // Scenario 6: Valid transfer
             var targetAccount = new Account { Id = Guid.NewGuid(), ShortName = "newowner" };
             this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "newowner", It.IsAny<CancellationToken>())).ReturnsAsync(targetAccount);
-            dialog.Instance.OnTargetAccountChanged("newowner");
-            dialog.Instance.OnConfirmationNameChanged("Starion Group");
-            dialog.Render();
-            await dialog.InvokeAsync(() => dialog.Find("#transfer-org-submit-button").ClickAsync());
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("newowner"));
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
+            await dialog.InvokeAsync(() => submitButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
