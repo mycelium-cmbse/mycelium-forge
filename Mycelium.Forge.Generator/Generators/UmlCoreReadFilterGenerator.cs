@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreReadFilterGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -103,9 +103,8 @@ namespace Mycelium.Forge.Generator.Generators
 
             foreach (var @class in classes)
             {
-                var content = template(@class);
-                var filePath = Path.Combine(outputDirectory.FullName, $"{@class.Name}ReadFilter.cs");
-                await File.WriteAllTextAsync(filePath, content);
+                var content = this.CodeCleanup(template(@class));
+                await WriteAsync(content, outputDirectory, $"{@class.Name}ReadFilter.cs");
             }
         }
 

@@ -83,6 +83,21 @@ namespace Mycelium.Forge.Orm.Tests.Services
         }
 
         [Test]
+        public async Task VerifyReadByStatusAsync()
+        {
+            var activeResult = await this.service.ReadByStatusAsync(this.adminUserContext, CancellationToken.None, [ScopeStatusKind.ACTIVE]);
+            var inactiveResult = await this.service.ReadByStatusAsync(this.adminUserContext, CancellationToken.None, [ScopeStatusKind.DEACTIVATED]);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(activeResult.IsError, Is.False);
+                Assert.That(activeResult.Value, Has.Count.EqualTo(2));
+                Assert.That(inactiveResult.IsError, Is.False);
+                Assert.That(inactiveResult.Value, Is.Empty);
+            }
+        }
+
+        [Test]
         public async Task VerifyUpdateAsync()
         {
             await using var transaction = await this.Connection.BeginTransactionAsync();

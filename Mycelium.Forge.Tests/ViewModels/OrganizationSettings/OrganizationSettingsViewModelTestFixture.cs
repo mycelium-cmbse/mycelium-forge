@@ -153,8 +153,8 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
-            // Scenario 2: Happy path where user is Administrator
-            await this.viewModel.InitializeViewModel("starion");
+            // Scenario 2: Happy path where user is Administrator (verifies mixed-case short name normalization)
+            await this.viewModel.InitializeViewModel("Starion");
 
             using (Assert.EnterMultipleScope())
             {

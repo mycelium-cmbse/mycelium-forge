@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Dal.Services
 {
     using System.Collections.Immutable;
+    using System.Globalization;
 
     using ErrorOr;
 
@@ -135,7 +136,10 @@ namespace Mycelium.Forge.Dal.Services
                 {
                     return permissionResult.Errors;
                 }
+            }
 
+            foreach (var dto in dtoList)
+            {
                 var createResult = await this.Dao.CreateAsync(transaction, dto, token);
 
                 if (createResult.IsError)
@@ -485,13 +489,14 @@ namespace Mycelium.Forge.Dal.Services
         /// Asynchronously reads instances of <typeparamref name="T" /> matching the specified property values within an existing
         /// transaction.
         /// </summary>
+        /// <typeparam name="TValue">The type of the property index values.</typeparam>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
         /// <param name="propertyName">The name of the property to query.</param>
         /// <param name="values">An optional array of index values to read.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="ErrorOr{TValue}" /> containing an <see cref="ImmutableList{T}" /> of permitted instances.</returns>
-        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync(IUserContext userContext, NpgsqlTransaction transaction, string propertyName, string[] values, CancellationToken token)
+        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync<TValue>(IUserContext userContext, NpgsqlTransaction transaction, string propertyName, TValue[] values, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(userContext);
 
@@ -507,13 +512,15 @@ namespace Mycelium.Forge.Dal.Services
                 return await this.ReadAsync(userContext, transaction, token);
             }
 
+            var stringValues = ConvertValuesToString(values);
+
             var filter = (SqlFilter)this.ReadFilter.FromUserContext(userContext);
 
             filter.Where($"""
                           "Thing"."classKind" = '{ClassKind}' AND "Thing"."data"->>'{sqlAttributeName}' = ANY(@values)
                           """);
 
-            filter.AddParameter("@values", (NpgsqlDbType)((int)NpgsqlDbType.Array | (int)NpgsqlDbType.Text), values);
+            filter.AddParameter("@values", (NpgsqlDbType)((int)NpgsqlDbType.Array | (int)NpgsqlDbType.Text), stringValues);
 
             var readResult = await this.Dao.ReadAsync(transaction, token, filter: filter);
 
@@ -541,12 +548,13 @@ namespace Mycelium.Forge.Dal.Services
         /// Asynchronously reads instances of <typeparamref name="T" /> matching the specified property values managing its own
         /// connection and transaction.
         /// </summary>
+        /// <typeparam name="TValue">The type of the property index values.</typeparam>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="propertyName">The name of the property to query.</param>
         /// <param name="values">An optional array of index values to read.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="ErrorOr{TValue}" /> containing an <see cref="ImmutableList{T}" /> of permitted instances.</returns>
-        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync(IUserContext userContext, string propertyName, string[] values, CancellationToken token)
+        protected async Task<ErrorOr<ImmutableList<T>>> ReadByIndexAsync<TValue>(IUserContext userContext, string propertyName, TValue[] values, CancellationToken token)
         {
             ArgumentNullException.ThrowIfNull(userContext);
 
@@ -574,6 +582,28 @@ namespace Mycelium.Forge.Dal.Services
 
                 return Error.Failure(description: exception.Message);
             }
+        }
+
+        /// <summary>
+        /// Converts an array of typed index values into an array of string values matching their JSON database representation.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the index values.</typeparam>
+        /// <param name="values">The array of values to convert.</param>
+        /// <returns>An array of string representations.</returns>
+        private static string[] ConvertValuesToString<TValue>(TValue[] values)
+        {
+            if (values is string[] stringArray)
+            {
+                return stringArray;
+            }
+
+            return values.Select(v => v switch
+            {
+                null => null,
+                Enum enumValue => enumValue.ToString(),
+                DateTime dateTime => dateTime.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture),
+                _ => v.ToString()
+            }).ToArray();
         }
 
         /// <summary>

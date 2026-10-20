@@ -154,7 +154,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         {
             this.userContext = await this.userService.GetUserContext();
 
-            var orgResult = await this.organizationService.ReadByShortNameAsync(this.userContext, CancellationToken.None, [shortName]);
+            var orgResult = await this.organizationService.ReadByShortNameAsync(this.userContext, CancellationToken.None, [shortName.ToLowerInvariant()]);
 
             if (orgResult.IsError || orgResult.Value.Count == 0 || !this.userContext.AccountId.HasValue)
             {

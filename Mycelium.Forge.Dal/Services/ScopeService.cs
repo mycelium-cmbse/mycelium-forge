@@ -137,7 +137,8 @@ namespace Mycelium.Forge.Dal.Services
 
         /// <summary>
         /// Asynchronously reads instances of <see cref="IScope" /> matching the specified scope short names managing its own
-        /// connection and transaction.
+        /// connection and transaction. Organizations are matched and returned first, followed by accounts for any unresolved
+        /// short names. The returned order reflects this sequence rather than the input order.
         /// </summary>
         /// <param name="userContext">The contextual user information and assigned roles.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
@@ -157,36 +158,29 @@ namespace Mycelium.Forge.Dal.Services
                 return await this.ReadAsync(userContext, token);
             }
 
-            var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, token, shortNames);
+            var normalizedShortNames = shortNames.Select(s => s.ToLowerInvariant()).ToArray();
+            var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, token, normalizedShortNames);
 
-            if (organizationResult.IsError && organizationResult.Errors.Exists(e => e.Type != ErrorType.NotFound))
+            if (organizationResult.IsError)
             {
                 return organizationResult.Errors;
             }
 
-            List<IScope> foundScopes = [];
-
-            if (!organizationResult.IsError)
-            {
-                foundScopes.AddRange(organizationResult.Value);
-            }
+            List<IScope> foundScopes = [.. organizationResult.Value];
 
             var foundShortNames = new HashSet<string>(foundScopes.Select(x => x.ShortName), StringComparer.OrdinalIgnoreCase);
-            var remainingShortNames = shortNames.Where(s => !foundShortNames.Contains(s)).ToArray();
+            var remainingShortNames = normalizedShortNames.Where(s => !foundShortNames.Contains(s)).ToArray();
 
             if (remainingShortNames.Length > 0)
             {
                 var accountResult = await this.accountService.ReadByShortNameAsync(userContext, token, remainingShortNames);
 
-                if (accountResult.IsError && accountResult.Errors.Exists(e => e.Type != ErrorType.NotFound))
+                if (accountResult.IsError)
                 {
                     return accountResult.Errors;
                 }
 
-                if (!accountResult.IsError)
-                {
-                    foundScopes.AddRange(accountResult.Value);
-                }
+                foundScopes.AddRange(accountResult.Value);
             }
 
             return foundScopes.ToImmutableList();

@@ -137,7 +137,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
             }
 
             var userContext = await this.UserService.GetUserContext();
-            var existingScopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, CancellationToken.None, [this.Scope]);
+            var existingScopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, CancellationToken.None, [this.Scope!.ToLowerInvariant()]);
 
             if (existingScopeResult.IsError)
             {

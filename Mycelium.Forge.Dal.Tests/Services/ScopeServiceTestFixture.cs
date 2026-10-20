@@ -234,11 +234,14 @@ namespace Mycelium.Forge.Dal.Tests.Services
             this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(expectedOrg)))).ReturnsAsync(ImmutableList.Create<IOrganization>(org));
 
             var orgSuccessResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["org"]);
+            var mixedCaseOrgResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["OrG"]);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(orgSuccessResult.IsError, Is.False);
                 Assert.That(orgSuccessResult.Value[0].ShortName, Is.EqualTo("org"));
+                Assert.That(mixedCaseOrgResult.IsError, Is.False);
+                Assert.That(mixedCaseOrgResult.Value[0].ShortName, Is.EqualTo("org"));
                 this.accountServiceMock.Verify(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>()), Times.Never());
             }
 
@@ -246,6 +249,7 @@ namespace Mycelium.Forge.Dal.Tests.Services
             this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Length == 1 && a[0] == "acc"))).ReturnsAsync(ImmutableList.Create<IAccount>(account));
 
             var batchResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["org", "acc"]);
+            var mixedCaseBatchResult = await this.service.ReadByShortNameAsync(this.userContext, CancellationToken.None, ["OrG", "AcC"]);
 
             using (Assert.EnterMultipleScope())
             {
@@ -253,6 +257,10 @@ namespace Mycelium.Forge.Dal.Tests.Services
                 Assert.That(batchResult.Value, Has.Count.EqualTo(2));
                 Assert.That(batchResult.Value[0].ShortName, Is.EqualTo("org"));
                 Assert.That(batchResult.Value[1].ShortName, Is.EqualTo("acc"));
+                Assert.That(mixedCaseBatchResult.IsError, Is.False);
+                Assert.That(mixedCaseBatchResult.Value, Has.Count.EqualTo(2));
+                Assert.That(mixedCaseBatchResult.Value[0].ShortName, Is.EqualTo("org"));
+                Assert.That(mixedCaseBatchResult.Value[1].ShortName, Is.EqualTo("acc"));
             }
 
             this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).SequenceEqual(expectedAcc)))).ReturnsAsync(ImmutableList<IOrganization>.Empty);

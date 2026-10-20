@@ -71,24 +71,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return property.QueryIsIndexable();
             });
 
-            handlebars.RegisterHelper("Property.QueryParameterPluralName", (_, arguments) =>
+            handlebars.RegisterHelper("Property.QueryIndexableTypeName", (_, arguments) =>
             {
-                var property = arguments.QuerySingle<IProperty>("Property.QueryParameterPluralName");
-                var lower = property.Name.LowerCaseFirstLetter();
+                var property = arguments.QuerySingle<IProperty>("Property.QueryIndexableTypeName");
 
-                if (lower.EndsWith("s", StringComparison.OrdinalIgnoreCase))
-                {
-                    return $"{lower}es";
-                }
-
-                return $"{lower}s";
-            });
-
-            handlebars.RegisterHelper("Property.QuerySqlAttributeName", (_, arguments) =>
-            {
-                var property = arguments.QuerySingle<IProperty>("Property.QuerySqlAttributeName");
-
-                return property.QuerySqlAttributeName();
+                return property.QueryCSharpTypeName();
             });
 
             // Writes XML documentation for a property, providing a default summary for owner properties
