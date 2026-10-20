@@ -33,7 +33,7 @@
 
             <BbBadge Variant="BadgeVariant.Secondary"
                      Class="badge-role text-primary">
-                @(this.ViewModel.CurrentUserRole)
+                Administrator
             </BbBadge>
         </div>
 
@@ -46,14 +46,17 @@
                 <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
                     MEMBERS
                 </span>
-                <BbButton id="org-settings-transfer-button"
-                          Variant="ButtonVariant.Outline"
-                          Size="ButtonSize.Small"
-                          Type="ButtonType.Button"
-                          OnClick="@(this.OnTransferOrganization)"
-                          Class="btn-destructive-outline shrink-0">
-                    Transfer
-                </BbButton>
+                @if (this.IsTransferOwnershipEnabled)
+                {
+                    <BbButton id="org-settings-transfer-button"
+                              Variant="ButtonVariant.Outline"
+                              Size="ButtonSize.Small"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.OnTransferOrganization)"
+                              Class="btn-destructive-outline shrink-0">
+                        Transfer
+                    </BbButton>
+                }
             </div>
 
             <div class="flex flex-col w-full divide-y divide-border">

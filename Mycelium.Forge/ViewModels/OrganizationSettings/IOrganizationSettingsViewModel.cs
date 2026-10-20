@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.ViewModels.OrganizationSettings
 {
+    using ErrorOr;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Enums;
 
@@ -23,9 +25,9 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         IOrganization Organization { get; set; }
 
         /// <summary>
-        /// Gets or sets the current user's role within the organization.
+        /// Gets the current user context.
         /// </summary>
-        OrganizationRole CurrentUserRole { get; set; }
+        IUserContext UserContext { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to manage the organization.
@@ -94,9 +96,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         Task RevokeInvitation(IOrganizationInvitation invitation);
 
         /// <summary>
-        /// Handles initiating an organization transfer asynchronously.
+        /// Transfers ownership of the organization to the specified recipient account asynchronously.
         /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task TransferOrganization();
+        /// <param name="recipient">The recipient account to transfer ownership to.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
+        Task<ErrorOr<Success>> TransferOrganization(IAccount recipient, CancellationToken token = default);
     }
 }

@@ -1,0 +1,69 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="TransferOrganizationOwnershipDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        <p class="text-sm leading-xs text-muted-foreground">
+            Transferring ownership moves this organization to another administrator. The recipient will become an administrator and you, if an organization admin, will be demoted to a member.
+        </p>
+
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.TargetAccount)))">
+            <BbFieldLabel For="transfer-org-target-input"
+                          Class="form-field-label">
+                New owner
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="transfer-org-target-input"
+                         Value="@(this.TargetAccount)"
+                         ValueChanged="@(this.OnTargetAccountChanged)"
+                         Placeholder="e.g. johndoe"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.TargetAccount)])"/>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ConfirmationOrganizationName)))">
+            <BbFieldLabel For="transfer-org-confirm-name-input"
+                          Class="form-field-label">
+                To confirm, type "@(this.OrganizationName)" below:
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="transfer-org-confirm-name-input"
+                         Value="@(this.ConfirmationOrganizationName)"
+                         ValueChanged="@(this.OnConfirmationNameChanged)"
+                         Placeholder="@(this.OrganizationName)"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.ConfirmationOrganizationName)])"/>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton id="transfer-org-cancel-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton id="transfer-org-submit-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  Disabled="@(this.IsTransferDisabled())"
+                  OnClick="@(this.OnTransferClicked)"
+                  Class="btn-destructive-outline">
+            Transfer ownership
+        </BbButton>
+    </Footer>
+</DialogComponent>
