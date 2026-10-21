@@ -18,6 +18,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
     using Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers;
 
+    using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
 
     /// <summary>
@@ -51,9 +52,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// </summary>
         /// <param name="entityDefinitions">The dictionary of entity permission definitions.</param>
         /// <param name="behaviorDefinitions">The dictionary of entity behavior definitions.</param>
-        public static void SetConfigurations(
-            Dictionary<string, EntityPermissionDefinition> entityDefinitions,
-            Dictionary<string, EntityBehaviorDefinition> behaviorDefinitions = null)
+        public static void SetConfigurations(Dictionary<string, EntityPermissionDefinition> entityDefinitions, Dictionary<string, EntityBehaviorDefinition> behaviorDefinitions = null)
         {
             entityPermissions = entityDefinitions ?? [];
             entityBehaviors = behaviorDefinitions ?? [];
@@ -155,7 +154,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             if (!string.IsNullOrWhiteSpace(permission.VisibilityProperty))
             {
-                var visibilityPropLower = char.ToLowerInvariant(permission.VisibilityProperty[0]) + permission.VisibilityProperty[1..];
+                var visibilityPropLower = permission.VisibilityProperty.LowerCaseFirstLetter();
                 parts.Add($"(\"Thing\".\"data\"->>'{visibilityPropLower}' = 'PUBLIC')");
             }
 
@@ -208,14 +207,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 }
                 else
                 {
-                    var ownerPropCamel = char.ToLowerInvariant(permission.OwnerProperty[0]) + permission.OwnerProperty[1..];
+                    var ownerPropCamel = permission.OwnerProperty.LowerCaseFirstLetter();
                     checks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{ownerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(permission.MaintainerProperty))
             {
-                var maintainerPropCamel = char.ToLowerInvariant(permission.MaintainerProperty[0]) + permission.MaintainerProperty[1..];
+                var maintainerPropCamel = permission.MaintainerProperty.LowerCaseFirstLetter();
                 checks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{maintainerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
             }
 

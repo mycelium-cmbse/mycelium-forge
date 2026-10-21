@@ -121,7 +121,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
             };
 
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.adminUserContext);
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "starion", It.IsAny<CancellationToken>())).ReturnsAsync(this.organization);
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("starion")))).ReturnsAsync(ImmutableList.Create<IOrganization>(this.organization));
             this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(this.package));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.packageVersion));
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageType>(this.packageType));
@@ -138,8 +138,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
         public async Task VerifyInitializeViewModel()
         {
             // Scenario 1: Organization service returns error (null org early return with warning log)
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "unknown", It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Error.NotFound("Not found"));
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("unknown")))).ReturnsAsync(ImmutableList<IOrganization>.Empty);
 
             await this.viewModel.InitializeViewModel("unknown");
 
@@ -151,15 +150,14 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
             }
 
             // Scenario 2: Exception handling with error log
-            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), "fail", It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("DB error"));
+            this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("fail")))).ThrowsAsync(new InvalidOperationException("DB error"));
 
             await this.viewModel.InitializeViewModel("fail");
 
             this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 
-            // Scenario 3: Happy path with admin by membership
-            await this.viewModel.InitializeViewModel("starion");
+            // Scenario 3: Happy path with admin by membership (verifies mixed-case short name normalization)
+            await this.viewModel.InitializeViewModel("Starion");
 
             using (Assert.EnterMultipleScope())
             {

@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 {
     using System;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -18,8 +19,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
     using BlazorBlueprint.Primitives.Extensions;
 
     using Bunit;
-
-    using ErrorOr;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -88,7 +87,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             this.viewModelMock.Setup(x => x.Organizations).Returns([this.adminOrganization, this.memberOrganization]);
 
             var scopeServiceMock = new Mock<IScopeService>();
-            scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Not found"));
+            scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList<IScope>.Empty);
 
             var userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(new UserContext());

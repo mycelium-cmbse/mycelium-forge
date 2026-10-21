@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="UmlCoreServiceGenerator.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -15,6 +15,8 @@ namespace Mycelium.Forge.Generator.Generators
     using uml4net.HandleBars;
     using uml4net.StructuredClassifiers;
     using uml4net.xmi.Readers;
+
+    using PropertyHelper = Mycelium.Forge.Generator.HandleBarHelpers.PropertyHelper;
 
     /// <summary>
     /// A UML Handlebars based Service code generator that generates domain entity service interfaces,
@@ -142,6 +144,8 @@ namespace Mycelium.Forge.Generator.Generators
             this.Handlebars.RegisterEnumHelper();
             this.Handlebars.RegisterDecoratorHelper();
             this.Handlebars.RegisterNamedElementHelper();
+
+            PropertyHelper.RegisterPropertyHelper(this.Handlebars);
         }
 
         /// <summary>

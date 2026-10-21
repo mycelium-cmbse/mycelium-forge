@@ -312,6 +312,21 @@ namespace Mycelium.Forge.Generator.Extensions
                     .OrderBy(subclass => subclass.Name)
                     .ToList();
             }
+
+            /// <summary>
+            /// Queries all indexable data-type properties for a class, including inherited properties from its hierarchy,
+            /// excluding root Thing properties.
+            /// </summary>
+            /// <returns>A collection of indexable <see cref="IProperty" /> instances.</returns>
+            public IEnumerable<IProperty> QueryIndexableProperties()
+            {
+                ArgumentNullException.ThrowIfNull(@class);
+
+                return @class.QueryDtoClassProperties()
+                    .Where(p => p.QueryIsDataType() && p.QueryIsIndexable() && p.Class.Name != ModelConstants.ThingName)
+                    .DistinctBy(p => p.Name)
+                    .OrderBy(p => p.Name);
+            }
         }
     }
 }

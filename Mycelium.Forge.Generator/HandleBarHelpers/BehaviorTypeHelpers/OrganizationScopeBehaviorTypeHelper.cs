@@ -15,6 +15,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
     using Mycelium.Forge.Generator.Models;
 
+    using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
 
     /// <summary>
@@ -241,24 +242,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             if (!config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase) &&
                 !config.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
             {
-                var ownerPropCamel = char.ToLowerInvariant(config.OwnerProperty[0]) + config.OwnerProperty[1..];
+                var ownerPropCamel = config.OwnerProperty.LowerCaseFirstLetter();
                 ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{ownerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
             }
 
             if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
             {
-                var maintainerPropCamel = char.ToLowerInvariant(definition.MaintainerProperty[0]) + definition.MaintainerProperty[1..];
+                var maintainerPropCamel = definition.MaintainerProperty.LowerCaseFirstLetter();
                 ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{maintainerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
             }
 
             var ownerChecksSql = string.Join("\r\n                        OR ", ownerChecks);
             var bypassSql = string.Join(" OR ", config.BypassPermissions.Select(p => $"@can{p} = true"));
 
-            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop =>
-            {
-                var propCamel = char.ToLowerInvariant(prop[0]) + prop[1..];
-                return $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{propCamel}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"owner\" AND \"targetAccount\" = @callerAccountId)";
-            });
+            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop => $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{prop.LowerCaseFirstLetter()}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"owner\" AND \"targetAccount\" = @callerAccountId)");
 
             var scopeLinksSql = string.Join("\r\n                                        OR ", scopeLinkChecks);
 

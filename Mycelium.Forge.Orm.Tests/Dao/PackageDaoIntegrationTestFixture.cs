@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDaoIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -59,7 +59,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
-                var result = await this.packageDao.CreateAsync(transaction, CancellationToken.None, package);
+                var result = await this.packageDao.CreateAsync(transaction, package, CancellationToken.None);
                 await transaction.CommitAsync();
 
                 Assert.That(result.IsSuccess, Is.True);
@@ -104,11 +104,11 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Visibility = VisibilityKind.PUBLIC
             };
 
-            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, package));
+            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, package, CancellationToken.None));
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
-                var deleteResult = await this.packageDao.DeleteAsync(transaction, CancellationToken.None, [package]);
+                var deleteResult = await this.packageDao.DeleteAsync(transaction, [package], CancellationToken.None);
                 await transaction.CommitAsync();
                 Assert.That(deleteResult.IsError, Is.False);
             }
@@ -143,7 +143,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Visibility = VisibilityKind.PUBLIC
             };
 
-            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, package));
+            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, package, CancellationToken.None));
 
             var org1PackageId = Guid.NewGuid();
 
@@ -159,7 +159,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Visibility = VisibilityKind.INTERNAL
             };
 
-            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, org1InternalPackage));
+            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, org1InternalPackage, CancellationToken.None));
 
             var orgBUserContext = new UserContext
             {
@@ -175,8 +175,9 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
             };
 
-            var orgBFilter = PackageReadFilter.FromUserContext(orgBUserContext);
-            var orgAFilter = PackageReadFilter.FromUserContext(orgAUserContext);
+            var readFilter = new PackageReadFilter();
+            var orgBFilter = readFilter.FromUserContext(orgBUserContext);
+            var orgAFilter = readFilter.FromUserContext(orgAUserContext);
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
@@ -221,7 +222,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Visibility = VisibilityKind.PUBLIC
             };
 
-            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, package));
+            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, package, CancellationToken.None));
 
             await using var transaction = await this.Connection.BeginTransactionAsync();
             var identifiers = await this.packageDao.ReadIdentifiersAsync(transaction, CancellationToken.None);
@@ -251,7 +252,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Visibility = VisibilityKind.PRIVATE
             };
 
-            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, CancellationToken.None, package));
+            await this.Insert(transaction => this.packageDao.CreateAsync(transaction, package, CancellationToken.None));
 
             package.Name = "UpdatedPackageName";
             package.Listed = true;
@@ -259,7 +260,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
-                var updateResult = await this.packageDao.UpdateAsync(transaction, CancellationToken.None, package);
+                var updateResult = await this.packageDao.UpdateAsync(transaction, package, CancellationToken.None);
                 await transaction.CommitAsync();
                 Assert.That(updateResult.IsSuccess, Is.True);
             }
@@ -318,7 +319,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Description = "Test Forge"
             };
 
-            await this.Insert(transaction => forgeDao.CreateAsync(transaction, CancellationToken.None, forge));
+            await this.Insert(transaction => forgeDao.CreateAsync(transaction, forge, CancellationToken.None));
 
             var countryId = Guid.NewGuid();
 
@@ -332,7 +333,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 NumericCode = "840"
             };
 
-            await this.Insert(transaction => countryDao.CreateAsync(transaction, CancellationToken.None, country));
+            await this.Insert(transaction => countryDao.CreateAsync(transaction, country, CancellationToken.None));
 
             this.accountId = Guid.NewGuid();
             var addressId = Guid.NewGuid();
@@ -367,14 +368,14 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 await using var setConstraints = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
                 await setConstraints.ExecuteNonQueryAsync();
 
-                var addressResult = await addressDao.CreateAsync(transaction, CancellationToken.None, address);
+                var addressResult = await addressDao.CreateAsync(transaction, address, CancellationToken.None);
 
                 if (addressResult.IsError)
                 {
                     return addressResult;
                 }
 
-                return await accountDao.CreateAsync(transaction, CancellationToken.None, account);
+                return await accountDao.CreateAsync(transaction, account, CancellationToken.None);
             });
 
             this.otherAccountId = Guid.NewGuid();
@@ -410,14 +411,14 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 await using var setConstraints = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
                 await setConstraints.ExecuteNonQueryAsync();
 
-                var addressResult = await addressDao.CreateAsync(transaction, CancellationToken.None, otherAddress);
+                var addressResult = await addressDao.CreateAsync(transaction, otherAddress, CancellationToken.None);
 
                 if (addressResult.IsError)
                 {
                     return addressResult;
                 }
 
-                return await accountDao.CreateAsync(transaction, CancellationToken.None, otherAccount);
+                return await accountDao.CreateAsync(transaction, otherAccount, CancellationToken.None);
             });
 
             var organizationDao = new OrganizationDao(
@@ -459,8 +460,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Member = [this.otherAccountId]
             };
 
-            await this.Insert(transaction => organizationDao.CreateAsync(transaction, CancellationToken.None, org1));
-            await this.Insert(transaction => organizationDao.CreateAsync(transaction, CancellationToken.None, org2));
+            await this.Insert(transaction => organizationDao.CreateAsync(transaction, org1, CancellationToken.None));
+            await this.Insert(transaction => organizationDao.CreateAsync(transaction, org2, CancellationToken.None));
 
             this.packageTypeId = Guid.NewGuid();
 
@@ -472,7 +473,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Description = "UML Model Package Type"
             };
 
-            await this.Insert(transaction => this.packageTypeDao.CreateAsync(transaction, CancellationToken.None, packageType));
+            await this.Insert(transaction => this.packageTypeDao.CreateAsync(transaction, packageType, CancellationToken.None));
         }
     }
 }
