@@ -10,6 +10,8 @@
 namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -18,8 +20,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
     using BlazorBlueprint.Primitives.Extensions;
 
     using Bunit;
-
-    using ErrorOr;
 
     using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.DependencyInjection;
@@ -179,7 +179,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
             }
 
             // Scenario 4: Account not found
-            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "unknown", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("unknown")))).ReturnsAsync(ImmutableList<IAccount>.Empty);
             await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("unknown"));
             await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
             await dialog.InvokeAsync(() => submitButton.ClickAsync());
@@ -192,7 +192,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
 
             // Scenario 5: Self transfer
             var selfAccount = new Account { Id = this.currentUserId, ShortName = "self" };
-            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "self", It.IsAny<CancellationToken>())).ReturnsAsync(selfAccount);
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("self")))).ReturnsAsync(ImmutableList.Create<IAccount>(selfAccount));
             await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("self"));
             await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
             await dialog.InvokeAsync(() => submitButton.ClickAsync());
@@ -205,7 +205,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings.Dialogs
 
             // Scenario 6: Valid transfer
             var targetAccount = new Account { Id = Guid.NewGuid(), ShortName = "newowner" };
-            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, "newowner", It.IsAny<CancellationToken>())).ReturnsAsync(targetAccount);
+            this.accountServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("newowner")))).ReturnsAsync(ImmutableList.Create<IAccount>(targetAccount));
             await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("newowner"));
             await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("Starion Group"));
             await dialog.InvokeAsync(() => submitButton.ClickAsync());

@@ -128,21 +128,23 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
             }
 
             var userContext = await this.UserService.GetUserContext();
-            var accountResult = await this.AccountService.ReadByShortNameAsync(userContext, this.TargetAccount, CancellationToken.None);
+            var accountResult = await this.AccountService.ReadByShortNameAsync(userContext, CancellationToken.None, [this.TargetAccount]);
 
-            if (accountResult.IsError)
+            if (accountResult.IsError || accountResult.Value.Count == 0)
             {
                 this.ValidationManager.Check(nameof(this.TargetAccount), false, $"Account '{this.TargetAccount}' not found.");
                 return;
             }
 
-            if (userContext.AccountId.HasValue && accountResult.Value.Id == userContext.AccountId.Value)
+            var account = accountResult.Value[0];
+
+            if (userContext.AccountId.HasValue && account.Id == userContext.AccountId.Value)
             {
                 this.ValidationManager.Check(nameof(this.TargetAccount), false, "You cannot transfer ownership to yourself.");
                 return;
             }
 
-            await this.OnResult.InvokeAsync(accountResult.Value);
+            await this.OnResult.InvokeAsync(account);
 
             if (this.DialogReference != null)
             {
