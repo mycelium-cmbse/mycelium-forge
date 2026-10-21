@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SeedData.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -355,29 +355,29 @@ namespace Mycelium.Forge.Data
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
+                    PublicationDate = baseDate.AddDays(-30),
                     Owner = SysmlIsqQuantitiesPackage.Id,
                     Version = "2025.2",
                     DownloadCount = 1400,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-30)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SysmlKernelLibraryPackage.Id,
+                    PublicationDate = baseDate.AddDays(-30),
                     Version = "2025.2",
                     DownloadCount = 2100,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-30)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = EcssEnvironmentPackage.Id,
                     Version = "1.0.0",
+                    PublicationDate = baseDate.AddDays(-60),
                     DownloadCount = 860,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-60)
+                    Listed = true
                 },
                 new PackageVersion
                 {
@@ -385,35 +385,35 @@ namespace Mycelium.Forge.Data
                     Owner = EcssPowerSubsystemPackage.Id,
                     Version = "1.2.0",
                     DownloadCount = 210,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-14)
+                    PublicationDate = baseDate.AddDays(-14),
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SmallSatPlatformPackage.Id,
                     Version = "0.8.2",
-                    DownloadCount = 145,
                     Listed = true,
+                    DownloadCount = 145,
                     PublicationDate = baseDate.AddDays(-21)
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = EcssRfCommsPackage.Id,
+                    PublicationDate = baseDate.AddDays(-60),
                     Version = "0.3.0",
                     DownloadCount = 190,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-60)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = Cdp4CometCorePackage.Id,
                     Version = "10.25.1",
+                    PublicationDate = baseDate.AddDays(-30),
                     DownloadCount = 320,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-30)
+                    Listed = true
                 },
                 new PackageVersion
                 {
@@ -421,43 +421,43 @@ namespace Mycelium.Forge.Data
                     Owner = CapellaSystemTemplatePackage.Id,
                     Version = "6.1.0",
                     DownloadCount = 185,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-90)
+                    PublicationDate = baseDate.AddDays(-90),
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
+                    PublicationDate = baseDate.AddDays(-90),
                     Owner = EcssMechanicalPackage.Id,
                     Version = "1.0.0",
                     DownloadCount = 165,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-90)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SysmlIsqQuantitiesPackage.Id,
                     Version = "2025.1",
+                    PublicationDate = baseDate.AddDays(-120),
                     DownloadCount = 980,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-120)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SysmlKernelLibraryPackage.Id,
+                    PublicationDate = baseDate.AddDays(-120),
                     Version = "2025.1",
                     DownloadCount = 1450,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-120)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = EcssEnvironmentPackage.Id,
                     Version = "0.9.0",
-                    DownloadCount = 320,
                     Listed = true,
+                    DownloadCount = 320,
                     PublicationDate = baseDate.AddDays(-150)
                 },
                 new PackageVersion
@@ -465,9 +465,9 @@ namespace Mycelium.Forge.Data
                     Id = Guid.NewGuid(),
                     Owner = EcssPowerSubsystemPackage.Id,
                     Version = "1.1.0",
+                    PublicationDate = baseDate.AddDays(-104),
                     DownloadCount = 180,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-104)
+                    Listed = true
                 },
                 new PackageVersion
                 {
@@ -475,17 +475,17 @@ namespace Mycelium.Forge.Data
                     Owner = EcssPowerSubsystemPackage.Id,
                     Version = "1.0.0",
                     DownloadCount = 95,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-194)
+                    PublicationDate = baseDate.AddDays(-194),
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = Cdp4CometCorePackage.Id,
                     Version = "10.25.0",
+                    PublicationDate = baseDate.AddDays(-120),
                     DownloadCount = 185,
-                    Listed = true,
-                    PublicationDate = baseDate.AddDays(-120)
+                    Listed = true
                 }
             ];
 
