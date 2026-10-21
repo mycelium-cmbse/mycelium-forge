@@ -155,7 +155,7 @@ namespace Mycelium.Forge.Common
                 PackageType = this.PackageType,
                 ShortName = this.ShortName,
                 Version = [.. this.Version],
-                Visibility = this.Visibility,
+                Visibility = this.Visibility
             };
         }
     }

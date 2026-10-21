@@ -117,7 +117,7 @@ namespace Mycelium.Forge.Common
                 Package = this.Package,
                 PackageInvitationKind = this.PackageInvitationKind,
                 Status = this.Status,
-                Target = this.Target,
+                Target = this.Target
             };
         }
     }

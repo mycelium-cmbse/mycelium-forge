@@ -117,7 +117,7 @@ namespace Mycelium.Forge.Common
                 OrganizationInvitationKind = this.OrganizationInvitationKind,
                 Owner = this.Owner,
                 Status = this.Status,
-                Target = this.Target,
+                Target = this.Target
             };
         }
     }

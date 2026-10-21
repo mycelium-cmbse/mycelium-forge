@@ -84,7 +84,7 @@ namespace Mycelium.Forge.Common
                 Id = this.Id,
                 ModifiedAt = this.ModifiedAt,
                 Name = this.Name,
-                Owner = this.Owner,
+                Owner = this.Owner
             };
         }
     }

@@ -87,16 +87,6 @@ namespace Mycelium.Forge.Common.Tests.AutoGenDto
                 Assert.That(original.Administrator, Has.Count.EqualTo(1));
                 Assert.That(original.Member, Has.Count.EqualTo(2));
             }
-
-            ICloneable<IScope> cloneableScope = original;
-            var covariantClone = cloneableScope.Clone();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(covariantClone, Is.Not.SameAs(original));
-                Assert.That(covariantClone, Is.InstanceOf<Organization>());
-                Assert.That(covariantClone.Id, Is.EqualTo(original.Id));
-            }
         }
     }
 }

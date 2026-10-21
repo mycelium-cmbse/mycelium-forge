@@ -80,7 +80,7 @@ namespace Mycelium.Forge.Common
                 ModifiedAt = this.ModifiedAt,
                 Owner = this.Owner,
                 ProfileType = this.ProfileType,
-                Uri = this.Uri,
+                Uri = this.Uri
             };
         }
     }

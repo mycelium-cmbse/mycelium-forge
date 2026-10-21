@@ -114,7 +114,7 @@ namespace Mycelium.Forge.Common
                 Owner = this.Owner,
                 Permissions = [.. this.Permissions],
                 RevokedAt = this.RevokedAt,
-                SecretHash = [.. this.SecretHash],
+                SecretHash = [.. this.SecretHash]
             };
         }
     }

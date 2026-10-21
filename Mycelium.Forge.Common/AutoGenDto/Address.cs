@@ -115,7 +115,7 @@ namespace Mycelium.Forge.Common
                 ModifiedAt = this.ModifiedAt,
                 Owner = this.Owner,
                 PostalCode = this.PostalCode,
-                Region = this.Region,
+                Region = this.Region
             };
         }
     }

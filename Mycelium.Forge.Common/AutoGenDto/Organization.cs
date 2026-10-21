@@ -199,7 +199,7 @@ namespace Mycelium.Forge.Common
                 ProfileLink = [.. this.ProfileLink],
                 ShortName = this.ShortName,
                 Status = this.Status,
-                Website = this.Website,
+                Website = this.Website
             };
         }
     }

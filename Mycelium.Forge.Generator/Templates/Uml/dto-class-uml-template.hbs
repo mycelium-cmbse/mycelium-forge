@@ -39,9 +39,7 @@ namespace Mycelium.Forge.Common
         {
             return new {{this.Name}}
             {
-                {{ #each (Class.QueryDtoClassProperties this) as | property | }}
-                {{ #Property.WriteCloneAssignment property ../ }}
-                {{/each~}}
+                {{ #Property.WriteCloneAssignments this }}
             };
         }
     }

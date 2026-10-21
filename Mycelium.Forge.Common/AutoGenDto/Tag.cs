@@ -59,7 +59,7 @@ namespace Mycelium.Forge.Common
             {
                 IsCurated = this.IsCurated,
                 Name = this.Name,
-                Owner = this.Owner,
+                Owner = this.Owner
             };
         }
     }

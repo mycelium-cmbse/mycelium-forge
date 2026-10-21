@@ -145,7 +145,7 @@ namespace Mycelium.Forge.Common
                 PackageType = [.. this.PackageType],
                 ProfileType = [.. this.ProfileType],
                 ShortName = this.ShortName,
-                Tag = [.. this.Tag],
+                Tag = [.. this.Tag]
             };
         }
     }

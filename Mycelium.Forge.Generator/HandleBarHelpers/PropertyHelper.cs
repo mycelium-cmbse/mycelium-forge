@@ -261,27 +261,29 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 writer.WriteSafeString(sb + Environment.NewLine);
             });
 
-            // Writes the object initializer assignment copying a property in the generated Clone() method; lists are shallow copied
-            handlebars.RegisterHelper("Property.WriteCloneAssignment", (writer, _, parameters) =>
+            // Writes the object initializer assignments copying properties in the generated Clone() method without a trailing comma
+            handlebars.RegisterHelper("Property.WriteCloneAssignments", (writer, _, parameters) =>
             {
-                var property = parameters.QueryFirst<IProperty>("Property.WriteCloneAssignment");
-                var classContext = parameters.QueryAt<IClass>(1, "Property.WriteCloneAssignment");
+                var classContext = parameters.QueryFirst<IClass>("Property.WriteCloneAssignments");
 
-                if (property.TryQueryRedefinedByProperty(classContext, out var _))
+                var properties = classContext.QueryDtoClassProperties()
+                    .Where(p => !p.TryQueryRedefinedByProperty(classContext, out var _))
+                    .ToList();
+
+                var lines = properties.Select(property =>
                 {
-                    return;
-                }
+                    var propertyName = property.Name.CapitalizeFirstLetter();
 
-                var propertyName = property.Name.CapitalizeFirstLetter();
+                    if (property.IsDerived || property.IsDerivedUnion)
+                    {
+                        propertyName = propertyName.LowerCaseFirstLetter();
+                    }
 
-                if (property.IsDerived || property.IsDerivedUnion)
-                {
-                    propertyName = propertyName.LowerCaseFirstLetter();
-                }
+                    var value = property.QueryIsEnumerable() ? $"[.. this.{propertyName}]" : $"this.{propertyName}";
+                    return $"                {propertyName} = {value}";
+                });
 
-                var value = property.QueryIsEnumerable() ? $"[.. this.{propertyName}]" : $"this.{propertyName}";
-
-                writer.WriteSafeString($"{propertyName} = {value},{Environment.NewLine}");
+                writer.WriteSafeString(string.Join("," + Environment.NewLine, lines));
             });
         }
 

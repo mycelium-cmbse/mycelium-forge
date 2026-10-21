@@ -82,7 +82,7 @@ namespace Mycelium.Forge.Common
                 LogoBlobReference = this.LogoBlobReference,
                 ModifiedAt = this.ModifiedAt,
                 Name = this.Name,
-                Owner = this.Owner,
+                Owner = this.Owner
             };
         }
     }
