@@ -14,16 +14,38 @@ namespace Mycelium.Forge.Common.Extensions
     /// </summary>
     public static class StringExtensions
     {
-        /// <summary>
-        /// Sanitizes the string for logging by removing carriage return and newline characters to prevent log injection.
-        /// </summary>
         /// <param name="value">The string value to sanitize.</param>
-        /// <returns>A log-safe string value, or an empty string if the input is null or empty.</returns>
-        public static string SanitizeForLog(this string value)
+        extension(string value)
         {
-            return string.IsNullOrEmpty(value)
-                ? string.Empty
-                : value.Replace("\r", string.Empty).Replace("\n", string.Empty);
+            /// <summary>
+            /// Sanitizes the string for logging by removing carriage return and newline characters to prevent log injection.
+            /// </summary>
+            /// <returns>A log-safe string value, or an empty string if the input is null or empty.</returns>
+            public string SanitizeForLog()
+            {
+                return string.IsNullOrEmpty(value)
+                    ? string.Empty
+                    : value.Replace("\r", string.Empty).Replace("\n", string.Empty);
+            }
+
+            /// <summary>
+            /// Converts the first character of the string to lowercase using invariant culture.
+            /// </summary>
+            /// <returns>The string with its first character converted to lowercase, or an empty string if the input is null or empty.</returns>
+            public string ToLowerCaseFirst()
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return string.Empty;
+                }
+
+                if (value.Length == 1)
+                {
+                    return char.ToLowerInvariant(value[0]).ToString();
+                }
+
+                return char.ToLowerInvariant(value[0]) + value[1..];
+            }
         }
     }
 }
