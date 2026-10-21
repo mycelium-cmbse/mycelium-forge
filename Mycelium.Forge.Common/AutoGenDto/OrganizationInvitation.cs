@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Common
     /// invitations.
     /// </summary>
     [Class(xmiId: "EAID_308123F2_0EF0_4cca_B5D2_ED4A358E022B", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class OrganizationInvitation : IOrganizationInvitation
+    public partial class OrganizationInvitation : IOrganizationInvitation, ICloneable<OrganizationInvitation>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -99,6 +99,27 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_dst018175_11F9_4022_84DE_4FA17FC3D3B2", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IOrganizationInvitation.Target")]
         public Guid Target { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="OrganizationInvitation" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="OrganizationInvitation" /> instance with the same property values.</returns>
+        public OrganizationInvitation Clone()
+        {
+            return new OrganizationInvitation
+            {
+                CreatedAt = this.CreatedAt,
+                ExperiesAt = this.ExperiesAt,
+                Id = this.Id,
+                isExpired = this.isExpired,
+                ModifiedAt = this.ModifiedAt,
+                Organization = this.Organization,
+                OrganizationInvitationKind = this.OrganizationInvitationKind,
+                Owner = this.Owner,
+                Status = this.Status,
+                Target = this.Target,
+            };
+        }
     }
 }
 

@@ -20,7 +20,7 @@ namespace Mycelium.Forge.Common
 
     {{ #Documentation this }}
     {{ #Decorator.WriteClassAttribute this }}
-    {{ Enum.ToString this.Visibility }} partial class {{this.Name}} : I{{this.Name}}
+    {{ Enum.ToString this.Visibility }} partial class {{this.Name}} : I{{this.Name}}, ICloneable<{{this.Name}}>
     {
         {{ #each (Class.QueryDtoClassProperties this) as | property | }}
         {{ #Property.WriteDocumentation property }}
@@ -30,7 +30,20 @@ namespace Mycelium.Forge.Common
         {{ #Decorator.WriteRedefinedByPropertyAttribute property ../ }}
         {{ #Decorator.WriteImplementsAttribute property }}
         {{ #Property.WriteForDTOClass property ../ }}{{#unless @last}}
-{{/unless}}{{/each~}}
+{{/unless}}{{/each}}
+        /// <summary>
+        /// Creates a copy of this <see cref="{{this.Name}}" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="{{this.Name}}" /> instance with the same property values.</returns>
+        public {{this.Name}} Clone()
+        {
+            return new {{this.Name}}
+            {
+                {{ #each (Class.QueryDtoClassProperties this) as | property | }}
+                {{ #Property.WriteCloneAssignment property ../ }}
+                {{/each~}}
+            };
+        }
     }
 }
 

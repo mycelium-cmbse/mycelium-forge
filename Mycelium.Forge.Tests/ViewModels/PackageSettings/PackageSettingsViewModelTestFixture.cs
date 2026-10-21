@@ -177,6 +177,8 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         [Test]
         public async Task VerifyDeprecateVersion()
         {
+            this.viewModel.Versions = [this.version];
+
             // Scenario 1: Failure
             this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
 
@@ -254,6 +256,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         public async Task VerifyRelistVersion()
         {
             this.version.Listed = false;
+            this.viewModel.Versions = [this.version];
 
             // Scenario 1: Failure
             this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
@@ -315,6 +318,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         public async Task VerifyUnlistVersion()
         {
             this.version.Listed = true;
+            this.viewModel.Versions = [this.version];
 
             // Scenario 1: Failure
             this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));

@@ -204,19 +204,32 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         [Test]
         public async Task VerifyResendInvitation()
         {
-            // Scenario 1: Success
-            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+            var originalExpiresAt = this.matchingInvitation.ExperiesAt;
+            this.viewModel.PendingInvitations = [this.matchingInvitation];
 
-            await this.viewModel.ResendInvitation(this.matchingInvitation);
-
-            Assert.That(this.matchingInvitation.ExperiesAt, Is.GreaterThan(DateTime.UtcNow));
-
-            // Scenario 2: Failure
+            // Scenario 1: Failure preserves the original
             this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
 
             await this.viewModel.ResendInvitation(this.matchingInvitation);
 
-            this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations[0], Is.SameAs(this.matchingInvitation));
+                Assert.That(this.matchingInvitation.ExperiesAt, Is.EqualTo(originalExpiresAt));
+                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            }
+
+            // Scenario 2: Success replaces the invitation with the updated clone
+            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+
+            await this.viewModel.ResendInvitation(this.matchingInvitation);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations[0], Is.Not.SameAs(this.matchingInvitation));
+                Assert.That(this.viewModel.PendingInvitations[0].ExperiesAt, Is.GreaterThan(DateTime.UtcNow));
+                Assert.That(this.matchingInvitation.ExperiesAt, Is.EqualTo(originalExpiresAt));
+            }
         }
 
         [Test]

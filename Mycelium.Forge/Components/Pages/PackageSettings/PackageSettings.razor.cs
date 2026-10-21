@@ -135,7 +135,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// </summary>
         /// <param name="version">The package version to unlist.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnUnlistVersion(IPackageVersion version)
+        private async Task OnUnlistVersion(PackageVersion version)
         {
             var onResult = new EventCallbackFactory().Create(this, async () => { await this.ViewModel.UnlistVersion(version); });
 
@@ -161,7 +161,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// </summary>
         /// <param name="version">The package version to relist.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnRelistVersion(IPackageVersion version)
+        private async Task OnRelistVersion(PackageVersion version)
         {
             await this.ViewModel.RelistVersion(version);
         }
@@ -171,7 +171,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// </summary>
         /// <param name="version">The package version to deprecate.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnDeprecateVersion(IPackageVersion version)
+        private async Task OnDeprecateVersion(PackageVersion version)
         {
             await this.ViewModel.DeprecateVersion(version);
         }

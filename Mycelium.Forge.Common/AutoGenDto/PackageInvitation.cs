@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Common
     /// invitations.
     /// </summary>
     [Class(xmiId: "EAID_78946262_88A9_441c_B65D_B0BD9BB8420A", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class PackageInvitation : IPackageInvitation
+    public partial class PackageInvitation : IPackageInvitation, ICloneable<PackageInvitation>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -99,6 +99,27 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_dst987416_2AAB_4120_9898_1EEA35FA0EF9", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackageInvitation.Target")]
         public Guid Target { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="PackageInvitation" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="PackageInvitation" /> instance with the same property values.</returns>
+        public PackageInvitation Clone()
+        {
+            return new PackageInvitation
+            {
+                CreatedAt = this.CreatedAt,
+                ExperiesAt = this.ExperiesAt,
+                Id = this.Id,
+                isExpired = this.isExpired,
+                ModifiedAt = this.ModifiedAt,
+                Owner = this.Owner,
+                Package = this.Package,
+                PackageInvitationKind = this.PackageInvitationKind,
+                Status = this.Status,
+                Target = this.Target,
+            };
+        }
     }
 }
 

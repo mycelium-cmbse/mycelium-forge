@@ -264,6 +264,34 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 writer.WriteSafeString(sb + Environment.NewLine);
             });
+
+            // Writes the object initializer assignment copying a property in the generated Clone() method; lists are shallow copied
+            handlebars.RegisterHelper("Property.WriteCloneAssignment", (writer, _, parameters) =>
+            {
+                if (parameters.Length != 2)
+                {
+                    throw new HandlebarsException("{{#Property.WriteCloneAssignment}} helper must have exactly two arguments");
+                }
+
+                var property = parameters.QueryFirst<IProperty>("Property.WriteCloneAssignment");
+                var classContext = parameters[1] as IClass ?? throw new HandlebarsException("Property.WriteCloneAssignment requires an IClass second argument.");
+
+                if (property.TryQueryRedefinedByProperty(classContext, out var _))
+                {
+                    return;
+                }
+
+                var propertyName = property.Name.CapitalizeFirstLetter();
+
+                if (property.IsDerived || property.IsDerivedUnion)
+                {
+                    propertyName = propertyName.LowerCaseFirstLetter();
+                }
+
+                var value = property.QueryIsEnumerable() ? $"[.. this.{propertyName}]" : $"this.{propertyName}";
+
+                writer.WriteSafeString($"{propertyName} = {value},{Environment.NewLine}");
+            });
         }
 
         /// <summary>

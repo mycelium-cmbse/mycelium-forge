@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Common
     /// Organization or an Account) and containing one or more PackageVersions
     /// </summary>
     [Class(xmiId: "EAID_65683CA4_032F_457d_B996_A3893C4293CA", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class Package : IPackage
+    public partial class Package : IPackage, ICloneable<Package>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -133,6 +133,31 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_84CB2554_8FEB_49ee_ADC4_8AEAECB7D2D1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackage.Visibility")]
         public VisibilityKind Visibility { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Package" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="Package" /> instance with the same property values.</returns>
+        public Package Clone()
+        {
+            return new Package
+            {
+                CreatedAt = this.CreatedAt,
+                Description = this.Description,
+                downloadCount = this.downloadCount,
+                Id = this.Id,
+                Listed = this.Listed,
+                ModifiedAt = this.ModifiedAt,
+                Name = this.Name,
+                Owner = this.Owner,
+                PackageMaintainer = [.. this.PackageMaintainer],
+                PackageOwner = [.. this.PackageOwner],
+                PackageType = this.PackageType,
+                ShortName = this.ShortName,
+                Version = [.. this.Version],
+                Visibility = this.Visibility,
+            };
+        }
     }
 }
 

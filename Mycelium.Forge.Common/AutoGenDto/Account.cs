@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Common
     /// additionally be granted administrator status on an Organization it belongs to
     /// </summary>
     [Class(xmiId: "EAID_CE60B1AB_3927_4382_B362_016EA94A2C80", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class Account : IAccount
+    public partial class Account : IAccount, ICloneable<Account>
     {
         /// <summary>
         /// The addresses that are owned or contained by the Scope
@@ -179,6 +179,37 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_2F9A52BC_EA1F_4af4_B07C_0FA5005BCF26", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IScope.Website")]
         public string Website { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Account" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="Account" /> instance with the same property values.</returns>
+        public Account Clone()
+        {
+            return new Account
+            {
+                Address = [.. this.Address],
+                ApiKey = [.. this.ApiKey],
+                AvatarBlobReference = this.AvatarBlobReference,
+                BillingEmail = this.BillingEmail,
+                CreatedAt = this.CreatedAt,
+                DefaultPackageVisibility = this.DefaultPackageVisibility,
+                Email = this.Email,
+                Id = this.Id,
+                ModifiedAt = this.ModifiedAt,
+                Name = this.Name,
+                Origin = this.Origin,
+                OwnedOrganizationInvitation = [.. this.OwnedOrganizationInvitation],
+                OwnedPackage = [.. this.OwnedPackage],
+                OwnedPackageInvitation = this.OwnedPackageInvitation,
+                Owner = this.Owner,
+                PrimaryAddress = this.PrimaryAddress,
+                ProfileLink = [.. this.ProfileLink],
+                ShortName = this.ShortName,
+                Status = this.Status,
+                Website = this.Website,
+            };
+        }
     }
 }
 

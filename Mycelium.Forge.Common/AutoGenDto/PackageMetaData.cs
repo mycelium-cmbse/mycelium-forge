@@ -21,7 +21,7 @@ namespace Mycelium.Forge.Common
     /// <summary>
     /// </summary>
     [Class(xmiId: "EAID_5C5C60CB_80CD_4aef_9FE8_BC1E4803B3F1", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class PackageMetaData : IPackageMetaData
+    public partial class PackageMetaData : IPackageMetaData, ICloneable<PackageMetaData>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -50,6 +50,21 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_src94AFDF_F62B_4600_9B44_6076F54197E6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "IPackageMetaData.Owner")]
         public Guid Owner { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="PackageMetaData" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="PackageMetaData" /> instance with the same property values.</returns>
+        public PackageMetaData Clone()
+        {
+            return new PackageMetaData
+            {
+                CreatedAt = this.CreatedAt,
+                Id = this.Id,
+                ModifiedAt = this.ModifiedAt,
+                Owner = this.Owner,
+            };
+        }
     }
 }
 

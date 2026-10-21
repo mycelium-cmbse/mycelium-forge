@@ -27,7 +27,7 @@ namespace Mycelium.Forge.Common
     /// protocol-specific API endpoint the Forge routes a given Package through.
     /// </summary>
     [Class(xmiId: "EAID_367F204E_758E_41a5_892F_22A589405944", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class PackageType : IPackageType
+    public partial class PackageType : IPackageType, ICloneable<PackageType>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -70,6 +70,23 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_srcF15AA0_EBC4_4186_B88D_3B78570FFDFA", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "IPackageType.Owner")]
         public Guid Owner { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="PackageType" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="PackageType" /> instance with the same property values.</returns>
+        public PackageType Clone()
+        {
+            return new PackageType
+            {
+                CreatedAt = this.CreatedAt,
+                Description = this.Description,
+                Id = this.Id,
+                ModifiedAt = this.ModifiedAt,
+                Name = this.Name,
+                Owner = this.Owner,
+            };
+        }
     }
 }
 

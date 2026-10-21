@@ -26,7 +26,7 @@ namespace Mycelium.Forge.Common
     /// Package, which only carries the shared, never-changing identity.
     /// </summary>
     [Class(xmiId: "EAID_88E567A2_4C86_4df5_B815_57A992FC2912", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class PackageVersion : IPackageVersion
+    public partial class PackageVersion : IPackageVersion, ICloneable<PackageVersion>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -90,6 +90,26 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_5E3DB552_5872_48f8_BDA3_4CB2ECE6BC69", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackageVersion.Version")]
         public string Version { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="PackageVersion" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="PackageVersion" /> instance with the same property values.</returns>
+        public PackageVersion Clone()
+        {
+            return new PackageVersion
+            {
+                CreatedAt = this.CreatedAt,
+                DownloadCount = this.DownloadCount,
+                Id = this.Id,
+                Listed = this.Listed,
+                MetaData = this.MetaData,
+                ModifiedAt = this.ModifiedAt,
+                Owner = this.Owner,
+                PublicationDate = this.PublicationDate,
+                Version = this.Version,
+            };
+        }
     }
 }
 
