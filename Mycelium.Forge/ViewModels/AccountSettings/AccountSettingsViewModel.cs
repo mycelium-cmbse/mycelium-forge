@@ -161,8 +161,6 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
                 Administrator = [this.currentUserId],
                 Member = [this.currentUserId],
                 Owner = this.forgeContext.ForgeId,
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow,
                 Email = result.BillingEmail
             };
 
