@@ -195,7 +195,13 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             await this.viewModel.DeprecateVersion(this.version, CancellationToken.None);
 
-            this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been deprecated.", "Version Deprecated", NotificationType.Success), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Versions[0], Is.Not.SameAs(this.version));
+                Assert.That(this.viewModel.Versions[0].IsDeprecated, Is.True);
+                Assert.That(this.version.IsDeprecated, Is.False);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been deprecated.", "Version Deprecated", NotificationType.Success), Times.Once);
+            }
         }
 
         [Test]
@@ -274,7 +280,13 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             await this.viewModel.RelistVersion(this.version, CancellationToken.None);
 
-            this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been relisted.", "Version Relisted", NotificationType.Success), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Versions[0], Is.Not.SameAs(this.version));
+                Assert.That(this.viewModel.Versions[0].Listed, Is.True);
+                Assert.That(this.version.Listed, Is.False);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been relisted.", "Version Relisted", NotificationType.Success), Times.Once);
+            }
         }
 
         [Test]
@@ -336,7 +348,13 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             await this.viewModel.UnlistVersion(this.version, CancellationToken.None);
 
-            this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been unlisted.", "Version Unlisted", NotificationType.Success), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Versions[0], Is.Not.SameAs(this.version));
+                Assert.That(this.viewModel.Versions[0].Listed, Is.False);
+                Assert.That(this.version.Listed, Is.True);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been unlisted.", "Version Unlisted", NotificationType.Success), Times.Once);
+            }
         }
     }
 }

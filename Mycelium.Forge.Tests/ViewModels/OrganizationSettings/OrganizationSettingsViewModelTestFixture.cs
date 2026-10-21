@@ -190,6 +190,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Members, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.Organization.Member, Does.Contain(this.memberAccount.Id));
                 this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
@@ -198,7 +199,11 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
 
             await this.viewModel.RemoveMember(this.memberAccount);
 
-            Assert.That(this.viewModel.Members, Has.Count.EqualTo(0));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Members, Has.Count.EqualTo(0));
+                Assert.That(this.viewModel.Organization.Member, Does.Not.Contain(this.memberAccount.Id));
+            }
         }
 
         [Test]
