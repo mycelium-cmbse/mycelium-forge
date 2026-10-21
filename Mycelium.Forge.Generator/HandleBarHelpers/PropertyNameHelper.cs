@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PropertyNameHelper.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -11,12 +11,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 {
     using HandlebarsDotNet;
 
+    using Mycelium.Forge.Generator.Constants;
+
     using uml4net.Classification;
     using uml4net.Extensions;
 
     /// <summary>
     /// A Handlebars helper that writes the C# property name a generated DTO exposes for a given
-    /// <see cref="IProperty"/> - the same naming rule <see cref="PropertyHelper"/> already applies
+    /// <see cref="IProperty" /> - the same naming rule <see cref="PropertyHelper" /> already applies
     /// when declaring the property (<c>property.Name.CapitalizeFirstLetter()</c>, lower-cased first
     /// letter for a derived/derived-union property), extracted into its own helper because the JSON
     /// (de)serializer templates only need the name, not a full property declaration.
@@ -24,10 +26,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     public static class PropertyNameHelper
     {
         /// <summary>
-        /// Registers the <see cref="PropertyNameHelper"/>
+        /// Registers the <see cref="PropertyNameHelper" />
         /// </summary>
         /// <param name="handlebars">
-        /// The <see cref="IHandlebars"/> context with which the helper needs to be registered
+        /// The <see cref="IHandlebars" /> context with which the helper needs to be registered
         /// </param>
         public static void RegisterPropertyNameHelper(this IHandlebars handlebars)
         {
@@ -53,7 +55,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             {
                 var property = arguments.QuerySingle<IProperty>("Property.IsThingId");
 
-                return property.Name.Equals("id", StringComparison.OrdinalIgnoreCase);
+                return property.Name.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase);
             });
 
             // Property.QueryIsString (uml4net core) tests whether the property's UML *type* is
