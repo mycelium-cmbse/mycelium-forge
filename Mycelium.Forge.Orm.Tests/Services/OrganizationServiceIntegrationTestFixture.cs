@@ -106,7 +106,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             var organization = readResult.Value.Single();
             organization.Email = "updated-org@example.com";
             organization.BillingEmail = "updated-billing@example.com";
-            organization.ModifiedAt = DateTime.UtcNow;
 
             var anonymousUpdateResult = await this.service.UpdateAsync(this.anonymousUserContext, transaction, [organization], CancellationToken.None);
             var nonAdminUpdateResult = await this.service.UpdateAsync(this.memberUserContext, transaction, [organization], CancellationToken.None);
