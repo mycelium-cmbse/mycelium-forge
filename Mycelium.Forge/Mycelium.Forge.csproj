@@ -43,6 +43,7 @@
         <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Dal\Mycelium.Forge.Dal.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Orm\Mycelium.Forge.Orm.csproj" />
+        <ProjectReference Include="..\Mycelium.Forge.Extractors\Mycelium.Forge.Extractors.csproj" />
         <ProjectReference Include="..\Mycelium.Forge.Storage\Mycelium.Forge.Storage.csproj" />
         <ProjectReference Include="..\Mycelium.DesignTokens\Mycelium.DesignTokens.csproj" />
     </ItemGroup>

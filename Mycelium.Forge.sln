@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Storage", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Storage.Tests", "Mycelium.Forge.Storage.Tests\Mycelium.Forge.Storage.Tests.csproj", "{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycelium.Forge.Extractors", "Mycelium.Forge.Extractors\Mycelium.Forge.Extractors.csproj", "{55353E91-883B-4859-88E2-9AB75EA2029F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -279,6 +281,18 @@ Global
 		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|x64.Build.0 = Release|Any CPU
 		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|x86.ActiveCfg = Release|Any CPU
 		{D5EE1EF2-FE4A-407F-B429-EAFCC6FAC2C5}.Release|x86.Build.0 = Release|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Debug|x64.Build.0 = Debug|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Debug|x86.Build.0 = Debug|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Release|x64.ActiveCfg = Release|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Release|x64.Build.0 = Release|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Release|x86.ActiveCfg = Release|Any CPU
+		{55353E91-883B-4859-88E2-9AB75EA2029F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
