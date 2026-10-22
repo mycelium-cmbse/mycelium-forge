@@ -16,8 +16,7 @@ namespace Mycelium.Forge.Extractors.Errors
     {
         /// <summary>
         /// The archive is not a valid ZIP, or its top-level <c>.project.json</c> / <c>.meta.json</c> are not exactly one each, or
-        /// an
-        /// indexed model interchange file is missing from the archive.
+        /// an indexed model interchange file is missing from the archive.
         /// </summary>
         public const string InvalidArchive = "Kpar.InvalidArchive";
 
@@ -66,5 +65,10 @@ namespace Mycelium.Forge.Extractors.Errors
         /// The checksum of a model interchange file differs from the one declared in <c>.meta.json</c>.
         /// </summary>
         public const string ChecksumMismatch = "Kpar.ChecksumMismatch";
+
+        /// <summary>
+        /// An unexpected runtime exception occurred while extracting the archive.
+        /// </summary>
+        public const string UnexpectedError = "Kpar.UnexpectedError";
     }
 }

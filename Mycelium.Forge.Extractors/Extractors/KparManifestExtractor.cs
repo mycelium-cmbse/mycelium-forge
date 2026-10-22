@@ -92,6 +92,10 @@ namespace Mycelium.Forge.Extractors.Extractors
             {
                 return Error.Validation(KparErrorCodes.InvalidDescriptor, exception.Message);
             }
+            catch (Exception exception)
+            {
+                return Error.Unexpected(KparErrorCodes.UnexpectedError, exception.Message);
+            }
 
             var errors = Validate(archive);
 
