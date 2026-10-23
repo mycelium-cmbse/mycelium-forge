@@ -29,6 +29,8 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
+    using Npgsql;
+
     [TestFixture]
     public class OrganizationSettingsViewModelTestFixture
     {
@@ -40,15 +42,16 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         private Mock<INotificationService> notificationServiceMock;
         private Mock<IUserService> userServiceMock;
         private Mock<ILogger<OrganizationSettingsViewModel>> loggerMock;
+
         private OrganizationSettingsViewModel viewModel;
-        private UserContext adminUserContext;
-        private UserContext memberUserContext;
         private Organization org;
         private Account adminAccount;
         private Account memberAccount;
         private OrganizationInvitation matchingInvitation;
         private OrganizationInvitation acceptedInvitation;
         private OrganizationInvitation otherOrgInvitation;
+        private UserContext adminUserContext;
+        private UserContext memberUserContext;
 
         [SetUp]
         public void SetUp()
@@ -62,49 +65,52 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             this.userServiceMock = new Mock<IUserService>();
             this.loggerMock = new Mock<ILogger<OrganizationSettingsViewModel>>();
 
+            var orgId = Guid.NewGuid();
             var adminId = Guid.NewGuid();
             var memberId = Guid.NewGuid();
-            var orgId = Guid.NewGuid();
+            var targetUserId = Guid.NewGuid();
 
-            this.adminUserContext = new UserContext { AccountId = adminId };
-            this.memberUserContext = new UserContext { AccountId = memberId };
+            this.adminAccount = new Account { Id = adminId, Name = "Admin User" };
+            this.memberAccount = new Account { Id = memberId, Name = "Member User" };
 
             this.org = new Organization
             {
                 Id = orgId,
-                Name = "Starion Group",
                 ShortName = "starion",
                 Administrator = [adminId],
                 Member = [memberId]
             };
 
-            this.adminAccount = new Account { Id = adminId, Name = "Admin User" };
-            this.memberAccount = new Account { Id = memberId, Name = "Member User" };
-
             this.matchingInvitation = new OrganizationInvitation
             {
                 Id = Guid.NewGuid(),
                 Organization = orgId,
+                Target = targetUserId,
                 Status = InvitationStatusKind.PENDING,
-                Target = Guid.NewGuid(),
-                ExperiesAt = DateTime.UtcNow
+                ExperiesAt = DateTime.UtcNow.AddDays(3)
             };
 
             this.acceptedInvitation = new OrganizationInvitation
             {
                 Id = Guid.NewGuid(),
                 Organization = orgId,
-                Status = InvitationStatusKind.ACCEPTED,
-                Target = Guid.NewGuid()
+                Target = Guid.NewGuid(),
+                Status = InvitationStatusKind.ACCEPTED
             };
 
             this.otherOrgInvitation = new OrganizationInvitation
             {
                 Id = Guid.NewGuid(),
                 Organization = Guid.NewGuid(),
-                Status = InvitationStatusKind.PENDING,
-                Target = Guid.NewGuid()
+                Target = Guid.NewGuid(),
+                Status = InvitationStatusKind.PENDING
             };
+
+            this.adminUserContext = new UserContext { AccountId = adminId };
+            this.memberUserContext = new UserContext { AccountId = memberId };
+
+            this.organizationPermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IOrganization>(), It.IsAny<IOrganization>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((func, _) => func(null!));
 
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.adminUserContext);
             this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("starion")))).ReturnsAsync(ImmutableList.Create<IOrganization>(this.org));
@@ -262,9 +268,47 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         }
 
         [Test]
-        public void VerifyTransferOrganization()
+        public async Task VerifyTransferOrganization()
         {
-            Assert.That(async () => await this.viewModel.TransferOrganization(), Throws.Nothing);
+            await this.viewModel.InitializeViewModel("starion");
+            this.viewModel.CanManageOrganization = true;
+            this.viewModel.Members = [this.adminAccount, this.memberAccount];
+
+            // Scenario 1: Update fails (preserves original)
+            this.organizationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Update failed"));
+
+            var updateFailResult = await this.viewModel.TransferOrganization(this.memberAccount);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(updateFailResult.IsError, Is.True);
+                Assert.That(this.viewModel.Organization, Is.SameAs(this.org));
+                Assert.That(this.viewModel.Organization.Administrator, Does.Contain(this.adminUserContext.AccountId!.Value));
+                Assert.That(this.viewModel.Organization.Administrator, Does.Not.Contain(this.memberAccount.Id));
+                Assert.That(this.org.Administrator, Does.Contain(this.adminUserContext.AccountId!.Value));
+                Assert.That(this.org.Administrator, Does.Not.Contain(this.memberAccount.Id));
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Transfer Error", NotificationType.Error), Times.Once);
+            }
+
+            // Scenario 2: Success
+            var newRecipient = new Account { Id = Guid.NewGuid(), Name = "New Admin" };
+            this.organizationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+
+            var successResult = await this.viewModel.TransferOrganization(newRecipient);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(successResult.IsError, Is.False);
+                Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Member));
+                Assert.That(this.viewModel.Organization, Is.Not.SameAs(this.org));
+                Assert.That(this.viewModel.Organization.Administrator, Does.Contain(newRecipient.Id));
+                Assert.That(this.viewModel.Organization.Administrator, Does.Not.Contain(this.adminUserContext.AccountId!.Value));
+                Assert.That(this.viewModel.Organization.Member, Does.Contain(newRecipient.Id));
+                Assert.That(this.viewModel.Members, Does.Contain(newRecipient));
+                Assert.That(this.org.Administrator, Does.Contain(this.adminUserContext.AccountId!.Value));
+                Assert.That(this.org.Administrator, Does.Not.Contain(newRecipient.Id));
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Ownership Transferred", NotificationType.Success), Times.Once);
+            }
         }
     }
 }
