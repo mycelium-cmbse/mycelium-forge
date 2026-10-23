@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="KparChecksum.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Extractors.Models
+namespace Mycelium.Forge.Extractors.Models.Kpar
 {
     /// <summary>
     /// Represents one <c>checksum</c> entry of a <c>.meta.json</c>.

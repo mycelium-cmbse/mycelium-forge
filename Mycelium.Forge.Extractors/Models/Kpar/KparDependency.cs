@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="KparDependency.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Extractors.Models
+namespace Mycelium.Forge.Extractors.Models.Kpar
 {
     /// <summary>
     /// Represents one <c>usage[]</c> entry of a <c>.project.json</c>, which is an edge of the dependency graph.

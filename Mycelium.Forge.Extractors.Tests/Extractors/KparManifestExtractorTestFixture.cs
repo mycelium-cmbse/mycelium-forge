@@ -17,9 +17,10 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
 
     using Moq;
 
+    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Errors;
     using Mycelium.Forge.Extractors.Extractors;
-    using Mycelium.Forge.Extractors.Models;
+    using Mycelium.Forge.Extractors.Models.Kpar;
     using Mycelium.Forge.Extractors.Tests.Models;
 
     using NUnit.Framework;

@@ -13,9 +13,9 @@ namespace Mycelium.Forge.Extractors.Tests.Extensions
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
 
+    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Extensions;
     using Mycelium.Forge.Extractors.Extractors;
-    using Mycelium.Forge.Extractors.Models;
 
     using NUnit.Framework;
 

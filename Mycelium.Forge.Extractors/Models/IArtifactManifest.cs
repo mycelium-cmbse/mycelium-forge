@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Extractors.Models
 {
+    using Mycelium.Forge.Extractors.Enums;
+
     /// <summary>
     /// Represents the metadata extracted from an artifact of any supported format.
     /// </summary>
