@@ -47,6 +47,9 @@ namespace Mycelium.Forge.Extractors.Tests.Resolvers
                                             }
                                             """;
 
+            var defaultOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            Assert.That(() => JsonSerializer.Deserialize<ExchangeFileHeader>(jsonWithDateTime, defaultOptions), Throws.TypeOf<InvalidOperationException>());
+
             var deserializedWithDate = JsonSerializer.Deserialize<ExchangeFileHeader>(jsonWithDateTime, this.serializerOptions);
 
             using (Assert.EnterMultipleScope())
