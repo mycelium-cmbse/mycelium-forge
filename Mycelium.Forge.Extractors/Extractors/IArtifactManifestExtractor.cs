@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Extractors.Extractors
 {
     using ErrorOr;
 
+    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Models;
 
     /// <summary>

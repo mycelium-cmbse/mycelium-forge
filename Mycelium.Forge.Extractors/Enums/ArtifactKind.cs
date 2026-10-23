@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Extractors.Models
+namespace Mycelium.Forge.Extractors.Enums
 {
     /// <summary>
     /// Enumerates the artifact formats that Forge can publish.

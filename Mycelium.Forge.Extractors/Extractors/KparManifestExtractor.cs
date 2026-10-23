@@ -14,8 +14,10 @@ namespace Mycelium.Forge.Extractors.Extractors
 
     using ErrorOr;
 
+    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Errors;
     using Mycelium.Forge.Extractors.Models;
+    using Mycelium.Forge.Extractors.Models.Kpar;
 
     using SysML2.NET.Kpar;
     using SysML2.NET.ModelInterchange;
