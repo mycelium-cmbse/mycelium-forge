@@ -177,6 +177,8 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         [Test]
         public async Task VerifyDeprecateVersion()
         {
+            this.viewModel.Versions = [this.version];
+
             // Scenario 1: Failure
             this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
 
@@ -193,7 +195,13 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             await this.viewModel.DeprecateVersion(this.version, CancellationToken.None);
 
-            this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been deprecated.", "Version Deprecated", NotificationType.Success), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Versions[0], Is.Not.SameAs(this.version));
+                Assert.That(this.viewModel.Versions[0].IsDeprecated, Is.True);
+                Assert.That(this.version.IsDeprecated, Is.False);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been deprecated.", "Version Deprecated", NotificationType.Success), Times.Once);
+            }
         }
 
         [Test]
@@ -254,6 +262,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         public async Task VerifyRelistVersion()
         {
             this.version.Listed = false;
+            this.viewModel.Versions = [this.version];
 
             // Scenario 1: Failure
             this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
@@ -271,7 +280,13 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             await this.viewModel.RelistVersion(this.version, CancellationToken.None);
 
-            this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been relisted.", "Version Relisted", NotificationType.Success), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Versions[0], Is.Not.SameAs(this.version));
+                Assert.That(this.viewModel.Versions[0].Listed, Is.True);
+                Assert.That(this.version.Listed, Is.False);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been relisted.", "Version Relisted", NotificationType.Success), Times.Once);
+            }
         }
 
         [Test]
@@ -315,6 +330,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         public async Task VerifyUnlistVersion()
         {
             this.version.Listed = true;
+            this.viewModel.Versions = [this.version];
 
             // Scenario 1: Failure
             this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
@@ -332,7 +348,13 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             await this.viewModel.UnlistVersion(this.version, CancellationToken.None);
 
-            this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been unlisted.", "Version Unlisted", NotificationType.Success), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Versions[0], Is.Not.SameAs(this.version));
+                Assert.That(this.viewModel.Versions[0].Listed, Is.False);
+                Assert.That(this.version.Listed, Is.True);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been unlisted.", "Version Unlisted", NotificationType.Success), Times.Once);
+            }
         }
     }
 }

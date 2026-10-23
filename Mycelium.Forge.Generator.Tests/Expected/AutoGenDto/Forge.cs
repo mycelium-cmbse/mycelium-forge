@@ -25,7 +25,7 @@ namespace Mycelium.Forge.Common
     /// which zero or multiple Forge instances exist simultaneously
     /// </summary>
     [Class(xmiId: "EAID_17429100_7982_41d3_AD5A_241745EAC4FE", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class Forge : IForge
+    public partial class Forge : IForge, ICloneable<Forge>
     {
         /// <summary>
         /// The accounts that exist in Forge
@@ -124,6 +124,30 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_dst13B896_A2F7_494b_8A14_ABD1D4CD5362", aggregation: AggregationKind.Composite, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IForge.Tag")]
         public List<Guid> Tag { get; set; } = [];
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Forge" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="Forge" /> instance with the same property values.</returns>
+        public Forge Clone()
+        {
+            return new Forge
+            {
+                Account = [.. this.Account],
+                Administrator = [.. this.Administrator],
+                Country = [.. this.Country],
+                CreatedAt = this.CreatedAt,
+                Description = this.Description,
+                Id = this.Id,
+                ModifiedAt = this.ModifiedAt,
+                Name = this.Name,
+                Organization = [.. this.Organization],
+                PackageType = [.. this.PackageType],
+                ProfileType = [.. this.ProfileType],
+                ShortName = this.ShortName,
+                Tag = [.. this.Tag]
+            };
+        }
     }
 }
 

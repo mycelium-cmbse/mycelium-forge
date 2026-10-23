@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common
     /// Represents a physical or postal address.
     /// </summary>
     [Class(xmiId: "EAID_5E20ADE8_09B7_4fdd_993D_A80F2328C5AE", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class Address : IAddress
+    public partial class Address : IAddress, ICloneable<Address>
     {
         /// <summary>
         /// The primary address line: street name and house/building number, or the main identifying line for
@@ -97,6 +97,27 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_1958E6AE_4997_452b_A3C0_E8B4B04792D0", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IAddress.Region")]
         public string Region { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Address" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="Address" /> instance with the same property values.</returns>
+        public Address Clone()
+        {
+            return new Address
+            {
+                AddressLine1 = this.AddressLine1,
+                AddressLine2 = this.AddressLine2,
+                Country = this.Country,
+                CreatedAt = this.CreatedAt,
+                Id = this.Id,
+                Locality = this.Locality,
+                ModifiedAt = this.ModifiedAt,
+                Owner = this.Owner,
+                PostalCode = this.PostalCode,
+                Region = this.Region
+            };
+        }
     }
 }
 

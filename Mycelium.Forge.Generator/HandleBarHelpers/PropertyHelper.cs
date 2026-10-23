@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using HandlebarsDotNet;
 
+    using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.Extensions;
 
     using uml4net.Classification;
@@ -83,7 +84,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             {
                 var property = arguments.QuerySingle<IProperty>("Property.WriteDocumentation");
 
-                if (property.OwnedComment.Count == 0 && property.Name.Equals("owner", StringComparison.OrdinalIgnoreCase))
+                if (property.OwnedComment.Count == 0 && property.Name.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
                 {
                     var ownerTypeName = property.Type?.Name
                                         ?? property.Opposite?.Class?.Name
@@ -154,13 +155,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             handlebars.RegisterHelper("Property.WriteForDTOClass", (writer, _, parameters) =>
             {
-                if (parameters.Length != 2)
-                {
-                    throw new HandlebarsException("{{#Property.WriteForDTOClass}} helper must have exactly two arguments");
-                }
-
                 var property = parameters.QueryFirst<IProperty>("Property.WriteForDTOClass");
-                var classContext = parameters[1] as IClass ?? throw new HandlebarsException("Property.WriteForDTOClass requires an IClass second argument.");
+                var classContext = parameters.QueryAt<IClass>(1, "Property.WriteForDTOClass");
 
                 var sb = new StringBuilder();
                 var propertyName = property.Name.CapitalizeFirstLetter();
@@ -263,6 +259,31 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 }
 
                 writer.WriteSafeString(sb + Environment.NewLine);
+            });
+
+            // Writes the object initializer assignments copying properties in the generated Clone() method without a trailing comma
+            handlebars.RegisterHelper("Property.WriteCloneAssignments", (writer, _, parameters) =>
+            {
+                var classContext = parameters.QueryFirst<IClass>("Property.WriteCloneAssignments");
+
+                var properties = classContext.QueryDtoClassProperties()
+                    .Where(p => !p.TryQueryRedefinedByProperty(classContext, out var _))
+                    .ToList();
+
+                var lines = properties.Select(property =>
+                {
+                    var propertyName = property.Name.CapitalizeFirstLetter();
+
+                    if (property.IsDerived || property.IsDerivedUnion)
+                    {
+                        propertyName = propertyName.LowerCaseFirstLetter();
+                    }
+
+                    var value = property.QueryIsEnumerable() ? $"[.. this.{propertyName}]" : $"this.{propertyName}";
+                    return $"                {propertyName} = {value}";
+                });
+
+                writer.WriteSafeString(string.Join("," + Environment.NewLine, lines));
             });
         }
 
