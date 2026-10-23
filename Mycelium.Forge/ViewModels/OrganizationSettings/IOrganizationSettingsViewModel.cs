@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.ViewModels.OrganizationSettings
 {
+    using ErrorOr;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Enums;
 
@@ -20,12 +22,17 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the organization profile details.
         /// </summary>
-        IOrganization Organization { get; set; }
+        Organization Organization { get; set; }
 
         /// <summary>
         /// Gets or sets the current user's role within the organization.
         /// </summary>
         OrganizationRole CurrentUserRole { get; set; }
+
+        /// <summary>
+        /// Gets the current user context.
+        /// </summary>
+        IUserContext UserContext { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to manage the organization.
@@ -45,7 +52,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the collection of pending invitations for the organization.
         /// </summary>
-        IReadOnlyList<IOrganizationInvitation> PendingInvitations { get; set; }
+        List<OrganizationInvitation> PendingInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the available role options for organization members.
@@ -84,19 +91,20 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// </summary>
         /// <param name="invitation">The invitation to resend.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task ResendInvitation(IOrganizationInvitation invitation);
+        Task ResendInvitation(OrganizationInvitation invitation);
 
         /// <summary>
         /// Revokes the specified pending invitation asynchronously.
         /// </summary>
         /// <param name="invitation">The invitation to revoke.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task RevokeInvitation(IOrganizationInvitation invitation);
+        Task RevokeInvitation(OrganizationInvitation invitation);
 
         /// <summary>
-        /// Handles initiating an organization transfer asynchronously.
+        /// Transfers ownership of the organization to the specified recipient account asynchronously.
         /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task TransferOrganization();
+        /// <param name="recipient">The recipient account to transfer ownership to.</param>
+        /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
+        Task<ErrorOr<Success>> TransferOrganization(IAccount recipient);
     }
 }

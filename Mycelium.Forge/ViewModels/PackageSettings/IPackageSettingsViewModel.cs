@@ -21,7 +21,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <summary>
         /// Gets or sets the underlying package DTO.
         /// </summary>
-        IPackage Package { get; set; }
+        Package Package { get; set; }
 
         /// <summary>
         /// Gets or sets the owning scope DTO.
@@ -31,17 +31,17 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <summary>
         /// Gets or sets the collection of maintainer accounts for the package.
         /// </summary>
-        IReadOnlyList<IAccount> Maintainers { get; set; }
+        List<IAccount> Maintainers { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of owner accounts for the package.
         /// </summary>
-        IReadOnlyList<IAccount> Owners { get; set; }
+        List<IAccount> Owners { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of released package versions.
         /// </summary>
-        IReadOnlyList<IPackageVersion> Versions { get; set; }
+        List<PackageVersion> Versions { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to manage the package.
@@ -75,7 +75,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <param name="version">The package version to unlist.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task UnlistVersion(IPackageVersion version, CancellationToken token = default);
+        Task UnlistVersion(PackageVersion version, CancellationToken token = default);
 
         /// <summary>
         /// Relists the specified unlisted package version asynchronously.
@@ -83,7 +83,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <param name="version">The package version to relist.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task RelistVersion(IPackageVersion version, CancellationToken token = default);
+        Task RelistVersion(PackageVersion version, CancellationToken token = default);
 
         /// <summary>
         /// Marks the specified package version as deprecated asynchronously.
@@ -91,7 +91,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <param name="version">The package version to deprecate.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task DeprecateVersion(IPackageVersion version, CancellationToken token = default);
+        Task DeprecateVersion(PackageVersion version, CancellationToken token = default);
 
         /// <summary>
         /// Transfers package ownership to the specified recipient scope asynchronously.

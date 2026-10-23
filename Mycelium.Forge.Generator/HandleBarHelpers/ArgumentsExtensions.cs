@@ -16,6 +16,21 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
     /// </summary>
     public static class ArgumentsExtensions
     {
+        /// <summary>
+        /// Describes an expected argument type with the article that reads correctly before it.
+        /// </summary>
+        /// <typeparam name="T">The expected argument type.</typeparam>
+        /// <returns>The article and the type name - for example <c>an IClass</c>.</returns>
+        private static string DescribeExpectedType<T>()
+        {
+            var typeName = typeof(T).Name;
+
+            return "AEIOU".Contains(typeName[0]) ? $"an {typeName}" : $"a {typeName}";
+        }
+
+        /// <summary>
+        /// Unpacks the arguments supplied to a Handlebars helper.
+        /// </summary>
         /// <param name="arguments">The <see cref="Arguments" /> to unpack.</param>
         extension(Arguments arguments)
         {
@@ -51,22 +66,25 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             /// </exception>
             public T QueryFirst<T>(string helperName)
             {
-                return arguments.Length > 0 && arguments[0] is T argument
-                    ? argument
-                    : throw new HandlebarsException($"{helperName} requires {DescribeExpectedType<T>()} first argument.");
+                return arguments.QueryAt<T>(0, helperName);
             }
-        }
 
-        /// <summary>
-        /// Describes an expected argument type with the article that reads correctly before it.
-        /// </summary>
-        /// <typeparam name="T">The expected argument type.</typeparam>
-        /// <returns>The article and the type name - for example <c>an IClass</c>.</returns>
-        private static string DescribeExpectedType<T>()
-        {
-            var typeName = typeof(T).Name;
-
-            return "AEIOU".Contains(typeName[0]) ? $"an {typeName}" : $"a {typeName}";
+            /// <summary>
+            /// Queries the argument at a specified index supplied to a helper.
+            /// </summary>
+            /// <typeparam name="T">The type the argument must have.</typeparam>
+            /// <param name="index">The zero-based position from which to read.</param>
+            /// <param name="helperName">The helper name used in validation messages.</param>
+            /// <returns>The supplied argument at the specified index.</returns>
+            /// <exception cref="HandlebarsException">
+            /// Thrown when the argument at position <paramref name="index" /> is absent or is not of type <typeparamref name="T" />.
+            /// </exception>
+            public T QueryAt<T>(int index, string helperName)
+            {
+                return arguments.Length > index && arguments[index] is T argument
+                    ? argument
+                    : throw new HandlebarsException($"{helperName} requires {DescribeExpectedType<T>()} at position {index} argument.");
+            }
         }
     }
 }

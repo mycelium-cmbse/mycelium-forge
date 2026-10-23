@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Common
     /// download Packages on that Account's behalf.
     /// </summary>
     [Class(xmiId: "EAID_795DCA68_B91A_4f22_80F4_8AB8C8705FAE", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class APIKey : IAPIKey
+    public partial class APIKey : IAPIKey, ICloneable<APIKey>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -96,6 +96,27 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_796BF175_5F57_4cf9_A60D_AA7936A12A6C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IAPIKey.SecretHash")]
         public List<byte> SecretHash { get; set; } = [];
+
+        /// <summary>
+        /// Creates a copy of this <see cref="APIKey" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="APIKey" /> instance with the same property values.</returns>
+        public APIKey Clone()
+        {
+            return new APIKey
+            {
+                CreatedAt = this.CreatedAt,
+                ExpiresAt = this.ExpiresAt,
+                Id = this.Id,
+                LastUsedAt = this.LastUsedAt,
+                ModifiedAt = this.ModifiedAt,
+                Name = this.Name,
+                Owner = this.Owner,
+                Permissions = [.. this.Permissions],
+                RevokedAt = this.RevokedAt,
+                SecretHash = [.. this.SecretHash]
+            };
+        }
     }
 }
 
