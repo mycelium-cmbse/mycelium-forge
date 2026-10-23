@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Extractors.Tests.Extractors
 {
-    using System.IO.Compression;
-
     using ErrorOr;
 
     using Microsoft.Extensions.Logging.Abstractions;
@@ -35,7 +33,6 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
         private const string SampleArchiveName = "Kernel_Data_Type_Library-1.1.0-dev.20260801.kpar";
         private const string ProjectFileName = ".project.json";
         private const string MetaFileName = ".meta.json";
-
         private KparManifestExtractor extractor;
 
         [SetUp]
