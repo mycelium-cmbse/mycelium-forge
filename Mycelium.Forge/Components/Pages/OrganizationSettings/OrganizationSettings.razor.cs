@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs;
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
@@ -41,6 +42,11 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// </summary>
         [Inject]
         public DialogService DialogService { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether transferring organization ownership is enabled and visible for the current user.
+        /// </summary>
+        private bool IsTransferOwnershipEnabled => this.ViewModel.Organization.Administrator.Contains(this.ViewModel.CurrentUserId) || PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.TransferOrganizationAdministration);
 
         /// <summary>
         /// Handles component parameter updates and initializes the view model with the organization identifier asynchronously.
@@ -147,7 +153,28 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task OnTransferOrganization()
         {
-            await this.ViewModel.TransferOrganization();
+            var onResult = new EventCallbackFactory().Create<IAccount>(this, async recipient =>
+            {
+                var result = await this.ViewModel.TransferOrganization(recipient);
+
+                if (result.IsSuccess)
+                {
+                    await this.InvokeAsync(this.StateHasChanged);
+                }
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(TransferOrganizationOwnershipDialog.OrganizationName), this.ViewModel.Organization.ShortName },
+                { nameof(TransferOrganizationOwnershipDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Transfer organization ownership"
+            };
+
+            await this.DialogService.OpenAsync<TransferOrganizationOwnershipDialog>(parameters, options);
         }
 
         /// <summary>
