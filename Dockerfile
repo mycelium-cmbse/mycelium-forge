@@ -1,4 +1,4 @@
-﻿# ---------- Build stage ----------
+# ---------- Build stage ----------
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
@@ -10,6 +10,7 @@ WORKDIR /src
 COPY Mycelium.Forge/Mycelium.Forge.csproj ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/Mycelium.Forge.Common.csproj ./Mycelium.Forge.Common/
 COPY Mycelium.Forge.Dal/Mycelium.Forge.Dal.csproj ./Mycelium.Forge.Dal/
+COPY Mycelium.Forge.Extractors/Mycelium.Forge.Extractors.csproj ./Mycelium.Forge.Extractors/
 COPY Mycelium.Forge.Orm/Mycelium.Forge.Orm.csproj ./Mycelium.Forge.Orm/
 COPY Mycelium.Forge.Serializer.Json/Mycelium.Forge.Serializer.Json.csproj ./Mycelium.Forge.Serializer.Json/
 COPY Mycelium.Forge.Storage/Mycelium.Forge.Storage.csproj ./Mycelium.Forge.Storage/
@@ -22,6 +23,7 @@ RUN dotnet restore Mycelium.Forge/Mycelium.Forge.csproj
 COPY Mycelium.Forge/ ./Mycelium.Forge/
 COPY Mycelium.Forge.Common/ ./Mycelium.Forge.Common/
 COPY Mycelium.Forge.Dal/ ./Mycelium.Forge.Dal/
+COPY Mycelium.Forge.Extractors/ ./Mycelium.Forge.Extractors/
 COPY Mycelium.Forge.Orm/ ./Mycelium.Forge.Orm/
 COPY Mycelium.Forge.Serializer.Json/ ./Mycelium.Forge.Serializer.Json/
 COPY Mycelium.Forge.Storage/ ./Mycelium.Forge.Storage/
