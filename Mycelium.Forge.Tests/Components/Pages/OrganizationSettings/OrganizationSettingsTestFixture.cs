@@ -186,7 +186,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         [Test]
         public void VerifyRenderingWhenUnauthorizedOrNull()
         {
-            this.viewModelMock.Setup(x => x.Organization).Returns((IOrganization)null!);
+            this.viewModelMock.Setup(x => x.Organization).Returns((Organization)null!);
             var nullPage = this.context.Render<OrganizationSettings>();
 
             this.viewModelMock.Setup(x => x.Organization).Returns(this.testOrganization);

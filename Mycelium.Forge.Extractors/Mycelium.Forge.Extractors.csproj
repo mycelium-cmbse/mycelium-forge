@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Mycelium.Forge.Extractors</AssemblyName>
+        <RootNamespace>Mycelium.Forge.Extractors</RootNamespace>
+        <LangVersion>14.0</LangVersion>
+        <Company>Starion Group S.A.</Company>
+        <Authors>Sam Gerene, Joao Rua</Authors>
+        <Description>Artifact manifest extractors mapping format metadata onto the Mycelium Forge registry model.</Description>
+        <Copyright>Copyright © Starion Group S.A.</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/mycelium-cmbse/mycelium-forge</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <ImplicitUsings>true</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <IsPackable>true</IsPackable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ErrorOr" Version="2.1.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
+        <PackageReference Include="SysML2.NET.Kpar" Version="0.24.1" />
+    </ItemGroup>
+
+</Project>

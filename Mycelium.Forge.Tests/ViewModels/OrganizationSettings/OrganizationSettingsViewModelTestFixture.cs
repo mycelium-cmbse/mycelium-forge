@@ -196,6 +196,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Members, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.Organization.Member, Does.Contain(this.memberAccount.Id));
                 this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
@@ -204,25 +205,42 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
 
             await this.viewModel.RemoveMember(this.memberAccount);
 
-            Assert.That(this.viewModel.Members, Has.Count.EqualTo(0));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Members, Has.Count.EqualTo(0));
+                Assert.That(this.viewModel.Organization.Member, Does.Not.Contain(this.memberAccount.Id));
+            }
         }
 
         [Test]
         public async Task VerifyResendInvitation()
         {
-            // Scenario 1: Success
-            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+            var originalExpiresAt = this.matchingInvitation.ExperiesAt;
+            this.viewModel.PendingInvitations = [this.matchingInvitation];
 
-            await this.viewModel.ResendInvitation(this.matchingInvitation);
-
-            Assert.That(this.matchingInvitation.ExperiesAt, Is.GreaterThan(DateTime.UtcNow));
-
-            // Scenario 2: Failure
+            // Scenario 1: Failure preserves the original
             this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
 
             await this.viewModel.ResendInvitation(this.matchingInvitation);
 
-            this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations[0], Is.SameAs(this.matchingInvitation));
+                Assert.That(this.matchingInvitation.ExperiesAt, Is.EqualTo(originalExpiresAt));
+                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+            }
+
+            // Scenario 2: Success replaces the invitation with the updated clone
+            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+
+            await this.viewModel.ResendInvitation(this.matchingInvitation);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations[0], Is.Not.SameAs(this.matchingInvitation));
+                Assert.That(this.viewModel.PendingInvitations[0].ExperiesAt, Is.GreaterThan(DateTime.UtcNow));
+                Assert.That(this.matchingInvitation.ExperiesAt, Is.EqualTo(originalExpiresAt));
+            }
         }
 
         [Test]
@@ -256,7 +274,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             this.viewModel.CanManageOrganization = true;
             this.viewModel.Members = [this.adminAccount, this.memberAccount];
 
-            // Scenario 1: Update fails (rollback)
+            // Scenario 1: Update fails (preserves original)
             this.organizationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Update failed"));
 
             var updateFailResult = await this.viewModel.TransferOrganization(this.memberAccount);
@@ -264,8 +282,11 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(updateFailResult.IsError, Is.True);
+                Assert.That(this.viewModel.Organization, Is.SameAs(this.org));
                 Assert.That(this.viewModel.Organization.Administrator, Does.Contain(this.adminUserContext.AccountId!.Value));
                 Assert.That(this.viewModel.Organization.Administrator, Does.Not.Contain(this.memberAccount.Id));
+                Assert.That(this.org.Administrator, Does.Contain(this.adminUserContext.AccountId!.Value));
+                Assert.That(this.org.Administrator, Does.Not.Contain(this.memberAccount.Id));
                 this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Transfer Error", NotificationType.Error), Times.Once);
             }
 
@@ -279,9 +300,13 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             {
                 Assert.That(successResult.IsError, Is.False);
                 Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Member));
+                Assert.That(this.viewModel.Organization, Is.Not.SameAs(this.org));
                 Assert.That(this.viewModel.Organization.Administrator, Does.Contain(newRecipient.Id));
                 Assert.That(this.viewModel.Organization.Administrator, Does.Not.Contain(this.adminUserContext.AccountId!.Value));
+                Assert.That(this.viewModel.Organization.Member, Does.Contain(newRecipient.Id));
                 Assert.That(this.viewModel.Members, Does.Contain(newRecipient));
+                Assert.That(this.org.Administrator, Does.Contain(this.adminUserContext.AccountId!.Value));
+                Assert.That(this.org.Administrator, Does.Not.Contain(newRecipient.Id));
                 this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Ownership Transferred", NotificationType.Success), Times.Once);
             }
         }

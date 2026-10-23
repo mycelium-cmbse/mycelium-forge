@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Common
     /// on write, but not curated or restricted to a fixed list
     /// </summary>
     [Class(xmiId: "EAID_B267D33A_7D03_4de8_BC66_066A0EC0DF2D", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class Tag : ITag
+    public partial class Tag : ITag, ICloneable<Tag>
     {
         /// <summary>
         /// Indicates whether the tag is part of the Forge's curated global tag set rather than an ad-hoc,
@@ -48,6 +48,20 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_src13B896_A2F7_494b_8A14_ABD1D4CD5362", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "ITag.Owner")]
         public Guid Owner { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Tag" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="Tag" /> instance with the same property values.</returns>
+        public Tag Clone()
+        {
+            return new Tag
+            {
+                IsCurated = this.IsCurated,
+                Name = this.Name,
+                Owner = this.Owner
+            };
+        }
     }
 }
 

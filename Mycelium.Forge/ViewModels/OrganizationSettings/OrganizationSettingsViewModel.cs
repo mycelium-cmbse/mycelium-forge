@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.ViewModels.OrganizationSettings
 {
+    using DynamicData;
+
     using ErrorOr;
 
     using Mycelium.Forge.Common;
@@ -110,7 +112,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the organization profile details.
         /// </summary>
-        public IOrganization Organization { get; set; }
+        public Organization Organization { get; set; }
 
         /// <summary>
         /// Gets or sets the current user's role within the organization.
@@ -140,7 +142,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the collection of pending invitations for the organization.
         /// </summary>
-        public IReadOnlyList<IOrganizationInvitation> PendingInvitations { get; set; } = [];
+        public List<OrganizationInvitation> PendingInvitations { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the available role options for organization members.
@@ -165,7 +167,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
                 return;
             }
 
-            this.Organization = orgResult.Value[0];
+            this.Organization = (Organization)orgResult.Value[0];
             this.CurrentUserId = this.UserContext.AccountId.Value;
 
             await this.ComputeCurrentUserPermissions();
@@ -174,7 +176,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             if (!invitationsResult.IsError)
             {
-                this.PendingInvitations = [.. invitationsResult.Value.Where(i => i.Organization == this.Organization.Id && i.Status == InvitationStatusKind.PENDING)];
+                this.PendingInvitations = [.. invitationsResult.Value.Cast<OrganizationInvitation>().Where(i => i.Organization == this.Organization.Id && i.Status == InvitationStatusKind.PENDING)];
             }
 
             List<Guid> memberIds = [.. this.Organization.Member, .. this.Organization.Administrator];
@@ -182,8 +184,8 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             var accountsOfInterest = await this.accountService.ReadOrEmpty(this.UserContext, [.. memberIds, .. pendingInvitationTargets]);
 
-            this.Members = accountsOfInterest.Where(a => memberIds.Contains(a.Id)).ToList();
-            this.InvitedAccounts = accountsOfInterest.Where(a => pendingInvitationTargets.Contains(a.Id)).ToList();
+            this.Members = [.. accountsOfInterest.Where(a => memberIds.Contains(a.Id))];
+            this.InvitedAccounts = [.. accountsOfInterest.Where(a => pendingInvitationTargets.Contains(a.Id))];
         }
 
         /// <summary>
@@ -194,32 +196,29 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task ChangeMemberRole(IAccount member, OrganizationRole newRole)
         {
-            var originalAdministrators = this.Organization.Administrator.ToList();
-            var originalMembers = this.Organization.Member.ToList();
+            var organizationClone = this.Organization.Clone();
 
             if (newRole == OrganizationRole.Administrator)
             {
-                this.Organization.Administrator.AddIfNotExisting(member.Id);
+                organizationClone.Administrator.AddIfNotExisting(member.Id);
             }
             else
             {
-                this.Organization.Administrator.Remove(member.Id);
-                this.Organization.Member.AddIfNotExisting(member.Id);
+                organizationClone.Administrator.Remove(member.Id);
+                organizationClone.Member.AddIfNotExisting(member.Id);
             }
 
-            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [this.Organization], CancellationToken.None);
+            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [organizationClone], CancellationToken.None);
 
             if (updateResult.IsError)
             {
-                this.Organization.Administrator = originalAdministrators;
-                this.Organization.Member = originalMembers;
-
                 const string errorMessage = "Failed to update member role.";
                 this.logger.LogError(errorMessage + " Account: {AccountId} Errors: {Errors}", member.Id, updateResult.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Role Update Error", NotificationType.Error);
                 return;
             }
 
+            this.Organization = organizationClone;
             this.notificationService.AddNotification($"Role updated to {newRole.ToUpperCaseFirst()} for {member.Name}.", "Role Updated", NotificationType.Success);
         }
 
@@ -230,25 +229,22 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task RemoveMember(IAccount member)
         {
-            var originalAdministrators = this.Organization.Administrator.ToList();
-            var originalMembers = this.Organization.Member.ToList();
+            var organizationClone = this.Organization.Clone();
 
-            this.Organization.Member.Remove(member.Id);
-            this.Organization.Administrator.Remove(member.Id);
+            organizationClone.Member.Remove(member.Id);
+            organizationClone.Administrator.Remove(member.Id);
 
-            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [this.Organization], CancellationToken.None);
+            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [organizationClone], CancellationToken.None);
 
             if (updateResult.IsError)
             {
-                this.Organization.Administrator = originalAdministrators;
-                this.Organization.Member = originalMembers;
-
                 const string errorMessage = "Failed to remove member from organization.";
                 this.logger.LogError(errorMessage + " Account: {AccountId} Errors: {Errors}", member.Id, updateResult.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Removal Error", NotificationType.Error);
                 return;
             }
 
+            this.Organization = organizationClone;
             this.Members = [.. this.Members.Where(m => m.Id != member.Id)];
             this.notificationService.AddNotification($"{member.Name} has been removed from the organization.", "Member Removed", NotificationType.Success);
         }
@@ -258,22 +254,22 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// </summary>
         /// <param name="invitation">The invitation to resend.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task ResendInvitation(IOrganizationInvitation invitation)
+        public async Task ResendInvitation(OrganizationInvitation invitation)
         {
-            var originalExpiresAt = invitation.ExperiesAt;
-            invitation.ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays);
-            var updateResult = await this.organizationInvitationService.UpdateAsync(this.UserContext, [invitation], CancellationToken.None);
+            var invitationClone = invitation.Clone();
+            invitationClone.ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays);
+
+            var updateResult = await this.organizationInvitationService.UpdateAsync(this.UserContext, [invitationClone], CancellationToken.None);
 
             if (updateResult.IsError)
             {
-                invitation.ExperiesAt = originalExpiresAt;
-
                 const string errorMessage = "Failed to resend invitation.";
                 this.logger.LogError(errorMessage + " Invitation: {InvitationId} Errors: {Errors}", invitation.Id, updateResult.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
                 return;
             }
 
+            this.PendingInvitations.Replace(invitation, invitationClone);
             this.notificationService.AddNotification("Invitation resent successfully.", "Invitation Resent", NotificationType.Success);
         }
 
@@ -282,7 +278,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// </summary>
         /// <param name="invitation">The invitation to revoke.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task RevokeInvitation(IOrganizationInvitation invitation)
+        public async Task RevokeInvitation(OrganizationInvitation invitation)
         {
             var deleteResult = await this.organizationInvitationService.DeleteAsync(this.UserContext, [invitation.Id], CancellationToken.None);
 
@@ -294,7 +290,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
                 return;
             }
 
-            this.PendingInvitations = [.. this.PendingInvitations.Where(i => i.Id != invitation.Id)];
+            this.PendingInvitations.Remove(invitation);
             this.notificationService.AddNotification("Invitation revoked successfully.", "Invitation Revoked", NotificationType.Success);
         }
 
@@ -305,27 +301,25 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
         public async Task<ErrorOr<Success>> TransferOrganization(IAccount recipient)
         {
-            var originalAdministrators = this.Organization.Administrator.ToList();
-            var originalMembers = this.Organization.Member.ToList();
+            var organizationClone = this.Organization.Clone();
 
             // Administrator subsets Member in the domain schema and seed data, so CurrentUserId remains in Member. Check Organization DTO summary.
-            this.Organization.Administrator.AddIfNotExisting(recipient.Id);
-            this.Organization.Member.AddIfNotExisting(recipient.Id);
-            this.Organization.Administrator.Remove(this.CurrentUserId);
-            
-            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [this.Organization], CancellationToken.None);
+            organizationClone.Administrator.AddIfNotExisting(recipient.Id);
+            organizationClone.Member.AddIfNotExisting(recipient.Id);
+            organizationClone.Administrator.Remove(this.CurrentUserId);
+
+            var updateResult = await this.organizationService.UpdateAsync(this.UserContext, [organizationClone], CancellationToken.None);
 
             if (updateResult.IsError)
             {
-                this.Organization.Administrator = originalAdministrators;
-                this.Organization.Member = originalMembers;
-
                 const string errorMessage = "Failed to transfer organization ownership.";
+
                 this.logger.LogError(errorMessage + " Recipient: {RecipientId} Errors: {Errors}", recipient.Id, updateResult.Errors.ToJoinedDescriptions());
                 this.notificationService.AddNotification(errorMessage, "Transfer Error", NotificationType.Error);
                 return updateResult.Errors;
             }
 
+            this.Organization = organizationClone;
             await this.ComputeCurrentUserPermissions();
 
             if (this.Members.All(m => m.Id != recipient.Id))

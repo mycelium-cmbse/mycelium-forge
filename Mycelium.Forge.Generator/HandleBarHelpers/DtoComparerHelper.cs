@@ -13,10 +13,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using HandlebarsDotNet;
 
+    using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.Extensions;
 
     using uml4net.Classification;
-    using uml4net.CommonStructure;
     using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
 
@@ -39,45 +39,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             {
                 var property = arguments.QueryFirst<IProperty>("forge.DtoComparer.WriteComparisonIfApplicable");
 
-                if (property.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
+                if (property.Name.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }
 
-                var classContext = arguments.Length > 1 ? arguments[1] as IClass : null;
+                var classContext = arguments.QueryAt<IClass>(1, "forge.DtoComparer.WriteComparisonIfApplicable");
                 var propertyName = property.QueryPropertyNameBasedOnUmlProperties();
-                var targetType = DetermineTargetType(classContext, property);
-
-                var propertyReference = string.IsNullOrEmpty(targetType)
-                    ? propertyName
-                    : $"{targetType}.{propertyName}";
+                var propertyReference = $"I{classContext.Name}.{propertyName}";
 
                 var stringBuilder = new StringBuilder();
                 AppendPropertyComparison(stringBuilder, propertyName, propertyReference, property.QueryIsEnumerable());
 
                 writer.WriteSafeString(stringBuilder.ToString());
             });
-        }
-
-        /// <summary>
-        /// Determines the target type name for the specified property within the class context.
-        /// </summary>
-        /// <param name="classContext">The optional class context.</param>
-        /// <param name="property">The property being compared.</param>
-        /// <returns>The formatted target interface name, or an empty string if unknown.</returns>
-        public static string DetermineTargetType(IClass classContext, IProperty property)
-        {
-            if (classContext != null)
-            {
-                return $"I{classContext.Name}";
-            }
-
-            if (property.Owner is INamedElement owner)
-            {
-                return $"I{owner.Name}";
-            }
-
-            return string.Empty;
         }
 
         /// <summary>

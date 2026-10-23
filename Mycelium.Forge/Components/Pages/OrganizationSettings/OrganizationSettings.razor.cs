@@ -132,7 +132,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// </summary>
         /// <param name="invitation">The invitation to resend.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnResendInvitation(IOrganizationInvitation invitation)
+        private async Task OnResendInvitation(OrganizationInvitation invitation)
         {
             await this.ViewModel.ResendInvitation(invitation);
         }
@@ -142,7 +142,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// </summary>
         /// <param name="invitation">The invitation to revoke.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnRevokeInvitation(IOrganizationInvitation invitation)
+        private async Task OnRevokeInvitation(OrganizationInvitation invitation)
         {
             await this.ViewModel.RevokeInvitation(invitation);
         }

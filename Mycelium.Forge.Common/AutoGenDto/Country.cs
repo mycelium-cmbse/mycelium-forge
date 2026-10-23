@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Common
     /// official ISO 3166-1 codes.
     /// </summary>
     [Class(xmiId: "EAID_A94A65F7_045C_49d9_9307_1DBFF810C3F4", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class Country : ICountry
+    public partial class Country : ICountry, ICloneable<Country>
     {
         /// <summary>
         /// The two-letter ISO 3166-1 alpha-2 code (e.g. "US", "NL"). Serves as the natural key � globally
@@ -85,6 +85,25 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_src695154_E9D7_48d8_887D_FAFCDDA173E1", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "ICountry.Owner")]
         public Guid Owner { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="Country" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="Country" /> instance with the same property values.</returns>
+        public Country Clone()
+        {
+            return new Country
+            {
+                Alpha2Code = this.Alpha2Code,
+                Alpha3Code = this.Alpha3Code,
+                CreatedAt = this.CreatedAt,
+                Id = this.Id,
+                ModifiedAt = this.ModifiedAt,
+                Name = this.Name,
+                NumericCode = this.NumericCode,
+                Owner = this.Owner
+            };
+        }
     }
 }
 
