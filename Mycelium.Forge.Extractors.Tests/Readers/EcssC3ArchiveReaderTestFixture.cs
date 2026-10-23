@@ -129,6 +129,24 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
                 using var nonZipStream = new MemoryStream([0x01, 0x02, 0x03, 0x04]);
                 this.reader.Read(nonZipStream);
             }, Throws.TypeOf<InvalidDataException>());
+
+            Assert.That(() =>
+            {
+                using var duplicateHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("sub/Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
+                this.reader.Read(duplicateHeaderStream);
+            }, Throws.TypeOf<InvalidDataException>());
+
+            Assert.That(() =>
+            {
+                using var duplicateSiteDirectoryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson), new ZipEntryModel("sub/SiteDirectory.json", this.validSiteDirectoryJson));
+                this.reader.Read(duplicateSiteDirectoryStream);
+            }, Throws.TypeOf<InvalidDataException>());
+
+            Assert.That(() =>
+            {
+                using var otherHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("OtherHeader.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
+                this.reader.Read(otherHeaderStream);
+            }, Throws.TypeOf<InvalidDataException>());
         }
     }
 }

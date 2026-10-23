@@ -70,11 +70,8 @@ namespace Mycelium.Forge.Extractors.Readers
         {
             using var archive = new ZipArchive(stream, ZipArchiveMode.Read, true);
 
-            var headerEntry = archive.Entries.FirstOrDefault(entry => entry.FullName.EndsWith(HeaderEntryName, StringComparison.OrdinalIgnoreCase))
-                              ?? throw new InvalidDataException("The archive does not contain a Header.json file.");
-
-            var siteEntry = archive.Entries.FirstOrDefault(entry => entry.FullName.EndsWith(SiteDirectoryEntryName, StringComparison.OrdinalIgnoreCase))
-                            ?? throw new InvalidDataException("The archive does not contain a SiteDirectory.json file.");
+            var headerEntry = GetUniqueEntry(archive, HeaderEntryName);
+            var siteEntry = GetUniqueEntry(archive, SiteDirectoryEntryName);
 
             using var headerStream = headerEntry.Open();
             var header = JsonSerializer.Deserialize<ExchangeFileHeader>(headerStream, SerializerOptions) ?? throw new JsonException("The Header.json content cannot be null.");
@@ -83,6 +80,27 @@ namespace Mycelium.Forge.Extractors.Readers
             var siteDirectoryThings = this.jsonFileDal.Serializer.Deserialize(siteStream)?.ToList() ?? [];
 
             return new EcssC3Archive(header, siteDirectoryThings);
+        }
+
+        /// <summary>
+        /// Gets the single archive entry with the specified file name.
+        /// </summary>
+        /// <param name="archive">The zip archive.</param>
+        /// <param name="entryName">The expected entry file name.</param>
+        /// <returns>The unique <see cref="ZipArchiveEntry" />.</returns>
+        /// <exception cref="InvalidDataException">
+        /// Thrown when the entry does not exist or when multiple entries share the same file name.
+        /// </exception>
+        private static ZipArchiveEntry GetUniqueEntry(ZipArchive archive, string entryName)
+        {
+            var matchingEntries = archive.Entries.Where(entry => string.Equals(entry.Name, entryName, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            return matchingEntries.Count switch
+            {
+                0 => throw new InvalidDataException($"The archive does not contain a {entryName} file."),
+                > 1 => throw new InvalidDataException($"The archive contains multiple {entryName} files."),
+                _ => matchingEntries[0]
+            };
         }
     }
 }

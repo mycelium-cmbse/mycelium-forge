@@ -33,7 +33,7 @@ namespace Mycelium.Forge.Extractors.Tests.Resolvers
         }
 
         [Test]
-        public void VerifyResolver()
+        public void VerifyGetTypeInfo()
         {
             const string jsonWithDateTime = """
                                             {

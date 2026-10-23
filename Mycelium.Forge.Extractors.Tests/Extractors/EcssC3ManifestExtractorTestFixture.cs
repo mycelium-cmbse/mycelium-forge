@@ -16,6 +16,8 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
     using CDP4JsonFileDal;
     using CDP4JsonFileDal.Json;
 
+    using CDP4JsonSerializer;
+
     using ErrorOr;
 
     using Moq;
@@ -76,7 +78,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
             };
 
             var validArchive = new EcssC3Archive(validHeader, [new SiteDirectory()]);
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(validArchive);
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(validArchive);
 
             using var sampleStream = new MemoryStream();
             var successResult = this.extractor.Extract(sampleStream);
@@ -99,7 +101,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(manifest.LastModifiedOn, Is.EqualTo(modifiedDate));
             }
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Throws(new InvalidDataException("Corrupted zip."));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Throws(new InvalidDataException("Corrupted zip."));
             var invalidArchiveResult = this.extractor.Extract(sampleStream);
 
             using (Assert.EnterMultipleScope())
@@ -108,7 +110,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(invalidArchiveResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.InvalidArchive));
             }
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Throws(new JsonException("Corrupted JSON."));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Throws(new JsonException("Corrupted JSON."));
             var invalidDescriptorResult = this.extractor.Extract(sampleStream);
 
             using (Assert.EnterMultipleScope())
@@ -117,7 +119,16 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(invalidDescriptorResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.InvalidDescriptor));
             }
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Throws(new InvalidOperationException("Unexpected failure."));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Throws(new DeSerializationException("Corrupted CDP4 DTO."));
+            var invalidCdpDescriptorResult = this.extractor.Extract(sampleStream);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(invalidCdpDescriptorResult.IsError, Is.True);
+                Assert.That(invalidCdpDescriptorResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.InvalidDescriptor));
+            }
+
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Throws(new InvalidOperationException("Unexpected failure."));
             var unexpectedResult = this.extractor.Extract(sampleStream);
 
             using (Assert.EnterMultipleScope())
@@ -136,7 +147,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 CreatorPerson = new ExchangeFileInitiator { GivenName = "Jane", Surname = "Doe" }
             };
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingMediaTypeHeader, [new SiteDirectory()]));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingMediaTypeHeader, [new SiteDirectory()]));
             var missingMediaTypeResult = this.extractor.Extract(sampleStream);
             Assert.That(missingMediaTypeResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.MissingMediaType));
 
@@ -149,7 +160,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 CreatorPerson = new ExchangeFileInitiator { GivenName = "Jane", Surname = "Doe" }
             };
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingDataModelVersionHeader, [new SiteDirectory()]));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingDataModelVersionHeader, [new SiteDirectory()]));
             var missingDataModelResult = this.extractor.Extract(sampleStream);
             Assert.That(missingDataModelResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.MissingDataModelVersion));
 
@@ -162,7 +173,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 CreatorPerson = new ExchangeFileInitiator { GivenName = "Jane", Surname = "Doe" }
             };
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingExchangeFormatHeader, [new SiteDirectory()]));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingExchangeFormatHeader, [new SiteDirectory()]));
             var missingExchangeFormatResult = this.extractor.Extract(sampleStream);
             Assert.That(missingExchangeFormatResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.MissingExchangeFileFormatVersion));
 
@@ -175,7 +186,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 CreatorPerson = new ExchangeFileInitiator { GivenName = "Jane", Surname = "Doe" }
             };
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingCreatedOnHeader, [new SiteDirectory()]));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingCreatedOnHeader, [new SiteDirectory()]));
             var missingCreatedOnResult = this.extractor.Extract(sampleStream);
             Assert.That(missingCreatedOnResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.MissingCreatedOn));
 
@@ -188,13 +199,17 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 CreatorPerson = null
             };
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingCreatorPersonHeader, [new SiteDirectory()]));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(missingCreatorPersonHeader, [new SiteDirectory()]));
             var missingCreatorPersonResult = this.extractor.Extract(sampleStream);
             Assert.That(missingCreatorPersonResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.MissingCreatorPerson));
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(validHeader, []));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(validHeader, []));
             var emptySiteResult = this.extractor.Extract(sampleStream);
             Assert.That(emptySiteResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.InvalidSiteDirectory));
+
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(validHeader, [new Person()]));
+            var noSiteDirectoryResult = this.extractor.Extract(sampleStream);
+            Assert.That(noSiteDirectoryResult.FirstError.Code, Is.EqualTo(EcssC3ErrorCodes.InvalidSiteDirectory));
 
             var completelyEmptyHeader = new ExchangeFileHeader
             {
@@ -205,7 +220,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 CreatorPerson = null
             };
 
-            this.readerMock.Setup(r => r.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(completelyEmptyHeader, []));
+            this.readerMock.Setup(reader => reader.Read(It.IsAny<Stream>())).Returns(new EcssC3Archive(completelyEmptyHeader, []));
             var multipleErrorsResult = this.extractor.Extract(sampleStream);
 
             using (Assert.EnterMultipleScope())
@@ -218,6 +233,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
         [Test]
         public void VerifyExtractWithSampleArchive()
         {
+            // Test verifying extraction against a real ECSS-E-TM-10-25 Annex C.3 sample archive.
             var samplePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Resources", SampleArchiveName);
             using var sampleStream = File.OpenRead(samplePath);
 

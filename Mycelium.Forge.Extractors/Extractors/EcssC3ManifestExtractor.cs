@@ -13,6 +13,8 @@ namespace Mycelium.Forge.Extractors.Extractors
 
     using CDP4Common.CommonData;
 
+    using CDP4JsonSerializer;
+
     using ErrorOr;
 
     using Mycelium.Forge.Extractors.Enums;
@@ -25,9 +27,15 @@ namespace Mycelium.Forge.Extractors.Extractors
 
     /// <summary>
     /// Validates an ECSS-E-TM-10-25 Annex C.3 exchange file using <see cref="IEcssC3ArchiveReader" /> and projects its
-    /// descriptors onto an
-    /// <see cref="EcssC3Manifest" />.
+    /// descriptors onto an <see cref="EcssC3Manifest" />.
     /// </summary>
+    /// <remarks>
+    /// Validating <c>SiteDirectory.json</c> is essential during archive extraction because ECSS-E-TM-10-25 Annex C.3 mandates
+    /// both <c>Header.json</c> and <c>SiteDirectory.json</c> as structural requirements of a conforming exchange file.
+    /// Deserializing <c>SiteDirectory.json</c> via <see cref="CDP4JsonFileDal.JsonFileDal.Serializer" /> exercises the
+    /// CDP4 DTO deserializer on model content, ensuring an archive contains a valid <see cref="SiteDirectory" /> without
+    /// exposing unnecessary model objects on the manifest.
+    /// </remarks>
     public class EcssC3ManifestExtractor : IArtifactManifestExtractor
     {
         /// <summary>
@@ -71,7 +79,7 @@ namespace Mycelium.Forge.Extractors.Extractors
             {
                 return Error.Validation(EcssC3ErrorCodes.InvalidArchive, exception.Message);
             }
-            catch (JsonException exception)
+            catch (Exception exception) when (exception is JsonException or DeSerializationException)
             {
                 return Error.Validation(EcssC3ErrorCodes.InvalidDescriptor, exception.Message);
             }
