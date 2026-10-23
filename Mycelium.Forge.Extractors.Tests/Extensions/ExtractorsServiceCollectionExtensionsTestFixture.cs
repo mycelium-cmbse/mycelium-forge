@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extensions
     using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Extensions;
     using Mycelium.Forge.Extractors.Extractors;
+    using Mycelium.Forge.Extractors.Readers;
 
     using NUnit.Framework;
 
@@ -34,16 +35,20 @@ namespace Mycelium.Forge.Extractors.Tests.Extensions
 
             using var provider = services.BuildServiceProvider();
             var checksumService = provider.GetService<IChecksumService>();
-            var reader = provider.GetService<IReader>();
+            var kparReader = provider.GetService<IReader>();
+            var ecssReader = provider.GetService<IEcssC3ArchiveReader>();
             var extractors = provider.GetServices<IArtifactManifestExtractor>().ToList();
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(checksumService, Is.Not.Null);
-                Assert.That(reader, Is.Not.Null);
-                Assert.That(extractors, Has.Count.GreaterThanOrEqualTo(1));
+                Assert.That(kparReader, Is.Not.Null);
+                Assert.That(ecssReader, Is.Not.Null);
+                Assert.That(extractors, Has.Count.GreaterThanOrEqualTo(2));
                 Assert.That(extractors, Has.One.InstanceOf<KparManifestExtractor>());
+                Assert.That(extractors, Has.One.InstanceOf<EcssC3ManifestExtractor>());
                 Assert.That(extractors.Any(registeredExtractor => registeredExtractor.CanHandle(ArtifactKind.Kpar)), Is.True);
+                Assert.That(extractors.Any(registeredExtractor => registeredExtractor.CanHandle(ArtifactKind.EcssC3)), Is.True);
             }
         }
     }

@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Extractors.Tests.Extractors
 {
-    using System.IO.Compression;
-
     using ErrorOr;
 
     using Microsoft.Extensions.Logging.Abstractions;
@@ -21,6 +19,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
     using Mycelium.Forge.Extractors.Errors;
     using Mycelium.Forge.Extractors.Extractors;
     using Mycelium.Forge.Extractors.Models.Kpar;
+    using Mycelium.Forge.Extractors.Tests.Helpers;
     using Mycelium.Forge.Extractors.Tests.Models;
 
     using NUnit.Framework;
@@ -99,7 +98,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
             const string validProject = "{\"name\":\"TestProject\",\"version\":\"1.0.0\",\"usage\":[{\"resource\":\"https://example.com/other.kpar\"}]}";
             const string validMeta = "{\"index\":{\"Pkg\":\"model.sysml\"},\"created\":\"2026-01-01T00:00:00Z\",\"metamodel\":\"https://example.com/meta\"}";
 
-            using var missingProjectStream = CreateZipStream(new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var missingProjectStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
             var missingProjectResult = this.extractor.Extract(missingProjectStream);
 
             using (Assert.EnterMultipleScope())
@@ -108,7 +107,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(missingProjectResult.FirstError.Code, Is.EqualTo(KparErrorCodes.InvalidArchive));
             }
 
-            using var missingMetaStream = CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var missingMetaStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel("model.sysml", "package Pkg;"));
             var missingMetaResult = this.extractor.Extract(missingMetaStream);
 
             using (Assert.EnterMultipleScope())
@@ -117,7 +116,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(missingMetaResult.FirstError.Code, Is.EqualTo(KparErrorCodes.InvalidArchive));
             }
 
-            using var duplicateProjectStream = CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var duplicateProjectStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
             var duplicateProjectResult = this.extractor.Extract(duplicateProjectStream);
 
             using (Assert.EnterMultipleScope())
@@ -126,7 +125,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(duplicateProjectResult.FirstError.Code, Is.EqualTo(KparErrorCodes.InvalidArchive));
             }
 
-            using var malformedJsonStream = CreateZipStream(new ZipEntryModel(ProjectFileName, "{ malformed json"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var malformedJsonStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, "{ malformed json"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
             var malformedJsonResult = this.extractor.Extract(malformedJsonStream);
 
             using (Assert.EnterMultipleScope())
@@ -135,7 +134,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(malformedJsonResult.FirstError.Code, Is.EqualTo(KparErrorCodes.InvalidDescriptor));
             }
 
-            using var missingNameStream = CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"version\":\"1.0.0\"}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var missingNameStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"version\":\"1.0.0\"}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
             var missingNameResult = this.extractor.Extract(missingNameStream);
 
             using (Assert.EnterMultipleScope())
@@ -144,7 +143,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(missingNameResult.FirstError.Code, Is.EqualTo(KparErrorCodes.MissingName));
             }
 
-            using var missingVersionStream = CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"name\":\"TestProject\"}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var missingVersionStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"name\":\"TestProject\"}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
             var missingVersionResult = this.extractor.Extract(missingVersionStream);
 
             using (Assert.EnterMultipleScope())
@@ -153,7 +152,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(missingVersionResult.FirstError.Code, Is.EqualTo(KparErrorCodes.MissingVersion));
             }
 
-            using var invalidVersionStream = CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"name\":\"TestProject\",\"version\":\"v1.0.0\"}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var invalidVersionStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"name\":\"TestProject\",\"version\":\"v1.0.0\"}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
             var invalidVersionResult = this.extractor.Extract(invalidVersionStream);
 
             using (Assert.EnterMultipleScope())
@@ -162,7 +161,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(invalidVersionResult.FirstError.Code, Is.EqualTo(KparErrorCodes.InvalidVersion));
             }
 
-            using var missingCreatedStream = CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, "{\"index\":{\"Pkg\":\"model.sysml\"}}"), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var missingCreatedStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, "{\"index\":{\"Pkg\":\"model.sysml\"}}"), new ZipEntryModel("model.sysml", "package Pkg;"));
             var missingCreatedResult = this.extractor.Extract(missingCreatedStream);
 
             using (Assert.EnterMultipleScope())
@@ -171,7 +170,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(missingCreatedResult.FirstError.Code, Is.EqualTo(KparErrorCodes.MissingCreated));
             }
 
-            using var emptyIndexStream = CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, "{\"index\":{},\"created\":\"2026-01-01T00:00:00Z\"}"), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var emptyIndexStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, "{\"index\":{},\"created\":\"2026-01-01T00:00:00Z\"}"), new ZipEntryModel("model.sysml", "package Pkg;"));
             var emptyIndexResult = this.extractor.Extract(emptyIndexStream);
 
             using (Assert.EnterMultipleScope())
@@ -180,7 +179,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(emptyIndexResult.FirstError.Code, Is.EqualTo(KparErrorCodes.NoModels));
             }
 
-            using var duplicateModelPathStream = CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, "{\"index\":{\"PkgA\":\"model.sysml\",\"PkgB\":\"model.sysml\"},\"created\":\"2026-01-01T00:00:00Z\"}"), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var duplicateModelPathStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, "{\"index\":{\"PkgA\":\"model.sysml\",\"PkgB\":\"model.sysml\"},\"created\":\"2026-01-01T00:00:00Z\"}"), new ZipEntryModel("model.sysml", "package Pkg;"));
             var duplicateModelPathResult = this.extractor.Extract(duplicateModelPathStream);
 
             using (Assert.EnterMultipleScope())
@@ -189,7 +188,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(duplicateModelPathResult.FirstError.Code, Is.EqualTo(KparErrorCodes.DuplicateModelPath));
             }
 
-            using var missingUsageResourceStream = CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"name\":\"TestProject\",\"version\":\"1.0.0\",\"usage\":[{\"versionConstraint\":\"^1.0.0\"}]}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var missingUsageResourceStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, "{\"name\":\"TestProject\",\"version\":\"1.0.0\",\"usage\":[{\"versionConstraint\":\"^1.0.0\"}]}"), new ZipEntryModel(MetaFileName, validMeta), new ZipEntryModel("model.sysml", "package Pkg;"));
             var missingUsageResourceResult = this.extractor.Extract(missingUsageResourceStream);
 
             using (Assert.EnterMultipleScope())
@@ -199,7 +198,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
             }
 
             const string metaWithBadChecksum = "{\"index\":{\"Pkg\":\"model.sysml\"},\"created\":\"2026-01-01T00:00:00Z\",\"checksum\":{\"model.sysml\":{\"value\":\"deadbeef\",\"algorithm\":\"SHA256\"}}}";
-            using var badChecksumStream = CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, metaWithBadChecksum), new ZipEntryModel("model.sysml", "package Pkg;"));
+            using var badChecksumStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, metaWithBadChecksum), new ZipEntryModel("model.sysml", "package Pkg;"));
             var badChecksumResult = this.extractor.Extract(badChecksumStream);
 
             using (Assert.EnterMultipleScope())
@@ -209,7 +208,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
             }
 
             const string metaWithMissingModelFile = "{\"index\":{\"Pkg\":\"missing_model.sysml\"},\"created\":\"2026-01-01T00:00:00Z\"}";
-            using var missingModelFileStream = CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, metaWithMissingModelFile));
+            using var missingModelFileStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, validProject), new ZipEntryModel(MetaFileName, metaWithMissingModelFile));
             var missingModelFileResult = this.extractor.Extract(missingModelFileStream);
 
             using (Assert.EnterMultipleScope())
@@ -220,7 +219,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
 
             const string multipleErrorsProject = "{\"version\":\"invalid-version\",\"usage\":[{\"versionConstraint\":\"1.0\"}]}";
             const string multipleErrorsMeta = "{\"index\":{}}";
-            using var multipleErrorsStream = CreateZipStream(new ZipEntryModel(ProjectFileName, multipleErrorsProject), new ZipEntryModel(MetaFileName, multipleErrorsMeta));
+            using var multipleErrorsStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel(ProjectFileName, multipleErrorsProject), new ZipEntryModel(MetaFileName, multipleErrorsMeta));
             var multipleErrorsResult = this.extractor.Extract(multipleErrorsStream);
 
             using (Assert.EnterMultipleScope())
@@ -252,24 +251,6 @@ namespace Mycelium.Forge.Extractors.Tests.Extractors
                 Assert.That(result.FirstError.Code, Is.EqualTo(KparErrorCodes.UnexpectedError));
                 Assert.That(result.FirstError.Description, Is.EqualTo("Simulated unexpected failure."));
             }
-        }
-
-        private static MemoryStream CreateZipStream(params ZipEntryModel[] entries)
-        {
-            var stream = new MemoryStream();
-
-            using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
-            {
-                foreach (var entry in entries)
-                {
-                    var zipEntry = archive.CreateEntry(entry.Name);
-                    using var writer = new StreamWriter(zipEntry.Open());
-                    writer.Write(entry.Content);
-                }
-            }
-
-            stream.Position = 0;
-            return stream;
         }
     }
 }
