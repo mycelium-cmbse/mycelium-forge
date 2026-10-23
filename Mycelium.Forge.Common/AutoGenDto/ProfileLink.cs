@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common
     /// Represents the type of profile and the actual URI pointing to the online profile
     /// </summary>
     [Class(xmiId: "EAID_230199C8_76A7_4a35_8CD6_A3F9EEDAD982", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class ProfileLink : IProfileLink
+    public partial class ProfileLink : IProfileLink, ICloneable<ProfileLink>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -66,6 +66,23 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_D49CC3FC_62EC_404e_9B1E_879EA59D11FD", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IProfileLink.Uri")]
         public string Uri { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="ProfileLink" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="ProfileLink" /> instance with the same property values.</returns>
+        public ProfileLink Clone()
+        {
+            return new ProfileLink
+            {
+                CreatedAt = this.CreatedAt,
+                Id = this.Id,
+                ModifiedAt = this.ModifiedAt,
+                Owner = this.Owner,
+                ProfileType = this.ProfileType,
+                Uri = this.Uri
+            };
+        }
     }
 }
 

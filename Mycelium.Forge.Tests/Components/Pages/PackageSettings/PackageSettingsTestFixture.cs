@@ -231,7 +231,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         [Test]
         public void VerifyRenderingWhenNullOrDeprecatedOrInternal()
         {
-            this.viewModelMock.Setup(x => x.Package).Returns((IPackage)null!);
+            this.viewModelMock.Setup(x => x.Package).Returns((Package)null!);
             var nullPage = this.context.Render<PackageSettings>();
 
             this.viewModelMock.Setup(x => x.Package).Returns(this.testPackage);

@@ -20,7 +20,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the organization profile details.
         /// </summary>
-        IOrganization Organization { get; set; }
+        Organization Organization { get; set; }
 
         /// <summary>
         /// Gets or sets the current user's role within the organization.
@@ -45,7 +45,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the collection of pending invitations for the organization.
         /// </summary>
-        IReadOnlyList<IOrganizationInvitation> PendingInvitations { get; set; }
+        List<OrganizationInvitation> PendingInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the available role options for organization members.
@@ -84,14 +84,14 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// </summary>
         /// <param name="invitation">The invitation to resend.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task ResendInvitation(IOrganizationInvitation invitation);
+        Task ResendInvitation(OrganizationInvitation invitation);
 
         /// <summary>
         /// Revokes the specified pending invitation asynchronously.
         /// </summary>
         /// <param name="invitation">The invitation to revoke.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task RevokeInvitation(IOrganizationInvitation invitation);
+        Task RevokeInvitation(OrganizationInvitation invitation);
 
         /// <summary>
         /// Handles initiating an organization transfer asynchronously.

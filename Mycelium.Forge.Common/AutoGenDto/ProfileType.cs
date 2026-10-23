@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Common
     /// organization or personal web site.
     /// </summary>
     [Class(xmiId: "EAID_A5813AB3_8596_4a27_9755_A3EC87649CF0", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial class ProfileType : IProfileType
+    public partial class ProfileType : IProfileType, ICloneable<ProfileType>
     {
         /// <summary>
         /// The DateTime at which the Thing has been created.
@@ -68,6 +68,23 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_src10489B_3E2E_4795_AA63_0F70D1AB3F3A", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: true)]
         [Implements(implementation: "IProfileType.Owner")]
         public Guid Owner { get; set; }
+
+        /// <summary>
+        /// Creates a copy of this <see cref="ProfileType" /> with all properties copied. List properties are copied shallowly.
+        /// </summary>
+        /// <returns>A new <see cref="ProfileType" /> instance with the same property values.</returns>
+        public ProfileType Clone()
+        {
+            return new ProfileType
+            {
+                CreatedAt = this.CreatedAt,
+                Id = this.Id,
+                LogoBlobReference = this.LogoBlobReference,
+                ModifiedAt = this.ModifiedAt,
+                Name = this.Name,
+                Owner = this.Owner
+            };
+        }
     }
 }
 

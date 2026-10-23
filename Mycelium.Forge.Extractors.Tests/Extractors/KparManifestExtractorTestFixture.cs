@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Extractors.Tests.Extractors
 {
+    using System.IO.Compression;
+
     using ErrorOr;
 
     using Microsoft.Extensions.Logging.Abstractions;
