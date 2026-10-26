@@ -35,8 +35,10 @@ namespace Mycelium.Forge.Extractors.Extensions
             services.AddSingleton<IReader, Reader>();
             services.AddSingleton<JsonFileDal>();
             services.AddSingleton<IEcssC3ArchiveReader, EcssC3ArchiveReader>();
+            services.AddSingleton<ICapellaArchiveReader, CapellaArchiveReader>();
             services.AddSingleton<IArtifactManifestExtractor, KparManifestExtractor>();
             services.AddSingleton<IArtifactManifestExtractor, EcssC3ManifestExtractor>();
+            services.AddSingleton<IArtifactManifestExtractor, CapellaManifestExtractor>();
 
             return services;
         }
