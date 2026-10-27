@@ -1,10 +1,11 @@
-﻿# Production deployment (current state): runs the published Mycelium.Forge image against a real
+# Production deployment (current state): runs the published Mycelium.Forge image against a real
 # PostgreSQL instance. Program.cs's normal startup path still doesn't touch PostgreSQL, Garage or
 # Keycloak itself (only the standalone `migrate` command reads ConnectionStrings:Default) - but
 # schema.sql is worth applying now, so postgres + the one-shot migrator are wired up for real, the
-# same way docker-compose.yml already does for dev. Garage/Keycloak stay out until the
-# app actually consumes them - docker/garage.toml and docker/keycloak/forge-realm.json are dev-only
-# (checked-in secrets, sslRequired "none", localhost redirect URIs) and must not be reused as-is.
+# same way docker-compose.yml already does for dev. Garage stays out until the
+# app consumes it - docker/garage.toml is dev-only (checked-in secrets) and must not be reused as-is.
+# Keycloak (DD-20) is wired in below from the same image as dev: its realm takes every environment-specific
+# value from variables, so nothing under docker/keycloak is dev-only.
 #
 # Usage:
 #   cp .env.prod.example .env.prod   # fill in real values, never commit .env.prod
@@ -33,6 +34,53 @@ services:
       retries: 10
     restart: unless-stopped
 
+  postgres-authentication:
+    # DD-20, DD-23: dedicated PostgreSQL 18 instance for Keycloak so the identity provider's schema
+    # and storage lifecycle stay isolated from Forge's database.
+    image: postgres:18
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?set KEYCLOAK_DB_PASSWORD in .env.prod}
+    volumes:
+      - keycloak-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # DD-20: the same Keycloak image dev runs (realm + forge theme baked in), configured purely by
+  # environment. TLS terminates at the reverse proxy in front of both Forge and Keycloak.
+  keycloak:
+    build:
+      context: docker/keycloak
+      dockerfile: Dockerfile
+    command: ["start", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?set KEYCLOAK_ADMIN_PASSWORD in .env.prod}
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres-authentication
+      KC_DB_URL_PORT: "5432"
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?set KEYCLOAK_DB_PASSWORD in .env.prod}
+      KC_HOSTNAME: ${KEYCLOAK_PUBLIC_URL:-http://localhost:8081}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      FORGE_BASE_URL: ${FORGE_PUBLIC_URL:-http://localhost:8080}
+      FORGE_CLIENT_SECRET: ${FORGE_CLIENT_SECRET:?set FORGE_CLIENT_SECRET in .env.prod}
+      FORGE_KEYCLOAK_SSL_REQUIRED: external
+    ports:
+      - "127.0.0.1:${KEYCLOAK_PORT:-8081}:8080"
+    depends_on:
+      postgres-authentication:
+        condition: service_healthy
+    restart: unless-stopped
   # Migrations are an explicit, one-shot invocation - never something every replica runs at startup
   # - so this runs the same published image as `app` with its `migrate` command, and `app` depends
   # on it completing successfully rather than migrating itself.
@@ -65,6 +113,10 @@ services:
       ArtifactStore__AccessKey: ${ARTIFACT_STORE_ACCESS_KEY:?set ARTIFACT_STORE_ACCESS_KEY in .env.prod}
       ArtifactStore__SecretKey: ${ARTIFACT_STORE_SECRET_KEY:?set ARTIFACT_STORE_SECRET_KEY in .env.prod}
       ArtifactStore__ForcePathStyle: "true"
+      Authentication__Authority: ${KEYCLOAK_PUBLIC_URL:-http://localhost:8081}/realms/forge
+      Authentication__MetadataAddress: http://keycloak:8080/realms/forge/.well-known/openid-configuration
+      Authentication__ClientId: forge-web
+      Authentication__ClientSecret: ${FORGE_CLIENT_SECRET:?set FORGE_CLIENT_SECRET in .env.prod}
     ports:
       # Bound to localhost only - the image serves plain HTTP, so a reverse proxy on the same host
       # terminates TLS and forwards here. Don't expose this port to the internet directly.
@@ -73,8 +125,11 @@ services:
     depends_on:
       migrator:
         condition: service_completed_successfully
+      keycloak:
+        condition: service_started
     # Replicas are stateless and interchangeable - scale with `--scale app=N` behind your own load
     # balancer/reverse proxy.
 
 volumes:
   postgres-data:
+  keycloak-postgres-data:

@@ -37,11 +37,6 @@ namespace Mycelium.Forge.Common
         OrganizationAdministrator,
 
         /// <summary>
-        /// Regular member of an Organization.
-        /// </summary>
-        OrganizationMember,
-
-        /// <summary>
         /// Authenticated user account with personal scope and self-service capabilities.
         /// </summary>
         Account,

@@ -30,13 +30,5 @@ namespace Mycelium.Forge.Services
         /// <param name="forceLoad">The value indicating whether to force a reload.</param>
         /// <returns>A <see cref="Task{IUserContext}" /> representing the asynchronous operation.</returns>
         Task<IUserContext> GetUserContext(bool forceLoad = false);
-
-        /// <summary>
-        /// Sets the currently authenticated user by account identifier and optional roles.
-        /// </summary>
-        /// <param name="userId">The unique identifier of the user account to set as current, or <c>null</c> for unauthenticated.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task SetCurrentUser(Guid? userId, CancellationToken cancellationToken = default);
     }
 }

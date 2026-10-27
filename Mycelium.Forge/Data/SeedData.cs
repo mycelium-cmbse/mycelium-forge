@@ -39,7 +39,7 @@ namespace Mycelium.Forge.Data
 
             StefanAccount = new Account
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("c7e6d9d6-f1c4-4b95-b66f-8e182c331602"),
                 Owner = forgeId,
                 Name = "S. Kramer",
                 ShortName = "s-kramer",
@@ -52,7 +52,7 @@ namespace Mycelium.Forge.Data
 
             KleinAccount = new Account
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("c7e6d9d6-f1c4-4b95-b66f-8e182c331603"),
                 Owner = forgeId,
                 Name = "J. Klein",
                 ShortName = "j-klein",
@@ -65,7 +65,7 @@ namespace Mycelium.Forge.Data
 
             BlancAccount = new Account
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("c7e6d9d6-f1c4-4b95-b66f-8e182c331604"),
                 Owner = forgeId,
                 Name = "M. Blanc",
                 ShortName = "m-blanc",
@@ -78,7 +78,7 @@ namespace Mycelium.Forge.Data
 
             NovakAccount = new Account
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("c7e6d9d6-f1c4-4b95-b66f-8e182c331605"),
                 Owner = forgeId,
                 Name = "A. Novak",
                 ShortName = "a-novak",
@@ -97,6 +97,15 @@ namespace Mycelium.Forge.Data
                 BlancAccount,
                 NovakAccount
             ];
+
+            AccountRoles = new Dictionary<Guid, IReadOnlyList<RoleKind>>
+            {
+                { RegisAccount.Id, [RoleKind.InstallationAdministrator, RoleKind.Account] },
+                { StefanAccount.Id, [RoleKind.OrganizationAdministrator, RoleKind.Account] },
+                { KleinAccount.Id, [RoleKind.PlatformOperator, RoleKind.Account] },
+                { BlancAccount.Id, [RoleKind.Account] },
+                { NovakAccount.Id, [RoleKind.Account] }
+            };
 
             Forge = new Forge
             {
@@ -720,6 +729,11 @@ namespace Mycelium.Forge.Data
         /// Gets the list of initial accounts.
         /// </summary>
         public static IReadOnlyList<Account> Accounts { get; }
+
+        /// <summary>
+        /// Gets the identity provider realm roles granted to each seeded account, keyed by account identifier.
+        /// </summary>
+        public static IReadOnlyDictionary<Guid, IReadOnlyList<RoleKind>> AccountRoles { get; }
 
         /// <summary>
         /// Gets the Starion Group organization.

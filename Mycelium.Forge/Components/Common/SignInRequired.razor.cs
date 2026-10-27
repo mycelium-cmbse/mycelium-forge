@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SignInRequired.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -36,7 +36,7 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The computed login URL string.</returns>
         public string GetSignInUrl()
         {
-            return this.ReturnUrl.GetSignInUrl(this.NavigationManager);
+            return this.NavigationManager.GetSignInUrl(this.ReturnUrl);
         }
     }
 }

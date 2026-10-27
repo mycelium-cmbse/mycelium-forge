@@ -112,7 +112,7 @@
             <NotAuthorized>
                 <BbButton Variant="ButtonVariant.Outline"
                           Size="ButtonSize.Small"
-                          Href="@PageRoutes.Login"
+                          Href="@(this.GetSignInUrl())"
                           Class="h-8 px-3 text-xs shrink-0">
                     Sign in
                 </BbButton>

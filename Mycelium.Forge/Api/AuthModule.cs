@@ -10,69 +10,56 @@
 namespace Mycelium.Forge.Api
 {
     using System.Diagnostics.CodeAnalysis;
-    using System.Security.Claims;
 
     using Carter;
 
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Data;
-    using Mycelium.Forge.Services;
 
     /// <summary>
-    /// Routes the local cookie authentication endpoints for user login and logout.
+    /// Routes the endpoints that start and end the OpenID Connect session. The identity provider callbacks
+    /// (<c>/signin-oidc</c>, <c>/signout-callback-oidc</c>) are served by the authentication middleware itself.
     /// </summary>
-    /// <remarks>
-    /// This module is a temporary placeholder used solely to allow mock authentication data during development.
-    /// It MUST be removed once OpenID Connect (OIDC) is fully configured and MUST NEVER be used in real production.
-    /// <para>
-    /// Excluded from code coverage as it is a temporary development-only module that will be removed before production.
-    /// </para>
-    /// </remarks>
     [ExcludeFromCodeCoverage]
     public sealed class AuthModule : ICarterModule
     {
         /// <summary>
-        /// Registers the authentication endpoints on the supplied route builder.
+        /// The value of the OpenID Connect <c>prompt</c> parameter that opens the identity provider registration form.
         /// </summary>
-        /// <remarks>
-        /// This method registers temporary local mock login/logout endpoints that will be replaced when OIDC is configured.
-        /// </remarks>
+        private const string CreatePrompt = "create";
+
+        /// <summary>
+        /// Registers the sign-in, sign-up and sign-out endpoints on the supplied route builder.
+        /// </summary>
         /// <param name="app">The endpoint route builder the routes are registered on.</param>
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet(PageRoutes.AuthLogin, async (HttpContext httpContext, IUserService userService, CancellationToken cancellationToken) =>
+            app.MapGet(PageRoutes.Login, ([FromQuery(Name = UrlParameterNames.ReturnUrl)] string returnUrl) => Results.Challenge(CreateProperties(returnUrl), [OpenIdConnectDefaults.AuthenticationScheme])).WithName("AuthLogin");
+
+            app.MapGet(PageRoutes.SignUp, ([FromQuery(Name = UrlParameterNames.ReturnUrl)] string returnUrl) =>
             {
-                var regisAccount = SeedData.RegisAccount;
-                await userService.SetCurrentUser(regisAccount.Id, cancellationToken);
+                var properties = CreateProperties(returnUrl);
+                properties.SetParameter(OpenIdConnectParameterNames.Prompt, CreatePrompt);
 
-                var claims = new List<Claim>
-                {
-                    new(ClaimTypes.NameIdentifier, regisAccount.Id.ToString()),
-                    new(ClaimTypes.Name, regisAccount.ShortName),
-                    new(ClaimTypes.Email, regisAccount.Email),
-                    new(ClaimTypes.Role, nameof(RoleKind.InstallationAdministrator)),
-                    new(ClaimTypes.Role, nameof(RoleKind.OrganizationAdministrator)),
-                    new(ClaimTypes.Role, nameof(RoleKind.Account))
-                };
+                return Results.Challenge(properties, [OpenIdConnectDefaults.AuthenticationScheme]);
+            }).WithName("AuthSignUp");
 
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
-                var principal = new ClaimsPrincipal(identity);
+            app.MapGet(PageRoutes.Logout, () => Results.SignOut(CreateProperties(PageRoutes.Home), [CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme])).WithName("AuthLogout");
+        }
 
-                await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-                return Results.LocalRedirect(PageRoutes.Home);
-            }).WithName("AuthLogin");
-
-            app.MapGet(PageRoutes.Logout, async (HttpContext httpContext, IUserService userService, CancellationToken cancellationToken) =>
-            {
-                await userService.SetCurrentUser(null, cancellationToken);
-                await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-                return Results.LocalRedirect(PageRoutes.Home);
-            }).WithName("AuthLogout");
+        /// <summary>
+        /// Creates the authentication properties redirecting back to a validated local URL.
+        /// </summary>
+        /// <param name="returnUrl">The requested return URL, which falls back to the home page unless it is local.</param>
+        /// <returns>The <see cref="AuthenticationProperties" /> to pass to the authentication handlers.</returns>
+        private static AuthenticationProperties CreateProperties(string returnUrl)
+        {
+            return new AuthenticationProperties { RedirectUri = returnUrl.GetSafeReturnUrl() };
         }
     }
 }

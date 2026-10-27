@@ -109,13 +109,16 @@ namespace Mycelium.Forge
                         services.AddForgeDal();
                         services.AddScoped<IDatabaseMigrator, DatabaseMigrator>();
                         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+                        services.Configure<KeycloakOptions>(context.Configuration.GetSection(KeycloakOptions.SectionName));
+                        services.AddHttpClient<IKeycloakUserSeeder, KeycloakUserSeeder>();
                     });
 
                 using var host = hostBuilder.Build();
                 using var scope = host.Services.CreateScope();
                 var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+                var keycloakSeeder = scope.ServiceProvider.GetRequiredService<IKeycloakUserSeeder>();
 
-                return await seeder.SeedAsync() ? 0 : 1;
+                return await seeder.SeedAsync() && await keycloakSeeder.SeedAsync() ? 0 : 1;
             }
 
             var builder = WebApplication.CreateBuilder(args);
