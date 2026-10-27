@@ -129,8 +129,6 @@ namespace Mycelium.Forge.Services
         /// <returns>An <see cref="ErrorOr{TValue}" /> indicating whether account creation succeeded.</returns>
         private async Task<ErrorOr<Success>> CreateAccountAsync(ClaimsPrincipal principal, Guid accountId, string username, IUserContext systemContext, CancellationToken cancellationToken)
         {
-            var now = DateTime.UtcNow;
-
             var givenName = principal.FindFirstValue(GivenNameClaimType) ?? principal.FindFirstValue(ClaimTypes.GivenName);
             var familyName = principal.FindFirstValue(FamilyNameClaimType) ?? principal.FindFirstValue(ClaimTypes.Surname);
             var displayName = $"{givenName} {familyName}".Trim();
@@ -143,8 +141,8 @@ namespace Mycelium.Forge.Services
                 ShortName = username,
                 Email = principal.FindFirstValue(EmailClaimType) ?? principal.FindFirstValue(ClaimTypes.Email),
                 OwnedPackageInvitation = Guid.NewGuid(), // Remove this line once the domain model is updated and OwnedPackageInvitation is no longer mandatory (#138).
-                CreatedAt = now,
-                ModifiedAt = now
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow
             };
 
             var created = await this.accountService.CreateAsync(systemContext, [account], cancellationToken);

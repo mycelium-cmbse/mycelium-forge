@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="KeycloakUserSeeder.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -10,7 +10,6 @@
 namespace Mycelium.Forge.Data
 {
     using System.Net.Http.Headers;
-    using System.Net.Http.Json;
     using System.Text.Json;
 
     using Microsoft.Extensions.Options;
@@ -28,14 +27,14 @@ namespace Mycelium.Forge.Data
         private readonly HttpClient httpClient;
 
         /// <summary>
-        /// The injected <see cref="KeycloakOptions" /> holding the Keycloak administration settings.
-        /// </summary>
-        private readonly KeycloakOptions options;
-
-        /// <summary>
         /// The injected <see cref="ILogger{KeycloakUserSeeder}" /> used for logging.
         /// </summary>
         private readonly ILogger<KeycloakUserSeeder> logger;
+
+        /// <summary>
+        /// The injected <see cref="KeycloakOptions" /> holding the Keycloak administration settings.
+        /// </summary>
+        private readonly KeycloakOptions options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeycloakUserSeeder" /> class.
@@ -53,7 +52,7 @@ namespace Mycelium.Forge.Data
 
         /// <summary>
         /// Asynchronously creates one Keycloak user per seeded account, with the account identifier as user identifier and
-        /// the account roles as realm roles. Existing users are replaced.
+        /// the account roles as realm roles. Existing users are deleted prior to import.
         /// </summary>
         /// <remarks>
         /// The partial import endpoint is used because it, unlike user creation, preserves the supplied user identifiers.
@@ -68,6 +67,8 @@ namespace Mycelium.Forge.Data
             try
             {
                 this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await this.GetAdminTokenAsync(cancellationToken));
+
+                await this.DeleteExistingUsersAsync(cancellationToken);
 
                 var users = SeedData.Accounts.Select(account =>
                 {
@@ -93,20 +94,55 @@ namespace Mycelium.Forge.Data
                 using var response = await this.httpClient.PostAsJsonAsync($"admin/realms/{this.options.Realm}/partialImport", new { ifResourceExists = "OVERWRITE", users }, cancellationToken);
                 response.EnsureSuccessStatusCode();
 
-                foreach (var account in SeedData.Accounts)
-                {
-                    await this.AssignRolesAsync(account, cancellationToken);
-                }
+                await Task.WhenAll(SeedData.Accounts.Select(account => this.AssignRolesAsync(account, cancellationToken)));
 
                 this.logger.LogInformation("Seeded {Count} Keycloak users", SeedData.Accounts.Count);
 
                 return true;
             }
-            catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException)
+            catch (Exception exception)
             {
                 this.logger.LogError(exception, "Failed to seed the Keycloak users");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Deletes all existing users in the realm to ensure a clean seeding state.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task DeleteExistingUsersAsync(CancellationToken cancellationToken)
+        {
+            var existingUsers = await this.httpClient.GetFromJsonAsync<List<JsonElement>>($"admin/realms/{this.options.Realm}/users", cancellationToken);
+
+            if (existingUsers is not { Count: > 0 })
+            {
+                return;
+            }
+
+            var deleteTasks = existingUsers
+                .Select(user => user.GetProperty("id").GetString())
+                .Select(id => this.DeleteUserAsync(id, cancellationToken));
+
+            await Task.WhenAll(deleteTasks);
+        }
+
+        /// <summary>
+        /// Deletes an individual user by their identifier from the realm.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user to delete.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task DeleteUserAsync(string userId, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return;
+            }
+
+            using var response = await this.httpClient.DeleteAsync($"admin/realms/{this.options.Realm}/users/{userId}", cancellationToken);
+            response.EnsureSuccessStatusCode();
         }
 
         /// <summary>
@@ -117,12 +153,8 @@ namespace Mycelium.Forge.Data
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task AssignRolesAsync(Account account, CancellationToken cancellationToken)
         {
-            var roles = new List<JsonElement>();
-
-            foreach (var role in SeedData.AccountRoles[account.Id])
-            {
-                roles.Add(await this.httpClient.GetFromJsonAsync<JsonElement>($"admin/realms/{this.options.Realm}/roles/{role}", cancellationToken));
-            }
+            var roleTasks = SeedData.AccountRoles[account.Id].Select(role => this.httpClient.GetFromJsonAsync<JsonElement>($"admin/realms/{this.options.Realm}/roles/{role}", cancellationToken));
+            var roles = await Task.WhenAll(roleTasks);
 
             using var response = await this.httpClient.PostAsJsonAsync($"admin/realms/{this.options.Realm}/users/{account.Id}/role-mappings/realm", roles, cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -147,7 +179,6 @@ namespace Mycelium.Forge.Data
             response.EnsureSuccessStatusCode();
 
             using var document = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync(cancellationToken), cancellationToken: cancellationToken);
-
             return document.RootElement.GetProperty("access_token").GetString();
         }
     }

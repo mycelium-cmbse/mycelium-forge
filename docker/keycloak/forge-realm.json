@@ -37,14 +37,12 @@
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "redirectUris": [
-        "https://localhost*",
-        "http://localhost*",
-        "${FORGE_BASE_URL:http://localhost:8080}/*"
+        "${FORGE_BASE_URL:http://localhost:8080}/*",
+        "${FORGE_DEV_REDIRECT_URI:http://localhost*}"
       ],
       "webOrigins": [
-        "https://localhost*",
-        "http://localhost*",
         "${FORGE_BASE_URL:http://localhost:8080}",
+        "${FORGE_DEV_WEB_ORIGIN:http://localhost*}",
         "+"
       ],
       "attributes": {

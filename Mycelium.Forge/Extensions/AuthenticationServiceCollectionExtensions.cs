@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="AuthenticationServiceCollectionExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -26,7 +26,6 @@ namespace Mycelium.Forge.Extensions
     /// </summary>
     public static class AuthenticationServiceCollectionExtensions
     {
-
         /// <summary>
         /// The claim type carrying the preferred username issued by the identity provider.
         /// </summary>
@@ -106,6 +105,7 @@ namespace Mycelium.Forge.Extensions
                         options.NonceCookie.SecurePolicy = securePolicy;
 
                         options.Events.OnTokenValidated = OnTokenValidated;
+
                         options.Events.OnRemoteFailure = context =>
                         {
                             context.Response.Redirect(PageRoutes.Home);
@@ -175,7 +175,8 @@ namespace Mycelium.Forge.Extensions
 
             return roles.EnumerateArray()
                 .Select(role => Enum.TryParse<RoleKind>(role.GetString(), out var kind) ? kind : (RoleKind?)null)
-                .OfType<RoleKind>()
+                .Where(role => role.HasValue)
+                .Select(role => role.Value)
                 .Distinct();
         }
     }

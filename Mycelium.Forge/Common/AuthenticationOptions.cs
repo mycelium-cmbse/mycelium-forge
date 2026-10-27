@@ -43,6 +43,12 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Gets or sets a value indicating whether HTTPS metadata is required. Defaults to <see langword="true" />.
         /// </summary>
+        /// <remarks>
+        /// Set to <see langword="false" /> in Docker container deployments where Forge accesses Keycloak's discovery
+        /// document over the internal container network (e.g., <c>http://keycloak:8080</c>). ASP.NET Core rejects
+        /// <c>http://</c> metadata addresses unless this is set to <see langword="false" />. In production, public browser
+        /// traffic remains encrypted via reverse-proxy TLS termination and forwarded proto headers.
+        /// </remarks>
         public bool RequireHttpsMetadata { get; set; } = true;
     }
 }
