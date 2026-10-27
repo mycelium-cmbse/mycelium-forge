@@ -9,31 +9,32 @@
 
 namespace Mycelium.Forge.Tests.Common
 {
+    using System.Threading.Tasks;
+
+    using Bunit;
+
+    using Microsoft.AspNetCore.Components;
+    using Microsoft.Extensions.DependencyInjection;
+
     using Mycelium.Forge.Common;
 
-    /// <summary>
-    /// Test fixture for <see cref="UrlHelper" />.
-    /// </summary>
     [TestFixture]
     public class UrlHelperTestFixture
     {
-        /// <summary>
-        /// Verifies that <see cref="UrlHelper.GetAuthLoginUrl" /> generates the cookie auth login endpoint URL.
-        /// </summary>
-        [Test]
-        public void VerifyGetAuthLoginUrl()
+        private BunitContext context;
+
+        [SetUp]
+        public void SetUp()
         {
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That("/my-packages".GetAuthLoginUrl(), Is.EqualTo($"{PageRoutes.AuthLogin}?{UrlParameterNames.ReturnUrl}=%2Fmy-packages"));
-                Assert.That("//evil.com".GetAuthLoginUrl(), Is.EqualTo($"{PageRoutes.AuthLogin}?{UrlParameterNames.ReturnUrl}=%2F"));
-            }
+            this.context = new BunitContext();
         }
 
-        /// <summary>
-        /// Verifies that <see cref="UrlHelper.GetSafeReturnUrl" /> safely resolves local URLs and applies
-        /// fallbacks.
-        /// </summary>
+        [TearDown]
+        public async Task TearDown()
+        {
+            await this.context.DisposeAsync();
+        }
+
         [Test]
         public void VerifyGetSafeReturnUrl()
         {
@@ -51,28 +52,21 @@ namespace Mycelium.Forge.Tests.Common
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="UrlHelper.GetSignInUrl" />
-        /// generates the proper login URL.
-        /// </summary>
         [Test]
         public void VerifyGetSignInUrl()
         {
-            string? nullUrl = null;
+            var nav = this.context.Services.GetRequiredService<NavigationManager>();
+            nav.NavigateTo("http://localhost/packages/detail");
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That("/my-packages".GetSignInUrl(), Is.EqualTo($"{PageRoutes.Login}?{UrlParameterNames.ReturnUrl}=%2Fmy-packages"));
-                Assert.That(nullUrl.GetSignInUrl(), Is.EqualTo(PageRoutes.Login));
-                Assert.That("//evil.com".GetSignInUrl(), Is.EqualTo(PageRoutes.Login));
-                Assert.That(PageRoutes.Login.GetSignInUrl(), Is.EqualTo(PageRoutes.Login));
+                Assert.That(nav.GetSignInUrl("/my-packages"), Is.EqualTo($"{PageRoutes.Login}?{UrlParameterNames.ReturnUrl}=%2Fmy-packages"));
+                Assert.That(nav.GetSignInUrl(), Is.EqualTo($"{PageRoutes.Login}?{UrlParameterNames.ReturnUrl}=packages%2Fdetail"));
+                Assert.That(nav.GetSignInUrl("//evil.com"), Is.EqualTo(PageRoutes.Login));
+                Assert.That(nav.GetSignInUrl(PageRoutes.Login), Is.EqualTo(PageRoutes.Login));
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="UrlHelper.IsLocalUrl" /> correctly validates local URLs and rejects open redirect
-        /// targets.
-        /// </summary>
         [Test]
         public void VerifyIsLocalUrl()
         {
