@@ -127,6 +127,11 @@ services:
       FORGE_CLIENT_SECRET: forge-dev-client-secret
       FORGE_KEYCLOAK_SSL_REQUIRED: none
       FORGE_KEYCLOAK_VERIFY_EMAIL: "false"
+      # Username validator extension (docker/keycloak/spi): where to reach Forge from inside this container
+      # (not FORGE_BASE_URL, which is the browser-facing URL and resolves to this container itself) and the
+      # shared secret it presents. docker-compose.dev.yml overrides the URL for Forge running on the host.
+      FORGE_SPI_BASE_URL: http://app:8080
+      FORGE_SPI_API_KEY: forge-dev-keycloak-spi-key
     volumes:
       - ./docker/keycloak/themes/forge:/opt/keycloak/themes/forge:ro
     ports:
@@ -179,6 +184,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       <<: [*database-environment, *storage-environment, *authentication-environment]
+      KeycloakSpi__ApiKey: forge-dev-keycloak-spi-key
     ports:
       - "8080:8080"
     depends_on:

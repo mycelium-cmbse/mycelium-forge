@@ -165,6 +165,8 @@ namespace Mycelium.Forge
 
             builder.Services.Configure<ShortcutCommandsOptions>(builder.Configuration.GetSection(ShortcutCommandsOptions.SectionName));
 
+            builder.Services.Configure<KeycloakSpiOptions>(builder.Configuration.GetSection(KeycloakSpiOptions.SectionName));
+
             RxAppBuilder.CreateReactiveUIBuilder().BuildApp();
 
             builder.RegisterDatabase();
@@ -195,7 +197,10 @@ namespace Mycelium.Forge
             app.UseStatusCodePagesWithReExecute(PageRoutes.NotFound, createScopeForStatusCodePages: true);
 
             // SSS-CC-EXT-FG1: the Forge HTTP API is served over HTTPS.
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseAuthentication();
             app.UseAuthorization();

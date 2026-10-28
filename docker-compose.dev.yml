@@ -24,6 +24,11 @@ services:
     extends:
       file: docker-compose.yml
       service: keycloak
+    environment:
+      # Forge runs on the host from the IDE (http profile port), not as a compose service.
+      FORGE_SPI_BASE_URL: http://host.docker.internal:5000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres-authentication:
         condition: service_healthy
