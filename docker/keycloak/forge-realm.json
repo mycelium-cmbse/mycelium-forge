@@ -38,11 +38,11 @@
       "serviceAccountsEnabled": false,
       "redirectUris": [
         "${FORGE_BASE_URL:http://localhost:8080}/*",
-        "${FORGE_DEV_REDIRECT_URI:http://localhost*}"
+        "${FORGE_DEV_REDIRECT_URI:https://localhost:5001/*}"
       ],
       "webOrigins": [
         "${FORGE_BASE_URL:http://localhost:8080}",
-        "${FORGE_DEV_WEB_ORIGIN:http://localhost*}",
+        "${FORGE_DEV_WEB_ORIGIN:https://localhost:5001}",
         "+"
       ],
       "attributes": {
