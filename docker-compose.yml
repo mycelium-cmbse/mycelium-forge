@@ -205,7 +205,8 @@ services:
     volumes:
       - .:/workspaces/mycelium-forge:cached
     environment:
-      <<: [*database-environment, *storage-environment]
+      <<: [*database-environment, *storage-environment, *authentication-environment]
+      Keycloak__BaseUrl: http://keycloak:8080
 
 volumes:
   postgres-data:
