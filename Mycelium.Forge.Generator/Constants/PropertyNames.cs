@@ -33,5 +33,15 @@ namespace Mycelium.Forge.Generator.Constants
         /// The Id property name.
         /// </summary>
         public const string Id = "Id";
+
+        /// <summary>
+        /// The CreatedAt property name.
+        /// </summary>
+        public const string CreatedAt = "CreatedAt";
+
+        /// <summary>
+        /// The ModifiedAt property name.
+        /// </summary>
+        public const string ModifiedAt = "ModifiedAt";
     }
 }

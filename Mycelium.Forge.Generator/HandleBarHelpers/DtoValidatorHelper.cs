@@ -13,6 +13,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using HandlebarsDotNet;
 
+    using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.Extensions;
 
     using uml4net.Classification;
@@ -187,7 +188,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             return property.IsDerived ||
                    property.IsDerivedUnion ||
                    property.IsReadOnly ||
-                   property.Name.Equals("classKind", StringComparison.OrdinalIgnoreCase);
+                   property.Name.Equals("classKind", StringComparison.OrdinalIgnoreCase) ||
+                   property.Name.Equals(PropertyNames.CreatedAt, StringComparison.OrdinalIgnoreCase) ||
+                   property.Name.Equals(PropertyNames.ModifiedAt, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
