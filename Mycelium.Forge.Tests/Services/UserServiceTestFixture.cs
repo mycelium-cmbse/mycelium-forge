@@ -63,8 +63,8 @@ namespace Mycelium.Forge.Tests.Services
             var regisPrincipal = CreatePrincipal(SeedData.RegisAccount.Id, RoleKind.Account);
             this.authenticationStateProvider.SetAuthenticationState(regisPrincipal);
 
+            // Case: Success via "nameidentifier" claim
             var user = await this.userService.GetCurrentUser();
-            var userForceLoaded = await this.userService.GetCurrentUser(true);
 
             using (Assert.EnterMultipleScope())
             {
@@ -72,8 +72,48 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(user.Id, Is.EqualTo(SeedData.RegisAccount.Id));
                 Assert.That(user.Name, Is.EqualTo(SeedData.RegisAccount.Name));
                 Assert.That(user.ShortName, Is.EqualTo(SeedData.RegisAccount.ShortName));
-                Assert.That(userForceLoaded, Is.SameAs(user));
             }
+
+            // Case: Force load user again, should return the same instance
+            var userForceLoaded = await this.userService.GetCurrentUser(true);
+            Assert.That(userForceLoaded, Is.SameAs(user));
+
+            // Case: Success via "sub" claim
+            var subPrincipal = new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", SeedData.StefanAccount.Id.ToString()), new Claim(ClaimTypes.Role, nameof(RoleKind.Account))], "auth"));
+            this.authenticationStateProvider.SetAuthenticationState(subPrincipal);
+
+            var stefanUser = await this.userService.GetCurrentUser(true);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(stefanUser, Is.Not.Null);
+                Assert.That(stefanUser.Id, Is.EqualTo(SeedData.StefanAccount.Id));
+                Assert.That(stefanUser.Name, Is.EqualTo(SeedData.StefanAccount.Name));
+                Assert.That(stefanUser.ShortName, Is.EqualTo(SeedData.StefanAccount.ShortName));
+            }
+
+            // Case: Invalid Guid in subject claim
+            var invalidGuidPrincipal = new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", "invalid-guid"), new Claim(ClaimTypes.Role, nameof(RoleKind.Account))], "auth"));
+            this.authenticationStateProvider.SetAuthenticationState(invalidGuidPrincipal);
+
+            var invalidGuidUser = await this.userService.GetCurrentUser(true);
+            Assert.That(invalidGuidUser, Is.Null);
+
+            // Case: No valid roles assigned to user
+            var noRolesPrincipal = new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", SeedData.StefanAccount.Id.ToString())], "auth"));
+            this.authenticationStateProvider.SetAuthenticationState(noRolesPrincipal);
+
+            var noRolesUser = await this.userService.GetCurrentUser(true);
+            Assert.That(noRolesUser, Is.Null);
+
+            // Case: Account service returns empty
+            var missingUserId = Guid.NewGuid();
+            this.accountServiceMock.Setup(service => service.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == missingUserId))).ReturnsAsync(ImmutableList<IAccount>.Empty);
+            var missingPrincipal = new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", missingUserId.ToString()), new Claim(ClaimTypes.Role, nameof(RoleKind.Account))], "auth"));
+            this.authenticationStateProvider.SetAuthenticationState(missingPrincipal);
+
+            var missingUser = await this.userService.GetCurrentUser(true);
+            Assert.That(missingUser, Is.Null);
         }
 
         [Test]

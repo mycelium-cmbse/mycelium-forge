@@ -14,4 +14,6 @@ COPY --from=spi /build/target/forge-keycloak-spi.jar /opt/keycloak/providers/for
 COPY themes/forge /opt/keycloak/themes/forge
 COPY forge-realm.json /opt/keycloak/data/import/forge-realm.json
 
+USER 1000
+
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]

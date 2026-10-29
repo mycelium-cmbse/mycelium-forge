@@ -130,7 +130,7 @@ namespace Mycelium.Forge.Extensions
         /// </remarks>
         /// <param name="context">The <see cref="TokenValidatedContext" /> of the sign-in.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private static async Task OnTokenValidated(TokenValidatedContext context)
+        public static async Task OnTokenValidated(TokenValidatedContext context)
         {
             if (context.Principal?.Identity is not ClaimsIdentity identity)
             {

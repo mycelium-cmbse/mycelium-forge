@@ -1,9 +1,6 @@
-# Production deployment (current state): runs the published Mycelium.Forge image against a real
-# PostgreSQL instance. Program.cs's normal startup path still doesn't touch PostgreSQL, Garage or
-# Keycloak itself (only the standalone `migrate` command reads ConnectionStrings:Default) - but
-# schema.sql is worth applying now, so postgres + the one-shot migrator are wired up for real, the
-# same way docker-compose.yml already does for dev. Garage stays out until the
-# app consumes it - docker/garage.toml is dev-only (checked-in secrets) and must not be reused as-is.
+# Production deployment: runs the published Mycelium.Forge image against PostgreSQL,
+# Garage (object storage), and Keycloak (identity provider), plus the one-shot migrator
+# the app depends on (DD-18).
 # Keycloak (DD-20) is wired in below from the same image as dev: its realm takes every environment-specific
 # value from variables, so nothing under docker/keycloak is dev-only.
 #
@@ -20,8 +17,7 @@ services:
       POSTGRES_USER: forge
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
       # forge_runtime is the least-privileged role schema.sql's REVOKE/GRANT targets - created by
-      # docker/postgres/00-create-roles.sh below. Not consumed by the app yet (nothing on the app's
-      # own runtime path queries the database today), provisioned ahead of that landing.
+      # docker/postgres/00-create-roles.sh below.
       FORGE_RUNTIME_PASSWORD: ${FORGE_RUNTIME_PASSWORD:?set FORGE_RUNTIME_PASSWORD in .env.prod}
     volumes:
       # PostgreSQL 18's image expects a single mount at /var/lib/postgresql, see docker-compose.yml.
@@ -46,6 +42,30 @@ services:
       - keycloak-postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  garage:
+    # DD-21: Garage is the named object-storage implementation - "the local development and CI
+    # target, so the path exercised in development is the path production runs." Pinned >= v2.3.0
+    # for --default-bucket's automatic key/bucket bootstrap.
+    image: dxflrs/garage:v2.3.0
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: ${ARTIFACT_STORE_ACCESS_KEY:?set ARTIFACT_STORE_ACCESS_KEY in .env.prod}
+      GARAGE_DEFAULT_SECRET_KEY: ${ARTIFACT_STORE_SECRET_KEY:?set ARTIFACT_STORE_SECRET_KEY in .env.prod}
+      GARAGE_DEFAULT_BUCKET: forge-artefacts
+      GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET:?set GARAGE_RPC_SECRET in .env.prod}
+      GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN:?set GARAGE_ADMIN_TOKEN in .env.prod}
+      GARAGE_METRICS_TOKEN: ${GARAGE_METRICS_TOKEN:?set GARAGE_METRICS_TOKEN in .env.prod}
+    volumes:
+      - ./docker/garage.prod.toml:/etc/garage.toml:ro
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -77,13 +97,21 @@ services:
       FORGE_DEV_WEB_ORIGIN: ${FORGE_PUBLIC_URL:?set FORGE_PUBLIC_URL in .env.prod}
       FORGE_CLIENT_SECRET: ${FORGE_CLIENT_SECRET:?set FORGE_CLIENT_SECRET in .env.prod}
       FORGE_KEYCLOAK_SSL_REQUIRED: external
+      FORGE_KEYCLOAK_VERIFY_EMAIL: "false"
       FORGE_SPI_BASE_URL: http://app:8080
-      FORGE_SPI_API_KEY: ${KEYCLOAK_SPI_API_KEY:?set KEYCLOAK_SPI_API_KEY in .env.prod}
+      FORGE_SPI_SECRET: ${KEYCLOAK_SPI_SECRET:?set KEYCLOAK_SPI_SECRET in .env.prod}
     ports:
       - "127.0.0.1:${KEYCLOAK_PORT:-8081}:8080"
     depends_on:
       postgres-authentication:
         condition: service_healthy
+    healthcheck:
+      # No curl/wget in the Keycloak image either; probe the management health endpoint over the
+      # container's own /dev/tcp instead.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
     restart: unless-stopped
   # Migrations are an explicit, one-shot invocation - never something every replica runs at startup
   # - so this runs the same published image as `app` with its `migrate` command, and `app` depends
@@ -122,7 +150,7 @@ services:
       Authentication__ClientId: forge-web
       Authentication__ClientSecret: ${FORGE_CLIENT_SECRET:?set FORGE_CLIENT_SECRET in .env.prod}
       Authentication__RequireHttpsMetadata: "false"
-      KeycloakSpi__ApiKey: ${KEYCLOAK_SPI_API_KEY:?set KEYCLOAK_SPI_API_KEY in .env.prod}
+      KeycloakSpi__Secret: ${KEYCLOAK_SPI_SECRET:?set KEYCLOAK_SPI_SECRET in .env.prod}
     ports:
       # Bound to localhost only - the image serves plain HTTP, so a reverse proxy on the same host
       # terminates TLS and forwards here. Don't expose this port to the internet directly.
@@ -131,11 +159,15 @@ services:
     depends_on:
       migrator:
         condition: service_completed_successfully
+      garage:
+        condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     # Replicas are stateless and interchangeable - scale with `--scale app=N` behind your own load
     # balancer/reverse proxy.
 
 volumes:
   postgres-data:
   keycloak-postgres-data:
+  garage-meta:
+  garage-data:

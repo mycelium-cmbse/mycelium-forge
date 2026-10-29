@@ -153,7 +153,10 @@ namespace Mycelium.Forge.Services
                 return created.Errors;
             }
 
-            this.logger.LogInformation("Provisioned the account of {Username} on first sign-in", username);
+            if (this.logger.IsEnabled(LogLevel.Information))
+            {
+                this.logger.LogInformation("Provisioned the account of {Username} on first sign-in", username);
+            }
 
             return Result.Success;
         }

@@ -48,6 +48,11 @@ namespace Mycelium.Forge.Services
         private IAccount currentUser;
 
         /// <summary>
+        /// A value indicating whether the service has already been disposed.
+        /// </summary>
+        private bool disposed;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="UserService" /> class in an unauthenticated state.
         /// </summary>
         /// <param name="accountService">The injected <see cref="IAccountService" />.</param>
@@ -62,11 +67,11 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Releases all managed and unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            this.authenticationStateProvider.AuthenticationStateChanged -= this.OnAuthenticationStateChanged;
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -107,6 +112,28 @@ namespace Mycelium.Forge.Services
                 Username = user.ShortName,
                 CurrentRoles = this.currentRoles
             };
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// <see langword="true" /> to release both managed and unmanaged resources; <see langword="false" /> to release only
+        /// unmanaged resources.
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                this.authenticationStateProvider.AuthenticationStateChanged -= this.OnAuthenticationStateChanged;
+            }
+
+            this.disposed = true;
         }
 
         /// <summary>

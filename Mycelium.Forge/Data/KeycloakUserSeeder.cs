@@ -96,7 +96,10 @@ namespace Mycelium.Forge.Data
 
                 await Task.WhenAll(SeedData.Accounts.Select(account => this.AssignRolesAsync(account, cancellationToken)));
 
-                this.logger.LogInformation("Seeded {Count} Keycloak users", SeedData.Accounts.Count);
+                if (this.logger.IsEnabled(LogLevel.Information))
+                {
+                    this.logger.LogInformation("Seeded {Count} Keycloak users", SeedData.Accounts.Count);
+                }
 
                 return true;
             }
