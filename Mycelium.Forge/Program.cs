@@ -197,10 +197,7 @@ namespace Mycelium.Forge
             app.UseStatusCodePagesWithReExecute(PageRoutes.NotFound, createScopeForStatusCodePages: true);
 
             // SSS-CC-EXT-FG1: the Forge HTTP API is served over HTTPS.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-            }
+            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

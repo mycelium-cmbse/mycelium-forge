@@ -13,6 +13,9 @@
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
   "bruteForceProtected": true,
+  "attributes": {
+    "userProfileEnabled": "true"
+  },
   "defaultRole": {
     "name": "Account",
     "description": "Default role of every Forge account"

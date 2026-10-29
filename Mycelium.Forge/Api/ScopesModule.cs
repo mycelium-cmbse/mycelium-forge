@@ -33,7 +33,7 @@ namespace Mycelium.Forge.Api
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             // Used by the Keycloak username validator to keep usernames from matching the short name of an existing scope.
-            app.MapGet("/api/v1/scopes/shortnames/{shortName}", ScopeShortNameExistsAsync)
+            app.MapGet(ApiRoutes.ScopeShortNameExists, ScopeShortNameExistsAsync)
                 .WithName("ScopeShortNameExists");
         }
 
@@ -46,19 +46,14 @@ namespace Mycelium.Forge.Api
         /// <param name="scopeService">The injected <see cref="IScopeService" />.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
-        /// A 404 when no API key is configured or the scope does not exist, a 401 when the API key is missing or invalid,
-        /// a 200 when the scope exists, or a 500 when it could not be read.
+        /// A 401 when the API key is missing, invalid, or unconfigured; a 404 when the scope does not exist; a 200 when the
+        /// scope exists; or a 500 when it could not be read.
         /// </returns>
         public static async Task<IResult> ScopeShortNameExistsAsync(string shortName, HttpRequest request, IOptions<KeycloakSpiOptions> options, IScopeService scopeService, CancellationToken cancellationToken)
         {
             var apiKey = options.Value.ApiKey;
 
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                return Results.NotFound();
-            }
-
-            if (!IsApiKeyValid(request.Headers[KeycloakSpiOptions.ApiKeyHeaderName].ToString(), apiKey))
+            if (string.IsNullOrEmpty(apiKey) || !IsApiKeyValid(request.Headers[KeycloakSpiOptions.ApiKeyHeaderName].ToString(), apiKey))
             {
                 return Results.Unauthorized();
             }
@@ -70,7 +65,7 @@ namespace Mycelium.Forge.Api
                 CurrentRoles = [RoleKind.InstallationAdministrator]
             };
 
-            var result = await scopeService.ReadByShortNameAsync(systemContext, cancellationToken, [shortName]);
+            var result = await scopeService.ReadByShortNameAsync(systemContext, cancellationToken, [shortName.ToLowerInvariant()]);
 
             if (result.IsError)
             {

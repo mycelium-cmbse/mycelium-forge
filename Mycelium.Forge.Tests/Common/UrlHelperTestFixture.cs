@@ -55,15 +55,15 @@ namespace Mycelium.Forge.Tests.Common
         [Test]
         public void VerifyGetSignInUrl()
         {
-            var nav = this.context.Services.GetRequiredService<NavigationManager>();
-            nav.NavigateTo("http://localhost/packages/detail");
+            var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
+            navigationManager.NavigateTo("http://localhost/packages/detail");
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(nav.GetSignInUrl("/my-packages"), Is.EqualTo($"{PageRoutes.Login}?{UrlParameterNames.ReturnUrl}=%2Fmy-packages"));
-                Assert.That(nav.GetSignInUrl(), Is.EqualTo($"{PageRoutes.Login}?{UrlParameterNames.ReturnUrl}=packages%2Fdetail"));
-                Assert.That(nav.GetSignInUrl("//evil.com"), Is.EqualTo(PageRoutes.Login));
-                Assert.That(nav.GetSignInUrl(PageRoutes.Login), Is.EqualTo(PageRoutes.Login));
+                Assert.That(navigationManager.GetSignInUrl("/my-packages"), Is.EqualTo($"{PageRoutes.Login}?{UrlParameterNames.ReturnUrl}=%2Fmy-packages"));
+                Assert.That(navigationManager.GetSignInUrl(), Is.EqualTo($"{PageRoutes.Login}?{UrlParameterNames.ReturnUrl}=packages%2Fdetail"));
+                Assert.That(navigationManager.GetSignInUrl("//evil.com"), Is.EqualTo(PageRoutes.Login));
+                Assert.That(navigationManager.GetSignInUrl(PageRoutes.Login), Is.EqualTo(PageRoutes.Login));
             }
         }
 

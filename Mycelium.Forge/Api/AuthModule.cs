@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="AuthModule.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -59,7 +59,10 @@ namespace Mycelium.Forge.Api
         /// <returns>The <see cref="AuthenticationProperties" /> to pass to the authentication handlers.</returns>
         private static AuthenticationProperties CreateProperties(string returnUrl)
         {
-            return new AuthenticationProperties { RedirectUri = returnUrl.GetSafeReturnUrl() };
+            var safeUrl = returnUrl.GetSafeReturnUrl();
+            var redirectUri = safeUrl.StartsWith('/') ? safeUrl : $"/{safeUrl}";
+
+            return new AuthenticationProperties { RedirectUri = redirectUri };
         }
     }
 }

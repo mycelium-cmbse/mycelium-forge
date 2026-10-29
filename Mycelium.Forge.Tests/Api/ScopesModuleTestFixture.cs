@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Api
 {
+    using System;
     using System.Collections.Immutable;
     using System.Threading;
     using System.Threading.Tasks;
@@ -44,9 +45,9 @@ namespace Mycelium.Forge.Tests.Api
             var unconfiguredOptions = Options.Create(new KeycloakSpiOptions { ApiKey = string.Empty });
             var httpContext = new DefaultHttpContext();
 
-            // Case 1: Unconfigured server API key returns 404 (disabled)
+            // Case 1: Unconfigured server API key returns 401
             var unconfiguredResult = await ScopesModule.ScopeShortNameExistsAsync("any-scope", httpContext.Request, unconfiguredOptions, this.scopeServiceMock.Object, CancellationToken.None);
-            Assert.That((unconfiguredResult as IStatusCodeHttpResult)?.StatusCode, Is.EqualTo(StatusCodes.Status404NotFound));
+            Assert.That((unconfiguredResult as IStatusCodeHttpResult)?.StatusCode, Is.EqualTo(StatusCodes.Status401Unauthorized));
 
             // Case 2: Missing API key header returns 401
             httpContext.Request.Headers.Clear();
@@ -60,8 +61,8 @@ namespace Mycelium.Forge.Tests.Api
 
             // Case 4: Scope exists returns 200
             httpContext.Request.Headers[KeycloakSpiOptions.ApiKeyHeaderName] = ConfiguredApiKey;
-            var existingScopeMock = new Mock<IScope>();
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create(existingScopeMock.Object));
+            var existingScope = new Account { Id = Guid.NewGuid(), ShortName = "existing-scope" };
+            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IScope>(existingScope));
             var existsResult = await ScopesModule.ScopeShortNameExistsAsync("existing-scope", httpContext.Request, validOptions, this.scopeServiceMock.Object, CancellationToken.None);
             Assert.That((existsResult as IStatusCodeHttpResult)?.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
 

@@ -89,7 +89,9 @@ namespace Mycelium.Forge.Tests.Services
             {
                 new("sub", newUserId.ToString()),
                 new("preferred_username", "newuser"),
-                new("email", "newuser@example.com")
+                new("email", "newuser@example.com"),
+                new("given_name", "New"),
+                new("family_name", "User")
             };
 
             var newPrincipal = new ClaimsPrincipal(new ClaimsIdentity(newClaims, "OIDC"));
@@ -99,7 +101,7 @@ namespace Mycelium.Forge.Tests.Services
                 .ReturnsAsync(ImmutableList<IAccount>.Empty);
 
             this.accountServiceMock
-                .Setup(service => service.CreateAsync(It.IsAny<IUserContext>(), It.Is<IEnumerable<IAccount>>(accounts => accounts.Any(a => a.ShortName == "newuser")), It.IsAny<CancellationToken>()))
+                .Setup(service => service.CreateAsync(It.IsAny<IUserContext>(), It.Is<IEnumerable<IAccount>>(accounts => accounts.Any(a => a.ShortName == "newuser" && a.Name == "New User")), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
 
             var createdResult = await this.provisioner.ProvisionAsync(newPrincipal, CancellationToken.None);

@@ -94,11 +94,11 @@ namespace Mycelium.Forge.Tests.Components.Layout
         public async Task VerifyOnSignOut()
         {
             var accountMenu = this.context.Render<AccountMenu>();
-            var nav = this.context.Services.GetRequiredService<NavigationManager>();
+            var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
 
             await accountMenu.InvokeAsync(() => accountMenu.Instance.OnSignOut());
 
-            Assert.That(nav.Uri, Does.Contain(PageRoutes.Logout));
+            Assert.That(navigationManager.Uri, Does.Contain(PageRoutes.Logout));
         }
     }
 }

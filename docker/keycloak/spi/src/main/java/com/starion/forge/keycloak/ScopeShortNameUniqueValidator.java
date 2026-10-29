@@ -21,7 +21,7 @@ import org.keycloak.validate.ValidatorConfig;
 /**
  * Rejects a username that equals the short name of an existing Forge scope (an Account or an Organization).
  * The check runs when the user is created and whenever the username of an existing user changes.
- * It queries Forge through <code>GET /api/v1/scopes/shortnames/{shortName}</code>: 200 means the short name
+ * It queries Forge through <code>GET /api/v1/internal/scopes/shortnames/{shortName}/exists</code>: 200 means the short name
  * is taken, 404 means it is free. Any other outcome rejects the value (fail closed).
  */
 public class ScopeShortNameUniqueValidator extends AbstractSimpleValidator {
@@ -149,15 +149,18 @@ public class ScopeShortNameUniqueValidator extends AbstractSimpleValidator {
             return Lookup.UNAVAILABLE;
         }
 
-        var encoded = URLEncoder.encode(username, StandardCharsets.UTF_8).replace("+", "%20");
-        var uri = URI.create(baseUrl.replaceAll("/+$", "") + "/api/v1/scopes/shortnames/" + encoded);
-        var request = HttpRequest.newBuilder(uri)
-                .GET()
-                .header(API_KEY_HEADER, apiKey)
-                .timeout(TIMEOUT)
-                .build();
-
         try {
+            var encoded = URLEncoder.encode(username, StandardCharsets.UTF_8).replace("+", "%20");
+            var uri = URI.create(baseUrl.replaceAll("/+$", "") + "/api/v1/internal/scopes/shortnames/" + encoded + "/exists");
+            
+            // Tells Forge's ForwardedHeadersMiddleware the internal request is secure so UseHttpsRedirection does not issue a 307.
+            var request = HttpRequest.newBuilder(uri)
+                    .GET()
+                    .header(API_KEY_HEADER, apiKey)
+                    .header("X-Forwarded-Proto", "https")
+                    .timeout(TIMEOUT)
+                    .build();
+
             var status = httpClient.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
 
             return switch (status) {
@@ -168,11 +171,11 @@ public class ScopeShortNameUniqueValidator extends AbstractSimpleValidator {
                     yield Lookup.UNAVAILABLE;
                 }
             };
-        } catch (IOException exception) {
-            LOGGER.error("Forge could not be reached to look up a short name", exception);
-            return Lookup.UNAVAILABLE;
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
+            return Lookup.UNAVAILABLE;
+        } catch (Exception exception) {
+            LOGGER.error("Forge could not be reached to look up a short name", exception);
             return Lookup.UNAVAILABLE;
         }
     }
