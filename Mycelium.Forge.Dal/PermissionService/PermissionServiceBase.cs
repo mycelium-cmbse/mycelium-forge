@@ -30,11 +30,6 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether creation is permitted.</returns>
         public virtual Task<ErrorOr<Success>> IsAllowedToCreate(IUserContext userContext, TThing toCreate, NpgsqlTransaction transaction)
         {
-            if (toCreate.CreatedAt != default || toCreate.ModifiedAt != default)
-            {
-                return Task.FromResult<ErrorOr<Success>>(Error.Validation(description: $"{nameof(IThing.CreatedAt)} and {nameof(IThing.ModifiedAt)} values cannot be set by client."));
-            }
-
             return this.IsAllowedToCreateImplementation(userContext, toCreate, transaction);
         }
 
@@ -61,11 +56,6 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether updating is permitted.</returns>
         public virtual Task<ErrorOr<Success>> IsAllowedToUpdate(IUserContext userContext, TThing existingThing, TThing updatedThing, NpgsqlTransaction transaction)
         {
-            if (existingThing.CreatedAt != updatedThing.CreatedAt || existingThing.ModifiedAt != updatedThing.ModifiedAt)
-            {
-                return Task.FromResult<ErrorOr<Success>>(Error.Validation(description: $"{nameof(IThing.CreatedAt)} and {nameof(IThing.ModifiedAt)} values cannot be changed by client."));
-            }
-
             return this.IsAllowedToUpdateImplementation(userContext, existingThing, updatedThing, transaction);
         }
 

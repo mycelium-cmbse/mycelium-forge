@@ -123,6 +123,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
                 Assert.That(updatedReadResult.IsError, Is.False);
                 Assert.That(updatedReadResult.Value.Single().Email, Is.EqualTo("updated-org@example.com"));
                 Assert.That(updatedReadResult.Value.Single().BillingEmail, Is.EqualTo("updated-billing@example.com"));
+                Assert.That(updatedReadResult.Value.Single().ModifiedAt, Is.GreaterThan(organization.CreatedAt));
             }
         }
 

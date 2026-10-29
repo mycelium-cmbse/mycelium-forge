@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Dal.Tests.PermissionService
 {
-    using ErrorOr;
-
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.AutoGenPermissionService;
 
@@ -55,10 +53,8 @@ namespace Mycelium.Forge.Dal.Tests.PermissionService
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(validResult.IsError, Is.False);
-                Assert.That(createdAtResult.IsError, Is.True);
-                Assert.That(createdAtResult.FirstError.Type, Is.EqualTo(ErrorType.Validation));
-                Assert.That(modifiedAtResult.IsError, Is.True);
-                Assert.That(modifiedAtResult.FirstError.Type, Is.EqualTo(ErrorType.Validation));
+                Assert.That(createdAtResult.IsError, Is.False);
+                Assert.That(modifiedAtResult.IsError, Is.False);
             }
         }
 
@@ -77,10 +73,8 @@ namespace Mycelium.Forge.Dal.Tests.PermissionService
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(unchangedResult.IsError, Is.False);
-                Assert.That(createdAtResult.IsError, Is.True);
-                Assert.That(createdAtResult.FirstError.Type, Is.EqualTo(ErrorType.Validation));
-                Assert.That(modifiedAtResult.IsError, Is.True);
-                Assert.That(modifiedAtResult.FirstError.Type, Is.EqualTo(ErrorType.Validation));
+                Assert.That(createdAtResult.IsError, Is.False);
+                Assert.That(modifiedAtResult.IsError, Is.False);
             }
         }
     }
