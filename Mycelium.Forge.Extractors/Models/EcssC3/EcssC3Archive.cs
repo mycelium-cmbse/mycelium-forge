@@ -18,5 +18,5 @@ namespace Mycelium.Forge.Extractors.Models.EcssC3
     /// </summary>
     /// <param name="Header">The deserialized Header descriptor.</param>
     /// <param name="SiteDirectoryThings">The things deserialized from the SiteDirectory.json file.</param>
-    public sealed record EcssC3Archive(ExchangeFileHeader Header, IReadOnlyCollection<Thing> SiteDirectoryThings);
+    public sealed record EcssC3Archive(ExchangeFileHeader Header, IReadOnlyCollection<Thing> SiteDirectoryThings) : IArchive;
 }

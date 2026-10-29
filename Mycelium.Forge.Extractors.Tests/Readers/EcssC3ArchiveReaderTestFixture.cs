@@ -16,6 +16,8 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
 
     using CDP4JsonFileDal;
 
+    using Mycelium.Forge.Extractors.Enums;
+    using Mycelium.Forge.Extractors.Models.EcssC3;
     using Mycelium.Forge.Extractors.Readers;
     using Mycelium.Forge.Extractors.Tests.Helpers;
     using Mycelium.Forge.Extractors.Tests.Models;
@@ -67,11 +69,22 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
         }
 
         [Test]
+        public void VerifyCanHandle()
+        {
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.reader.CanHandle(ArtifactKind.EcssC3), Is.True);
+                Assert.That(this.reader.CanHandle(ArtifactKind.Kpar), Is.False);
+                Assert.That(this.reader.CanHandle(ArtifactKind.Capella), Is.False);
+            }
+        }
+
+        [Test]
         public void VerifyRead()
         {
             var samplePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Resources", SampleArchiveName);
             using var sampleStream = File.OpenRead(samplePath);
-            var archive = this.reader.Read(sampleStream);
+            var archive = (EcssC3Archive)this.reader.Read(sampleStream);
 
             using (Assert.EnterMultipleScope())
             {
@@ -87,7 +100,7 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
             }
 
             using var rootArchiveStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
-            var rootArchive = this.reader.Read(rootArchiveStream);
+            var rootArchive = (EcssC3Archive)this.reader.Read(rootArchiveStream);
 
             using (Assert.EnterMultipleScope())
             {
