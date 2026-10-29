@@ -99,7 +99,7 @@ services:
       FORGE_KEYCLOAK_SSL_REQUIRED: external
       FORGE_KEYCLOAK_VERIFY_EMAIL: "false"
       FORGE_SPI_BASE_URL: http://app:8080
-      FORGE_SPI_SECRET: ${KEYCLOAK_SPI_SECRET:?set KEYCLOAK_SPI_SECRET in .env.prod}
+      FORGE_SPI_API_KEY: ${KEYCLOAK_SPI_API_KEY:?set KEYCLOAK_SPI_API_KEY in .env.prod}
     ports:
       - "127.0.0.1:${KEYCLOAK_PORT:-8081}:8080"
     depends_on:
@@ -150,7 +150,7 @@ services:
       Authentication__ClientId: forge-web
       Authentication__ClientSecret: ${FORGE_CLIENT_SECRET:?set FORGE_CLIENT_SECRET in .env.prod}
       Authentication__RequireHttpsMetadata: "false"
-      KeycloakSpi__Secret: ${KEYCLOAK_SPI_SECRET:?set KEYCLOAK_SPI_SECRET in .env.prod}
+      KeycloakSpi__ApiKey: ${KEYCLOAK_SPI_API_KEY:?set KEYCLOAK_SPI_API_KEY in .env.prod}
     ports:
       # Bound to localhost only - the image serves plain HTTP, so a reverse proxy on the same host
       # terminates TLS and forwards here. Don't expose this port to the internet directly.

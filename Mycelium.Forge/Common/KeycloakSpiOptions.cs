@@ -21,14 +21,14 @@ namespace Mycelium.Forge.Common
         public const string SectionName = "KeycloakSpi";
 
         /// <summary>
-        /// The name of the request header carrying the <see cref="Secret" />.
+        /// The name of the request header carrying the <see cref="ApiKey" />.
         /// </summary>
-        public const string SecretHeaderName = "X-Forge-Secret";
+        public const string ApiKeyHeaderName = "X-Forge-Api-Key";
 
         /// <summary>
-        /// Gets or sets the shared secret the Keycloak extension presents to the Forge HTTP API. When empty, the
+        /// Gets or sets the shared API key the Keycloak extension presents to the Forge HTTP API. When empty, the
         /// endpoints that require it are disabled.
         /// </summary>
-        public string Secret { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
     }
 }

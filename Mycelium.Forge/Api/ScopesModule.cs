@@ -46,14 +46,14 @@ namespace Mycelium.Forge.Api
         /// <param name="scopeService">The injected <see cref="IScopeService" />.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
-        /// A 401 when the secret is missing, invalid, or unconfigured; a 404 when the scope does not exist; a 200 when the
+        /// A 401 when the API key is missing, invalid, or unconfigured; a 404 when the scope does not exist; a 200 when the
         /// scope exists; or a 500 when it could not be read.
         /// </returns>
         public static async Task<IResult> ScopeShortNameExistsAsync(string shortName, HttpRequest request, IOptions<KeycloakSpiOptions> options, IScopeService scopeService, CancellationToken cancellationToken)
         {
-            var secret = options.Value.Secret;
+            var apiKey = options.Value.ApiKey;
 
-            if (string.IsNullOrEmpty(secret) || !IsSecretValid(request.Headers[KeycloakSpiOptions.SecretHeaderName].ToString(), secret))
+            if (string.IsNullOrEmpty(apiKey) || !IsApiKeyValid(request.Headers[KeycloakSpiOptions.ApiKeyHeaderName].ToString(), apiKey))
             {
                 return Results.Unauthorized();
             }
@@ -78,15 +78,15 @@ namespace Mycelium.Forge.Api
         }
 
         /// <summary>
-        /// Compares the presented secret to the configured one in constant time.
+        /// Compares the presented API key to the configured one in constant time.
         /// </summary>
-        /// <param name="presentedSecret">The secret presented by the caller.</param>
-        /// <param name="configuredSecret">The configured secret.</param>
-        /// <returns><see langword="true" /> when both secrets are equal; otherwise <see langword="false" />.</returns>
-        private static bool IsSecretValid(string presentedSecret, string configuredSecret)
+        /// <param name="presentedApiKey">The API key presented by the caller.</param>
+        /// <param name="configuredApiKey">The configured API key.</param>
+        /// <returns><see langword="true" /> when both keys are equal; otherwise <see langword="false" />.</returns>
+        private static bool IsApiKeyValid(string presentedApiKey, string configuredApiKey)
         {
-            var presented = SHA256.HashData(Encoding.UTF8.GetBytes(presentedSecret));
-            var configured = SHA256.HashData(Encoding.UTF8.GetBytes(configuredSecret));
+            var presented = SHA256.HashData(Encoding.UTF8.GetBytes(presentedApiKey));
+            var configured = SHA256.HashData(Encoding.UTF8.GetBytes(configuredApiKey));
 
             return CryptographicOperations.FixedTimeEquals(presented, configured);
         }

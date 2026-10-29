@@ -52,14 +52,14 @@ public class ScopeShortNameUniqueValidator extends AbstractSimpleValidator {
     private static final String BASE_URL_VARIABLE = "FORGE_SPI_BASE_URL";
 
     /**
-     * Environment variable containing the shared secret for Forge API authentication.
+     * Environment variable containing the shared API key for Forge API authentication.
      */
-    private static final String SECRET_VARIABLE = "FORGE_SPI_SECRET";
+    private static final String API_KEY_VARIABLE = "FORGE_SPI_API_KEY";
 
     /**
-     * Request header name carrying the shared secret.
+     * Request header name carrying the shared API key.
      */
-    private static final String SECRET_HEADER = "X-Forge-Secret";
+    private static final String API_KEY_HEADER = "X-Forge-Api-Key";
 
     /**
      * HTTP connection and request timeout when calling Forge.
@@ -142,10 +142,10 @@ public class ScopeShortNameUniqueValidator extends AbstractSimpleValidator {
      */
     private Lookup lookup(String username) {
         var baseUrl = System.getenv(BASE_URL_VARIABLE);
-        var secret = System.getenv(SECRET_VARIABLE);
+        var apiKey = System.getenv(API_KEY_VARIABLE);
 
-        if (baseUrl == null || baseUrl.isBlank() || secret == null || secret.isBlank()) {
-            LOGGER.errorf("%s and %s must be set to validate usernames against Forge", BASE_URL_VARIABLE, SECRET_VARIABLE);
+        if (baseUrl == null || baseUrl.isBlank() || apiKey == null || apiKey.isBlank()) {
+            LOGGER.errorf("%s and %s must be set to validate usernames against Forge", BASE_URL_VARIABLE, API_KEY_VARIABLE);
             return Lookup.UNAVAILABLE;
         }
 
@@ -156,7 +156,7 @@ public class ScopeShortNameUniqueValidator extends AbstractSimpleValidator {
             // Tells Forge's ForwardedHeadersMiddleware the internal request is secure so UseHttpsRedirection does not issue a 307.
             var request = HttpRequest.newBuilder(uri)
                     .GET()
-                    .header(SECRET_HEADER, secret)
+                    .header(API_KEY_HEADER, apiKey)
                     .header("X-Forwarded-Proto", "https")
                     .timeout(TIMEOUT)
                     .build();
