@@ -61,7 +61,7 @@ namespace Mycelium.Forge.Tests.Extensions
             var validPrincipal = new ClaimsPrincipal(identity);
             var tokenContext = new TokenValidatedContext(new DefaultHttpContext { RequestServices = serviceProvider }, scheme, oidcOptions, validPrincipal, new AuthenticationProperties());
 
-            var payload = "{\"realm_access\":{\"roles\":[\"InstallationAdministrator\",\"Account\",\"UnknownRole\"]}}";
+            const string payload = "{\"realm_access\":{\"roles\":[\"InstallationAdministrator\",\"Account\",\"UnknownRole\"]}}";
             tokenContext.TokenEndpointResponse = new OpenIdConnectMessage { AccessToken = CreateTestJwt(payload) };
 
             await AuthenticationServiceCollectionExtensions.OnTokenValidated(tokenContext);
@@ -86,7 +86,7 @@ namespace Mycelium.Forge.Tests.Extensions
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(emptyTokenIdentity.Claims, Is.Empty);
-                Assert.That(emptyTokenContext.Result.Failure, Is.Null);
+                Assert.That(emptyTokenContext.Result, Is.Null);
             }
 
             // Case 4: Missing realm_access in access token
@@ -102,7 +102,7 @@ namespace Mycelium.Forge.Tests.Extensions
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(noRolesIdentity.Claims, Is.Empty);
-                Assert.That(noRolesContext.Result.Failure, Is.Null);
+                Assert.That(noRolesContext.Result, Is.Null);
             }
 
             // Case 5: Non-array roles in access token
@@ -118,7 +118,7 @@ namespace Mycelium.Forge.Tests.Extensions
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(nonArrayRolesIdentity.Claims, Is.Empty);
-                Assert.That(nonArrayRolesContext.Result.Failure, Is.Null);
+                Assert.That(nonArrayRolesContext.Result, Is.Null);
             }
 
             // Case 6: Provisioning Error
