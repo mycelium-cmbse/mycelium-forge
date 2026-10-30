@@ -47,29 +47,19 @@ namespace Mycelium.Forge.Common
         public const string Organization = "/organizations/{shortName}";
 
         /// <summary>
-        /// The user authentication and sign-in page route path.
+        /// The sign-in endpoint route path, which redirects to the OpenID Connect identity provider.
         /// </summary>
         public const string Login = "/login";
 
         /// <summary>
-        /// The user authentication cookie login endpoint route path.
-        /// </summary>
-        public const string AuthLogin = "/api/auth/login";
-
-        /// <summary>
-        /// The user authentication sign-out endpoint route path.
+        /// The sign-out endpoint route path, which also ends the identity provider session.
         /// </summary>
         public const string Logout = "/api/auth/logout";
 
         /// <summary>
-        /// The user registration and sign-up page route path.
+        /// The sign-up endpoint route path, which redirects to the identity provider registration form.
         /// </summary>
         public const string SignUp = "/signup";
-
-        /// <summary>
-        /// The user email verification page route path.
-        /// </summary>
-        public const string VerifyEmail = "/verify-email";
 
         /// <summary>
         /// The generic error handling page route path.

@@ -1,0 +1,293 @@
+/* ==========================================================================
+   Mycelium Forge Theme for Keycloak (DD-20)
+   PatternFly v5 Design Tokens & Concise Layout
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Forge Design Tokens */
+    --forge-background: #f7fafc;
+    --forge-foreground: #293342;
+    --forge-muted-foreground: #64748b;
+    --forge-card: #ffffff;
+    --forge-border: #e3e8ed;
+    --forge-input-bg: #ffffff;
+    --forge-primary: #a34a24;
+    --forge-primary-hover: #8a3e1f;
+    --forge-primary-focus: rgba(163, 74, 36, 0.2);
+    --forge-danger: #ef4444;
+    --forge-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --forge-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --forge-transition: 0.15s ease;
+
+    /* PatternFly Global Overrides */
+    --pf-v5-global--FontFamily--text: var(--forge-font);
+    --pf-v5-global--FontFamily--heading: var(--forge-font);
+    --pf-v5-global--FontFamily--redhatfont--heading--sans-serif: var(--forge-font);
+    --pf-v5-global--FontFamily--redhatfont--text--sans-serif: var(--forge-font);
+    --pf-v5-global--primary-color--100: var(--forge-primary);
+    --pf-v5-global--primary-color--200: var(--forge-primary-hover);
+    --pf-v5-global--link--Color: var(--forge-primary);
+    --pf-v5-global--link--Color--hover: var(--forge-primary-hover);
+    --pf-v5-global--danger-color--100: var(--forge-danger);
+    --pf-v5-global--danger-color--200: var(--forge-danger);
+    --pf-v5-global--active-color--100: var(--forge-primary);
+}
+
+.pf-v5-theme-dark {
+    --forge-background: #0e1116;
+    --forge-foreground: #eceff3;
+    --forge-muted-foreground: #cdd4dd;
+    --forge-card: #161920;
+    --forge-border: #2e333d;
+    --forge-input-bg: #161920;
+    --forge-primary: #d88255;
+    --forge-primary-hover: #a34a24;
+    --forge-primary-focus: rgba(216, 130, 85, 0.25);
+    --forge-shadow: none;
+
+    --pf-v5-global--palette--blue-300: var(--forge-primary);
+    --pf-v5-global--link--Color--hover: #f1a980;
+    --pf-v5-global--danger-color--100: var(--forge-danger);
+    --pf-v5-global--danger-color--200: var(--forge-danger);
+}
+
+/* Base Document */
+html, body {
+    background-color: var(--forge-background);
+    color: var(--forge-foreground);
+    font-family: var(--forge-font);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+*, ::after, ::before {
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+/* Outer Layout & Container */
+.pf-v5-c-login__container {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header & Brand Logo */
+.pf-v5-c-login__header {
+    display: flex;
+    justify-content: center;
+}
+
+#kc-header-wrapper {
+    background: url("../img/forge-logo-light.svg") no-repeat center / contain;
+    width: 170px;
+    height: 28px;
+    color: transparent;
+    font-size: 0;
+    user-select: none;
+}
+
+.pf-v5-theme-dark #kc-header-wrapper {
+    background-image: url("../img/forge-logo-dark.svg");
+}
+
+/* Auth Card */
+.pf-v5-c-login__main {
+    width: 100%;
+    background-color: var(--forge-card);
+    border: 1px solid var(--forge-border);
+    border-radius: 16px;
+    box-shadow: var(--forge-shadow);
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pf-v5-c-login__main-header {
+    padding: 0;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#kc-page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--forge-foreground);
+}
+
+/* Centered Subtitle & Required Fields */
+.subtitle,
+.instruction {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--forge-muted-foreground);
+    text-align: center;
+}
+
+.pf-v5-c-form__label-required,
+.required {
+    color: var(--forge-primary);
+    font-weight: 600;
+    margin-left: 2px;
+}
+
+/* Form Layout & Labels */
+.pf-v5-c-login__main-body {
+    padding: 0;
+}
+
+.pf-v5-c-form {
+    gap: 1.125rem;
+}
+
+.pf-v5-c-form__label-text {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--forge-muted-foreground);
+}
+
+/* Inputs & Form Controls: Disable PatternFly blue bottom bar */
+.pf-v5-c-form-control::after,
+.pf-v5-c-button.pf-m-control::after {
+    display: none;
+    border: none;
+    content: none;
+}
+
+.pf-v5-c-form-control {
+    background: transparent;
+}
+
+.pf-v5-c-form-control input {
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 6px;
+    border: 1px solid var(--forge-border);
+    background-color: var(--forge-input-bg);
+    color: var(--forge-foreground);
+    font-size: 14px;
+    outline: none;
+    transition: border-color var(--forge-transition), box-shadow var(--forge-transition);
+}
+
+.pf-v5-c-form-control input:hover {
+    border-color: var(--forge-muted-foreground);
+}
+
+.pf-v5-c-form-control input:focus {
+    border-color: var(--forge-primary);
+    box-shadow: 0 0 0 2px var(--forge-primary-focus);
+}
+
+/* Password Input Group & Eye Button */
+.pf-v5-c-input-group {
+    border: 1px solid var(--forge-border);
+    border-radius: 6px;
+    background-color: var(--forge-input-bg);
+    transition: border-color var(--forge-transition), box-shadow var(--forge-transition);
+}
+
+.pf-v5-c-input-group:hover {
+    border-color: var(--forge-muted-foreground);
+}
+
+.pf-v5-c-input-group:focus-within {
+    border-color: var(--forge-primary);
+    box-shadow: 0 0 0 2px var(--forge-primary-focus);
+}
+
+.pf-v5-c-input-group .pf-v5-c-input-group__item.pf-m-fill {
+    flex: 1 1 auto;
+}
+
+.pf-v5-c-input-group input {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    height: 38px;
+}
+
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control {
+    background: transparent;
+    transition: color var(--forge-transition);
+}
+
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control:hover {
+    color: var(--forge-foreground);
+}
+
+/* Links & Forgot Password (Right Aligned) */
+a {
+    color: var(--forge-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: border-color var(--forge-transition), box-shadow var(--forge-transition);
+}
+
+a:hover {
+    text-decoration: underline;
+    color: var(--forge-primary-hover);
+}
+
+.pf-v5-c-form__helper-text {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Primary Button */
+.pf-v5-c-button.pf-m-primary {
+    width: 100%;
+    height: 40px;
+    border-radius: 6px;
+    background-color: var(--forge-primary);
+    font-size: 14px;
+    font-weight: 500;
+    align-items: center;
+    transition: background-color var(--forge-transition);
+    margin-top: 6px;
+    cursor: pointer;
+}
+
+.pf-v5-c-button.pf-m-primary:hover {
+    background-color: var(--forge-primary-hover);
+}
+
+.pf-v5-c-button.pf-m-secondary {
+    transition: all var(--forge-transition);
+}
+
+/* Registration Footer */
+#kc-info {
+    margin-top: 20px;
+    padding-top: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--forge-muted-foreground);
+}
+
+#kc-registration-container {
+    display: flex;
+    justify-content: center;
+}
+
+#kc-registration a {
+    margin-left: 4px;
+}
+/* Alerts */
+.pf-v5-c-alert {
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 1rem;
+    font-size: 13px;
+    border: 1px solid var(--forge-border);
+    background-color: var(--forge-card);
+}

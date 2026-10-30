@@ -9,7 +9,7 @@
   // Postgres, Garage, Keycloak, and a completed migrator run - but deliberately excludes `app`, so it
   // doesn't fight the `dotnet run`/debug session started interactively from inside `workspace`.
   "service": "workspace",
-  "runServices": ["postgres", "garage", "keycloak", "migrator"],
+  "runServices": ["postgres", "postgres-authentication", "garage", "keycloak", "migrator"],
   "workspaceFolder": "/workspaces/mycelium-forge",
   "shutdownAction": "stopCompose",
   "features": {

@@ -151,14 +151,14 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             {
                 AccountId = this.otherAccountId,
                 Username = "otherOrgUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             var orgAUserContext = new UserContext
             {
                 AccountId = this.accountId,
                 Username = "owningOrgUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             var readFilter = new PackageReadFilter();
