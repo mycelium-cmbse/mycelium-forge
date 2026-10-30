@@ -14,7 +14,6 @@ COPY Mycelium.Forge.Extractors/Mycelium.Forge.Extractors.csproj ./Mycelium.Forge
 COPY Mycelium.Forge.Orm/Mycelium.Forge.Orm.csproj ./Mycelium.Forge.Orm/
 COPY Mycelium.Forge.Serializer.Json/Mycelium.Forge.Serializer.Json.csproj ./Mycelium.Forge.Serializer.Json/
 COPY Mycelium.Forge.Storage/Mycelium.Forge.Storage.csproj ./Mycelium.Forge.Storage/
-COPY Mycelium.DesignTokens/Mycelium.DesignTokens.csproj ./Mycelium.DesignTokens/
 COPY Directory.Build.targets Nuget.Config ./
 
 RUN dotnet restore Mycelium.Forge/Mycelium.Forge.csproj
@@ -27,7 +26,6 @@ COPY Mycelium.Forge.Extractors/ ./Mycelium.Forge.Extractors/
 COPY Mycelium.Forge.Orm/ ./Mycelium.Forge.Orm/
 COPY Mycelium.Forge.Serializer.Json/ ./Mycelium.Forge.Serializer.Json/
 COPY Mycelium.Forge.Storage/ ./Mycelium.Forge.Storage/
-COPY Mycelium.DesignTokens/ ./Mycelium.DesignTokens/
 
 # Run BuildTailwind standalone so wwwroot/css/app.css exists on disk before any MSBuild invocation
 # that discovers static web assets - discovering the file and generating it in the same `dotnet
