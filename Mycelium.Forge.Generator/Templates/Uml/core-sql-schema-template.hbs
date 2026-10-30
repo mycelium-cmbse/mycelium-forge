@@ -1,4 +1,4 @@
-﻿------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
 -- <copyright file="schema.sql" company="Starion Group S.A.">
 --
 --   Copyright 2026 Starion Group S.A.
@@ -52,6 +52,54 @@ ALTER TABLE "Forge"."Thing" SET (autovacuum_analyze_threshold = 2500);
 {{#each this as | class |}}
 {{#Forge.SQL.WriteIndexableValuePropertyIndexes class}}
 {{/each}}
+
+-- Timestamp Trigger Functions for Thing Table
+CREATE OR REPLACE FUNCTION "Forge".thing_timestamps_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+        ts text := to_char(transaction_timestamp() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"');
+    BEGIN
+
+        NEW.data = COALESCE(NEW.data, '{}'::jsonb)
+                || jsonb_build_object('createdAt', ts, 'modifiedAt', ts);
+
+        RETURN NEW;
+    END;
+$$;
+
+CREATE OR REPLACE FUNCTION "Forge".thing_timestamps_update()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+        ts text := to_char(transaction_timestamp() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"');
+    BEGIN
+
+        -- createdAt is immutable: always taken from the existing row (fallback: now)
+        NEW.data = COALESCE(NEW.data, '{}'::jsonb)
+                || jsonb_build_object(
+                       'createdAt',  COALESCE(OLD.data ->> 'createdAt', ts),
+                       'modifiedAt', ts
+                   );
+
+        RETURN NEW;
+    END;
+$$;
+
+-- Timestamp Triggers for Thing Table
+CREATE OR REPLACE TRIGGER trg_thing_timestamps_insert
+    BEFORE INSERT ON "Forge"."Thing"
+    FOR EACH ROW
+        EXECUTE FUNCTION "Forge".thing_timestamps_insert();
+
+-- WHEN: skip the function entirely for no-op updates (modifiedAt is not bumped)
+CREATE OR REPLACE TRIGGER trg_thing_timestamps_update
+    BEFORE UPDATE ON "Forge"."Thing"
+    FOR EACH ROW
+    WHEN (OLD.* IS DISTINCT FROM NEW.*)
+        EXECUTE FUNCTION "Forge".thing_timestamps_update();
 
 CREATE OR REPLACE FUNCTION "Forge".thing_delete()
 RETURNS trigger

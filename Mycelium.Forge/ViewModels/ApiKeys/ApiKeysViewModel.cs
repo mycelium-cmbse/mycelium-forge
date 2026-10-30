@@ -54,7 +54,6 @@ namespace Mycelium.Forge.ViewModels.ApiKeys
             {
                 Id = Guid.NewGuid(),
                 Name = result.KeyName,
-                CreatedAt = DateTime.UtcNow,
                 ExpiresAt = result.ExpiresAt
             };
 

@@ -73,7 +73,7 @@ namespace Mycelium.Forge.Extractors.Extractors
 
             try
             {
-                archive = this.reader.Read(artifact);
+                archive = (EcssC3Archive)this.reader.Read(artifact);
             }
             catch (InvalidDataException exception)
             {
