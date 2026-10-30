@@ -72,6 +72,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                     Assert.That(readResult.Value[0].ShortName, Is.EqualTo("test-pkg-create"));
                     Assert.That(readResult.Value[0].Owner, Is.EqualTo(this.accountId));
                     Assert.That(readResult.Value[0].PackageType, Is.EqualTo(this.packageTypeId));
+                    Assert.That(readResult.Value[0].CreatedAt, Is.Not.Default);
+                    Assert.That(readResult.Value[0].ModifiedAt, Is.EqualTo(readResult.Value[0].CreatedAt));
                 }
             }
         }
@@ -251,6 +253,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                     Assert.That(readResult.Value[0].Name, Is.EqualTo("UpdatedPackageName"));
                     Assert.That(readResult.Value[0].Listed, Is.True);
                     Assert.That(readResult.Value[0].Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
+                    Assert.That(readResult.Value[0].ModifiedAt, Is.GreaterThan(readResult.Value[0].CreatedAt));
                 }
             }
         }

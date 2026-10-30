@@ -32,9 +32,7 @@ namespace Mycelium.Forge.Data
                 Email = "regis.andre@starion.eu",
                 Website = "stariongroup.eu",
                 Origin = "Toulouse, France",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc)
+                Status = ScopeStatusKind.ACTIVE
             };
 
             StefanAccount = new Account
@@ -45,9 +43,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "s-kramer",
                 Email = "stefan.kramer@starion.eu",
                 Origin = "local",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc)
+                Status = ScopeStatusKind.ACTIVE
             };
 
             KleinAccount = new Account
@@ -58,9 +54,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "j-klein",
                 Email = "j.klein@esa.int",
                 Origin = "local",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 3, 10, 0, 0, 0, DateTimeKind.Utc)
+                Status = ScopeStatusKind.ACTIVE
             };
 
             BlancAccount = new Account
@@ -71,9 +65,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "m-blanc",
                 Email = "m.blanc@starion.eu",
                 Origin = "local",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 4, 5, 0, 0, 0, DateTimeKind.Utc)
+                Status = ScopeStatusKind.ACTIVE
             };
 
             NovakAccount = new Account
@@ -84,9 +76,7 @@ namespace Mycelium.Forge.Data
                 ShortName = "a-novak",
                 Email = "a.novak@esa.int",
                 Origin = "local",
-                Status = ScopeStatusKind.ACTIVE,
-                CreatedAt = new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 5, 20, 0, 0, 0, DateTimeKind.Utc)
+                Status = ScopeStatusKind.ACTIVE
             };
 
             Accounts =
@@ -113,8 +103,6 @@ namespace Mycelium.Forge.Data
                 Name = "Mycelium Forge",
                 ShortName = "forge",
                 Description = "The central package registry and distribution platform for MBSE model libraries.",
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 Administrator = [RegisAccount.Id],
                 Account =
                 [
@@ -135,9 +123,7 @@ namespace Mycelium.Forge.Data
                     Alpha2Code = "FR",
                     Alpha3Code = "FRA",
                     NumericCode = "250",
-                    Name = "France",
-                    CreatedAt = DateTime.UtcNow,
-                    ModifiedAt = DateTime.UtcNow
+                    Name = "France"
                 },
                 new Country
                 {
@@ -146,9 +132,7 @@ namespace Mycelium.Forge.Data
                     Alpha2Code = "NL",
                     Alpha3Code = "NLD",
                     NumericCode = "528",
-                    Name = "Netherlands",
-                    CreatedAt = DateTime.UtcNow,
-                    ModifiedAt = DateTime.UtcNow
+                    Name = "Netherlands"
                 },
                 new Country
                 {
@@ -157,9 +141,7 @@ namespace Mycelium.Forge.Data
                     Alpha2Code = "DE",
                     Alpha3Code = "DEU",
                     NumericCode = "276",
-                    Name = "Germany",
-                    CreatedAt = DateTime.UtcNow,
-                    ModifiedAt = DateTime.UtcNow
+                    Name = "Germany"
                 },
                 new Country
                 {
@@ -168,9 +150,7 @@ namespace Mycelium.Forge.Data
                     Alpha2Code = "US",
                     Alpha3Code = "USA",
                     NumericCode = "840",
-                    Name = "United States",
-                    CreatedAt = DateTime.UtcNow,
-                    ModifiedAt = DateTime.UtcNow
+                    Name = "United States"
                 }
             ];
 
@@ -179,9 +159,7 @@ namespace Mycelium.Forge.Data
                 Id = Guid.NewGuid(),
                 Owner = forgeId,
                 Name = PackageFormatConstants.SysMlV2,
-                Description = "Systems Modeling Language v2 package format.",
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow
+                Description = "Systems Modeling Language v2 package format."
             };
 
             Cdp4CometPackageType = new PackageType
@@ -189,9 +167,7 @@ namespace Mycelium.Forge.Data
                 Id = Guid.NewGuid(),
                 Owner = forgeId,
                 Name = "Cdp4Comet",
-                Description = "Concurrent Design Platform COMET data definitions.",
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow
+                Description = "Concurrent Design Platform COMET data definitions."
             };
 
             CapellaPackageType = new PackageType
@@ -199,9 +175,7 @@ namespace Mycelium.Forge.Data
                 Id = Guid.NewGuid(),
                 Owner = forgeId,
                 Name = "Capella",
-                Description = "Capella system architecture and Arcadia methodology models.",
-                CreatedAt = DateTime.UtcNow,
-                ModifiedAt = DateTime.UtcNow
+                Description = "Capella system architecture and Arcadia methodology models."
             };
 
             PackageTypes =
@@ -221,9 +195,7 @@ namespace Mycelium.Forge.Data
                 Origin = "Systems engineering models and ECSS mission libraries for early-phase spacecraft design.",
                 Status = ScopeStatusKind.ACTIVE,
                 Administrator = [RegisAccount.Id, StefanAccount.Id],
-                Member = [RegisAccount.Id, StefanAccount.Id, KleinAccount.Id, BlancAccount.Id],
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                Member = [RegisAccount.Id, StefanAccount.Id, KleinAccount.Id, BlancAccount.Id]
             };
 
             EsaOrganization = new Organization
@@ -236,9 +208,7 @@ namespace Mycelium.Forge.Data
                 Origin = "European Space Agency engineering libraries and flight dynamics models.",
                 Status = ScopeStatusKind.ACTIVE,
                 Administrator = [RegisAccount.Id],
-                Member = [RegisAccount.Id, KleinAccount.Id, NovakAccount.Id],
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                Member = [RegisAccount.Id, KleinAccount.Id, NovakAccount.Id]
             };
 
             OmgOrganization = new Organization
@@ -251,9 +221,7 @@ namespace Mycelium.Forge.Data
                 Origin = "Official SysML v2 and KerML specification standard libraries.",
                 Status = ScopeStatusKind.ACTIVE,
                 Administrator = [RegisAccount.Id],
-                Member = [RegisAccount.Id],
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ModifiedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                Member = [RegisAccount.Id]
             };
 
             Organizations =
@@ -274,9 +242,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [RegisAccount.Id],
-                PackageMaintainer = [StefanAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-30),
-                ModifiedAt = DateTime.UtcNow.AddDays(-30)
+                PackageMaintainer = [StefanAccount.Id]
             };
 
             SysmlKernelLibraryPackage = new Package
@@ -290,9 +256,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [RegisAccount.Id],
-                PackageMaintainer = [StefanAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-30),
-                ModifiedAt = DateTime.UtcNow.AddDays(-30)
+                PackageMaintainer = [StefanAccount.Id]
             };
 
             EcssEnvironmentPackage = new Package
@@ -306,9 +270,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [NovakAccount.Id],
-                PackageMaintainer = [RegisAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-60),
-                ModifiedAt = DateTime.UtcNow.AddDays(-60)
+                PackageMaintainer = [RegisAccount.Id]
             };
 
             EcssPowerSubsystemPackage = new Package
@@ -322,9 +284,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [RegisAccount.Id],
-                PackageMaintainer = [StefanAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-14),
-                ModifiedAt = DateTime.UtcNow.AddDays(-14)
+                PackageMaintainer = [StefanAccount.Id]
             };
 
             SmallSatPlatformPackage = new Package
@@ -338,9 +298,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [RegisAccount.Id],
-                PackageMaintainer = [StefanAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-21),
-                ModifiedAt = DateTime.UtcNow.AddDays(-21)
+                PackageMaintainer = [StefanAccount.Id]
             };
 
             EcssRfCommsPackage = new Package
@@ -354,9 +312,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [RegisAccount.Id],
-                PackageMaintainer = [StefanAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-60),
-                ModifiedAt = DateTime.UtcNow.AddDays(-60)
+                PackageMaintainer = [StefanAccount.Id]
             };
 
             Cdp4CometCorePackage = new Package
@@ -370,9 +326,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [StefanAccount.Id],
-                PackageMaintainer = [RegisAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-30),
-                ModifiedAt = DateTime.UtcNow.AddDays(-30)
+                PackageMaintainer = [RegisAccount.Id]
             };
 
             CapellaSystemTemplatePackage = new Package
@@ -386,9 +340,7 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [KleinAccount.Id],
-                PackageMaintainer = [StefanAccount.Id, RegisAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-90),
-                ModifiedAt = DateTime.UtcNow.AddDays(-90)
+                PackageMaintainer = [StefanAccount.Id, RegisAccount.Id]
             };
 
             EcssMechanicalPackage = new Package
@@ -402,45 +354,39 @@ namespace Mycelium.Forge.Data
                 Visibility = VisibilityKind.PUBLIC,
                 Listed = true,
                 PackageOwner = [RegisAccount.Id],
-                PackageMaintainer = [StefanAccount.Id],
-                CreatedAt = DateTime.UtcNow.AddDays(-90),
-                ModifiedAt = DateTime.UtcNow.AddDays(-90)
+                PackageMaintainer = [StefanAccount.Id]
             };
+
+            var baseDate = DateTime.UtcNow;
 
             PackageVersions =
             [
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
+                    PublicationDate = baseDate.AddDays(-30),
                     Owner = SysmlIsqQuantitiesPackage.Id,
                     Version = "2025.2",
                     DownloadCount = 1400,
-                    Listed = true,
-                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt,
-                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt,
-                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SysmlKernelLibraryPackage.Id,
+                    PublicationDate = baseDate.AddDays(-30),
                     Version = "2025.2",
                     DownloadCount = 2100,
-                    Listed = true,
-                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt,
-                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt,
-                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = EcssEnvironmentPackage.Id,
                     Version = "1.0.0",
+                    PublicationDate = baseDate.AddDays(-60),
                     DownloadCount = 860,
-                    Listed = true,
-                    PublicationDate = EcssEnvironmentPackage.CreatedAt,
-                    CreatedAt = EcssEnvironmentPackage.CreatedAt,
-                    ModifiedAt = EcssEnvironmentPackage.CreatedAt
+                    Listed = true
                 },
                 new PackageVersion
                 {
@@ -448,43 +394,35 @@ namespace Mycelium.Forge.Data
                     Owner = EcssPowerSubsystemPackage.Id,
                     Version = "1.2.0",
                     DownloadCount = 210,
-                    Listed = true,
-                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt,
-                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt,
-                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt
+                    PublicationDate = baseDate.AddDays(-14),
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SmallSatPlatformPackage.Id,
                     Version = "0.8.2",
-                    DownloadCount = 145,
                     Listed = true,
-                    PublicationDate = SmallSatPlatformPackage.CreatedAt,
-                    CreatedAt = SmallSatPlatformPackage.CreatedAt,
-                    ModifiedAt = SmallSatPlatformPackage.CreatedAt
+                    DownloadCount = 145,
+                    PublicationDate = baseDate.AddDays(-21)
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = EcssRfCommsPackage.Id,
+                    PublicationDate = baseDate.AddDays(-60),
                     Version = "0.3.0",
                     DownloadCount = 190,
-                    Listed = true,
-                    PublicationDate = EcssRfCommsPackage.CreatedAt,
-                    CreatedAt = EcssRfCommsPackage.CreatedAt,
-                    ModifiedAt = EcssRfCommsPackage.CreatedAt
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = Cdp4CometCorePackage.Id,
                     Version = "10.25.1",
+                    PublicationDate = baseDate.AddDays(-30),
                     DownloadCount = 320,
-                    Listed = true,
-                    PublicationDate = Cdp4CometCorePackage.CreatedAt,
-                    CreatedAt = Cdp4CometCorePackage.CreatedAt,
-                    ModifiedAt = Cdp4CometCorePackage.CreatedAt
+                    Listed = true
                 },
                 new PackageVersion
                 {
@@ -492,65 +430,53 @@ namespace Mycelium.Forge.Data
                     Owner = CapellaSystemTemplatePackage.Id,
                     Version = "6.1.0",
                     DownloadCount = 185,
-                    Listed = true,
-                    PublicationDate = CapellaSystemTemplatePackage.CreatedAt,
-                    CreatedAt = CapellaSystemTemplatePackage.CreatedAt,
-                    ModifiedAt = CapellaSystemTemplatePackage.CreatedAt
+                    PublicationDate = baseDate.AddDays(-90),
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
+                    PublicationDate = baseDate.AddDays(-90),
                     Owner = EcssMechanicalPackage.Id,
                     Version = "1.0.0",
                     DownloadCount = 165,
-                    Listed = true,
-                    PublicationDate = EcssMechanicalPackage.CreatedAt,
-                    CreatedAt = EcssMechanicalPackage.CreatedAt,
-                    ModifiedAt = EcssMechanicalPackage.CreatedAt
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SysmlIsqQuantitiesPackage.Id,
                     Version = "2025.1",
+                    PublicationDate = baseDate.AddDays(-120),
                     DownloadCount = 980,
-                    Listed = true,
-                    PublicationDate = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = SysmlIsqQuantitiesPackage.CreatedAt.AddDays(-90)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = SysmlKernelLibraryPackage.Id,
+                    PublicationDate = baseDate.AddDays(-120),
                     Version = "2025.1",
                     DownloadCount = 1450,
-                    Listed = true,
-                    PublicationDate = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = SysmlKernelLibraryPackage.CreatedAt.AddDays(-90)
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = EcssEnvironmentPackage.Id,
                     Version = "0.9.0",
-                    DownloadCount = 320,
                     Listed = true,
-                    PublicationDate = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = EcssEnvironmentPackage.CreatedAt.AddDays(-90)
+                    DownloadCount = 320,
+                    PublicationDate = baseDate.AddDays(-150)
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = EcssPowerSubsystemPackage.Id,
                     Version = "1.1.0",
+                    PublicationDate = baseDate.AddDays(-104),
                     DownloadCount = 180,
-                    Listed = true,
-                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
-                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-90)
+                    Listed = true
                 },
                 new PackageVersion
                 {
@@ -558,21 +484,17 @@ namespace Mycelium.Forge.Data
                     Owner = EcssPowerSubsystemPackage.Id,
                     Version = "1.0.0",
                     DownloadCount = 95,
-                    Listed = true,
-                    PublicationDate = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
-                    CreatedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180),
-                    ModifiedAt = EcssPowerSubsystemPackage.CreatedAt.AddDays(-180)
+                    PublicationDate = baseDate.AddDays(-194),
+                    Listed = true
                 },
                 new PackageVersion
                 {
                     Id = Guid.NewGuid(),
                     Owner = Cdp4CometCorePackage.Id,
                     Version = "10.25.0",
+                    PublicationDate = baseDate.AddDays(-120),
                     DownloadCount = 185,
-                    Listed = true,
-                    PublicationDate = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
-                    CreatedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90),
-                    ModifiedAt = Cdp4CometCorePackage.CreatedAt.AddDays(-90)
+                    Listed = true
                 }
             ];
 
@@ -608,9 +530,7 @@ namespace Mycelium.Forge.Data
                     Target = NovakAccount.Id,
                     OrganizationInvitationKind = OrganizationInvitationKind.MEMBER,
                     Status = InvitationStatusKind.PENDING,
-                    ExperiesAt = DateTime.UtcNow.AddDays(7),
-                    CreatedAt = DateTime.UtcNow,
-                    ModifiedAt = DateTime.UtcNow
+                    ExperiesAt = DateTime.UtcNow.AddDays(7)
                 },
                 new OrganizationInvitation
                 {
@@ -620,9 +540,7 @@ namespace Mycelium.Forge.Data
                     Target = StefanAccount.Id,
                     OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR,
                     Status = InvitationStatusKind.PENDING,
-                    ExperiesAt = DateTime.UtcNow.AddDays(7),
-                    CreatedAt = DateTime.UtcNow,
-                    ModifiedAt = DateTime.UtcNow
+                    ExperiesAt = DateTime.UtcNow.AddDays(7)
                 }
             ];
 
@@ -633,10 +551,8 @@ namespace Mycelium.Forge.Data
                     Id = Guid.NewGuid(),
                     Owner = RegisAccount.Id,
                     Name = "ci-publish",
-                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     ExpiresAt = new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-3),
-                    ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     SecretHash = [1, 2, 3],
                     Permissions = ["read", "write"]
@@ -646,10 +562,8 @@ namespace Mycelium.Forge.Data
                     Id = Guid.NewGuid(),
                     Owner = RegisAccount.Id,
                     Name = "release-bot",
-                    CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc),
                     ExpiresAt = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-14),
-                    ModifiedAt = new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc),
                     RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     SecretHash = [1, 2, 3],
                     Permissions = ["read", "write"]
@@ -659,10 +573,8 @@ namespace Mycelium.Forge.Data
                     Id = Guid.NewGuid(),
                     Owner = RegisAccount.Id,
                     Name = "local-dev",
-                    CreatedAt = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc),
                     ExpiresAt = new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-30),
-                    ModifiedAt = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc),
                     RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     SecretHash = [1, 2, 3],
                     Permissions = ["read", "write"]
@@ -841,9 +753,7 @@ namespace Mycelium.Forge.Data
             var metaData = new PackageMetaData
             {
                 Id = Guid.NewGuid(),
-                Owner = packageVersion.Id,
-                CreatedAt = packageVersion.CreatedAt,
-                ModifiedAt = packageVersion.ModifiedAt
+                Owner = packageVersion.Id
             };
 
             packageVersion.MetaData = metaData.Id;
@@ -866,9 +776,7 @@ namespace Mycelium.Forge.Data
                 Target = StefanAccount.Id == account.Id ? RegisAccount.Id : StefanAccount.Id,
                 PackageInvitationKind = PackageInvitationKind.MAINTAINER,
                 Status = InvitationStatusKind.PENDING,
-                ExperiesAt = DateTime.UtcNow.AddDays(14),
-                CreatedAt = account.CreatedAt,
-                ModifiedAt = account.ModifiedAt
+                ExperiesAt = DateTime.UtcNow.AddDays(14)
             };
 
             account.OwnedPackageInvitation = invitation.Id;
