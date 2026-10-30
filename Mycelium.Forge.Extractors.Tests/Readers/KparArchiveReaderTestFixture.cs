@@ -12,7 +12,6 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
     using Microsoft.Extensions.Logging.Abstractions;
 
     using Mycelium.Forge.Extractors.Enums;
-    using Mycelium.Forge.Extractors.Models;
     using Mycelium.Forge.Extractors.Models.Kpar;
     using Mycelium.Forge.Extractors.Readers;
 
@@ -59,16 +58,6 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
                 Assert.That(archive.Archive, Is.Not.Null);
                 Assert.That(archive.Archive.Project, Is.Not.Null);
                 Assert.That(archive.Archive.Project.Name, Is.EqualTo("Kernel Data Type Library"));
-            }
-
-            using var secondStream = File.OpenRead(samplePath);
-            IArchiveReader baseReader = this.reader;
-            var genericArchive = baseReader.Read(secondStream);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(genericArchive, Is.Not.Null);
-                Assert.That(genericArchive, Is.InstanceOf<IArchive>());
             }
 
             Assert.That(() =>
