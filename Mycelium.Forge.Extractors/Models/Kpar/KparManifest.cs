@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="KparManifest.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -7,8 +7,10 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Extractors.Models
+namespace Mycelium.Forge.Extractors.Models.Kpar
 {
+    using Mycelium.Forge.Extractors.Enums;
+
     /// <summary>
     /// Represents the registry metadata projected from the <c>.project.json</c> and <c>.meta.json</c> of a kpar.
     /// </summary>

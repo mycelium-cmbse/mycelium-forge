@@ -14,10 +14,12 @@ namespace Mycelium.Forge.Extractors.Extractors
 
     using ErrorOr;
 
+    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Errors;
     using Mycelium.Forge.Extractors.Models;
+    using Mycelium.Forge.Extractors.Models.Kpar;
+    using Mycelium.Forge.Extractors.Readers;
 
-    using SysML2.NET.Kpar;
     using SysML2.NET.ModelInterchange;
 
     /// <summary>
@@ -27,7 +29,7 @@ namespace Mycelium.Forge.Extractors.Extractors
     public partial class KparManifestExtractor : IArtifactManifestExtractor
     {
         /// <summary>
-        /// The resource the <see cref="IReader" /> assigns to a usage entry that declares none.
+        /// The resource the <see cref="IKparArchiveReader" /> assigns to a usage entry that declares none.
         /// </summary>
         /// <remarks>
         /// <see cref="InterchangeProjectUsage" /> initializes its <c>Resource</c> to <c>about:blank</c> by default. When
@@ -36,27 +38,15 @@ namespace Mycelium.Forge.Extractors.Extractors
         private const string AbsentResource = "about:blank";
 
         /// <summary>
-        /// The options making the <see cref="IReader" /> enforce the root descriptors, the existence of every indexed model file
-        /// and the declared checksums, collecting every checksum mismatch.
-        /// </summary>
-        private static readonly ReadOptions ReadOptions = new()
-        {
-            ValidateRequiredDescriptors = true,
-            ValidateIndexPaths = true,
-            ValidateChecksums = true,
-            ChecksumFailureBehavior = ChecksumFailureBehavior.Collect
-        };
-
-        /// <summary>
         /// The reader of the kpar archive format.
         /// </summary>
-        private readonly IReader reader;
+        private readonly IKparArchiveReader reader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KparManifestExtractor" /> class.
         /// </summary>
         /// <param name="reader">The reader of the kpar archive format.</param>
-        public KparManifestExtractor(IReader reader)
+        public KparManifestExtractor(IKparArchiveReader reader)
         {
             this.reader = reader;
         }
@@ -78,11 +68,11 @@ namespace Mycelium.Forge.Extractors.Extractors
         /// <returns>A result containing the <see cref="KparManifest" />, or one error for each failed validation check.</returns>
         public ErrorOr<IArtifactManifest> Extract(Stream artifact)
         {
-            Archive archive;
+            KparArchive archive;
 
             try
             {
-                archive = this.reader.Read(artifact, ReadOptions);
+                archive = (KparArchive)this.reader.Read(artifact);
             }
             catch (InvalidDataException exception)
             {
@@ -97,14 +87,14 @@ namespace Mycelium.Forge.Extractors.Extractors
                 return Error.Unexpected(KparErrorCodes.UnexpectedError, exception.Message);
             }
 
-            var errors = Validate(archive);
+            var errors = Validate(archive.Archive);
 
             if (errors.Count > 0)
             {
                 return errors;
             }
 
-            return CreateManifest(archive);
+            return CreateManifest(archive.Archive);
         }
 
         /// <summary>
@@ -115,9 +105,9 @@ namespace Mycelium.Forge.Extractors.Extractors
         private static partial Regex SemanticVersionRegex();
 
         /// <summary>
-        /// Runs the checks that the <see cref="IReader" /> does not enforce.
+        /// Runs the checks that the <see cref="IKparArchiveReader" /> does not enforce.
         /// </summary>
-        /// <param name="archive">The archive read by the <see cref="IReader" />.</param>
+        /// <param name="archive">The archive read by the <see cref="IKparArchiveReader" />.</param>
         /// <returns>One error for each failed check.</returns>
         private static List<Error> Validate(Archive archive)
         {

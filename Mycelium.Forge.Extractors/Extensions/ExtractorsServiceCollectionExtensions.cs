@@ -9,9 +9,12 @@
 
 namespace Mycelium.Forge.Extractors.Extensions
 {
+    using CDP4JsonFileDal;
+
     using Microsoft.Extensions.DependencyInjection;
 
     using Mycelium.Forge.Extractors.Extractors;
+    using Mycelium.Forge.Extractors.Readers;
 
     using SysML2.NET.Kpar;
     using SysML2.NET.Kpar.Cryptography;
@@ -30,7 +33,13 @@ namespace Mycelium.Forge.Extractors.Extensions
         {
             services.AddSingleton<IChecksumService, ChecksumService>();
             services.AddSingleton<IReader, Reader>();
+            services.AddSingleton<JsonFileDal>();
+            services.AddSingleton<IEcssC3ArchiveReader, EcssC3ArchiveReader>();
+            services.AddSingleton<IKparArchiveReader, KparArchiveReader>();
+            services.AddSingleton<IArchiveReader, EcssC3ArchiveReader>();
+            services.AddSingleton<IArchiveReader, KparArchiveReader>();
             services.AddSingleton<IArtifactManifestExtractor, KparManifestExtractor>();
+            services.AddSingleton<IArtifactManifestExtractor, EcssC3ManifestExtractor>();
 
             return services;
         }
