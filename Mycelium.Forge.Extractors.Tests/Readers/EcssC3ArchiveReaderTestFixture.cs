@@ -113,53 +113,29 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
                 Assert.That(rootArchive.SiteDirectoryThings, Has.Count.EqualTo(1));
             }
 
-            Assert.That(() =>
-            {
-                using var missingHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
-                this.reader.Read(missingHeaderStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var missingHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
+            Assert.That(() => this.reader.Read(missingHeaderStream), Throws.TypeOf<InvalidDataException>());
 
-            Assert.That(() =>
-            {
-                using var missingSiteDirectoryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson));
-                this.reader.Read(missingSiteDirectoryStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var missingSiteDirectoryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson));
+            Assert.That(() => this.reader.Read(missingSiteDirectoryStream), Throws.TypeOf<InvalidDataException>());
 
-            Assert.That(() =>
-            {
-                using var corruptHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", "{ not valid json"), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
-                this.reader.Read(corruptHeaderStream);
-            }, Throws.TypeOf<JsonException>());
+            var corruptHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", "{ not valid json"), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
+            Assert.That(() => this.reader.Read(corruptHeaderStream), Throws.TypeOf<JsonException>());
 
-            Assert.That(() =>
-            {
-                using var corruptSiteDirectoryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", "{ not valid json"));
-                this.reader.Read(corruptSiteDirectoryStream);
-            }, Throws.TypeOf<JsonException>());
+            var corruptSiteDirectoryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", "{ not valid json"));
+            Assert.That(() => this.reader.Read(corruptSiteDirectoryStream), Throws.TypeOf<JsonException>());
 
-            Assert.That(() =>
-            {
-                using var nonZipStream = new MemoryStream([0x01, 0x02, 0x03, 0x04]);
-                this.reader.Read(nonZipStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var nonZipStream = new MemoryStream([0x01, 0x02, 0x03, 0x04]);
+            Assert.That(() => this.reader.Read(nonZipStream), Throws.TypeOf<InvalidDataException>());
 
-            Assert.That(() =>
-            {
-                using var duplicateHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("sub/Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
-                this.reader.Read(duplicateHeaderStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var duplicateHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("sub/Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
+            Assert.That(() => this.reader.Read(duplicateHeaderStream), Throws.TypeOf<InvalidDataException>());
 
-            Assert.That(() =>
-            {
-                using var duplicateSiteDirectoryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson), new ZipEntryModel("sub/SiteDirectory.json", this.validSiteDirectoryJson));
-                this.reader.Read(duplicateSiteDirectoryStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var duplicateSiteDirectoryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("Header.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson), new ZipEntryModel("sub/SiteDirectory.json", this.validSiteDirectoryJson));
+            Assert.That(() => this.reader.Read(duplicateSiteDirectoryStream), Throws.TypeOf<InvalidDataException>());
 
-            Assert.That(() =>
-            {
-                using var otherHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("OtherHeader.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
-                this.reader.Read(otherHeaderStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var otherHeaderStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("OtherHeader.json", this.validHeaderJson), new ZipEntryModel("SiteDirectory.json", this.validSiteDirectoryJson));
+            Assert.That(() => this.reader.Read(otherHeaderStream), Throws.TypeOf<InvalidDataException>());
         }
     }
 }

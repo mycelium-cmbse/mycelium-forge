@@ -38,6 +38,7 @@ namespace Mycelium.Forge.Extractors.Tests.Extensions
             var kparReader = provider.GetService<IReader>();
             var ecssReader = provider.GetService<IEcssC3ArchiveReader>();
             var capellaReader = provider.GetService<ICapellaArchiveReader>();
+            var archiveReaders = provider.GetServices<IArchiveReader>().ToList();
             var extractors = provider.GetServices<IArtifactManifestExtractor>().ToList();
 
             using (Assert.EnterMultipleScope())
@@ -46,6 +47,13 @@ namespace Mycelium.Forge.Extractors.Tests.Extensions
                 Assert.That(kparReader, Is.Not.Null);
                 Assert.That(ecssReader, Is.Not.Null);
                 Assert.That(capellaReader, Is.Not.Null);
+                Assert.That(archiveReaders, Has.Count.EqualTo(3));
+                Assert.That(archiveReaders, Has.One.InstanceOf<KparArchiveReader>());
+                Assert.That(archiveReaders, Has.One.InstanceOf<EcssC3ArchiveReader>());
+                Assert.That(archiveReaders, Has.One.InstanceOf<CapellaArchiveReader>());
+                Assert.That(archiveReaders.Any(registeredReader => registeredReader.CanHandle(ArtifactKind.Kpar)), Is.True);
+                Assert.That(archiveReaders.Any(registeredReader => registeredReader.CanHandle(ArtifactKind.EcssC3)), Is.True);
+                Assert.That(archiveReaders.Any(registeredReader => registeredReader.CanHandle(ArtifactKind.Capella)), Is.True);
                 Assert.That(extractors, Has.Count.GreaterThanOrEqualTo(3));
                 Assert.That(extractors, Has.One.InstanceOf<KparManifestExtractor>());
                 Assert.That(extractors, Has.One.InstanceOf<EcssC3ManifestExtractor>());

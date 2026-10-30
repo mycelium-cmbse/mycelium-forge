@@ -60,11 +60,8 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
                 Assert.That(archive.Archive.Project.Name, Is.EqualTo("Kernel Data Type Library"));
             }
 
-            Assert.That(() =>
-            {
-                using var corruptStream = new MemoryStream([0x01, 0x02, 0x03, 0x04]);
-                this.reader.Read(corruptStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var corruptStream = new MemoryStream([0x01, 0x02, 0x03, 0x04]);
+            Assert.That(() => this.reader.Read(corruptStream), Throws.TypeOf<InvalidDataException>());
         }
     }
 }

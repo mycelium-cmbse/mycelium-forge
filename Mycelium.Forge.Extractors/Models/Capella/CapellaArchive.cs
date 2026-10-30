@@ -12,22 +12,8 @@ namespace Mycelium.Forge.Extractors.Models.Capella
     using Auriga.Capellamodeller;
 
     /// <summary>
-    /// Encapsulates the descriptors and model elements read from a Capella archive package.
+    /// Represents the raw extracted contents of a Capella project archive.
     /// </summary>
-    public class CapellaArchive
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CapellaArchive" /> class.
-        /// </summary>
-        /// <param name="project">The deserialized Capella project or library.</param>
-        public CapellaArchive(IProject project)
-        {
-            this.Project = project;
-        }
-
-        /// <summary>
-        /// Gets the deserialized Capella project or library.
-        /// </summary>
-        public IProject Project { get; }
-    }
+    /// <param name="Project">The deserialized Capella project descriptor.</param>
+    public sealed record CapellaArchive(IProject Project) : IArchive;
 }

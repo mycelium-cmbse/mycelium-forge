@@ -11,28 +11,11 @@ namespace Mycelium.Forge.Extractors.Readers
 {
     using System.IO.Compression;
 
-    using Mycelium.Forge.Extractors.Enums;
-    using Mycelium.Forge.Extractors.Models;
-
     /// <summary>
     /// Base class for readers that inspect and extract entries from a zip-based artifact archive.
     /// </summary>
-    public abstract class ZipArchiveReader : IArchiveReader
+    public abstract class ZipArchiveReader
     {
-        /// <summary>
-        /// Determines whether the reader handles the specified artifact format.
-        /// </summary>
-        /// <param name="kind">The artifact format.</param>
-        /// <returns>True if the reader handles the format, otherwise false.</returns>
-        public abstract bool CanHandle(ArtifactKind kind);
-
-        /// <summary>
-        /// Reads an artifact archive package from the specified stream.
-        /// </summary>
-        /// <param name="stream">The archive content stream to read.</param>
-        /// <returns>The deserialized <see cref="IArchive" />.</returns>
-        public abstract IArchive Read(Stream stream);
-
         /// <summary>
         /// Gets the single archive entry with the specified file name.
         /// </summary>

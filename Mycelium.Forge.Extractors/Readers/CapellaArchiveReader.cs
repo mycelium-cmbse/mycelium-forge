@@ -15,6 +15,8 @@ namespace Mycelium.Forge.Extractors.Readers
     using Auriga.Capellamodeller;
     using Auriga.Libraries;
 
+    using Mycelium.Forge.Extractors.Enums;
+    using Mycelium.Forge.Extractors.Models;
     using Mycelium.Forge.Extractors.Models.Capella;
 
     /// <summary>
@@ -24,7 +26,7 @@ namespace Mycelium.Forge.Extractors.Readers
     /// Once the <c>Auriga.Xmi</c> package is published on NuGet, this reader should be updated to use Auriga's native
     /// XMI capabilities and tools to parse the semantic model directly.
     /// </remarks>
-    public class CapellaArchiveReader : ICapellaArchiveReader
+    public class CapellaArchiveReader : ZipArchiveReader, ICapellaArchiveReader
     {
         /// <summary>
         /// The file extensions that identify a Capella semantic model file.
@@ -32,15 +34,24 @@ namespace Mycelium.Forge.Extractors.Readers
         private static readonly string[] ModelExtensions = [".capella", ".melodymodeller"];
 
         /// <summary>
-        /// Reads a Capella archive package from the specified stream.
+        /// Determines whether the reader handles the specified artifact format.
+        /// </summary>
+        /// <param name="kind">The artifact format.</param>
+        /// <returns>True if the reader handles the format, otherwise false.</returns>
+        public bool CanHandle(ArtifactKind kind)
+        {
+            return kind == ArtifactKind.Capella;
+        }
+
+        /// <summary>
+        /// Reads an artifact archive package from the specified stream.
         /// </summary>
         /// <param name="stream">The archive content stream to read.</param>
-        /// <returns>The deserialized <see cref="CapellaArchive" /> containing the project descriptor.</returns>
-        public CapellaArchive Read(Stream stream)
+        /// <returns>The deserialized <see cref="IArchive" />.</returns>
+        public IArchive Read(Stream stream)
         {
             using var archive = new ZipArchive(stream, ZipArchiveMode.Read, true);
-
-            var modelEntry = GetUniqueModelEntry(archive);
+            var modelEntry = GetUniqueEntry(archive, ModelExtensions);
 
             using var entryStream = modelEntry.Open();
             var document = XDocument.Load(entryStream);
@@ -122,25 +133,6 @@ namespace Mycelium.Forge.Extractors.Readers
             var xsiType = (string)element.Attribute(XName.Get("type", "http://www.w3.org/2001/XMLSchema-instance")) ?? string.Empty;
 
             return isVersionName || xsiType.EndsWith("ModelVersion", StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Gets the single root semantic model file entry (.capella or .melodymodeller) from the archive.
-        /// </summary>
-        /// <param name="archive">The zip archive.</param>
-        /// <returns>The unique <see cref="ZipArchiveEntry" />.</returns>
-        private static ZipArchiveEntry GetUniqueModelEntry(ZipArchive archive)
-        {
-            var matchingEntries = archive.Entries
-                .Where(entry => ModelExtensions.Contains(Path.GetExtension(entry.FullName), StringComparer.OrdinalIgnoreCase))
-                .ToList();
-
-            return matchingEntries.Count switch
-            {
-                0 => throw new InvalidDataException("The archive does not contain a .capella or .melodymodeller file."),
-                1 => matchingEntries[0],
-                _ => throw new InvalidDataException("The archive contains multiple semantic model files.")
-            };
         }
     }
 }

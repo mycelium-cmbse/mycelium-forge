@@ -12,6 +12,8 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
     using Auriga.Capellamodeller;
     using Auriga.Libraries;
 
+    using Mycelium.Forge.Extractors.Enums;
+    using Mycelium.Forge.Extractors.Models.Capella;
     using Mycelium.Forge.Extractors.Readers;
     using Mycelium.Forge.Extractors.Tests.Helpers;
     using Mycelium.Forge.Extractors.Tests.Models;
@@ -93,11 +95,22 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
         }
 
         [Test]
+        public void VerifyCanHandle()
+        {
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.reader.CanHandle(ArtifactKind.Capella), Is.True);
+                Assert.That(this.reader.CanHandle(ArtifactKind.Kpar), Is.False);
+                Assert.That(this.reader.CanHandle(ArtifactKind.EcssC3), Is.False);
+            }
+        }
+
+        [Test]
         public void VerifyRead()
         {
             var samplePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Resources", SampleArchiveName);
             using var sampleStream = File.OpenRead(samplePath);
-            var sampleArchive = this.reader.Read(sampleStream);
+            var sampleArchive = (CapellaArchive)this.reader.Read(sampleStream);
 
             using (Assert.EnterMultipleScope())
             {
@@ -108,7 +121,7 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
             }
 
             using var projectStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("model.capella", this.validCapellaXml));
-            var projectArchive = this.reader.Read(projectStream);
+            var projectArchive = (CapellaArchive)this.reader.Read(projectStream);
 
             using (Assert.EnterMultipleScope())
             {
@@ -129,7 +142,7 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
             }
 
             using var untypedVersionStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("model.capella", this.validVersionWithoutXsiTypeXml));
-            var untypedVersionArchive = this.reader.Read(untypedVersionStream);
+            var untypedVersionArchive = (CapellaArchive)this.reader.Read(untypedVersionStream);
 
             using (Assert.EnterMultipleScope())
             {
@@ -142,7 +155,7 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
             }
 
             using var fragmentedProjectStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("model.capella", this.validCapellaXml), new ZipEntryModel("subsystem.capellafragment", "<fragment />"));
-            var fragmentedArchive = this.reader.Read(fragmentedProjectStream);
+            var fragmentedArchive = (CapellaArchive)this.reader.Read(fragmentedProjectStream);
 
             using (Assert.EnterMultipleScope())
             {
@@ -151,7 +164,7 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
             }
 
             using var legacyStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("legacy.melodymodeller", this.validMelodyModellerXml));
-            var legacyArchive = this.reader.Read(legacyStream);
+            var legacyArchive = (CapellaArchive)this.reader.Read(legacyStream);
 
             using (Assert.EnterMultipleScope())
             {
@@ -160,7 +173,7 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
             }
 
             using var libraryStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("component.capella", this.validLibraryXml));
-            var libraryArchive = this.reader.Read(libraryStream);
+            var libraryArchive = (CapellaArchive)this.reader.Read(libraryStream);
 
             using (Assert.EnterMultipleScope())
             {
@@ -169,23 +182,14 @@ namespace Mycelium.Forge.Extractors.Tests.Readers
                 Assert.That(libraryArchive.Project.Name, Is.EqualTo("Sample Capella Library"));
             }
 
-            Assert.That(() =>
-            {
-                using var emptyArchiveStream = ArchiveTestHelper.CreateZipStream();
-                this.reader.Read(emptyArchiveStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var emptyArchiveStream = ArchiveTestHelper.CreateZipStream();
+            Assert.That(() => this.reader.Read(emptyArchiveStream), Throws.TypeOf<InvalidDataException>());
 
-            Assert.That(() =>
-            {
-                using var multipleModelsStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("a.capella", this.validCapellaXml), new ZipEntryModel("b.capella", this.validCapellaXml));
-                this.reader.Read(multipleModelsStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var multipleModelsStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("a.capella", this.validCapellaXml), new ZipEntryModel("b.capella", this.validCapellaXml));
+            Assert.That(() => this.reader.Read(multipleModelsStream), Throws.TypeOf<InvalidDataException>());
 
-            Assert.That(() =>
-            {
-                using var invalidRootStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("invalid.capella", InvalidRootXml));
-                this.reader.Read(invalidRootStream);
-            }, Throws.TypeOf<InvalidDataException>());
+            var invalidRootStream = ArchiveTestHelper.CreateZipStream(new ZipEntryModel("invalid.capella", InvalidRootXml));
+            Assert.That(() => this.reader.Read(invalidRootStream), Throws.TypeOf<InvalidDataException>());
         }
     }
 }
