@@ -20,9 +20,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="PackageDao" /> class.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class PackageDaoIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -36,10 +33,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
         private Guid org1Id;
         private Guid org2Id;
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.CreateAsync" /> correctly persists a new Package in the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyCreateAsync()
         {
@@ -79,14 +72,12 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                     Assert.That(readResult.Value[0].ShortName, Is.EqualTo("test-pkg-create"));
                     Assert.That(readResult.Value[0].Owner, Is.EqualTo(this.accountId));
                     Assert.That(readResult.Value[0].PackageType, Is.EqualTo(this.packageTypeId));
+                    Assert.That(readResult.Value[0].CreatedAt, Is.Not.Default);
+                    Assert.That(readResult.Value[0].ModifiedAt, Is.EqualTo(readResult.Value[0].CreatedAt));
                 }
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.DeleteAsync" /> deletes a Package from the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyDeleteAsync()
         {
@@ -121,11 +112,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.ReadAsync" /> reads packages by identifiers, handles missing entries,
-        /// and enforces organization visibility filters on internal packages.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -201,10 +187,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.ReadIdentifiersAsync" /> returns all Package IDs in the database.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadIdentifiersAsync()
         {
@@ -231,10 +213,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             Assert.That(identifiers, Does.Contain(packageId));
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDao.UpdateAsync" /> updates mutable fields of an existing Package.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyUpdateAsync()
         {
@@ -275,14 +253,11 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                     Assert.That(readResult.Value[0].Name, Is.EqualTo("UpdatedPackageName"));
                     Assert.That(readResult.Value[0].Listed, Is.True);
                     Assert.That(readResult.Value[0].Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
+                    Assert.That(readResult.Value[0].ModifiedAt, Is.GreaterThan(readResult.Value[0].CreatedAt));
                 }
             }
         }
 
-        /// <summary>
-        /// Sets up DAOs and prerequisite records before each test.
-        /// </summary>
-        /// <remarks>A <see cref="Task" /></remarks>
         protected override async Task PostSetup()
         {
             this.packageDao = new PackageDao(

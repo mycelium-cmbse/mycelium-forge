@@ -379,7 +379,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     suffix = string.Empty;
                 }
 
-                sql.AppendLine($"                       (\"Thing\".\"data\"->>'{property.Name}'){suffix} AS \"{propertyName}\",");
+                sql.AppendLine($"                       (\"Thing\".\"data\"->>'{propertyName}'){suffix} AS \"{propertyName}\",");
             }
         }
 

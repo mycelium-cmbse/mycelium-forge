@@ -32,9 +32,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         protected ThingValidator()
         {
-            this.RuleFor(x => x.CreatedAt).NotEmpty();
             this.RuleFor(x => x.Id).NotEmpty();
-            this.RuleFor(x => x.ModifiedAt).NotEmpty();
             this.AddCustomValidation();
         }
 
