@@ -68,7 +68,7 @@ namespace Mycelium.Forge.Extractors.Readers
         /// </summary>
         /// <param name="kind">The artifact format.</param>
         /// <returns>True if the reader handles the format, otherwise false.</returns>
-        public override bool CanHandle(ArtifactKind kind)
+        public bool CanHandle(ArtifactKind kind)
         {
             return kind == ArtifactKind.EcssC3;
         }
@@ -78,7 +78,7 @@ namespace Mycelium.Forge.Extractors.Readers
         /// </summary>
         /// <param name="stream">The archive content stream to read.</param>
         /// <returns>The deserialized <see cref="IArchive" />.</returns>
-        public override IArchive Read(Stream stream)
+        public IArchive Read(Stream stream)
         {
             using var archive = new ZipArchive(stream, ZipArchiveMode.Read, true);
 
