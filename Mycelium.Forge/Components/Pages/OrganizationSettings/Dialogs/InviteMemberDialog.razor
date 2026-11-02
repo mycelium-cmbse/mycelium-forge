@@ -1,0 +1,65 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="InviteMemberDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        <p class="text-sm leading-xs text-muted-foreground">
+            Invite a new member to join this organization. They will receive a notification and can accept or decline the invitation.
+        </p>
+
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.TargetAccount)))">
+            <BbFieldLabel For="invite-member-target-input"
+                          Class="form-field-label">
+                Username
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="invite-member-target-input"
+                         Value="@(this.TargetAccount)"
+                         ValueChanged="@(this.OnTargetAccountChanged)"
+                         Placeholder="e.g. johndoe"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.TargetAccount)])"/>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="invite-member-role-select"
+                          Class="form-field-label">
+                Role
+            </BbFieldLabel>
+            <BbFieldContent>
+                <ForgeSelect TValue="OrganizationInvitationKind"
+                             Value="@(this.SelectedRole)"
+                             ValueChanged="@(this.OnRoleChanged)"
+                             Items="@(this.RoleOptions)"
+                             DisplayTextSelector="@(role => role.ToUpperCaseFirst())"
+                             Id="invite-member-role-select"/>
+            </BbFieldContent>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton id="invite-member-cancel-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton id="invite-member-submit-button"
+                  Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnInviteClicked)">
+            Invite member
+        </BbButton>
+    </Footer>
+</DialogComponent>

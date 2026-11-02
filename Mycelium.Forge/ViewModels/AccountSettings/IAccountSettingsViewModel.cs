@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.ViewModels.AccountSettings
 {
+    using DynamicData;
+
     using ErrorOr;
 
     using Mycelium.Forge.Common;
@@ -25,9 +27,14 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         IAccount Profile { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of organizations associated with the user account.
+        /// Gets the collection of organizations associated with the user account.
         /// </summary>
-        IReadOnlyList<IOrganization> Organizations { get; set; }
+        SourceList<IOrganization> Organizations { get; }
+
+        /// <summary>
+        /// Gets the view model for managing pending requests.
+        /// </summary>
+        IPendingRequestsManagerViewModel PendingRequestsManagerViewModel { get; }
 
         /// <summary>
         /// Gets or sets the primary address location string.

@@ -17,6 +17,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
     using Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs;
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Common;
+    using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
     /// <summary>
@@ -47,6 +48,11 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// Gets a value indicating whether transferring organization ownership is enabled and visible for the current user.
         /// </summary>
         private bool IsTransferOwnershipEnabled => this.ViewModel.Organization.Administrator.Contains(this.ViewModel.CurrentUserId) || PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.TransferOrganizationAdministration);
+
+        /// <summary>
+        /// Gets a value indicating whether inviting organization members is enabled and visible for the current user.
+        /// </summary>
+        private bool IsInviteMemberEnabled => this.ViewModel.Organization.Administrator.Contains(this.ViewModel.CurrentUserId) || PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.InviteOrganizationMembers);
 
         /// <summary>
         /// Handles component parameter updates and initializes the view model with the organization identifier asynchronously.
@@ -155,12 +161,8 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         {
             var onResult = new EventCallbackFactory().Create<IAccount>(this, async recipient =>
             {
-                var result = await this.ViewModel.TransferOrganization(recipient);
-
-                if (result.IsSuccess)
-                {
-                    await this.InvokeAsync(this.StateHasChanged);
-                }
+                await this.ViewModel.TransferOrganization(recipient);
+                await this.InvokeAsync(this.StateHasChanged);
             });
 
             var parameters = new Dictionary<string, object>
@@ -175,6 +177,33 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
             };
 
             await this.DialogService.OpenAsync<TransferOrganizationOwnershipDialog>(parameters, options);
+        }
+
+        /// <summary>
+        /// Handles the action to initiate an organization member invitation asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnInviteMember()
+        {
+            var onResult = new EventCallbackFactory().Create<InviteMemberResult>(this, async result =>
+            {
+                await this.ViewModel.InviteMember(result.TargetAccount, result.Role);
+                await this.InvokeAsync(this.StateHasChanged);
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(InviteMemberDialog.Organization), this.ViewModel.Organization },
+                { nameof(InviteMemberDialog.PendingInvitations), this.ViewModel.PendingInvitations },
+                { nameof(InviteMemberDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Invite member"
+            };
+
+            await this.DialogService.OpenAsync<InviteMemberDialog>(parameters, options);
         }
 
         /// <summary>

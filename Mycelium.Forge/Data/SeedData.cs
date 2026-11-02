@@ -198,8 +198,8 @@ namespace Mycelium.Forge.Data
                 Email = "contact@esa.int",
                 Origin = "European Space Agency engineering libraries and flight dynamics models.",
                 Status = ScopeStatusKind.ACTIVE,
-                Administrator = [RegisAccount.Id],
-                Member = [RegisAccount.Id, KleinAccount.Id, NovakAccount.Id]
+                Administrator = [KleinAccount.Id],
+                Member = [KleinAccount.Id, NovakAccount.Id]
             };
 
             OmgOrganization = new Organization

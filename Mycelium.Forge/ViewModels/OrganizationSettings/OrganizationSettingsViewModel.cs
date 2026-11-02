@@ -132,12 +132,12 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <summary>
         /// Gets or sets the collection of members belonging to the organization.
         /// </summary>
-        public IReadOnlyList<IAccount> Members { get; set; } = [];
+        public List<IAccount> Members { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the collection of accounts that have been invited to join the organization.
         /// </summary>
-        public IReadOnlyList<IAccount> InvitedAccounts { get; set; } = [];
+        public List<IAccount> InvitedAccounts { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the collection of pending invitations for the organization.
@@ -184,8 +184,8 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             var accountsOfInterest = await this.accountService.ReadOrEmpty(this.UserContext, [.. memberIds, .. pendingInvitationTargets]);
 
-            this.Members = [.. accountsOfInterest.Where(a => memberIds.Contains(a.Id))];
-            this.InvitedAccounts = [.. accountsOfInterest.Where(a => pendingInvitationTargets.Contains(a.Id))];
+            this.Members = accountsOfInterest.Where(a => memberIds.Contains(a.Id)).ToList();
+            this.InvitedAccounts = accountsOfInterest.Where(a => pendingInvitationTargets.Contains(a.Id)).ToList();
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             }
 
             this.Organization = organizationClone;
-            this.Members = [.. this.Members.Where(m => m.Id != member.Id)];
+            this.Members.RemoveAll(m => m.Id == member.Id);
             this.notificationService.AddNotification($"{member.Name} has been removed from the organization.", "Member Removed", NotificationType.Success);
         }
 
@@ -280,9 +280,12 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task RevokeInvitation(OrganizationInvitation invitation)
         {
-            var deleteResult = await this.organizationInvitationService.DeleteAsync(this.UserContext, [invitation.Id], CancellationToken.None);
+            var invitationClone = invitation.Clone();
+            invitationClone.Status = InvitationStatusKind.REVOKED;
 
-            if (deleteResult.IsError)
+            var updateResult = await this.organizationInvitationService.UpdateAsync(this.UserContext, [invitationClone], CancellationToken.None);
+
+            if (updateResult.IsError)
             {
                 const string errorMessage = "Failed to revoke invitation.";
                 this.logger.LogError(errorMessage + " Invitation: {InvitationId}", invitation.Id);
@@ -322,12 +325,47 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             this.Organization = organizationClone;
             await this.ComputeCurrentUserPermissions();
 
-            if (this.Members.All(m => m.Id != recipient.Id))
-            {
-                this.Members = [.. this.Members, recipient];
-            }
+            this.Members.AddOrReplace(recipient);
 
             this.notificationService.AddNotification($"Organization ownership transferred to {recipient.Name}.", "Ownership Transferred", NotificationType.Success);
+            return Result.Success;
+        }
+
+        /// <summary>
+        /// Invites an account to join the organization with the specified role asynchronously.
+        /// </summary>
+        /// <param name="target">The target account being invited.</param>
+        /// <param name="role">The invitation role to grant.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
+        public async Task<ErrorOr<Success>> InviteMember(IAccount target, OrganizationInvitationKind role, CancellationToken token = default)
+        {
+            var invitation = new OrganizationInvitation
+            {
+                Id = Guid.NewGuid(),
+                Organization = this.Organization.Id,
+                Target = target.Id,
+                Owner = this.CurrentUserId,
+                OrganizationInvitationKind = role,
+                Status = InvitationStatusKind.PENDING,
+                ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays)
+            };
+
+            var createResult = await this.organizationInvitationService.CreateAsync(this.UserContext, [invitation], token);
+
+            if (createResult.IsError)
+            {
+                const string errorMessage = "Failed to send invitation.";
+
+                this.logger.LogError(errorMessage + " Target: {TargetId} Errors: {Errors}", target.Id, createResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
+                return createResult.Errors;
+            }
+
+            this.PendingInvitations.Add(invitation);
+            this.InvitedAccounts.AddOrReplace(target);
+
+            this.notificationService.AddNotification($"Invitation sent to {target.Name}.", "Invitation Sent", NotificationType.Success);
             return Result.Success;
         }
 

@@ -46,6 +46,16 @@
                 <span class="text-xs leading-2xs font-semibold uppercase tracking-wider text-muted-foreground flex-1">
                     MEMBERS
                 </span>
+                @if (this.IsInviteMemberEnabled)
+                {
+                    <BbButton id="org-settings-invite-button"
+                              Variant="ButtonVariant.Default"
+                              Size="ButtonSize.Small"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.OnInviteMember)">
+                        Invite member
+                    </BbButton>
+                }
                 @if (this.IsTransferOwnershipEnabled)
                 {
                     <BbButton id="org-settings-transfer-button"

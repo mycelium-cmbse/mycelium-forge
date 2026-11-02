@@ -64,6 +64,8 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Error.Unauthorized(description: "Unauthenticated user cannot create an invitation.");
             }
 
+            var accountId = userContext.AccountId.Value;
+
             var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.InviteOrganizationMembers);
 
             if (!guard.IsError)
@@ -77,7 +79,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             {
                 var organization = scopeResult.Value[0];
 
-                if (organization.Administrator.Contains(userContext.AccountId.Value))
+                if (organization.Administrator.Contains(accountId))
                 {
                     return Result.Success;
                 }
@@ -130,54 +132,68 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IOrganizationInvitation existingThing, IOrganizationInvitation updatedThing, NpgsqlTransaction transaction)
+        protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IOrganizationInvitation existingThing, IOrganizationInvitation updatedThing, NpgsqlTransaction transaction)
         {
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
-                return Task.FromResult<ErrorOr<Success>>(Error.Unauthorized(description: "Unauthenticated user cannot respond to an invitation."));
+                return Error.Unauthorized(description: "Unauthenticated user cannot respond to an invitation.");
             }
+
+            var accountId = userContext.AccountId.Value;
 
             if (existingThing.Status != updatedThing.Status)
             {
                 if (existingThing.Status != InvitationStatusKind.PENDING)
                 {
-                    return Task.FromResult<ErrorOr<Success>>(Error.Forbidden(description: $"Cannot change status of invitation that is already {existingThing.Status}."));
+                    return Error.Forbidden(description: $"Cannot change status of invitation that is already {existingThing.Status}.");
                 }
 
-                if (updatedThing.Status == InvitationStatusKind.ACCEPTED)
+                if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                 {
-                    if (existingThing.Target != userContext.AccountId.Value && !PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+                    if (existingThing.Target != accountId && !PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
                     {
-                        return Task.FromResult<ErrorOr<Success>>(Error.Forbidden(description: "Access denied: only the invited target account can accept the invitation."));
+                        return Error.Forbidden(description: "Access denied: only the invited target account can accept or reject the invitation.");
                     }
 
-                    return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.AcceptOrganizationInvitation));
+                    return PermissionGuard.GuardPermission(userContext, PermissionKind.AcceptOrganizationInvitation);
                 }
 
                 if (updatedThing.Status == InvitationStatusKind.REVOKED)
                 {
-                    if (existingThing.Owner != userContext.AccountId.Value && !PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+                    if (existingThing.Owner == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
                     {
-                        return Task.FromResult<ErrorOr<Success>>(Error.Forbidden(description: "Access denied: only the invitation creator can revoke the invitation."));
+                        return Result.Success;
                     }
 
-                    return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.RevokeOrganizationInvitation));
+                    var scopeResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Organization]);
+
+                    if (!scopeResult.IsError && scopeResult.Value.Count > 0)
+                    {
+                        var organization = scopeResult.Value[0];
+
+                        if (organization.Administrator.Contains(accountId))
+                        {
+                            return Result.Success;
+                        }
+                    }
+
+                    return Error.Forbidden(description: "Access denied: only the invitation creator or administrators can revoke the invitation.");
                 }
 
-                return Task.FromResult<ErrorOr<Success>>(Error.Forbidden(description: $"Unsupported invitation status transition to {updatedThing.Status}."));
+                return Error.Forbidden(description: $"Unsupported invitation status transition to {updatedThing.Status}.");
             }
 
-            if (existingThing.Owner == userContext.AccountId.Value || existingThing.Target == userContext.AccountId.Value)
+            if (existingThing.Owner == accountId || existingThing.Target == accountId)
             {
-                return Task.FromResult<ErrorOr<Success>>(Result.Success);
+                return Result.Success;
             }
 
             if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
             {
-                return Task.FromResult<ErrorOr<Success>>(Result.Success);
+                return Result.Success;
             }
 
-            return Task.FromResult<ErrorOr<Success>>(Error.Forbidden(description: "Access denied: you are not a party to this invitation."));
+            return Error.Forbidden(description: "Access denied: you are not a party to this invitation.");
         }
 
         /// <summary>
@@ -194,11 +210,13 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Error.Unauthorized(description: "Unauthenticated user cannot revoke an invitation.");
             }
 
+            var accountId = userContext.AccountId.Value;
+
             var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.InviteOrganizationMembers);
 
-            if (guard.IsError)
+            if (!guard.IsError)
             {
-                return guard;
+                return Result.Success;
             }
 
             var scopeResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Organization]);
@@ -206,7 +224,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             if (!scopeResult.IsError && scopeResult.Value.Count > 0)
             {
                 var organization = scopeResult.Value[0];
-                var accountId = userContext.AccountId.Value;
 
                 if (organization.Administrator.Contains(accountId))
                 {
