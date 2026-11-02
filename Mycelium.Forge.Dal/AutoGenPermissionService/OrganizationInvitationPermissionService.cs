@@ -150,6 +150,20 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                 {
+                    if (existingThing.ExperiesAt <= DateTime.UtcNow)
+                    {
+                        return Error.Forbidden(description: "Cannot respond to an invitation that has expired.");
+                    }
+
+                    if (existingThing.ExperiesAt != updatedThing.ExperiesAt ||
+                        existingThing.OrganizationInvitationKind != updatedThing.OrganizationInvitationKind ||
+                        existingThing.Organization != updatedThing.Organization ||
+                        existingThing.Target != updatedThing.Target ||
+                        existingThing.Owner != updatedThing.Owner)
+                    {
+                        return Error.Forbidden(description: "Cannot modify invitation details when accepting or rejecting an invitation.");
+                    }
+
                     if (existingThing.Target != accountId && !PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
                     {
                         return Error.Forbidden(description: "Access denied: only the invited target account can accept or reject the invitation.");

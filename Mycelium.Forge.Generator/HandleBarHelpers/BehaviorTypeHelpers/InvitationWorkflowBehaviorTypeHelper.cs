@@ -147,6 +147,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             var failUnauth = PermissionStatementHelper.GetUnauthorizedReturn("\"Unauthenticated user cannot respond to an invitation.\"", isAsync);
             var failAlready = PermissionStatementHelper.GetFailReturn("$\"Cannot change status of invitation that is already {existingThing.Status}.\"", isAsync);
+            var failExpired = PermissionStatementHelper.GetFailReturn("\"Cannot respond to an invitation that has expired.\"", isAsync);
+            var failModified = PermissionStatementHelper.GetFailReturn("\"Cannot modify invitation details when accepting or rejecting an invitation.\"", isAsync);
             var failNotInvitee = PermissionStatementHelper.GetFailReturn("\"Access denied: only the invited target account can accept or reject the invitation.\"", isAsync);
             var acceptGuard = PermissionStatementHelper.GetReturnStatement($"PermissionGuard.GuardPermission(userContext, PermissionKind.{config.AcceptPermission})", isAsync);
             var failUnsupported = PermissionStatementHelper.GetFailReturn("$\"Unsupported invitation status transition to {updatedThing.Status}.\"", isAsync);
@@ -171,6 +173,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                    if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                                                    {
+                                                       if (existingThing.ExperiesAt <= DateTime.UtcNow)
+                                                       {
+                                                           {{failExpired}}
+                                                       }
+
+                                                       if (existingThing.ExperiesAt != updatedThing.ExperiesAt ||
+                                                           existingThing.{{config.EntityName}}Kind != updatedThing.{{config.EntityName}}Kind ||
+                                                           existingThing.{{config.ScopeProperty}} != updatedThing.{{config.ScopeProperty}} ||
+                                                           existingThing.{{config.InviteeProperty}} != updatedThing.{{config.InviteeProperty}} ||
+                                                           existingThing.{{config.OwnerProperty}} != updatedThing.{{config.OwnerProperty}})
+                                                       {
+                                                           {{failModified}}
+                                                       }
+
                                                        if (existingThing.{{config.InviteeProperty}} != accountId && !PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
                                                        {
                                                            {{failNotInvitee}}
