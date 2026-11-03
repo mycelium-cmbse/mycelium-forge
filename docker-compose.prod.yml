@@ -20,7 +20,9 @@ services:
       # docker/postgres/00-create-roles.sh below.
       FORGE_RUNTIME_PASSWORD: ${FORGE_RUNTIME_PASSWORD:?set FORGE_RUNTIME_PASSWORD in .env.prod}
     volumes:
-      # PostgreSQL 18's image expects a single mount at /var/lib/postgresql, see docker-compose.yml.
+      # PostgreSQL 18's image expects a single mount at /var/lib/postgresql (not .../data as with
+      # earlier major versions) - it manages a version-specific subdirectory itself so that
+      # `pg_upgrade --link` isn't blocked by a mount-point boundary.
       - postgres-data:/var/lib/postgresql
       - ./docker/postgres/00-create-roles.sh:/docker-entrypoint-initdb.d/00-create-roles.sh:ro
     healthcheck:

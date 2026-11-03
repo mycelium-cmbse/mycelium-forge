@@ -1,8 +1,9 @@
 ﻿# Getting started
 
 How to go from a clean clone of `mycelium-forge` to a running, debuggable instance of Forge on your
-own machine. This walks through **JetBrains Rider** as the reference IDE, with a plain-`docker compose`
-path alongside it for anyone not using Rider's Dev Containers support.
+own machine. This walks through **JetBrains Rider** as the reference IDE, with a plain `dotnet run`
+path alongside it for anyone not using Rider's Dev Containers support. Local services are orchestrated by the
+.NET Aspire AppHost (`Mycelium.Forge.AppHost`).
 
 If you just want to see the app running without opening an editor at all, skip to
 [Just run it](#just-run-it).
@@ -17,16 +18,20 @@ If you just want to see the app running without opening an editor at all, skip t
   [Option A2](#a2-from-the-welcome-screen-no-clone-needed) below).
 
 You do **not** need the .NET SDK installed locally for the Dev Container path — it's already inside
-the container. You do need it if you choose [Option B](#option-b-run-the-supporting-services-only)
+the container. You do need it if you choose [Option B](#option-b-run-the-apphost-on-your-machine)
 instead.
 
 ## Option A: Dev Container in Rider (recommended)
 
-This gets you PostgreSQL, Garage (object storage), Keycloak (identity provider) and a completed
-database migration running alongside a full .NET SDK, with the repository's source live-mounted —
-edit on your host, the container sees it immediately.
+This gets you a full .NET SDK plus a Docker daemon of its own, so the Aspire AppHost can start PostgreSQL,
+Garage (object storage), Keycloak (identity provider), the migrator and seeder, and Forge itself. The
+repository lives in a container volume (see [A2](#a2-from-the-welcome-screen-no-clone-needed)).
 
-### A1. From an already-cloned repo
+### A1. From an already-cloned repo (not recommended)
+
+> **Heads up:** this bind-mounts your local folder. On Windows/macOS the files are not owned by the container's
+> non-root `forge` user, so builds fail (`MSB3374 ... cannot be set`). Prefer A2 below, which clones into a
+> container volume.
 
 1. Clone the repo and open it in Rider as a normal local project.
 2. Open the **Services** tool window (bottom toolbar, or <kbd>Alt+8</kbd>).
@@ -39,12 +44,15 @@ edit on your host, the container sees it immediately.
    window route above works regardless and is easier to find.)
 4. Pick **Rider** as the backend IDE when prompted.
 5. Watch progress in the **Services** tool window — this is Rider building the workspace image,
-   starting the supporting containers (Postgres, Garage, Keycloak, and a one-shot migration run), and
+   installing the Docker-in-Docker feature, and
    **downloading the Rider backend into the container**. That backend download only happens once and
    can take a while (several hundred MB+) — subsequent connects reuse it and are fast.
 6. Once it's ready, click **Connect**. Rider reopens the project from inside the container.
 
 ### A2. From the Welcome screen (no clone needed)
+
+This is the supported route: the repo is cloned into a container volume, so the non-root `forge` user owns
+every file.
 
 1. On Rider's Welcome screen, click **Remote Development**, then **Create Dev Container**.
 2. Rider auto-detects your local Docker connection. If it doesn't, make sure Docker Desktop is
@@ -57,26 +65,24 @@ edit on your host, the container sees it immediately.
 
 ### Once you're connected
 
-You're now working inside the `workspace` container, with the repository bind-mounted at
-`/workspaces/mycelium-forge` and the .NET SDK already there. Postgres, Garage and Keycloak are running
-alongside you as separate containers on the same network, and the placeholder database migration has
-already run.
+You're now working inside the `workspace` container, with the repository in a container volume at
+`/workspaces/mycelium-forge` and the .NET SDK already there. Start the Aspire AppHost from the terminal
+(`dotnet run --project Mycelium.Forge.AppHost`): Postgres, Garage, Keycloak, the migrator, the seeder and Forge
+run as containers/processes inside this container.
 
-- **Run/debug the app**: open `Mycelium.Forge.sln`, make sure `Mycelium.Forge` is the startup project,
+- **Run/debug the app**: open `Mycelium.Forge.sln`, make sure `Mycelium.Forge.AppHost` is the startup project,
   and Run or Debug as usual (▶ / 🐞 in the toolbar, or <kbd>Shift+F10</kbd> / <kbd>Shift+F9</kbd>). The
-  connection string is already set via environment variable inside the container, so this just works —
+  database, storage and authentication settings are injected by the AppHost, so this just works -
   no local `appsettings.json` to create.
 - **Run tests**: use Rider's built-in test runner (right-click a test project or class → **Run
   Unit Tests**), or `dotnet test` from the integrated terminal.
-- The `app` service defined in `docker-compose.yml` is **deliberately not started** by the dev
-  container — you're running the app yourself, interactively, instead of it running as its own
-  container. If you also want to see the fully containerized app running side-by-side, see
-  [Just run it](#just-run-it) in a separate terminal.
+- The Aspire dashboard port is random: use the URL (with its login token) printed by the AppHost; the IDE
+  forwards it automatically, as it does Forge (5000) and Keycloak (8081).
 - **Getting a shell**: Rider's integrated terminal already opens inside the container — no extra step
   needed. From a plain host terminal instead (Rider not open, or not connected right now), with the
   container already running:
   ```
-  docker compose exec workspace bash
+  docker exec -it -u forge <container-name> bash
   ```
 
 ### Claude Code inside the Dev Container
@@ -88,35 +94,35 @@ Login state persists across rebuilds (it lives in a named Docker volume), so you
 once. Skipping permission prompts is still a real trust decision, not just a root-vs-non-root technicality —
 only use it in a container you're comfortable giving broad, prompt-free access to.
 
-## Option B: run the supporting services only
+## Option B: run the AppHost on your machine
 
-If you'd rather work outside a Dev Container — plain Rider on your host, .NET SDK installed locally —
-you can still get Postgres/Garage/Keycloak from Compose and just point Rider at them directly.
+If you'd rather work outside a Dev Container - plain Rider on your host, .NET SDK installed locally -
+the Aspire AppHost still gives you Postgres/Garage/Keycloak, the migrator and seeder, and Forge.
 
-1. From the repo root, start only the supporting services (skip `app`, which you're about to run
-   yourself):
+1. Open `Mycelium.Forge.sln` in Rider normally (no Dev Container) and run or debug the
+   `Mycelium.Forge.AppHost` project, or from the repo root:
    ```
-   docker compose up postgres garage keycloak migrator
+   dotnet run --project Mycelium.Forge.AppHost
    ```
-   Wait for the migrator to log `Upgrade successful` and exit — that's Postgres ready and migrated.
-2. Open `Mycelium.Forge.sln` in Rider normally (no Dev Container).
-3. Edit the `Mycelium.Forge` run configuration and add an environment variable:
-   ```
-   ConnectionStrings__Default=Host=localhost;Port=5432;Database=forge;Username=forge;Password=forge-dev-password
-   ```
-4. Run or debug as usual.
+2. Open the Aspire dashboard URL printed in the console (it carries a login token). Wait for the migrator and
+   seeder to finish and for `forge` to be running.
+3. Browse to **http://localhost:5000**.
+
+Forge runs as a normal host process started by the AppHost, so debugging the AppHost debugs Forge. Always start
+Forge through the AppHost: the database, storage and authentication settings are injected by it as environment
+variables.
 
 ## Just run it
 
 No editor, no interactive development — just see a working Forge instance:
 
 ```
-docker compose up
+dotnet run --project Mycelium.Forge.AppHost
 ```
 
-This builds the app image and brings up everything: Postgres, Garage, Keycloak, the one-shot migrator,
+This starts the Aspire AppHost, which brings up Postgres, Garage, Keycloak, the one-shot migrator,
 the database seeder, and the app itself, in dependency order (the app doesn't start until the seeder finishes
-successfully). Once it settles, browse to **http://localhost:8080**.
+successfully). Once it settles, browse to **http://localhost:5000**.
 
 Run it a second time and it's a clean no-op — the migrator sees nothing new to apply and the app
 starts immediately.
@@ -124,26 +130,25 @@ starts immediately.
 ## Resetting local state
 
 ```
-docker compose down -v
+docker volume rm forge-postgres-data forge-keycloak-postgres-data forge-garage-meta forge-garage-data
 ```
 
-This removes the containers **and** their volumes — Postgres data, Garage's buckets/keys, Keycloak's
-realm state. The next `docker compose up` starts from scratch. Use this if something's in a state you
+This removes Postgres data, Garage's buckets/keys and Keycloak's realm state. Stop the AppHost first. The next
+AppHost start begins from scratch. Use this if something's in a state you
 don't trust, or after pulling changes that touch the database schema.
 
 ## Troubleshooting
 
 - **"Cannot connect to the Docker daemon"** — Docker Desktop isn't running. Start it and wait for it to
   fully initialize before retrying.
-- **Port already in use** (5432, 8080, 8081, 3900, 3903) — something else on your machine is already
-  using it. Stop that, or edit the port mapping in `docker-compose.yml`.
-- **A service won't go "healthy"** — check its logs: `docker compose logs <service>`. `docker compose
-  ps` shows the current status of everything.
-- **Stale/weird state after switching branches** — `docker compose down -v`, then bring it back up.
+- **Port already in use** (5000, 5432, 5433, 8081, 3900, 3903) - something else on your machine is already
+  using it. Stop that; these ports are fixed in `Mycelium.Forge.AppHost/Program.cs` and the Forge launch profile.
+- **A resource won't go "healthy"** - open it in the Aspire dashboard and read its console logs.
+- **Stale/weird state after switching branches** - reset the local state as above, then start the AppHost again.
 
 ## What's here, and what isn't yet
 
-- Every credential in `docker-compose.yml` / `docker/garage.toml` is a fixed, checked-in, dev-only
+- Every credential in `Mycelium.Forge.AppHost/Program.cs` / `docker/garage.toml` is a fixed, checked-in, dev-only
   value. Never reuse any of it anywhere real.
 - The database migration that runs is a small **placeholder**, not the real Forge schema — that
   lands once the model-driven schema generator ships. Don't build on it.
