@@ -122,7 +122,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var entityLower = @class.Name.ToLowerInvariant();
-            var bypassChecks = config.BypassPermissions.Select(p => $"PermissionGuard.HasPermission(userContext, PermissionKind.{p})").ToList();
+            var bypassCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.BypassPermissions);
             var scopeRoleChecks = config.ScopeMemberProperties.Select(prop => $"organization.{prop}.Contains(accountId)");
 
             var ownershipChecks = new List<string> { $"thing.{PropertyNames.Owner} == accountId" };
@@ -156,13 +156,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                }
                                    """);
 
-            if (bypassChecks.Count > 0)
+            if (!string.IsNullOrEmpty(bypassCheck))
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine();
 
                 stringBuilder.Append($$"""
-                                               if ({{string.Join(" || ", bypassChecks)}})
+                                               if ({{bypassCheck}})
                                                {
                                                    return Result.Success;
                                                }

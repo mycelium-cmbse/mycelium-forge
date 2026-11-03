@@ -169,7 +169,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                         return Error.Forbidden(description: "Access denied: only the invited target account can accept or reject the invitation.");
                     }
 
-                    return PermissionGuard.GuardPermission(userContext, PermissionKind.AcceptPackageInvitation);
+                    return Result.Success;
                 }
 
                 if (updatedThing.Status == InvitationStatusKind.REVOKED)
@@ -226,9 +226,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
-
-            if (!guard.IsError)
+            if (thing.Owner == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
             {
                 return Result.Success;
             }
@@ -245,7 +243,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return Error.Forbidden(description: "Access denied: only packageOwner or packageMaintainers can revoke invitations.");
+            return Error.Forbidden(description: "Access denied: only the invitation creator or packageOwner or packageMaintainers can revoke invitations.");
         }
     }
 }

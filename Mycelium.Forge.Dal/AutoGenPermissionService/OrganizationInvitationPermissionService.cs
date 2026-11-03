@@ -66,7 +66,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.InviteOrganizationMembers);
+            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOrganizationMembers);
 
             if (!guard.IsError)
             {
@@ -169,12 +169,12 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                         return Error.Forbidden(description: "Access denied: only the invited target account can accept or reject the invitation.");
                     }
 
-                    return PermissionGuard.GuardPermission(userContext, PermissionKind.AcceptOrganizationInvitation);
+                    return Result.Success;
                 }
 
                 if (updatedThing.Status == InvitationStatusKind.REVOKED)
                 {
-                    if (existingThing.Owner == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+                    if (existingThing.Owner == accountId || PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
                     {
                         return Result.Success;
                     }
@@ -226,9 +226,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.InviteOrganizationMembers);
-
-            if (!guard.IsError)
+            if (thing.Owner == accountId || PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
             {
                 return Result.Success;
             }
@@ -245,7 +243,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return Error.Forbidden(description: "Access denied: only administrators can revoke invitations.");
+            return Error.Forbidden(description: "Access denied: only the invitation creator or administrators can revoke invitations.");
         }
     }
 }

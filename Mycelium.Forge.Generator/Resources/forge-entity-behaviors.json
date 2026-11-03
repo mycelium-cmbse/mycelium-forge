@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "./forge-entity-behaviors.schema.json",
   "behaviors": [
     {
@@ -69,8 +69,6 @@
           "Administrator"
         ],
         "InviteeProperty": "Target",
-        "AcceptPermission": "AcceptOrganizationInvitation",
-        "RevokePermission": "RevokeOrganizationInvitation",
         "AdminPermission": "ManageOrganizations"
       }
     },
@@ -84,8 +82,6 @@
           "PackageMaintainer"
         ],
         "InviteeProperty": "Target",
-        "AcceptPermission": "AcceptPackageInvitation",
-        "RevokePermission": "RevokePackageInvitation",
         "AdminPermission": "ManagePackageTeam"
       }
     },

@@ -124,7 +124,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Success;
             }
 
-            if (PermissionGuard.HasPermission(userContext, PermissionKind.ViewAllOrganizations) || PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+            if (PermissionGuard.HasAnyPermission(userContext, PermissionKind.ViewAllOrganizations, PermissionKind.ManageOrganizations))
             {
                 return Result.Success;
             }

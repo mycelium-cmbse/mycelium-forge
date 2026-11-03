@@ -30,8 +30,6 @@ namespace Mycelium.Forge.Generator.Models
 
             var scopeEntity = GetValue(config, ConfigurationKeys.ScopeEntity, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ScopeEntity}'.");
             var inviteeProp = GetValue(config, ConfigurationKeys.InviteeProperty, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.InviteeProperty}'.");
-            var acceptPerm = GetValue(config, ConfigurationKeys.AcceptPermission, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.AcceptPermission}'.");
-            var revokePerm = GetValue(config, ConfigurationKeys.RevokePermission, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.RevokePermission}'.");
             var sr = GetValue(config, ConfigurationKeys.ScopeRoles, errorMessage: $"Entity '{entityName}' with InvitationWorkflow behavior must configure '{ConfigurationKeys.ScopeRoles}'.");
 
             var ownerProp = GetValue(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
@@ -55,8 +53,6 @@ namespace Mycelium.Forge.Generator.Models
             this.OwnerColumn = ownerProp.ToLowerInvariant();
             this.CreatePermission = createPerm;
             this.ReadPermission = readPerm;
-            this.AcceptPermission = acceptPerm;
-            this.RevokePermission = revokePerm;
             this.ScopeRoles = SplitValues(sr);
             this.ScopeRoleDescription = string.Join(" or ", this.ScopeRoles.Select(r => char.ToLowerInvariant(r[0]) + r[1..]));
             this.AdminPermission = adminPerm;
@@ -111,16 +107,6 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the permission required to read an invitation.
         /// </summary>
         public string ReadPermission { get; }
-
-        /// <summary>
-        /// Gets the permission required to accept an invitation.
-        /// </summary>
-        public string AcceptPermission { get; }
-
-        /// <summary>
-        /// Gets the permission required to revoke an invitation.
-        /// </summary>
-        public string RevokePermission { get; }
 
         /// <summary>
         /// Gets the roles on the scope entity that can invite or revoke members.

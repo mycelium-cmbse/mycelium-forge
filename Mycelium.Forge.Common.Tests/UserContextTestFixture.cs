@@ -39,7 +39,6 @@ namespace Mycelium.Forge.Common.Tests
                 Assert.That(regularContext.HasPermission(PermissionKind.ManageOrganizations), Is.False);
                 Assert.That(regularContext.HasPermission(PermissionKind.CreateOrganization), Is.True);
                 Assert.That(anonymousContext.HasPermission(PermissionKind.ManageOrganizations), Is.False);
-                Assert.That(anonymousContext.HasPermission(PermissionKind.ReadCountry), Is.True);
                 Assert.That(adminContext.IsAuthenticated, Is.True);
                 Assert.That(anonymousContext.IsAuthenticated, Is.False);
             }

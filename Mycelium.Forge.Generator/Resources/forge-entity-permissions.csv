@@ -1,15 +1,15 @@
-﻿Entity,CreatePermission,ReadPermission,UpdatePermission,DeletePermission,OwnerProperty,MaintainerProperty,VisibilityProperty
+Entity,CreatePermission,ReadPermission,UpdatePermission,DeletePermission,OwnerProperty,MaintainerProperty,VisibilityProperty
 Package,PublishPackageToPersonalScope,,ManagePackageSettings,DeletePackage,PackageOwner,PackageMaintainer,Visibility
 Organization,CreateOrganization,,ManageOrganizationSettings | ManageOrganizations,ManageOrganizations,Administrator,Member,
 APIKey,IssueApiKey,RevokeAnyApiKey,RevokeAnyApiKey,RevokeAnyApiKey,Owner,,
 Account,ManageAccounts,ViewAllAccounts | ManageAccounts,ManageAccounts,ManageAccounts,Id,,
-OrganizationInvitation,InviteOrganizationMembers,ViewOrganizationMemberList,,,Owner,,
+OrganizationInvitation,ManageOrganizationMembers,ViewOrganizationMemberList,,,Owner,,
 PackageInvitation,ManagePackageTeam,ManagePackageTeam,,,Owner,,
 PackageVersion,PublishPackageVersion,,,ErasePackageVersion,,,
 PackageMetaData,PublishPackageVersion,,ManagePackageSettings,DeletePackage,,,
-ProfileLink,CreateProfileLink,ReadProfileLink,UpdateProfileLink,DeleteProfileLink,Owner,,
-Address,CreateAddress,ReadAddress,UpdateAddress,DeleteAddress,Owner,,
-Country,ConfigurePlatformDefaults,ReadCountry,ConfigurePlatformDefaults,ConfigurePlatformDefaults,,,
+ProfileLink,,,,,Owner,,
+Address,,,,,Owner,,
+Country,ConfigurePlatformDefaults,,ConfigurePlatformDefaults,ConfigurePlatformDefaults,,,
 Forge,ConfigurePlatformDefaults,ViewInstallationMetrics,ConfigurePlatformDefaults,ConfigurePlatformDefaults,,,
-PackageType,ConfigurePlatformDefaults,ReadPackageType,ConfigurePlatformDefaults,ConfigurePlatformDefaults,,,
-ProfileType,ConfigurePlatformDefaults,ReadProfileType,ConfigurePlatformDefaults,ConfigurePlatformDefaults,,,
+PackageType,ConfigurePlatformDefaults,,ConfigurePlatformDefaults,ConfigurePlatformDefaults,,,
+ProfileType,ConfigurePlatformDefaults,,ConfigurePlatformDefaults,ConfigurePlatformDefaults,,,

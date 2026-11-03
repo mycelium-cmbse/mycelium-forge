@@ -82,14 +82,9 @@ namespace Mycelium.Forge.Common
         ManageOrganizationSettings,
 
         /// <summary>
-        /// Permission: InviteOrganizationMembers.
+        /// Permission: ManageOrganizationMembers.
         /// </summary>
-        InviteOrganizationMembers,
-
-        /// <summary>
-        /// Permission: RemoveOrganizationMembers.
-        /// </summary>
-        RemoveOrganizationMembers,
+        ManageOrganizationMembers,
 
         /// <summary>
         /// Permission: ConfigurePublishingPolicy.
@@ -115,16 +110,6 @@ namespace Mycelium.Forge.Common
         /// Permission: ViewOrganizationMemberList.
         /// </summary>
         ViewOrganizationMemberList,
-
-        /// <summary>
-        /// Permission: AcceptOrganizationInvitation.
-        /// </summary>
-        AcceptOrganizationInvitation,
-
-        /// <summary>
-        /// Permission: RevokeOrganizationInvitation.
-        /// </summary>
-        RevokeOrganizationInvitation,
 
         /// <summary>
         /// Permission: PublishPackageToPersonalScope.
@@ -172,16 +157,6 @@ namespace Mycelium.Forge.Common
         ManagePackageSettings,
 
         /// <summary>
-        /// Permission: AcceptPackageInvitation.
-        /// </summary>
-        AcceptPackageInvitation,
-
-        /// <summary>
-        /// Permission: RevokePackageInvitation.
-        /// </summary>
-        RevokePackageInvitation,
-
-        /// <summary>
         /// Permission: ManageOwnProfile.
         /// </summary>
         ManageOwnProfile,
@@ -199,62 +174,7 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// Permission: ListOwnApiKeys.
         /// </summary>
-        ListOwnApiKeys,
-
-        /// <summary>
-        /// Permission: CreateAddress.
-        /// </summary>
-        CreateAddress,
-
-        /// <summary>
-        /// Permission: ReadAddress.
-        /// </summary>
-        ReadAddress,
-
-        /// <summary>
-        /// Permission: UpdateAddress.
-        /// </summary>
-        UpdateAddress,
-
-        /// <summary>
-        /// Permission: DeleteAddress.
-        /// </summary>
-        DeleteAddress,
-
-        /// <summary>
-        /// Permission: CreateProfileLink.
-        /// </summary>
-        CreateProfileLink,
-
-        /// <summary>
-        /// Permission: ReadProfileLink.
-        /// </summary>
-        ReadProfileLink,
-
-        /// <summary>
-        /// Permission: UpdateProfileLink.
-        /// </summary>
-        UpdateProfileLink,
-
-        /// <summary>
-        /// Permission: DeleteProfileLink.
-        /// </summary>
-        DeleteProfileLink,
-
-        /// <summary>
-        /// Permission: ReadCountry.
-        /// </summary>
-        ReadCountry,
-
-        /// <summary>
-        /// Permission: ReadPackageType.
-        /// </summary>
-        ReadPackageType,
-
-        /// <summary>
-        /// Permission: ReadProfileType.
-        /// </summary>
-        ReadProfileType
+        ListOwnApiKeys
     }
 }
 

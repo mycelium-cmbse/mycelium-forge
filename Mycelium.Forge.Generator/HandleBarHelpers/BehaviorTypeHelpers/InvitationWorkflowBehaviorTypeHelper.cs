@@ -22,8 +22,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     /// invitation lifecycle workflow (e.g. OrganizationInvitation, PackageInvitation).
     /// Fully configurable via behavior key-value pairs:
     /// <c>ScopeEntity</c>, <c>ScopeProperty</c>, <c>ScopeRoles</c>, <c>InviteeProperty</c>,
-    /// <c>CreatePermission</c>, <c>ReadPermission</c>, <c>AcceptPermission</c>, <c>RevokePermission</c>,
-    /// <c>AdminPermission</c>.
+    /// <c>CreatePermission</c>, <c>ReadPermission</c>, <c>AdminPermission</c>.
     /// </summary>
     public class InvitationWorkflowBehaviorTypeHelper : ScopedBehaviorTypeHelperBase<InvitationWorkflowConfiguration>
     {
@@ -144,13 +143,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
             var isAsync = this.IsAsyncMethod(Operations.Update);
             var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
-
+            var revokePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
+            
             var failUnauth = PermissionStatementHelper.GetUnauthorizedReturn("\"Unauthenticated user cannot respond to an invitation.\"", isAsync);
             var failAlready = PermissionStatementHelper.GetFailReturn("$\"Cannot change status of invitation that is already {existingThing.Status}.\"", isAsync);
             var failExpired = PermissionStatementHelper.GetFailReturn("\"Cannot respond to an invitation that has expired.\"", isAsync);
             var failModified = PermissionStatementHelper.GetFailReturn("\"Cannot modify invitation details when accepting or rejecting an invitation.\"", isAsync);
             var failNotInvitee = PermissionStatementHelper.GetFailReturn("\"Access denied: only the invited target account can accept or reject the invitation.\"", isAsync);
-            var acceptGuard = PermissionStatementHelper.GetReturnStatement($"PermissionGuard.GuardPermission(userContext, PermissionKind.{config.AcceptPermission})", isAsync);
             var failUnsupported = PermissionStatementHelper.GetFailReturn("$\"Unsupported invitation status transition to {updatedThing.Status}.\"", isAsync);
             var okParty = PermissionStatementHelper.GetOkReturn(isAsync);
             var okAdmin = PermissionStatementHelper.GetOkReturn(isAsync);
@@ -192,12 +191,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                            {{failNotInvitee}}
                                                        }
 
-                                                       {{acceptGuard}}
+                                                       {{okParty}}
                                                    }
 
                                                    if (updatedThing.Status == InvitationStatusKind.REVOKED)
                                                    {
-                                                       if (existingThing.Owner == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                                       if (existingThing.Owner == accountId || {{revokePermCheck}})
                                                        {
                                                            {{okParty}}
                                                        }
@@ -245,6 +244,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
+            var deletePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -254,9 +254,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var accountId = userContext.AccountId.Value;
 
-                                               var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
-
-                                               if (!guard.IsError)
+                                               if (thing.{{config.OwnerProperty}} == accountId || {{deletePermCheck}})
                                                {
                                                    return Result.Success;
                                                }
@@ -273,7 +271,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    }
                                                }
 
-                                               return Error.Forbidden(description: "Access denied: only {{config.ScopeRoleDescription}}s can revoke invitations.");
+                                               return Error.Forbidden(description: "Access denied: only the invitation creator or {{config.ScopeRoleDescription}}s can revoke invitations.");
                                    """);
         }
 

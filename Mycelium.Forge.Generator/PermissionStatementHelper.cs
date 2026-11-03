@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionStatementHelper.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -63,6 +63,24 @@ namespace Mycelium.Forge.Generator
         public static string GetUnauthorizedReturn(string messageExpression, bool isAsync)
         {
             return isAsync ? $"return Error.Unauthorized(description: {messageExpression});" : $"return Task.FromResult<ErrorOr<Success>>(Error.Unauthorized(description: {messageExpression}));";
+        }
+
+        /// <summary>
+        /// Gets the C# boolean expression checking if the user context has a specific permission or any of the specified
+        /// permissions.
+        /// </summary>
+        /// <param name="permissions">The collection of permission names.</param>
+        /// <returns>A C# boolean expression string, or an empty string if no permissions are provided.</returns>
+        public static string FormatHasPermissionCheck(params string[] permissions)
+        {
+            var list = permissions.Where(permission => !string.IsNullOrWhiteSpace(permission)).Distinct().ToList();
+
+            return list.Count switch
+            {
+                0 => string.Empty,
+                1 => $"PermissionGuard.HasPermission(userContext, PermissionKind.{list[0]})",
+                _ => $"PermissionGuard.HasAnyPermission(userContext, {string.Join(", ", list.Select(permission => $"PermissionKind.{permission}"))})"
+            };
         }
     }
 }

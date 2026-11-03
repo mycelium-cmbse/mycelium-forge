@@ -52,7 +52,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         /// <summary>
         /// Gets a value indicating whether inviting organization members is enabled and visible for the current user.
         /// </summary>
-        private bool IsInviteMemberEnabled => this.ViewModel.Organization.Administrator.Contains(this.ViewModel.CurrentUserId) || PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.InviteOrganizationMembers);
+        private bool IsInviteMemberEnabled => this.ViewModel.Organization.Administrator.Contains(this.ViewModel.CurrentUserId) || PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.ManageOrganizationMembers);
 
         /// <summary>
         /// Handles component parameter updates and initializes the view model with the organization identifier asynchronously.
