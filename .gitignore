@@ -83,3 +83,6 @@ Mycelium.Forge/Styles/Generated/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Aspire publish output
+Mycelium.Forge.AppHost/deploy/
