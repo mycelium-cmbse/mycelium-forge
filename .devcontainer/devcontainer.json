@@ -2,19 +2,17 @@
   "name": "Mycelium Forge",
   // Open Dev Containers specification (https://containers.dev/) - not VS Code-proprietary. JetBrains
   // Rider opens this same file via JetBrains Gateway, no separate JetBrains-only config needed.
-  "dockerComposeFile": "../docker-compose.yml",
-  // The `workspace` service (the public .NET SDK image, not the runtime-only `app` image built from
-  // this repo's Dockerfile) is where the editor lands. `runServices` brings up the supporting
-  // services alongside it -
-  // Postgres, Garage, Keycloak, and a completed migrator run - but deliberately excludes `app`, so it
-  // doesn't fight the `dotnet run`/debug session started interactively from inside `workspace`.
-  "service": "workspace",
-  "runServices": ["postgres", "postgres-authentication", "garage", "keycloak", "migrator"],
+  "image": "mcr.microsoft.com/dotnet/sdk:10.0",
   "workspaceFolder": "/workspaces/mycelium-forge",
-  "shutdownAction": "stopCompose",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/mycelium-forge,type=bind",
+  // The Aspire AppHost (Mycelium.Forge.AppHost) starts Postgres, Garage, Keycloak, the migrator, the
+  // seeder and Forge itself. docker-in-docker (not docker-outside-of-docker) gives it a Docker daemon
+  // inside this container, so the AppHost's bind-mount paths (/workspaces/...) resolve natively.
+  // Start it from inside the container with: dotnet run --project Mycelium.Forge.AppHost
   "features": {
-    // Non-root user: the workspace image itself has none (its Dockerfile stage never sets USER, so a
-    // plain `docker compose up workspace` still runs as root) - the Claude Code CLI refuses
+    "ghcr.io/microsoft/aspire-devcontainer-feature/aspire:2": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    // Non-root user: the workspace image itself has none (it runs as root by default) - the Claude Code CLI refuses
     // `--dangerously-skip-permissions` when launched as root, so a non-root remote user is what
     // actually makes that flag usable here, not just a hardening nicety.
     // No explicit userUid/userGid: the SDK base image already occupies GID 1000 with its own group,
@@ -26,18 +24,29 @@
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
   },
   "remoteUser": "forge",
+  "postStartCommand": "aspire certs trust --non-interactive",
+  // Forge (5000) and Keycloak (8081) are reachable from the host browser. The Aspire dashboard port is
+  // random and printed (with its login token) by the AppHost, so the IDE forwards it automatically.
+  "forwardPorts": [5000, 8081],
   // `~/.claude.json` lives outside `~/.claude`, so persisting only the `.claude` directory isn't
   // enough on its own - CLAUDE_CONFIG_DIR redirects Claude Code's full state (including that file)
   // into the directory the named volume below actually covers, so login survives container rebuilds.
   "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/home/forge/.claude"
+    "CLAUDE_CONFIG_DIR": "/home/forge/.claude",
+    "ASPIRE_ALLOW_UNSECURED_TRANSPORT": "true"
+  },
+  "remoteEnv": {
+    "SSL_CERT_DIR": "/usr/lib/ssl/certs:/home/forge/.aspnet/dev-certs/trust"
   },
   "mounts": [
     "source=mycelium-forge-claude-config,target=/home/forge/.claude,type=volume"
   ],
   "customizations": {
     "vscode": {
-      "extensions": ["ms-dotnettools.csdevkit"]
+      "extensions": [
+        "microsoft-aspire.aspire-vscode",
+        "ms-dotnettools.csdevkit"
+      ]
     }
   }
 }

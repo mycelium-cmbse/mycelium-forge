@@ -14,9 +14,9 @@ When asked to run the project in seed mode or migrate mode, use the explicit pro
 dotnet run --project Mycelium.Forge/Mycelium.Forge.csproj -- seed
 ```
 > [!NOTE]
-> Ensure the PostgreSQL container is running and healthy prior to executing seeding:
+> Ensure the PostgreSQL and Keycloak containers are running and healthy prior to executing seeding. The Aspire AppHost runs migrate and seed for you:
 > ```powershell
-> docker compose up -d postgres
+> dotnet run --project Mycelium.Forge.AppHost
 > ```
 
 ### Migrate Mode

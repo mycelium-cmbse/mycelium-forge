@@ -16,14 +16,14 @@ Model-Based Systems Engineering (MBSE) artefacts. Forge provides a public web in
 
 ## Getting started
 
-To go from a clean clone to a running, debuggable instance of Forge on your own machine, including the Dev Container and plain `docker compose` paths — see [`docs/getting-started.md`](docs/getting-started.md).
+To go from a clean clone to a running, debuggable instance of Forge on your own machine, including the Dev Container path — see [`docs/getting-started.md`](docs/getting-started.md).
 
 The short version:
 
 ```
-docker compose up
+dotnet run --project Mycelium.Forge.AppHost
 ```
-brings up Postgres, Garage (object storage), Keycloak, the one-shot migrator and the app itself. Once it settles, browse to **http://localhost:8080**.
+starts the Aspire AppHost, which brings up Postgres, Garage (object storage), Keycloak, the one-shot migrator and seeder, and the app itself. Once it settles, browse to **http://localhost:5000**.
 
 ## Installation
 
