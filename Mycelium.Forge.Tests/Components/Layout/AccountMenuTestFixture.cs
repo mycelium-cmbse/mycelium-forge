@@ -26,18 +26,12 @@ namespace Mycelium.Forge.Tests.Components.Layout
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Services;
 
-    /// <summary>
-    /// Test fixture for <see cref="AccountMenu" />.
-    /// </summary>
     [TestFixture]
     public class AccountMenuTestFixture
     {
         private BunitContext context;
         private Mock<IUserService> userServiceMock;
 
-        /// <summary>
-        /// Sets up mock dependencies and test context before each test.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -54,20 +48,12 @@ namespace Mycelium.Forge.Tests.Components.Layout
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
         }
 
-        /// <summary>
-        /// Tears down the BUnit context after each test.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         [TearDown]
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
         }
 
-        /// <summary>
-        /// Verifies the rendering of the <see cref="AccountMenu" /> component and expanding its dropdown.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         [Test]
         public async Task VerifyAccountMenuRendering()
         {
@@ -104,23 +90,15 @@ namespace Mycelium.Forge.Tests.Components.Layout
             }
         }
 
-        /// <summary>
-        /// Verifies that signing out clears authentication state and navigates to the logout route.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         [Test]
         public async Task VerifyOnSignOut()
         {
             var accountMenu = this.context.Render<AccountMenu>();
-            var nav = this.context.Services.GetRequiredService<NavigationManager>();
+            var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
 
             await accountMenu.InvokeAsync(() => accountMenu.Instance.OnSignOut());
 
-            using (Assert.EnterMultipleScope())
-            {
-                this.userServiceMock.Verify(s => s.SetCurrentUser(null), Times.Once);
-                Assert.That(nav.Uri, Does.Contain(PageRoutes.Logout));
-            }
+            Assert.That(navigationManager.Uri, Does.Contain(PageRoutes.Logout));
         }
     }
 }

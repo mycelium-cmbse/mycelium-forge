@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageMetaDataServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -27,10 +27,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Integration test suite for <see cref="PackageMetaDataService" /> verifying end-to-end read behavior
-    /// against a real PostgreSQL instance provided by Testcontainers.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class PackageMetaDataServiceIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -47,11 +43,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
         private Guid privatePackageMetaDataId;
         private Guid privatePackageVersionId;
 
-        /// <summary>
-        /// Verifies that <see cref="PackageMetaDataService.ReadAsync(IUserContext, CancellationToken, Guid[])" />
-        /// enforces visibility rules across public, internal, and private packages for different caller roles.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -115,10 +106,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             }
         }
 
-        /// <summary>
-        /// Wires up DAOs, the services under test, user contexts, and prerequisite database records before each test.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
             var databaseSourceMock = new Mock<IDatabaseSource>();
@@ -167,21 +154,21 @@ namespace Mycelium.Forge.Orm.Tests.Services
             {
                 AccountId = sameOrgMemberId,
                 Username = "sameOrgMember",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.otherOrgMemberUserContext = new UserContext
             {
                 AccountId = otherOrgMemberId,
                 Username = "otherOrgMember",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.packageOwnerUserContext = new UserContext
             {
                 AccountId = orgAdminId,
                 Username = "packageOwner",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
             };
 
             this.appAdminUserContext = new UserContext
@@ -194,17 +181,6 @@ namespace Mycelium.Forge.Orm.Tests.Services
             await this.SeedDatabaseAsync(organizationDao, packageDao, packageVersionDao, packageMetaDataDao, sameOrgMemberId, otherOrgMemberId, orgAdminId);
         }
 
-        /// <summary>
-        /// Seeds the database with prerequisite records required by the tests.
-        /// </summary>
-        /// <param name="organizationDao">The <see cref="OrganizationDao" /> used to insert organizations.</param>
-        /// <param name="packageDao">The <see cref="PackageDao" /> used to insert packages.</param>
-        /// <param name="packageVersionDao">The <see cref="PackageVersionDao" /> used to insert package versions.</param>
-        /// <param name="packageMetaDataDao">The <see cref="PackageMetaDataDao" /> used to insert package metadata.</param>
-        /// <param name="sameOrgMemberId">The ID of the account in the owning organization.</param>
-        /// <param name="otherOrgMemberId">The ID of the account in another organization.</param>
-        /// <param name="orgAdminId">The ID of the account who administers the owning organization and owns the packages.</param>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         private async Task SeedDatabaseAsync(
             OrganizationDao organizationDao,
             PackageDao packageDao,

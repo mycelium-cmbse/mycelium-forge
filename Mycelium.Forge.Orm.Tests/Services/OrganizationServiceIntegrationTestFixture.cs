@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -175,14 +175,14 @@ namespace Mycelium.Forge.Orm.Tests.Services
             {
                 AccountId = this.adminAccountId,
                 Username = "adminUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
             };
 
             this.memberUserContext = new UserContext
             {
                 AccountId = this.memberAccountId,
                 Username = "memberUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.anonymousUserContext = UserContext.CreateAnonymous();

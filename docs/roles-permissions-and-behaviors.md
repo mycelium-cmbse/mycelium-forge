@@ -43,11 +43,9 @@ graph TD
     Account[Account]
     InstallationAdministrator[InstallationAdministrator]
     OrganizationAdministrator[OrganizationAdministrator]
-    OrganizationMember[OrganizationMember]
 
     Account --> InstallationAdministrator
     Account --> OrganizationAdministrator
-    Account --> OrganizationMember
 ```
 
 ### 2.2 System Roles Catalog
@@ -57,7 +55,6 @@ graph TD
 | `InstallationAdministrator` | `Account` | Super-administrator across the entire Forge deployment. | Full administrative access across all accounts, organizations, packages, and system metrics. |
 | `PlatformOperator` | *None* | Infrastructure operations and SRE team. | SaaS health monitoring, metrics, and platform-wide defaults. |
 | `OrganizationAdministrator` | `Account` | Tenant administrator for a specific Organization. | Manage organization profile, invite/remove members, configure publishing policies and visibility, manage org packages. |
-| `OrganizationMember` | `Account` | Regular member of an Organization tenant. | View member lists, publish packages to organization scope, collaborate on organization packages. |
 | `Account` | *None* | Standard authenticated user account. | Manage own profile, manage personal packages (`@username/*`), issue/revoke personal API keys, create organizations. |
 | `Anonymous` | *None* | Unauthenticated visitor, crawler, or package consumer. | Read public packages, download published versions, view reference data (countries, package types). |
 

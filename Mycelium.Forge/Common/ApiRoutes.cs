@@ -18,5 +18,10 @@ namespace Mycelium.Forge.Common
         /// The route path for staging package archive uploads.
         /// </summary>
         public const string UploadFileForStage = "/api/v1/upload/stage";
+
+        /// <summary>
+        /// The route template for determining whether a scope with the specified short name exists.
+        /// </summary>
+        public const string ScopeShortNameExists = "/api/v1/internal/scopes/shortnames/{shortName}/exists";
     }
 }

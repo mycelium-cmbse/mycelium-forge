@@ -1,4 +1,4 @@
-﻿# Local development environment (F-07, DD-09): PostgreSQL, object storage and an identity provider,
+# Local development environment (F-07, DD-09): PostgreSQL, object storage and an identity provider,
 # plus the one-shot migrator the app depends on (DD-18). See docs/getting-started.md for the seed
 # path. Every credential below is a fixed, checked-in, dev-only value - never used outside this file.
 
@@ -9,6 +9,15 @@ x-database-environment: &database-environment
   DatabaseConnection__Database: forge
   DatabaseConnection__Username: forge
   DatabaseConnection__Password: forge-dev-password
+
+# Define shared identity provider environment variables (DD-20). The app talks to Keycloak over the
+# compose network (MetadataAddress) while the browser is sent to the public Authority.
+x-authentication-environment: &authentication-environment
+  Authentication__Authority: http://localhost:8081/realms/forge
+  Authentication__MetadataAddress: http://keycloak:8080/realms/forge/.well-known/openid-configuration
+  Authentication__ClientId: forge-web
+  Authentication__ClientSecret: forge-dev-client-secret
+  Authentication__RequireHttpsMetadata: "false"
 
 # Define shared storage environment variables (DD-21)
 x-storage-environment: &storage-environment
@@ -44,6 +53,24 @@ services:
       timeout: 5s
       retries: 10
 
+  postgres-authentication:
+    # DD-20, DD-23: dedicated PostgreSQL 18 instance for Keycloak so the identity provider's schema
+    # and storage lifecycle stay isolated from Forge's database.
+    image: postgres:18
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak-dev-password
+    volumes:
+      - keycloak-postgres-data:/var/lib/postgresql
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   garage:
     # DD-21: Garage is the named object-storage implementation - "the local development and CI
     # target, so the path exercised in development is the path production runs." Pinned >= v2.3.0
@@ -72,21 +99,46 @@ services:
       retries: 10
 
   keycloak:
-    # DD-20: Forge ships its own Keycloak - the same component production runs, not a stand-in.
-    # --import-realm bootstraps the minimal "forge" realm in docker/keycloak/forge-realm.json.
-    # The account/organization administration surface is separate, later Phase 1 work; this only
-    # stands up the identity provider container itself.
-    image: quay.io/keycloak/keycloak:26.0
+    # DD-20: Forge ships its own Keycloak - the same image production runs, not a stand-in. The
+    # realm (forge-realm.json) and the "forge" login theme are baked into docker/keycloak/Dockerfile
+    # and imported on start; environments differ only through environment variables. The theme
+    # folder is additionally bind-mounted here so edits show on refresh without a rebuild.
+    # KC_HOSTNAME is the browser-facing URL; the backchannel stays dynamic so the app container can
+    # reach Keycloak as http://keycloak:8080 while issued tokens still carry the localhost issuer.
+    build:
+      context: docker/keycloak
+      dockerfile: Dockerfile
     command: ["start-dev", "--import-realm"]
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: forge-dev-password
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres-authentication
+      KC_DB_URL_PORT: "5432"
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak-dev-password
+      KC_HOSTNAME: http://localhost:8081
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
       # Health endpoints (used by the healthcheck below, on the management port) are opt-in.
       KC_HEALTH_ENABLED: "true"
+      # Values substituted into forge-realm.json on import.
+      FORGE_BASE_URL: http://localhost:8080
+      FORGE_CLIENT_SECRET: forge-dev-client-secret
+      FORGE_KEYCLOAK_SSL_REQUIRED: none
+      FORGE_KEYCLOAK_VERIFY_EMAIL: "false"
+      # Username validator extension (docker/keycloak/spi): where to reach Forge from inside this container
+      # (not FORGE_BASE_URL, which is the browser-facing URL and resolves to this container itself) and the
+      # shared secret it presents. docker-compose.dev.yml overrides the URL for Forge running on the host.
+      FORGE_SPI_BASE_URL: http://app:8080
+      FORGE_SPI_API_KEY: ${FORGE_SPI_API_KEY:-forge-dev-keycloak-spi-key}
     volumes:
-      - ./docker/keycloak/forge-realm.json:/opt/keycloak/data/import/forge-realm.json:ro
+      - ./docker/keycloak/themes/forge:/opt/keycloak/themes/forge:ro
     ports:
       - "8081:8080"
+    depends_on:
+      postgres-authentication:
+        condition: service_healthy
     healthcheck:
       # No curl/wget in the Keycloak image either; probe the management health endpoint over the
       # container's own /dev/tcp instead.
@@ -94,7 +146,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 15
-
   # DD-18: migrations are an explicit, one-shot invocation - never something every replica runs at
   # startup - so this runs the same image as `app` with its `migrate` command, and `app` depends on
   # it completing successfully rather than migrating itself.
@@ -116,9 +167,15 @@ services:
     command: ["seed"]
     environment:
       <<: *database-environment
+      Keycloak__BaseUrl: http://keycloak:8080
+      Keycloak__Realm: forge
+      Keycloak__AdminUsername: admin
+      Keycloak__AdminPassword: admin
     depends_on:
       migrator:
         condition: service_completed_successfully
+      keycloak:
+        condition: service_healthy
 
   app:
     build:
@@ -126,7 +183,8 @@ services:
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      <<: [*database-environment, *storage-environment]
+      <<: [*database-environment, *storage-environment, *authentication-environment]
+      KeycloakSpi__ApiKey: ${KeycloakSpi__ApiKey:-forge-dev-keycloak-spi-key}
     ports:
       - "8080:8080"
     depends_on:
@@ -153,9 +211,11 @@ services:
     volumes:
       - .:/workspaces/mycelium-forge:cached
     environment:
-      <<: [*database-environment, *storage-environment]
+      <<: [*database-environment, *storage-environment, *authentication-environment]
+      Keycloak__BaseUrl: http://keycloak:8080
 
 volumes:
   postgres-data:
+  keycloak-postgres-data:
   garage-meta:
   garage-data:

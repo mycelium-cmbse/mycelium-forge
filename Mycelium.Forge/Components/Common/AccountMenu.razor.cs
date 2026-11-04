@@ -47,12 +47,10 @@ namespace Mycelium.Forge.Components.Common
         public string Organization { get; set; } = "starion";
 
         /// <summary>
-        /// Handles the user sign-out action by clearing current authentication and navigating to login.
+        /// Handles the user sign-out action by navigating to the sign-out endpoint, which ends the identity provider session.
         /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OnSignOut()
+        public void OnSignOut()
         {
-            await this.UserService.SetCurrentUser(null);
             this.NavigationManager.NavigateTo(PageRoutes.Logout, true);
         }
 
