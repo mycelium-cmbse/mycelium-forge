@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ProjectResourceBuilderExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -36,7 +36,7 @@ namespace Mycelium.Forge.AppHost.Extensions
                 return project
                     .WithEnvironment("DatabaseConnection__Host", postgres.GetEndpoint("tcp").Property(EndpointProperty.Host))
                     .WithEnvironment("DatabaseConnection__Port", postgres.GetEndpoint("tcp").Property(EndpointProperty.Port))
-                    .WithEnvironment("DatabaseConnection__Database", AppHostConstants.Forge)
+                    .WithEnvironment("DatabaseConnection__Database", AppHostConstants.ForgeDatabase)
                     .WithEnvironment("DatabaseConnection__Username", username)
                     .WithEnvironment("DatabaseConnection__Password", password);
             }

@@ -56,8 +56,8 @@ namespace Mycelium.Forge.AppHost.Extensions
         /// </summary>
         private static readonly Dictionary<string, string> DefaultEnvValues = new()
         {
-            { "DATABASE_USERNAME", AppHostConstants.Forge },
-            { "AUTHENTICATION_DATABASE_USERNAME", AppHostConstants.Keycloak },
+            { "DATABASE_USERNAME", AppHostConstants.ForgeDatabase },
+            { "AUTHENTICATION_DATABASE_USERNAME", AppHostConstants.KeycloakDatabase },
             { "FORGE_PORT", "8080" }
         };
 

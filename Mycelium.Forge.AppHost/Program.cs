@@ -31,11 +31,6 @@ namespace Mycelium.Forge.AppHost
     public static class Program
     {
         /// <summary>
-        /// The default administrator password used in local development.
-        /// </summary>
-        private const string DefaultAdminPassword = "admin";
-
-        /// <summary>
         /// The endpoint name for the Garage administrator API and health check.
         /// </summary>
         private const string GarageAdminEndpointName = "admin";
@@ -63,34 +58,33 @@ namespace Mycelium.Forge.AppHost
             builder.AddDockerComposeEnvironment("compose")
                 .WithProductionComposeConfiguration();
 
-            var databaseUsername = builder.AddParameter("database-username", AppHostConstants.Forge);
+            var databaseUsername = builder.AddParameter("database-username", AppHostConstants.ForgeDatabase);
             var databasePassword = builder.AddSecretParameter("postgres-password", "forge-dev-password");
             var runtimePassword = builder.AddSecretParameter("forge-runtime-password", "forge-runtime-dev-password");
-            var authenticationDatabaseUsername = builder.AddParameter("authentication-database-username", AppHostConstants.Keycloak);
+            var authenticationDatabaseUsername = builder.AddParameter("authentication-database-username", AppHostConstants.KeycloakDatabase);
             var authenticationDatabasePassword = builder.AddSecretParameter("keycloak-db-password", "keycloak-dev-password");
-            var keycloakAdminPassword = builder.AddSecretParameter("keycloak-admin-password", DefaultAdminPassword);
+            var keycloakAdminPassword = builder.AddSecretParameter("keycloak-admin-password", "admin");
             var clientSecret = builder.AddSecretParameter("forge-client-secret", "forge-dev-client-secret");
             var spiApiKey = builder.AddSecretParameter("keycloak-spi-api-key", "forge-dev-keycloak-spi-key");
             var storageAccessKey = builder.AddSecretParameter("artifact-store-access-key", "GKdevlocal000000000");
             var storageSecretKey = builder.AddSecretParameter("artifact-store-secret-key", "dev0000000000000000000000000000000000000000000000000000000000");
+            var garageConfigPath = builder.ExecutionContext.IsPublishMode ? "../docker/garage.prod.toml" : "../docker/garage.toml";
 
             var postgres = builder.AddPostgres(AppHostConstants.Postgres, databaseUsername, databasePassword, 5432)
                 .WithImageTag("18")
-                .WithEnvironment("POSTGRES_DB", AppHostConstants.Forge)
+                .WithEnvironment("POSTGRES_DB", AppHostConstants.ForgeDatabase)
                 .WithEnvironment("FORGE_RUNTIME_PASSWORD", runtimePassword)
                 .WithDataVolume("forge-postgres-data")
                 .WithBindMount("../docker/postgres/00-create-roles.sh", "/docker-entrypoint-initdb.d/00-create-roles.sh", true)
                 .WithForgeContainerDefaults(AppHostConstants.Postgres)
-                .WithPostgresPublishConfiguration(AppHostConstants.Forge, AppHostConstants.Forge);
+                .WithPostgresPublishConfiguration(AppHostConstants.ForgeDatabase, AppHostConstants.ForgeDatabase);
 
             var authenticationPostgres = builder.AddPostgres(AppHostConstants.PostgresAuthentication, authenticationDatabaseUsername, authenticationDatabasePassword, 5433)
                 .WithImageTag("18")
-                .WithEnvironment("POSTGRES_DB", AppHostConstants.Keycloak)
+                .WithEnvironment("POSTGRES_DB", AppHostConstants.KeycloakDatabase)
                 .WithDataVolume("forge-keycloak-postgres-data")
                 .WithForgeContainerDefaults(AppHostConstants.PostgresAuthentication)
-                .WithPostgresPublishConfiguration(AppHostConstants.Keycloak, AppHostConstants.Keycloak);
-
-            var garageConfigPath = builder.ExecutionContext.IsPublishMode ? "../docker/garage.prod.toml" : "../docker/garage.toml";
+                .WithPostgresPublishConfiguration(AppHostConstants.KeycloakDatabase, AppHostConstants.KeycloakDatabase);
 
             var garage = builder.AddContainer(AppHostConstants.Garage, "dxflrs/garage", "v2.3.0")
                 .WithArgs("/garage", "server", "--single-node", "--default-bucket")
@@ -112,7 +106,7 @@ namespace Mycelium.Forge.AppHost
                 .WithEnvironment("KC_DB", "postgres")
                 .WithEnvironment("KC_DB_URL_HOST", authenticationPostgres.GetEndpoint("tcp").Property(EndpointProperty.Host))
                 .WithEnvironment("KC_DB_URL_PORT", authenticationPostgres.GetEndpoint("tcp").Property(EndpointProperty.Port))
-                .WithEnvironment("KC_DB_URL_DATABASE", AppHostConstants.Keycloak)
+                .WithEnvironment("KC_DB_URL_DATABASE", AppHostConstants.KeycloakDatabase)
                 .WithEnvironment("KC_DB_USERNAME", authenticationDatabaseUsername)
                 .WithEnvironment("KC_DB_PASSWORD", authenticationDatabasePassword)
                 .WithEnvironment("KC_HOSTNAME_BACKCHANNEL_DYNAMIC", "true")

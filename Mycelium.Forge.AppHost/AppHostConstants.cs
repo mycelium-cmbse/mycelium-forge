@@ -18,12 +18,12 @@ namespace Mycelium.Forge.AppHost
     public static class AppHostConstants
     {
         /// <summary>
-        /// The service identifier for the Forge web application and database.
+        /// The service identifier for the Forge web application.
         /// </summary>
         public const string Forge = "forge";
 
         /// <summary>
-        /// The service identifier for the Keycloak identity provider and database.
+        /// The service identifier for the Keycloak identity provider.
         /// </summary>
         public const string Keycloak = "keycloak";
 
@@ -51,6 +51,16 @@ namespace Mycelium.Forge.AppHost
         /// The service identifier for the database seeder one-shot project.
         /// </summary>
         public const string Seeder = "seeder";
+
+        /// <summary>
+        /// The database name and default user name for the primary Forge PostgreSQL database.
+        /// </summary>
+        public const string ForgeDatabase = "forge";
+
+        /// <summary>
+        /// The database name and default user name for the Keycloak PostgreSQL database.
+        /// </summary>
+        public const string KeycloakDatabase = "keycloak";
 
         /// <summary>
         /// The default Keycloak administrator username used in local development.
