@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels.AccountSettings
 {
-    using System.Reactive.Subjects;
-
     using ErrorOr;
 
     using Mycelium.Forge.Common;
@@ -22,14 +20,14 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
     public interface IPendingRequestsManagerViewModel
     {
         /// <summary>
-        /// Gets the subject that emits an <see cref="IOrganization" /> when an invitation has been accepted.
-        /// </summary>
-        Subject<IOrganization> OnOrganizationAccepted { get; }
-
-        /// <summary>
         /// Gets or sets the collection of pending invitations for the user account.
         /// </summary>
         List<OrganizationInvitationRowViewModel> PendingInvitations { get; set; }
+
+        /// <summary>
+        /// Gets or sets the action invoked when an organization invitation has been accepted.
+        /// </summary>
+        Action<IOrganization> OnOrganizationAccepted { get; set; }
 
         /// <summary>
         /// Initializes the view model state asynchronously.

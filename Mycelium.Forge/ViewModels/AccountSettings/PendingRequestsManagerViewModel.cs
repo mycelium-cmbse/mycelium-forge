@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels.AccountSettings
 {
-    using System.Reactive.Subjects;
-
     using ErrorOr;
 
     using Mycelium.Forge.Common;
@@ -79,14 +77,14 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         }
 
         /// <summary>
-        /// Gets the subject that emits an <see cref="IOrganization" /> when an invitation has been accepted.
-        /// </summary>
-        public Subject<IOrganization> OnOrganizationAccepted { get; } = new();
-
-        /// <summary>
         /// Gets or sets the collection of pending invitations for the user account.
         /// </summary>
         public List<OrganizationInvitationRowViewModel> PendingInvitations { get; set; } = [];
+
+        /// <summary>
+        /// Gets or sets the action invoked when an organization invitation has been accepted.
+        /// </summary>
+        public Action<IOrganization> OnOrganizationAccepted { get; set; }
 
         /// <summary>
         /// Initializes the view model state asynchronously.
@@ -124,7 +122,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             }
 
             this.PendingInvitations.Remove(row);
-            this.OnOrganizationAccepted.OnNext(acceptResult.Value);
+            this.OnOrganizationAccepted?.Invoke(acceptResult.Value);
             this.notificationService.AddNotification("Invitation accepted.", type: NotificationType.Success);
 
             return Result.Success;
@@ -175,7 +173,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             var organizationsIds = pending.Select(invitation => invitation.Organization).ToArray();
 
             var organizationsResult = await this.organizationService.ReadOrEmpty(this.userContext, organizationsIds, token: token);
-            this.PendingInvitations = OrganizationInvitationRowViewModel.GenerateRows(pending, organizationsResult);
+            this.PendingInvitations = [.. OrganizationInvitationRowViewModel.GenerateRows(pending, organizationsResult)];
         }
     }
 }

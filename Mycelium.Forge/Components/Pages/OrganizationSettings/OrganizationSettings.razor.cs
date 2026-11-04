@@ -55,6 +55,11 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         private bool IsInviteMemberEnabled => this.ViewModel.Organization.Administrator.Contains(this.ViewModel.CurrentUserId) || PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.ManageOrganizationMembers);
 
         /// <summary>
+        /// Gets the available role options for organization members.
+        /// </summary>
+        private IReadOnlyList<OrganizationRole> RoleOptions { get; } = Enum.GetValues<OrganizationRole>();
+
+        /// <summary>
         /// Handles component parameter updates and initializes the view model with the organization identifier asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>

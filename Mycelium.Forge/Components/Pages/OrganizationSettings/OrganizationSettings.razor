@@ -90,7 +90,7 @@
                                          Value="@(this.GetMemberRole(member))"
                                          ValueChanged="@(role => this.OnChangeMemberRole(member, role))"
                                          Disabled="@(this.IsRoleChangeDisabled(member))"
-                                         Items="@(this.ViewModel.RoleOptions)"
+                                         Items="@(this.RoleOptions)"
                                          DisplayTextSelector="@(role => role.ToUpperCaseFirst())"
                                          TriggerClass="!h-7 !px-2.5 !py-1 !text-xs !leading-2xs !gap-1.5"
                                          ItemClass="!text-xs !leading-2xs"/>

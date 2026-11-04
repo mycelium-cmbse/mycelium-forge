@@ -45,24 +45,19 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         Guid CurrentUserId { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of members belonging to the organization.
+        /// Gets the collection of members belonging to the organization.
         /// </summary>
-        List<IAccount> Members { get; set; }
+        IReadOnlyList<IAccount> Members { get; }
 
         /// <summary>
-        /// Gets or sets the collection of pending invitations for the organization.
+        /// Gets the collection of pending invitations for the organization.
         /// </summary>
-        List<OrganizationInvitation> PendingInvitations { get; set; }
+        IReadOnlyList<OrganizationInvitation> PendingInvitations { get; }
 
         /// <summary>
-        /// Gets or sets the available role options for organization members.
+        /// Gets the collection of accounts that have been invited to join the organization.
         /// </summary>
-        IReadOnlyList<OrganizationRole> RoleOptions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of accounts that have been invited to join the organization.
-        /// </summary>
-        List<IAccount> InvitedAccounts { get; set; }
+        IReadOnlyList<IAccount> InvitedAccounts { get; }
 
         /// <summary>
         /// Initializes the view model state for the specified organization short name asynchronously.

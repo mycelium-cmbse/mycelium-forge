@@ -49,11 +49,10 @@ namespace Mycelium.Forge.ViewModels.Rows
         /// </summary>
         /// <param name="invitations">The collection of invitations.</param>
         /// <param name="relatedThings">The collection of related Things.</param>
-        /// <returns>A list of <see cref="OrganizationInvitationRowViewModel" /> instances.</returns>
-        public static List<OrganizationInvitationRowViewModel> GenerateRows(IEnumerable<IOrganizationInvitation> invitations, IEnumerable<IThing> relatedThings)
+        /// <returns>An enumerable of <see cref="OrganizationInvitationRowViewModel" /> instances.</returns>
+        public static IEnumerable<OrganizationInvitationRowViewModel> GenerateRows(IEnumerable<IOrganizationInvitation> invitations, IEnumerable<IThing> relatedThings)
         {
             var organizationsList = relatedThings?.OfType<Organization>().ToList() ?? [];
-            var rows = new List<OrganizationInvitationRowViewModel>();
 
             foreach (var invitation in invitations.OfType<OrganizationInvitation>())
             {
@@ -64,16 +63,14 @@ namespace Mycelium.Forge.ViewModels.Rows
                     continue;
                 }
 
-                rows.Add(new OrganizationInvitationRowViewModel
+                yield return new OrganizationInvitationRowViewModel
                 {
                     Invitation = invitation,
                     Organization = organization,
                     RoleName = invitation.OrganizationInvitationKind == OrganizationInvitationKind.ADMINISTRATOR ? "Administrator" : "Member",
                     ExpiresIn = invitation.ExperiesAt <= DateTime.UtcNow ? "Expired" : $"Expires in {invitation.ExperiesAt.ToTimeToCome()}"
-                });
+                };
             }
-
-            return rows;
         }
     }
 }

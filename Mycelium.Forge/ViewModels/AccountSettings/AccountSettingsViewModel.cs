@@ -93,10 +93,10 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             this.userService = userService;
             this.logger = logger;
 
-            this.Disposables.Add(this.PendingRequestsManagerViewModel.OnOrganizationAccepted.Subscribe(acceptedOrg =>
+            this.PendingRequestsManagerViewModel.OnOrganizationAccepted = acceptedOrg =>
             {
                 this.Organizations.Edit(innerList => innerList.AddOrReplace(acceptedOrg));
-            }));
+            };
         }
 
         /// <summary>

@@ -33,15 +33,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         private const int InvitationExpirationDays = 7;
 
         /// <summary>
-        /// The list of available role options for organization members.
-        /// </summary>
-        private static readonly List<OrganizationRole> AvailableRoles =
-        [
-            OrganizationRole.Administrator,
-            OrganizationRole.Member
-        ];
-
-        /// <summary>
         /// The (injected) <see cref="IAccountService" /> domain service.
         /// </summary>
         private readonly IAccountService accountService;
@@ -80,6 +71,21 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// The (injected) <see cref="IUserService" /> domain service.
         /// </summary>
         private readonly IUserService userService;
+
+        /// <summary>
+        /// The collection of accounts that have been invited to join the organization.
+        /// </summary>
+        private List<IAccount> invitedAccounts = [];
+
+        /// <summary>
+        /// The collection of members belonging to the organization.
+        /// </summary>
+        private List<IAccount> members = [];
+
+        /// <summary>
+        /// The collection of pending invitations for the organization.
+        /// </summary>
+        private List<OrganizationInvitation> pendingInvitations = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizationSettingsViewModel" /> class.
@@ -130,24 +136,19 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         public Guid CurrentUserId { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of members belonging to the organization.
+        /// Gets the collection of members belonging to the organization.
         /// </summary>
-        public List<IAccount> Members { get; set; } = [];
+        public IReadOnlyList<IAccount> Members => this.members.AsReadOnly();
 
         /// <summary>
-        /// Gets or sets the collection of accounts that have been invited to join the organization.
+        /// Gets the collection of accounts that have been invited to join the organization.
         /// </summary>
-        public List<IAccount> InvitedAccounts { get; set; } = [];
+        public IReadOnlyList<IAccount> InvitedAccounts => this.invitedAccounts.AsReadOnly();
 
         /// <summary>
-        /// Gets or sets the collection of pending invitations for the organization.
+        /// Gets the collection of pending invitations for the organization.
         /// </summary>
-        public List<OrganizationInvitation> PendingInvitations { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the available role options for organization members.
-        /// </summary>
-        public IReadOnlyList<OrganizationRole> RoleOptions { get; set; } = AvailableRoles;
+        public IReadOnlyList<OrganizationInvitation> PendingInvitations => this.pendingInvitations.AsReadOnly();
 
         /// <summary>
         /// Initializes the view model state for the specified organization short name asynchronously.
@@ -176,16 +177,16 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             if (!invitationsResult.IsError)
             {
-                this.PendingInvitations = [.. invitationsResult.Value.Cast<OrganizationInvitation>().Where(i => i.Organization == this.Organization.Id && i.Status == InvitationStatusKind.PENDING)];
+                this.pendingInvitations = [.. invitationsResult.Value.Cast<OrganizationInvitation>().Where(i => i.Organization == this.Organization.Id && i.Status == InvitationStatusKind.PENDING)];
             }
 
             List<Guid> memberIds = [.. this.Organization.Member, .. this.Organization.Administrator];
-            var pendingInvitationTargets = this.PendingInvitations.Select(i => i.Target).ToList();
+            var pendingInvitationTargets = this.pendingInvitations.Select(i => i.Target).ToList();
 
             var accountsOfInterest = await this.accountService.ReadOrEmpty(this.UserContext, [.. memberIds, .. pendingInvitationTargets]);
 
-            this.Members = accountsOfInterest.Where(a => memberIds.Contains(a.Id)).ToList();
-            this.InvitedAccounts = accountsOfInterest.Where(a => pendingInvitationTargets.Contains(a.Id)).ToList();
+            this.members = accountsOfInterest.Where(a => memberIds.Contains(a.Id)).ToList();
+            this.invitedAccounts = accountsOfInterest.Where(a => pendingInvitationTargets.Contains(a.Id)).ToList();
         }
 
         /// <summary>
@@ -245,7 +246,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             }
 
             this.Organization = organizationClone;
-            this.Members.RemoveAll(m => m.Id == member.Id);
+            this.members.RemoveAll(m => m.Id == member.Id);
             this.notificationService.AddNotification($"{member.Name} has been removed from the organization.", "Member Removed", NotificationType.Success);
         }
 
@@ -269,7 +270,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
                 return;
             }
 
-            this.PendingInvitations.Replace(invitation, invitationClone);
+            this.pendingInvitations.Replace(invitation, invitationClone);
             this.notificationService.AddNotification("Invitation resent successfully.", "Invitation Resent", NotificationType.Success);
         }
 
@@ -293,7 +294,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
                 return;
             }
 
-            this.PendingInvitations.Remove(invitation);
+            this.pendingInvitations.Remove(invitation);
             this.notificationService.AddNotification("Invitation revoked successfully.", "Invitation Revoked", NotificationType.Success);
         }
 
@@ -325,7 +326,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             this.Organization = organizationClone;
             await this.ComputeCurrentUserPermissions();
 
-            this.Members.AddOrReplace(recipient);
+            this.members.AddOrReplace(recipient);
 
             this.notificationService.AddNotification($"Organization ownership transferred to {recipient.Name}.", "Ownership Transferred", NotificationType.Success);
             return Result.Success;
@@ -362,8 +363,8 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
                 return createResult.Errors;
             }
 
-            this.PendingInvitations.Add(invitation);
-            this.InvitedAccounts.AddOrReplace(target);
+            this.pendingInvitations.Add(invitation);
+            this.invitedAccounts.AddOrReplace(target);
 
             this.notificationService.AddNotification($"Invitation sent to {target.Name}.", "Invitation Sent", NotificationType.Success);
             return Result.Success;

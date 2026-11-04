@@ -98,7 +98,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             this.viewModelMock.Setup(x => x.Members).Returns([this.testMember]);
             this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testInvitation]);
             this.viewModelMock.Setup(x => x.InvitedAccounts).Returns([]);
-            this.viewModelMock.Setup(x => x.RoleOptions).Returns([OrganizationRole.Administrator, OrganizationRole.Member]);
 
             var userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(x => x.GetUserContext(It.IsAny<bool>())).ReturnsAsync(this.testUserContext);

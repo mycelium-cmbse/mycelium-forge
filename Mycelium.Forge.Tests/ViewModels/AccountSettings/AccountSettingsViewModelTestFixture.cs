@@ -13,7 +13,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
-    using System.Reactive.Subjects;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -48,7 +47,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
         private Address address;
         private Organization adminOrg;
         private Organization memberOrg;
-        private Subject<IOrganization> onOrganizationAcceptedSubject;
 
         [SetUp]
         public void SetUp()
@@ -59,8 +57,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             this.notificationServiceMock = new Mock<INotificationService>();
             this.organizationServiceMock = new Mock<IOrganizationService>();
             this.pendingRequestsManagerViewModelMock = new Mock<IPendingRequestsManagerViewModel>();
-            this.onOrganizationAcceptedSubject = new Subject<IOrganization>();
-            this.pendingRequestsManagerViewModelMock.Setup(x => x.OnOrganizationAccepted).Returns(this.onOrganizationAcceptedSubject);
+            this.pendingRequestsManagerViewModelMock.SetupProperty(x => x.OnOrganizationAccepted);
             this.userServiceMock = new Mock<IUserService>();
             this.loggerMock = new Mock<ILogger<AccountSettingsViewModel>>();
 
@@ -126,7 +123,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
         public void TearDown()
         {
             this.viewModel.Dispose();
-            this.onOrganizationAcceptedSubject.Dispose();
         }
 
         [Test]
@@ -251,7 +247,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
 
             // Verify OnOrganizationAccepted subscription
             var newOrg = new Organization { Id = Guid.NewGuid(), Name = "Accepted Org" };
-            this.onOrganizationAcceptedSubject.OnNext(newOrg);
+            this.pendingRequestsManagerViewModelMock.Object.OnOrganizationAccepted?.Invoke(newOrg);
             Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(3));
         }
     }

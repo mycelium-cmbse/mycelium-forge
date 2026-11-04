@@ -92,7 +92,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             this.viewModel.PendingInvitations.Add(row);
 
             IOrganization acceptedOrgFromSubject = null!;
-            this.viewModel.OnOrganizationAccepted.Subscribe(org => acceptedOrgFromSubject = org);
+            this.viewModel.OnOrganizationAccepted = org => acceptedOrgFromSubject = org;
 
             // Scenario 1: Failure path
             this.organizationInvitationServiceMock

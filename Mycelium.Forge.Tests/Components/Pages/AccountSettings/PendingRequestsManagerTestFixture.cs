@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -63,7 +64,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
                 ExperiesAt = DateTime.UtcNow.AddDays(7)
             };
 
-            this.testRow = OrganizationInvitationRowViewModel.GenerateRows([this.testInvitation], [this.testOrganization])[0];
+            this.testRow = OrganizationInvitationRowViewModel.GenerateRows([this.testInvitation], [this.testOrganization]).First();
         }
 
         [TearDown]
