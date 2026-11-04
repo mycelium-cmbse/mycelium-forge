@@ -1,18 +1,71 @@
 {
   "realm": "forge",
+  "displayName": "Mycelium Forge",
   "enabled": true,
-  "sslRequired": "none",
+  "sslRequired": "${FORGE_KEYCLOAK_SSL_REQUIRED:none}",
+  "loginTheme": "forge",
+  "adminTheme": "forge",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": false,
+  "verifyEmail": "${FORGE_KEYCLOAK_VERIFY_EMAIL:false}",
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "attributes": {
+    "userProfileEnabled": "true"
+  },
+  "defaultRole": {
+    "name": "Account",
+    "description": "Default role of every Forge account"
+  },
+  "roles": {
+    "realm": [
+      { "name": "Account", "description": "Registered Forge account" },
+      { "name": "OrganizationAdministrator", "description": "Administers an organization" },
+      { "name": "PlatformOperator", "description": "Operates the Forge platform" },
+      { "name": "InstallationAdministrator", "description": "Administers the whole Forge installation" }
+    ]
+  },
   "clients": [
     {
       "clientId": "forge-web",
       "name": "Mycelium Forge web interface",
       "enabled": true,
-      "publicClient": true,
       "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "${FORGE_CLIENT_SECRET:forge-dev-client-secret}",
       "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
-      "redirectUris": ["http://localhost:8080/*"],
-      "webOrigins": ["http://localhost:8080"]
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "${FORGE_BASE_URL:http://localhost:8080}/*",
+        "${FORGE_DEV_REDIRECT_URI:https://localhost:5001/*}"
+      ],
+      "webOrigins": [
+        "${FORGE_BASE_URL:http://localhost:8080}",
+        "${FORGE_DEV_WEB_ORIGIN:https://localhost:5001}",
+        "+"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      },
+      "defaultClientScopes": ["web-origins", "profile", "roles", "email"]
     }
-  ]
+  ],
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":3,\"max\":255},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{},\"pattern\":{\"pattern\":\"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$\",\"error-message\":\"Username must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.\"},\"forge-scope-shortname-unique\":{}},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"firstName\",\"displayName\":\"${firstName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"lastName\",\"displayName\":\"${lastName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to user metadata\"}]}"
+          ]
+        }
+      }
+    ]
+  }
 }

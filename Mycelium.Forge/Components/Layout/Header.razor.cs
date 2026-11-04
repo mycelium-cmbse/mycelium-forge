@@ -139,6 +139,15 @@ namespace Mycelium.Forge.Components.Layout
         }
 
         /// <summary>
+        /// Computes the sign-in URL returning back to the current page after authentication.
+        /// </summary>
+        /// <returns>The computed login URL string with returnUrl query parameter.</returns>
+        public string GetSignInUrl()
+        {
+            return this.NavigationManager.GetSignInUrl();
+        }
+
+        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing">

@@ -94,22 +94,6 @@ namespace Mycelium.Forge.Common
                 ]
             },
             {
-                RoleKind.OrganizationMember, [
-                    PermissionKind.ViewOrganizationPackageList,
-                    PermissionKind.ViewOrganizationMemberList,
-                    PermissionKind.PublishPackageToOrganizationScope,
-                    PermissionKind.PublishPackageVersion,
-                    PermissionKind.UnlistPackageVersion,
-                    PermissionKind.RelistPackageVersion,
-                    PermissionKind.CreateOrganization,
-                    PermissionKind.PublishPackageToPersonalScope,
-                    PermissionKind.ManageOwnProfile,
-                    PermissionKind.IssueApiKey,
-                    PermissionKind.RevokeOwnApiKey,
-                    PermissionKind.ListOwnApiKeys,
-                ]
-            },
-            {
                 RoleKind.Account, [
                     PermissionKind.CreateOrganization,
                     PermissionKind.PublishPackageToPersonalScope,

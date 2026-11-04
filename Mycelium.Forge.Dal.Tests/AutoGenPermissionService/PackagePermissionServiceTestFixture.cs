@@ -23,9 +23,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Test fixture for <see cref="PackagePermissionService" />.
-    /// </summary>
     [TestFixture]
     public class PackagePermissionServiceTestFixture
     {
@@ -41,9 +38,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         private UserContext adminUserContext;
         private UserContext anonymousUserContext;
 
-        /// <summary>
-        /// Sets up the test fixture before each test.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -97,10 +91,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             };
         }
 
-        /// <summary>
-        /// Verifies the <see cref="PackagePermissionService.IsAllowedToCreate" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToCreate()
         {
@@ -124,10 +114,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             }
         }
 
-        /// <summary>
-        /// Verifies the IsAllowedToDelete method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToDelete()
         {
@@ -150,10 +136,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             }
         }
 
-        /// <summary>
-        /// Verifies the <see cref="PackagePermissionService.IsAllowedToRead" /> method across all visibility tiers.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToRead()
         {
@@ -250,14 +232,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 AccountId = this.otherUserId,
                 Username = "orgBMember",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             var orgAMemberUserContext = new UserContext
             {
                 AccountId = this.userId,
                 Username = "orgAMember",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             var otherOrgMemberResult = await this.permissionService.IsAllowedToRead(orgBMemberUserContext, orgAInternalPackage, this.transaction);
@@ -278,10 +260,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             }
         }
 
-        /// <summary>
-        /// Verifies the <see cref="PackagePermissionService.IsAllowedToUpdate" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToUpdate()
         {

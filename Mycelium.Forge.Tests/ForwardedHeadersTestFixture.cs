@@ -47,6 +47,8 @@ namespace Mycelium.Forge.Tests
                 {
                     builder.UseEnvironment("Production");
                     builder.UseSetting("https_port", "443");
+                    builder.UseSetting("Authentication:ClientId", "forge-web");
+                    builder.UseSetting("Authentication:Authority", "https://localhost");
 
                     builder.ConfigureTestServices(services => { services.AddSingleton(forgeContextMock.Object); });
                 });

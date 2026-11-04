@@ -16,9 +16,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Test fixture for <see cref="OrganizationPermissionService" />.
-    /// </summary>
     [TestFixture]
     public class OrganizationPermissionServiceTestFixture
     {
@@ -33,9 +30,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         private UserContext installationAdminUserContext;
         private UserContext anonymousUserContext;
 
-        /// <summary>
-        /// Sets up the test fixture before each test.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -56,7 +50,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 AccountId = this.otherUserId,
                 Username = "orgMember",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationMember]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.accountUserContext = new UserContext
@@ -81,10 +75,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             };
         }
 
-        /// <summary>
-        /// Verifies the <see cref="OrganizationPermissionService.IsAllowedToCreate" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToCreate()
         {
@@ -109,10 +99,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             }
         }
 
-        /// <summary>
-        /// Verifies the IsAllowedToDelete method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToDelete()
         {
@@ -135,10 +121,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             }
         }
 
-        /// <summary>
-        /// Verifies the <see cref="OrganizationPermissionService.IsAllowedToRead" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToRead()
         {
@@ -232,10 +214,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             }
         }
 
-        /// <summary>
-        /// Verifies the <see cref="OrganizationPermissionService.IsAllowedToUpdate" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToUpdate()
         {
