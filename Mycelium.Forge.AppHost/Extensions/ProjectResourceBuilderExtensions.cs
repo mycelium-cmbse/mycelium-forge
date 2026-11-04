@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ProjectResourceBuilderExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -36,7 +36,7 @@ namespace Mycelium.Forge.AppHost.Extensions
                 return project
                     .WithEnvironment("DatabaseConnection__Host", postgres.GetEndpoint("tcp").Property(EndpointProperty.Host))
                     .WithEnvironment("DatabaseConnection__Port", postgres.GetEndpoint("tcp").Property(EndpointProperty.Port))
-                    .WithEnvironment("DatabaseConnection__Database", "forge")
+                    .WithEnvironment("DatabaseConnection__Database", AppHostConstants.Forge)
                     .WithEnvironment("DatabaseConnection__Username", username)
                     .WithEnvironment("DatabaseConnection__Password", password);
             }
@@ -53,34 +53,33 @@ namespace Mycelium.Forge.AppHost.Extensions
                     project.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Production");
                 }
 
-                return project.PublishAsDockerComposeService((_, service) => { service.DependsOn["postgres"].Condition = "service_healthy"; });
+                return project.PublishAsDockerComposeService((_, service) => { service.DependsOn[AppHostConstants.Postgres].Condition = "service_healthy"; });
             }
 
             /// <summary>
             /// Configures the Forge application service for run mode or Docker Compose publishing mode.
             /// </summary>
             /// <param name="builder">The distributed application builder.</param>
-            /// <param name="keycloakPublicUrl">The local development public URL of Keycloak.</param>
             /// <param name="keycloakPublicUrlParameter">The publish-mode parameter representing the public Keycloak URL.</param>
             /// <param name="keycloakAdminPassword">The Keycloak administrator password parameter.</param>
             /// <param name="migrator">The migrator project resource builder.</param>
             /// <param name="seeder">The seeder project resource builder.</param>
             /// <returns>The configured <see cref="IResourceBuilder{ProjectResource}" /> instance.</returns>
-            public IResourceBuilder<ProjectResource> WithForgeEnvironmentAndPublishConfiguration(IDistributedApplicationBuilder builder, string keycloakPublicUrl, IResourceBuilder<ParameterResource> keycloakPublicUrlParameter, IResourceBuilder<ParameterResource> keycloakAdminPassword, IResourceBuilder<ProjectResource> migrator, IResourceBuilder<ProjectResource> seeder)
+            public IResourceBuilder<ProjectResource> WithForgeEnvironmentAndPublishConfiguration(IDistributedApplicationBuilder builder, IResourceBuilder<ParameterResource> keycloakPublicUrlParameter, IResourceBuilder<ParameterResource> keycloakAdminPassword, IResourceBuilder<ProjectResource> migrator, IResourceBuilder<ProjectResource> seeder)
             {
                 if (builder.ExecutionContext.IsPublishMode)
                 {
                     project.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Production")
                         .WithEnvironment("Authentication__Authority", $"{keycloakPublicUrlParameter}/realms/forge")
-                        .WithEnvironment("Authentication__MetadataAddress", "http://keycloak:8080/realms/forge/.well-known/openid-configuration")
+                        .WithEnvironment("Authentication__MetadataAddress", $"http://{AppHostConstants.Keycloak}:8080/realms/forge/.well-known/openid-configuration")
                         .WaitForCompletion(migrator);
                 }
                 else
                 {
-                    project.WithEnvironment("Authentication__Authority", $"{keycloakPublicUrl}/realms/forge")
-                        .WithEnvironment("Keycloak__BaseUrl", keycloakPublicUrl)
+                    project.WithEnvironment("Authentication__Authority", $"{AppHostConstants.DevelopmentKeycloakPublicUrl}/realms/forge")
+                        .WithEnvironment("Keycloak__BaseUrl", AppHostConstants.DevelopmentKeycloakPublicUrl)
                         .WithEnvironment("Keycloak__Realm", "forge")
-                        .WithEnvironment("Keycloak__AdminUsername", "admin")
+                        .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
                         .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword)
                         .WaitForCompletion(seeder);
                 }
@@ -90,13 +89,13 @@ namespace Mycelium.Forge.AppHost.Extensions
                     service.Restart = "unless-stopped";
                     service.Ports = ["127.0.0.1:${APP_PORT:-8080}:8080"];
 
-                    service.DependsOn["migrator"] = new ServiceDependency
+                    service.DependsOn[AppHostConstants.Migrator] = new ServiceDependency
                     {
                         Condition = "service_completed_successfully"
                     };
 
-                    service.DependsOn["garage"].Condition = "service_healthy";
-                    service.DependsOn["keycloak"].Condition = "service_healthy";
+                    service.DependsOn[AppHostConstants.Garage].Condition = "service_healthy";
+                    service.DependsOn[AppHostConstants.Keycloak].Condition = "service_healthy";
                 });
             }
         }

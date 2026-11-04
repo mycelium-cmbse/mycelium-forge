@@ -31,19 +31,14 @@ namespace Mycelium.Forge.AppHost
     public static class Program
     {
         /// <summary>
-        /// The browser-facing URL of Keycloak in local development.
+        /// The default administrator password used in local development.
         /// </summary>
-        private const string KeycloakPublicUrl = "http://localhost:8081";
+        private const string DefaultAdminPassword = "admin";
 
         /// <summary>
-        /// The browser-facing URL of Forge in local development, matching the <c>http</c> launch profile of Mycelium.Forge.
+        /// The endpoint name for the Garage administrator API and health check.
         /// </summary>
-        private const string ForgePublicUrl = "http://localhost:5000";
-
-        /// <summary>
-        /// The URL Keycloak uses, from inside its container, to reach Forge running as a host process.
-        /// </summary>
-        private const string ForgeUrlFromContainers = "http://host.docker.internal:5000";
+        private const string GarageAdminEndpointName = "admin";
 
         /// <summary>
         /// Builds the Aspire resource model and runs or publishes the application.
@@ -68,36 +63,36 @@ namespace Mycelium.Forge.AppHost
             builder.AddDockerComposeEnvironment("compose")
                 .WithProductionComposeConfiguration();
 
-            var databaseUsername = builder.AddParameter("database-username", "forge");
+            var databaseUsername = builder.AddParameter("database-username", AppHostConstants.Forge);
             var databasePassword = builder.AddSecretParameter("postgres-password", "forge-dev-password");
             var runtimePassword = builder.AddSecretParameter("forge-runtime-password", "forge-runtime-dev-password");
-            var authenticationDatabaseUsername = builder.AddParameter("authentication-database-username", "keycloak");
+            var authenticationDatabaseUsername = builder.AddParameter("authentication-database-username", AppHostConstants.Keycloak);
             var authenticationDatabasePassword = builder.AddSecretParameter("keycloak-db-password", "keycloak-dev-password");
-            var keycloakAdminPassword = builder.AddSecretParameter("keycloak-admin-password", "admin");
+            var keycloakAdminPassword = builder.AddSecretParameter("keycloak-admin-password", DefaultAdminPassword);
             var clientSecret = builder.AddSecretParameter("forge-client-secret", "forge-dev-client-secret");
             var spiApiKey = builder.AddSecretParameter("keycloak-spi-api-key", "forge-dev-keycloak-spi-key");
             var storageAccessKey = builder.AddSecretParameter("artifact-store-access-key", "GKdevlocal000000000");
             var storageSecretKey = builder.AddSecretParameter("artifact-store-secret-key", "dev0000000000000000000000000000000000000000000000000000000000");
 
-            var postgres = builder.AddPostgres("postgres", databaseUsername, databasePassword, 5432)
+            var postgres = builder.AddPostgres(AppHostConstants.Postgres, databaseUsername, databasePassword, 5432)
                 .WithImageTag("18")
-                .WithEnvironment("POSTGRES_DB", "forge")
+                .WithEnvironment("POSTGRES_DB", AppHostConstants.Forge)
                 .WithEnvironment("FORGE_RUNTIME_PASSWORD", runtimePassword)
                 .WithDataVolume("forge-postgres-data")
                 .WithBindMount("../docker/postgres/00-create-roles.sh", "/docker-entrypoint-initdb.d/00-create-roles.sh", true)
-                .WithForgeContainerDefaults("postgres")
-                .WithPostgresPublishConfiguration("forge", "forge");
+                .WithForgeContainerDefaults(AppHostConstants.Postgres)
+                .WithPostgresPublishConfiguration(AppHostConstants.Forge, AppHostConstants.Forge);
 
-            var authenticationPostgres = builder.AddPostgres("postgres-authentication", authenticationDatabaseUsername, authenticationDatabasePassword, 5433)
+            var authenticationPostgres = builder.AddPostgres(AppHostConstants.PostgresAuthentication, authenticationDatabaseUsername, authenticationDatabasePassword, 5433)
                 .WithImageTag("18")
-                .WithEnvironment("POSTGRES_DB", "keycloak")
+                .WithEnvironment("POSTGRES_DB", AppHostConstants.Keycloak)
                 .WithDataVolume("forge-keycloak-postgres-data")
-                .WithForgeContainerDefaults("postgres-authentication")
-                .WithPostgresPublishConfiguration("keycloak", "keycloak");
+                .WithForgeContainerDefaults(AppHostConstants.PostgresAuthentication)
+                .WithPostgresPublishConfiguration(AppHostConstants.Keycloak, AppHostConstants.Keycloak);
 
             var garageConfigPath = builder.ExecutionContext.IsPublishMode ? "../docker/garage.prod.toml" : "../docker/garage.toml";
 
-            var garage = builder.AddContainer("garage", "dxflrs/garage", "v2.3.0")
+            var garage = builder.AddContainer(AppHostConstants.Garage, "dxflrs/garage", "v2.3.0")
                 .WithArgs("/garage", "server", "--single-node", "--default-bucket")
                 .WithEnvironment("GARAGE_DEFAULT_ACCESS_KEY", storageAccessKey)
                 .WithEnvironment("GARAGE_DEFAULT_SECRET_KEY", storageSecretKey)
@@ -106,18 +101,18 @@ namespace Mycelium.Forge.AppHost
                 .WithVolume("forge-garage-meta", "/var/lib/garage/meta")
                 .WithVolume("forge-garage-data", "/var/lib/garage/data")
                 .WithHttpEndpoint(3900, 3900, "s3")
-                .WithHttpEndpoint(3903, 3903, "admin")
-                .WithHttpHealthCheck("/health", endpointName: "admin")
-                .WithForgeContainerDefaults("garage")
+                .WithHttpEndpoint(3903, 3903, GarageAdminEndpointName)
+                .WithHttpHealthCheck("/health", endpointName: GarageAdminEndpointName)
+                .WithForgeContainerDefaults(AppHostConstants.Garage)
                 .WithGaragePublishConfiguration(builder);
 
-            var keycloak = builder.AddDockerfile("keycloak", "../docker/keycloak")
-                .WithEnvironment("KC_BOOTSTRAP_ADMIN_USERNAME", "admin")
+            var keycloak = builder.AddDockerfile(AppHostConstants.Keycloak, "../docker/keycloak")
+                .WithEnvironment("KC_BOOTSTRAP_ADMIN_USERNAME", AppHostConstants.DefaultAdminUsername)
                 .WithEnvironment("KC_BOOTSTRAP_ADMIN_PASSWORD", keycloakAdminPassword)
                 .WithEnvironment("KC_DB", "postgres")
                 .WithEnvironment("KC_DB_URL_HOST", authenticationPostgres.GetEndpoint("tcp").Property(EndpointProperty.Host))
                 .WithEnvironment("KC_DB_URL_PORT", authenticationPostgres.GetEndpoint("tcp").Property(EndpointProperty.Port))
-                .WithEnvironment("KC_DB_URL_DATABASE", "keycloak")
+                .WithEnvironment("KC_DB_URL_DATABASE", AppHostConstants.Keycloak)
                 .WithEnvironment("KC_DB_USERNAME", authenticationDatabaseUsername)
                 .WithEnvironment("KC_DB_PASSWORD", authenticationDatabasePassword)
                 .WithEnvironment("KC_HOSTNAME_BACKCHANNEL_DYNAMIC", "true")
@@ -128,28 +123,28 @@ namespace Mycelium.Forge.AppHost
                 .WithHttpEndpoint(8081, 8080, "http")
                 .WithHttpEndpoint(null, 9000, "management")
                 .WithHttpHealthCheck("/health/ready", endpointName: "management")
-                .WithForgeContainerDefaults("keycloak")
+                .WithForgeContainerDefaults(AppHostConstants.Keycloak)
                 .WaitFor(authenticationPostgres)
-                .WithKeycloakEnvironmentAndPublishConfiguration(builder, KeycloakPublicUrl, ForgePublicUrl, ForgeUrlFromContainers, out var keycloakPublicUrlParameter);
+                .WithKeycloakEnvironmentAndPublishConfiguration(builder, out var keycloakPublicUrlParameter);
 
-            var migrator = builder.AddProject<Mycelium_Forge>("migrator", options => options.ExcludeLaunchProfile = true)
+            var migrator = builder.AddProject<Mycelium_Forge>(AppHostConstants.Migrator, options => options.ExcludeLaunchProfile = true)
                 .WithArgs("migrate")
                 .WithDatabaseEnvironment(postgres, databaseUsername, databasePassword)
                 .WaitFor(postgres)
                 .WithMigratorPublishConfiguration(builder);
 
-            var seeder = builder.AddProject<Mycelium_Forge>("seeder", options => options.ExcludeLaunchProfile = true)
+            var seeder = builder.AddProject<Mycelium_Forge>(AppHostConstants.Seeder, options => options.ExcludeLaunchProfile = true)
                 .WithArgs("seed")
                 .WithDatabaseEnvironment(postgres, databaseUsername, databasePassword)
-                .WithEnvironment("Keycloak__BaseUrl", KeycloakPublicUrl)
+                .WithEnvironment("Keycloak__BaseUrl", AppHostConstants.DevelopmentKeycloakPublicUrl)
                 .WithEnvironment("Keycloak__Realm", "forge")
-                .WithEnvironment("Keycloak__AdminUsername", "admin")
+                .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
                 .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword)
                 .WaitForCompletion(migrator)
                 .WaitFor(keycloak)
                 .ExcludeFromManifest();
 
-            builder.AddProject<Mycelium_Forge>("forge", "http")
+            builder.AddProject<Mycelium_Forge>(AppHostConstants.Forge, "http")
                 .WithDatabaseEnvironment(postgres, databaseUsername, databasePassword)
                 .WithEnvironment("ArtifactStore__ServiceUrl", garage.GetEndpoint("s3"))
                 .WithEnvironment("ArtifactStore__Region", "garage")
@@ -163,7 +158,7 @@ namespace Mycelium.Forge.AppHost
                 .WithEnvironment("KeycloakSpi__ApiKey", spiApiKey)
                 .WaitFor(garage)
                 .WaitFor(keycloak)
-                .WithForgeEnvironmentAndPublishConfiguration(builder, KeycloakPublicUrl, keycloakPublicUrlParameter, keycloakAdminPassword, migrator, seeder);
+                .WithForgeEnvironmentAndPublishConfiguration(builder, keycloakPublicUrlParameter, keycloakAdminPassword, migrator, seeder);
 
             builder.Build().Run();
         }

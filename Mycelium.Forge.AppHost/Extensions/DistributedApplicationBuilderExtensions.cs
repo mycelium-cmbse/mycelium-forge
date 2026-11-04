@@ -32,7 +32,9 @@ namespace Mycelium.Forge.AppHost.Extensions
             /// <returns>The configured <see cref="IResourceBuilder{ParameterResource}" /> instance.</returns>
             public IResourceBuilder<ParameterResource> AddSecretParameter(string name, string developmentDefault)
             {
-                return builder.ExecutionContext.IsPublishMode ? builder.AddParameter(name, true) : builder.AddParameter(name, developmentDefault, secret: true);
+                return builder.ExecutionContext.IsPublishMode 
+                    ? builder.AddParameter(name, true) 
+                    : builder.AddParameter(name, developmentDefault, secret: true);
             }
         }
     }

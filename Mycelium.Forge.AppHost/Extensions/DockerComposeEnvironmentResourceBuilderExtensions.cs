@@ -24,7 +24,7 @@ namespace Mycelium.Forge.AppHost.Extensions
     /// published Docker Compose and <c>.env</c> files.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public static class DockerComposeEnvironmentResourceBuilderExtensions
+    public static partial class DockerComposeEnvironmentResourceBuilderExtensions
     {
         /// <summary>
         /// The container image expression for Forge and the migrator, requiring an explicit release <c>TAG</c> in <c>.env</c>.
@@ -56,8 +56,8 @@ namespace Mycelium.Forge.AppHost.Extensions
         /// </summary>
         private static readonly Dictionary<string, string> DefaultEnvValues = new()
         {
-            { "DATABASE_USERNAME", "forge" },
-            { "AUTHENTICATION_DATABASE_USERNAME", "keycloak" },
+            { "DATABASE_USERNAME", AppHostConstants.Forge },
+            { "AUTHENTICATION_DATABASE_USERNAME", AppHostConstants.Keycloak },
             { "FORGE_PORT", "8080" }
         };
 
@@ -85,7 +85,7 @@ namespace Mycelium.Forge.AppHost.Extensions
         /// <param name="composeFile">The Docker Compose file model.</param>
         private static void ConfigureComposeFile(ComposeFile composeFile)
         {
-            composeFile.Name = "forge";
+            composeFile.Name = AppHostConstants.Forge;
 
             foreach (var service in composeFile.Services.Values)
             {
@@ -98,29 +98,27 @@ namespace Mycelium.Forge.AppHost.Extensions
                         continue;
                     }
 
-                    var updated = Regex.Replace(value, @"\$\{(?<name>[A-Z0-9_]+)\}", ReplacePlaceholder);
+                    var updated = PlaceholderRegex().Replace(value, ReplacePlaceholder);
                     service.Environment[key] = updated;
                 }
 
                 foreach (var volume in service.Volumes)
                 {
-                    if (volume.Source == "${POSTGRES_BINDMOUNT_0}")
+                    volume.Source = volume.Source switch
                     {
-                        volume.Source = "./docker/postgres/00-create-roles.sh";
-                    }
-                    else if (volume.Source == "${GARAGE_BINDMOUNT_0}")
-                    {
-                        volume.Source = "./docker/garage.prod.toml";
-                    }
+                        "${POSTGRES_BINDMOUNT_0}" => "./docker/postgres/00-create-roles.sh",
+                        "${GARAGE_BINDMOUNT_0}" => "./docker/garage.prod.toml",
+                        _ => volume.Source
+                    };
                 }
             }
 
-            if (composeFile.Services.TryGetValue("migrator", out var migratorService))
+            if (composeFile.Services.TryGetValue(AppHostConstants.Migrator, out var migratorService))
             {
                 migratorService.Image = ForgeImageExpression;
             }
 
-            if (composeFile.Services.TryGetValue("forge", out var forgeService))
+            if (composeFile.Services.TryGetValue(AppHostConstants.Forge, out var forgeService))
             {
                 forgeService.Image = ForgeImageExpression;
             }
@@ -183,5 +181,12 @@ namespace Mycelium.Forge.AppHost.Extensions
 
             return match.Value;
         }
+
+        /// <summary>
+        /// Gets the compiled regular expression used to match environment variable placeholders.
+        /// </summary>
+        /// <returns>A compiled <see cref="Regex" /> instance.</returns>
+        [GeneratedRegex(@"\$\{(?<name>[A-Z0-9_]+)\}", RegexOptions.None, 1000)]
+        private static partial Regex PlaceholderRegex();
     }
 }

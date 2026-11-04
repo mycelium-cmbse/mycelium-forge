@@ -26,6 +26,16 @@ namespace Mycelium.Forge.AppHost.Extensions
         /// </summary>
         private const string DockerComposeProjectLabel = "com.docker.compose.project=forge-aspire";
 
+        /// <summary>
+        /// The browser-facing URL of Forge in local development, matching the <c>http</c> launch profile of Mycelium.Forge.
+        /// </summary>
+        private const string DevelopmentForgePublicUrl = "http://localhost:5000";
+
+        /// <summary>
+        /// The URL Keycloak uses, from inside its container, to reach Forge running as a host process in local development.
+        /// </summary>
+        private const string DevelopmentForgeUrlFromContainers = "http://host.docker.internal:5000";
+
         /// <param name="container">The <see cref="IResourceBuilder{ContainerResource}" /> to configure.</param>
         extension<T>(IResourceBuilder<T> container) where T : ContainerResource
         {
@@ -84,15 +94,12 @@ namespace Mycelium.Forge.AppHost.Extensions
             /// Configures the Keycloak service for run mode or Docker Compose publishing mode.
             /// </summary>
             /// <param name="builder">The distributed application builder.</param>
-            /// <param name="keycloakPublicUrl">The local development public URL of Keycloak.</param>
-            /// <param name="forgePublicUrl">The local development public URL of Forge.</param>
-            /// <param name="forgeUrlFromContainers">The URL containers use to reach Forge on the host in run mode.</param>
             /// <param name="keycloakPublicUrlParameter">
             /// When in publish mode, receives the parameter representing the public Keycloak
             /// URL.
             /// </param>
             /// <returns>The configured <see cref="IResourceBuilder{ContainerResource}" /> instance.</returns>
-            public IResourceBuilder<ContainerResource> WithKeycloakEnvironmentAndPublishConfiguration(IDistributedApplicationBuilder builder, string keycloakPublicUrl, string forgePublicUrl, string forgeUrlFromContainers, out IResourceBuilder<ParameterResource> keycloakPublicUrlParameter)
+            public IResourceBuilder<ContainerResource> WithKeycloakEnvironmentAndPublishConfiguration(IDistributedApplicationBuilder builder, out IResourceBuilder<ParameterResource> keycloakPublicUrlParameter)
             {
                 if (builder.ExecutionContext.IsPublishMode)
                 {
@@ -107,17 +114,17 @@ namespace Mycelium.Forge.AppHost.Extensions
                         .WithEnvironment("FORGE_DEV_REDIRECT_URI", $"{forgePublicUrlParameter}/*")
                         .WithEnvironment("FORGE_DEV_WEB_ORIGIN", forgePublicUrlParameter)
                         .WithEnvironment("FORGE_KEYCLOAK_SSL_REQUIRED", "external")
-                        .WithEnvironment("FORGE_SPI_BASE_URL", "http://forge:8080");
+                        .WithEnvironment("FORGE_SPI_BASE_URL", $"http://{AppHostConstants.Forge}:8080");
                 }
                 else
                 {
                     keycloakPublicUrlParameter = null;
 
                     container.WithArgs("start-dev", "--import-realm")
-                        .WithEnvironment("KC_HOSTNAME", keycloakPublicUrl)
-                        .WithEnvironment("FORGE_BASE_URL", forgePublicUrl)
+                        .WithEnvironment("KC_HOSTNAME", AppHostConstants.DevelopmentKeycloakPublicUrl)
+                        .WithEnvironment("FORGE_BASE_URL", DevelopmentForgePublicUrl)
                         .WithEnvironment("FORGE_KEYCLOAK_SSL_REQUIRED", "none")
-                        .WithEnvironment("FORGE_SPI_BASE_URL", forgeUrlFromContainers)
+                        .WithEnvironment("FORGE_SPI_BASE_URL", DevelopmentForgeUrlFromContainers)
                         .WithBindMount("../docker/keycloak/themes/forge", "/opt/keycloak/themes/forge", true)
                         .WithContainerRuntimeArgs("--add-host", "host.docker.internal:host-gateway");
                 }
@@ -133,7 +140,7 @@ namespace Mycelium.Forge.AppHost.Extensions
                     service.Image = null;
                     service.Restart = "unless-stopped";
                     service.Ports = ["127.0.0.1:${KEYCLOAK_PORT:-8081}:8080"];
-                    service.DependsOn["postgres-authentication"].Condition = "service_healthy";
+                    service.DependsOn[AppHostConstants.PostgresAuthentication].Condition = "service_healthy";
 
                     service.Healthcheck = new Healthcheck
                     {
