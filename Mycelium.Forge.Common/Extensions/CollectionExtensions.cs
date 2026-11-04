@@ -39,5 +39,35 @@ namespace Mycelium.Forge.Common.Extensions
                 return true;
             }
         }
+
+        /// <summary>
+        /// Provides extension methods for <see cref="IList{T}" /> where <typeparamref name="T" /> is an <see cref="IThing" />.
+        /// </summary>
+        /// <param name="collection">The list to operate on.</param>
+        /// <typeparam name="T">The type of elements implementing <see cref="IThing" />.</typeparam>
+        extension<T>(IList<T> collection) where T : IThing
+        {
+            /// <summary>
+            /// Adds the specified item or replaces it if an item with the same identifier already exists in the collection.
+            /// </summary>
+            /// <param name="item">The item to add or replace.</param>
+            /// <returns><c>true</c> if the item was added; <c>false</c> if an existing item was replaced.</returns>
+            public bool AddOrReplace(T item)
+            {
+                for (var i = 0; i < collection.Count; i++)
+                {
+                    if (collection[i].Id != item.Id)
+                    {
+                        continue;
+                    }
+
+                    collection[i] = item;
+                    return false;
+                }
+
+                collection.Add(item);
+                return true;
+            }
+        }
     }
 }

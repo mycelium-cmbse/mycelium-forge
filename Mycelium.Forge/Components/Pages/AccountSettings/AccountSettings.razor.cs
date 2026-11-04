@@ -15,6 +15,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.AccountSettings;
@@ -22,7 +23,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
     /// <summary>
     /// Represents the user account settings and profile configuration view of the Mycelium Forge registry.
     /// </summary>
-    public partial class AccountSettings : ComponentBase
+    public partial class AccountSettings : DisposableComponent
     {
         /// <summary>
         /// Gets or sets the dialog service used to display modal dialogs.
@@ -37,12 +38,18 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         public IAccountSettingsViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Initializes the component and view model state asynchronously.
+        /// Method invoked when the component is ready to start, having received its
+        /// initial parameters from its parent in the render tree.
+        ///
+        /// Override this method if you will perform an asynchronous operation and
+        /// want the component to refresh when that operation is completed.
         /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task"/> representing any asynchronous operation.</returns>
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+
+            this.Disposables.Add(this.ViewModel.Organizations.Connect().SubscribeAsync(_ => this.InvokeAsync(this.StateHasChanged)));
 
             await this.ViewModel.InitializeViewModel();
         }

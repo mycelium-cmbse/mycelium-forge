@@ -45,24 +45,19 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         Guid CurrentUserId { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of members belonging to the organization.
+        /// Gets the collection of members belonging to the organization.
         /// </summary>
-        IReadOnlyList<IAccount> Members { get; set; }
+        IReadOnlyList<IAccount> Members { get; }
 
         /// <summary>
-        /// Gets or sets the collection of pending invitations for the organization.
+        /// Gets the collection of pending invitations for the organization.
         /// </summary>
-        List<OrganizationInvitation> PendingInvitations { get; set; }
+        IReadOnlyList<OrganizationInvitation> PendingInvitations { get; }
 
         /// <summary>
-        /// Gets or sets the available role options for organization members.
+        /// Gets the collection of accounts that have been invited to join the organization.
         /// </summary>
-        IReadOnlyList<OrganizationRole> RoleOptions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of accounts that have been invited to join the organization.
-        /// </summary>
-        IReadOnlyList<IAccount> InvitedAccounts { get; set; }
+        IReadOnlyList<IAccount> InvitedAccounts { get; }
 
         /// <summary>
         /// Initializes the view model state for the specified organization short name asynchronously.
@@ -106,5 +101,14 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <param name="recipient">The recipient account to transfer ownership to.</param>
         /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
         Task<ErrorOr<Success>> TransferOrganization(IAccount recipient);
+
+        /// <summary>
+        /// Invites an account to join the organization with the specified role asynchronously.
+        /// </summary>
+        /// <param name="target">The target account being invited.</param>
+        /// <param name="role">The invitation role to grant.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task{ErrorOr}" /> representing the asynchronous operation.</returns>
+        Task<ErrorOr<Success>> InviteMember(IAccount target, OrganizationInvitationKind role, CancellationToken token = default);
     }
 }

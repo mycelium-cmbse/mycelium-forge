@@ -45,6 +45,40 @@ namespace Mycelium.Forge.Orm.Tests.Services
         private Guid memberAccountId;
 
         [Test]
+        public async Task VerifyReadByAccountMembershipAsync()
+        {
+            // Case 1: Admin account membership
+            var adminOrgsResult = await this.service.ReadByAccountMembershipAsync(this.adminUserContext, this.adminAccountId, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(adminOrgsResult.IsError, Is.False);
+                Assert.That(adminOrgsResult.Value, Has.Count.EqualTo(2));
+                Assert.That(adminOrgsResult.Value.Select(x => x.Id), Does.Contain(this.publicOrgId));
+                Assert.That(adminOrgsResult.Value.Select(x => x.Id), Does.Contain(this.privateOrgId));
+            }
+
+            // Case 2: Member account membership
+            var memberOrgsResult = await this.service.ReadByAccountMembershipAsync(this.memberUserContext, this.memberAccountId, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(memberOrgsResult.IsError, Is.False);
+                Assert.That(memberOrgsResult.Value, Has.Count.EqualTo(1));
+                Assert.That(memberOrgsResult.Value[0].Id, Is.EqualTo(this.privateOrgId));
+            }
+
+            // Case 3: Non-member account
+            var anonOrgsResult = await this.service.ReadByAccountMembershipAsync(this.anonymousUserContext, Guid.NewGuid(), CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(anonOrgsResult.IsError, Is.False);
+                Assert.That(anonOrgsResult.Value, Is.Empty);
+            }
+        }
+
+        [Test]
         public async Task VerifyReadByShortNameAsync()
         {
             var anonPublicResult = await this.service.ReadByShortNameAsync(this.anonymousUserContext, CancellationToken.None, ["public-org"]);

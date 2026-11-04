@@ -1,4 +1,4 @@
-﻿# Mycelium Forge — Roles, Permissions, and Behaviors Specification
+# Mycelium Forge — Roles, Permissions, and Behaviors Specification
 
 **Applies to:** `mycelium-forge`  
 **Component:** `Mycelium.Forge.Generator`, `Mycelium.Forge.Dal`, `Mycelium.Forge`  
@@ -79,15 +79,12 @@ Permissions are atomic privileges representing discrete actions. They are config
 - `ManageOrganizations`: Manage, update, or administratively configure any organization.
 - `CreateOrganization`: Create a new organization tenant.
 - `ManageOrganizationSettings`: Update settings, description, links, and avatar of the organization.
-- `InviteOrganizationMembers`: Send invitations to prospective members or administrators.
-- `RemoveOrganizationMembers`: Expel members from the organization.
+- `ManageOrganizationMembers`: Manage members, invite prospective members or administrators, and revoke pending invitations.
 - `ConfigurePublishingPolicy`: Enforce package signing, validation rules, or release workflows on the organization.
 - `TransferOrganizationAdministration`: Transfer the primary administrator ownership of the organization.
 - `ConfigureDefaultPackageVisibility`: Set default visibility (Public / Internal / Private) for newly published packages.
 - `ViewOrganizationPackageList`: View packages belonging to the organization.
 - `ViewOrganizationMemberList`: View members and their roles within the organization.
-- `AcceptOrganizationInvitation`: Accept an invitation to join an organization.
-- `RevokeOrganizationInvitation`: Cancel or revoke a pending invitation to an organization.
 
 ### 3.3 Package Permissions
 
@@ -100,8 +97,6 @@ Permissions are atomic privileges representing discrete actions. They are config
 - `ManagePackageTeam`: Add, remove, or change maintainers on a package.
 - `TransferPackageOwnership`: Transfer package ownership to another account or organization.
 - `ManagePackageSettings`: Modify package descriptions, metadata, README, and tags.
-- `AcceptPackageInvitation`: Accept an invitation to become maintainer/owner of a package.
-- `RevokePackageInvitation`: Revoke a pending package maintainer invitation.
 
 ### 3.4 Account & Personal Scope Permissions
 
@@ -111,14 +106,6 @@ Permissions are atomic privileges representing discrete actions. They are config
 - `IssueApiKey`: Generate new personal API keys for CLI and CI/CD access.
 - `RevokeOwnApiKey`: Revoke personal API keys.
 - `ListOwnApiKeys`: List personal active and revoked API keys.
-- `CreateAddress` / `ReadAddress` / `UpdateAddress` / `DeleteAddress`: Manage personal or organization postal addresses.
-- `CreateProfileLink` / `ReadProfileLink` / `UpdateProfileLink` / `DeleteProfileLink`: Manage social, repository, and web links.
-
-### 3.5 Reference Data Permissions
-
-- `ReadCountry`: Query supported country codes and names.
-- `ReadPackageType`: Query supported package types and extensions.
-- `ReadProfileType`: Query supported profile link categories.
 
 ---
 
@@ -134,16 +121,16 @@ Configured in `forge-entity-permissions.csv` and `forge-property-permissions.csv
 | `Organization` | `CreateOrganization` | *(Public)* | `ManageOrganizationSettings \| ManageOrganizations` | `ManageOrganizations` | `Administrator` | `Member` | |
 | `APIKey` | `IssueApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `Owner` | | |
 | `Account` | `ManageAccounts` | `ViewAllAccounts \| ManageAccounts` | `ManageAccounts` | `ManageAccounts` | `Id` | | |
-| `OrganizationInvitation` | `InviteOrganizationMembers` | `ViewOrganizationMemberList` | | | `Owner` | | |
+| `OrganizationInvitation` | `ManageOrganizationMembers` | `ViewOrganizationMemberList` | | | `Owner` | | |
 | `PackageInvitation` | `ManagePackageTeam` | `ManagePackageTeam` | | | `Owner` | | |
 | `PackageVersion` | `PublishPackageVersion` | *(Handled by ParentDelegation)* | | `ErasePackageVersion` | | | |
 | `PackageMetaData` | `PublishPackageVersion` | *(Public/Internal)* | `ManagePackageSettings` | `DeletePackage` | | | |
-| `ProfileLink` | `CreateProfileLink` | `ReadProfileLink` | `UpdateProfileLink` | `DeleteProfileLink` | `Owner` | | |
-| `Address` | `CreateAddress` | `ReadAddress` | `UpdateAddress` | `DeleteAddress` | `Owner` | | |
-| `Country` | `ConfigurePlatformDefaults` | `ReadCountry` | `ConfigurePlatformDefaults` | `ConfigurePlatformDefaults` | | | |
+| `ProfileLink` | *(Handled by ScopeItem)* | *(Handled by ScopeItem)* | *(Handled by ScopeItem)* | *(Handled by ScopeItem)* | `Owner` | | |
+| `Address` | *(Handled by ScopeItem)* | *(Handled by ScopeItem)* | *(Handled by ScopeItem)* | *(Handled by ScopeItem)* | `Owner` | | |
+| `Country` | `ConfigurePlatformDefaults` | *(Public)* | `ConfigurePlatformDefaults` | `ConfigurePlatformDefaults` | | | |
 | `Forge` | `ConfigurePlatformDefaults` | `ViewInstallationMetrics` | `ConfigurePlatformDefaults` | `ConfigurePlatformDefaults` | | | |
-| `PackageType` | `ConfigurePlatformDefaults` | `ReadPackageType` | `ConfigurePlatformDefaults` | `ConfigurePlatformDefaults` | | | |
-| `ProfileType` | `ConfigurePlatformDefaults` | `ReadProfileType` | `ConfigurePlatformDefaults` | `ConfigurePlatformDefaults` | | | |
+| `PackageType` | `ConfigurePlatformDefaults` | *(Public)* | `ConfigurePlatformDefaults` | `ConfigurePlatformDefaults` | | | |
+| `ProfileType` | `ConfigurePlatformDefaults` | *(Public)* | `ConfigurePlatformDefaults` | `ConfigurePlatformDefaults` | | | |
 
 ### 4.2 Property-Level Mutation Rules
 
@@ -156,7 +143,7 @@ When updating an entity, specific property changes require elevated permissions 
 | `Package` | `PackageMaintainer` | `ManagePackageTeam` | `Update` | Modifying the package maintainer set. |
 | `Package` | `Owner` | `TransferPackageOwnership` | `Update` | Transferring root scope ownership of a package. |
 | `Organization` | `Administrator` | `TransferOrganizationAdministration` | `Update` | Changing the primary organization administrator. |
-| `Organization` | `Member` | `InviteOrganizationMembers \| ManageOrganizations` | `Update` | Modifying organization membership. |
+| `Organization` | `Member` | `ManageOrganizationMembers \| ManageOrganizations` | `Update` | Modifying organization membership. |
 | `Organization` | `DefaultPackageVisibility` | `ConfigureDefaultPackageVisibility \| ManageOrganizations` | `Update` | Changing tenant default package visibility. |
 
 ---
@@ -252,10 +239,8 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   - `ScopeRoles`: Roles on the scope entity that have authority to issue/revoke invitations (`Administrator`, `PackageOwner`, `PackageMaintainer`).
   - `InviteeProperty`: Property holding the target invited account (`Target`).
   - `OwnerProperty`: Property holding the invitation sender/creator (`Owner`).
-  - `CreatePermission`: Permission required to send invitation (`InviteOrganizationMembers` / `ManagePackageTeam`).
+  - `CreatePermission`: Permission required to send invitation (`ManageOrganizationMembers` / `ManagePackageTeam`).
   - `ReadPermission`: Permission required to view invitations (`ViewOrganizationMemberList` / `ManagePackageTeam`).
-  - `AcceptPermission`: Permission required to accept (`AcceptOrganizationInvitation` / `AcceptPackageInvitation`).
-  - `RevokePermission`: Permission required to revoke (`RevokeOrganizationInvitation` / `RevokePackageInvitation`).
   - `AdminPermission`: Administrative override permission (`ManageOrganizations` / `ManagePackageTeam`).
   - `BypassPermissions`: Permissions that bypass read filtering.
 - **Enforcement Logic:**

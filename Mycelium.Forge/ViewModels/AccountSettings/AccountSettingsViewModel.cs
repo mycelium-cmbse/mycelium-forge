@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.ViewModels.AccountSettings
 {
+    using DynamicData;
+
     using ErrorOr;
 
     using Mycelium.Forge.Common;
@@ -22,7 +24,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
     /// <summary>
     /// Provides view model state and operations for the user account settings and profile management page.
     /// </summary>
-    public class AccountSettingsViewModel : IAccountSettingsViewModel
+    public class AccountSettingsViewModel : DisposableViewModel, IAccountSettingsViewModel
     {
         /// <summary>
         /// The (injected) <see cref="IAccountService" /> domain service.
@@ -77,17 +79,24 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
         /// <param name="addressService">The (injected) <see cref="IAddressService" />.</param>
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" />.</param>
+        /// <param name="pendingRequestsManagerViewModel">The (injected) <see cref="IPendingRequestsManagerViewModel" />.</param>
         /// <param name="forgeContext">The (injected) <see cref="IForgeContext" />.</param>
         /// <param name="notificationService">The (injected) <see cref="INotificationService" />.</param>
-        public AccountSettingsViewModel(ILogger<AccountSettingsViewModel> logger, IUserService userService, IAccountService accountService, IAddressService addressService, IOrganizationService organizationService, IForgeContext forgeContext, INotificationService notificationService)
+        public AccountSettingsViewModel(ILogger<AccountSettingsViewModel> logger, IUserService userService, IAccountService accountService, IAddressService addressService, IOrganizationService organizationService, IPendingRequestsManagerViewModel pendingRequestsManagerViewModel, IForgeContext forgeContext, INotificationService notificationService)
         {
             this.accountService = accountService;
             this.addressService = addressService;
             this.organizationService = organizationService;
+            this.PendingRequestsManagerViewModel = pendingRequestsManagerViewModel;
             this.forgeContext = forgeContext;
             this.notificationService = notificationService;
             this.userService = userService;
             this.logger = logger;
+
+            this.PendingRequestsManagerViewModel.OnOrganizationAccepted = acceptedOrg =>
+            {
+                this.Organizations.Edit(innerList => innerList.AddOrReplace(acceptedOrg));
+            };
         }
 
         /// <summary>
@@ -96,9 +105,14 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         public IAccount Profile { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of organizations associated with the user account.
+        /// Gets the collection of organizations associated with the user account.
         /// </summary>
-        public IReadOnlyList<IOrganization> Organizations { get; set; } = [];
+        public SourceList<IOrganization> Organizations { get; } = new();
+
+        /// <summary>
+        /// Gets the view model for managing pending requests.
+        /// </summary>
+        public IPendingRequestsManagerViewModel PendingRequestsManagerViewModel { get; }
 
         /// <summary>
         /// Gets or sets the primary address location string.
@@ -134,12 +148,18 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
                 this.Location = address != null ? address.Locality : "-";
             }
 
-            var organizationsResult = await this.organizationService.ReadAsync(this.userContext, CancellationToken.None);
+            var organizationsResult = await this.organizationService.ReadByAccountMembershipAsync(this.userContext, this.currentUserId, CancellationToken.None);
 
             if (!organizationsResult.IsError)
             {
-                this.Organizations = [.. organizationsResult.Value.Where(org => org.Member.Contains(this.currentUserId) || org.Administrator.Contains(this.currentUserId))];
+                this.Organizations.Edit(innerList =>
+                {
+                    innerList.Clear();
+                    innerList.AddRange(organizationsResult.Value);
+                });
             }
+
+            await this.PendingRequestsManagerViewModel.InitializeViewModel();
         }
 
         /// <summary>
@@ -173,7 +193,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
                 return createResult.Errors;
             }
 
-            this.Organizations = [.. this.Organizations, org];
+            this.Organizations.Add(org);
             this.notificationService.AddNotification($"Organization {org.Name} created successfully.", "Organization Created", NotificationType.Success);
             return Result.Success;
         }

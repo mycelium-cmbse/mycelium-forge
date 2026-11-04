@@ -87,7 +87,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             if (!existingThing.Member.SequenceEqual(updatedThing.Member))
             {
-                var guard = PermissionGuard.GuardAnyPermission(userContext, PermissionKind.InviteOrganizationMembers, PermissionKind.ManageOrganizations);
+                var guard = PermissionGuard.GuardAnyPermission(userContext, PermissionKind.ManageOrganizationMembers, PermissionKind.ManageOrganizations);
 
                 if (guard.IsError)
                 {

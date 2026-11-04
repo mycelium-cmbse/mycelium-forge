@@ -168,7 +168,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
                 Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Administrator));
                 Assert.That(this.viewModel.Members, Has.Count.EqualTo(2));
                 Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.RoleOptions, Has.Count.EqualTo(2));
             }
 
             // Scenario 3: User is Member, not Administrator
@@ -183,10 +182,46 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         }
 
         [Test]
+        public async Task VerifyInviteMember()
+        {
+            await this.viewModel.InitializeViewModel("starion");
+
+            var targetAccount = new Account
+            {
+                Id = Guid.NewGuid(),
+                Name = "Invited User"
+            };
+
+            // Scenario 1: Failure path
+            this.organizationInvitationServiceMock.Setup(x => x.CreateAsync(this.adminUserContext, It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Invitation creation failed"));
+            var failureResult = await this.viewModel.InviteMember(targetAccount, OrganizationInvitationKind.MEMBER);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(failureResult.IsError, Is.True);
+                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.InvitedAccounts, Has.Count.EqualTo(0));
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Invitation Error", NotificationType.Error), Times.Once);
+            }
+
+            // Scenario 2: Happy path
+            this.organizationInvitationServiceMock.Setup(x => x.CreateAsync(this.adminUserContext, It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
+            var successResult = await this.viewModel.InviteMember(targetAccount, OrganizationInvitationKind.ADMINISTRATOR);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(successResult.IsError, Is.False);
+                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(2));
+                Assert.That(this.viewModel.InvitedAccounts, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.InvitedAccounts, Does.Contain(targetAccount));
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Invitation Sent", NotificationType.Success), Times.Once);
+            }
+        }
+
+        [Test]
         public async Task VerifyRemoveMember()
         {
-            this.viewModel.Organization = this.org;
-            this.viewModel.Members = [this.memberAccount];
+            await this.viewModel.InitializeViewModel("starion");
 
             // Scenario 1: Failure
             this.organizationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Update failed"));
@@ -195,7 +230,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.viewModel.Members, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.Members, Has.Count.EqualTo(2));
                 Assert.That(this.viewModel.Organization.Member, Does.Contain(this.memberAccount.Id));
                 this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
@@ -207,7 +242,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(this.viewModel.Members, Has.Count.EqualTo(0));
+                Assert.That(this.viewModel.Members, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.Organization.Member, Does.Not.Contain(this.memberAccount.Id));
             }
         }
@@ -215,8 +250,8 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         [Test]
         public async Task VerifyResendInvitation()
         {
+            await this.viewModel.InitializeViewModel("starion");
             var originalExpiresAt = this.matchingInvitation.ExperiesAt;
-            this.viewModel.PendingInvitations = [this.matchingInvitation];
 
             // Scenario 1: Failure preserves the original
             this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
@@ -246,10 +281,10 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         [Test]
         public async Task VerifyRevokeInvitation()
         {
-            this.viewModel.PendingInvitations = [this.matchingInvitation];
+            await this.viewModel.InitializeViewModel("starion");
 
             // Scenario 1: Failure
-            this.organizationInvitationServiceMock.Setup(x => x.DeleteAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
+            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
 
             await this.viewModel.RevokeInvitation(this.matchingInvitation);
 
@@ -260,7 +295,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             }
 
             // Scenario 2: Success
-            this.organizationInvitationServiceMock.Setup(x => x.DeleteAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Deleted);
+            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
 
             await this.viewModel.RevokeInvitation(this.matchingInvitation);
 
@@ -272,7 +307,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         {
             await this.viewModel.InitializeViewModel("starion");
             this.viewModel.CanManageOrganization = true;
-            this.viewModel.Members = [this.adminAccount, this.memberAccount];
 
             // Scenario 1: Update fails (preserves original)
             this.organizationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Update failed"));

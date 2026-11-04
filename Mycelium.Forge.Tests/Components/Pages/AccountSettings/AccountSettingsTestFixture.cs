@@ -20,6 +20,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
     using Bunit;
 
+    using DynamicData;
+
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
@@ -41,6 +43,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         private Account testAccount;
         private Organization adminOrganization;
         private Organization memberOrganization;
+        private SourceList<IOrganization> organizationsSourceList;
 
         [SetUp]
         public void SetUp()
@@ -84,7 +87,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
             this.viewModelMock.Setup(x => x.Profile).Returns(this.testAccount);
             this.viewModelMock.Setup(x => x.Location).Returns("Darmstadt, Germany");
-            this.viewModelMock.Setup(x => x.Organizations).Returns([this.adminOrganization, this.memberOrganization]);
+            this.organizationsSourceList = new SourceList<IOrganization>();
+            this.organizationsSourceList.AddRange([this.adminOrganization, this.memberOrganization]);
+            this.viewModelMock.Setup(x => x.Organizations).Returns(this.organizationsSourceList);
+
+            var pendingRequestsManagerViewModelMock = new Mock<IPendingRequestsManagerViewModel>();
+            pendingRequestsManagerViewModelMock.Setup(x => x.PendingInvitations).Returns([]);
+            this.viewModelMock.Setup(x => x.PendingRequestsManagerViewModel).Returns(pendingRequestsManagerViewModelMock.Object);
 
             var scopeServiceMock = new Mock<IScopeService>();
             scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList<IScope>.Empty);
@@ -101,6 +110,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         [TearDown]
         public async Task TearDown()
         {
+            this.organizationsSourceList.Dispose();
             this.dialogProvider.Dispose();
             await this.context.DisposeAsync();
         }

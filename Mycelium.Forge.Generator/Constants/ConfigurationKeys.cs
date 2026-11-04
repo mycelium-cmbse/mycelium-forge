@@ -60,16 +60,6 @@ namespace Mycelium.Forge.Generator.Constants
         public const string ReadPermission = "ReadPermission";
 
         /// <summary>
-        /// Configuration key for AcceptPermission.
-        /// </summary>
-        public const string AcceptPermission = "AcceptPermission";
-
-        /// <summary>
-        /// Configuration key for RevokePermission.
-        /// </summary>
-        public const string RevokePermission = "RevokePermission";
-
-        /// <summary>
         /// Configuration key for DeletePermission.
         /// </summary>
         public const string DeletePermission = "DeletePermission";

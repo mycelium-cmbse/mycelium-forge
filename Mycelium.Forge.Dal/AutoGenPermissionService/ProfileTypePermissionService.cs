@@ -57,7 +57,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether reading is permitted.</returns>
         protected override Task<ErrorOr<Success>> IsAllowedToReadImplementation(IUserContext userContext, IProfileType thing, NpgsqlTransaction transaction)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ReadProfileType));
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
 
         /// <summary>

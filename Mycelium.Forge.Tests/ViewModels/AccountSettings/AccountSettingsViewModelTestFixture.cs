@@ -36,6 +36,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
         private Mock<IForgeContext> forgeContextMock;
         private Mock<INotificationService> notificationServiceMock;
         private Mock<IOrganizationService> organizationServiceMock;
+        private Mock<IPendingRequestsManagerViewModel> pendingRequestsManagerViewModelMock;
         private Mock<IUserService> userServiceMock;
         private Mock<ILogger<AccountSettingsViewModel>> loggerMock;
         private AccountSettingsViewModel viewModel;
@@ -46,7 +47,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
         private Address address;
         private Organization adminOrg;
         private Organization memberOrg;
-        private Organization unrelatedOrg;
 
         [SetUp]
         public void SetUp()
@@ -56,6 +56,8 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             this.forgeContextMock = new Mock<IForgeContext>();
             this.notificationServiceMock = new Mock<INotificationService>();
             this.organizationServiceMock = new Mock<IOrganizationService>();
+            this.pendingRequestsManagerViewModelMock = new Mock<IPendingRequestsManagerViewModel>();
+            this.pendingRequestsManagerViewModelMock.SetupProperty(x => x.OnOrganizationAccepted);
             this.userServiceMock = new Mock<IUserService>();
             this.loggerMock = new Mock<ILogger<AccountSettingsViewModel>>();
 
@@ -95,30 +97,32 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             this.adminOrg = new Organization
             {
                 Id = Guid.NewGuid(),
-                Name = "Admin Org",
-                Administrator = [userId]
+                Name = "Starion",
+                Administrator = [userId],
+                Member = []
             };
 
             this.memberOrg = new Organization
             {
                 Id = Guid.NewGuid(),
-                Name = "Member Org",
+                Name = "Rhea",
+                Administrator = [],
                 Member = [userId]
-            };
-
-            this.unrelatedOrg = new Organization
-            {
-                Id = Guid.NewGuid(),
-                Name = "Unrelated Org"
             };
 
             this.forgeContextMock.Setup(x => x.ForgeId).Returns(Guid.NewGuid());
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.authenticatedContext);
             this.accountServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.profileWithAddress));
             this.addressServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAddress>(this.address));
-            this.organizationServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganization>());
+            this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.authenticatedContext, userId, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganization>());
 
-            this.viewModel = new AccountSettingsViewModel(this.loggerMock.Object, this.userServiceMock.Object, this.accountServiceMock.Object, this.addressServiceMock.Object, this.organizationServiceMock.Object, this.forgeContextMock.Object, this.notificationServiceMock.Object);
+            this.viewModel = new AccountSettingsViewModel(this.loggerMock.Object, this.userServiceMock.Object, this.accountServiceMock.Object, this.addressServiceMock.Object, this.organizationServiceMock.Object, this.pendingRequestsManagerViewModelMock.Object, this.forgeContextMock.Object, this.notificationServiceMock.Object);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            this.viewModel.Dispose();
         }
 
         [Test]
@@ -156,8 +160,8 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             {
                 Assert.That(successOperationResult.IsError, Is.False);
                 Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.Organizations[0].Name, Is.EqualTo("New Org"));
-                Assert.That(this.viewModel.Organizations[0].ShortName, Is.EqualTo("neworg"));
+                Assert.That(this.viewModel.Organizations.Items[0].Name, Is.EqualTo("New Org"));
+                Assert.That(this.viewModel.Organizations.Items[0].ShortName, Is.EqualTo("neworg"));
 
                 var createdOrg = (Organization)capturedOrganizations.First();
                 var accountId = this.authenticatedContext.AccountId.GetValueOrDefault();
@@ -213,8 +217,9 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             }
 
             // Scenario 3: Organization read error and no primary address
+            var userId = this.authenticatedContext.AccountId!.Value;
             this.accountServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.profileNoAddress));
-            this.organizationServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed to read"));
+            this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.authenticatedContext, userId, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed to read"));
 
             await this.viewModel.InitializeViewModel();
 
@@ -228,7 +233,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             // Scenario 4: Happy path with address and organizations
             this.accountServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.profileWithAddress));
             this.addressServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAddress>(this.address));
-            this.organizationServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganization>(this.adminOrg, this.memberOrg, this.unrelatedOrg));
+            this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.authenticatedContext, userId, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganization>(this.adminOrg, this.memberOrg));
 
             await this.viewModel.InitializeViewModel();
 
@@ -237,7 +242,13 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 Assert.That(this.viewModel.Profile, Is.EqualTo(this.profileWithAddress));
                 Assert.That(this.viewModel.Location, Is.EqualTo("Darmstadt"));
                 Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(2));
+                this.pendingRequestsManagerViewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
             }
+
+            // Verify OnOrganizationAccepted subscription
+            var newOrg = new Organization { Id = Guid.NewGuid(), Name = "Accepted Org" };
+            this.pendingRequestsManagerViewModelMock.Object.OnOrganizationAccepted?.Invoke(newOrg);
+            Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(3));
         }
     }
 }
