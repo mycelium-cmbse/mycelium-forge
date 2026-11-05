@@ -7,18 +7,36 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Components.Pages.Publish
+namespace Mycelium.Forge.Components.Pages.Publish.Steps
 {
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Forms;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Models.Publish;
 
     /// <summary>
     /// Represents the first step (upload) component of the package publishing wizard.
     /// </summary>
     public partial class PublishUploadStep : ComponentBase
     {
+        /// <summary>
+        /// The guidance information card configuration for the upload step.
+        /// </summary>
+        private static readonly InformationCardModel StepInformationCard = new()
+        {
+            Title = "BEFORE YOU UPLOAD",
+            Items =
+            [
+                "A published version is immutable. A correction ships as a new version, never as a replacement.",
+                "Everything inside the archive stays public for as long as the version is served. No secrets in the manifest.",
+                "Only the Installation Administrator can erase a version. You can unlist one."
+            ],
+            HelpText = "Publishing from a pipeline? Use forge publish with a key scoped to publish only.",
+            LinkText = "Read the publishing guide \u2192",
+            LinkHref = "/docs/publishing"
+        };
+
         /// <summary>
         /// The dictionary mapping supported file extensions to human-readable format names.
         /// </summary>

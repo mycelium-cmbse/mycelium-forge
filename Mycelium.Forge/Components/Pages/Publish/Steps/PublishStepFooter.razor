@@ -1,0 +1,48 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PublishStepFooter.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full flex items-center justify-between gap-2.5 pt-2">
+    <div class="flex-1 min-w-0">
+        @if (this.Footnote != null)
+        {
+            @(this.Footnote)
+        }
+        else if (!string.IsNullOrEmpty(this.FootnoteText))
+        {
+            <p class="text-xs leading-2xs font-normal text-muted-foreground truncate">
+                @(this.FootnoteText)
+            </p>
+        }
+    </div>
+
+    <div class="flex items-center gap-2.5 shrink-0">
+        @if (this.OnBack.HasDelegate)
+        {
+            <BbButton Variant="ButtonVariant.Outline"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnBack)"
+                      id="@(this.BackId)">
+                @(this.BackText)
+            </BbButton>
+        }
+
+        @if (this.OnContinue.HasDelegate)
+        {
+            <BbButton Variant="ButtonVariant.Default"
+                      Type="ButtonType.Button"
+                      OnClick="@(this.OnContinue)"
+                      Disabled="@(this.IsContinueDisabled)"
+                      id="@(this.ContinueId)">
+                @(this.ContinueText)
+            </BbButton>
+        }
+    </div>
+</div>
+
+<div class="w-full h-12 shrink-0"></div>

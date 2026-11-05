@@ -14,7 +14,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Forms;
 
-    using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Services;
@@ -31,6 +30,11 @@ namespace Mycelium.Forge.Components.Pages.Publish
         private IBrowserFile uploadedPackage;
 
         /// <summary>
+        /// A unique key to force re-mounting and clearing of the upload step component upon artefact replacement.
+        /// </summary>
+        private Guid uploadStepKey = Guid.NewGuid();
+
+        /// <summary>
         /// Gets or sets the view model for the package publishing page.
         /// </summary>
         [Inject]
@@ -41,12 +45,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         [Inject]
         public INotificationService NotificationService { get; set; }
-
-        /// <summary>
-        /// Gets or sets the navigation manager instance.
-        /// </summary>
-        [Inject]
-        public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
         /// Gets or sets the dialog service used to display modal dialogs.
@@ -65,121 +63,38 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public int ActiveStep { get; set; }
 
         /// <summary>
-        /// Gets the CSS classes for the validation status outcome badge.
+        /// Handles returning to the preceding wizard step.
         /// </summary>
-        /// <param name="status">The validation check status outcome.</param>
-        /// <returns>The computed CSS class string for the status text.</returns>
-        public static string GetValidationStatusBadgeClass(ValidationStatus status)
+        public void OnBack()
         {
-            return status switch
+            if (this.ActiveStep > 0)
             {
-                ValidationStatus.Pass => "text-xs leading-2xs font-medium text-success-vivid shrink-0",
-                ValidationStatus.Warning => "text-xs leading-2xs font-medium text-warning-vivid shrink-0",
-                ValidationStatus.Missing => "text-xs leading-2xs font-medium text-warning-vivid shrink-0",
-                ValidationStatus.Fail => "text-xs leading-2xs font-medium text-destructive shrink-0",
-                _ => "text-xs leading-2xs font-medium text-muted-foreground shrink-0"
-            };
+                this.ActiveStep--;
+            }
         }
 
         /// <summary>
-        /// Gets the formatted summary title describing the number of validation warnings.
+        /// Handles advancing to the next wizard step.
         /// </summary>
-        /// <returns>A formatted string indicating the warning count.</returns>
-        public string GetWarningsTitle()
+        public void OnNext()
         {
-            var count = this.ViewModel.ValidationChecks.Count(x => x.Status != ValidationStatus.Pass);
-            return count == 1 ? "1 warning" : $"{count} warnings";
-        }
-
-        /// <summary>
-        /// Gets the action button label text for publishing the package release.
-        /// </summary>
-        /// <returns>The button display text with version.</returns>
-        public string GetPublishButtonText()
-        {
-            return $"Validate & publish v{this.ViewModel.Metadata.Version}";
+            this.ActiveStep++;
         }
 
         /// <summary>
         /// Handles replacing the currently loaded package archive artefact.
         /// </summary>
+        /// <remarks>
+        /// Reassigning <see cref="uploadStepKey" /> to a new <see cref="Guid" /> forces Blazor to re-render
+        /// and reconstruct the upload step component, resetting the native HTML file input DOM element so that
+        /// previously selected files are discarded.
+        /// </remarks>
         public void OnReplaceArtefact()
         {
             this.uploadedPackage = null;
+            this.uploadStepKey = Guid.NewGuid();
             this.ViewModel.InitializeViewModel();
             this.ActiveStep = 0;
-        }
-
-        /// <summary>
-        /// Handles changes to the package scope selection.
-        /// </summary>
-        /// <param name="scope">The selected scope value.</param>
-        public void OnScopeChanged(string scope)
-        {
-            this.ViewModel.Metadata.Scope = scope ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Handles changes to the package name input value.
-        /// </summary>
-        /// <param name="packageName">The new package name value.</param>
-        public void OnPackageNameChanged(string packageName)
-        {
-            this.ViewModel.Metadata.PackageName = packageName ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Handles changes to the package version input value.
-        /// </summary>
-        /// <param name="version">The new package version value.</param>
-        public void OnVersionChanged(string version)
-        {
-            this.ViewModel.Metadata.Version = version ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Handles changes to the package description input value.
-        /// </summary>
-        /// <param name="description">The new description value.</param>
-        public void OnDescriptionChanged(string description)
-        {
-            this.ViewModel.Metadata.Description = description ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Handles changes to the package license selection.
-        /// </summary>
-        /// <param name="license">The selected license identifier.</param>
-        public void OnLicenseChanged(string license)
-        {
-            this.ViewModel.Metadata.License = license ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Handles changes to the package visibility selection.
-        /// </summary>
-        /// <param name="visibility">The selected visibility setting.</param>
-        public void OnVisibilityChanged(VisibilityKind visibility)
-        {
-            this.ViewModel.Metadata.Visibility = visibility;
-        }
-
-        /// <summary>
-        /// Handles changes to the package metamodel selection.
-        /// </summary>
-        /// <param name="metamodel">The selected metamodel specification.</param>
-        public void OnMetamodelChanged(string metamodel)
-        {
-            this.ViewModel.Metadata.Metamodel = metamodel ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Handles changes to the package tags input value.
-        /// </summary>
-        /// <param name="tags">The new tags value.</param>
-        public void OnTagsChanged(string tags)
-        {
-            this.ViewModel.Metadata.Tags = tags ?? string.Empty;
         }
 
         /// <summary>
@@ -226,7 +141,29 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             this.uploadedPackage = file;
             this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
-            this.ActiveStep = 1;
+            this.ViewModel.Metadata.ArtefactFormat = ResolveArtefactFormat(this.uploadedPackage.Name);
+            this.OnNext();
+        }
+
+        /// <summary>
+        /// Handles re-running pre-publish validation checks.
+        /// </summary>
+        public void OnValidationReRun()
+        {
+            // TODO: Replace with live package archive validation once backend validation service is implemented.
+            this.ViewModel.InitializeViewModel();
+        }
+
+        /// <summary>
+        /// Handles navigating directly to a specific wizard step.
+        /// </summary>
+        /// <param name="step">The zero-based wizard step index.</param>
+        public void OnNavigateToStep(int step)
+        {
+            if (this.CanOpenStep(step))
+            {
+                this.ActiveStep = step;
+            }
         }
 
         /// <summary>
@@ -250,19 +187,58 @@ namespace Mycelium.Forge.Components.Pages.Publish
         }
 
         /// <summary>
+        /// Resolves the human-readable format description from the archive file extension.
+        /// </summary>
+        /// <param name="fileName">The archive file name.</param>
+        /// <returns>The resolved format name.</returns>
+        private static string ResolveArtefactFormat(string fileName)
+        {
+            var extension = Path.GetExtension(fileName);
+
+            return extension switch
+            {
+                ".kpar" => "SysML v2 (kpar)",
+                ".zip" => "ECSS-E-TM-10-25",
+                ".tar.gz" => "Capella",
+                _ => !string.IsNullOrEmpty(extension) ? extension : "Unknown"
+            };
+        }
+
+        /// <summary>
         /// Determines whether the specified step can be opened based on the current state.
         /// </summary>
         /// <param name="stepNumber">The step number.</param>
         /// <returns><c>true</c> if the step can be opened; otherwise, <c>false</c>.</returns>
         private bool CanOpenStep(int stepNumber)
         {
-            // Step 0 (Upload) can always be opened; Step 1 (Metadata) can only be opened if a package has been uploaded. Other steps are still to be implemented
             return stepNumber switch
             {
                 0 => true,
                 1 => this.CanOpenStep(0) && this.uploadedPackage != null,
+                2 => this.CanOpenStep(1) && this.IsMetadataValid(),
+                3 => this.CanOpenStep(2) && !this.HasValidationErrors(),
                 _ => false
             };
+        }
+
+        /// <summary>
+        /// Determines whether any pre-publish validation checks failed with a blocking error.
+        /// </summary>
+        /// <returns><c>true</c> if any check has a failed status; otherwise, <c>false</c>.</returns>
+        private bool HasValidationErrors()
+        {
+            return this.ViewModel.ValidationChecks.Any(x => x.Status == ValidationStatus.Fail);
+        }
+
+        /// <summary>
+        /// Determines whether all mandatory package metadata fields are populated.
+        /// </summary>
+        /// <returns><c>true</c> if package name, version, and scope are non-empty; otherwise, <c>false</c>.</returns>
+        private bool IsMetadataValid()
+        {
+            return !string.IsNullOrWhiteSpace(this.ViewModel.Metadata.PackageName) &&
+                   !string.IsNullOrWhiteSpace(this.ViewModel.Metadata.Version) &&
+                   !string.IsNullOrWhiteSpace(this.ViewModel.Metadata.Scope);
         }
     }
 }
