@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishValidationStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -96,7 +96,7 @@
             <BbButton Variant="ButtonVariant.Link"
                       Type="ButtonType.Button"
                       id="publish-validation-rerun-button"
-                      OnClick="@(this.OnReRun)"
+                      OnClick="@(this.HandleReRun)"
                       Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
                 Re-run
             </BbButton>
@@ -136,7 +136,7 @@
                         @if (check.Status == ValidationStatus.Fail)
                         {
                             <span class="text-xs leading-2xs font-medium text-destructive pt-0.5">
-                                @(this.GetCheckFixRecommendation(check))
+                               @(this.GetCheckFixRecommendation(check))
                             </span>
                         }
                     </div>

@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="Publish.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -26,24 +26,21 @@
 </div>
 
 <BbStepper @bind-ActiveStep="this.ActiveStep"
-           Clickable="true"
+           Clickable="false"
            Class="w-full"
            IndicatorClass="stepper-bar">
-    <BbStep Title="Upload"
-            Disabled="@(!this.CanOpenStep(0))"/>
+    <BbStep Title="Upload"/>
 
-    <BbStep Title="Package metadata"
-            Disabled="@(!this.CanOpenStep(1))"/>
+    <BbStep Title="Package metadata"/>
 
-    <BbStep Title="Validation"
-            Disabled="@(!this.CanOpenStep(2))"/>
+    <BbStep Title="Validation"/>
 
-    <BbStep Title="Review & publish"
-            Disabled="@(!this.CanOpenStep(3))"/>
+    <BbStep Title="Review & publish"/>
 </BbStepper>
 
 <div class="@(this.GetStepClass(0))">
     <PublishUploadStep @key="this.uploadStepKey"
+                       ViewModel="@(this.ViewModel)"
                        OnContinue="@(this.OnUploadStepContinued)"
                        InputId="@(UploadInputId)"/>
 </div>
@@ -62,7 +59,6 @@
                                UploadedFile="@(this.uploadedPackage)"
                                OnBack="@(this.OnBack)"
                                OnContinue="@(this.OnNext)"
-                               OnReRun="@(this.OnValidationReRun)"
                                OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
     </div>
 

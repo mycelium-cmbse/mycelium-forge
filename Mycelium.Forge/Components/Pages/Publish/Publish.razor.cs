@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="Publish.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -104,7 +104,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public async Task PublishPackage()
         {
             // Issue #180: Implement package publishing workflow.
-
             var result = this.ViewModel.Publish();
 
             if (result.IsError)
@@ -140,18 +139,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public void OnUploadStepContinued(IBrowserFile file)
         {
             this.uploadedPackage = file;
-            this.ViewModel.Metadata.ArtefactFileName = this.uploadedPackage.Name;
-            this.ViewModel.Metadata.ArtefactFormat = ResolveArtefactFormat(this.uploadedPackage.Name);
             this.OnNext();
-        }
-
-        /// <summary>
-        /// Handles re-running pre-publish validation checks.
-        /// </summary>
-        public void OnValidationReRun()
-        {
-            // TODO: Replace with live package archive validation once backend validation service is implemented.
-            this.ViewModel.InitializeViewModel();
         }
 
         /// <summary>
@@ -160,10 +148,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <param name="step">The zero-based wizard step index.</param>
         public void OnNavigateToStep(int step)
         {
-            if (this.CanOpenStep(step))
-            {
-                this.ActiveStep = step;
-            }
+            this.ActiveStep = step;
         }
 
         /// <summary>
@@ -184,61 +169,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             base.OnInitialized();
             this.ViewModel.InitializeViewModel();
-        }
-
-        /// <summary>
-        /// Resolves the human-readable format description from the archive file extension.
-        /// </summary>
-        /// <param name="fileName">The archive file name.</param>
-        /// <returns>The resolved format name.</returns>
-        private static string ResolveArtefactFormat(string fileName)
-        {
-            var extension = Path.GetExtension(fileName);
-
-            return extension switch
-            {
-                ".kpar" => "SysML v2 (kpar)",
-                ".zip" => "ECSS-E-TM-10-25",
-                ".tar.gz" => "Capella",
-                _ => !string.IsNullOrEmpty(extension) ? extension : "Unknown"
-            };
-        }
-
-        /// <summary>
-        /// Determines whether the specified step can be opened based on the current state.
-        /// </summary>
-        /// <param name="stepNumber">The step number.</param>
-        /// <returns><c>true</c> if the step can be opened; otherwise, <c>false</c>.</returns>
-        private bool CanOpenStep(int stepNumber)
-        {
-            return stepNumber switch
-            {
-                0 => true,
-                1 => this.CanOpenStep(0) && this.uploadedPackage != null,
-                2 => this.CanOpenStep(1) && this.IsMetadataValid(),
-                3 => this.CanOpenStep(2) && !this.HasValidationErrors(),
-                _ => false
-            };
-        }
-
-        /// <summary>
-        /// Determines whether any pre-publish validation checks failed with a blocking error.
-        /// </summary>
-        /// <returns><c>true</c> if any check has a failed status; otherwise, <c>false</c>.</returns>
-        private bool HasValidationErrors()
-        {
-            return this.ViewModel.ValidationChecks.Any(x => x.Status == ValidationStatus.Fail);
-        }
-
-        /// <summary>
-        /// Determines whether all mandatory package metadata fields are populated.
-        /// </summary>
-        /// <returns><c>true</c> if package name, version, and scope are non-empty; otherwise, <c>false</c>.</returns>
-        private bool IsMetadataValid()
-        {
-            return !string.IsNullOrWhiteSpace(this.ViewModel.Metadata.PackageName) &&
-                   !string.IsNullOrWhiteSpace(this.ViewModel.Metadata.Version) &&
-                   !string.IsNullOrWhiteSpace(this.ViewModel.Metadata.Scope);
         }
     }
 }

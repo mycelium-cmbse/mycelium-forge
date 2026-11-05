@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishValidationStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -74,12 +74,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public EventCallback OnReplaceArtefact { get; set; }
 
         /// <summary>
-        /// Gets or sets the callback invoked when re-running pre-publish validation checks.
-        /// </summary>
-        [Parameter]
-        public EventCallback OnReRun { get; set; }
-
-        /// <summary>
         /// Gets a value indicating whether any validation checks failed with a blocking error.
         /// </summary>
         public bool HasFailures => this.ViewModel.ValidationChecks.Any(x => x.Status == ValidationStatus.Fail);
@@ -104,6 +98,15 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
                 ValidationStatus.Missing => BadgeVariant.Secondary,
                 _ => BadgeVariant.Outline
             };
+        }
+
+        /// <summary>
+        /// Handles re-running pre-publish validation checks.
+        /// </summary>
+        public void HandleReRun()
+        {
+            // TODO: Replace with live package archive validation once backend validation service is implemented.
+            this.ViewModel.InitializeViewModel();
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishUploadStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Models.Publish;
+    using Mycelium.Forge.ViewModels.Publish;
 
     /// <summary>
     /// Represents the first step (upload) component of the package publishing wizard.
@@ -38,14 +39,13 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         };
 
         /// <summary>
-        /// The dictionary mapping supported file extensions to human-readable format names.
+        /// The dictionary mapping human-readable model types to supported file extensions.
         /// </summary>
-        /// <remarks>Used just as a mock until we do a real parsing of the model</remarks>
         private readonly Dictionary<string, string> acceptedFormats = new()
         {
-            { ".kpar", "SysML v2 (kpar)" },
-            { ".zip", "ECSS-E-TM-10-25" },
-            { ".tar.gz", "Capella" }
+            { "SysML v2 (kpar)", ".kpar" },
+            { "ECSS-E-TM-10-25", ".zip" },
+            { "Capella", ".zip" }
         };
 
         /// <summary>
@@ -59,6 +59,16 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         private IBrowserFile selectedFile;
 
         /// <summary>
+        /// The user-selected model type when an ambiguous archive extension with multiple models is uploaded.
+        /// </summary>
+        private string selectedAmbiguousModelType = string.Empty;
+
+        /// <summary>
+        /// Backing field indicating whether an upload operation is currently in progress.
+        /// </summary>
+        private bool isUploading;
+
+        /// <summary>
         /// The maximum allowed upload file size in bytes.
         /// </summary>
         private long MaxAllowedFileSize => this.maxAllowedFileSizeInMb * 1024 * 1024;
@@ -70,9 +80,15 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public IConfiguration Configuration { get; set; }
 
         /// <summary>
+        /// Gets or sets the view model for the package publishing page.
+        /// </summary>
+        [Parameter]
+        public IPublishViewModel ViewModel { get; set; }
+
+        /// <summary>
         /// Gets the comma-separated list of accepted file extensions.
         /// </summary>
-        private string AcceptedExtensions => string.Join(",", this.acceptedFormats.Keys);
+        private string AcceptedExtensions => string.Join(",", this.acceptedFormats.Values.Distinct());
 
         /// <summary>
         /// Gets a value indicating whether a file is currently selected.
@@ -103,18 +119,89 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         }
 
         /// <summary>
-        /// Gets the detected format name of the selected file.
+        /// Determines whether advancing to the next step is disabled.
         /// </summary>
-        /// <returns>The human-readable format name or file extension.</returns>
-        private string GetSelectedFileFormat()
+        /// <returns><c>true</c> if continue is disabled; otherwise, <c>false</c>.</returns>
+        private bool IsContinueDisabled()
         {
-            var fileExtension = Path.GetExtension(this.selectedFile.Name);
-            var extension = !string.IsNullOrEmpty(fileExtension) ? fileExtension : "unknown";
+            return !this.HasSelectedFile ||
+                   this.isUploading || 
+                   (this.RequiresModelTypeSelection() && string.IsNullOrWhiteSpace(this.selectedAmbiguousModelType));
+        }
 
-            // If format is a recognized model extension, return the corresponding format name; otherwise, return the file extension.
-            return this.acceptedFormats.TryGetValue(extension, out var format)
-                ? format
-                : extension;
+        /// <summary>
+        /// Determines whether the selected file has multiple matching model types requiring explicit user selection.
+        /// </summary>
+        /// <returns><c>true</c> if multiple model types share the file extension; otherwise, <c>false</c>.</returns>
+        private bool RequiresModelTypeSelection()
+        {
+            return this.GetMatchingModelTypes().Count > 1;
+        }
+
+        /// <summary>
+        /// Gets the list of supported model types that match the extension of the selected file.
+        /// </summary>
+        /// <returns>A collection of matching model type names.</returns>
+        private IReadOnlyList<string> GetMatchingModelTypes()
+        {
+            if (this.selectedFile == null)
+            {
+                return [];
+            }
+
+            var extension = Path.GetExtension(this.selectedFile.Name);
+
+            if (string.IsNullOrEmpty(extension))
+            {
+                return [];
+            }
+
+            return [.. this.acceptedFormats.Where(x => x.Value.Equals(extension, StringComparison.OrdinalIgnoreCase)).Select(x => x.Key)];
+        }
+
+        /// <summary>
+        /// Gets the summary description text for the selected file model type outcome.
+        /// </summary>
+        /// <returns>The summary description text.</returns>
+        private string GetSelectedModelTypeSummary()
+        {
+            var modelType = this.GetSelectedModelType();
+
+            if (string.IsNullOrEmpty(modelType))
+            {
+                return "Model type selection required";
+            }
+
+            return this.RequiresModelTypeSelection()
+                ? $"Selected {modelType}"
+                : $"Detected {modelType}";
+        }
+
+        /// <summary>
+        /// Gets the detected or selected model type of the currently selected file.
+        /// </summary>
+        /// <returns>The human-readable model type name or file extension.</returns>
+        private string GetSelectedModelType()
+        {
+            if (this.selectedFile == null)
+            {
+                return string.Empty;
+            }
+
+            var matches = this.GetMatchingModelTypes();
+
+            if (matches.Count > 1)
+            {
+                return this.selectedAmbiguousModelType;
+            }
+
+            if (matches.Count == 1)
+            {
+                return matches[0];
+            }
+
+            var extension = Path.GetExtension(this.selectedFile.Name);
+            return !string.IsNullOrEmpty(extension) ? extension : "unknown";
         }
 
         /// <summary>
@@ -126,7 +213,17 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             if (files is { Count: > 0 })
             {
                 this.selectedFile = files[0];
+                this.selectedAmbiguousModelType = string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Handles the format change event from the model type selector toggle group.
+        /// </summary>
+        /// <param name="modelType">The selected model type string.</param>
+        private void HandleModelSelectionChanged(string modelType)
+        {
+            this.selectedAmbiguousModelType = modelType ?? string.Empty;
         }
 
         /// <summary>
@@ -135,7 +232,16 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task HandleContinue()
         {
+            this.isUploading = true;
+
+            this.ViewModel.Metadata = new PublishPackageMetadataModel
+            {
+                ArtefactFileName = this.selectedFile.Name,
+                ArtefactFormat = this.GetSelectedModelType()
+            };
+
             await this.OnContinue.InvokeAsync(this.selectedFile);
+            this.isUploading = false;
         }
     }
 }
