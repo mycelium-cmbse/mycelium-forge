@@ -18,5 +18,15 @@ namespace Mycelium.Forge.Common
         /// Constant representing the SysML v2 format name.
         /// </summary>
         public const string SysMlV2 = "SysML v2";
+
+        /// <summary>
+        /// Constant representing the CDP4-COMET format name.
+        /// </summary>
+        public const string Cdp4Comet = "Cdp4Comet";
+
+        /// <summary>
+        /// Constant representing the Capella format name.
+        /// </summary>
+        public const string Capella = "Capella";
     }
 }

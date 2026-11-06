@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Models.Validation
 {
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Enums;
 
     /// <summary>
@@ -27,16 +28,14 @@ namespace Mycelium.Forge.Models.Validation
         /// Initializes a new instance of the <see cref="ValidationCheckModel" /> class with specified properties.
         /// </summary>
         /// <param name="title">The title or description label of the check.</param>
-        /// <param name="detail">The detailed execution summary or diagnostic message.</param>
         /// <param name="status">The evaluation status outcome value.</param>
-        public ValidationCheckModel(
-            string title,
-            string detail = "",
-            ValidationStatus status = ValidationStatus.Pass)
+        /// <param name="detail">The detailed execution summary or diagnostic message.</param>
+        public ValidationCheckModel(string title, ValidationStatus status, string detail = "")
         {
             this.Title = title;
             this.Detail = detail;
             this.Status = status;
+            this.Recommendation = ResolveRecommendation(title);
         }
 
         /// <summary>
@@ -53,5 +52,27 @@ namespace Mycelium.Forge.Models.Validation
         /// Gets or sets the evaluation status outcome value.
         /// </summary>
         public ValidationStatus Status { get; set; } = ValidationStatus.Pass;
+
+        /// <summary>
+        /// Gets or sets the suggested recommendation action to resolve a failed check.
+        /// </summary>
+        public string Recommendation { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Resolves the default remediation recommendation message for a given check title.
+        /// </summary>
+        /// <param name="title">The validation check title.</param>
+        /// <returns>A recommendation message string.</returns>
+        private static string ResolveRecommendation(string title)
+        {
+            return title switch
+            {
+                ValidationTypes.PackageVersion => "Must be greater than the latest published version.",
+                ValidationTypes.NamespaceUniqueness => "Choose a unique package name in the selected namespace scope.",
+                ValidationTypes.SchemaValidation => "Verify archive manifest syntax and conform to specification.",
+                ValidationTypes.License => "Select a license identifier for the package.",
+                _ => "Review the validation failure and resolve the underlying issue before publishing."
+            };
+        }
     }
 }

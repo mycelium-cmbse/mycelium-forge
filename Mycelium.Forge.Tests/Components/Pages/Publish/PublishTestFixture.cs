@@ -27,7 +27,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.Publish;
     using Mycelium.Forge.Enums;
-    using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
@@ -72,8 +71,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
 
             this.viewModelMock.Setup(x => x.ValidationChecks).Returns(
             [
-                new ValidationCheckModel("Schema validation"),
-                new ValidationCheckModel("License file", status: ValidationStatus.Warning)
+                new ValidationCheckModel("Schema validation", ValidationStatus.Pass),
+                new ValidationCheckModel("License file", ValidationStatus.Warning)
             ]);
 
             this.viewModelMock.Setup(x => x.ScopeOptions).Returns(["@starion", "@esa"]);

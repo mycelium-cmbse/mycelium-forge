@@ -32,6 +32,11 @@ namespace Mycelium.Forge.Common
         public const string Publish = "/publish";
 
         /// <summary>
+        /// The package publishing page route path for publishing a new version of an existing package.
+        /// </summary>
+        public const string PublishPackage = "/publish/{scope}/{package}";
+
+        /// <summary>
         /// The package details page route path.
         /// </summary>
         public const string Package = "/packages/{scope}/{packageShortname}";
@@ -100,6 +105,18 @@ namespace Mycelium.Forge.Common
         /// The installation accounts administration page route path.
         /// </summary>
         public const string Accounts = "/admin/accounts";
+
+        /// <summary>
+        /// Generates the relative URL for listing a new version of an existing package.
+        /// </summary>
+        /// <param name="scope">The owning scope or publisher name.</param>
+        /// <param name="packageShortname">The package short name.</param>
+        /// <returns>The formatted list version route path.</returns>
+        public static string GetPublishVersionRoute(string scope, string packageShortname)
+        {
+            var cleanScope = scope.CleanScope();
+            return $"{Publish}/{cleanScope}/{packageShortname}";
+        }
 
         /// <summary>
         /// Generates the relative URL for the package details page, optionally with a specified tab.

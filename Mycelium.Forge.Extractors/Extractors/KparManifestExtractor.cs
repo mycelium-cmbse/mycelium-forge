@@ -102,7 +102,7 @@ namespace Mycelium.Forge.Extractors.Extractors
         /// </summary>
         /// <returns>The <see cref="Regex" />.</returns>
         [GeneratedRegex(@"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$")]
-        private static partial Regex SemanticVersionRegex();
+        public static partial Regex SemanticVersionRegex();
 
         /// <summary>
         /// Runs the checks that the <see cref="IKparArchiveReader" /> does not enforce.

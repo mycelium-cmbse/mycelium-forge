@@ -1,0 +1,57 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="PublishStepBase.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="w-full flex flex-col lg:flex-row items-start gap-6">
+    <ForgeCard Class="w-full lg:flex-1 p-6 gap-4">
+        @(this.Body)
+    </ForgeCard>
+
+    <ForgeCard Class="w-full lg:w-[380px] p-5 gap-3 shrink-0">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            @(this.InformationCard.Title)
+        </span>
+
+        @foreach (var item in this.InformationCard.Items)
+        {
+            <div @key="item" class="flex items-start gap-2.5 w-full">
+                <div class="w-4 h-5 flex items-center justify-center shrink-0">
+                    <LucideIcon Name="circle-check"
+                                Size="14"
+                                Class="text-primary shrink-0"/>
+                </div>
+                <p class="text-sm leading-xs font-normal text-foreground-muted flex-1">
+                    @(item)
+                </p>
+            </div>
+        }
+
+        <BbSeparator Class="w-full shrink-0 my-0.5"/>
+
+        @if (!string.IsNullOrEmpty(this.InformationCard.HelpText))
+        {
+            <p class="text-xs leading-2xs font-normal text-muted-foreground w-full">
+                @(this.InformationCard.HelpText)
+            </p>
+        }
+
+        @if (!string.IsNullOrEmpty(this.InformationCard.LinkHref))
+        {
+            <BbButton Variant="ButtonVariant.Link"
+                      Href="@(this.InformationCard.LinkHref)"
+                      Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline">
+                <span>@(this.InformationCard.LinkText)</span>
+            </BbButton>
+        }
+    </ForgeCard>
+</div>
+
+@if (this.Footer != null)
+{
+    @(this.Footer)
+}
