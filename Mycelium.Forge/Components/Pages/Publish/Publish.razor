@@ -7,69 +7,76 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 @attribute [Route(PageRoutes.Publish)]
+@attribute [Route(PageRoutes.PublishPackage)]
 @attribute [Authorize]
 @rendermode InteractiveServer
 @using Mycelium.Forge.Components.Pages.Publish.Steps
 
 <PageTitle>Publish to Forge &mdash; Mycelium Forge</PageTitle>
 
-<div class="w-full bg-background min-h-screen py-10 select-none">
-<div class="max-w-6xl w-full mx-auto px-6 flex flex-col gap-6">
-<div class="flex flex-col gap-1.5 w-full">
-    <h1 class="text-3xl leading-3xl font-semibold text-foreground tracking-tight">
-        Publish to Forge
-    </h1>
-    <p class="text-base leading-normal text-muted-foreground">
-        Publish a library or a model so others can discover, version and, where the format allows it, import it into their projects.
-    </p>
-    <AntiforgeryToken/>
-</div>
-
-<BbStepper @bind-ActiveStep="this.ActiveStep"
-           Clickable="false"
-           Class="w-full"
-           IndicatorClass="stepper-bar">
-    <BbStep Title="Upload"/>
-
-    <BbStep Title="Package metadata"/>
-
-    <BbStep Title="Validation"/>
-
-    <BbStep Title="Review & publish"/>
-</BbStepper>
-
-<div class="@(this.GetStepClass(0))">
-    <PublishUploadStep @key="this.uploadStepKey"
-                       ViewModel="@(this.ViewModel)"
-                       OnContinue="@(this.OnUploadStepContinued)"
-                       InputId="@(UploadInputId)"/>
-</div>
-
-<div class="@(this.GetStepClass(1))">
-    <PublishMetadataStep ViewModel="@(this.ViewModel)"
-                         OnBack="@(this.OnBack)"
-                         OnContinue="@(this.OnNext)"
-                         OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
-</div>
-
-@if (this.uploadedPackage != null)
+@if (this.IsUnauthorizedExistingPackage)
 {
-    <div class="@(this.GetStepClass(2))">
-        <PublishValidationStep ViewModel="@(this.ViewModel)"
-                               UploadedFile="@(this.uploadedPackage)"
-                               OnBack="@(this.OnBack)"
-                               OnContinue="@(this.OnNext)"
-                               OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
-    </div>
-
-    <div class="@(this.GetStepClass(3))">
-        <PublishReviewStep ViewModel="@(this.ViewModel)"
-                           UploadedFile="@(this.uploadedPackage)"
-                           OnBack="@(this.OnBack)"
-                           OnPublish="@(this.PublishPackage)"
-                           OnNavigateToStep="@(this.OnNavigateToStep)"
-                           OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
-    </div>
+    return;
 }
-</div>
+
+<div class="w-full bg-background min-h-screen py-10 select-none">
+    <div class="max-w-6xl w-full mx-auto px-6 flex flex-col gap-6">
+        <div class="flex flex-col gap-1.5 w-full">
+            <h1 class="text-3xl leading-3xl font-semibold text-foreground tracking-tight">
+                Publish to Forge
+            </h1>
+            <p class="text-base leading-normal text-muted-foreground">
+                Publish a library or a model so others can discover, version and, where the format allows it, import it into their projects.
+            </p>
+            <AntiforgeryToken/>
+        </div>
+
+        <BbStepper @bind-ActiveStep="this.ActiveStep"
+                   Clickable="false"
+                   Class="w-full"
+                   IndicatorClass="stepper-bar">
+            <BbStep Title="Upload"/>
+
+            <BbStep Title="Package metadata"/>
+
+            <BbStep Title="Validation"/>
+
+            <BbStep Title="Review & publish"/>
+        </BbStepper>
+
+        <div class="@(this.GetStepClass(0))">
+            <PublishUploadStep @key="this.uploadStepKey"
+                               ViewModel="@(this.ViewModel)"
+                               OnContinue="@(this.OnUploadStepContinued)"
+                               InputId="@(UploadInputId)"/>
+        </div>
+
+        @if (this.HasStagedArtefact)
+        {
+            <div class="@(this.GetStepClass(1))">
+                <PublishMetadataStep ViewModel="@(this.ViewModel)"
+                                     Artefact="@(this.stagedArtefact)"
+                                     OnBack="@(this.OnBack)"
+                                     OnContinue="@(this.OnNext)"
+                                     OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
+            </div>
+
+            <div class="@(this.GetStepClass(2))">
+                <PublishValidationStep ViewModel="@(this.ViewModel)"
+                                       Artefact="@(this.stagedArtefact)"
+                                       OnBack="@(this.OnBack)"
+                                       OnContinue="@(this.OnNext)"
+                                       OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
+            </div>
+
+            <div class="@(this.GetStepClass(3))">
+                <PublishReviewStep ViewModel="@(this.ViewModel)"
+                                   Artefact="@(this.stagedArtefact)"
+                                   OnBack="@(this.OnBack)"
+                                   OnPublish="@(this.PublishPackage)"
+                                   OnNavigateToStep="@(this.OnNavigateToStep)"
+                                   OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
+            </div>
+        }
+    </div>
 </div>

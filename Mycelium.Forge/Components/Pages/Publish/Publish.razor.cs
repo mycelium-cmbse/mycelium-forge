@@ -12,10 +12,11 @@ namespace Mycelium.Forge.Components.Pages.Publish
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
-    using Microsoft.AspNetCore.Components.Forms;
 
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
     using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Extractors.Enums;
+    using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
@@ -25,9 +26,9 @@ namespace Mycelium.Forge.Components.Pages.Publish
     public partial class Publish : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the uploaded package archive file for validation and publishing.
+        /// The currently staged artefact UI model.
         /// </summary>
-        private IBrowserFile uploadedPackage;
+        private PublishArtefactModel stagedArtefact;
 
         /// <summary>
         /// A unique key to force re-mounting and clearing of the upload step component upon artefact replacement.
@@ -53,6 +54,18 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public DialogService DialogService { get; set; }
 
         /// <summary>
+        /// Gets or sets the optional scope segment when publishing a new version of an existing package.
+        /// </summary>
+        [Parameter]
+        public string Scope { get; set; }
+
+        /// <summary>
+        /// Gets or sets the optional package short name segment when publishing a new version of an existing package.
+        /// </summary>
+        [Parameter]
+        public string Package { get; set; }
+
+        /// <summary>
         /// Gets the HTML ID for the file input element.
         /// </summary>
         public static string UploadInputId => "publish-package-file-input";
@@ -63,10 +76,28 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public int ActiveStep { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether an artefact has been staged in the current wizard session.
+        /// </summary>
+        private bool HasStagedArtefact => this.stagedArtefact != null;
+
+        /// <summary>
+        /// Gets a value indicating whether the user is unauthorized to release a new version of the specified existing package.
+        /// </summary>
+        public bool IsUnauthorizedExistingPackage => this.ViewModel.IsExistingPackage &&
+                                                     (this.ViewModel.Package == null || !this.ViewModel.CanUserReleaseExistingPackageVersion);
+
+        /// <summary>
         /// Handles returning to the preceding wizard step.
         /// </summary>
         public void OnBack()
         {
+            // If the user is on the validation step and the staged artefact is a KPAR with an invalid manifest, return to the upload step instead of the metadata step.
+            if (this.ActiveStep == 2 && this.stagedArtefact is { Kind: ArtifactKind.Kpar, IsManifestValid: false })
+            {
+                this.ActiveStep = 0;
+                return;
+            }
+
             if (this.ActiveStep > 0)
             {
                 this.ActiveStep--;
@@ -76,35 +107,46 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <summary>
         /// Handles advancing to the next wizard step.
         /// </summary>
-        public void OnNext()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnNext()
         {
+            if (this.ActiveStep == 1)
+            {
+                await this.ViewModel.Validate();
+            }
+
             this.ActiveStep++;
+        }
+
+        /// <summary>
+        /// Handles completing the upload step and advancing to metadata or validation.
+        /// </summary>
+        /// <param name="artefact">The staged artefact UI model.</param>
+        public void OnUploadStepContinued(PublishArtefactModel artefact)
+        {
+            this.stagedArtefact = artefact;
+
+            // If the uploaded artefact is a KPAR with an invalid manifest, skip the metadata step and go directly to validation.
+            this.ActiveStep = artefact.Kind == ArtifactKind.Kpar && !artefact.IsManifestValid ? 2 : 1;
         }
 
         /// <summary>
         /// Handles replacing the currently loaded package archive artefact.
         /// </summary>
-        /// <remarks>
-        /// Reassigning <see cref="uploadStepKey" /> to a new <see cref="Guid" /> forces Blazor to re-render
-        /// and reconstruct the upload step component, resetting the native HTML file input DOM element so that
-        /// previously selected files are discarded.
-        /// </remarks>
         public void OnReplaceArtefact()
         {
-            this.uploadedPackage = null;
+            this.stagedArtefact = null;
             this.uploadStepKey = Guid.NewGuid();
-            this.ViewModel.InitializeViewModel();
             this.ActiveStep = 0;
         }
 
         /// <summary>
-        /// Executes the validation and publish submission workflow.
+        /// Executes the publish submission workflow.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task PublishPackage()
         {
-            // Issue #180: Implement package publishing workflow.
-            var result = this.ViewModel.Publish();
+            var result = await this.ViewModel.Publish();
 
             if (result.IsError)
             {
@@ -112,42 +154,35 @@ namespace Mycelium.Forge.Components.Pages.Publish
                 return;
             }
 
-            var scope = this.ViewModel.Metadata.Scope;
-            var packageName = this.ViewModel.Metadata.PackageName;
-            var version = this.ViewModel.Metadata.Version;
-
             var parameters = new Dictionary<string, object>
             {
-                { nameof(PublishedToForgeDialog.Scope), scope },
-                { nameof(PublishedToForgeDialog.PackageShortname), packageName },
-                { nameof(PublishedToForgeDialog.Version), version }
+                { nameof(PublishedToForgeDialog.Scope), this.ViewModel.SelectedScope.ShortName },
+                { nameof(PublishedToForgeDialog.PackageShortname), this.ViewModel.Package.ShortName },
+                { nameof(PublishedToForgeDialog.Version), this.ViewModel.PackageVersion.Version }
             };
 
             var options = new DialogOpenOptions
             {
                 ShowClose = false,
-                Size = DialogSize.Small
+                Size = DialogSize.Small,
+                PreventClose = true
             };
 
             await this.DialogService.OpenAsync<PublishedToForgeDialog>(parameters, options);
         }
 
         /// <summary>
-        /// Handles completing the upload step and advancing to package metadata.
-        /// </summary>
-        /// <param name="file">The uploaded file.</param>
-        public void OnUploadStepContinued(IBrowserFile file)
-        {
-            this.uploadedPackage = file;
-            this.OnNext();
-        }
-
-        /// <summary>
         /// Handles navigating directly to a specific wizard step.
         /// </summary>
         /// <param name="step">The zero-based wizard step index.</param>
-        public void OnNavigateToStep(int step)
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task OnNavigateToStep(int step)
         {
+            if (step == 2)
+            {
+                await this.ViewModel.Validate();
+            }
+
             this.ActiveStep = step;
         }
 
@@ -165,10 +200,18 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <summary>
         /// Initializes the component lifecycle and populates the view model state.
         /// </summary>
-        protected override void OnInitialized()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        protected override async Task OnInitializedAsync()
         {
-            base.OnInitialized();
-            this.ViewModel.InitializeViewModel();
+            await base.OnInitializedAsync();
+
+            if (!string.IsNullOrWhiteSpace(this.Scope) && !string.IsNullOrWhiteSpace(this.Package))
+            {
+                await this.ViewModel.InitializeViewModel(this.Scope, this.Package);
+                return;
+            }
+
+            await this.ViewModel.InitializeViewModel();
         }
     }
 }

@@ -7,131 +7,139 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 
+@using Mycelium.Forge.Models.Publish
+
 <PublishStepBase InformationCard="@(StepInformationCard)">
     <Body>
-        <ForgeFileUpload OnSelectedFilesChanged="@(this.HandleFilesSelected)"
-                         Accept="@(this.AcceptedExtensions)"
-                         InputId="@(this.InputId)"
-                         MaxFileSizeInMb="@(this.maxAllowedFileSizeInMb)"
-                         Class="w-full"/>
+    <ForgeFileUpload OnSelectedFilesChanged="@(this.HandleFilesSelected)"
+                     Accept="@(this.AcceptedExtensions)"
+                     InputId="@(this.InputId)"
+                     MaxFileSizeInMb="@(this.maxAllowedFileSizeInMb)"
+                     Class="w-full"/>
 
-        <div class="flex items-center gap-2 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                ACCEPTED
-            </span>
-            @foreach (var format in this.acceptedFormats.Keys)
-            {
-                <BbBadge @key="format"
-                         Variant="BadgeVariant.Secondary"
-                         Class="badge-format">
-                    @(format)
-                </BbBadge>
-            }
+    <div class="flex items-center gap-2 w-full">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            ACCEPTED
+        </span>
+        @foreach (var format in this.AcceptedFormats)
+        {
+            <BbBadge @key="format.Name"
+                     Variant="BadgeVariant.Secondary"
+                     Class="badge-format">
+                @(format.Name)
+            </BbBadge>
+        }
+    </div>
+
+    <p class="text-xs leading-2xs font-normal text-muted-foreground w-full">
+        Only packages up to @(this.MaxAllowedFileSize.FormatFileSize()) are supported.
+    </p>
+
+    <BbFieldError Class="form-field-error"
+                  Errors="@(this.ValidationManager[nameof(this.selectedFile)])"/>
+
+    @if (this.HasSelectedFile)
+    {
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            SELECTED FILE
+        </span>
+
+        <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
+            <LucideIcon Name="package"
+                        Size="16"
+                        Class="text-muted-foreground shrink-0"/>
+
+            <div class="flex flex-col gap-1 flex-1 min-w-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="font-mono text-sm leading-normal text-foreground truncate">
+                        @(this.selectedFile.Name)
+                    </span>
+                    @if (!string.IsNullOrEmpty(this.GetSelectedModelType()))
+                    {
+                        <BbBadge Variant="BadgeVariant.Secondary"
+                                 Class="badge-format">
+                            @(this.GetSelectedModelType())
+                        </BbBadge>
+                    }
+                </div>
+                <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                    @(this.selectedFile.Size.FormatFileSize()) &bull; @(this.GetSelectedModelTypeSummary())
+                </span>
+            </div>
         </div>
 
-        <p class="text-xs leading-2xs font-normal text-muted-foreground w-full">
-            Only packages up to @(this.MaxAllowedFileSize.FormatFileSize()) are supported.
-        </p>
-
-        @if (this.HasSelectedFile)
+        @if (this.RequiresModelTypeSelection())
         {
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                SELECTED FILE
-            </span>
-
-            <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
-                <LucideIcon Name="package"
-                            Size="16"
-                            Class="text-muted-foreground shrink-0"/>
-
-                <div class="flex flex-col gap-1 flex-1 min-w-0">
-                    <div class="flex items-center gap-2.5">
-                        <span class="font-mono text-sm leading-normal text-foreground truncate">
-                            @(this.selectedFile.Name)
-                        </span>
-                        @if (!string.IsNullOrEmpty(this.GetSelectedModelType()))
+            <BbField Class="w-full flex flex-col gap-4"
+                     IsInvalid="@(this.ValidationManager.HasError(nameof(this.selectedFormat)))">
+                <BbFieldLabel For="publish-model-type"
+                              Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    SELECT MODEL TYPE
+                </BbFieldLabel>
+                <BbFieldContent>
+                    <BbToggleGroup TValue="SupportedPackageFormat"
+                                   Value="@(this.selectedFormat)"
+                                   ValueChanged="@(this.HandleFormatChanged)"
+                                   Type="ToggleGroupType.Single"
+                                   Variant="ToggleVariant.Outline"
+                                   Size="ToggleSize.Small"
+                                   Required="true"
+                                   id="publish-model-type"
+                                   Class="w-fit">
+                        @foreach (var format in this.GetMatchingFormats())
                         {
-                            <BbBadge Variant="BadgeVariant.Secondary"
-                                     Class="badge-format">
-                                @(this.GetSelectedModelType())
-                            </BbBadge>
+                            <BbToggleGroupItem @key="format.Name"
+                                               Value="@(format)"
+                                               Class="cursor-pointer">
+                                @(format.Name)
+                            </BbToggleGroupItem>
                         }
-                    </div>
-                    <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                        @(this.selectedFile.Size.FormatFileSize()) &bull; @(this.GetSelectedModelTypeSummary())
-                    </span>
-                </div>
-            </div>
-
-            @if (this.RequiresModelTypeSelection())
-            {
-                <BbField Class="w-full flex flex-col gap-4">
-                    <BbFieldLabel For="publish-model-type"
-                                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        SELECT MODEL TYPE
-                    </BbFieldLabel>
-                    <BbFieldContent>
-                        <BbToggleGroup TValue="string"
-                                       Value="@(this.selectedAmbiguousModelType)"
-                                       ValueChanged="@(this.HandleModelSelectionChanged)"
-                                       Type="ToggleGroupType.Single"
-                                       Variant="ToggleVariant.Outline"
-                                       Size="ToggleSize.Small"
-                                       Required="true"
-                                       id="publish-model-type"
-                                       Class="w-fit">
-                            @foreach (var modelType in this.GetMatchingModelTypes())
-                            {
-                                <BbToggleGroupItem @key="modelType"
-                                                   Value="@(modelType)"
-                                                   Class="cursor-pointer">
-                                    @(modelType)
-                                </BbToggleGroupItem>
-                            }
-                        </BbToggleGroup>
-                    </BbFieldContent>
-                    <BbFieldDescription Class="text-xs leading-2xs font-normal text-muted-foreground">
-                        A @(Path.GetExtension(this.selectedFile.Name)) archive can contain @(string.Join(" or ", this.GetMatchingModelTypes())) model. Select the model type of your package.
-                    </BbFieldDescription>
-                </BbField>
-            }
-
-            @if (!string.IsNullOrEmpty(this.GetSelectedModelType()))
-            {
-                <div class="flex items-start gap-2 w-full">
-                    <LucideIcon Name="circle-check"
-                                Size="14"
-                                Class="text-success-vivid shrink-0 mt-0.5"/>
-                    <p class="text-xs leading-2xs font-normal text-foreground-muted flex-1">
-                        @if (this.RequiresModelTypeSelection())
-                        {
-                            <span>Name, version, licence and dependencies must be entered manually on the next step.</span>
-                        }
-                        else
-                        {
-                            <span>Model type detected from the archive manifest. Name, version, licence and dependencies are read from it on the next step, not typed by hand.</span>
-                        }
-                    </p>
-                </div>
-            }
+                    </BbToggleGroup>
+                </BbFieldContent>
+                <BbFieldError Class="form-field-error"
+                              Errors="@(this.ValidationManager[nameof(this.selectedFormat)])"/>
+                <BbFieldDescription Class="text-xs leading-2xs font-normal text-muted-foreground">
+                    A @(Path.GetExtension(this.selectedFile.Name)) archive can contain @(string.Join(" or ", this.GetMatchingFormats().Select(x => x.Name))) model. Select the model type of your package.
+                </BbFieldDescription>
+            </BbField>
         }
 
-        @if (this.isUploading)
+        @if (!string.IsNullOrEmpty(this.GetSelectedModelType()))
         {
-            <div class="w-full flex items-center gap-2 p-3.5 sm:px-4 rounded-lg bg-card border border-border text-xs leading-2xs text-muted-foreground">
-                <LucideIcon Name="loader-circle"
-                            Size="16"
-                            Class="animate-spin text-primary shrink-0"/>
-                <span class="font-medium text-foreground">Processing package...</span>
+            <div class="flex items-start gap-2 w-full">
+                <LucideIcon Name="circle-check"
+                            Size="14"
+                            Class="text-success-vivid shrink-0 mt-0.5"/>
+                <p class="text-xs leading-2xs font-normal text-foreground-muted flex-1">
+                    @if (this.RequiresModelTypeSelection())
+                    {
+                        <span>Name, version, licence and dependencies must be entered manually on the next step.</span>
+                    }
+                    else
+                    {
+                        <span>Model type detected from the archive manifest. Name, version, licence and dependencies are read from it on the next step, not typed by hand.</span>
+                    }
+                </p>
             </div>
         }
+    }
+
+    @if (this.isUploading)
+    {
+        <div class="w-full flex items-center gap-2 p-3.5 sm:px-4 rounded-lg bg-card border border-border text-xs leading-2xs text-muted-foreground">
+            <LucideIcon Name="loader-circle"
+                        Size="16"
+                        Class="animate-spin text-primary shrink-0"/>
+            <span class="font-medium text-foreground">Processing package...</span>
+        </div>
+    }
     </Body>
 
     <Footer>
         <PublishStepFooter FootnoteText="Nothing is published until you confirm on the last step."
                            ContinueText="Continue to metadata"
                            ContinueId="publish-continue-button"
-                           IsContinueDisabled="@(this.IsContinueDisabled())"
+                           IsContinueDisabled="@(this.isUploading)"
                            OnContinue="@(this.HandleContinue)"/>
     </Footer>
 </PublishStepBase>

@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishValidationStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -9,145 +9,145 @@
 
 <PublishStepBase InformationCard="@(StepInformationCard)">
     <Body>
-        <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
-            <LucideIcon Name="package"
-                        Size="16"
-                        Class="text-muted-foreground shrink-0"/>
+    <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
+        <LucideIcon Name="package"
+                    Size="16"
+                    Class="text-muted-foreground shrink-0"/>
 
-            <div class="flex flex-col gap-1 flex-1 min-w-0">
-                <div class="flex items-center gap-2.5">
-                    <span class="font-mono text-sm leading-normal text-foreground truncate">
-                        @(this.ViewModel.Metadata.ArtefactFileName)
-                    </span>
-                    <BbBadge Variant="BadgeVariant.Secondary"
-                             Class="badge-format">
-                        @(this.ViewModel.Metadata.ArtefactFormat)
-                    </BbBadge>
-                </div>
-                <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                    @(this.UploadedFile.Size.FormatFileSize()) &bull; Detected @(this.ViewModel.Metadata.ArtefactFormat)
+        <div class="flex flex-col gap-1 flex-1 min-w-0">
+            <div class="flex items-center gap-2.5">
+                <span class="font-mono text-sm leading-normal text-foreground truncate">
+                    @(this.Artefact.FileName)
                 </span>
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="badge-format">
+                    @(this.Artefact.Format)
+                </BbBadge>
             </div>
-
-            @if (this.HasFailures)
-            {
-                <BbButton Variant="ButtonVariant.Link"
-                          Type="ButtonType.Button"
-                          id="publish-validation-replace-button"
-                          OnClick="@(this.OnReplaceArtefact)"
-                          Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
-                    Replace
-                </BbButton>
-            }
+            <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                @(this.Artefact.SizeInBytes.FormatFileSize()) &bull; Detected @(this.Artefact.Format)
+            </span>
         </div>
 
         @if (this.HasFailures)
         {
-            <div class="w-full p-4 rounded-lg bg-destructive/10 border border-destructive/40 flex items-center gap-3.5">
-                <div class="w-8 h-8 rounded-full bg-background flex items-center justify-center shrink-0">
-                    <LucideIcon Name="circle-x"
-                                Size="16"
-                                Class="text-destructive shrink-0"/>
-                </div>
-
-                <div class="flex flex-col gap-1 flex-1 min-w-0">
-                    <span class="text-md leading-sm font-semibold text-foreground">
-                        Pre-publish validation failed
-                    </span>
-                    <span class="text-sm leading-xs font-normal text-muted-foreground">
-                        @(this.GetValidationSubText())
-                    </span>
-                </div>
-
-                <span class="text-xs leading-2xs font-medium text-muted-foreground shrink-0">
-                    @(this.GetValidationCountsText())
-                </span>
-            </div>
-        }
-        else
-        {
-            <div class="w-full p-4 rounded-lg bg-background border border-border flex items-center gap-3.5">
-                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <LucideIcon Name="check"
-                                Size="14"
-                                Class="text-primary shrink-0"/>
-                </div>
-
-                <div class="flex flex-col gap-1 flex-1 min-w-0">
-                    <span class="text-md leading-sm font-semibold text-foreground">
-                        Pre-publish validation passed
-                    </span>
-                    <span class="text-sm leading-xs font-normal text-muted-foreground">
-                        @(this.GetValidationSubText())
-                    </span>
-                </div>
-
-                <span class="text-xs leading-2xs font-medium text-muted-foreground shrink-0">
-                    @(this.GetValidationCountsText())
-                </span>
-            </div>
-        }
-
-        <div class="flex items-center justify-between gap-2.5 w-full pt-1">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                VALIDATION CHECKS
-            </span>
-
             <BbButton Variant="ButtonVariant.Link"
                       Type="ButtonType.Button"
-                      id="publish-validation-rerun-button"
-                      OnClick="@(this.HandleReRun)"
+                      id="publish-validation-replace-button"
+                      OnClick="@(this.OnReplaceArtefact)"
                       Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
-                Re-run
+                Replace
             </BbButton>
+        }
+    </div>
+
+    @if (this.HasFailures)
+    {
+        <div class="w-full p-4 rounded-lg bg-destructive/10 border border-destructive/40 flex items-center gap-3.5">
+            <div class="w-8 h-8 rounded-full bg-background flex items-center justify-center shrink-0">
+                <LucideIcon Name="circle-x"
+                            Size="16"
+                            Class="text-destructive shrink-0"/>
+            </div>
+
+            <div class="flex flex-col gap-1 flex-1 min-w-0">
+                <span class="text-md leading-sm font-semibold text-foreground">
+                    Pre-publish validation failed
+                </span>
+                <span class="text-sm leading-xs font-normal text-muted-foreground">
+                    @(this.GetValidationSubText())
+                </span>
+            </div>
+
+            <span class="text-xs leading-2xs font-medium text-muted-foreground shrink-0">
+                @(this.GetValidationCountsText())
+            </span>
         </div>
+    }
+    else
+    {
+        <div class="w-full p-4 rounded-lg bg-background border border-border flex items-center gap-3.5">
+            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <LucideIcon Name="check"
+                            Size="14"
+                            Class="text-primary shrink-0"/>
+            </div>
 
-        <div class="flex flex-col w-full">
-            @foreach (var check in this.ViewModel.ValidationChecks)
-            {
-                <div @key="check.Title"
-                     class="@(check.Status == ValidationStatus.Fail ? "w-full flex items-start gap-3 p-3 my-1 rounded-md bg-destructive/10 border-t border-border" : "w-full flex items-start gap-3 py-3.5 border-t border-border")">
-                    @if (check.Status == ValidationStatus.Pass)
-                    {
-                        <LucideIcon Name="check"
-                                    Size="16"
-                                    Class="text-success-vivid shrink-0 mt-0.5"/>
-                    }
-                    else if (check.Status == ValidationStatus.Fail)
-                    {
-                        <LucideIcon Name="circle-x"
-                                    Size="16"
-                                    Class="text-destructive shrink-0 mt-0.5"/>
-                    }
-                    else
-                    {
-                        <LucideIcon Name="triangle-alert"
-                                    Size="16"
-                                    Class="text-warning-vivid shrink-0 mt-0.5"/>
-                    }
+            <div class="flex flex-col gap-1 flex-1 min-w-0">
+                <span class="text-md leading-sm font-semibold text-foreground">
+                    Pre-publish validation passed
+                </span>
+                <span class="text-sm leading-xs font-normal text-muted-foreground">
+                    @(this.GetValidationSubText())
+                </span>
+            </div>
 
-                    <div class="flex flex-col gap-0.5 flex-1 min-w-0">
-                        <span class="text-sm leading-xs font-semibold text-foreground">
-                            @(check.Title)
+            <span class="text-xs leading-2xs font-medium text-muted-foreground shrink-0">
+                @(this.GetValidationCountsText())
+            </span>
+        </div>
+    }
+
+    <div class="flex items-center justify-between gap-2.5 w-full pt-1">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            VALIDATION CHECKS
+        </span>
+
+        <BbButton Variant="ButtonVariant.Link"
+                  Type="ButtonType.Button"
+                  id="publish-validation-rerun-button"
+                  OnClick="@(this.HandleReRun)"
+                  Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
+            Re-run
+        </BbButton>
+    </div>
+
+    <div class="flex flex-col w-full">
+        @foreach (var check in this.ViewModel.ValidationChecks)
+        {
+            <div @key="check"
+                 class="@(GetCheckRowClass(check.Status))">
+                @if (check.Status == ValidationStatus.Pass)
+                {
+                    <LucideIcon Name="check"
+                                Size="16"
+                                Class="text-success-vivid shrink-0 mt-0.5"/>
+                }
+                else if (check.Status == ValidationStatus.Fail)
+                {
+                    <LucideIcon Name="circle-x"
+                                Size="16"
+                                Class="text-destructive shrink-0 mt-0.5"/>
+                }
+                else
+                {
+                    <LucideIcon Name="triangle-alert"
+                                Size="16"
+                                Class="text-warning-vivid shrink-0 mt-0.5"/>
+                }
+
+                <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                    <span class="text-sm leading-xs font-semibold text-foreground">
+                        @(check.Title)
+                    </span>
+                    <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                        @(check.Detail)
+                    </span>
+                    @if (check.Status == ValidationStatus.Fail)
+                    {
+                        <span class="text-xs leading-2xs font-medium text-destructive pt-0.5">
+                            @(check.Recommendation)
                         </span>
-                        <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                            @(this.GetCheckDescription(check))
-                        </span>
-                        @if (check.Status == ValidationStatus.Fail)
-                        {
-                            <span class="text-xs leading-2xs font-medium text-destructive pt-0.5">
-                               @(this.GetCheckFixRecommendation(check))
-                            </span>
-                        }
-                    </div>
-
-                    <BbBadge Variant="@(GetValidationBadgeVariant(check.Status))"
-                             Class="shrink-0 text-xs leading-2xs font-medium">
-                        @(check.Status)
-                    </BbBadge>
+                    }
                 </div>
-            }
-        </div>
+
+                <BbBadge Variant="@(GetValidationBadgeVariant(check.Status))"
+                         Class="shrink-0 text-xs leading-2xs font-medium">
+                    @(check.Status)
+                </BbBadge>
+            </div>
+        }
+    </div>
     </Body>
 
     <Footer>
@@ -156,8 +156,7 @@
                            BackId="publish-back-to-metadata-button"
                            ContinueText="Continue to review"
                            ContinueId="publish-continue-to-review-button"
-                           IsContinueDisabled="@(this.HasFailures)"
                            OnBack="@(this.OnBack)"
-                           OnContinue="@(this.OnContinue)"/>
+                           OnContinue="@(this.HandleContinue)"/>
     </Footer>
 </PublishStepBase>

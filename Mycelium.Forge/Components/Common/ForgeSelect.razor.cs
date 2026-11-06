@@ -185,6 +185,15 @@ namespace Mycelium.Forge.Components.Common
         /// <returns>The combined CSS class string.</returns>
         public string GetItemClass(TValue item)
         {
+            if (this.IsItemDisabled(item))
+            {
+                const string disabledItemClass = "px-3 py-1.5 text-left text-sm text-muted-foreground opacity-50 cursor-not-allowed select-none";
+               
+                return string.IsNullOrWhiteSpace(this.ItemClass) 
+                    ? disabledItemClass
+                    : $"{disabledItemClass} {this.ItemClass}";
+            }
+
             var isSelected = EqualityComparer<TValue>.Default.Equals(item, this.Value);
 
             const string filterItemBase = "px-3 py-1.5 text-left text-sm hover:bg-muted transition-colors cursor-pointer";

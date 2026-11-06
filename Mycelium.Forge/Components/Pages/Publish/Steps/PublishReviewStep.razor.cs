@@ -10,11 +10,12 @@
 namespace Mycelium.Forge.Components.Pages.Publish.Steps
 {
     using Microsoft.AspNetCore.Components;
-    using Microsoft.AspNetCore.Components.Forms;
 
     using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
     /// <summary>
@@ -40,6 +41,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         };
 
         /// <summary>
+        /// Gets the validation manager handling field validation states for the review form.
+        /// </summary>
+        public ValidationManager ValidationManager { get; } = new();
+
+        /// <summary>
         /// Gets or sets the view model for the package publishing page.
         /// </summary>
         [Parameter]
@@ -47,11 +53,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public IPublishViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the uploaded package archive file for sizing and metadata display.
+        /// Gets or sets the staged artefact UI model.
         /// </summary>
         [Parameter]
         [EditorRequired]
-        public IBrowserFile UploadedFile { get; set; }
+        public PublishArtefactModel Artefact { get; set; }
 
         /// <summary>
         /// Gets or sets the callback invoked when navigating back to the validation step.
@@ -83,9 +89,78 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public bool IsAcknowledged { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the publish action is disabled.
+        /// Handles changes to the registry compliance acknowledgment checkbox.
         /// </summary>
-        public bool IsPublishDisabled => !this.IsAcknowledged || this.ViewModel.IsPublishing;
+        /// <param name="isAcknowledged">The new checkbox state.</param>
+        public void OnAcknowledgmentChanged(bool isAcknowledged)
+        {
+            this.IsAcknowledged = isAcknowledged;
+            this.ValidationManager.ClearError(nameof(this.IsAcknowledged));
+        }
+
+        /// <summary>
+        /// Handles initiating package publication after validating acknowledgment of registry terms.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task HandlePublish()
+        {
+            if (this.ViewModel.IsPublishing)
+            {
+                return;
+            }
+
+            var isValid = this.ValidationManager
+                .Check(nameof(this.IsAcknowledged), this.IsAcknowledged, "Please confirm that the package complies with the registry terms.")
+                .IsValid;
+
+            if (!isValid)
+            {
+                return;
+            }
+
+            await this.OnPublish.InvokeAsync();
+        }
+
+        /// <summary>
+        /// Gets the formatted `@scope/packageName` coordinate string for display.
+        /// </summary>
+        /// <returns>The formatted package coordinate string.</returns>
+        public string GetScopePackageCoordinate()
+        {
+            return $"{this.ViewModel.SelectedScope.GetDisplayShortName()}/{this.ViewModel.Package.ShortName}";
+        }
+
+        /// <summary>
+        /// Gets the formatted license text or "None" when unspecified.
+        /// </summary>
+        /// <returns>The license display string.</returns>
+        public string GetLicenseText()
+        {
+            return string.IsNullOrWhiteSpace(this.ViewModel.Package.License) ? "None" : this.ViewModel.Package.License;
+        }
+
+        /// <summary>
+        /// Gets the comma-separated tags display text or "None" when empty.
+        /// </summary>
+        /// <returns>The tags display string.</returns>
+        public string GetTagsText()
+        {
+            return this.ViewModel.Package.Tags is { Count: > 0 } ? string.Join(", ", this.ViewModel.Package.Tags) : "None";
+        }
+
+        /// <summary>
+        /// Gets the comma-separated dependencies display text or "None" when empty.
+        /// </summary>
+        /// <returns>The dependencies display string.</returns>
+        public string GetDependenciesText()
+        {
+            if (this.ViewModel.PackageMetaData.Dependencies is not { Count: > 0 })
+            {
+                return "None";
+            }
+
+            return string.Join(", ", this.ViewModel.PackageMetaData.Dependencies.Select(d => string.IsNullOrWhiteSpace(d.Summary) ? d.Name : $"{d.Name} {d.Summary}"));
+        }
 
         /// <summary>
         /// Gets the human-readable summary of the validation status outcome.

@@ -9,11 +9,15 @@
 
 namespace Mycelium.Forge.Components.Pages.Publish.Steps
 {
+    using ErrorOr;
+
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Forms;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Publish;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
     /// <summary>
@@ -39,14 +43,9 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         };
 
         /// <summary>
-        /// The dictionary mapping human-readable model types to supported file extensions.
+        /// Backing field indicating whether an upload operation is currently in progress.
         /// </summary>
-        private readonly Dictionary<string, string> acceptedFormats = new()
-        {
-            { "SysML v2 (kpar)", ".kpar" },
-            { "ECSS-E-TM-10-25", ".zip" },
-            { "Capella", ".zip" }
-        };
+        private bool isUploading;
 
         /// <summary>
         /// The maximum allowed upload file size in megabytes.
@@ -59,19 +58,9 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         private IBrowserFile selectedFile;
 
         /// <summary>
-        /// The user-selected model type when an ambiguous archive extension with multiple models is uploaded.
+        /// The resolved or selected format of the uploaded archive.
         /// </summary>
-        private string selectedAmbiguousModelType = string.Empty;
-
-        /// <summary>
-        /// Backing field indicating whether an upload operation is currently in progress.
-        /// </summary>
-        private bool isUploading;
-
-        /// <summary>
-        /// The maximum allowed upload file size in bytes.
-        /// </summary>
-        private long MaxAllowedFileSize => this.maxAllowedFileSizeInMb * 1024 * 1024;
+        private SupportedPackageFormat selectedFormat;
 
         /// <summary>
         /// Gets or sets the application configuration.
@@ -80,32 +69,64 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public IConfiguration Configuration { get; set; }
 
         /// <summary>
+        /// Gets or sets the JavaScript interop service.
+        /// </summary>
+        [Inject]
+        public IJsInterop JsInterop { get; set; }
+
+        /// <summary>
+        /// Gets or sets the notification service.
+        /// </summary>
+        [Inject]
+        public INotificationService NotificationService { get; set; }
+
+        /// <summary>
         /// Gets or sets the view model for the package publishing page.
         /// </summary>
         [Parameter]
+        [EditorRequired]
         public IPublishViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets the comma-separated list of accepted file extensions.
-        /// </summary>
-        private string AcceptedExtensions => string.Join(",", this.acceptedFormats.Values.Distinct());
-
-        /// <summary>
-        /// Gets a value indicating whether a file is currently selected.
-        /// </summary>
-        private bool HasSelectedFile => this.selectedFile != null;
-
-        /// <summary>
-        /// Gets or sets the callback invoked when the user proceeds to the next step.
+        /// Gets or sets the callback invoked when the user proceeds to the next step with the staged artefact details.
         /// </summary>
         [Parameter]
-        public EventCallback<IBrowserFile> OnContinue { get; set; }
+        public EventCallback<PublishArtefactModel> OnContinue { get; set; }
 
         /// <summary>
         /// Gets or sets the HTML ID applied to the dropzone file input element.
         /// </summary>
         [Parameter]
         public string InputId { get; set; } = "publish-package-file-input";
+
+        /// <summary>
+        /// Gets the validation manager handling field validation states for the upload form.
+        /// </summary>
+        public ValidationManager ValidationManager { get; } = new();
+
+        /// <summary>
+        /// The maximum allowed upload file size in bytes.
+        /// </summary>
+        private long MaxAllowedFileSize => this.maxAllowedFileSizeInMb * 1024 * 1024;
+
+        /// <summary>
+        /// Gets the comma-separated list of accepted file extensions.
+        /// </summary>
+        private string AcceptedExtensions => this.ViewModel.ExpectedFormat != null
+            ? this.ViewModel.ExpectedFormat.Extension
+            : string.Join(",", SupportedPackageFormat.All.Select(x => x.Extension).Distinct());
+
+        /// <summary>
+        /// Gets the list of accepted package formats.
+        /// </summary>
+        private IReadOnlyList<SupportedPackageFormat> AcceptedFormats => this.ViewModel.ExpectedFormat != null
+            ? [this.ViewModel.ExpectedFormat]
+            : SupportedPackageFormat.All;
+
+        /// <summary>
+        /// Gets a value indicating whether a file is currently selected.
+        /// </summary>
+        private bool HasSelectedFile => this.selectedFile != null;
 
         /// <summary>
         /// Initializes the component lifecycle and resolves configured upload limits.
@@ -119,30 +140,19 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         }
 
         /// <summary>
-        /// Determines whether advancing to the next step is disabled.
-        /// </summary>
-        /// <returns><c>true</c> if continue is disabled; otherwise, <c>false</c>.</returns>
-        private bool IsContinueDisabled()
-        {
-            return !this.HasSelectedFile ||
-                   this.isUploading || 
-                   (this.RequiresModelTypeSelection() && string.IsNullOrWhiteSpace(this.selectedAmbiguousModelType));
-        }
-
-        /// <summary>
         /// Determines whether the selected file has multiple matching model types requiring explicit user selection.
         /// </summary>
         /// <returns><c>true</c> if multiple model types share the file extension; otherwise, <c>false</c>.</returns>
         private bool RequiresModelTypeSelection()
         {
-            return this.GetMatchingModelTypes().Count > 1;
+            return this.ViewModel.ExpectedFormat == null && this.GetMatchingFormats().Count > 1;
         }
 
         /// <summary>
-        /// Gets the list of supported model types that match the extension of the selected file.
+        /// Gets the list of supported formats that match the extension of the selected file.
         /// </summary>
-        /// <returns>A collection of matching model type names.</returns>
-        private IReadOnlyList<string> GetMatchingModelTypes()
+        /// <returns>A collection of matching <see cref="SupportedPackageFormat" /> instances.</returns>
+        private IReadOnlyList<SupportedPackageFormat> GetMatchingFormats()
         {
             if (this.selectedFile == null)
             {
@@ -150,13 +160,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             }
 
             var extension = Path.GetExtension(this.selectedFile.Name);
-
-            if (string.IsNullOrEmpty(extension))
-            {
-                return [];
-            }
-
-            return [.. this.acceptedFormats.Where(x => x.Value.Equals(extension, StringComparison.OrdinalIgnoreCase)).Select(x => x.Key)];
+            return [.. SupportedPackageFormat.All.Where(x => x.Extension.Equals(extension, StringComparison.OrdinalIgnoreCase))];
         }
 
         /// <summary>
@@ -165,43 +169,25 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>The summary description text.</returns>
         private string GetSelectedModelTypeSummary()
         {
-            var modelType = this.GetSelectedModelType();
-
-            if (string.IsNullOrEmpty(modelType))
+            if (this.selectedFormat == null)
             {
-                return "Model type selection required";
+                return this.GetMatchingFormats().Count > 0
+                    ? "Model type selection required"
+                    : "Unsupported format";
             }
 
             return this.RequiresModelTypeSelection()
-                ? $"Selected {modelType}"
-                : $"Detected {modelType}";
+                ? $"Selected {this.selectedFormat.Name}"
+                : $"Detected {this.selectedFormat.Name}";
         }
 
         /// <summary>
-        /// Gets the detected or selected model type of the currently selected file.
+        /// Gets the detected or selected model type name of the currently selected file.
         /// </summary>
         /// <returns>The human-readable model type name or file extension.</returns>
         private string GetSelectedModelType()
         {
-            if (this.selectedFile == null)
-            {
-                return string.Empty;
-            }
-
-            var matches = this.GetMatchingModelTypes();
-
-            if (matches.Count > 1)
-            {
-                return this.selectedAmbiguousModelType;
-            }
-
-            if (matches.Count == 1)
-            {
-                return matches[0];
-            }
-
-            var extension = Path.GetExtension(this.selectedFile.Name);
-            return !string.IsNullOrEmpty(extension) ? extension : "unknown";
+            return this.selectedFormat?.Name ?? Path.GetExtension(this.selectedFile.Name);
         }
 
         /// <summary>
@@ -210,38 +196,101 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <param name="files">The list of selected files.</param>
         private void HandleFilesSelected(IReadOnlyList<IBrowserFile> files)
         {
-            if (files is { Count: > 0 })
-            {
-                this.selectedFile = files[0];
-                this.selectedAmbiguousModelType = string.Empty;
-            }
+            this.selectedFile = files is { Count: > 0 } ? files[0] : null;
+            var matches = this.GetMatchingFormats();
+            this.selectedFormat = this.ViewModel.ExpectedFormat ?? (matches.Count == 1 ? matches[0] : null);
+            this.ValidationManager.ClearError(nameof(this.selectedFile));
+            this.ValidationManager.ClearError(nameof(this.selectedFormat));
         }
 
         /// <summary>
         /// Handles the format change event from the model type selector toggle group.
         /// </summary>
-        /// <param name="modelType">The selected model type string.</param>
-        private void HandleModelSelectionChanged(string modelType)
+        /// <param name="format">The selected format.</param>
+        private void HandleFormatChanged(SupportedPackageFormat format)
         {
-            this.selectedAmbiguousModelType = modelType ?? string.Empty;
+            this.selectedFormat = format;
+            this.ValidationManager.ClearError(nameof(this.selectedFormat));
         }
 
         /// <summary>
-        /// Handles the continue to metadata button click.
+        /// Validates the currently selected file and format.
+        /// </summary>
+        /// <returns>A <see cref="Result.Success" /> if valid; otherwise, a validation <see cref="Error" /> with description.</returns>
+        private ErrorOr<Success> ValidateSelectedFile()
+        {
+            if (!this.HasSelectedFile)
+            {
+                return Error.Validation(description: "Please select an archive file to upload.");
+            }
+
+            if (this.selectedFile.Size > this.MaxAllowedFileSize)
+            {
+                return Error.Validation(description: $"The selected file exceeds the maximum allowed file size of {this.maxAllowedFileSizeInMb} MB.");
+            }
+
+            if (this.ViewModel.ExpectedFormat != null && this.selectedFormat != this.ViewModel.ExpectedFormat)
+            {
+                return Error.Validation(description: $"Only {this.ViewModel.ExpectedFormat.Name} ({this.ViewModel.ExpectedFormat.Extension}) archives can be uploaded for this package.");
+            }
+
+            if (this.ViewModel.ExpectedFormat == null && this.GetMatchingFormats().Count == 0)
+            {
+                return Error.Validation(description: "The selected archive format is not supported.");
+            }
+
+            return Result.Success;
+        }
+
+        /// <summary>
+        /// Handles the continue to metadata button click by staging the file over HTTP and extracting its manifest.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task HandleContinue()
         {
+            if (this.isUploading)
+            {
+                return;
+            }
+
+            var fileValidation = this.ValidateSelectedFile();
+
+            var isValid = this.ValidationManager
+                .Check(nameof(this.selectedFile), !fileValidation.IsError, fileValidation.FirstError.Description)
+                .Check(nameof(this.selectedFormat), this.selectedFormat != null, "Please select the model type for this archive.")
+                .IsValid;
+
+            if (!isValid)
+            {
+                return;
+            }
+
             this.isUploading = true;
 
-            this.ViewModel.Metadata = new PublishPackageMetadataModel
+            try
             {
-                ArtefactFileName = this.selectedFile.Name,
-                ArtefactFormat = this.GetSelectedModelType()
-            };
+                var uploadToken = await this.JsInterop.UploadLargeFile(this.InputId, ApiRoutes.UploadFileForStage);
+                var isManifestValid = await this.ViewModel.ExtractManifest(uploadToken, this.selectedFormat!.Kind);
 
-            await this.OnContinue.InvokeAsync(this.selectedFile);
-            this.isUploading = false;
+                var artefact = new PublishArtefactModel
+                {
+                    FileName = this.selectedFile.Name,
+                    Format = this.selectedFormat.Name,
+                    SizeInBytes = this.selectedFile.Size,
+                    Kind = this.selectedFormat.Kind,
+                    IsManifestValid = isManifestValid
+                };
+
+                await this.OnContinue.InvokeAsync(artefact);
+            }
+            catch (Exception exception)
+            {
+                this.NotificationService.AddNotification(exception.Message, "Upload failed", NotificationType.Error);
+            }
+            finally
+            {
+                this.isUploading = false;
+            }
         }
     }
 }

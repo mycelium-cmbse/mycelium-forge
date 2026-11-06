@@ -39,6 +39,11 @@ namespace Mycelium.Forge.Common
         long SizeInBytes { get; set; }
 
         /// <summary>
+        /// Gets or sets the SHA-256 checksum of the binary artifact.
+        /// </summary>
+        string Checksum { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this specific package version is deprecated.
         /// </summary>
         /// <remarks>

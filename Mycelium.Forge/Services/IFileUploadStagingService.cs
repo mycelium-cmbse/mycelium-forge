@@ -23,7 +23,8 @@ namespace Mycelium.Forge.Services
         Task<string> StageAsync(Stream inputStream, CancellationToken token = default);
 
         /// <summary>
-        /// Opens a seekable read stream for the specified staged upload token.
+        /// Opens a seekable read stream for the specified staged upload token. The staged file and its token are kept until
+        /// <see cref="Cleanup" /> is called.
         /// </summary>
         /// <param name="uploadToken">The unique upload token identifying the staged file.</param>
         /// <returns>A readable <see cref="Stream" /> representing the staged package file.</returns>

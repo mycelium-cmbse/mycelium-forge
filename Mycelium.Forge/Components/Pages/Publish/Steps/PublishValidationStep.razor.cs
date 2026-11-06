@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishValidationStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,11 +12,9 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
     using BlazorBlueprint.Components;
 
     using Microsoft.AspNetCore.Components;
-    using Microsoft.AspNetCore.Components.Forms;
 
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Publish;
-    using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.ViewModels.Publish;
 
     /// <summary>
@@ -49,11 +47,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public IPublishViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the uploaded package archive file for metadata and sizing.
+        /// Gets or sets the staged artefact UI model.
         /// </summary>
         [Parameter]
         [EditorRequired]
-        public IBrowserFile UploadedFile { get; set; }
+        public PublishArtefactModel Artefact { get; set; }
 
         /// <summary>
         /// Gets or sets the callback invoked when returning to the package metadata step.
@@ -101,12 +99,38 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         }
 
         /// <summary>
+        /// Resolves the CSS class string for a validation check row based on its status.
+        /// </summary>
+        /// <param name="status">The validation check status outcome.</param>
+        /// <returns>The CSS class string for the row container.</returns>
+        public static string GetCheckRowClass(ValidationStatus status)
+        {
+            return status == ValidationStatus.Fail
+                ? "w-full flex items-start gap-3 p-3 my-1 rounded-md bg-destructive/10 border-t border-border"
+                : "w-full flex items-start gap-3 py-3.5 border-t border-border";
+        }
+
+        /// <summary>
         /// Handles re-running pre-publish validation checks.
         /// </summary>
-        public void HandleReRun()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task HandleReRun()
         {
-            // TODO: Replace with live package archive validation once backend validation service is implemented.
-            this.ViewModel.InitializeViewModel();
+            await this.ViewModel.Validate();
+        }
+
+        /// <summary>
+        /// Handles advancing to the review step after verifying that all blocking validation checks have passed.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task HandleContinue()
+        {
+            if (this.HasFailures)
+            {
+                return;
+            }
+
+            await this.OnContinue.InvokeAsync();
         }
 
         /// <summary>
@@ -134,8 +158,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>A formatted string indicating the warning count.</returns>
         public string GetWarningsTitle()
         {
-            var count = this.ViewModel.ValidationChecks.Count(x => x.Status != ValidationStatus.Pass && x.Status != ValidationStatus.Fail);
-            return count == 1 ? "1 warning" : $"{count} warnings";
+            return this.WarningCount == 1 ? "1 warning" : $"{this.WarningCount} warnings";
         }
 
         /// <summary>
@@ -172,46 +195,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             return count == 0
                 ? "All pre-publish checks completed successfully."
                 : $"{count} {(count == 1 ? "warning does" : "warnings do")} not block publishing, but review them below.";
-        }
-
-        /// <summary>
-        /// Resolves the explanatory description for a validation rule check item.
-        /// </summary>
-        /// <param name="check">The validation check evaluation model.</param>
-        /// <returns>The detailed description for the check.</returns>
-        public string GetCheckDescription(ValidationCheckModel check)
-        {
-            if (!string.IsNullOrWhiteSpace(check.Detail))
-            {
-                return check.Detail;
-            }
-
-            return check.Title switch
-            {
-                "Schema validation" => "Archive structure and manifests conform to specification.",
-                "Namespace uniqueness" => "Package identifier is available in the selected scope.",
-                "Required metadata" => "All mandatory manifest fields are present and valid.",
-                "Dependency resolution" => "Declared dependencies are resolvable from registry.",
-                "License file" => "No LICENSE file found in archive root. Consider adding one.",
-                "README.md" => "No README.md documentation file found in archive root.",
-                _ => check.Title
-            };
-        }
-
-        /// <summary>
-        /// Resolves the corrective recommendation message for a failed validation check.
-        /// </summary>
-        /// <param name="check">The validation check evaluation model.</param>
-        /// <returns>The suggested remediation action or string empty.</returns>
-        public string GetCheckFixRecommendation(ValidationCheckModel check)
-        {
-            return check.Title switch
-            {
-                "Version" or "Package version" => "Must be greater than the latest published version.",
-                "Namespace uniqueness" => "Choose a unique package name in the selected namespace scope.",
-                "Schema validation" => "Verify archive manifest syntax and conform to specification.",
-                _ => "Resolve the issue in the archive manifest and re-run validation."
-            };
         }
     }
 }

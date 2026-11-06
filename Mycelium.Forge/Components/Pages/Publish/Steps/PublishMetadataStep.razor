@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishMetadataStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -8,180 +8,229 @@
 ------------------------------------------------------------------------------------------------ *@
 
 <PublishStepBase InformationCard="@(StepInformationCard)">
-    <Body>
-        <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2">
-            <div class="flex items-center gap-2.5 w-full">
-                <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    ARTEFACT
-                </span>
-                <span class="font-mono text-sm leading-normal text-foreground flex-1 truncate">
-                    @(this.ViewModel.Metadata.ArtefactFileName)
-                </span>
+<Body>
+<div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2">
+    <div class="flex items-center gap-2.5 w-full">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            ARTEFACT
+        </span>
+        <span class="font-mono text-sm leading-normal text-foreground flex-1 truncate">
+            @(this.Artefact.FileName)
+        </span>
 
-                <BbBadge Variant="BadgeVariant.Secondary"
-                         Class="badge-format">
-                    @(this.ViewModel.Metadata.ArtefactFormat)
-                </BbBadge>
+        <BbBadge Variant="BadgeVariant.Secondary"
+                 Class="badge-format">
+            @(this.Artefact.Format)
+        </BbBadge>
 
-                <BbButton Variant="ButtonVariant.Outline"
-                          Size="ButtonSize.Small"
-                          Type="ButtonType.Button"
-                          OnClick="@(this.OnReplaceArtefact)"
-                          Class="button-sm">
-                    Replace
-                </BbButton>
-            </div>
+        <BbButton Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnReplaceArtefact)"
+                  Class="button-sm">
+            Replace
+        </BbButton>
+    </div>
 
-            <p class="text-xs leading-2xs font-normal text-muted-foreground">
-                Format detected from the archive. The metadata below is read from the kpar manifest, so it is shown for confirmation rather than entry.
-            </p>
-        </div>
+    @if (this.IsKpar)
+    {
+        <p class="text-xs leading-2xs font-normal text-muted-foreground">
+            Format detected from the archive. The metadata below is read from the kpar manifest, so it is shown for confirmation rather than entry.
+        </p>
+    }
+</div>
 
-        <h2 class="text-md leading-sm font-semibold text-foreground">
-            Package metadata
-        </h2>
+<h2 class="text-md leading-sm font-semibold text-foreground">
+    Package metadata
+</h2>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
-            <BbField Class="w-full sm:w-[200px] shrink-0 flex flex-col gap-1.5">
-                <BbFieldLabel For="publish-scope"
-                              Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    SCOPE
-                </BbFieldLabel>
-                <BbFieldContent>
-                    <ForgeSelect TValue="string"
-                                 Value="@(this.ViewModel.Metadata.Scope)"
-                                 ValueChanged="@(this.OnScopeChanged)"
-                                 Items="@(this.ViewModel.ScopeOptions)"
-                                 id="publish-scope">
-                        <TriggerContent>
-                            <div class="flex items-center gap-1.5 flex-1 truncate">
-                                <span>@(this.ViewModel.Metadata.Scope)</span>
-                                @if (this.ViewModel.Metadata.IsScopeVerified)
-                                {
-                                    <LucideIcon Name="badge-check"
-                                                Size="14"
-                                                Class="text-primary shrink-0"/>
-                                }
-                            </div>
-                            <LucideIcon Name="chevron-down"
-                                        Size="16"
-                                        Class="text-muted-foreground shrink-0"/>
-                        </TriggerContent>
-                    </ForgeSelect>
-                </BbFieldContent>
-            </BbField>
+<div class="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 w-full">
+    <BbField Class="w-full sm:w-[200px] shrink-0 flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(IScope)))">
+        <BbFieldLabel For="publish-scope"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            SCOPE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="IScope"
+                         Value="@(this.ViewModel.SelectedScope)"
+                         ValueChanged="@(this.OnScopeChanged)"
+                         Items="@(this.ViewModel.ScopeOptions)"
+                         DisplayTextSelector="@(x => x.GetDisplayShortName())"
+                         Disabled="@(this.ViewModel.IsExistingPackage)"
+                         Id="publish-scope">
+                <TriggerContent>
+                    <div class="flex items-center gap-1.5 flex-1 truncate">
+                        <span>@(this.ViewModel.SelectedScope.GetDisplayShortName())</span>
+                        @if (this.IsSelectedScopeVerified)
+                        {
+                            <LucideIcon Name="badge-check"
+                                        Size="14"
+                                        Class="text-primary shrink-0"/>
+                        }
+                    </div>
+                    <LucideIcon Name="chevron-down"
+                                Size="16"
+                                Class="text-muted-foreground shrink-0"/>
+                </TriggerContent>
+            </ForgeSelect>
+        </BbFieldContent>
+        <BbFieldError Class="form-field-error"
+                      Errors="@(this.ValidationManager[nameof(IScope)])"/>
+    </BbField>
 
-            <BbField Class="w-full sm:flex-1 flex flex-col gap-1.5">
-                <BbFieldLabel For="publish-package-name"
-                              Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    PACKAGE NAME
-                </BbFieldLabel>
-                <BbFieldContent>
-                    <BbInput id="publish-package-name"
-                             Value="@(this.ViewModel.Metadata.PackageName)"
-                             ValueChanged="@(this.OnPackageNameChanged)"
-                             Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-                </BbFieldContent>
-            </BbField>
-        </div>
+    <BbField Class="w-full sm:flex-1 flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.ShortName)))">
+        <BbFieldLabel For="publish-package-short-name"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            SHORT NAME
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbInput id="publish-package-short-name"
+                     Value="@(this.ViewModel.Package.ShortName)"
+                     ValueChanged="@(this.OnPackageShortNameChanged)"
+                     Disabled="@(this.ViewModel.IsExistingPackage)"
+                     Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+        </BbFieldContent>
+        <BbFieldError Class="form-field-error"
+                      Errors="@(this.ValidationManager[nameof(IPackage.ShortName)])"/>
+    </BbField>
+</div>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-version"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                VERSION
-            </BbFieldLabel>
-            <BbFieldContent>
-                <BbInput id="publish-version"
-                         Value="@(this.ViewModel.Metadata.Version)"
-                         ValueChanged="@(this.OnVersionChanged)"
-                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-            </BbFieldContent>
-            <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
-                Must be greater than the latest published version (v1.2.0). SemVer 2.0.0.
-            </BbFieldDescription>
-        </BbField>
+<BbField Class="w-full flex flex-col gap-1.5"
+         IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.Name)))">
+    <BbFieldLabel For="publish-package-name"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        PACKAGE NAME
+    </BbFieldLabel>
+    <BbFieldContent>
+        <BbInput id="publish-package-name"
+                 Value="@(this.ViewModel.Package.Name)"
+                 ValueChanged="@(this.OnPackageNameChanged)"
+                 Disabled="@(this.IsPackageManifestFieldDisabled)"
+                 Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+    </BbFieldContent>
+    <BbFieldError Class="form-field-error"
+                  Errors="@(this.ValidationManager[nameof(IPackage.Name)])"/>
+</BbField>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-description"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                DESCRIPTION
-            </BbFieldLabel>
-            <BbFieldContent>
-                <BbTextarea id="publish-description"
-                            Value="@(this.ViewModel.Metadata.Description)"
-                            ValueChanged="@(this.OnDescriptionChanged)"
-                            Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
-            </BbFieldContent>
-        </BbField>
+<BbField Class="w-full flex flex-col gap-1.5"
+         IsInvalid="@(this.ValidationManager.HasError(nameof(IPackageVersion.Version)))">
+    <BbFieldLabel For="publish-version"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        VERSION
+    </BbFieldLabel>
+    <BbFieldContent>
+        <BbInput id="publish-version"
+                 Value="@(this.ViewModel.PackageVersion.Version)"
+                 ValueChanged="@(this.OnVersionChanged)"
+                 Disabled="@(this.IsKpar)"
+                 Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+    </BbFieldContent>
+    <BbFieldError Class="form-field-error"
+                  Errors="@(this.ValidationManager[nameof(IPackageVersion.Version)])"/>
+    <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
+        @(this.GetVersionDescription())
+    </BbFieldDescription>
+</BbField>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-license"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                LICENSE
-            </BbFieldLabel>
-            <BbFieldContent>
-                <ForgeSelect TValue="string"
-                             Value="@(this.ViewModel.Metadata.License)"
-                             ValueChanged="@(this.OnLicenseChanged)"
-                             Items="@(this.ViewModel.LicenseOptions)"
-                             id="publish-license"/>
-            </BbFieldContent>
-        </BbField>
+<BbField Class="w-full flex flex-col gap-1.5"
+         IsInvalid="@(this.ValidationManager.HasError(nameof(IPackageVersion.ReleaseNotes)))">
+    <BbFieldLabel For="publish-release-notes"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        RELEASE NOTES
+    </BbFieldLabel>
+    <BbFieldContent>
+        <BbTextarea id="publish-release-notes"
+                    Value="@(this.ViewModel.PackageVersion.ReleaseNotes)"
+                    ValueChanged="@(this.OnReleaseNotesChanged)"
+                    Placeholder="Describe changes and improvements in this release..."
+                    Class="w-full h-20 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
+    </BbFieldContent>
+    <BbFieldError Class="form-field-error"
+                  Errors="@(this.ValidationManager[nameof(IPackageVersion.ReleaseNotes)])"/>
+</BbField>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-visibility"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                VISIBILITY
-            </BbFieldLabel>
-            <BbFieldContent>
-                <ForgeSelect TValue="VisibilityKind"
-                             Value="@(this.ViewModel.Metadata.Visibility)"
-                             ValueChanged="@(this.OnVisibilityChanged)"
-                             Items="@(this.ViewModel.VisibilityOptions)"
-                             id="publish-visibility"
-                             DisplayTextSelector="@(x => x.ToUpperCaseFirst())"/>
-            </BbFieldContent>
-            <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
-                Public: anyone can find and download it. Organization: visible to members of the owning scope. Private: only Maintainers and Accounts granted the Reader role. New packages default to private.
-            </BbFieldDescription>
-        </BbField>
+<BbField Class="w-full flex flex-col gap-1.5"
+         IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.Description)))">
+    <BbFieldLabel For="publish-description"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        DESCRIPTION
+    </BbFieldLabel>
+    <BbFieldContent>
+        <BbTextarea id="publish-description"
+                    Value="@(this.ViewModel.Package.Description)"
+                    ValueChanged="@(this.OnDescriptionChanged)"
+                    Disabled="@(this.IsPackageManifestFieldDisabled)"
+                    Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
+    </BbFieldContent>
+    <BbFieldError Class="form-field-error"
+                  Errors="@(this.ValidationManager[nameof(IPackage.Description)])"/>
+</BbField>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-metamodel"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                METAMODEL
-            </BbFieldLabel>
-            <BbFieldContent>
-                <ForgeSelect TValue="string"
-                             Value="@(this.ViewModel.Metadata.Metamodel)"
-                             ValueChanged="@(this.OnMetamodelChanged)"
-                             Items="@(this.ViewModel.MetamodelOptions)"
-                             id="publish-metamodel"/>
-            </BbFieldContent>
-        </BbField>
+<BbField Class="w-full flex flex-col gap-1.5">
+    <BbFieldLabel For="publish-license"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        LICENSE
+    </BbFieldLabel>
+    <BbFieldContent>
+        <ForgeSelect TValue="string"
+                     Value="@(this.ViewModel.Package.License)"
+                     ValueChanged="@(this.OnLicenseChanged)"
+                     Items="@(LicenseOptions)"
+                     Disabled="@(this.IsPackageManifestFieldDisabled)"
+                     Id="publish-license"/>
+    </BbFieldContent>
+</BbField>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
-            <BbFieldLabel For="publish-tags"
-                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                TAGS
-            </BbFieldLabel>
-            <BbFieldContent>
-                <BbTagInput @bind-Tags="this.TagList"
-                            id="publish-tags"
-                            Placeholder="Add tag..."
-                            Class="w-full"/>
-            </BbFieldContent>
-        </BbField>
-    </Body>
+<BbField Class="w-full flex flex-col gap-1.5">
+    <BbFieldLabel For="publish-visibility"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        VISIBILITY
+    </BbFieldLabel>
+    <BbFieldContent>
+        <ForgeSelect TValue="VisibilityKind"
+                     Value="@(this.ViewModel.Package.Visibility)"
+                     ValueChanged="@(this.OnVisibilityChanged)"
+                     Items="@(VisibilityOptions)"
+                     DisabledExpression="@(this.IsVisibilityItemDisabled)"
+                     Disabled="@(this.ViewModel.IsExistingPackage)"
+                     Id="publish-visibility"
+                     DisplayTextSelector="@(x => x.ToUpperCaseFirst())"/>
+    </BbFieldContent>
+    <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground flex flex-col gap-0.5">
+        <span>Public: anyone can find and download it.</span>
+        @if (this.IsScopeOrganization)
+        {
+            <span>Internal: visible to members of the owning scope.</span>
+        }
+        <span>Private: only Maintainers and Accounts granted the Reader role.</span>
+    </BbFieldDescription>
+</BbField>
 
-    <Footer>
-        <PublishStepFooter FootnoteText="Nothing is published until you confirm on the last step."
-                           BackText="Back to upload"
-                           BackId="publish-back-button"
-                           ContinueText="Continue to validation"
-                           ContinueId="publish-continue-to-validation-button"
-                           IsContinueDisabled="@(this.IsContinueDisabled)"
-                           OnBack="@(this.OnBack)"
-                           OnContinue="@(this.OnContinue)"/>
-    </Footer>
+<BbField Class="w-full flex flex-col gap-1.5">
+    <BbFieldLabel For="publish-tags"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        TAGS
+    </BbFieldLabel>
+    <BbFieldContent>
+        <BbTagInput Tags="@(this.ViewModel.Package.Tags)"
+                    TagsChanged="@(this.OnTagsChanged)"
+                    id="publish-tags"
+                    Disabled="@(this.IsPackageManifestFieldDisabled)"
+                    Placeholder="Add tag..."
+                    Class="w-full"/>
+    </BbFieldContent>
+</BbField>
+</Body>
+
+<Footer>
+    <PublishStepFooter FootnoteText="Nothing is published until you confirm on the last step."
+                       BackText="Back to upload"
+                       BackId="publish-back-button"
+                       ContinueText="Continue to validation"
+                       ContinueId="publish-continue-to-validation-button"
+                       OnBack="@(this.OnBack)"
+                       OnContinue="@(this.HandleContinue)"/>
+</Footer>
 </PublishStepBase>

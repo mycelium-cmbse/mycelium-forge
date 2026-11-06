@@ -9,142 +9,142 @@
 
 <PublishStepBase InformationCard="@(StepInformationCard)">
     <Body>
-        <div class="flex items-center justify-between gap-2.5 w-full">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                ARTEFACT
+    <div class="flex items-center justify-between gap-2.5 w-full">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            ARTEFACT
+        </span>
+
+        <BbButton Variant="ButtonVariant.Link"
+                  Type="ButtonType.Button"
+                  id="publish-review-replace-button"
+                  OnClick="@(this.HandleReplaceArtefact)"
+                  Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
+            Replace
+        </BbButton>
+    </div>
+
+    <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
+        <LucideIcon Name="package"
+                    Size="16"
+                    Class="text-muted-foreground shrink-0"/>
+
+        <div class="flex flex-col gap-1 flex-1 min-w-0">
+            <div class="flex items-center gap-2.5">
+                <span class="font-mono text-sm leading-normal text-foreground truncate">
+                    @(this.Artefact.FileName)
+                </span>
+                <BbBadge Variant="BadgeVariant.Secondary"
+                         Class="badge-format">
+                    @(this.Artefact.Format)
+                </BbBadge>
+            </div>
+            <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                @(this.Artefact.SizeInBytes.FormatFileSize()) &bull; Detected @(this.Artefact.Format) &bull; SHA-256 verified
             </span>
-
-            <BbButton Variant="ButtonVariant.Link"
-                      Type="ButtonType.Button"
-                      id="publish-review-replace-button"
-                      OnClick="@(this.HandleReplaceArtefact)"
-                      Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
-                Replace
-            </BbButton>
         </div>
+    </div>
 
-        <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
-            <LucideIcon Name="package"
-                        Size="16"
-                        Class="text-muted-foreground shrink-0"/>
+    <div class="flex items-center justify-between gap-2.5 w-full pt-1">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            PACKAGE METADATA
+        </span>
 
-            <div class="flex flex-col gap-1 flex-1 min-w-0">
-                <div class="flex items-center gap-2.5">
-                    <span class="font-mono text-sm leading-normal text-foreground truncate">
-                        @(this.ViewModel.Metadata.ArtefactFileName)
-                    </span>
-                    <BbBadge Variant="BadgeVariant.Secondary"
-                             Class="badge-format">
-                        @(this.ViewModel.Metadata.ArtefactFormat)
-                    </BbBadge>
-                </div>
-                <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                    @(this.UploadedFile.Size.FormatFileSize()) &bull; Detected @(this.ViewModel.Metadata.ArtefactFormat) &bull; SHA-256 verified
-                </span>
-            </div>
-        </div>
+        <BbButton Variant="ButtonVariant.Link"
+                  Type="ButtonType.Button"
+                  id="publish-review-edit-button"
+                  OnClick="@(this.HandleEditMetadata)"
+                  Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
+            Edit
+        </BbButton>
+    </div>
 
-        <div class="flex items-center justify-between gap-2.5 w-full pt-1">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                PACKAGE METADATA
+    <div class="flex flex-col w-full">
+        <div class="w-full flex items-start gap-4 py-3 border-t border-border">
+            <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
+                Package
             </span>
-
-            <BbButton Variant="ButtonVariant.Link"
-                      Type="ButtonType.Button"
-                      id="publish-review-edit-button"
-                      OnClick="@(this.HandleEditMetadata)"
-                      Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
-                Edit
-            </BbButton>
-        </div>
-
-        <div class="flex flex-col w-full">
-            <div class="w-full flex items-start gap-4 py-3 border-t border-border">
-                <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                    Package
-                </span>
-                <span class="flex-1 min-w-0 font-mono text-xs leading-normal text-foreground break-all">
-                    @(this.ViewModel.Metadata.Scope)/@(this.ViewModel.Metadata.PackageName)
-                </span>
-            </div>
-
-            <div class="w-full flex items-start gap-4 py-3 border-t border-border">
-                <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                    Version
-                </span>
-                <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
-                    @(this.ViewModel.Metadata.Version)
-                </span>
-            </div>
-
-            <div class="w-full flex items-start gap-4 py-3 border-t border-border">
-                <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                    Format
-                </span>
-                <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
-                    @(this.ViewModel.Metadata.ArtefactFormat)
-                </span>
-            </div>
-
-            <div class="w-full flex items-start gap-4 py-3 border-t border-border">
-                <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                    License
-                </span>
-                <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
-                    @(string.IsNullOrWhiteSpace(this.ViewModel.Metadata.License) ? "None" : this.ViewModel.Metadata.License)
-                </span>
-            </div>
-
-            <div class="w-full flex items-start gap-4 py-3 border-t border-border">
-                <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                    Visibility
-                </span>
-                <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
-                    @(this.ViewModel.Metadata.Visibility.ToUpperCaseFirst())
-                </span>
-            </div>
-
-            <div class="w-full flex items-start gap-4 py-3 border-t border-border">
-                <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                    Tags
-                </span>
-                <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
-                    @(string.IsNullOrWhiteSpace(this.ViewModel.Metadata.Tags) ? "None" : this.ViewModel.Metadata.Tags)
-                </span>
-            </div>
-
-            <div class="w-full flex items-start gap-4 py-3 border-t border-border">
-                <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                    Dependencies
-                </span>
-                <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
-                    None
-                </span>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-between gap-2.5 w-full pt-1">
-            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-                VALIDATION
+            <span class="flex-1 min-w-0 font-mono text-xs leading-normal text-foreground break-all">
+                @(this.GetScopePackageCoordinate())
             </span>
-
-            <BbButton Variant="ButtonVariant.Link"
-                      Type="ButtonType.Button"
-                      id="publish-review-details-button"
-                      OnClick="@(this.HandleViewValidationDetails)"
-                      Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
-                Details
-            </BbButton>
         </div>
 
         <div class="w-full flex items-start gap-4 py-3 border-t border-border">
             <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
-                Status
+                Version
             </span>
             <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
-                @(this.GetValidationStatusText())
+                @(this.ViewModel.PackageVersion.Version)
             </span>
         </div>
+
+        <div class="w-full flex items-start gap-4 py-3 border-t border-border">
+            <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
+                Format
+            </span>
+            <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
+                @(this.Artefact.Format)
+            </span>
+        </div>
+
+        <div class="w-full flex items-start gap-4 py-3 border-t border-border">
+            <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
+                License
+            </span>
+            <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
+                @(this.GetLicenseText())
+            </span>
+        </div>
+
+        <div class="w-full flex items-start gap-4 py-3 border-t border-border">
+            <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
+                Visibility
+            </span>
+            <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
+                @(this.ViewModel.Package.Visibility.ToUpperCaseFirst())
+            </span>
+        </div>
+
+        <div class="w-full flex items-start gap-4 py-3 border-t border-border">
+            <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
+                Tags
+            </span>
+            <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
+                @(this.GetTagsText())
+            </span>
+        </div>
+
+        <div class="w-full flex items-start gap-4 py-3 border-t border-border">
+            <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
+                Dependencies
+            </span>
+            <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
+                @(this.GetDependenciesText())
+            </span>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-between gap-2.5 w-full pt-1">
+        <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            VALIDATION
+        </span>
+
+        <BbButton Variant="ButtonVariant.Link"
+                  Type="ButtonType.Button"
+                  id="publish-review-details-button"
+                  OnClick="@(this.HandleViewValidationDetails)"
+                  Class="p-0 h-auto text-xs leading-2xs font-medium text-primary hover:underline shrink-0">
+            Details
+        </BbButton>
+    </div>
+
+    <div class="w-full flex items-start gap-4 py-3 border-t border-border">
+        <span class="w-40 shrink-0 text-xs leading-2xs font-normal text-muted-foreground">
+            Status
+        </span>
+        <span class="flex-1 min-w-0 text-sm leading-normal text-foreground">
+            @(this.GetValidationStatusText())
+        </span>
+    </div>
     </Body>
 
     <Footer>
@@ -152,17 +152,22 @@
                            BackId="publish-back-to-validation-button"
                            ContinueText="Publish package"
                            ContinueId="publish-submit-button"
-                           IsContinueDisabled="@(this.IsPublishDisabled)"
+                           IsContinueDisabled="@(this.ViewModel.IsPublishing)"
                            OnBack="@(this.OnBack)"
-                           OnContinue="@(this.OnPublish)">
+                           OnContinue="@(this.HandlePublish)">
             <Footnote>
-                <div class="flex items-center gap-2.5">
-                    <BbCheckbox @bind-Checked="this.IsAcknowledged"
-                                Id="publish-acknowledge-checkbox"/>
-                    <label for="publish-acknowledge-checkbox"
-                           class="text-xs leading-2xs font-normal text-foreground-muted cursor-pointer select-none">
-                        I confirm that this package complies with the registry terms and does not contain confidential data.
-                    </label>
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center gap-2.5">
+                        <BbCheckbox Checked="@(this.IsAcknowledged)"
+                                    CheckedChanged="@(this.OnAcknowledgmentChanged)"
+                                    Id="publish-acknowledge-checkbox"/>
+                        <label for="publish-acknowledge-checkbox"
+                               class="text-xs leading-2xs font-normal text-foreground-muted cursor-pointer select-none">
+                            I confirm that this package complies with the registry terms and does not contain confidential data.
+                        </label>
+                    </div>
+                    <BbFieldError Class="form-field-error"
+                                  Errors="@(this.ValidationManager[nameof(this.IsAcknowledged)])"/>
                 </div>
             </Footnote>
         </PublishStepFooter>

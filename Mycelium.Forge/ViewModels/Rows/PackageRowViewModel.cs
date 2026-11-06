@@ -150,7 +150,7 @@ namespace Mycelium.Forge.ViewModels.Rows
                     Description = package.Description,
                     Publisher = publisher,
                     Version = latestVersion != null ? latestVersion.Version : DefaultVersion,
-                    Format = packageType?.Name ?? PackageFormatConstants.SysMlV2,
+                    Format = packageType?.Name ?? "-",
                     Tags = ResolveTagsForPackage(package),
                     DownloadCount = package.ComputeDownloadCount(packageVersions),
                     DependentsCount = ResolveDependentsCountForPackage(package),
