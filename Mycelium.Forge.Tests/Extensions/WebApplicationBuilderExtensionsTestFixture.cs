@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Extensions
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.Caching.Memory;
@@ -89,11 +90,13 @@ namespace Mycelium.Forge.Tests.Extensions
             using var app = this.builder.Build();
             var memoryCache = app.Services.GetService<IMemoryCache>();
             var stagingService = app.Services.GetService<IFileUploadStagingService>();
+            var publishServiceDescriptor = this.builder.Services.FirstOrDefault(x => x.ServiceType == typeof(IPackagePublishService));
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(memoryCache, Is.Not.Null);
                 Assert.That(stagingService, Is.Not.Null);
+                Assert.That(publishServiceDescriptor, Is.Not.Null);
             }
         }
 
