@@ -80,8 +80,8 @@ namespace Mycelium.Forge.Services
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" /> domain service.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackagePublishService}" /> logger.</param>
         public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors, 
-            IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, 
-            IPackageTypeService packageTypeService, ILogger<PackagePublishService> logger)
+            IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService, 
+            ILogger<PackagePublishService> logger)
         {
             this.artifactStore = artifactStore;
             this.databaseSource = databaseSource;
@@ -286,7 +286,7 @@ namespace Mycelium.Forge.Services
                 return new ValidationCheckModel(ValidationTypes.NamespaceUniqueness, ValidationStatus.Pass, "Publishing a new version to an existing package in the selected scope.");
             }
 
-            var existingResult = await this.packageService.ReadByCoordinateAsync(userContext, selectedScope?.ShortName ?? string.Empty, package.ShortName, token);
+            var existingResult = await this.packageService.ReadByCoordinateAsync(userContext, selectedScope?.ShortName ?? string.Empty, package.ShortName, true, token);
 
             return !existingResult.IsError
                 ? new ValidationCheckModel(ValidationTypes.NamespaceUniqueness, ValidationStatus.Fail, $"Package '{package.ShortName}' already exists in scope '@{selectedScope?.ShortName}'.")

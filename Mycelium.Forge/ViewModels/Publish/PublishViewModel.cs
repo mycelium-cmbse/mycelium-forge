@@ -210,7 +210,7 @@ namespace Mycelium.Forge.ViewModels.Publish
             await this.InitializeBase();
             this.IsExistingPackage = true;
 
-            var existingResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scopeShortName.CleanScope(), packageShortName.ToShortName(), CancellationToken.None);
+            var existingResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scopeShortName.CleanScope(), packageShortName.ToShortName(), token: CancellationToken.None);
 
             if (existingResult.IsError)
             {

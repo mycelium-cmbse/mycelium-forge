@@ -68,6 +68,12 @@ namespace Mycelium.Forge.Tests.Services
             userContextMock.Setup(x => x.AccountId).Returns(Guid.NewGuid());
             this.userContext = userContextMock.Object;
 
+            this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(("hash-12345", true));
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((action, _) => action(null!));
+            this.packageServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
+            this.packageVersionServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
+            this.packageMetaDataServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageMetaData>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
+
             this.service = new PackagePublishService(this.artifactStoreMock.Object, this.databaseSourceMock.Object, this.manifestExtractors, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageMetaDataServiceMock.Object, this.packageTypeServiceMock.Object, this.loggerMock.Object);
         }
 
@@ -80,9 +86,7 @@ namespace Mycelium.Forge.Tests.Services
             var content = "dummy-archive-payload"u8.ToArray();
 
             // Case 1: Unconfigured package type for new release returns validation error
-            this.packageTypeServiceMock
-                .Setup(x => x.ReadByNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<string[]>()))
-                .ReturnsAsync(ImmutableList<IPackageType>.Empty);
+            this.packageTypeServiceMock.Setup(x => x.ReadByNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList<IPackageType>.Empty);
 
             using (var stream = new MemoryStream(content))
             {
@@ -97,11 +101,7 @@ namespace Mycelium.Forge.Tests.Services
 
             // Case 2: Configured package type but no matching extractor returns validation error
             var packageType = new PackageType { Id = Guid.NewGuid(), Name = "SysML v2" };
-
-            this.packageTypeServiceMock
-                .Setup(x => x.ReadByNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<string[]>()))
-                .ReturnsAsync(ImmutableList.Create<IPackageType>(packageType));
-
+            this.packageTypeServiceMock.Setup(x => x.ReadByNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IPackageType>(packageType));
             this.manifestExtractorMock.Setup(x => x.CanHandle(ArtifactKind.Kpar)).Returns(false);
 
             using (var stream = new MemoryStream(content))
@@ -117,10 +117,7 @@ namespace Mycelium.Forge.Tests.Services
 
             // Case 3: Extractor returns error
             this.manifestExtractorMock.Setup(x => x.CanHandle(ArtifactKind.Kpar)).Returns(true);
-
-            this.manifestExtractorMock
-                .Setup(x => x.Extract(It.IsAny<Stream>()))
-                .Returns(Error.Validation(ValidationTypes.SchemaValidation, "Archive corrupted"));
+            this.manifestExtractorMock.Setup(x => x.Extract(It.IsAny<Stream>())).Returns(Error.Validation(ValidationTypes.SchemaValidation, "Archive corrupted"));
 
             using (var stream = new MemoryStream(content))
             {
@@ -178,44 +175,7 @@ namespace Mycelium.Forge.Tests.Services
             var packageMetaData = new PackageMetaData { Id = Guid.NewGuid() };
             var content = "package-archive-content"u8.ToArray();
 
-            // Case 1: Artifact storage failure aborts without entering DB transaction
-            this.artifactStoreMock
-                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Error.Failure(description: "Storage unavailable"));
-
-            using (var stream = new MemoryStream(content))
-            {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
-
-                using (Assert.EnterMultipleScope())
-                {
-                    Assert.That(result.IsError, Is.True);
-                    Assert.That(result.FirstError.Description, Is.EqualTo("Storage unavailable"));
-                    this.databaseSourceMock.Verify(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()), Times.Never);
-                }
-            }
-
-            // Case 2: Happy path for new package stores artifact and creates records inside transaction
-            this.artifactStoreMock
-                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(("hash-12345", true));
-
-            this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
-                .Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((action, _) => action(null!));
-
-            this.packageServiceMock
-                .Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Result.Created);
-
-            this.packageVersionServiceMock
-                .Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Result.Created);
-
-            this.packageMetaDataServiceMock
-                .Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageMetaData>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Result.Created);
-
+            // Case 1: Happy path for new package stores artifact and creates records inside transaction
             using (var stream = new MemoryStream(content))
             {
                 var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
@@ -232,7 +192,7 @@ namespace Mycelium.Forge.Tests.Services
                 }
             }
 
-            // Case 3: Happy path for existing package skips package create and links new version ID
+            // Case 2: Happy path for existing package skips package create and links new version ID
             this.packageServiceMock.Invocations.Clear();
             var existingPackage = new Package { Id = Guid.NewGuid(), Name = "existing", Owner = scope.Id, Version = [] };
             var newVersion = new PackageVersion { Id = Guid.NewGuid(), Version = "1.1.0" };
@@ -250,12 +210,26 @@ namespace Mycelium.Forge.Tests.Services
                 }
             }
 
+            // Case 3: Artifact storage failure aborts without entering DB transaction
+            this.databaseSourceMock.Invocations.Clear();
+            this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Storage unavailable"));
+
+            using (var stream = new MemoryStream(content))
+            {
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(result.IsError, Is.True);
+                    Assert.That(result.FirstError.Description, Is.EqualTo("Storage unavailable"));
+                    this.databaseSourceMock.Verify(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()), Times.Never);
+                }
+            }
+
             // Case 4: DB transaction failure rolls back newly stored artifact
             this.artifactStoreMock.Invocations.Clear();
-
-            this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Error.Failure(description: "DB deadlocked"));
+            this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(("hash-12345", true));
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "DB deadlocked"));
 
             using (var stream = new MemoryStream(content))
             {
@@ -270,9 +244,7 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 5: DB transaction failure with deduplicated (non-new) artifact does NOT delete artifact
-            this.artifactStoreMock
-                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(("hash-deduped", false));
+            this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(("hash-deduped", false));
 
             using (var stream = new MemoryStream(content))
             {
@@ -286,13 +258,8 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 6: Exception during publication logs error, deletes newly stored artifact, and returns failure
-            this.artifactStoreMock
-                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(("hash-throw", true));
-
-            this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("Connection broken"));
+            this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(("hash-throw", true));
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException("Connection broken"));
 
             using (var stream = new MemoryStream(content))
             {
@@ -307,13 +274,8 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 7: Exception during publication with deduplicated artifact does not delete artifact
-            this.artifactStoreMock
-                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(("hash-throw-deduped", false));
-
-            this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new InvalidOperationException("Connection broken"));
+            this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(("hash-throw-deduped", false));
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException("Connection broken"));
 
             using (var stream = new MemoryStream(content))
             {
@@ -328,17 +290,9 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 8: Entity creation failure inside transaction aborts and rolls back newly stored artifact
-            this.artifactStoreMock
-                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(("hash-entity-fail", true));
-
-            this.databaseSourceMock
-                .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>()))
-                .Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((action, _) => action(null!));
-
-            this.packageServiceMock
-                .Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Error.Failure(description: "Package insert failed"));
+            this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(("hash-entity-fail", true));
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((action, _) => action(null!));
+            this.packageServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Package insert failed"));
 
             using (var stream = new MemoryStream(content))
             {
@@ -408,19 +362,14 @@ namespace Mycelium.Forge.Tests.Services
             Assert.That(majorWithNotesResult.All(x => x.Status == ValidationStatus.Pass), Is.True);
 
             // Case 6: New package with coordinate collision returns namespace fail
-            this.packageServiceMock
-                .Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new Package { Id = Guid.NewGuid() });
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", true, It.IsAny<CancellationToken>())).ReturnsAsync(new Package { Id = Guid.NewGuid() });
 
             var collisionResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, []);
             Assert.That(collisionResult.Any(x => x.Title == ValidationTypes.NamespaceUniqueness && x.Status == ValidationStatus.Fail), Is.True);
 
             // Case 7: New package without license produces warning
             package.License = string.Empty;
-
-            this.packageServiceMock
-                .Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Error.NotFound());
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", true, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
 
             var noLicenseResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, []);
 

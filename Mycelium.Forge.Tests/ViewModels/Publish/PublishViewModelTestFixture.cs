@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -169,7 +169,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             var existingPackage = new Package { Id = Guid.NewGuid(), Name = "Existing", ShortName = "existing", Owner = this.activeScope.Id, PackageType = this.packageType.Id, Version = [Guid.NewGuid()] };
             var existingVersion = new PackageVersion { Id = existingPackage.Version[0], Version = "1.0.0", Owner = existingPackage.Id };
 
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "existing", It.IsAny<CancellationToken>())).ReturnsAsync(existingPackage);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "existing", false, It.IsAny<CancellationToken>())).ReturnsAsync(existingPackage);
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(existingVersion));
             this.packageVersionPermissionServiceMock.Setup(x => x.IsAllowedToCreate(this.userContext, It.IsAny<PackageVersion>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
 
@@ -186,14 +186,14 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             }
 
             // Case 3: Package coordinate not found sets can release to false
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "missing", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "missing", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
             await this.viewModel.InitializeViewModel("starion", "missing");
 
             Assert.That(this.viewModel.CanUserReleaseExistingPackageVersion, Is.False);
 
             // Case 4: Package with unresolvable package type sets can release to false
             var unknownTypePackage = new Package { Id = Guid.NewGuid(), Name = "Unknown", ShortName = "unknown", Owner = this.activeScope.Id, PackageType = Guid.NewGuid(), Version = [] };
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "unknown", It.IsAny<CancellationToken>())).ReturnsAsync(unknownTypePackage);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "unknown", false, It.IsAny<CancellationToken>())).ReturnsAsync(unknownTypePackage);
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length > 0 && ids[0] == unknownTypePackage.PackageType))).ReturnsAsync(ImmutableList<IPackageType>.Empty);
 
             await this.viewModel.InitializeViewModel("starion", "unknown");
