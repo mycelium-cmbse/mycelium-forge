@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="Publish.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -48,15 +48,14 @@
         <div class="@(this.GetStepClass(0))">
             <PublishUploadStep @key="this.uploadStepKey"
                                ViewModel="@(this.ViewModel)"
-                               OnContinue="@(this.OnUploadStepContinued)"
+                               OnContinue="@(this.OnNext)"
                                InputId="@(UploadInputId)"/>
         </div>
 
-        @if (this.HasStagedArtefact)
+        @if (this.ViewModel.StagedArtefact != null)
         {
             <div class="@(this.GetStepClass(1))">
                 <PublishMetadataStep ViewModel="@(this.ViewModel)"
-                                     Artefact="@(this.stagedArtefact)"
                                      OnBack="@(this.OnBack)"
                                      OnContinue="@(this.OnNext)"
                                      OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
@@ -64,7 +63,6 @@
 
             <div class="@(this.GetStepClass(2))">
                 <PublishValidationStep ViewModel="@(this.ViewModel)"
-                                       Artefact="@(this.stagedArtefact)"
                                        OnBack="@(this.OnBack)"
                                        OnContinue="@(this.OnNext)"
                                        OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
@@ -72,7 +70,6 @@
 
             <div class="@(this.GetStepClass(3))">
                 <PublishReviewStep ViewModel="@(this.ViewModel)"
-                                   Artefact="@(this.stagedArtefact)"
                                    OnBack="@(this.OnBack)"
                                    OnPublish="@(this.PublishPackage)"
                                    OnNavigateToStep="@(this.OnNavigateToStep)"

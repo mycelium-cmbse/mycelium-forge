@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishValidationStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -17,15 +17,15 @@
         <div class="flex flex-col gap-1 flex-1 min-w-0">
             <div class="flex items-center gap-2.5">
                 <span class="font-mono text-sm leading-normal text-foreground truncate">
-                    @(this.Artefact.FileName)
+                    @(this.ViewModel.StagedArtefact.FileName)
                 </span>
                 <BbBadge Variant="BadgeVariant.Secondary"
                          Class="badge-format">
-                    @(this.Artefact.Format)
+                    @(this.ViewModel.StagedArtefact.Format)
                 </BbBadge>
             </div>
             <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                @(this.Artefact.SizeInBytes.FormatFileSize()) &bull; Detected @(this.Artefact.Format)
+                @(this.ViewModel.StagedArtefact.SizeInBytes.FormatFileSize()) &bull; Detected @(this.ViewModel.StagedArtefact.Format)
             </span>
         </div>
 
@@ -141,7 +141,7 @@
                     }
                 </div>
 
-                <BbBadge Variant="@(GetValidationBadgeVariant(check.Status))"
+                <BbBadge Variant="@(check.Status.ToBadgeVariant())"
                          Class="shrink-0 text-xs leading-2xs font-medium">
                     @(check.Status)
                 </BbBadge>

@@ -22,6 +22,11 @@ namespace Mycelium.Forge.Models.Publish
         public string FileName { get; set; }
 
         /// <summary>
+        /// Gets or sets the token identifying the staged upload artefact.
+        /// </summary>
+        public string StagingToken { get; set; }
+
+        /// <summary>
         /// Gets or sets the human-readable format name of the staged artefact.
         /// </summary>
         public string Format { get; set; }

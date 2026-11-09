@@ -145,24 +145,27 @@ namespace Mycelium.Forge.Storage.Tests.Stores
         [Test]
         public async Task VerifyStoreArtifactAsync()
         {
+            // Case 1: First upload of artifact sets WasNewlyUploaded to true
             using var uploadStream = new MemoryStream(this.testPayloadBytes);
             var storeResult = await this.ArtifactStore.StoreArtifactAsync(uploadStream, "application/octet-stream", CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(storeResult.IsError, Is.False);
-                Assert.That(storeResult.Value, Is.EqualTo(this.testContentHash));
+                Assert.That(storeResult.Value, Is.EqualTo((this.testContentHash, true)));
             }
 
+            // Case 2: Subsequent upload of identical artifact deduplicates (WasNewlyUploaded = false)
             using var duplicateStream = new MemoryStream(this.testPayloadBytes);
             var deduplicatedResult = await this.ArtifactStore.StoreArtifactAsync(duplicateStream, "application/octet-stream", CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(deduplicatedResult.IsError, Is.False);
-                Assert.That(deduplicatedResult.Value, Is.EqualTo(this.testContentHash));
+                Assert.That(deduplicatedResult.Value, Is.EqualTo((this.testContentHash, false)));
             }
 
+            // Case 3: Storing null stream returns error
             var nullResult = await this.ArtifactStore.StoreArtifactAsync(null, null, CancellationToken.None);
             Assert.That(nullResult.IsError, Is.True);
         }

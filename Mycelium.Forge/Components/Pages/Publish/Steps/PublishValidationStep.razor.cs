@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishValidationStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,11 +9,10 @@
 
 namespace Mycelium.Forge.Components.Pages.Publish.Steps
 {
-    using BlazorBlueprint.Components;
-
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.ViewModels.Publish;
 
@@ -47,13 +46,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public IPublishViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the staged artefact UI model.
-        /// </summary>
-        [Parameter]
-        [EditorRequired]
-        public PublishArtefactModel Artefact { get; set; }
-
-        /// <summary>
         /// Gets or sets the callback invoked when returning to the package metadata step.
         /// </summary>
         [Parameter]
@@ -79,24 +71,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <summary>
         /// Gets the count of non-blocking warning check outcomes.
         /// </summary>
-        public int WarningCount => this.ViewModel.ValidationChecks.Count(x => x.Status != ValidationStatus.Pass && x.Status != ValidationStatus.Fail);
-
-        /// <summary>
-        /// Resolves the badge visual variant for a validation status outcome.
-        /// </summary>
-        /// <param name="status">The validation check status outcome.</param>
-        /// <returns>The corresponding <see cref="BadgeVariant" />.</returns>
-        public static BadgeVariant GetValidationBadgeVariant(ValidationStatus status)
-        {
-            return status switch
-            {
-                ValidationStatus.Pass => BadgeVariant.SoftSuccess,
-                ValidationStatus.Fail => BadgeVariant.SoftDestructive,
-                ValidationStatus.Warning => BadgeVariant.SoftWarning,
-                ValidationStatus.Missing => BadgeVariant.Secondary,
-                _ => BadgeVariant.Outline
-            };
-        }
+        public int WarningCount => this.ViewModel.ValidationChecks.Count(x => x.Status is ValidationStatus.Warning or ValidationStatus.Missing);
 
         /// <summary>
         /// Resolves the CSS class string for a validation check row based on its status.
@@ -139,7 +114,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>The button text.</returns>
         public string GetBackText()
         {
-            return this.Artefact is { IsManifestValid: false } ? "Back to upload" : "Back to metadata";
+            return this.ViewModel.StagedArtefact is { IsManifestValid: false } ? "Back to upload" : "Back to metadata";
         }
 
         /// <summary>
@@ -167,7 +142,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>A formatted string indicating the warning count.</returns>
         public string GetWarningsTitle()
         {
-            return this.WarningCount == 1 ? "1 warning" : $"{this.WarningCount} warnings";
+            return "warning".ToQuantity(this.WarningCount);
         }
 
         /// <summary>
@@ -177,15 +152,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public string GetValidationCountsText()
         {
             var passedCount = this.ViewModel.ValidationChecks.Count(x => x.Status == ValidationStatus.Pass);
-            var warningCount = this.ViewModel.ValidationChecks.Count(x => x.Status == ValidationStatus.Warning || x.Status == ValidationStatus.Missing);
             var failCount = this.ViewModel.ValidationChecks.Count(x => x.Status == ValidationStatus.Fail);
 
-            if (failCount > 0)
-            {
-                return $"{failCount} {(failCount == 1 ? "error" : "errors")} \u2022 {warningCount} {(warningCount == 1 ? "warning" : "warnings")}";
-            }
-
-            return $"{passedCount} passed \u2022 {warningCount} {(warningCount == 1 ? "warning" : "warnings")}";
+            return failCount > 0
+                ? $"{"error".ToQuantity(failCount)} \u2022 {"warning".ToQuantity(this.WarningCount)}"
+                : $"{passedCount} passed \u2022 {"warning".ToQuantity(this.WarningCount)}";
         }
 
         /// <summary>
@@ -199,11 +170,9 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
                 return "Package cannot be published until all blocking errors are resolved.";
             }
 
-            var count = this.ViewModel.ValidationChecks.Count(x => x.Status != ValidationStatus.Pass);
-
-            return count == 0
+            return this.WarningCount == 0
                 ? "All pre-publish checks completed successfully."
-                : $"{count} {(count == 1 ? "warning does" : "warnings do")} not block publishing, but review them below.";
+                : $"{"warning".ToQuantity(this.WarningCount)} {(this.WarningCount == 1 ? "does" : "do")} not block publishing, but review them below.";
         }
     }
 }

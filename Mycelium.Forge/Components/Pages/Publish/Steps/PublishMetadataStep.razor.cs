@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishMetadataStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -68,13 +68,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public IPublishViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the staged artefact UI model.
-        /// </summary>
-        [Parameter]
-        [EditorRequired]
-        public PublishArtefactModel Artefact { get; set; }
-
-        /// <summary>
         /// Gets or sets the callback invoked when returning to the previous step.
         /// </summary>
         [Parameter]
@@ -101,7 +94,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <summary>
         /// Gets a value indicating whether the staged artefact is a Kpar archive whose metadata is declared by the manifest.
         /// </summary>
-        public bool IsKpar => this.Artefact.Kind == ArtifactKind.Kpar;
+        public bool IsKpar => this.ViewModel.StagedArtefact.Kind == ArtifactKind.Kpar;
 
         /// <summary>
         /// Gets a value indicating whether the package name field is disabled.
@@ -220,17 +213,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         }
 
         /// <summary>
-        /// Gets the description and format guidance for the version field.
-        /// </summary>
-        /// <returns>The version field description string.</returns>
-        private string GetVersionDescription()
-        {
-            return this.ViewModel.IsExistingPackage && this.ViewModel.ExistingVersions is { Count: > 0 }
-                ? $"SemVer 2.0.0 format. Latest published version is {this.ViewModel.ExistingVersions[0]}"
-                : "SemVer 2.0.0 format (e.g. 1.0.0).";
-        }
-
-        /// <summary>
         /// Handles changes to the package version input value.
         /// </summary>
         /// <param name="version">The new package version value.</param>
@@ -286,6 +268,17 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public void OnTagsChanged(IReadOnlyList<string> tags)
         {
             this.ViewModel.Package.Tags = [.. tags ?? []];
+        }
+
+        /// <summary>
+        /// Gets the description and format guidance for the version field.
+        /// </summary>
+        /// <returns>The version field description string.</returns>
+        private string GetVersionDescription()
+        {
+            return this.ViewModel.IsExistingPackage && this.ViewModel.ExistingVersions is { Count: > 0 }
+                ? $"SemVer 2.0.0 format. Latest published version is {this.ViewModel.ExistingVersions[0]}"
+                : "SemVer 2.0.0 format (e.g. 1.0.0).";
         }
     }
 }

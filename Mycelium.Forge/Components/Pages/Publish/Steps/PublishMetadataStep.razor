@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishMetadataStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -14,13 +14,13 @@
         <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             ARTEFACT
         </span>
-        <span class="font-mono text-sm leading-normal text-foreground flex-1 truncate">
-            @(this.Artefact.FileName)
+        <span class="publish-file-name font-mono text-sm leading-normal text-foreground flex-1 truncate">
+            @(this.ViewModel.StagedArtefact.FileName)
         </span>
 
         <BbBadge Variant="BadgeVariant.Secondary"
-                 Class="badge-format">
-            @(this.Artefact.Format)
+                 Class="publish-file-format badge-format">
+            @(this.ViewModel.StagedArtefact.Format)
         </BbBadge>
 
         <BbButton Variant="ButtonVariant.Outline"

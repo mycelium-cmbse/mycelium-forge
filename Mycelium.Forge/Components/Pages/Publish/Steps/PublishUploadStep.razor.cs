@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishUploadStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -88,10 +88,10 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public IPublishViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the callback invoked when the user proceeds to the next step with the staged artefact details.
+        /// Gets or sets the callback invoked when the user proceeds to the next step.
         /// </summary>
         [Parameter]
-        public EventCallback<PublishArtefactModel> OnContinue { get; set; }
+        public EventCallback OnContinue { get; set; }
 
         /// <summary>
         /// Gets or sets the HTML ID applied to the dropzone file input element.
@@ -260,18 +260,18 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             try
             {
                 var uploadToken = await this.JsInterop.UploadLargeFile(this.InputId, ApiRoutes.UploadFileForStage);
-                var isManifestValid = await this.ViewModel.ExtractManifest(uploadToken, this.selectedFormat!.Kind);
 
                 var artefact = new PublishArtefactModel
                 {
                     FileName = this.selectedFile.Name,
-                    Format = this.selectedFormat.Name,
+                    Format = this.selectedFormat!.Name,
                     SizeInBytes = this.selectedFile.Size,
                     Kind = this.selectedFormat.Kind,
-                    IsManifestValid = isManifestValid
+                    StagingToken = uploadToken
                 };
 
-                await this.OnContinue.InvokeAsync(artefact);
+                await this.ViewModel.ExtractManifest(artefact);
+                await this.OnContinue.InvokeAsync();
             }
             catch (Exception exception)
             {

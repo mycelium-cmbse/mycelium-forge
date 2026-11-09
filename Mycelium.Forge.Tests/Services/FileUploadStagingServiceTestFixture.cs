@@ -42,6 +42,7 @@ namespace Mycelium.Forge.Tests.Services
         [Test]
         public async Task VerifyCleanup()
         {
+            // Case 1: Null, empty, or nonexistent tokens do not throw
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => this.stagingService.Cleanup(null), Throws.Nothing);
@@ -49,6 +50,7 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(() => this.stagingService.Cleanup("nonexistent-token"), Throws.Nothing);
             }
 
+            // Case 2: Cleanup deletes the staged file and removes its token
             var payload = new byte[] { 7, 8, 9 };
             using var inputStream = new MemoryStream(payload);
             var token = await this.stagingService.StageAsync(inputStream);
@@ -75,6 +77,7 @@ namespace Mycelium.Forge.Tests.Services
         [Test]
         public async Task VerifyOpenStagedFile()
         {
+            // Case 1: Invalid tokens throw FileNotFoundException
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => this.stagingService.OpenStagedFile(null), Throws.TypeOf<FileNotFoundException>());
@@ -82,6 +85,7 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(() => this.stagingService.OpenStagedFile("nonexistent-token"), Throws.TypeOf<FileNotFoundException>());
             }
 
+            // Case 2: OpenStagedFile returns readable stream and retains file for subsequent reads
             var payload = "*+,"u8.ToArray();
             using var inputStream = new MemoryStream(payload);
             var token = await this.stagingService.StageAsync(inputStream);
@@ -93,9 +97,13 @@ namespace Mycelium.Forge.Tests.Services
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(() => this.stagingService.OpenStagedFile(token), Throws.TypeOf<FileNotFoundException>());
                 Assert.That(memoryStream.ToArray(), Is.EqualTo(payload));
+                Assert.That(() => this.stagingService.OpenStagedFile(token), Throws.Nothing);
             }
+
+            // Case 3: Explicit cleanup removes staged file
+            this.stagingService.Cleanup(token);
+            Assert.That(() => this.stagingService.OpenStagedFile(token), Throws.TypeOf<FileNotFoundException>());
         }
 
         [Test]
@@ -114,8 +122,10 @@ namespace Mycelium.Forge.Tests.Services
         [Test]
         public async Task VerifyStageAsync()
         {
+            // Case 1: Null input stream throws ArgumentNullException
             Assert.That(async () => await this.stagingService.StageAsync(null), Throws.TypeOf<ArgumentNullException>());
 
+            // Case 2: Successfully stage valid payload stream
             var payload = new byte[] { 1, 2, 3, 4, 5 };
             using var inputStream = new MemoryStream(payload);
             var uploadToken = await this.stagingService.StageAsync(inputStream);
@@ -126,6 +136,7 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(uploadToken, Is.Not.Empty);
             }
 
+            // Case 3: Cancelled token aborts staging operation
             using var cancelledCts = new CancellationTokenSource();
             await cancelledCts.CancelAsync();
             var token = cancelledCts.Token;

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="Publish.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -15,8 +15,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
 
     using Mycelium.Forge.Components.Pages.Publish.Dialogs;
     using Mycelium.Forge.Enums;
-    using Mycelium.Forge.Extractors.Enums;
-    using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
@@ -25,11 +23,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
     /// </summary>
     public partial class Publish : DisposableComponent
     {
-        /// <summary>
-        /// The currently staged artefact UI model.
-        /// </summary>
-        private PublishArtefactModel stagedArtefact;
-
         /// <summary>
         /// A unique key to force re-mounting and clearing of the upload step component upon artefact replacement.
         /// </summary>
@@ -76,11 +69,6 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public int ActiveStep { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether an artefact has been staged in the current wizard session.
-        /// </summary>
-        private bool HasStagedArtefact => this.stagedArtefact != null;
-
-        /// <summary>
         /// Gets a value indicating whether the user is unauthorized to release a new version of the specified existing package.
         /// </summary>
         public bool IsUnauthorizedExistingPackage => this.ViewModel.IsExistingPackage &&
@@ -92,7 +80,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public void OnBack()
         {
             // If the user is on the validation step and the staged artefact has an invalid manifest, return to the upload step instead of the metadata step.
-            if (this.ActiveStep == 2 && this.stagedArtefact is { IsManifestValid: false })
+            if (this.ActiveStep == 2 && this.ViewModel.StagedArtefact is { IsManifestValid: false })
             {
                 this.ActiveStep = 0;
                 return;
@@ -110,6 +98,13 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnNext()
         {
+            // If advancing from the upload step and the uploaded artefact has an invalid manifest, skip the metadata step and go directly to validation.
+            if (this.ActiveStep == 0 && this.ViewModel.StagedArtefact is { IsManifestValid: false })
+            {
+                this.ActiveStep = 2;
+                return;
+            }
+
             if (this.ActiveStep == 1)
             {
                 await this.ViewModel.Validate();
@@ -119,43 +114,13 @@ namespace Mycelium.Forge.Components.Pages.Publish
         }
 
         /// <summary>
-        /// Handles completing the upload step and advancing to metadata or validation.
-        /// </summary>
-        /// <param name="artefact">The staged artefact UI model.</param>
-        public void OnUploadStepContinued(PublishArtefactModel artefact)
-        {
-            this.stagedArtefact = artefact;
-
-            // If the uploaded artefact has an invalid manifest, skip the metadata step and go directly to validation.
-            this.ActiveStep = !artefact.IsManifestValid ? 2 : 1;
-        }
-
-        /// <summary>
         /// Handles replacing the currently loaded package archive artefact.
         /// </summary>
         public void OnReplaceArtefact()
         {
             this.ViewModel.DiscardStagedFile();
-            this.stagedArtefact = null;
             this.uploadStepKey = Guid.NewGuid();
             this.ActiveStep = 0;
-        }
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="disposing">
-        /// <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
-        /// unmanaged resources.
-        /// </param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                this.ViewModel.DiscardStagedFile();
-            }
-
-            base.Dispose(disposing);
         }
 
         /// <summary>
@@ -213,6 +178,23 @@ namespace Mycelium.Forge.Components.Pages.Publish
         public string GetStepClass(int stepIndex, string activeClasses = "w-full")
         {
             return this.ActiveStep == stepIndex ? activeClasses : "hidden";
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
+        /// unmanaged resources.
+        /// </param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.ViewModel.DiscardStagedFile();
+            }
+
+            base.Dispose(disposing);
         }
 
         /// <summary>

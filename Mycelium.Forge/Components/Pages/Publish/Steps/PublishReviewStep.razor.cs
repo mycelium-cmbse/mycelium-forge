@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishReviewStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -51,13 +51,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         [Parameter]
         [EditorRequired]
         public IPublishViewModel ViewModel { get; set; }
-
-        /// <summary>
-        /// Gets or sets the staged artefact UI model.
-        /// </summary>
-        [Parameter]
-        [EditorRequired]
-        public PublishArtefactModel Artefact { get; set; }
 
         /// <summary>
         /// Gets or sets the callback invoked when navigating back to the validation step.
@@ -173,21 +166,15 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             if (failures.Count > 0)
             {
                 var failureNames = string.Join(", ", failures.Select(f => f.Title));
-
-                return failures.Count == 1
-                    ? $"Failed with 1 error ({failureNames})"
-                    : $"Failed with {failures.Count} errors ({failureNames})";
+                return $"Failed with {"error".ToQuantity(failures.Count)} ({failureNames})";
             }
 
-            List<ValidationCheckModel> warnings = [.. this.ViewModel.ValidationChecks.Where(x => x.Status != ValidationStatus.Pass && x.Status != ValidationStatus.Fail)];
+            List<ValidationCheckModel> warnings = [.. this.ViewModel.ValidationChecks.Where(x => x.Status is ValidationStatus.Warning or ValidationStatus.Missing)];
 
             if (warnings.Count > 0)
             {
                 var warningNames = string.Join(", ", warnings.Select(w => w.Title));
-
-                return warnings.Count == 1
-                    ? $"Passed with 1 warning ({warningNames})"
-                    : $"Passed with {warnings.Count} warnings ({warningNames})";
+                return $"Passed with {"warning".ToQuantity(warnings.Count)} ({warningNames})";
             }
 
             return "Passed all validation checks";

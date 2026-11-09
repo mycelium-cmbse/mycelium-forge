@@ -78,6 +78,19 @@ namespace Mycelium.Forge.Extensions
             {
                 return (value ?? string.Empty).Trim().Replace(' ', '-').ToLowerInvariant();
             }
+
+            /// <summary>
+            /// Formats a quantity count with the string as singular or plural.
+            /// </summary>
+            /// <param name="count">The quantity count.</param>
+            /// <param name="plural">The optional custom plural form. If null, the singular string with an appended 's' is used.</param>
+            /// <param name="includeCount">Whether to prepend the count number to the result string.</param>
+            /// <returns>A formatted quantity string.</returns>
+            public string ToQuantity(int count, string plural = null, bool includeCount = true)
+            {
+                var noun = count == 1 ? value : plural ?? $"{value}s";
+                return includeCount ? $"{count} {noun}" : noun;
+            }
         }
     }
 }

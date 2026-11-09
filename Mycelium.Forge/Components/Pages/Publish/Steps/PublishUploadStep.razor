@@ -1,4 +1,4 @@
-@* ------------------------------------------------------------------------------------------------
+﻿@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishUploadStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -40,25 +40,25 @@
             SELECTED FILE
         </span>
 
-        <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
+        <div class="publish-selected-file w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex items-center gap-3">
             <LucideIcon Name="package"
                         Size="16"
                         Class="text-muted-foreground shrink-0"/>
 
             <div class="flex flex-col gap-1 flex-1 min-w-0">
                 <div class="flex items-center gap-2.5">
-                    <span class="font-mono text-sm leading-normal text-foreground truncate">
+                    <span class="publish-file-name font-mono text-sm leading-normal text-foreground truncate">
                         @(this.selectedFile.Name)
                     </span>
                     @if (!string.IsNullOrEmpty(this.GetSelectedModelType()))
                     {
                         <BbBadge Variant="BadgeVariant.Secondary"
-                                 Class="badge-format">
+                                 Class="publish-file-format badge-format">
                             @(this.GetSelectedModelType())
                         </BbBadge>
                     }
                 </div>
-                <span class="text-xs leading-2xs font-normal text-muted-foreground">
+                <span class="publish-file-summary text-xs leading-2xs font-normal text-muted-foreground">
                     @(this.selectedFile.Size.FormatFileSize()) &bull; @(this.GetSelectedModelTypeSummary())
                 </span>
             </div>
@@ -81,7 +81,7 @@
                                    Size="ToggleSize.Small"
                                    Required="true"
                                    id="publish-model-type"
-                                   Class="w-fit">
+                                   Class="publish-model-type-toggle w-fit">
                         @foreach (var format in this.GetMatchingFormats())
                         {
                             <BbToggleGroupItem @key="format.Name"

@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -19,25 +19,17 @@ namespace Mycelium.Forge.ViewModels.Publish
     using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
-    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Extractors;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.Storage.Stores;
 
-    using Npgsql;
-
     /// <summary>
     /// Provides view model state and operations for the Mycelium Forge package publishing wizard page.
     /// </summary>
     public class PublishViewModel : DisposableViewModel, IPublishViewModel
     {
-        /// <summary>
-        /// The (injected) <see cref="IAccountService" /> domain service.
-        /// </summary>
-        private readonly IAccountService accountService;
-
         /// <summary>
         /// The (injected) <see cref="IArtifactStore" /> object storage service.
         /// </summary>
@@ -62,16 +54,6 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// The (injected) collection of <see cref="IArtifactManifestExtractor" /> instances.
         /// </summary>
         private readonly IEnumerable<IArtifactManifestExtractor> manifestExtractors;
-
-        /// <summary>
-        /// The (injected) <see cref="IOrganizationService" /> domain service.
-        /// </summary>
-        private readonly IOrganizationService organizationService;
-
-        /// <summary>
-        /// The (injected) <see cref="IPackageMetaDataService" /> domain service.
-        /// </summary>
-        private readonly IPackageMetaDataService packageMetaDataService;
 
         /// <summary>
         /// The (injected) <see cref="IPackageService" /> domain service.
@@ -109,16 +91,6 @@ namespace Mycelium.Forge.ViewModels.Publish
         private Guid currentUserId;
 
         /// <summary>
-        /// The errors reported by the manifest extractor for the currently staged artefact.
-        /// </summary>
-        private List<Error> extractorErrors = [];
-
-        /// <summary>
-        /// The token identifying the currently staged upload artefact.
-        /// </summary>
-        private string stagingToken;
-
-        /// <summary>
         /// The authenticated user context resolved on initialization.
         /// </summary>
         private IUserContext userContext;
@@ -128,31 +100,25 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// </summary>
         /// <param name="logger">The (injected) <see cref="ILogger{PublishViewModel}" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
-        /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
-        /// <param name="organizationService">The (injected) <see cref="IOrganizationService" />.</param>
         /// <param name="scopeService">The (injected) <see cref="IScopeService" />.</param>
         /// <param name="packageService">The (injected) <see cref="IPackageService" />.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" />.</param>
-        /// <param name="packageMetaDataService">The (injected) <see cref="IPackageMetaDataService" />.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" />.</param>
         /// <param name="databaseSource">The (injected) <see cref="IDatabaseSource" />.</param>
         /// <param name="fileUploadStagingService">The (injected) <see cref="IFileUploadStagingService" />.</param>
         /// <param name="artifactStore">The (injected) <see cref="IArtifactStore" />.</param>
         /// <param name="manifestExtractors">The (injected) collection of <see cref="IArtifactManifestExtractor" /> instances.</param>
         /// <param name="packageVersionPermissionService">The (injected) <see cref="IPackageVersionPermissionService" />.</param>
-        public PublishViewModel(ILogger<PublishViewModel> logger, IUserService userService, IAccountService accountService, IOrganizationService organizationService,
-            IScopeService scopeService, IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService,
-            IPackageTypeService packageTypeService, IDatabaseSource databaseSource, IFileUploadStagingService fileUploadStagingService, IArtifactStore artifactStore,
+        public PublishViewModel(ILogger<PublishViewModel> logger, IUserService userService, IScopeService scopeService,
+            IPackageService packageService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService,
+            IDatabaseSource databaseSource, IFileUploadStagingService fileUploadStagingService, IArtifactStore artifactStore,
             IEnumerable<IArtifactManifestExtractor> manifestExtractors, IPackageVersionPermissionService packageVersionPermissionService)
         {
             this.logger = logger;
             this.userService = userService;
-            this.accountService = accountService;
-            this.organizationService = organizationService;
             this.scopeService = scopeService;
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
-            this.packageMetaDataService = packageMetaDataService;
             this.packageTypeService = packageTypeService;
             this.databaseSource = databaseSource;
             this.fileUploadStagingService = fileUploadStagingService;
@@ -180,6 +146,11 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// Gets or sets the scope that owns the package.
         /// </summary>
         public IScope SelectedScope { get; set; }
+
+        /// <summary>
+        /// Gets the staged upload artefact model, or <see langword="null" /> if no artefact has been staged.
+        /// </summary>
+        public PublishArtefactModel StagedArtefact { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether a new version of an already existing package is being published.
@@ -288,47 +259,45 @@ namespace Mycelium.Forge.ViewModels.Publish
         }
 
         /// <summary>
-        /// Reads the manifest of the staged artefact and maps its values onto the package metadata.
+        /// Reads the manifest of the staged artefact, maps its values onto the package metadata, and tracks the staged artefact
+        /// model.
         /// </summary>
-        /// <param name="stagingUploadToken">The token identifying the staged artefact.</param>
-        /// <param name="artifactKind">The kind of the artefact.</param>
+        /// <param name="artefact">The staged artefact UI model containing the staging token and archive metadata.</param>
         /// <returns>
         /// A <see cref="Task{Boolean}" /> that is <see langword="true" /> when manifest extraction succeeded without
         /// errors; otherwise, <see langword="false" />.
         /// </returns>
-        public async Task<bool> ExtractManifest(string stagingUploadToken, ArtifactKind artifactKind)
+        public async Task<bool> ExtractManifest(PublishArtefactModel artefact)
         {
             this.DiscardStagedFile();
 
-            this.stagingToken = stagingUploadToken;
-            this.extractorErrors = [];
+            this.StagedArtefact = artefact;
 
             if (!this.IsExistingPackage)
             {
-                var packageTypeName = SupportedPackageFormat.All.Single(x => x.Kind == artifactKind).Name;
-                var packageTypeResult = await this.packageTypeService.ReadByNameAsync(this.userContext, CancellationToken.None, [packageTypeName]);
+                var packageTypeResult = await this.packageTypeService.ReadByNameAsync(this.userContext, CancellationToken.None, [artefact.Format]);
 
                 if (packageTypeResult.IsError || packageTypeResult.Value.Count == 0)
                 {
-                    this.extractorErrors = [Error.Validation(ValidationTypes.SchemaValidation, $"Package type '{packageTypeName}' is not configured in the registry.")];
-                    await this.Validate();
+                    artefact.IsManifestValid = false;
+                    await this.Validate([Error.Validation(ValidationTypes.SchemaValidation, $"Package type '{artefact.Format}' is not configured in the registry.")]);
                     return false;
                 }
 
                 this.Package.PackageType = packageTypeResult.Value[0].Id;
             }
 
-            var extractor = this.manifestExtractors.Single(x => x.CanHandle(artifactKind));
+            var extractor = this.manifestExtractors.Single(x => x.CanHandle(artefact.Kind));
 
-            await using var stream = this.fileUploadStagingService.OpenStagedFile(this.stagingToken);
+            await using var stream = this.fileUploadStagingService.OpenStagedFile(artefact.StagingToken);
             this.PackageVersion.SizeInBytes = stream.Length;
 
             var extractResult = extractor.Extract(stream);
+            artefact.IsManifestValid = !extractResult.IsError;
 
-            if (extractResult.IsError)
+            if (!artefact.IsManifestValid)
             {
-                this.extractorErrors = extractResult.Errors;
-                await this.Validate();
+                await this.Validate(extractResult.Errors);
                 return false;
             }
 
@@ -339,14 +308,18 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// <summary>
         /// Evaluates the pre-publishing validation checks of the package being published.
         /// </summary>
+        /// <param name="beforeValidationErrors">
+        /// Optional pre-validation or extraction errors to evaluate before executing domain
+        /// checks.
+        /// </param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task Validate()
+        public async Task Validate(IReadOnlyList<Error> beforeValidationErrors = null)
         {
             this.ValidationChecks.Clear();
 
-            if (this.extractorErrors.Count > 0)
+            if (beforeValidationErrors is { Count: > 0 })
             {
-                this.ValidationChecks.AddRange(this.extractorErrors.Select(error => new ValidationCheckModel(error.Code, ValidationStatus.Fail, error.Description)));
+                this.ValidationChecks.AddRange(beforeValidationErrors.Select(error => new ValidationCheckModel(error.Code, ValidationStatus.Fail, error.Description)));
                 this.PackageMetaData.QualityChecks = [.. this.ValidationChecks.Select(check => (check.Title, check.Detail, check.Status == ValidationStatus.Pass))];
                 return;
             }
@@ -376,7 +349,8 @@ namespace Mycelium.Forge.ViewModels.Publish
 
             try
             {
-                var artifactResult = await this.StoreStagedArtifact(token);
+                await using var stagedStream = this.fileUploadStagingService.OpenStagedFile(this.StagedArtefact.StagingToken);
+                var artifactResult = await this.artifactStore.StoreArtifactAsync(stagedStream, token: token);
 
                 if (artifactResult.IsError)
                 {
@@ -386,7 +360,12 @@ namespace Mycelium.Forge.ViewModels.Publish
                 (storedHash, wasArtifactNew) = artifactResult.Value;
                 this.PackageVersion.Checksum = storedHash;
 
-                var persistResult = await this.PersistPackageAndRelease(token);
+                if (!this.IsExistingPackage)
+                {
+                    this.Package.Owner = this.SelectedScope.Id;
+                }
+
+                var persistResult = await this.packageService.PublishReleaseAsync(this.userContext, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, token);
 
                 if (!persistResult.IsError)
                 {
@@ -416,6 +395,19 @@ namespace Mycelium.Forge.ViewModels.Publish
                 this.DiscardStagedFile();
                 this.IsPublishing = false;
             }
+        }
+
+        /// <summary>
+        /// Deletes the staged artefact of the current upload, if any.
+        /// </summary>
+        public void DiscardStagedFile()
+        {
+            if (!string.IsNullOrWhiteSpace(this.StagedArtefact?.StagingToken))
+            {
+                this.fileUploadStagingService.Cleanup(this.StagedArtefact.StagingToken);
+            }
+
+            this.StagedArtefact = null;
         }
 
         /// <summary>
@@ -450,7 +442,7 @@ namespace Mycelium.Forge.ViewModels.Publish
                 if (conflictingVersion != null)
                 {
                     var isDuplicate = SemanticVersionComparer.Instance.Compare(this.PackageVersion.Version, conflictingVersion) == 0;
-                    
+
                     var detail = isDuplicate
                         ? $"Version '{this.PackageVersion.Version}' already exists for this package."
                         : $"Version '{this.PackageVersion.Version}' must be strictly greater than published version '{conflictingVersion}'.";
@@ -488,7 +480,8 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// <remarks>
         /// Explicitly initializes partial DTO properties (e.g. Readme, SizeInBytes, Dependencies, Elements) to clean, empty
         /// values to prevent mock defaults defined in prototype partial classes (such as <see cref="PackageVersion" /> and
-        /// <see cref="PackageMetaData" />) from persisting into the database. These settings shall be removed in future model changes.
+        /// <see cref="PackageMetaData" />) from persisting into the database. These settings shall be removed in future model
+        /// changes.
         /// </remarks>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         private async Task InitializeBase()
@@ -496,23 +489,8 @@ namespace Mycelium.Forge.ViewModels.Publish
             this.userContext = await this.userService.GetUserContext();
             this.currentUserId = this.userContext.AccountId!.Value;
 
-            var scopes = new List<IScope>();
-            var account = await this.accountService.ReadOrNull(this.userContext, this.currentUserId);
-
-            if (account is { Status: ScopeStatusKind.ACTIVE })
-            {
-                scopes.Add(account);
-            }
-
-            var organizationsResult = await this.organizationService.ReadByAccountMembershipAsync(this.userContext, this.currentUserId, CancellationToken.None);
-
-            if (!organizationsResult.IsError)
-            {
-                scopes.AddRange(organizationsResult.Value.Where(x => x.Status == ScopeStatusKind.ACTIVE));
-            }
-
-            this.ScopeOptions = scopes;
-            this.SelectedScope = scopes.FirstOrDefault();
+            this.ScopeOptions = await this.scopeService.ReadActiveByAccountAsync(this.userContext, this.currentUserId);
+            this.SelectedScope = this.ScopeOptions.FirstOrDefault();
 
             var versionId = Guid.NewGuid();
             var metaDataId = Guid.NewGuid();
@@ -536,95 +514,6 @@ namespace Mycelium.Forge.ViewModels.Publish
                 Elements = [],
                 QualityChecks = []
             };
-        }
-
-        /// <summary>
-        /// Deletes the staged artefact of the current upload, if any.
-        /// </summary>
-        public void DiscardStagedFile()
-        {
-            if (string.IsNullOrWhiteSpace(this.stagingToken))
-            {
-                return;
-            }
-
-            this.fileUploadStagingService.Cleanup(this.stagingToken);
-            this.stagingToken = null;
-        }
-
-        /// <summary>
-        /// Stores the staged file in object storage.
-        /// </summary>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{TValue}" /> containing the stored content hash and whether the blob was newly uploaded.</returns>
-        private async Task<ErrorOr<(string Hash, bool WasNew)>> StoreStagedArtifact(CancellationToken token)
-        {
-            await using var stagedStream = this.fileUploadStagingService.OpenStagedFile(this.stagingToken);
-            return await this.artifactStore.StoreArtifactAsync(stagedStream, token: token);
-        }
-
-        /// <summary>
-        /// Persists the package, version, and metadata entities within an atomic database transaction.
-        /// </summary>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{Success}" /> representing the persistence outcome.</returns>
-        private async Task<ErrorOr<Success>> PersistPackageAndRelease(CancellationToken token)
-        {
-            this.PackageVersion.PublicationDate = DateTime.UtcNow;
-
-            return await this.databaseSource.ExecuteInTransactionAsync(async transaction =>
-            {
-                await this.databaseSource.DeferConstraintsAsync(transaction, token);
-
-                // If publishing a new version of an existing package, only the version and metadata records are created; the package record already exists.
-                if (this.IsExistingPackage)
-                {
-                    var versionResult = await this.CreateVersionAndMetaData(transaction, token);
-
-                    if (!versionResult.IsError)
-                    {
-                        this.Package.Version.Add(this.PackageVersion.Id);
-                    }
-
-                    return versionResult;
-                }
-
-                // If publishing a new package, the package record is created first, followed by the version and metadata records.
-                this.Package.Owner = this.SelectedScope.Id;
-                var packageResult = await this.packageService.CreateAsync(this.userContext, transaction, [this.Package], token);
-
-                if (packageResult.IsError)
-                {
-                    return packageResult.Errors;
-                }
-
-                return await this.CreateVersionAndMetaData(transaction, token);
-            }, token);
-        }
-
-        /// <summary>
-        /// Creates the package version and package metadata records within the supplied transaction.
-        /// </summary>
-        /// <param name="transaction">The active database transaction.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{Success}" /> representing the creation outcome.</returns>
-        private async Task<ErrorOr<Success>> CreateVersionAndMetaData(NpgsqlTransaction transaction, CancellationToken token)
-        {
-            var versionResult = await this.packageVersionService.CreateAsync(this.userContext, transaction, [this.PackageVersion], token);
-
-            if (versionResult.IsError)
-            {
-                return versionResult.Errors;
-            }
-
-            var metaDataResult = await this.packageMetaDataService.CreateAsync(this.userContext, transaction, [this.PackageMetaData], token);
-
-            if (metaDataResult.IsError)
-            {
-                return metaDataResult.Errors;
-            }
-
-            return Result.Success;
         }
     }
 }

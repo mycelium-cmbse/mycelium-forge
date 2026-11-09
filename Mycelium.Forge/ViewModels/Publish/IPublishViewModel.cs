@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="IPublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -12,7 +12,6 @@ namespace Mycelium.Forge.ViewModels.Publish
     using ErrorOr;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
 
@@ -73,6 +72,11 @@ namespace Mycelium.Forge.ViewModels.Publish
         IReadOnlyList<IScope> ScopeOptions { get; }
 
         /// <summary>
+        /// Gets the staged upload artefact model, or <see langword="null" /> if no artefact has been staged.
+        /// </summary>
+        PublishArtefactModel StagedArtefact { get; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether a package publish operation is currently in progress.
         /// </summary>
         bool IsPublishing { get; set; }
@@ -98,21 +102,25 @@ namespace Mycelium.Forge.ViewModels.Publish
         Task InitializeViewModel(string scopeShortName, string packageShortName);
 
         /// <summary>
-        /// Reads the manifest of the staged artefact and maps its values onto the package metadata.
+        /// Reads the manifest of the staged artefact, maps its values onto the package metadata, and tracks the staged artefact
+        /// model.
         /// </summary>
-        /// <param name="stagingUploadToken">The token identifying the staged artefact.</param>
-        /// <param name="artifactKind">The kind of the artefact.</param>
+        /// <param name="artefact">The staged artefact UI model containing the staging token and archive metadata.</param>
         /// <returns>
         /// A <see cref="Task{Boolean}" /> that is <see langword="true" /> when manifest extraction succeeded without
         /// errors; otherwise, <see langword="false" />.
         /// </returns>
-        Task<bool> ExtractManifest(string stagingUploadToken, ArtifactKind artifactKind);
+        Task<bool> ExtractManifest(PublishArtefactModel artefact);
 
         /// <summary>
         /// Evaluates the pre-publishing validation checks of the package being published.
         /// </summary>
+        /// <param name="beforeValidationErrors">
+        /// Optional pre-validation or extraction errors to evaluate before executing domain
+        /// checks.
+        /// </param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task Validate();
+        Task Validate(IReadOnlyList<Error> beforeValidationErrors = null);
 
         /// <summary>
         /// Publishes the staged artefact and persists the package, its version, and its metadata.
