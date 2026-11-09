@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SemanticVersionComparer.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -18,8 +18,13 @@ namespace Mycelium.Forge.Common
     /// Maintained as a zero-dependency implementation complying with SemVer 2.0.0 specification section 11 precedence rules,
     /// avoiding external package dependencies (such as Semver or NuGet.Versioning) for core release ordering and validation.
     /// </remarks>
-    public static class SemanticVersionComparer
+    public sealed class SemanticVersionComparer : IComparer<string>
     {
+        /// <summary>
+        /// Gets the singleton instance of the <see cref="SemanticVersionComparer" />.
+        /// </summary>
+        public static SemanticVersionComparer Instance { get; } = new();
+
         /// <summary>
         /// Compares two SemVer 2.0.0 formatted version strings for precedence.
         /// </summary>
@@ -30,7 +35,7 @@ namespace Mycelium.Forge.Common
         /// <paramref name="versionB" />; zero if equal; greater than zero if <paramref name="versionA" /> succeeds
         /// <paramref name="versionB" />.
         /// </returns>
-        public static int Compare(string versionA, string versionB)
+        public int Compare(string versionA, string versionB)
         {
             if (string.Equals(versionA, versionB, StringComparison.Ordinal))
             {
@@ -78,10 +83,10 @@ namespace Mycelium.Forge.Common
         /// <param name="newVersion">The new semantic version string.</param>
         /// <param name="previousVersion">The previous semantic version string.</param>
         /// <returns><see langword="true" /> if the major version number has increased; otherwise, <see langword="false" />.</returns>
-        public static bool IsMajorBump(string newVersion, string previousVersion)
+        public bool IsMajorBump(string newVersion, string previousVersion)
         {
-            var matchNew = KparManifestExtractor.SemanticVersionRegex().Match(newVersion ?? string.Empty);
-            var matchPrev = KparManifestExtractor.SemanticVersionRegex().Match(previousVersion ?? string.Empty);
+            var matchNew = KparManifestExtractor.SemanticVersionRegex().Match(newVersion);
+            var matchPrev = KparManifestExtractor.SemanticVersionRegex().Match(previousVersion);
 
             if (!matchNew.Success || !matchPrev.Success)
             {

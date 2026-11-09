@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishValidationStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -131,6 +131,15 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             }
 
             await this.OnContinue.InvokeAsync();
+        }
+
+        /// <summary>
+        /// Gets the back button display text depending on whether the manifest is valid.
+        /// </summary>
+        /// <returns>The button text.</returns>
+        public string GetBackText()
+        {
+            return this.Artefact is { IsManifestValid: false } ? "Back to upload" : "Back to metadata";
         }
 
         /// <summary>

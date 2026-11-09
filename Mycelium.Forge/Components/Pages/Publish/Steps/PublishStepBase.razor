@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishStepBase.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -19,7 +19,8 @@
 
         @foreach (var item in this.InformationCard.Items)
         {
-            <div @key="item" class="flex items-start gap-2.5 w-full">
+            <div @key="item"
+                 class="flex items-start gap-2.5 w-full">
                 <div class="w-4 h-5 flex items-center justify-center shrink-0">
                     <LucideIcon Name="circle-check"
                                 Size="14"

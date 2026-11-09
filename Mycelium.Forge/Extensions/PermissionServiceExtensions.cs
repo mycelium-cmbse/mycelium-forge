@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PermissionServiceExtensions.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -35,11 +35,6 @@ namespace Mycelium.Forge.Extensions
             /// <returns>A task indicating whether creation is permitted.</returns>
             public Task<ErrorOr<Success>> IsAllowedToCreate(IDatabaseSource databaseSource, IUserContext userContext, TThing thing, CancellationToken token = default)
             {
-                ArgumentNullException.ThrowIfNull(service);
-                ArgumentNullException.ThrowIfNull(databaseSource);
-                ArgumentNullException.ThrowIfNull(userContext);
-                ArgumentNullException.ThrowIfNull(thing);
-
                 return databaseSource.ExecuteInTransactionAsync(transaction => service.IsAllowedToCreate(userContext, thing, transaction), token);
             }
 
@@ -54,11 +49,6 @@ namespace Mycelium.Forge.Extensions
             /// <returns>A task indicating whether updating is permitted.</returns>
             public Task<ErrorOr<Success>> IsAllowedToUpdate(IDatabaseSource databaseSource, IUserContext userContext, TThing thing, CancellationToken token = default)
             {
-                ArgumentNullException.ThrowIfNull(service);
-                ArgumentNullException.ThrowIfNull(databaseSource);
-                ArgumentNullException.ThrowIfNull(userContext);
-                ArgumentNullException.ThrowIfNull(thing);
-
                 return databaseSource.ExecuteInTransactionAsync(transaction => service.IsAllowedToUpdate(userContext, thing, thing, transaction), token);
             }
 
@@ -73,11 +63,6 @@ namespace Mycelium.Forge.Extensions
             /// <returns>A task indicating whether deletion is permitted.</returns>
             public Task<ErrorOr<Success>> IsAllowedToDelete(IDatabaseSource databaseSource, IUserContext userContext, TThing thing, CancellationToken token = default)
             {
-                ArgumentNullException.ThrowIfNull(service);
-                ArgumentNullException.ThrowIfNull(databaseSource);
-                ArgumentNullException.ThrowIfNull(userContext);
-                ArgumentNullException.ThrowIfNull(thing);
-
                 return databaseSource.ExecuteInTransactionAsync(transaction => service.IsAllowedToDelete(userContext, thing, transaction), token);
             }
         }

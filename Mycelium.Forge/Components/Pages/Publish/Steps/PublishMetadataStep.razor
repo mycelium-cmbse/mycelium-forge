@@ -35,7 +35,7 @@
     @if (this.IsKpar)
     {
         <p class="text-xs leading-2xs font-normal text-muted-foreground">
-            Format detected from the archive. The metadata below is read from the kpar manifest, so it is shown for confirmation rather than entry.
+            Format detected from the archive. Package name and version are defined by the kpar manifest, while description, license, and tags are pre-filled and can be refined.
         </p>
     }
 </div>
@@ -44,75 +44,100 @@
     Package metadata
 </h2>
 
-<div class="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 w-full">
-    <BbField Class="w-full sm:w-[200px] shrink-0 flex flex-col gap-1.5"
-             IsInvalid="@(this.ValidationManager.HasError(nameof(IScope)))">
-        <BbFieldLabel For="publish-scope"
-                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-            SCOPE
-        </BbFieldLabel>
-        <BbFieldContent>
-            <ForgeSelect TValue="IScope"
-                         Value="@(this.ViewModel.SelectedScope)"
-                         ValueChanged="@(this.OnScopeChanged)"
-                         Items="@(this.ViewModel.ScopeOptions)"
-                         DisplayTextSelector="@(x => x.GetDisplayShortName())"
-                         Disabled="@(this.ViewModel.IsExistingPackage)"
-                         Id="publish-scope">
-                <TriggerContent>
-                    <div class="flex items-center gap-1.5 flex-1 truncate">
-                        <span>@(this.ViewModel.SelectedScope.GetDisplayShortName())</span>
-                        @if (this.IsSelectedScopeVerified)
-                        {
-                            <LucideIcon Name="badge-check"
-                                        Size="14"
-                                        Class="text-primary shrink-0"/>
-                        }
-                    </div>
-                    <LucideIcon Name="chevron-down"
-                                Size="16"
-                                Class="text-muted-foreground shrink-0"/>
-                </TriggerContent>
-            </ForgeSelect>
-        </BbFieldContent>
-        <BbFieldError Class="form-field-error"
-                      Errors="@(this.ValidationManager[nameof(IScope)])"/>
-    </BbField>
+@if (this.ViewModel.IsExistingPackage)
+{
+    <div class="w-full p-3.5 sm:px-4 rounded-lg bg-card border border-border flex items-center justify-between gap-3">
+        <div class="flex flex-col gap-0.5 min-w-0">
+            <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                TARGET PACKAGE
+            </span>
+            <div class="flex items-center gap-2">
+                <span class="font-mono text-sm leading-normal font-semibold text-foreground truncate">
+                    @(this.GetScopePackageCoordinate())
+                </span>
+                <span class="text-xs leading-2xs text-muted-foreground truncate">
+                    @(this.ViewModel.Package.Name)
+                </span>
+            </div>
+        </div>
+        <BbBadge Variant="BadgeVariant.Secondary"
+                 Class="badge-format shrink-0">
+            @(this.ViewModel.Package.Visibility.ToUpperCaseFirst())
+        </BbBadge>
+    </div>
+}
+else
+{
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 w-full">
+        <BbField Class="w-full sm:w-[200px] shrink-0 flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(IScope)))">
+            <BbFieldLabel For="publish-scope"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                SCOPE
+            </BbFieldLabel>
+            <BbFieldContent>
+                <ForgeSelect TValue="IScope"
+                             Value="@(this.ViewModel.SelectedScope)"
+                             ValueChanged="@(this.OnScopeChanged)"
+                             Items="@(this.ViewModel.ScopeOptions)"
+                             DisplayTextSelector="@(x => x?.GetDisplayShortName() ?? string.Empty)"
+                             Disabled="@(this.ViewModel.IsExistingPackage)"
+                             Id="publish-scope">
+                    <TriggerContent>
+                        <div class="flex items-center gap-1.5 flex-1 truncate">
+                            <span>@(this.ViewModel.SelectedScope?.GetDisplayShortName() ?? string.Empty)</span>
+                            @if (this.IsSelectedScopeVerified)
+                            {
+                                <LucideIcon Name="badge-check"
+                                            Size="14"
+                                            Class="text-primary shrink-0"/>
+                            }
+                        </div>
+                        <LucideIcon Name="chevron-down"
+                                    Size="16"
+                                    Class="text-muted-foreground shrink-0"/>
+                    </TriggerContent>
+                </ForgeSelect>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(IScope)])"/>
+        </BbField>
 
-    <BbField Class="w-full sm:flex-1 flex flex-col gap-1.5"
-             IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.ShortName)))">
-        <BbFieldLabel For="publish-package-short-name"
+        <BbField Class="w-full sm:flex-1 flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.ShortName)))">
+            <BbFieldLabel For="publish-package-short-name"
+                          Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                SHORT NAME
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput id="publish-package-short-name"
+                         Value="@(this.ViewModel.Package.ShortName)"
+                         ValueChanged="@(this.OnPackageShortNameChanged)"
+                         Disabled="@(this.ViewModel.IsExistingPackage)"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(IPackage.ShortName)])"/>
+        </BbField>
+    </div>
+
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.Name)))">
+        <BbFieldLabel For="publish-package-name"
                       Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-            SHORT NAME
+            PACKAGE NAME
         </BbFieldLabel>
         <BbFieldContent>
-            <BbInput id="publish-package-short-name"
-                     Value="@(this.ViewModel.Package.ShortName)"
-                     ValueChanged="@(this.OnPackageShortNameChanged)"
-                     Disabled="@(this.ViewModel.IsExistingPackage)"
+            <BbInput id="publish-package-name"
+                     Value="@(this.ViewModel.Package.Name)"
+                     ValueChanged="@(this.OnPackageNameChanged)"
+                     Disabled="@(this.IsPackageNameDisabled)"
                      Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
         </BbFieldContent>
         <BbFieldError Class="form-field-error"
-                      Errors="@(this.ValidationManager[nameof(IPackage.ShortName)])"/>
+                      Errors="@(this.ValidationManager[nameof(IPackage.Name)])"/>
     </BbField>
-</div>
-
-<BbField Class="w-full flex flex-col gap-1.5"
-         IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.Name)))">
-    <BbFieldLabel For="publish-package-name"
-                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-        PACKAGE NAME
-    </BbFieldLabel>
-    <BbFieldContent>
-        <BbInput id="publish-package-name"
-                 Value="@(this.ViewModel.Package.Name)"
-                 ValueChanged="@(this.OnPackageNameChanged)"
-                 Disabled="@(this.IsPackageManifestFieldDisabled)"
-                 Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
-    </BbFieldContent>
-    <BbFieldError Class="form-field-error"
-                  Errors="@(this.ValidationManager[nameof(IPackage.Name)])"/>
-</BbField>
+}
 
 <BbField Class="w-full flex flex-col gap-1.5"
          IsInvalid="@(this.ValidationManager.HasError(nameof(IPackageVersion.Version)))">
@@ -151,77 +176,77 @@
                   Errors="@(this.ValidationManager[nameof(IPackageVersion.ReleaseNotes)])"/>
 </BbField>
 
-<BbField Class="w-full flex flex-col gap-1.5"
-         IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.Description)))">
-    <BbFieldLabel For="publish-description"
-                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-        DESCRIPTION
-    </BbFieldLabel>
-    <BbFieldContent>
-        <BbTextarea id="publish-description"
-                    Value="@(this.ViewModel.Package.Description)"
-                    ValueChanged="@(this.OnDescriptionChanged)"
-                    Disabled="@(this.IsPackageManifestFieldDisabled)"
-                    Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
-    </BbFieldContent>
-    <BbFieldError Class="form-field-error"
-                  Errors="@(this.ValidationManager[nameof(IPackage.Description)])"/>
-</BbField>
+@if (!this.ViewModel.IsExistingPackage)
+{
+    <BbField Class="w-full flex flex-col gap-1.5"
+             IsInvalid="@(this.ValidationManager.HasError(nameof(IPackage.Description)))">
+        <BbFieldLabel For="publish-description"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            DESCRIPTION
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbTextarea id="publish-description"
+                        Value="@(this.ViewModel.Package.Description)"
+                        ValueChanged="@(this.OnDescriptionChanged)"
+                        Class="w-full h-18 p-2.5 px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground resize-none focus:outline-none"/>
+        </BbFieldContent>
+        <BbFieldError Class="form-field-error"
+                      Errors="@(this.ValidationManager[nameof(IPackage.Description)])"/>
+    </BbField>
 
-<BbField Class="w-full flex flex-col gap-1.5">
-    <BbFieldLabel For="publish-license"
-                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-        LICENSE
-    </BbFieldLabel>
-    <BbFieldContent>
-        <ForgeSelect TValue="string"
-                     Value="@(this.ViewModel.Package.License)"
-                     ValueChanged="@(this.OnLicenseChanged)"
-                     Items="@(LicenseOptions)"
-                     Disabled="@(this.IsPackageManifestFieldDisabled)"
-                     Id="publish-license"/>
-    </BbFieldContent>
-</BbField>
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-license"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            LICENSE
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="string"
+                         Value="@(this.ViewModel.Package.License)"
+                         ValueChanged="@(this.OnLicenseChanged)"
+                         Items="@(LicenseOptions)"
+                         Id="publish-license"/>
+        </BbFieldContent>
+    </BbField>
 
-<BbField Class="w-full flex flex-col gap-1.5">
-    <BbFieldLabel For="publish-visibility"
-                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-        VISIBILITY
-    </BbFieldLabel>
-    <BbFieldContent>
-        <ForgeSelect TValue="VisibilityKind"
-                     Value="@(this.ViewModel.Package.Visibility)"
-                     ValueChanged="@(this.OnVisibilityChanged)"
-                     Items="@(VisibilityOptions)"
-                     DisabledExpression="@(this.IsVisibilityItemDisabled)"
-                     Disabled="@(this.ViewModel.IsExistingPackage)"
-                     Id="publish-visibility"
-                     DisplayTextSelector="@(x => x.ToUpperCaseFirst())"/>
-    </BbFieldContent>
-    <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground flex flex-col gap-0.5">
-        <span>Public: anyone can find and download it.</span>
-        @if (this.IsScopeOrganization)
-        {
-            <span>Internal: visible to members of the owning scope.</span>
-        }
-        <span>Private: only Maintainers and Accounts granted the Reader role.</span>
-    </BbFieldDescription>
-</BbField>
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-visibility"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            VISIBILITY
+        </BbFieldLabel>
+        <BbFieldContent>
+            <ForgeSelect TValue="VisibilityKind"
+                         Value="@(this.ViewModel.Package.Visibility)"
+                         ValueChanged="@(this.OnVisibilityChanged)"
+                         Items="@(VisibilityOptions)"
+                         DisabledExpression="@(this.IsVisibilityItemDisabled)"
+                         Disabled="@(this.ViewModel.IsExistingPackage)"
+                         Id="publish-visibility"
+                         DisplayTextSelector="@(x => x.ToUpperCaseFirst())"/>
+        </BbFieldContent>
+        <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground flex flex-col gap-0.5">
+            <span>Public: anyone can find and download it.</span>
+            @if (this.IsScopeOrganization)
+            {
+                <span>Internal: visible to members of the owning scope.</span>
+            }
+            <span>Private: only Maintainers and Accounts granted the Reader role.</span>
+        </BbFieldDescription>
+    </BbField>
 
-<BbField Class="w-full flex flex-col gap-1.5">
-    <BbFieldLabel For="publish-tags"
-                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-        TAGS
-    </BbFieldLabel>
-    <BbFieldContent>
-        <BbTagInput Tags="@(this.ViewModel.Package.Tags)"
-                    TagsChanged="@(this.OnTagsChanged)"
-                    id="publish-tags"
-                    Disabled="@(this.IsPackageManifestFieldDisabled)"
-                    Placeholder="Add tag..."
-                    Class="w-full"/>
-    </BbFieldContent>
-</BbField>
+    <BbField Class="w-full flex flex-col gap-1.5">
+        <BbFieldLabel For="publish-tags"
+                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+            TAGS
+        </BbFieldLabel>
+        <BbFieldContent>
+            <BbTagInput Tags="@(this.ViewModel.Package.Tags)"
+                        TagsChanged="@(this.OnTagsChanged)"
+                        id="publish-tags"
+                        Placeholder="Add tag..."
+                        Class="w-full"/>
+        </BbFieldContent>
+    </BbField>
+}
 </Body>
 
 <Footer>

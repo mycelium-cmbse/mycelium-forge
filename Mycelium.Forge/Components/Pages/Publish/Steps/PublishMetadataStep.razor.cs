@@ -104,19 +104,28 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public bool IsKpar => this.Artefact.Kind == ArtifactKind.Kpar;
 
         /// <summary>
-        /// Gets a value indicating whether package-level manifest fields are disabled.
+        /// Gets a value indicating whether the package name field is disabled.
         /// </summary>
-        public bool IsPackageManifestFieldDisabled => this.IsKpar || this.ViewModel.IsExistingPackage;
+        public bool IsPackageNameDisabled => this.IsKpar;
 
         /// <summary>
         /// Gets a value indicating whether the selected scope is verified.
         /// </summary>
-        public bool IsSelectedScopeVerified => this.ViewModel.SelectedScope.IsVerified();
+        public bool IsSelectedScopeVerified => this.ViewModel.SelectedScope?.IsVerified() ?? false;
 
         /// <summary>
         /// Gets a value indicating whether the selected scope is an organization.
         /// </summary>
         public bool IsScopeOrganization => this.ViewModel.SelectedScope is IOrganization;
+
+        /// <summary>
+        /// Gets the formatted `@scope/packageName` coordinate string for display.
+        /// </summary>
+        /// <returns>The formatted package coordinate string.</returns>
+        public string GetScopePackageCoordinate()
+        {
+            return $"{this.ViewModel.SelectedScope.GetDisplayShortName()}/{this.ViewModel.Package.ShortName}";
+        }
 
         /// <summary>
         /// Determines whether a visibility option is disabled for the currently selected scope.
@@ -134,6 +143,24 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task HandleContinue()
         {
+            if (this.ViewModel.IsExistingPackage)
+            {
+                var isExistingVersionValid = !string.IsNullOrWhiteSpace(this.ViewModel.PackageVersion.Version) &&
+                                             KparManifestExtractor.SemanticVersionRegex().IsMatch(this.ViewModel.PackageVersion.Version);
+
+                var isExistingValid = this.ValidationManager
+                    .Check(nameof(IPackageVersion.Version), isExistingVersionValid, "Version must follow SemVer 2.0.0 format (e.g. 1.0.0).")
+                    .IsValid;
+
+                if (!isExistingValid)
+                {
+                    return;
+                }
+
+                await this.OnContinue.InvokeAsync();
+                return;
+            }
+
             var isShortNameValid = !string.IsNullOrWhiteSpace(this.ViewModel.Package.ShortName) &&
                                    PackageValidator.ShortNameFormatRegex().IsMatch(this.ViewModel.Package.ShortName);
 
@@ -165,9 +192,10 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             this.ViewModel.SelectedScope = scope;
             this.ValidationManager.ClearError(nameof(IScope));
 
-            if (!this.ViewModel.IsExistingPackage)
+            if (!this.ViewModel.IsExistingPackage && scope != null)
             {
                 this.ViewModel.Package.Visibility = scope.DefaultPackageVisibility;
+                this.ViewModel.Package.IsVerified = scope.IsVerified();
             }
         }
 
@@ -257,7 +285,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <param name="tags">The updated list of tags.</param>
         public void OnTagsChanged(IReadOnlyList<string> tags)
         {
-            this.ViewModel.Package.Tags = tags?.ToList() ?? [];
+            this.ViewModel.Package.Tags = [.. tags ?? []];
         }
     }
 }

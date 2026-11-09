@@ -31,10 +31,6 @@
         }
     </div>
 
-    <p class="text-xs leading-2xs font-normal text-muted-foreground w-full">
-        Only packages up to @(this.MaxAllowedFileSize.FormatFileSize()) are supported.
-    </p>
-
     <BbFieldError Class="form-field-error"
                   Errors="@(this.ValidationManager[nameof(this.selectedFile)])"/>
 

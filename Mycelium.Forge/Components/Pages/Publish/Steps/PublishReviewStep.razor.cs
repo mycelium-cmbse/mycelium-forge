@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishReviewStep.razor.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -32,7 +32,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             Items =
             [
                 "A published version becomes immutable. A correction ships as a new version.",
-                "It is public. Anyone can find and download it.",
+                "Visibility follows the setting chosen for the package.",
                 "You can unlist it later. Only the Installation Administrator can erase it."
             ],
             HelpText = "The publish is recorded in the package audit log.",

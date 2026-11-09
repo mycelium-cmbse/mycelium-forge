@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Components.Pages.Publish
     /// <summary>
     /// Represents the package publishing wizard page of the Mycelium Forge registry.
     /// </summary>
-    public partial class Publish : ComponentBase
+    public partial class Publish : DisposableComponent
     {
         /// <summary>
         /// The currently staged artefact UI model.
@@ -91,8 +91,8 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         public void OnBack()
         {
-            // If the user is on the validation step and the staged artefact is a KPAR with an invalid manifest, return to the upload step instead of the metadata step.
-            if (this.ActiveStep == 2 && this.stagedArtefact is { Kind: ArtifactKind.Kpar, IsManifestValid: false })
+            // If the user is on the validation step and the staged artefact has an invalid manifest, return to the upload step instead of the metadata step.
+            if (this.ActiveStep == 2 && this.stagedArtefact is { IsManifestValid: false })
             {
                 this.ActiveStep = 0;
                 return;
@@ -126,8 +126,8 @@ namespace Mycelium.Forge.Components.Pages.Publish
         {
             this.stagedArtefact = artefact;
 
-            // If the uploaded artefact is a KPAR with an invalid manifest, skip the metadata step and go directly to validation.
-            this.ActiveStep = artefact.Kind == ArtifactKind.Kpar && !artefact.IsManifestValid ? 2 : 1;
+            // If the uploaded artefact has an invalid manifest, skip the metadata step and go directly to validation.
+            this.ActiveStep = !artefact.IsManifestValid ? 2 : 1;
         }
 
         /// <summary>
@@ -135,9 +135,27 @@ namespace Mycelium.Forge.Components.Pages.Publish
         /// </summary>
         public void OnReplaceArtefact()
         {
+            this.ViewModel.DiscardStagedFile();
             this.stagedArtefact = null;
             this.uploadStepKey = Guid.NewGuid();
             this.ActiveStep = 0;
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only
+        /// unmanaged resources.
+        /// </param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.ViewModel.DiscardStagedFile();
+            }
+
+            base.Dispose(disposing);
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishReviewStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -39,7 +39,7 @@
                 </BbBadge>
             </div>
             <span class="text-xs leading-2xs font-normal text-muted-foreground">
-                @(this.Artefact.SizeInBytes.FormatFileSize()) &bull; Detected @(this.Artefact.Format) &bull; SHA-256 verified
+                @(this.Artefact.SizeInBytes.FormatFileSize()) &bull; @(this.Artefact.Format)
             </span>
         </div>
     </div>

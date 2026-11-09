@@ -32,11 +32,6 @@ namespace Mycelium.Forge.Extensions
             /// <param name="isExistingPackage">A value indicating whether an existing package is being versioned.</param>
             public void ApplyTo(IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage)
             {
-                if (manifest == null)
-                {
-                    return;
-                }
-
                 switch (manifest)
                 {
                     case KparManifest kpar:

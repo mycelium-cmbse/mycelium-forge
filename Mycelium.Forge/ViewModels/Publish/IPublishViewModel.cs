@@ -78,6 +78,11 @@ namespace Mycelium.Forge.ViewModels.Publish
         bool IsPublishing { get; set; }
 
         /// <summary>
+        /// Discards the currently staged upload file and frees associated resources.
+        /// </summary>
+        void DiscardStagedFile();
+
+        /// <summary>
         /// Initializes the view model state and loads the scopes of the current account for creating a new package.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>

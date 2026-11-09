@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels.Publish
 {
-    using System.Security.Cryptography;
-
     using ErrorOr;
 
     using Mycelium.Forge.Common;
@@ -237,7 +235,13 @@ namespace Mycelium.Forge.ViewModels.Publish
                 Visibility = this.SelectedScope?.DefaultPackageVisibility ?? VisibilityKind.PRIVATE,
                 Listed = true,
                 PackageOwner = [this.currentUserId],
-                Version = [this.PackageVersion.Id]
+                Version = [this.PackageVersion.Id],
+                License = string.Empty,
+                RepositoryUrl = string.Empty,
+                HomepageUrl = string.Empty,
+                DocumentationUrl = string.Empty,
+                Tags = [],
+                IsVerified = this.SelectedScope?.IsVerified() ?? false
             };
         }
 
@@ -251,6 +255,7 @@ namespace Mycelium.Forge.ViewModels.Publish
         public async Task InitializeViewModel(string scopeShortName, string packageShortName)
         {
             await this.InitializeBase();
+            this.IsExistingPackage = true;
 
             var existingResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scopeShortName.CleanScope(), packageShortName.ToShortName(), CancellationToken.None);
 
@@ -262,13 +267,18 @@ namespace Mycelium.Forge.ViewModels.Publish
 
             this.Package = existingResult.Value;
             this.PackageVersion.Owner = this.Package.Id;
-            this.IsExistingPackage = true;
 
             var packageType = await this.packageTypeService.ReadOrNull(this.userContext, this.Package.PackageType);
-            this.ExpectedFormat = SupportedPackageFormat.All.Single(x => x.Name.Equals(packageType?.Name, StringComparison.OrdinalIgnoreCase));
+            this.ExpectedFormat = SupportedPackageFormat.All.SingleOrDefault(x => x.Name.Equals(packageType?.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (this.ExpectedFormat == null)
+            {
+                this.CanUserReleaseExistingPackageVersion = false;
+                return;
+            }
 
             var packageVersions = await this.packageVersionService.ReadOrEmpty(this.userContext, this.Package.Version);
-            this.ExistingVersions = [.. packageVersions.Select(x => x.Version)];
+            this.ExistingVersions = [.. packageVersions.Select(x => x.Version).OrderDescending(SemanticVersionComparer.Instance)];
 
             this.SelectedScope = this.ScopeOptions.FirstOrDefault(x => x.Id == this.Package.Owner)
                                  ?? await this.scopeService.ReadOrNull(this.userContext, this.Package.Owner);
@@ -298,10 +308,14 @@ namespace Mycelium.Forge.ViewModels.Publish
                 var packageTypeName = SupportedPackageFormat.All.Single(x => x.Kind == artifactKind).Name;
                 var packageTypeResult = await this.packageTypeService.ReadByNameAsync(this.userContext, CancellationToken.None, [packageTypeName]);
 
-                if (!packageTypeResult.IsError && packageTypeResult.Value.Count > 0)
+                if (packageTypeResult.IsError || packageTypeResult.Value.Count == 0)
                 {
-                    this.Package.PackageType = packageTypeResult.Value[0].Id;
+                    this.extractorErrors = [Error.Validation(ValidationTypes.SchemaValidation, $"Package type '{packageTypeName}' is not configured in the registry.")];
+                    await this.Validate();
+                    return false;
                 }
+
+                this.Package.PackageType = packageTypeResult.Value[0].Id;
             }
 
             var extractor = this.manifestExtractors.Single(x => x.CanHandle(artifactKind));
@@ -390,7 +404,7 @@ namespace Mycelium.Forge.ViewModels.Publish
             {
                 this.logger.LogError(exception, "Failed to publish package {PackageName}", this.Package.Name.SanitizeForLog());
 
-                if (wasArtifactNew && !string.IsNullOrWhiteSpace(storedHash))
+                if (wasArtifactNew)
                 {
                     await this.artifactStore.DeleteArtifactAsync(storedHash, token);
                 }
@@ -431,23 +445,21 @@ namespace Mycelium.Forge.ViewModels.Publish
             {
                 this.ValidationChecks.Add(new ValidationCheckModel(ValidationTypes.NamespaceUniqueness, ValidationStatus.Pass, "Publishing a new version to an existing package in the selected scope."));
 
-                var isDuplicateVersion = this.ExistingVersions.Any(x => string.Equals(x, this.PackageVersion.Version, StringComparison.OrdinalIgnoreCase));
+                var conflictingVersion = this.ExistingVersions.FirstOrDefault(x => SemanticVersionComparer.Instance.Compare(this.PackageVersion.Version, x) <= 0);
 
-                if (isDuplicateVersion)
+                if (conflictingVersion != null)
                 {
-                    this.ValidationChecks.Add(new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Fail, $"Version '{this.PackageVersion.Version}' already exists for this package."));
+                    var isDuplicate = SemanticVersionComparer.Instance.Compare(this.PackageVersion.Version, conflictingVersion) == 0;
+                    
+                    var detail = isDuplicate
+                        ? $"Version '{this.PackageVersion.Version}' already exists for this package."
+                        : $"Version '{this.PackageVersion.Version}' must be strictly greater than published version '{conflictingVersion}'.";
+
+                    this.ValidationChecks.Add(new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Fail, detail));
                     return;
                 }
 
-                var notGreaterVersion = this.ExistingVersions.FirstOrDefault(x => SemanticVersionComparer.Compare(this.PackageVersion.Version, x) <= 0);
-
-                if (notGreaterVersion != null)
-                {
-                    this.ValidationChecks.Add(new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Fail, $"Version '{this.PackageVersion.Version}' must be strictly greater than published version '{notGreaterVersion}'."));
-                    return;
-                }
-
-                var isMajorBump = this.ExistingVersions.Any(x => SemanticVersionComparer.IsMajorBump(this.PackageVersion.Version, x));
+                var isMajorBump = this.ExistingVersions.Any(x => SemanticVersionComparer.Instance.IsMajorBump(this.PackageVersion.Version, x));
 
                 if (isMajorBump && string.IsNullOrWhiteSpace(this.PackageVersion.ReleaseNotes))
                 {
@@ -473,6 +485,11 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// Initializes the user context, available scopes, and new version and metadata instances shared by both initialization
         /// paths.
         /// </summary>
+        /// <remarks>
+        /// Explicitly initializes partial DTO properties (e.g. Readme, SizeInBytes, Dependencies, Elements) to clean, empty
+        /// values to prevent mock defaults defined in prototype partial classes (such as <see cref="PackageVersion" /> and
+        /// <see cref="PackageMetaData" />) from persisting into the database. These settings shall be removed in future model changes.
+        /// </remarks>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         private async Task InitializeBase()
         {
@@ -504,20 +521,27 @@ namespace Mycelium.Forge.ViewModels.Publish
             {
                 Id = versionId,
                 MetaData = metaDataId,
-                Listed = true
+                Listed = true,
+                Readme = string.Empty,
+                ReleaseNotes = string.Empty,
+                Checksum = string.Empty,
+                SizeInBytes = 0
             };
 
             this.PackageMetaData = new PackageMetaData
             {
                 Id = metaDataId,
-                Owner = versionId
+                Owner = versionId,
+                Dependencies = [],
+                Elements = [],
+                QualityChecks = []
             };
         }
 
         /// <summary>
         /// Deletes the staged artefact of the current upload, if any.
         /// </summary>
-        private void DiscardStagedFile()
+        public void DiscardStagedFile()
         {
             if (string.IsNullOrWhiteSpace(this.stagingToken))
             {
@@ -529,32 +553,14 @@ namespace Mycelium.Forge.ViewModels.Publish
         }
 
         /// <summary>
-        /// Hashes the staged file, checks whether it already exists in object storage, and stores it.
+        /// Stores the staged file in object storage.
         /// </summary>
         /// <param name="token">The cancellation token.</param>
         /// <returns>An <see cref="ErrorOr{TValue}" /> containing the stored content hash and whether the blob was newly uploaded.</returns>
         private async Task<ErrorOr<(string Hash, bool WasNew)>> StoreStagedArtifact(CancellationToken token)
         {
             await using var stagedStream = this.fileUploadStagingService.OpenStagedFile(this.stagingToken);
-
-            var hashBytes = await SHA256.HashDataAsync(stagedStream, token);
-            var computedHash = Convert.ToHexStringLower(hashBytes);
-
-            var existsResult = await this.artifactStore.ExistsAsync(computedHash, token);
-
-            if (existsResult.IsError)
-            {
-                return existsResult.Errors;
-            }
-
-            var storeResult = await this.artifactStore.StoreArtifactAsync(stagedStream, token: token);
-
-            if (storeResult.IsError)
-            {
-                return storeResult.Errors;
-            }
-
-            return (storeResult.Value, !existsResult.Value);
+            return await this.artifactStore.StoreArtifactAsync(stagedStream, token: token);
         }
 
         /// <summary>

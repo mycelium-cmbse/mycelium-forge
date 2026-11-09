@@ -105,11 +105,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         public ValidationManager ValidationManager { get; } = new();
 
         /// <summary>
-        /// The maximum allowed upload file size in bytes.
-        /// </summary>
-        private long MaxAllowedFileSize => this.maxAllowedFileSizeInMb * 1024 * 1024;
-
-        /// <summary>
         /// Gets the comma-separated list of accepted file extensions.
         /// </summary>
         private string AcceptedExtensions => this.ViewModel.ExpectedFormat != null
@@ -222,11 +217,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             if (!this.HasSelectedFile)
             {
                 return Error.Validation(description: "Please select an archive file to upload.");
-            }
-
-            if (this.selectedFile.Size > this.MaxAllowedFileSize)
-            {
-                return Error.Validation(description: $"The selected file exceeds the maximum allowed file size of {this.maxAllowedFileSizeInMb} MB.");
             }
 
             if (this.ViewModel.ExpectedFormat != null && this.selectedFormat != this.ViewModel.ExpectedFormat)

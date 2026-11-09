@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishValidationStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -152,10 +152,11 @@
 
     <Footer>
         <PublishStepFooter FootnoteText="@(this.GetFootnoteText())"
-                           BackText="Back to metadata"
+                           BackText="@(this.GetBackText())"
                            BackId="publish-back-to-metadata-button"
                            ContinueText="Continue to review"
                            ContinueId="publish-continue-to-review-button"
+                           IsContinueDisabled="@(this.HasFailures)"
                            OnBack="@(this.OnBack)"
                            OnContinue="@(this.HandleContinue)"/>
     </Footer>
