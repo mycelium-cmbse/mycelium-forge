@@ -203,7 +203,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         {
             this.selectedFile = files is { Count: > 0 } ? files[0] : null;
             var matches = this.GetMatchingFormats();
-            this.selectedFormat = this.ViewModel.ExpectedFormat ?? (matches.Count == 1 ? matches[0] : null);
+            this.selectedFormat = matches.Count == 1 ? matches[0] : (matches.Contains(this.ViewModel.ExpectedFormat) ? this.ViewModel.ExpectedFormat : null);
             this.ValidationManager.ClearError(nameof(this.selectedFile));
             this.ValidationManager.ClearError(nameof(this.selectedFormat));
         }

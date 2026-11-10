@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Models.Validation
 {
+    using ErrorOr;
+
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Enums;
 
@@ -36,6 +38,21 @@ namespace Mycelium.Forge.Models.Validation
             this.Title = title;
             this.Detail = detail;
             this.Status = status;
+            this.Recommendation = !string.IsNullOrWhiteSpace(recommendation) ? recommendation : ResolveRecommendation(title);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationCheckModel" /> class from an <see cref="ErrorOr{Success}" /> result.
+        /// </summary>
+        /// <param name="title">The title or description label of the check.</param>
+        /// <param name="result">The validation evaluation result.</param>
+        /// <param name="successDetail">The detailed execution summary when validation passes.</param>
+        /// <param name="recommendation">The optional suggested recommendation action to resolve a failed check.</param>
+        public ValidationCheckModel(string title, ErrorOr<Success> result, string successDetail = "", string recommendation = "")
+        {
+            this.Title = title;
+            this.Status = result.IsError ? ValidationStatus.Fail : ValidationStatus.Pass;
+            this.Detail = result.IsError ? result.FirstError.Description : successDetail;
             this.Recommendation = !string.IsNullOrWhiteSpace(recommendation) ? recommendation : ResolveRecommendation(title);
         }
 

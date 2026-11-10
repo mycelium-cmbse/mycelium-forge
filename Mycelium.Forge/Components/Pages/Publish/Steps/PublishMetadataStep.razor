@@ -7,6 +7,11 @@
 </copyright>
 ------------------------------------------------------------------------------------------------ *@
 
+@if (this.ViewModel.StagedArtefact == null)
+{
+    return;
+}
+
 <PublishStepBase InformationCard="@(StepInformationCard)">
 <Body>
 <div class="w-full p-3.5 sm:px-4 rounded-lg bg-background border border-border flex flex-col gap-2">

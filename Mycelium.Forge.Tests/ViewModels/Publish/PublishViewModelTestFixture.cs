@@ -221,11 +221,10 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
             await this.viewModel.ExtractManifest(artefact);
 
-            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
-
-            var successResult = await this.viewModel.Publish(CancellationToken.None);
+            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<IScope>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
 
             var expectedCacheKey = this.memoryCacheMock.Object.BuildPackageDetailsCacheKey(this.userContext, this.activeScope.ShortName, this.viewModel.Package.ShortName);
+            var successResult = await this.viewModel.Publish(CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
@@ -238,7 +237,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
             // Case 2: Publication error returns failure
             await this.viewModel.ExtractManifest(artefact);
-            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Upload failed"));
+            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<IScope>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Upload failed"));
 
             var artifactFailResult = await this.viewModel.Publish(CancellationToken.None);
 

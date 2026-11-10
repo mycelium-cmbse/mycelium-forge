@@ -112,6 +112,30 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
                 Assert.That(continued, Is.False);
                 this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), It.IsAny<string>(), NotificationType.Error), Times.Once);
             }
+
+            // Case 4: Mismatched file format for existing package rejects upload and shows error
+            this.viewModelMock.Setup(x => x.ExpectedFormat).Returns(SupportedPackageFormat.All[0]);
+            this.jsInteropMock.Invocations.Clear();
+
+            var mismatchedStep = this.context.Render<PublishUploadStep>(parameters =>
+            {
+                parameters.Add(x => x.ViewModel, this.viewModelMock.Object);
+                parameters.Add(x => x.OnContinue, onContinue);
+            });
+
+            var mismatchedInput = mismatchedStep.FindComponent<InputFile>();
+            mismatchedInput.UploadFiles(InputFileContent.CreateFromText("zip payload", "model.zip"));
+
+            var mismatchedContinue = mismatchedStep.Find("#publish-continue-button");
+            continued = false;
+            await mismatchedContinue.ClickAsync(new MouseEventArgs());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(continued, Is.False);
+                this.jsInteropMock.Verify(x => x.UploadLargeFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+                Assert.That(mismatchedStep.Markup, Does.Contain($"Only {SupportedPackageFormat.All[0].Name} ({SupportedPackageFormat.All[0].Extension}) archives can be uploaded for this package."));
+            }
         }
 
         [Test]

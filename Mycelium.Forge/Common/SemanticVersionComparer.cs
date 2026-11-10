@@ -48,21 +48,21 @@ namespace Mycelium.Forge.Common
                 return string.Compare(versionA, versionB, StringComparison.OrdinalIgnoreCase);
             }
 
-            var majorComparison = long.Parse(matchA.Groups[1].Value).CompareTo(long.Parse(matchB.Groups[1].Value));
+            var majorComparison = CompareNumeric(matchA.Groups[1].Value, matchB.Groups[1].Value);
 
             if (majorComparison != 0)
             {
                 return majorComparison;
             }
 
-            var minorComparison = long.Parse(matchA.Groups[2].Value).CompareTo(long.Parse(matchB.Groups[2].Value));
+            var minorComparison = CompareNumeric(matchA.Groups[2].Value, matchB.Groups[2].Value);
 
             if (minorComparison != 0)
             {
                 return minorComparison;
             }
 
-            var patchComparison = long.Parse(matchA.Groups[3].Value).CompareTo(long.Parse(matchB.Groups[3].Value));
+            var patchComparison = CompareNumeric(matchA.Groups[3].Value, matchB.Groups[3].Value);
 
             if (patchComparison != 0)
             {
@@ -91,7 +91,7 @@ namespace Mycelium.Forge.Common
                 return false;
             }
 
-            return long.Parse(matchNew.Groups[1].Value) > long.Parse(matchPrev.Groups[1].Value);
+            return CompareNumeric(matchNew.Groups[1].Value, matchPrev.Groups[1].Value) > 0;
         }
 
         /// <summary>
@@ -142,12 +142,12 @@ namespace Mycelium.Forge.Common
         /// <returns>A signed integer indicating precedence.</returns>
         private static int CompareIdentifier(string identifierA, string identifierB)
         {
-            var isNumericA = long.TryParse(identifierA, out var numA);
-            var isNumericB = long.TryParse(identifierB, out var numB);
+            var isNumericA = IsNumericIdentifier(identifierA);
+            var isNumericB = IsNumericIdentifier(identifierB);
 
             if (isNumericA && isNumericB)
             {
-                return numA.CompareTo(numB);
+                return CompareNumeric(identifierA, identifierB);
             }
 
             if (isNumericA)
@@ -161,6 +161,44 @@ namespace Mycelium.Forge.Common
             }
 
             return string.Compare(identifierA, identifierB, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Determines whether an identifier string conforms to numeric identifier rules under SemVer 2.0.0.
+        /// </summary>
+        /// <param name="value">The identifier string to evaluate.</param>
+        /// <returns><c>true</c> if purely numeric without prohibited leading zeros; otherwise, <c>false</c>.</returns>
+        private static bool IsNumericIdentifier(string value)
+        {
+            return !string.IsNullOrEmpty(value) &&
+                   value.All(char.IsAsciiDigit) &&
+                   (value.Length == 1 || value[0] != '0');
+        }
+
+        /// <summary>
+        /// Compares two numeric string representations without parsing, avoiding integer overflow.
+        /// </summary>
+        /// <param name="a">The first numeric string.</param>
+        /// <param name="b">The second numeric string.</param>
+        /// <returns>A signed integer indicating relative value.</returns>
+        private static int CompareNumeric(string a, string b)
+        {
+            var cleanA = a?.TrimStart('0') ?? string.Empty;
+            var cleanB = b?.TrimStart('0') ?? string.Empty;
+
+            if (cleanA.Length == 0)
+            {
+                cleanA = "0";
+            }
+
+            if (cleanB.Length == 0)
+            {
+                cleanB = "0";
+            }
+
+            return cleanA.Length != cleanB.Length
+                ? cleanA.Length.CompareTo(cleanB.Length)
+                : string.Compare(cleanA, cleanB, StringComparison.Ordinal);
         }
     }
 }

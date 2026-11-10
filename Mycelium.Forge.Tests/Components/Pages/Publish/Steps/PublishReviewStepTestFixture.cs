@@ -104,7 +104,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             this.validationChecks.Add(new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Warning, "License warning"));
             Assert.That(step.GetValidationStatusText(), Does.Contain("Passed with 1 warning"));
 
-            this.validationChecks.Add(new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Missing, "License missing"));
+            this.validationChecks.Add(new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Warning, "License warning 2"));
             Assert.That(step.GetValidationStatusText(), Does.Contain("Passed with 2 warnings"));
 
             this.validationChecks.Add(new ValidationCheckModel(ValidationTypes.SchemaValidation, ValidationStatus.Fail, "Schema fail"));

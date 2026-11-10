@@ -40,8 +40,8 @@ namespace Mycelium.Forge.Tests.Extensions
             var authenticatedContext = new UserContext { AccountId = accountId, Username = "alice" };
             var anonymousContext = new UserContext { Username = "anonymous" };
 
-            // Case 1: Authenticated user produces key with account identifier
-            var authenticatedKey = this.memoryCache.BuildPackageDetailsCacheKey(authenticatedContext, "starion", "my-package");
+            // Case 1: Authenticated user produces key with account identifier and normalized coordinate
+            var authenticatedKey = this.memoryCache.BuildPackageDetailsCacheKey(authenticatedContext, "Starion", "My-Package");
             Assert.That(authenticatedKey, Is.EqualTo($"pkg-details:starion:my-package:{accountId}"));
 
             // Case 2: Anonymous user produces key with Guid.Empty

@@ -315,7 +315,7 @@ namespace Mycelium.Forge.ViewModels.Publish
                 }
 
                 await using var stagedStream = this.fileUploadStagingService.OpenStagedFile(this.StagedArtefact.StagingToken);
-                var result = await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, token);
+                var result = await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, this.SelectedScope, this.ExistingVersions, token);
 
                 if (!result.IsError)
                 {

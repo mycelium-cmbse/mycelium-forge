@@ -42,5 +42,15 @@ namespace Mycelium.Forge.Dal.DatabaseSource
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         Task DeferConstraintsAsync(NpgsqlTransaction transaction, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously acquires a transaction-scoped advisory lock for a categorized resource.
+        /// </summary>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
+        /// <param name="category">The lock category or domain.</param>
+        /// <param name="resource">The resource identifier to lock.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task AcquireAdvisoryLockAsync(NpgsqlTransaction transaction, string category, string resource, CancellationToken cancellationToken = default);
     }
 }

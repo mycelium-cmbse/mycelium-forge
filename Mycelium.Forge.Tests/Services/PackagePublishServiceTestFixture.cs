@@ -70,6 +70,9 @@ namespace Mycelium.Forge.Tests.Services
 
             this.artifactStoreMock.Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(("hash-12345", true));
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((action, _) => action(null!));
+            this.databaseSourceMock.Setup(x => x.AcquireAdvisoryLockAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(It.IsAny<IUserContext>(), It.IsAny<string>(), It.IsAny<string>(), true, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
+            this.packageServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync((IUserContext _, NpgsqlTransaction _, CancellationToken _, Guid[] ids) => ImmutableList.Create<IPackage>(new Package { Id = ids?.FirstOrDefault() ?? Guid.NewGuid(), ShortName = "existing", Version = [] }));
             this.packageServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
             this.packageVersionServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
             this.packageMetaDataServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageMetaData>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
@@ -178,13 +181,14 @@ namespace Mycelium.Forge.Tests.Services
             // Case 1: Happy path for new package stores artifact and creates records inside transaction
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
 
                 using (Assert.EnterMultipleScope())
                 {
                     Assert.That(result.IsError, Is.False);
                     Assert.That(packageVersion.Checksum, Is.EqualTo("hash-12345"));
                     Assert.That(package.Owner, Is.EqualTo(scope.Id));
+                    this.databaseSourceMock.Verify(x => x.AcquireAdvisoryLockAsync(It.IsAny<NpgsqlTransaction>(), "coordinate", It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
                     this.databaseSourceMock.Verify(x => x.DeferConstraintsAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>()), Times.Once);
                     this.packageServiceMock.Verify(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()), Times.Once);
                     this.packageVersionServiceMock.Verify(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -194,18 +198,20 @@ namespace Mycelium.Forge.Tests.Services
 
             // Case 2: Happy path for existing package skips package create and links new version ID
             this.packageServiceMock.Invocations.Clear();
-            var existingPackage = new Package { Id = Guid.NewGuid(), Name = "existing", Owner = scope.Id, Version = [] };
+            var existingPackage = new Package { Id = Guid.NewGuid(), Name = "existing", ShortName = "existing", Owner = scope.Id, Version = [] };
             var newVersion = new PackageVersion { Id = Guid.NewGuid(), Version = "1.1.0" };
             var newMetaData = new PackageMetaData { Id = Guid.NewGuid() };
+            this.packageServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(new Package { Id = existingPackage.Id, ShortName = existingPackage.ShortName, Version = [] }));
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, existingPackage, newVersion, newMetaData, true);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, existingPackage, newVersion, newMetaData, true, scope, ["1.0.0"]);
 
                 using (Assert.EnterMultipleScope())
                 {
                     Assert.That(result.IsError, Is.False);
                     Assert.That(existingPackage.Version, Does.Contain(newVersion.Id));
+                    this.packageServiceMock.Verify(x => x.ReadAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(existingPackage.Id))), Times.Once);
                     this.packageServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()), Times.Never);
                 }
             }
@@ -216,7 +222,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -233,7 +239,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -248,7 +254,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -263,7 +269,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -279,7 +285,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -296,13 +302,85 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
 
                 using (Assert.EnterMultipleScope())
                 {
                     Assert.That(result.IsError, Is.True);
                     Assert.That(result.FirstError.Description, Is.EqualTo("Package insert failed"));
                     this.artifactStoreMock.Verify(x => x.DeleteArtifactAsync("hash-entity-fail", It.IsAny<CancellationToken>()), Times.Once);
+                }
+            }
+
+            // Case 9: Pre-publish validation failure aborts before artifact storage
+            this.artifactStoreMock.Invocations.Clear();
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "test", true, It.IsAny<CancellationToken>())).ReturnsAsync(new Package { Id = Guid.NewGuid() });
+
+            using (var stream = new MemoryStream(content))
+            {
+                var failValidationResult = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false, scope, []);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(failValidationResult.IsError, Is.True);
+                    Assert.That(failValidationResult.FirstError.Code, Is.EqualTo(ValidationTypes.NamespaceUniqueness));
+                    this.artifactStoreMock.Verify(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+                }
+            }
+
+            // Case 10: Existing package with omitted existingVersions resolves versions from packageVersionService
+            this.packageVersionServiceMock.Invocations.Clear();
+            var existingVersionId = Guid.NewGuid();
+            var autoPackage = new Package { Id = Guid.NewGuid(), Name = "auto-pkg", ShortName = "auto-pkg", Owner = scope.Id, Version = [existingVersionId] };
+            var autoVersionEntity = new PackageVersion { Id = existingVersionId, Version = "1.0.0" };
+            var autoNewVersion = new PackageVersion { Id = Guid.NewGuid(), Version = "1.2.0" };
+
+            this.packageServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(new Package { Id = autoPackage.Id, ShortName = autoPackage.ShortName, Version = [existingVersionId] }));
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(autoVersionEntity));
+
+            using (var stream = new MemoryStream(content))
+            {
+                var autoResolveResult = await this.service.PublishReleaseAsync(this.userContext, stream, autoPackage, autoNewVersion, newMetaData, true, scope);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(autoResolveResult.IsError, Is.False);
+                    Assert.That(autoPackage.Version, Does.Contain(autoNewVersion.Id));
+                    this.packageVersionServiceMock.Verify(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>()), Times.AtLeastOnce);
+                }
+            }
+
+            // Case 11: Existing package not found in DB under advisory lock returns NotFound
+            this.packageServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IPackage>.Empty);
+
+            using (var stream = new MemoryStream(content))
+            {
+                var notFoundResult = await this.service.PublishReleaseAsync(this.userContext, stream, existingPackage, newVersion, newMetaData, true, scope, ["1.0.0"]);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(notFoundResult.IsError, Is.True);
+                    Assert.That(notFoundResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
+                }
+            }
+
+            // Case 12: Concurrent version collision detected under advisory lock returns Conflict
+            var concurrentVersionId = Guid.NewGuid();
+            var collisionPackage = new Package { Id = existingPackage.Id, ShortName = existingPackage.ShortName, Version = [concurrentVersionId] };
+            var collisionVersion = new PackageVersion { Id = concurrentVersionId, Version = "1.1.0" };
+
+            this.packageServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(collisionPackage));
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(collisionVersion));
+
+            using (var stream = new MemoryStream(content))
+            {
+                var collisionResult = await this.service.PublishReleaseAsync(this.userContext, stream, existingPackage, newVersion, newMetaData, true, scope, ["1.0.0"]);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(collisionResult.IsError, Is.True);
+                    Assert.That(collisionResult.FirstError.Type, Is.EqualTo(ErrorType.Conflict));
+                    Assert.That(collisionResult.FirstError.Code, Is.EqualTo(ValidationTypes.PackageVersion));
                 }
             }
         }
@@ -315,7 +393,7 @@ namespace Mycelium.Forge.Tests.Services
             var packageVersion = new PackageVersion { Version = "1.0.0" };
 
             // Case 1: Pre-validation errors short-circuit and convert to failed checks
-            var preErrors = new List<Error> { Error.Validation("PreCheck", "Format invalid") };
+            List<Error> preErrors = [Error.Validation("PreCheck", "Format invalid")];
             var preResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, [], preErrors);
 
             using (Assert.EnterMultipleScope())
@@ -389,6 +467,11 @@ namespace Mycelium.Forge.Tests.Services
             packageVersion.ReleaseNotes = string.Empty;
             var minorNoNotesResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, true, ["1.0.0"]);
             Assert.That(minorNoNotesResult.Any(x => x.Title == ValidationTypes.PackageVersion && x.Status == ValidationStatus.Pass), Is.True);
+
+            // Case 10: Database error during namespace availability check returns Fail
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", true, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Database connection failed"));
+            var dbErrorResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, []);
+            Assert.That(dbErrorResult.Any(x => x.Title == ValidationTypes.NamespaceUniqueness && x.Status == ValidationStatus.Fail), Is.True);
         }
     }
 }

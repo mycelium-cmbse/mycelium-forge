@@ -25,11 +25,6 @@ namespace Mycelium.Forge.Enums
         Warning,
 
         /// <summary>
-        /// An expected documentation or package file was not found.
-        /// </summary>
-        Missing,
-
-        /// <summary>
         /// The validation check failed and prevents publishing.
         /// </summary>
         Fail

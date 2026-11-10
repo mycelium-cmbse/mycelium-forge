@@ -45,36 +45,41 @@
             <BbStep Title="Review & publish"/>
         </BbStepper>
 
-        <div class="@(this.GetStepClass(0))">
-            <PublishUploadStep @key="this.uploadStepKey"
-                               ViewModel="@(this.ViewModel)"
-                               OnContinue="@(this.OnNext)"
-                               InputId="@(UploadInputId)"/>
-        </div>
-
-        @if (this.ViewModel.StagedArtefact != null)
+        @switch (this.ActiveStep)
         {
-            <div class="@(this.GetStepClass(1))">
-                <PublishMetadataStep ViewModel="@(this.ViewModel)"
-                                     OnBack="@(this.OnBack)"
-                                     OnContinue="@(this.OnNext)"
-                                     OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
-            </div>
-
-            <div class="@(this.GetStepClass(2))">
-                <PublishValidationStep ViewModel="@(this.ViewModel)"
-                                       OnBack="@(this.OnBack)"
+            case 0:
+                <div class="@(this.GetStepClass(0))">
+                    <PublishUploadStep @key="this.uploadStepKey"
+                                       ViewModel="@(this.ViewModel)"
                                        OnContinue="@(this.OnNext)"
+                                       InputId="@(UploadInputId)"/>
+                </div>
+                break;
+            case 1:
+                <div class="@(this.GetStepClass(1))">
+                    <PublishMetadataStep ViewModel="@(this.ViewModel)"
+                                         OnBack="@(this.OnBack)"
+                                         OnContinue="@(this.OnNext)"
+                                         OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
+                </div>
+                break;
+            case 2:
+                <div class="@(this.GetStepClass(2))">
+                    <PublishValidationStep ViewModel="@(this.ViewModel)"
+                                           OnBack="@(this.OnBack)"
+                                           OnContinue="@(this.OnNext)"
+                                           OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
+                </div>
+                break;
+            case 3:
+                <div class="@(this.GetStepClass(3))">
+                    <PublishReviewStep ViewModel="@(this.ViewModel)"
+                                       OnBack="@(this.OnBack)"
+                                       OnPublish="@(this.PublishPackage)"
+                                       OnNavigateToStep="@(this.OnNavigateToStep)"
                                        OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
-            </div>
-
-            <div class="@(this.GetStepClass(3))">
-                <PublishReviewStep ViewModel="@(this.ViewModel)"
-                                   OnBack="@(this.OnBack)"
-                                   OnPublish="@(this.PublishPackage)"
-                                   OnNavigateToStep="@(this.OnNavigateToStep)"
-                                   OnReplaceArtefact="@(this.OnReplaceArtefact)"/>
-            </div>
+                </div>
+                break;
         }
     </div>
 </div>

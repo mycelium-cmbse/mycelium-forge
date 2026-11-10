@@ -32,6 +32,11 @@ namespace Mycelium.Forge.Services
     public class PackagePublishService : IPackagePublishService
     {
         /// <summary>
+        /// The lock category used for transaction-scoped advisory locks on package coordinates.
+        /// </summary>
+        private const string CoordinateLockCategory = "coordinate";
+
+        /// <summary>
         /// The (injected) <see cref="IArtifactStore" /> object storage service.
         /// </summary>
         private readonly IArtifactStore artifactStore;
@@ -82,9 +87,7 @@ namespace Mycelium.Forge.Services
         /// <param name="packageMetaDataService">The (injected) <see cref="IPackageMetaDataService" /> domain service.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" /> domain service.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackagePublishService}" /> logger.</param>
-        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors,
-            IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService,
-            ILogger<PackagePublishService> logger)
+        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors, IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService, ILogger<PackagePublishService> logger)
         {
             this.artifactStore = artifactStore;
             this.databaseSource = databaseSource;
@@ -169,8 +172,15 @@ namespace Mycelium.Forge.Services
             }
 
             checks.Add(new ValidationCheckModel(ValidationTypes.SchemaValidation, ValidationStatus.Pass, "Archive structure and manifests conform to specification."));
-            checks.Add(await this.ValidateNamespaceAsync(userContext, selectedScope, package, isExistingPackage, token));
-            checks.Add(ValidateVersion(packageVersion, isExistingPackage, existingVersions));
+
+            var namespaceResult = await this.ValidateNamespaceAsync(userContext, selectedScope, package, isExistingPackage, token);
+            var namespaceSuccessDetail = isExistingPackage ? "Publishing a new version to an existing package in the selected scope." : "Package identifier is available in the selected scope.";
+            checks.Add(new ValidationCheckModel(ValidationTypes.NamespaceUniqueness, namespaceResult, namespaceSuccessDetail));
+
+            var versionResult = ValidateVersion(packageVersion, isExistingPackage, existingVersions);
+            var versionSuccessDetail = !isExistingPackage ? "Initial version is valid for publication." : "Version is unique and strictly greater than prior releases.";
+            checks.Add(new ValidationCheckModel(ValidationTypes.PackageVersion, versionResult, versionSuccessDetail));
+
             checks.Add(ValidateLicense(package));
 
             return checks;
@@ -186,10 +196,28 @@ namespace Mycelium.Forge.Services
         /// <param name="packageVersion">The package version to create.</param>
         /// <param name="packageMetaData">The package metadata to create.</param>
         /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
+        /// <param name="selectedScope">The owning scope of the package.</param>
+        /// <param name="existingVersions">The optional collection of previously published version strings.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or failure of the publication.</returns>
-        public async Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token = default)
+        public async Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, IScope selectedScope, IReadOnlyList<string> existingVersions = null, CancellationToken token = default)
         {
+            var resolvedVersions = existingVersions?.ToList() ?? [];
+
+            if (isExistingPackage && resolvedVersions.Count == 0)
+            {
+                var existingEntities = await this.packageVersionService.ReadOrEmpty(userContext, package.Version, token: token);
+                resolvedVersions = existingEntities.Select(x => x.Version).ToList();
+            }
+
+            var validationChecks = await this.ValidateReleaseAsync(userContext, selectedScope, package, packageVersion, isExistingPackage, resolvedVersions, token: token);
+            var failedCheck = validationChecks.FirstOrDefault(x => x.Status == ValidationStatus.Fail);
+
+            if (failedCheck != null)
+            {
+                return Error.Validation(failedCheck.Title, failedCheck.Detail);
+            }
+
             var storedHash = string.Empty;
             var wasArtifactNew = false;
 
@@ -206,7 +234,7 @@ namespace Mycelium.Forge.Services
                 packageVersion.Checksum = storedHash;
                 packageVersion.PublicationDate = DateTime.UtcNow;
 
-                var dbResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.PersistReleaseEntitiesAsync(userContext, transaction, package, packageVersion, packageMetaData, isExistingPackage, token), token);
+                var dbResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.PersistReleaseEntitiesAsync(userContext, transaction, package, packageVersion, packageMetaData, isExistingPackage, selectedScope, token), token);
 
                 if (!dbResult.IsError)
                 {
@@ -242,11 +270,22 @@ namespace Mycelium.Forge.Services
         /// <param name="packageVersion">The package version to create.</param>
         /// <param name="packageMetaData">The package metadata to create.</param>
         /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
+        /// <param name="selectedScope">The owning scope of the package.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or database errors.</returns>
-        private async Task<ErrorOr<Success>> PersistReleaseEntitiesAsync(IUserContext userContext, NpgsqlTransaction transaction, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token)
+        private async Task<ErrorOr<Success>> PersistReleaseEntitiesAsync(IUserContext userContext, NpgsqlTransaction transaction, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, IScope selectedScope, CancellationToken token)
         {
+            var coordinate = $"{selectedScope.ShortName}:{package.ShortName.Trim().ToLowerInvariant()}";
+
+            await this.databaseSource.AcquireAdvisoryLockAsync(transaction, CoordinateLockCategory, coordinate, token);
             await this.databaseSource.DeferConstraintsAsync(transaction, token);
+
+            var validationResult = await this.CheckConcurrentCollisionsAsync(userContext, transaction, package, packageVersion, isExistingPackage, selectedScope, token);
+
+            if (validationResult.IsError)
+            {
+                return validationResult.Errors;
+            }
 
             if (!isExistingPackage)
             {
@@ -281,6 +320,48 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
+        /// Validates namespace availability or version uniqueness under the advisory lock inside the database transaction.
+        /// </summary>
+        /// <param name="userContext">The contextual user information.</param>
+        /// <param name="transaction">The database transaction.</param>
+        /// <param name="package">The package entity being created or updated.</param>
+        /// <param name="packageVersion">The package version being published.</param>
+        /// <param name="isExistingPackage">A value indicating whether publishing a new version of an existing package.</param>
+        /// <param name="selectedScope">The owning scope of the package.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether transaction validation passed or conflicted.</returns>
+        /// <remarks>
+        /// While <see cref="IPackageService.ReadByCoordinateAsync" /> executes up to three times during a full publication
+        /// lifecycle,
+        /// each invocation protects a distinct boundary:
+        /// 1. UI rendering (providing immediate user feedback on wizard steps).
+        /// 2. Pre-network upload gate (failing fast in <see cref="PublishReleaseAsync" /> before expensive artifact object storage
+        /// uploads).
+        /// 3. Concurrent database lock (this method, verifying state under the PostgreSQL advisory lock to prevent races without
+        /// schema constraints).
+        /// </remarks>
+        private async Task<ErrorOr<Success>> CheckConcurrentCollisionsAsync(IUserContext userContext, NpgsqlTransaction transaction, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, IScope selectedScope, CancellationToken token)
+        {
+            if (!isExistingPackage)
+            {
+                return await this.ValidateNamespaceAsync(userContext, selectedScope, package, false, token);
+            }
+
+            var readResult = await this.packageService.ReadAsync(userContext, transaction, token, [package.Id]);
+
+            if (readResult.IsError || readResult.Value.Count == 0)
+            {
+                return Error.NotFound(description: $"Package '{package.ShortName}' was not found.");
+            }
+
+            var freshPackage = readResult.Value[0];
+            package.Version = freshPackage.Version;
+
+            var freshVersions = (await this.packageVersionService.ReadOrEmpty(userContext, package.Version, token: token)).Select(x => x.Version).ToList();
+            return ValidateVersion(packageVersion, true, freshVersions);
+        }
+
+        /// <summary>
         /// Validates that the package namespace is unique within the target scope.
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
@@ -288,19 +369,27 @@ namespace Mycelium.Forge.Services
         /// <param name="package">The package entity being published.</param>
         /// <param name="isExistingPackage">A value indicating whether publishing a new version of an existing package.</param>
         /// <param name="token">The cancellation token.</param>
-        /// <returns>A <see cref="ValidationCheckModel" /> representing the namespace uniqueness check.</returns>
-        private async Task<ValidationCheckModel> ValidateNamespaceAsync(IUserContext userContext, IScope selectedScope, IPackage package, bool isExistingPackage, CancellationToken token)
+        /// <returns>An <see cref="ErrorOr{Success}" /> representing the namespace uniqueness check.</returns>
+        private async Task<ErrorOr<Success>> ValidateNamespaceAsync(IUserContext userContext, IScope selectedScope, IPackage package, bool isExistingPackage, CancellationToken token)
         {
             if (isExistingPackage)
             {
-                return new ValidationCheckModel(ValidationTypes.NamespaceUniqueness, ValidationStatus.Pass, "Publishing a new version to an existing package in the selected scope.");
+                return Result.Success;
             }
 
             var existingResult = await this.packageService.ReadByCoordinateAsync(userContext, selectedScope?.ShortName ?? string.Empty, package.ShortName, true, token);
 
-            return !existingResult.IsError
-                ? new ValidationCheckModel(ValidationTypes.NamespaceUniqueness, ValidationStatus.Fail, $"Package '{package.ShortName}' already exists in scope '@{selectedScope?.ShortName}'.")
-                : new ValidationCheckModel(ValidationTypes.NamespaceUniqueness, ValidationStatus.Pass, "Package identifier is available in the selected scope.");
+            if (existingResult.IsError && existingResult.FirstError.Type != ErrorType.NotFound)
+            {
+                return Error.Failure(ValidationTypes.NamespaceUniqueness, "Could not verify namespace availability.");
+            }
+
+            if (!existingResult.IsError)
+            {
+                return Error.Conflict(ValidationTypes.NamespaceUniqueness, $"Package '{package.ShortName}' already exists in scope '@{selectedScope?.ShortName}'.");
+            }
+
+            return Result.Success;
         }
 
         /// <summary>
@@ -309,12 +398,12 @@ namespace Mycelium.Forge.Services
         /// <param name="packageVersion">The package version being published.</param>
         /// <param name="isExistingPackage">A value indicating whether publishing a new version of an existing package.</param>
         /// <param name="existingVersions">The collection of previously published version strings for this package.</param>
-        /// <returns>A <see cref="ValidationCheckModel" /> representing the version validation check.</returns>
-        private static ValidationCheckModel ValidateVersion(IPackageVersion packageVersion, bool isExistingPackage, IReadOnlyList<string> existingVersions)
+        /// <returns>An <see cref="ErrorOr{Success}" /> representing the version validation check.</returns>
+        private static ErrorOr<Success> ValidateVersion(IPackageVersion packageVersion, bool isExistingPackage, IReadOnlyList<string> existingVersions)
         {
             if (!isExistingPackage)
             {
-                return new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Pass, "Initial version is valid for publication.");
+                return Result.Success;
             }
 
             var conflictingVersion = existingVersions?.FirstOrDefault(x => SemanticVersionComparer.Instance.Compare(packageVersion.Version, x) <= 0);
@@ -327,7 +416,7 @@ namespace Mycelium.Forge.Services
                     ? $"Version '{packageVersion.Version}' already exists for this package."
                     : $"Version '{packageVersion.Version}' must be strictly greater than published version '{conflictingVersion}'.";
 
-                return new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Fail, detail);
+                return Error.Conflict(ValidationTypes.PackageVersion, detail);
             }
 
             var latestVersion = existingVersions?.OrderByDescending(x => x, SemanticVersionComparer.Instance).FirstOrDefault();
@@ -335,10 +424,10 @@ namespace Mycelium.Forge.Services
 
             if (isMajorBump && string.IsNullOrWhiteSpace(packageVersion.ReleaseNotes))
             {
-                return new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Fail, "A major-version update requires release notes.", "Provide release notes for this major release.");
+                return Error.Validation(ValidationTypes.PackageVersion, "A major-version update requires release notes.");
             }
 
-            return new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Pass, "Version is unique and strictly greater than prior releases.");
+            return Result.Success;
         }
 
         /// <summary>

@@ -32,7 +32,6 @@ namespace Mycelium.Forge.Extensions
                     ValidationStatus.Pass => BadgeVariant.SoftSuccess,
                     ValidationStatus.Fail => BadgeVariant.SoftDestructive,
                     ValidationStatus.Warning => BadgeVariant.SoftWarning,
-                    ValidationStatus.Missing => BadgeVariant.Secondary,
                     _ => BadgeVariant.Outline
                 };
             }

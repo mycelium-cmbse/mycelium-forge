@@ -116,7 +116,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             }
 
             // Case 3: Multiple warnings title pluralization
-            this.validationChecks.Add(new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Missing, "No license"));
+            this.validationChecks.Add(new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Warning, "No license"));
 
             using (Assert.EnterMultipleScope())
             {

@@ -76,7 +76,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <summary>
         /// Gets the count of non-blocking warning check outcomes.
         /// </summary>
-        public int WarningCount => this.ViewModel.ValidationChecks.Count(x => x.Status is ValidationStatus.Warning or ValidationStatus.Missing);
+        public int WarningCount => this.ViewModel.ValidationChecks.Count(x => x.Status == ValidationStatus.Warning);
 
         /// <summary>
         /// Resolves the CSS class string for a validation check row based on its status.

@@ -273,6 +273,21 @@ namespace Mycelium.Forge.Storage.Tests.Stores
                 Assert.That(failureResult.IsError, Is.True);
                 Assert.That(failureResult.FirstError.Type, Is.EqualTo(ErrorType.Failure));
             }
+
+            // Case 5: ExistsAsync error returns error and never calls PutObjectAsync
+            var errorBytes = "error-bytes"u8.ToArray();
+            var errorHash = Convert.ToHexStringLower(SHA256.HashData(errorBytes));
+            this.amazonS3Mock.Invocations.Clear();
+            this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.Key == errorHash), It.IsAny<CancellationToken>())).ThrowsAsync(new AmazonS3Exception("Forbidden") { StatusCode = HttpStatusCode.Forbidden });
+
+            using var errorStream = new MemoryStream(errorBytes);
+            var existsErrorResult = await this.artifactStore.StoreArtifactAsync(errorStream, null, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(existsErrorResult.IsError, Is.True);
+                this.amazonS3Mock.Verify(x => x.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+            }
         }
     }
 }

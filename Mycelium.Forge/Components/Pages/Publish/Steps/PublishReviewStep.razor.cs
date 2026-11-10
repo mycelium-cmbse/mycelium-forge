@@ -169,7 +169,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
                 return $"Failed with {"error".ToQuantity(failures.Count)} ({failureNames})";
             }
 
-            List<ValidationCheckModel> warnings = [.. this.ViewModel.ValidationChecks.Where(x => x.Status is ValidationStatus.Warning or ValidationStatus.Missing)];
+            List<ValidationCheckModel> warnings = [.. this.ViewModel.ValidationChecks.Where(x => x.Status == ValidationStatus.Warning)];
 
             if (warnings.Count > 0)
             {

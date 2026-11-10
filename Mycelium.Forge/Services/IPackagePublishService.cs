@@ -64,8 +64,10 @@ namespace Mycelium.Forge.Services
         /// <param name="packageVersion">The package version to create.</param>
         /// <param name="packageMetaData">The package metadata to create.</param>
         /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
+        /// <param name="selectedScope">The owning scope of the package.</param>
+        /// <param name="existingVersions">The optional collection of previously published version strings.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or failure of the publication.</returns>
-        Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token = default);
+        Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, IScope selectedScope, IReadOnlyList<string> existingVersions = null, CancellationToken token = default);
     }
 }
