@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishUploadStep.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -21,12 +21,12 @@
         <span class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
             ACCEPTED
         </span>
-        @foreach (var format in this.AcceptedFormats)
+        @foreach (var formatName in this.AcceptedFormats.Select(format => format.Name))
         {
-            <BbBadge @key="format.Name"
+            <BbBadge @key="formatName"
                      Variant="BadgeVariant.Secondary"
                      Class="badge-format">
-                @(format.Name)
+                @(formatName)
             </BbBadge>
         }
     </div>

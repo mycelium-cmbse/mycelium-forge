@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ValidationCheckModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -30,12 +30,13 @@ namespace Mycelium.Forge.Models.Validation
         /// <param name="title">The title or description label of the check.</param>
         /// <param name="status">The evaluation status outcome value.</param>
         /// <param name="detail">The detailed execution summary or diagnostic message.</param>
-        public ValidationCheckModel(string title, ValidationStatus status, string detail = "")
+        /// <param name="recommendation">The optional suggested recommendation action to resolve a failed check.</param>
+        public ValidationCheckModel(string title, ValidationStatus status, string detail = "", string recommendation = "")
         {
             this.Title = title;
             this.Detail = detail;
             this.Status = status;
-            this.Recommendation = ResolveRecommendation(title);
+            this.Recommendation = !string.IsNullOrWhiteSpace(recommendation) ? recommendation : ResolveRecommendation(title);
         }
 
         /// <summary>

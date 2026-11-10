@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackagePublishService.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -23,9 +23,12 @@ namespace Mycelium.Forge.Services
     using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.Storage.Stores;
 
+    using Npgsql;
+
     /// <summary>
     /// Service implementation coordinating package publishing operations.
     /// </summary>
+    /// <remarks>Encapsulates logic that can be used later for both UI and CLI projects.</remarks>
     public class PackagePublishService : IPackagePublishService
     {
         /// <summary>
@@ -79,8 +82,8 @@ namespace Mycelium.Forge.Services
         /// <param name="packageMetaDataService">The (injected) <see cref="IPackageMetaDataService" /> domain service.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" /> domain service.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackagePublishService}" /> logger.</param>
-        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors, 
-            IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService, 
+        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors,
+            IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService,
             ILogger<PackagePublishService> logger)
         {
             this.artifactStore = artifactStore;
@@ -209,41 +212,7 @@ namespace Mycelium.Forge.Services
                     package.Owner = selectedScope.Id;
                 }
 
-                var dbResult = await this.databaseSource.ExecuteInTransactionAsync<Success>(async transaction =>
-                {
-                    await this.databaseSource.DeferConstraintsAsync(transaction, token);
-
-                    if (!isExistingPackage)
-                    {
-                        var packageResult = await this.packageService.CreateAsync(userContext, transaction, [package], token);
-
-                        if (packageResult.IsError)
-                        {
-                            return packageResult.Errors;
-                        }
-                    }
-
-                    var versionResult = await this.packageVersionService.CreateAsync(userContext, transaction, [packageVersion], token);
-
-                    if (versionResult.IsError)
-                    {
-                        return versionResult.Errors;
-                    }
-
-                    var metaDataResult = await this.packageMetaDataService.CreateAsync(userContext, transaction, [packageMetaData], token);
-
-                    if (metaDataResult.IsError)
-                    {
-                        return metaDataResult.Errors;
-                    }
-
-                    if (isExistingPackage)
-                    {
-                        package.Version.Add(packageVersion.Id);
-                    }
-
-                    return Result.Success;
-                }, token);
+                var dbResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.PersistReleaseEntitiesAsync(userContext, transaction, package, packageVersion, packageMetaData, isExistingPackage, token), token);
 
                 if (!dbResult.IsError)
                 {
@@ -268,6 +237,53 @@ namespace Mycelium.Forge.Services
 
                 return Error.Failure(description: exception.Message);
             }
+        }
+
+        /// <summary>
+        /// Persists the package, package version, and metadata entities in the database during publication.
+        /// </summary>
+        /// <param name="userContext">The contextual user information.</param>
+        /// <param name="transaction">The database transaction.</param>
+        /// <param name="package">The package being created or updated.</param>
+        /// <param name="packageVersion">The package version to create.</param>
+        /// <param name="packageMetaData">The package metadata to create.</param>
+        /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or database errors.</returns>
+        private async Task<ErrorOr<Success>> PersistReleaseEntitiesAsync(IUserContext userContext, NpgsqlTransaction transaction, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token)
+        {
+            await this.databaseSource.DeferConstraintsAsync(transaction, token);
+
+            if (!isExistingPackage)
+            {
+                var packageResult = await this.packageService.CreateAsync(userContext, transaction, [package], token);
+
+                if (packageResult.IsError)
+                {
+                    return packageResult.Errors;
+                }
+            }
+
+            var versionResult = await this.packageVersionService.CreateAsync(userContext, transaction, [packageVersion], token);
+
+            if (versionResult.IsError)
+            {
+                return versionResult.Errors;
+            }
+
+            var metaDataResult = await this.packageMetaDataService.CreateAsync(userContext, transaction, [packageMetaData], token);
+
+            if (metaDataResult.IsError)
+            {
+                return metaDataResult.Errors;
+            }
+
+            if (isExistingPackage)
+            {
+                package.Version.Add(packageVersion.Id);
+            }
+
+            return Result.Success;
         }
 
         /// <summary>
@@ -321,11 +337,11 @@ namespace Mycelium.Forge.Services
             }
 
             var latestVersion = existingVersions?.OrderByDescending(x => x, SemanticVersionComparer.Instance).FirstOrDefault();
-            var isMajorBump = latestVersion != null && SemanticVersionComparer.Instance.IsMajorBump(packageVersion.Version, latestVersion);
+            var isMajorBump = latestVersion != null && SemanticVersionComparer.IsMajorBump(packageVersion.Version, latestVersion);
 
             if (isMajorBump && string.IsNullOrWhiteSpace(packageVersion.ReleaseNotes))
             {
-                return new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Fail, "A major-version update requires release notes.");
+                return new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Fail, "A major-version update requires release notes.", "Provide release notes for this major release.");
             }
 
             return new ValidationCheckModel(ValidationTypes.PackageVersion, ValidationStatus.Pass, "Version is unique and strictly greater than prior releases.");

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="SemanticVersionComparerTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -50,7 +50,7 @@ namespace Mycelium.Forge.Tests.Common
             switch (expectedSign)
             {
                 case 0:
-                    Assert.That(result, Is.EqualTo(0));
+                    Assert.That(result, Is.Zero);
                     break;
                 case > 0:
                     Assert.That(result, Is.GreaterThan(0));
@@ -69,7 +69,7 @@ namespace Mycelium.Forge.Tests.Common
         [TestCase("1.0.0", "invalid", false)]
         public void VerifyIsMajorBump(string? newVersion, string? currentVersion, bool expected)
         {
-            Assert.That(this.comparer.IsMajorBump(newVersion, currentVersion), Is.EqualTo(expected));
+            Assert.That(SemanticVersionComparer.IsMajorBump(newVersion, currentVersion), Is.EqualTo(expected));
         }
     }
 }

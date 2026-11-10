@@ -83,7 +83,7 @@ namespace Mycelium.Forge.Common
         /// <param name="newVersion">The new semantic version string.</param>
         /// <param name="previousVersion">The previous semantic version string.</param>
         /// <returns><see langword="true" /> if the major version number has increased; otherwise, <see langword="false" />.</returns>
-        public bool IsMajorBump(string newVersion, string previousVersion)
+        public static bool IsMajorBump(string newVersion, string previousVersion)
         {
             var matchNew = KparManifestExtractor.SemanticVersionRegex().Match(newVersion);
             var matchPrev = KparManifestExtractor.SemanticVersionRegex().Match(previousVersion);

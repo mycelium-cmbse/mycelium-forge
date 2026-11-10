@@ -22,6 +22,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
     public partial class PublishValidationStep : ComponentBase
     {
         /// <summary>
+        /// The singular warning text literal used for quantity formatting.
+        /// </summary>
+        private const string WarningLiteral = "warning";
+
+        /// <summary>
         /// The guidance information card configuration for the validation step.
         /// </summary>
         private static readonly InformationCardModel StepInformationCard = new()
@@ -142,7 +147,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>A formatted string indicating the warning count.</returns>
         public string GetWarningsTitle()
         {
-            return "warning".ToQuantity(this.WarningCount);
+            return WarningLiteral.ToQuantity(this.WarningCount);
         }
 
         /// <summary>
@@ -155,8 +160,8 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             var failCount = this.ViewModel.ValidationChecks.Count(x => x.Status == ValidationStatus.Fail);
 
             return failCount > 0
-                ? $"{"error".ToQuantity(failCount)} \u2022 {"warning".ToQuantity(this.WarningCount)}"
-                : $"{passedCount} passed \u2022 {"warning".ToQuantity(this.WarningCount)}";
+                ? $"{"error".ToQuantity(failCount)} \u2022 {WarningLiteral.ToQuantity(this.WarningCount)}"
+                : $"{passedCount} passed \u2022 {WarningLiteral.ToQuantity(this.WarningCount)}";
         }
 
         /// <summary>
@@ -172,7 +177,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
 
             return this.WarningCount == 0
                 ? "All pre-publish checks completed successfully."
-                : $"{"warning".ToQuantity(this.WarningCount)} {(this.WarningCount == 1 ? "does" : "do")} not block publishing, but review them below.";
+                : $"{WarningLiteral.ToQuantity(this.WarningCount)} - not block publishing, but review them below.";
         }
     }
 }
