@@ -170,7 +170,7 @@ namespace Mycelium.Forge.Tests.Services
         public async Task VerifyPublishReleaseAsync()
         {
             var scope = new Account { Id = Guid.NewGuid(), ShortName = "starion" };
-            var package = new Package { Id = Guid.NewGuid(), Name = "test", ShortName = "test" };
+            var package = new Package { Id = Guid.NewGuid(), Name = "test", ShortName = "test", Owner = scope.Id };
             var packageVersion = new PackageVersion { Id = Guid.NewGuid(), Version = "1.0.0" };
             var packageMetaData = new PackageMetaData { Id = Guid.NewGuid() };
             var content = "package-archive-content"u8.ToArray();
@@ -178,7 +178,7 @@ namespace Mycelium.Forge.Tests.Services
             // Case 1: Happy path for new package stores artifact and creates records inside transaction
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -200,7 +200,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, existingPackage, newVersion, newMetaData, true);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, existingPackage, newVersion, newMetaData, true);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -216,7 +216,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -233,7 +233,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -248,7 +248,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -263,7 +263,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -279,7 +279,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
 
                 using (Assert.EnterMultipleScope())
                 {
@@ -296,7 +296,7 @@ namespace Mycelium.Forge.Tests.Services
 
             using (var stream = new MemoryStream(content))
             {
-                var result = await this.service.PublishReleaseAsync(this.userContext, stream, scope, package, packageVersion, packageMetaData, false);
+                var result = await this.service.PublishReleaseAsync(this.userContext, stream, package, packageVersion, packageMetaData, false);
 
                 using (Assert.EnterMultipleScope())
                 {

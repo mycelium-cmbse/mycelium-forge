@@ -56,7 +56,7 @@
                             @foreach (var item in group)
                             {
                                 var facetId = $"facet-{group.Key}-{item.Label}".ToLowerInvariant().Replace(" ", "-");
-                                <div @key="item.Key"
+                                <div @key="item"
                                      class="flex flex-row items-center gap-2 w-full select-none">
                                     <BbCheckbox Checked="@(item.IsChecked)"
                                                 CheckedChanged="@(_ => ToggleFacet(item))"
@@ -99,7 +99,7 @@
                 {
                     @foreach (var package in this.ViewModel.PackageResults)
                     {
-                        <PackageRow @key="package.FullName"
+                        <PackageRow @key="package"
                                     Model="@package"/>
                     }
                 }

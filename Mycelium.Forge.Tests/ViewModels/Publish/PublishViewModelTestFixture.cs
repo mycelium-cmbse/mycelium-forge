@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -72,6 +72,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
             this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(this.userContext);
             this.scopeServiceMock.Setup(x => x.ReadActiveByAccountAsync(this.userContext, accountId, It.IsAny<CancellationToken>())).ReturnsAsync([this.activeScope]);
+            this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length > 0 && ids[0] == this.activeScope.Id))).ReturnsAsync(ImmutableList.Create<IScope>(this.activeScope));
             this.packageTypeServiceMock.Setup(x => x.ReadByNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IPackageType>(this.packageType));
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length > 0 && ids[0] == this.packageType.Id))).ReturnsAsync(ImmutableList.Create<IPackageType>(this.packageType));
 
@@ -178,6 +179,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.IsExistingPackage, Is.True);
+                Assert.That(this.viewModel.SelectedScope, Is.EqualTo(this.activeScope));
                 Assert.That(this.viewModel.Package, Is.EqualTo(existingPackage));
                 Assert.That(this.viewModel.ExpectedFormat, Is.Not.Null);
                 Assert.That(this.viewModel.ExpectedFormat.Name, Is.EqualTo(PackageFormatConstants.SysMlV2));
@@ -214,20 +216,21 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
             await this.viewModel.ExtractManifest(artefact);
 
-            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.SelectedScope, this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
 
             var successResult = await this.viewModel.Publish(CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(successResult.IsError, Is.False);
+                Assert.That(this.viewModel.Package.Owner, Is.EqualTo(this.activeScope.Id));
                 Assert.That(this.viewModel.IsPublishing, Is.False);
                 Assert.That(this.viewModel.StagedArtefact, Is.Null);
             }
 
             // Case 2: Publication error returns failure
             await this.viewModel.ExtractManifest(artefact);
-            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.SelectedScope, this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Upload failed"));
+            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Upload failed"));
 
             var artifactFailResult = await this.viewModel.Publish(CancellationToken.None);
 

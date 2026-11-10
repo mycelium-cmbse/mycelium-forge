@@ -47,7 +47,7 @@
             <div class="flex flex-col gap-3.5 w-full">
                 @foreach (var owner in this.ViewModel.Owners)
                 {
-                    <PackageCollaboratorRow @key="owner.Id"
+                    <PackageCollaboratorRow @key="Guid.NewGuid()"
                                             Account="@owner"
                                             Role="Owner"
                                             OnMenu="@(OnMaintainerMenu)"/>
@@ -55,7 +55,7 @@
 
                 @foreach (var maintainer in this.ViewModel.Maintainers)
                 {
-                    <PackageCollaboratorRow @key="maintainer.Id"
+                    <PackageCollaboratorRow @key="Guid.NewGuid()"
                                             Account="@maintainer"
                                             Role="Maintainer"
                                             OnMenu="@(OnMaintainerMenu)"/>

@@ -38,7 +38,7 @@
                 @foreach (var check in this.Checks)
                 {
                     <BlazorBlueprint.Primitives.Table.BbTableRow TData="object"
-                                                                 @key="check.Title"
+                                                                 @key="Guid.NewGuid()"
                                                                  class="px-4 py-3 flex items-center gap-2.5 hover:bg-muted/50 transition-colors">
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="flex items-center gap-2.5 flex-1 p-0">
                             <LucideIcon Name="check"

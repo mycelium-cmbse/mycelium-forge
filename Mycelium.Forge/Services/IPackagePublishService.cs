@@ -60,13 +60,12 @@ namespace Mycelium.Forge.Services
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="artifactStream">The stream of the artifact package file.</param>
-        /// <param name="selectedScope">The owning scope of the package.</param>
         /// <param name="package">The package being created or updated.</param>
         /// <param name="packageVersion">The package version to create.</param>
         /// <param name="packageMetaData">The package metadata to create.</param>
         /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or failure of the publication.</returns>
-        Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IScope selectedScope, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token = default);
+        Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token = default);
     }
 }

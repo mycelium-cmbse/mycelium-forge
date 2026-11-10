@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -178,6 +178,9 @@ namespace Mycelium.Forge.ViewModels.Publish
         {
             await this.InitializeBase();
 
+            this.ScopeOptions = await this.scopeService.ReadActiveByAccountAsync(this.userContext, this.currentUserId);
+            this.SelectedScope = this.ScopeOptions.Count > 0 ? this.ScopeOptions[0] : null;
+
             var packageId = Guid.NewGuid();
             this.PackageVersion.Owner = packageId;
 
@@ -233,8 +236,7 @@ namespace Mycelium.Forge.ViewModels.Publish
             var packageVersions = await this.packageVersionService.ReadOrEmpty(this.userContext, this.Package.Version);
             this.ExistingVersions = [.. packageVersions.Select(x => x.Version).OrderDescending(SemanticVersionComparer.Instance)];
 
-            this.SelectedScope = this.ScopeOptions.FirstOrDefault(x => x.Id == this.Package.Owner)
-                                 ?? await this.scopeService.ReadOrNull(this.userContext, this.Package.Owner);
+            this.SelectedScope = await this.scopeService.ReadOrNull(this.userContext, this.Package.Owner);
 
             var permissionResult = await this.packageVersionPermissionService.IsAllowedToCreate(this.databaseSource, this.userContext, this.PackageVersion);
             this.CanUserReleaseExistingPackageVersion = !permissionResult.IsError;
@@ -298,8 +300,13 @@ namespace Mycelium.Forge.ViewModels.Publish
 
             try
             {
+                if (!this.IsExistingPackage && this.SelectedScope != null)
+                {
+                    this.Package.Owner = this.SelectedScope.Id;
+                }
+
                 await using var stagedStream = this.fileUploadStagingService.OpenStagedFile(this.StagedArtefact.StagingToken);
-                return await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.SelectedScope, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, token);
+                return await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, token);
             }
             finally
             {
@@ -339,8 +346,7 @@ namespace Mycelium.Forge.ViewModels.Publish
         }
 
         /// <summary>
-        /// Initializes the user context, available scopes, and new version and metadata instances shared by both initialization
-        /// paths.
+        /// Initializes the user context and new version and metadata instances shared by both initialization paths.
         /// </summary>
         /// <remarks>
         /// Explicitly initializes partial DTO properties (e.g. Readme, SizeInBytes, Dependencies, Elements) to clean, empty
@@ -353,9 +359,6 @@ namespace Mycelium.Forge.ViewModels.Publish
         {
             this.userContext = await this.userService.GetUserContext();
             this.currentUserId = this.userContext.AccountId!.Value;
-
-            this.ScopeOptions = await this.scopeService.ReadActiveByAccountAsync(this.userContext, this.currentUserId);
-            this.SelectedScope = this.ScopeOptions.Count > 0 ? this.ScopeOptions[0] : null;
 
             var versionId = Guid.NewGuid();
             var metaDataId = Guid.NewGuid();
