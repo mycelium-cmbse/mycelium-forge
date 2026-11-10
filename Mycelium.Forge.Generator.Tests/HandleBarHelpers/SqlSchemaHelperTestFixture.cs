@@ -64,8 +64,8 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                     .ToList();
 
                 var result = template(allClasses);
-                Assert.That(result, Does.Contain("CREATE OR REPLACE FUNCTION \"Forge\".scope_delete()"));
-                Assert.That(result, Does.Contain("EXECUTE 'DELETE FROM \"Forge\".\"Scope\" WHERE id = $1' USING OLD.id;"));
+                Assert.That(result, Does.Contain("CREATE OR REPLACE FUNCTION forge.scope_delete()"));
+                Assert.That(result, Does.Contain("EXECUTE 'DELETE FROM forge.scope WHERE id = $1' USING OLD.id;"));
             }
         }
 
@@ -95,8 +95,8 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_scope_on_account_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".scope_delete()"));
+                Assert.That(accountResult, Does.Contain("AFTER DELETE ON forge.account"));
+                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION forge.scope_delete()"));
             }
         }
 
@@ -116,10 +116,10 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("CREATE TABLE \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("\"id\" uuid NOT NULL"));
-                Assert.That(accountResult, Does.Contain("\"owner\" uuid NOT NULL"));
-                Assert.That(accountResult, Does.Contain("PRIMARY KEY (\"id\")"));
+                Assert.That(accountResult, Does.Contain("CREATE TABLE forge.account"));
+                Assert.That(accountResult, Does.Contain("id uuid NOT NULL"));
+                Assert.That(accountResult, Does.Contain("owner uuid NOT NULL"));
+                Assert.That(accountResult, Does.Contain("PRIMARY KEY (id)"));
             }
         }
 
@@ -139,7 +139,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT \"Account_Thing_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Thing\" (\"id\")"));
+                Assert.That(accountResult, Does.Contain("ALTER TABLE forge.account ADD CONSTRAINT account_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id)"));
             }
         }
 
@@ -160,8 +160,8 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_thing_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".thing_delete()"));
+                Assert.That(accountResult, Does.Contain("AFTER DELETE ON forge.account"));
+                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION forge.thing_delete()"));
             }
         }
 
@@ -181,8 +181,8 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var orgResult = template(this.organizationClass);
-                Assert.That(orgResult, Does.Contain("CREATE TABLE \"Forge\".\"Organization_administrator__Account\""));
-                Assert.That(orgResult, Does.Contain("CREATE TABLE \"Forge\".\"Organization_member__Account\""));
+                Assert.That(orgResult, Does.Contain("CREATE TABLE forge.organization_administrator__account"));
+                Assert.That(orgResult, Does.Contain("CREATE TABLE forge.organization_member__account"));
 
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Is.Empty);
@@ -205,7 +205,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT"));
+                Assert.That(accountResult, Does.Contain("ALTER TABLE forge.account ADD CONSTRAINT"));
                 Assert.That(accountResult, Does.Contain("CREATE INDEX"));
             }
         }

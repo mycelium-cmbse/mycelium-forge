@@ -1,6 +1,6 @@
 #!/bin/sh
 # Runs once via docker-entrypoint-initdb.d, on first init of an empty data directory. Creates the
-# least-privileged runtime role (forge_runtime only ever gets DELETE on Forge.Thing, nothing else)
+# least-privileged runtime role (forge_runtime only ever gets DELETE on forge.thing, nothing else)
 # alongside the admin/migrator role the image itself bootstraps from POSTGRES_USER. A shell script
 # rather than a plain .sql file so the password can come from the container's own environment
 # (FORGE_RUNTIME_PASSWORD) instead of being hardcoded here - the same script runs unmodified in

@@ -80,7 +80,7 @@ namespace Mycelium.Forge.Orm.Tests.Helper
         [SetUp]
         public async Task CleanDataBase()
         {
-            await using var sqlRemoveCommand = new NpgsqlCommand("DROP SCHEMA IF EXISTS \"Forge\" CASCADE;", this.Connection);
+            await using var sqlRemoveCommand = new NpgsqlCommand("DROP SCHEMA IF EXISTS forge CASCADE;", this.Connection);
             sqlRemoveCommand.ExecuteNonQuery();
 
             var path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Data", "Script0001_InitialSchema.sql");

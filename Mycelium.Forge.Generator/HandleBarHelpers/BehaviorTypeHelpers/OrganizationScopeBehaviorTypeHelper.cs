@@ -13,9 +13,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
     using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.Models;
 
-    using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
 
     /// <summary>
@@ -236,36 +236,34 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             var ownerChecks = new List<string>
             {
-                $"\"{entityName}\".\"owner\" = @callerAccountId"
+                $"{entityName.ToSnakeCase()}.owner = @callerAccountId"
             };
 
             if (!config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase) &&
                 !config.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
             {
-                var ownerPropCamel = config.OwnerProperty.LowerCaseFirstLetter();
-                ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{ownerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+                ownerChecks.Add(ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(entityName, config.OwnerProperty, entityName, PropertyNames.Id));
             }
 
             if (!string.IsNullOrWhiteSpace(definition.MaintainerProperty))
             {
-                var maintainerPropCamel = definition.MaintainerProperty.LowerCaseFirstLetter();
-                ownerChecks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{entityName}_{maintainerPropCamel}__Account\" WHERE \"source{entityName}\" = \"{entityName}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+                ownerChecks.Add(ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(entityName, definition.MaintainerProperty, entityName, PropertyNames.Id));
             }
 
             var ownerChecksSql = string.Join("\r\n                        OR ", ownerChecks);
             var bypassSql = string.Join(" OR ", config.BypassPermissions.Select(p => $"@can{p} = true"));
 
-            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop => $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{prop.LowerCaseFirstLetter()}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"owner\" AND \"targetAccount\" = @callerAccountId)");
+            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop => ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, prop, entityName, PropertyNames.Owner));
 
             var scopeLinksSql = string.Join("\r\n                                        OR ", scopeLinkChecks);
 
             return $$"""
-                                         ("Thing"."data"->>'{{config.VisibilityPropertyLower}}' = 'PUBLIC')
+                                         (thing.data->>'{{config.VisibilityPropertyLower}}' = 'PUBLIC')
                                          OR (@callerAccountId IS NOT NULL AND (
                                              {{ownerChecksSql}}
                                              OR {{bypassSql}}
                                              OR (
-                                                 "Thing"."data"->>'{{config.VisibilityPropertyLower}}' = 'INTERNAL'
+                                                 thing.data->>'{{config.VisibilityPropertyLower}}' = 'INTERNAL'
                                                  AND (
                                                      {{scopeLinksSql}}
                                                  )

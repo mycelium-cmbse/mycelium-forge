@@ -166,15 +166,15 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
-            {
-                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-            }
+                if (!property.QueryIsManyToMany())
+                {
+                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+                }
 
                 var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
                 var typeName = property.Type?.Name ?? string.Empty;
 
-                return $"{ownerName.CapitalizeFirstLetter()}_{property.Name.LowerCaseFirstLetter()}__{typeName.CapitalizeFirstLetter()}";
+                return $"{ownerName.ToSnakeCase()}_{property.Name.ToSnakeCase()}__{typeName.ToSnakeCase()}";
             }
 
             /// <summary>
@@ -185,10 +185,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
-            {
-                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-            }
+                if (!property.QueryIsManyToMany())
+                {
+                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+                }
 
                 return property.Type?.Name.CapitalizeFirstLetter() ?? string.Empty;
             }
@@ -201,12 +201,12 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
-            {
-                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-            }
+                if (!property.QueryIsManyToMany())
+                {
+                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+                }
 
-                return $"target{property.QueryManyToManyTargetPropertyTypeName()}";
+                return $"target{property.QueryManyToManyTargetPropertyTypeName()}".ToSnakeCase();
             }
 
             /// <summary>
@@ -217,10 +217,10 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
-            {
-                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-            }
+                if (!property.QueryIsManyToMany())
+                {
+                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+                }
 
                 var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
                 return ownerName.CapitalizeFirstLetter();
@@ -234,12 +234,12 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-            if (!property.QueryIsManyToMany())
-            {
-                throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
-            }
+                if (!property.QueryIsManyToMany())
+                {
+                    throw new ArgumentException($"{property.Name} is not a many-to-many property", nameof(property));
+                }
 
-                return $"source{property.QueryManyToManySourcePropertyTypeName()}";
+                return $"source{property.QueryManyToManySourcePropertyTypeName()}".ToSnakeCase();
             }
 
             /// <summary>
@@ -268,14 +268,14 @@ namespace Mycelium.Forge.Generator.Extensions
             /// <summary>
             /// Gets the SQL attribute (column) name for this property.
             /// </summary>
-            /// <returns>The SQL attribute name in lower-camel-case.</returns>
+            /// <returns>The SQL attribute name in snake_case.</returns>
             public string QuerySqlAttributeName()
             {
                 ArgumentNullException.ThrowIfNull(property);
 
                 return string.IsNullOrWhiteSpace(property.Name)
                     ? string.Empty
-                    : property.Name.LowerCaseFirstLetter();
+                    : property.Name.ToSnakeCase();
             }
 
             /// <summary>
@@ -316,7 +316,7 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                var propName = property.Name.LowerCaseFirstLetter();
+                var propName = property.QuerySqlAttributeName();
                 var typeName = property.QuerySqlTypeName();
 
                 if (typeName == "timestamp")

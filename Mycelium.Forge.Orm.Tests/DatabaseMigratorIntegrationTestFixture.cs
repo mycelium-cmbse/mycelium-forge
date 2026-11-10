@@ -32,7 +32,7 @@ namespace Mycelium.Forge.Orm.Tests
         [SetUp]
         public new async Task CleanDataBase()
         {
-            await using var sqlRemoveCommand = new NpgsqlCommand("DROP SCHEMA IF EXISTS \"Forge\" CASCADE; DROP TABLE IF EXISTS \"schemaversions\" CASCADE;", this.Connection);
+            await using var sqlRemoveCommand = new NpgsqlCommand("DROP SCHEMA IF EXISTS forge CASCADE; DROP TABLE IF EXISTS \"schemaversions\" CASCADE;", this.Connection);
             await sqlRemoveCommand.ExecuteNonQueryAsync();
 
             this.databaseMigrator = new DatabaseMigrator();
@@ -67,7 +67,7 @@ namespace Mycelium.Forge.Orm.Tests
         {
             var resetResult = await this.databaseMigrator.ResetDatabaseAsync(this.ConnectionString, CancellationToken.None);
 
-            await using var verifyCommand = new NpgsqlCommand("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'Forge' AND table_name = 'Package');", this.Connection);
+            await using var verifyCommand = new NpgsqlCommand("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'forge' AND table_name = 'package');", this.Connection);
             var tableExists = (bool)(await verifyCommand.ExecuteScalarAsync())!;
 
             using (Assert.EnterMultipleScope())

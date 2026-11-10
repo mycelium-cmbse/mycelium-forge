@@ -77,12 +77,12 @@ namespace Mycelium.Forge.Generator.Extensions
             /// <summary>
             /// Gets the SQL table name for this class.
             /// </summary>
-            /// <returns>The SQL table name.</returns>
+            /// <returns>The SQL table name in snake_case.</returns>
             public string QuerySqlTableName()
             {
                 ArgumentNullException.ThrowIfNull(@class);
 
-                return @class.Name.CapitalizeFirstLetter();
+                return @class.Name.ToSnakeCase();
             }
 
             /// <summary>

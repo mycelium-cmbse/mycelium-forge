@@ -193,7 +193,7 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         }
 
         /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.QuerySqlTableName" /> returns the capitalized table name.
+        /// Verifies that <see cref="GeneratorClassExtensions.QuerySqlTableName" /> returns the snake_case table name.
         /// </summary>
         [Test]
         public void VerifyQuerySqlTableName()
@@ -203,9 +203,9 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => GeneratorClassExtensions.QuerySqlTableName(null!), Throws.TypeOf<ArgumentNullException>());
-                Assert.That(GeneratorClassExtensions.QuerySqlTableName(this.accountClass), Is.EqualTo("Account"));
-                Assert.That(GeneratorClassExtensions.QuerySqlTableName(this.organizationClass), Is.EqualTo("Organization"));
-                Assert.That(GeneratorClassExtensions.QuerySqlTableName(customClass), Is.EqualTo("CustomEntity"));
+                Assert.That(GeneratorClassExtensions.QuerySqlTableName(this.accountClass), Is.EqualTo("account"));
+                Assert.That(GeneratorClassExtensions.QuerySqlTableName(this.organizationClass), Is.EqualTo("organization"));
+                Assert.That(GeneratorClassExtensions.QuerySqlTableName(customClass), Is.EqualTo("custom_entity"));
             }
         }
 

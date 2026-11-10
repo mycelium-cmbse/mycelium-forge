@@ -59,23 +59,23 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             var stringBuilder = new StringBuilder();
 
-            stringBuilder.AppendLine($"CREATE TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" (");
-            stringBuilder.AppendLine("    \"id\" uuid NOT NULL,");
+            stringBuilder.AppendLine($"CREATE TABLE forge.{@class.QuerySqlTableName()} (");
+            stringBuilder.AppendLine("    id uuid NOT NULL,");
 
             foreach (var property in @class.QuerySqlSingleReferenceProperties())
             {
                 // Preserves property UML multiplicity nullability without overriding non-owned composite properties
                 var isNullable = property.QueryIsNullable();
-                stringBuilder.AppendLine($"    \"{property.QuerySqlAttributeName()}\" {property.QuerySqlTypeName()}{(isNullable ? "" : " NOT NULL")},");
+                stringBuilder.AppendLine($"    {property.QuerySqlAttributeName()} {property.QuerySqlTypeName()}{(isNullable ? "" : " NOT NULL")},");
             }
 
-            stringBuilder.AppendLine("    PRIMARY KEY (\"id\")");
+            stringBuilder.AppendLine("    PRIMARY KEY (id)");
             stringBuilder.AppendLine(");");
             stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" SET (autovacuum_vacuum_scale_factor = 0.0);");
-            stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" SET (autovacuum_vacuum_threshold = 2500);");
-            stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" SET (autovacuum_analyze_scale_factor = 0.0);");
-            stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" SET (autovacuum_analyze_threshold = 2500);");
+            stringBuilder.AppendLine($"ALTER TABLE forge.{@class.QuerySqlTableName()} SET (autovacuum_vacuum_scale_factor = 0.0);");
+            stringBuilder.AppendLine($"ALTER TABLE forge.{@class.QuerySqlTableName()} SET (autovacuum_vacuum_threshold = 2500);");
+            stringBuilder.AppendLine($"ALTER TABLE forge.{@class.QuerySqlTableName()} SET (autovacuum_analyze_scale_factor = 0.0);");
+            stringBuilder.AppendLine($"ALTER TABLE forge.{@class.QuerySqlTableName()} SET (autovacuum_analyze_threshold = 2500);");
             stringBuilder.AppendLine();
 
             writer.WriteSafeString(stringBuilder);
@@ -97,7 +97,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             }
 
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" ADD CONSTRAINT \"{@class.QuerySqlTableName()}_Thing_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Thing\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;");
+            stringBuilder.AppendLine($"ALTER TABLE forge.{@class.QuerySqlTableName()} ADD CONSTRAINT {@class.QuerySqlTableName()}_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;");
 
             writer.WriteSafeString(stringBuilder);
         }
@@ -123,28 +123,31 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             foreach (var property in ownedManyToManyProperties)
             {
                 var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
+                var tableName = property.QueryManyToManyTableName();
+                var sourceColumn = property.QueryManyToManySourcePropertyName();
+                var targetColumn = property.QueryManyToManyTargetPropertyName();
+                var sourceTable = property.QueryManyToManySourcePropertyTypeName().ToSnakeCase();
+                var targetTable = property.QueryManyToManyTargetPropertyTypeName().ToSnakeCase();
 
-                stringBuilder.AppendLine($"CREATE TABLE \"Forge\".\"{property.QueryManyToManyTableName()}\" (");
-                stringBuilder.AppendLine($"    \"{property.QueryManyToManySourcePropertyName()}\" uuid NOT NULL,");
-                stringBuilder.AppendLine($"    \"{property.QueryManyToManyTargetPropertyName()}\" uuid NOT NULL,");
-                stringBuilder.AppendLine($"    PRIMARY KEY (\"{property.QueryManyToManySourcePropertyName()}\", \"{property.QueryManyToManyTargetPropertyName()}\")");
+                stringBuilder.AppendLine($"CREATE TABLE forge.{tableName} (");
+                stringBuilder.AppendLine($"    {sourceColumn} uuid NOT NULL,");
+                stringBuilder.AppendLine($"    {targetColumn} uuid NOT NULL,");
+                stringBuilder.AppendLine($"    PRIMARY KEY ({sourceColumn}, {targetColumn})");
                 stringBuilder.AppendLine(");");
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{property.QueryManyToManyTableName()}\" SET (autovacuum_vacuum_scale_factor = 0.0);");
-                stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{property.QueryManyToManyTableName()}\" SET (autovacuum_vacuum_threshold = 2500);");
-                stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{property.QueryManyToManyTableName()}\" SET (autovacuum_analyze_scale_factor = 0.0);");
-                stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{property.QueryManyToManyTableName()}\" SET (autovacuum_analyze_threshold = 2500);");
+                stringBuilder.AppendLine($"ALTER TABLE forge.{tableName} SET (autovacuum_vacuum_scale_factor = 0.0);");
+                stringBuilder.AppendLine($"ALTER TABLE forge.{tableName} SET (autovacuum_vacuum_threshold = 2500);");
+                stringBuilder.AppendLine($"ALTER TABLE forge.{tableName} SET (autovacuum_analyze_scale_factor = 0.0);");
+                stringBuilder.AppendLine($"ALTER TABLE forge.{tableName} SET (autovacuum_analyze_threshold = 2500);");
                 stringBuilder.AppendLine();
 
-                stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{property.QueryManyToManyTableName()}\" ADD CONSTRAINT \"{property.QueryManyToManySourcePropertyTypeName()}_FK_Source\" FOREIGN KEY (\"{property.QueryManyToManySourcePropertyName()}\") REFERENCES \"Forge\".\"{property.QueryManyToManySourcePropertyTypeName()}\" (\"id\") ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;");
+                stringBuilder.AppendLine($"ALTER TABLE forge.{tableName} ADD CONSTRAINT {sourceTable}_fk_source FOREIGN KEY ({sourceColumn}) REFERENCES forge.{sourceTable} (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;");
 
-                stringBuilder.AppendLine(
-                    $"CREATE INDEX \"idx_{ownerName.CapitalizeFirstLetter()}_{property.Name.LowerCaseFirstLetter()}_{property.QueryManyToManySourcePropertyName()}\" ON \"Forge\".\"{property.QueryManyToManyTableName()}\" (\"{property.QueryManyToManySourcePropertyName()}\");");
+                stringBuilder.AppendLine($"CREATE INDEX idx_{ownerName.ToSnakeCase()}_{property.Name.ToSnakeCase()}_{sourceColumn} ON forge.{tableName} ({sourceColumn});");
 
-                stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{property.QueryManyToManyTableName()}\" ADD CONSTRAINT \"{property.QueryManyToManyTargetPropertyTypeName()}_FK_Target\" FOREIGN KEY (\"{property.QueryManyToManyTargetPropertyName()}\") REFERENCES \"Forge\".\"{property.QueryManyToManyTargetPropertyTypeName()}\" (\"id\") ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;");
+                stringBuilder.AppendLine($"ALTER TABLE forge.{tableName} ADD CONSTRAINT {targetTable}_fk_target FOREIGN KEY ({targetColumn}) REFERENCES forge.{targetTable} (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;");
 
-                stringBuilder.AppendLine(
-                    $"CREATE INDEX \"idx_{ownerName.CapitalizeFirstLetter()}_{property.Name.LowerCaseFirstLetter()}_{property.QueryManyToManyTargetPropertyName()}\" ON \"Forge\".\"{property.QueryManyToManyTableName()}\" (\"{property.QueryManyToManyTargetPropertyName()}\");");
+                stringBuilder.AppendLine($"CREATE INDEX idx_{ownerName.ToSnakeCase()}_{property.Name.ToSnakeCase()}_{targetColumn} ON forge.{tableName} ({targetColumn});");
 
                 stringBuilder.AppendLine();
             }
@@ -171,10 +174,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             foreach (var property in @class.QuerySqlSingleReferenceProperties())
             {
-                stringBuilder.AppendLine($"ALTER TABLE \"Forge\".\"{@class.QuerySqlTableName()}\" ADD CONSTRAINT \"{@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()}_FK_Source\" FOREIGN KEY (\"{property.QuerySqlAttributeName()}\") REFERENCES \"Forge\".\"{property.QueryTypeName()}\" (\"id\"){(property.Opposite?.IsComposite ?? false ? " ON DELETE CASCADE" : string.Empty)} ON UPDATE CASCADE DEFERRABLE;");
+                stringBuilder.AppendLine($"ALTER TABLE forge.{@class.QuerySqlTableName()} ADD CONSTRAINT {@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()}_fk_source FOREIGN KEY ({property.QuerySqlAttributeName()}) REFERENCES forge.{property.QueryTypeName().ToSnakeCase()} (id){(property.Opposite?.IsComposite ?? false ? " ON DELETE CASCADE" : string.Empty)} ON UPDATE CASCADE DEFERRABLE;");
 
-                stringBuilder.AppendLine(
-                    $"CREATE INDEX \"idx_{@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()}\" ON \"Forge\".\"{@class.QuerySqlTableName()}\" (\"{property.QuerySqlAttributeName()}\");");
+                stringBuilder.AppendLine($"CREATE INDEX idx_{@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()} ON forge.{@class.QuerySqlTableName()} ({property.QuerySqlAttributeName()});");
             }
 
             writer.WriteSafeString(stringBuilder);
@@ -210,7 +212,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             foreach (var property in indexableValueProperties)
             {
-                stringBuilder.AppendLine($"CREATE INDEX \"idx_{@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()}\" ON \"Forge\".\"Thing\" ((\"data\" ->> '{property.QuerySqlAttributeName()}')){whereClause};");
+                stringBuilder.AppendLine($"CREATE INDEX idx_{@class.QuerySqlTableName()}_{property.QuerySqlAttributeName()} ON forge.thing ((data ->> '{property.Name.LowerCaseFirstLetter()}')){whereClause};");
             }
 
             writer.WriteSafeString(stringBuilder);
@@ -225,7 +227,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             if (!@class.IsAbstract)
             {
-                return $" WHERE \"classKind\" = '{@class.Name}'";
+                return $" WHERE class_kind = '{@class.Name}'";
             }
 
             var concreteSubclasses = @class.QueryConcreteSubclasses();
@@ -233,8 +235,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             return concreteSubclasses.Count switch
             {
                 0 => string.Empty,
-                1 => $" WHERE \"classKind\" = '{concreteSubclasses[0].Name}'",
-                _ => $" WHERE \"classKind\" IN ('{string.Join("', '", concreteSubclasses.Select(x => x.Name))}')"
+                1 => $" WHERE class_kind = '{concreteSubclasses[0].Name}'",
+                _ => $" WHERE class_kind IN ('{string.Join("', '", concreteSubclasses.Select(x => x.Name))}')"
             };
         }
 
@@ -253,12 +255,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             foreach (var className in classes.Where(x => x.QueryAllSpecializations().Count != 0 && x.QueryDerivesFrom(ModelConstants.ThingName)).Select(@class => @class.Name))
             {
                 var sql = $$"""
-                            CREATE OR REPLACE FUNCTION "Forge".{{className.ToLower()}}_delete()
+                            CREATE OR REPLACE FUNCTION forge.{{className.ToSnakeCase()}}_delete()
                                 RETURNS trigger
                                 LANGUAGE plpgsql
                                 AS $$
                                 BEGIN
-                                    EXECUTE 'DELETE FROM "Forge"."{{className}}" WHERE id = $1' USING OLD.id;
+                                    EXECUTE 'DELETE FROM forge.{{className.ToSnakeCase()}} WHERE id = $1' USING OLD.id;
                                     RETURN OLD;
                                 END;
                             $$;
@@ -288,9 +290,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             var txt = $$"""
                         CREATE OR REPLACE TRIGGER trg_thing_delete
-                            AFTER DELETE ON "Forge"."{{@class.QuerySqlTableName()}}"
+                            AFTER DELETE ON forge.{{@class.QuerySqlTableName()}}
                             FOR EACH ROW
-                                EXECUTE FUNCTION "Forge".thing_delete();
+                                EXECUTE FUNCTION forge.thing_delete();
 
 
                         """;
@@ -316,10 +318,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             foreach (var baseClassName in @class.Generalization.Select(x => x.General).OfType<IClass>().Where(x => x.QueryDerivesFrom(ModelConstants.ThingName)).Select(baseClass => baseClass.Name))
             {
                 var txt = $$"""
-                            CREATE OR REPLACE TRIGGER trg_{{baseClassName.ToLower()}}_on_{{@class.QuerySqlTableName().ToLower()}}_delete
-                                AFTER DELETE ON "Forge"."{{@class.QuerySqlTableName()}}"
+                            CREATE OR REPLACE TRIGGER trg_{{baseClassName.ToSnakeCase()}}_on_{{@class.QuerySqlTableName()}}_delete
+                                AFTER DELETE ON forge.{{@class.QuerySqlTableName()}}
                                 FOR EACH ROW
-                                    EXECUTE FUNCTION "Forge".{{baseClassName.ToLower()}}_delete();
+                                    EXECUTE FUNCTION forge.{{baseClassName.ToSnakeCase()}}_delete();
 
 
                             """;

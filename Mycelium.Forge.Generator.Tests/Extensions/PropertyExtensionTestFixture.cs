@@ -131,7 +131,7 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManySourcePropertyName(null!), Throws.TypeOf<ArgumentNullException>());
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManySourcePropertyName(this.packageTypeProperty), Throws.TypeOf<ArgumentException>());
 
-                Assert.That(GeneratorPropertyExtension.QueryManyToManySourcePropertyName(this.administratorProperty), Is.EqualTo("sourceOrganization"));
+                Assert.That(GeneratorPropertyExtension.QueryManyToManySourcePropertyName(this.administratorProperty), Is.EqualTo("source_organization"));
             }
         }
 
@@ -161,7 +161,7 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             {
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTableName(null!), Throws.TypeOf<ArgumentNullException>());
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTableName(this.packageTypeProperty), Throws.TypeOf<ArgumentException>());
-                Assert.That(GeneratorPropertyExtension.QueryManyToManyTableName(this.administratorProperty), Is.EqualTo("Organization_administrator__Account"));
+                Assert.That(GeneratorPropertyExtension.QueryManyToManyTableName(this.administratorProperty), Is.EqualTo("organization_administrator__account"));
             }
         }
 
@@ -177,7 +177,7 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(null!), Throws.TypeOf<ArgumentNullException>());
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(this.packageTypeProperty), Throws.TypeOf<ArgumentException>());
 
-                Assert.That(GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(this.administratorProperty), Is.EqualTo("targetAccount"));
+                Assert.That(GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(this.administratorProperty), Is.EqualTo("target_account"));
             }
         }
 
@@ -291,7 +291,25 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         }
 
         /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QuerySqlAttributeName" /> generates lower-camel-case column names.
+        /// Verifies that <see cref="GeneratorPropertyExtension.QueryReadConversion" /> generates conversion expressions with snake_case column names.
+        /// </summary>
+        [Test]
+        public void VerifyQueryReadConversion()
+        {
+            var createdAtProp = GetOwnedProperty("Thing", "createdAt");
+            var visibilityProp = GetOwnedProperty("Package", "visibility");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => GeneratorPropertyExtension.QueryReadConversion(null!), Throws.TypeOf<ArgumentNullException>());
+                Assert.That(GeneratorPropertyExtension.QueryReadConversion(this.billingEmailProperty), Is.EqualTo("(string)reader[\"billing_email\"]"));
+                Assert.That(GeneratorPropertyExtension.QueryReadConversion(createdAtProp), Is.EqualTo("DateTime.Parse((string)reader[\"created_at\"], CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)"));
+                Assert.That(GeneratorPropertyExtension.QueryReadConversion(visibilityProp), Is.EqualTo("VisibilityKindProvider.Parse((string)reader[\"visibility\"])"));
+            }
+        }
+
+        /// <summary>
+        /// Verifies that <see cref="GeneratorPropertyExtension.QuerySqlAttributeName" /> generates snake_case column names.
         /// </summary>
         [Test]
         public void VerifyQuerySqlAttributeName()
@@ -302,7 +320,7 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => GeneratorPropertyExtension.QuerySqlAttributeName(null!), Throws.TypeOf<ArgumentNullException>());
-                Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(this.billingEmailProperty), Is.EqualTo("billingEmail"));
+                Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(this.billingEmailProperty), Is.EqualTo("billing_email"));
                 Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(this.idProperty), Is.EqualTo("id"));
                 Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(nullNameProp), Is.EqualTo(string.Empty));
                 Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(emptyNameProp), Is.EqualTo(string.Empty));
