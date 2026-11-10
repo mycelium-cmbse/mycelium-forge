@@ -10,10 +10,10 @@
 namespace Mycelium.Forge.Extractors.Extractors
 {
     using System.Text.Json;
-    using System.Text.RegularExpressions;
 
     using ErrorOr;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Errors;
     using Mycelium.Forge.Extractors.Models;
@@ -26,7 +26,7 @@ namespace Mycelium.Forge.Extractors.Extractors
     /// Validates a kpar against the publish-time checks of design §9.1 (KerML 1.0 §10.3) and projects its descriptors onto a
     /// <see cref="KparManifest" />.
     /// </summary>
-    public partial class KparManifestExtractor : IArtifactManifestExtractor
+    public class KparManifestExtractor : IArtifactManifestExtractor
     {
         /// <summary>
         /// The resource the <see cref="IKparArchiveReader" /> assigns to a usage entry that declares none.
@@ -98,13 +98,6 @@ namespace Mycelium.Forge.Extractors.Extractors
         }
 
         /// <summary>
-        /// Gets the regular expression of the SemVer 2.0.0 grammar published at https://semver.org.
-        /// </summary>
-        /// <returns>The <see cref="Regex" />.</returns>
-        [GeneratedRegex(@"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$")]
-        public static partial Regex SemanticVersionRegex();
-
-        /// <summary>
         /// Runs the checks that the <see cref="IKparArchiveReader" /> does not enforce.
         /// </summary>
         /// <param name="archive">The archive read by the <see cref="IKparArchiveReader" />.</param>
@@ -122,7 +115,7 @@ namespace Mycelium.Forge.Extractors.Extractors
             {
                 errors.Add(Error.Validation(KparErrorCodes.MissingVersion, "The .project.json has no version."));
             }
-            else if (!SemanticVersionRegex().IsMatch(archive.Project.Version))
+            else if (!SemanticVersion.VersionFormatRegex().IsMatch(archive.Project.Version))
             {
                 errors.Add(Error.Validation(KparErrorCodes.InvalidVersion, $"The version '{archive.Project.Version}' is not SemVer 2.0.0."));
             }

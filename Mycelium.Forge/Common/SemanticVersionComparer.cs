@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="SemanticVersionComparer.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.Common
 {
-    using Mycelium.Forge.Extractors.Extractors;
-
     /// <summary>
     /// Implements SemVer 2.0.0 precedence comparison for semantic version strings.
     /// </summary>
@@ -42,8 +40,8 @@ namespace Mycelium.Forge.Common
                 return 0;
             }
 
-            var matchA = KparManifestExtractor.SemanticVersionRegex().Match(versionA ?? string.Empty);
-            var matchB = KparManifestExtractor.SemanticVersionRegex().Match(versionB ?? string.Empty);
+            var matchA = SemanticVersion.VersionFormatRegex().Match(versionA ?? string.Empty);
+            var matchB = SemanticVersion.VersionFormatRegex().Match(versionB ?? string.Empty);
 
             if (!matchA.Success || !matchB.Success)
             {
@@ -85,8 +83,8 @@ namespace Mycelium.Forge.Common
         /// <returns><see langword="true" /> if the major version number has increased; otherwise, <see langword="false" />.</returns>
         public static bool IsMajorBump(string newVersion, string previousVersion)
         {
-            var matchNew = KparManifestExtractor.SemanticVersionRegex().Match(newVersion);
-            var matchPrev = KparManifestExtractor.SemanticVersionRegex().Match(previousVersion);
+            var matchNew = SemanticVersion.VersionFormatRegex().Match(newVersion);
+            var matchPrev = SemanticVersion.VersionFormatRegex().Match(previousVersion);
 
             if (!matchNew.Success || !matchPrev.Success)
             {

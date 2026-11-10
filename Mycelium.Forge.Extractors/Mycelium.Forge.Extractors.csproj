@@ -27,4 +27,8 @@
         <PackageReference Include="SysML2.NET.Kpar" Version="0.24.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Mycelium.Forge.Common\Mycelium.Forge.Common.csproj" />
+    </ItemGroup>
+
 </Project>

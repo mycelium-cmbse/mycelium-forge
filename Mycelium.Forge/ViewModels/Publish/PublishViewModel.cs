@@ -355,7 +355,7 @@ namespace Mycelium.Forge.ViewModels.Publish
             this.currentUserId = this.userContext.AccountId!.Value;
 
             this.ScopeOptions = await this.scopeService.ReadActiveByAccountAsync(this.userContext, this.currentUserId);
-            this.SelectedScope = this.ScopeOptions.FirstOrDefault();
+            this.SelectedScope = this.ScopeOptions.Count > 0 ? this.ScopeOptions[0] : null;
 
             var versionId = Guid.NewGuid();
             var metaDataId = Guid.NewGuid();

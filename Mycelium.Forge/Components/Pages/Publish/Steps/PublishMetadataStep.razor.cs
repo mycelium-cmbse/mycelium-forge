@@ -15,7 +15,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
     using Mycelium.Forge.Dal.AutoGenDtoValidator;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Extractors.Enums;
-    using Mycelium.Forge.Extractors.Extractors;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
@@ -136,13 +135,13 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task HandleContinue()
         {
+            var isVersionValid = !string.IsNullOrWhiteSpace(this.ViewModel.PackageVersion.Version) &&
+                                 SemanticVersion.VersionFormatRegex().IsMatch(this.ViewModel.PackageVersion.Version);
+
             if (this.ViewModel.IsExistingPackage)
             {
-                var isExistingVersionValid = !string.IsNullOrWhiteSpace(this.ViewModel.PackageVersion.Version) &&
-                                             KparManifestExtractor.SemanticVersionRegex().IsMatch(this.ViewModel.PackageVersion.Version);
-
                 var isExistingValid = this.ValidationManager
-                    .Check(nameof(IPackageVersion.Version), isExistingVersionValid, "Version must follow SemVer 2.0.0 format (e.g. 1.0.0).")
+                    .Check(nameof(IPackageVersion.Version), isVersionValid, "Version must follow SemVer 2.0.0 format (e.g. 1.0.0).")
                     .IsValid;
 
                 if (!isExistingValid)
@@ -156,9 +155,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
 
             var isShortNameValid = !string.IsNullOrWhiteSpace(this.ViewModel.Package.ShortName) &&
                                    PackageValidator.ShortNameFormatRegex().IsMatch(this.ViewModel.Package.ShortName);
-
-            var isVersionValid = !string.IsNullOrWhiteSpace(this.ViewModel.PackageVersion.Version) &&
-                                 KparManifestExtractor.SemanticVersionRegex().IsMatch(this.ViewModel.PackageVersion.Version);
 
             var isValid = this.ValidationManager
                 .Check(nameof(IScope), this.ViewModel.SelectedScope != null, "Scope selection is required.")
