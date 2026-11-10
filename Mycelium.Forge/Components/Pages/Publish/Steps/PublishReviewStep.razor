@@ -161,10 +161,10 @@
                         <BbCheckbox Checked="@(this.IsAcknowledged)"
                                     CheckedChanged="@(this.OnAcknowledgmentChanged)"
                                     Id="publish-acknowledge-checkbox"/>
-                        <label for="publish-acknowledge-checkbox"
-                               class="text-xs leading-2xs font-normal text-foreground-muted cursor-pointer select-none">
+                        <BbLabel For="publish-acknowledge-checkbox"
+                                 Class="text-xs leading-2xs font-normal text-foreground-muted cursor-pointer select-none">
                             I confirm that this package complies with the registry terms and does not contain confidential data.
-                        </label>
+                        </BbLabel>
                     </div>
                     <BbFieldError Class="form-field-error"
                                   Errors="@(this.ValidationManager[nameof(this.IsAcknowledged)])"/>

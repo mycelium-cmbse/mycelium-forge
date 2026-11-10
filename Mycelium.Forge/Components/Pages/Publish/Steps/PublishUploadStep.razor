@@ -107,13 +107,13 @@
                             Size="14"
                             Class="text-success-vivid shrink-0 mt-0.5"/>
                 <p class="text-xs leading-2xs font-normal text-foreground-muted flex-1">
-                    @if (this.RequiresModelTypeSelection())
+                    @if (this.ReadsMetadataFromManifest())
                     {
-                        <span>Name, version, licence and dependencies must be entered manually on the next step.</span>
+                        <span>Model type detected from the archive manifest. Name, version, licence and dependencies are read from it on the next step, not typed by hand.</span>
                     }
                     else
                     {
-                        <span>Model type detected from the archive manifest. Name, version, licence and dependencies are read from it on the next step, not typed by hand.</span>
+                        <span>Name, version, licence and dependencies must be entered manually on the next step.</span>
                     }
                 </p>
             </div>

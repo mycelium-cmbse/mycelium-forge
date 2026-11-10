@@ -213,7 +213,7 @@ namespace Mycelium.Forge.ViewModels.Publish
             await this.InitializeBase();
             this.IsExistingPackage = true;
 
-            var existingResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scopeShortName.CleanScope(), packageShortName.ToShortName(), token: CancellationToken.None);
+            var existingResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scopeShortName.CleanScope(), packageShortName.Trim().ToLowerInvariant(), token: CancellationToken.None);
 
             if (existingResult.IsError)
             {
@@ -306,11 +306,17 @@ namespace Mycelium.Forge.ViewModels.Publish
                 }
 
                 await using var stagedStream = this.fileUploadStagingService.OpenStagedFile(this.StagedArtefact.StagingToken);
-                return await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, token);
+                var result = await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, token);
+
+                if (!result.IsError)
+                {
+                    this.DiscardStagedFile();
+                }
+
+                return result;
             }
             finally
             {
-                this.DiscardStagedFile();
                 this.IsPublishing = false;
             }
         }

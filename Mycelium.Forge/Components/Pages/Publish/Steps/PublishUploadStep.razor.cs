@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
@@ -141,6 +142,15 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         private bool RequiresModelTypeSelection()
         {
             return this.ViewModel.ExpectedFormat == null && this.GetMatchingFormats().Count > 1;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the selected format extracts metadata directly from an archive manifest.
+        /// </summary>
+        /// <returns><c>true</c> if metadata is read from the manifest; otherwise, <c>false</c>.</returns>
+        private bool ReadsMetadataFromManifest()
+        {
+            return this.selectedFormat?.Kind == ArtifactKind.Kpar;
         }
 
         /// <summary>

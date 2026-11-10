@@ -138,7 +138,7 @@ namespace Mycelium.Forge.ViewModels.Rows
                 var latestVersion = packageVersions
                     .Where(v => v.Owner == package.Id && v.Listed)
                     .OrderByDescending(v => v.PublicationDate)
-                    .ThenByDescending(v => v.Version)
+                    .ThenByDescending(v => v.Version, SemanticVersionComparer.Instance)
                     .FirstOrDefault();
 
                 var latestPublicationDate = latestVersion?.PublicationDate ?? package.CreatedAt;

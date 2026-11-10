@@ -109,7 +109,7 @@ namespace Mycelium.Forge.Dal.Tests.Services
             var dummyTransaction = (NpgsqlTransaction)RuntimeHelpers.GetUninitializedObject(typeof(NpgsqlTransaction));
             var org = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
             var account = new Account { Id = Guid.NewGuid(), Name = "Acc", ShortName = "acc" };
-            var queryIds = new[] { org.Id, account.Id };
+            Guid[] queryIds = [org.Id, account.Id];
 
             // Null checks
             using (Assert.EnterMultipleScope())
@@ -196,7 +196,7 @@ namespace Mycelium.Forge.Dal.Tests.Services
             }
 
             // Case: Short-circuiting when all query IDs are found in Org service -> Account service is not called
-            var singleOrgQueryIds = new[] { org.Id };
+            Guid[] singleOrgQueryIds = [org.Id];
 
             this.organizationServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), singleOrgQueryIds))
                 .ReturnsAsync(ImmutableList.Create<IOrganization>(org));

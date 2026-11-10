@@ -51,7 +51,7 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 2: Cleanup deletes the staged file and removes its token
-            var payload = new byte[] { 7, 8, 9 };
+            byte[] payload = [7, 8, 9];
             using var inputStream = new MemoryStream(payload);
             var token = await this.stagingService.StageAsync(inputStream);
 
@@ -65,7 +65,7 @@ namespace Mycelium.Forge.Tests.Services
         {
             var localService = new FileUploadStagingService(this.loggerMock.Object);
 
-            var payload = new byte[] { 10, 20, 30 };
+            byte[] payload = [10, 20, 30];
             using var inputStream = new MemoryStream(payload);
             var token = await localService.StageAsync(inputStream);
 
@@ -107,7 +107,7 @@ namespace Mycelium.Forge.Tests.Services
         }
 
         [Test]
-        public void VerifyPackageUploadStagingService()
+        public void VerifyConstructor()
         {
             var stagingDirectory = Path.Combine(Path.GetTempPath(), "mycelium_forge_staged_uploads");
             Directory.CreateDirectory(stagingDirectory);
@@ -126,7 +126,7 @@ namespace Mycelium.Forge.Tests.Services
             Assert.That(async () => await this.stagingService.StageAsync(null), Throws.TypeOf<ArgumentNullException>());
 
             // Case 2: Successfully stage valid payload stream
-            var payload = new byte[] { 1, 2, 3, 4, 5 };
+            byte[] payload = [1, 2, 3, 4, 5];
             using var inputStream = new MemoryStream(payload);
             var uploadToken = await this.stagingService.StageAsync(inputStream);
 

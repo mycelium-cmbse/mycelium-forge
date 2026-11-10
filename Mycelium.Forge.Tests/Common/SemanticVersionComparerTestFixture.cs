@@ -67,6 +67,9 @@ namespace Mycelium.Forge.Tests.Common
         [TestCase("1.0.0", "2.0.0", false)]
         [TestCase("invalid", "1.0.0", false)]
         [TestCase("1.0.0", "invalid", false)]
+        [TestCase(null, "1.0.0", false)]
+        [TestCase("2.0.0", null, false)]
+        [TestCase(null, null, false)]
         public void VerifyIsMajorBump(string? newVersion, string? currentVersion, bool expected)
         {
             Assert.That(SemanticVersionComparer.IsMajorBump(newVersion, currentVersion), Is.EqualTo(expected));

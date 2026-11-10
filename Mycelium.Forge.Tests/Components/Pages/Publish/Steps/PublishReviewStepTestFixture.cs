@@ -166,15 +166,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             });
 
             // Case 1: HandleReplaceArtefact triggers OnReplaceArtefact callback
-            await renderedStep.Instance.HandleReplaceArtefact();
+            await renderedStep.Find("#publish-review-replace-button").ClickAsync(new MouseEventArgs());
             Assert.That(replaced, Is.True);
 
             // Case 2: HandleEditMetadata navigates to metadata step (1)
-            await renderedStep.Instance.HandleEditMetadata();
+            await renderedStep.Find("#publish-review-edit-button").ClickAsync(new MouseEventArgs());
             Assert.That(navigatedStep, Is.EqualTo(1));
 
             // Case 3: HandleViewValidationDetails navigates to validation step (2)
-            await renderedStep.Instance.HandleViewValidationDetails();
+            await renderedStep.Find("#publish-review-details-button").ClickAsync(new MouseEventArgs());
             Assert.That(navigatedStep, Is.EqualTo(2));
         }
     }

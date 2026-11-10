@@ -89,16 +89,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
         }
 
         [Test]
-        public async Task VerifyHandleReRun()
-        {
-            var renderedStep = this.context.Render<PublishValidationStep>(parameters => { parameters.Add(x => x.ViewModel, this.viewModelMock.Object); });
-
-            await renderedStep.Instance.HandleReRun();
-
-            this.viewModelMock.Verify(x => x.Validate(null), Times.Once);
-        }
-
-        [Test]
         public void VerifyValidationPropertiesAndFormatting()
         {
             var renderedStep = this.context.Render<PublishValidationStep>(p => p.Add(x => x.ViewModel, this.viewModelMock.Object));

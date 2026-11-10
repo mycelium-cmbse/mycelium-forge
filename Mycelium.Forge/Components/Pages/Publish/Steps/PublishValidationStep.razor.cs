@@ -91,15 +91,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         }
 
         /// <summary>
-        /// Handles re-running pre-publish validation checks.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task HandleReRun()
-        {
-            await this.ViewModel.Validate();
-        }
-
-        /// <summary>
         /// Handles advancing to the review step after verifying that all blocking validation checks have passed.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -177,7 +168,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
 
             return this.WarningCount == 0
                 ? "All pre-publish checks completed successfully."
-                : $"{WarningLiteral.ToQuantity(this.WarningCount)} - not block publishing, but review them below.";
+                : $"{WarningLiteral.ToQuantity(this.WarningCount)} - non-blocking, but review them below.";
         }
     }
 }

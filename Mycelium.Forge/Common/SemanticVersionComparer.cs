@@ -83,8 +83,8 @@ namespace Mycelium.Forge.Common
         /// <returns><see langword="true" /> if the major version number has increased; otherwise, <see langword="false" />.</returns>
         public static bool IsMajorBump(string newVersion, string previousVersion)
         {
-            var matchNew = SemanticVersion.VersionFormatRegex().Match(newVersion);
-            var matchPrev = SemanticVersion.VersionFormatRegex().Match(previousVersion);
+            var matchNew = SemanticVersion.VersionFormatRegex().Match(newVersion ?? string.Empty);
+            var matchPrev = SemanticVersion.VersionFormatRegex().Match(previousVersion ?? string.Empty);
 
             if (!matchNew.Success || !matchPrev.Success)
             {
