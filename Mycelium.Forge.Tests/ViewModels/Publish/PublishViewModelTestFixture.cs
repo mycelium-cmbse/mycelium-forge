@@ -18,6 +18,8 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
     using ErrorOr;
 
+    using Microsoft.Extensions.Caching.Memory;
+
     using Moq;
 
     using Mycelium.Forge.Common;
@@ -26,6 +28,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Models.Kpar;
     using Mycelium.Forge.Models.Publish;
@@ -47,6 +50,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
         private Mock<IFileUploadStagingService> fileUploadStagingServiceMock;
         private Mock<IPackagePublishService> packagePublishServiceMock;
         private Mock<IPackageVersionPermissionService> packageVersionPermissionServiceMock;
+        private Mock<IMemoryCache> memoryCacheMock;
         private UserContext userContext;
         private Organization activeScope;
         private PackageType packageType;
@@ -64,6 +68,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             this.fileUploadStagingServiceMock = new Mock<IFileUploadStagingService>();
             this.packagePublishServiceMock = new Mock<IPackagePublishService>();
             this.packageVersionPermissionServiceMock = new Mock<IPackageVersionPermissionService>();
+            this.memoryCacheMock = new Mock<IMemoryCache>();
 
             var accountId = Guid.NewGuid();
             this.userContext = new UserContext { AccountId = accountId, Username = "testPublisher" };
@@ -76,7 +81,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             this.packageTypeServiceMock.Setup(x => x.ReadByNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IPackageType>(this.packageType));
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length > 0 && ids[0] == this.packageType.Id))).ReturnsAsync(ImmutableList.Create<IPackageType>(this.packageType));
 
-            this.viewModel = new PublishViewModel(this.userServiceMock.Object, this.scopeServiceMock.Object, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.databaseSourceMock.Object, this.fileUploadStagingServiceMock.Object, this.packagePublishServiceMock.Object, this.packageVersionPermissionServiceMock.Object);
+            this.viewModel = new PublishViewModel(this.userServiceMock.Object, this.scopeServiceMock.Object, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.databaseSourceMock.Object, this.fileUploadStagingServiceMock.Object, this.packagePublishServiceMock.Object, this.packageVersionPermissionServiceMock.Object, this.memoryCacheMock.Object);
         }
 
         [TearDown]
@@ -220,12 +225,15 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
             var successResult = await this.viewModel.Publish(CancellationToken.None);
 
+            var expectedCacheKey = this.memoryCacheMock.Object.BuildPackageDetailsCacheKey(this.userContext, this.activeScope.ShortName, this.viewModel.Package.ShortName);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(successResult.IsError, Is.False);
                 Assert.That(this.viewModel.Package.Owner, Is.EqualTo(this.activeScope.Id));
                 Assert.That(this.viewModel.IsPublishing, Is.False);
                 Assert.That(this.viewModel.StagedArtefact, Is.Null);
+                this.memoryCacheMock.Verify(x => x.Remove(expectedCacheKey), Times.Once);
             }
 
             // Case 2: Publication error returns failure
@@ -238,6 +246,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             {
                 Assert.That(artifactFailResult.IsError, Is.True);
                 Assert.That(artifactFailResult.FirstError.Description, Is.EqualTo("Upload failed"));
+                this.memoryCacheMock.Verify(x => x.Remove(expectedCacheKey), Times.Once);
             }
         }
 
