@@ -203,7 +203,20 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         {
             this.selectedFile = files is { Count: > 0 } ? files[0] : null;
             var matches = this.GetMatchingFormats();
-            this.selectedFormat = matches.Count == 1 ? matches[0] : (matches.Contains(this.ViewModel.ExpectedFormat) ? this.ViewModel.ExpectedFormat : null);
+
+            if (matches.Count == 1)
+            {
+                this.selectedFormat = matches[0];
+            }
+            else if (matches.Contains(this.ViewModel.ExpectedFormat))
+            {
+                this.selectedFormat = this.ViewModel.ExpectedFormat;
+            }
+            else
+            {
+                this.selectedFormat = null;
+            }
+
             this.ValidationManager.ClearError(nameof(this.selectedFile));
             this.ValidationManager.ClearError(nameof(this.selectedFormat));
         }
@@ -274,7 +287,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
                 var artefact = new PublishArtefactModel
                 {
                     FileName = this.selectedFile.Name,
-                    Format = this.selectedFormat!.Name,
+                    Format = this.selectedFormat.Name,
                     SizeInBytes = this.selectedFile.Size,
                     Kind = this.selectedFormat.Kind,
                     StagingToken = uploadToken

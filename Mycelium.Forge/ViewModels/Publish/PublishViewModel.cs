@@ -374,7 +374,7 @@ namespace Mycelium.Forge.ViewModels.Publish
         private async Task InitializeBase()
         {
             this.userContext = await this.userService.GetUserContext();
-            this.currentUserId = this.userContext.AccountId!.Value;
+            this.currentUserId = this.userContext.AccountId.Value;
 
             var versionId = Guid.NewGuid();
             var metaDataId = Guid.NewGuid();

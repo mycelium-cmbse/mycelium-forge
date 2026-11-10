@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="ValidationCheckModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -20,6 +20,11 @@ namespace Mycelium.Forge.Models.Validation
     public class ValidationCheckModel
     {
         /// <summary>
+        /// The metadata key used to store a specific remediation recommendation in an <see cref="Error" />.
+        /// </summary>
+        public const string RecommendationMetadataKey = "recommendation";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ValidationCheckModel" /> class.
         /// </summary>
         public ValidationCheckModel()
@@ -38,11 +43,25 @@ namespace Mycelium.Forge.Models.Validation
             this.Title = title;
             this.Detail = detail;
             this.Status = status;
-            this.Recommendation = !string.IsNullOrWhiteSpace(recommendation) ? recommendation : ResolveRecommendation(title);
+            this.Recommendation = ResolveRecommendation(title, null, recommendation);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationCheckModel" /> class from an <see cref="ErrorOr{Success}" /> result.
+        /// Initializes a new instance of the <see cref="ValidationCheckModel" /> class from an <see cref="Error" />.
+        /// </summary>
+        /// <param name="error">The validation error.</param>
+        /// <param name="recommendation">The optional suggested recommendation action to resolve a failed check.</param>
+        public ValidationCheckModel(Error error, string recommendation = "")
+        {
+            this.Title = error.Code;
+            this.Status = ValidationStatus.Fail;
+            this.Detail = error.Description;
+            this.Recommendation = ResolveRecommendation(error.Code, error.Metadata, recommendation);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationCheckModel" /> class from an <see cref="ErrorOr{Success}" />
+        /// result.
         /// </summary>
         /// <param name="title">The title or description label of the check.</param>
         /// <param name="result">The validation evaluation result.</param>
@@ -53,7 +72,7 @@ namespace Mycelium.Forge.Models.Validation
             this.Title = title;
             this.Status = result.IsError ? ValidationStatus.Fail : ValidationStatus.Pass;
             this.Detail = result.IsError ? result.FirstError.Description : successDetail;
-            this.Recommendation = !string.IsNullOrWhiteSpace(recommendation) ? recommendation : ResolveRecommendation(title);
+            this.Recommendation = result.IsError ? ResolveRecommendation(title, result.FirstError.Metadata, recommendation) : string.Empty;
         }
 
         /// <summary>
@@ -77,12 +96,25 @@ namespace Mycelium.Forge.Models.Validation
         public string Recommendation { get; set; } = string.Empty;
 
         /// <summary>
-        /// Resolves the default remediation recommendation message for a given check title.
+        /// Resolves the default remediation recommendation message prioritizing explicit recommendation, error metadata, then
+        /// title mapping.
         /// </summary>
         /// <param name="title">The validation check title.</param>
+        /// <param name="metadata">The optional error metadata dictionary.</param>
+        /// <param name="recommendation">The optional explicit recommendation message.</param>
         /// <returns>A recommendation message string.</returns>
-        private static string ResolveRecommendation(string title)
+        private static string ResolveRecommendation(string title, Dictionary<string, object> metadata = null, string recommendation = "")
         {
+            if (!string.IsNullOrWhiteSpace(recommendation))
+            {
+                return recommendation;
+            }
+
+            if (metadata != null && metadata.TryGetValue(RecommendationMetadataKey, out var metaRec) && metaRec is string recString)
+            {
+                return recString;
+            }
+
             return title switch
             {
                 ValidationTypes.PackageVersion => "Must be greater than the latest published version.",

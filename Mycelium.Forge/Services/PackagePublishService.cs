@@ -167,7 +167,7 @@ namespace Mycelium.Forge.Services
 
             if (beforeValidationErrors is { Count: > 0 })
             {
-                checks.AddRange(beforeValidationErrors.Select(error => new ValidationCheckModel(error.Code, ValidationStatus.Fail, error.Description)));
+                checks.AddRange(beforeValidationErrors.Select(error => new ValidationCheckModel(error)));
                 return checks;
             }
 
@@ -416,7 +416,11 @@ namespace Mycelium.Forge.Services
                     ? $"Version '{packageVersion.Version}' already exists for this package."
                     : $"Version '{packageVersion.Version}' must be strictly greater than published version '{conflictingVersion}'.";
 
-                return Error.Conflict(ValidationTypes.PackageVersion, detail);
+                var recommendation = isDuplicate
+                    ? "Increment the version number."
+                    : "Must be greater than the latest published version.";
+
+                return Error.Conflict(ValidationTypes.PackageVersion, detail, new Dictionary<string, object> { { ValidationCheckModel.RecommendationMetadataKey, recommendation } });
             }
 
             var latestVersion = existingVersions?.OrderByDescending(x => x, SemanticVersionComparer.Instance).FirstOrDefault();
@@ -424,7 +428,7 @@ namespace Mycelium.Forge.Services
 
             if (isMajorBump && string.IsNullOrWhiteSpace(packageVersion.ReleaseNotes))
             {
-                return Error.Validation(ValidationTypes.PackageVersion, "A major-version update requires release notes.");
+                return Error.Validation(ValidationTypes.PackageVersion, "A major-version update requires release notes.", new Dictionary<string, object> { { ValidationCheckModel.RecommendationMetadataKey, "Provide release notes for this major release." } });
             }
 
             return Result.Success;

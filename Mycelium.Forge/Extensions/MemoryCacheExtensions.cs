@@ -34,6 +34,8 @@ namespace Mycelium.Forge.Extensions
             /// </remarks>
             public string BuildPackageDetailsCacheKey(IUserContext userContext, string scope, string packageShortname)
             {
+                ArgumentNullException.ThrowIfNull(memoryCache);
+
                 var normalizedScope = scope?.ToLowerInvariant() ?? string.Empty;
                 var normalizedPackage = packageShortname?.ToLowerInvariant() ?? string.Empty;
 
