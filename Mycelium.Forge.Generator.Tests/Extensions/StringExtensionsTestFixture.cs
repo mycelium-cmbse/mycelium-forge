@@ -11,9 +11,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
 {
     using Mycelium.Forge.Generator.Extensions;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="StringExtensions" /> class.
-    /// </summary>
     [TestFixture]
     public class StringExtensionsTestFixture
     {

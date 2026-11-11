@@ -17,9 +17,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
 
     using GeneratorClassExtensions = Mycelium.Forge.Generator.Extensions.ClassExtensions;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="GeneratorClassExtensions" /> class.
-    /// </summary>
     [TestFixture]
     public class ClassExtensionsTestFixture
     {
@@ -28,9 +25,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         private IClass thingClass;
         private IClass scopeClass;
 
-        /// <summary>
-        /// Sets up the test fixture before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -40,9 +34,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             this.scopeClass = GetClass("Scope");
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.HasThingClass" /> correctly detects Thing in the hierarchy.
-        /// </summary>
         [Test]
         public void VerifyHasThingClass()
         {
@@ -58,9 +49,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.IsThingClass" /> identifies if a class is the root Thing class.
-        /// </summary>
         [Test]
         public void VerifyIsThingClass()
         {
@@ -73,9 +61,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.IsConcreteThingClass" /> identifies concrete classes in the Thing hierarchy.
-        /// </summary>
         [Test]
         public void VerifyIsConcreteThingClass()
         {
@@ -96,9 +81,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.QueryAllOppositeReferencesToMe" /> returns all opposite references.
-        /// </summary>
         [Test]
         public void VerifyQueryAllOppositeReferencesToMe()
         {
@@ -114,9 +96,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.QueryDerivesFrom" /> correctly evaluates inheritance hierarchy.
-        /// </summary>
         [Test]
         public void VerifyQueryDerivesFrom()
         {
@@ -133,10 +112,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.QueryOppositeCompositeProperties" /> returns opposite composite
-        /// properties and handles invalid arguments.
-        /// </summary>
         [Test]
         public void VerifyQueryOppositeCompositeProperties()
         {
@@ -154,9 +129,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.QueryOwnedManyToManyProperties" /> returns many-to-many properties.
-        /// </summary>
         [Test]
         public void VerifyQueryOwnedManyToManyProperties()
         {
@@ -173,10 +145,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.QuerySqlSingleReferenceProperties" /> returns single reference
-        /// properties.
-        /// </summary>
         [Test]
         public void VerifyQuerySqlSingleReferenceProperties()
         {
@@ -192,9 +160,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorClassExtensions.QuerySqlTableName" /> returns the snake_case table name.
-        /// </summary>
         [Test]
         public void VerifyQuerySqlTableName()
         {

@@ -51,10 +51,6 @@ namespace Mycelium.Forge.Orm.Tests.Helper
         /// </summary>
         public NpgsqlConnection Connection { get; private set; }
 
-        /// <summary>
-        /// Initializes the test container, connection, and logging before running tests.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [OneTimeSetUp]
         public async Task InitializeTests()
         {
@@ -74,9 +70,6 @@ namespace Mycelium.Forge.Orm.Tests.Helper
             await this.Connection.OpenAsync();
         }
 
-        /// <summary>
-        /// Drops and recreates the database schema before each test.
-        /// </summary>
         [SetUp]
         public async Task CleanDataBase()
         {
@@ -92,10 +85,6 @@ namespace Mycelium.Forge.Orm.Tests.Helper
             await this.PostSetup();
         }
 
-        /// <summary>
-        /// Cleans up the connection and stops the PostgreSQL test container after all tests in the fixture run.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [OneTimeTearDown]
         public async Task Cleanup()
         {

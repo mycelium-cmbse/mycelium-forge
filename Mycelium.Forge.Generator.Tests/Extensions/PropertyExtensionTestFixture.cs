@@ -21,9 +21,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
     using GeneratorClassExtensions = Mycelium.Forge.Generator.Extensions.ClassExtensions;
     using GeneratorPropertyExtension = Mycelium.Forge.Generator.Extensions.PropertyExtension;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="GeneratorPropertyExtension" /> class.
-    /// </summary>
     [TestFixture]
     public class PropertyExtensionTestFixture
     {
@@ -36,9 +33,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         private IProperty scopeAddressProperty;
         private IProperty orgInvitationTargetProperty;
 
-        /// <summary>
-        /// Sets up the test fixture before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -52,10 +46,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             this.orgInvitationTargetProperty = GetOwnedProperty("OrganizationInvitation", "target");
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryIsEnumPropertyWithDefaultValue" /> handles various enum
-        /// default value specifications.
-        /// </summary>
         [Test]
         public void VerifyQueryIsEnumPropertyWithDefaultValue()
         {
@@ -119,10 +109,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManySourcePropertyName" /> returns the source property
-        /// column name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManySourcePropertyName()
         {
@@ -135,10 +121,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManySourcePropertyTypeName" /> returns the source owner
-        /// type name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManySourcePropertyTypeName()
         {
@@ -150,10 +132,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManyTableName" /> returns the formatted junction table
-        /// name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManyTableName()
         {
@@ -165,10 +143,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManyTargetPropertyName" /> returns the target property
-        /// column name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManyTargetPropertyName()
         {
@@ -181,10 +155,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManyTargetPropertyTypeName" /> returns the target type
-        /// name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManyTargetPropertyTypeName()
         {
@@ -196,10 +166,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryOppositeAttributeNeedsSqlAttribute" /> evaluates opposite SQL
-        /// attribute requirement.
-        /// </summary>
         [Test]
         public void VerifyQueryOppositeAttributeNeedsSqlAttribute()
         {
@@ -233,10 +199,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute" /> evaluates SQL attribute
-        /// requirement.
-        /// </summary>
         [Test]
         public void VerifyQueryOwnedAttributeNeedsSqlAttribute()
         {
@@ -272,10 +234,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryPropertyNameBasedOnUmlProperties" /> formats names according
-        /// to UML attributes.
-        /// </summary>
         [Test]
         public void VerifyQueryPropertyNameBasedOnUmlProperties()
         {
@@ -290,9 +248,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryReadConversion" /> generates conversion expressions with snake_case column names.
-        /// </summary>
         [Test]
         public void VerifyQueryReadConversion()
         {
@@ -308,9 +263,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QuerySqlAttributeName" /> generates snake_case column names.
-        /// </summary>
         [Test]
         public void VerifyQuerySqlAttributeName()
         {
@@ -327,9 +279,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QuerySqlTypeName" /> maps UML types to SQL types correctly.
-        /// </summary>
         [Test]
         public void VerifyQuerySqlTypeName()
         {

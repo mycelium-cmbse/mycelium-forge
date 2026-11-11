@@ -20,9 +20,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
     using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="SqlSchemaHelper" /> class.
-    /// </summary>
     [TestFixture]
     public class SqlSchemaHelperTestFixture
     {
@@ -31,9 +28,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         private IClass organizationClass;
         private IClass thingClass;
 
-        /// <summary>
-        /// Sets up the test fixture before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -46,9 +40,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             this.thingClass = GetClass("Thing");
         }
 
-        /// <summary>
-        /// Verifies that DeleteBaseTableTriggerFunctions renders trigger functions and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyDeleteBaseTableTriggerFunctions()
         {
@@ -69,18 +60,12 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="SqlSchemaHelper.RegisterSqlSchemaHelpers" /> registers helpers and handles null argument.
-        /// </summary>
         [Test]
         public void VerifyRegisterSqlSchemaHelpers()
         {
             Assert.That(() => SqlSchemaHelper.RegisterSqlSchemaHelpers(null!), Throws.TypeOf<ArgumentNullException>());
         }
 
-        /// <summary>
-        /// Verifies that WriteBaseTableDeleteTriggers renders base table triggers and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBaseTableDeleteTriggers()
         {
@@ -100,9 +85,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteBasicTableDefinitions renders table DDL for classes and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBasicTableDefinitions()
         {
@@ -123,9 +105,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteBasicTableThingConstraints renders FK constraints and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBasicTableThingConstraints()
         {
@@ -143,9 +122,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteBasicTableThingDeleteTriggers renders thing delete triggers and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBasicTableThingDeleteTriggers()
         {
@@ -165,9 +141,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteManyToManyTableDefinitionsAndConstraints renders junction tables and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteManyToManyTableDefinitionsAndConstraints()
         {
@@ -189,9 +162,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteNormalReferenceConstraints renders FK constraints and indexes.
-        /// </summary>
         [Test]
         public void VerifyWriteNormalReferenceConstraints()
         {
