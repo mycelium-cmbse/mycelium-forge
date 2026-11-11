@@ -70,6 +70,27 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
+        /// Determines whether transferring package ownership is enabled and visible for the current user.
+        /// </summary>
+        /// <returns><c>true</c> if transferring package ownership is enabled; otherwise, <c>false</c>.</returns>
+        private bool IsTransferOwnershipEnabled()
+        {
+            var accountId = this.ViewModel.UserContext.AccountId;
+
+            if (!accountId.HasValue)
+            {
+                return false;
+            }
+
+            if (this.ViewModel.Package.PackageOwner.Contains(accountId.Value))
+            {
+                return true;
+            }
+
+            return PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.TransferPackageOwnership);
+        }
+
+        /// <summary>
         /// Gets the breadcrumb navigation items for the package settings page.
         /// </summary>
         /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
@@ -182,13 +203,13 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task OnTransferOwnership()
         {
-            var onResult = new EventCallbackFactory().Create(this, async (string targetScope) =>
+            var onResult = new EventCallbackFactory().Create<IScope>(this, async targetScope =>
             {
                 var result = await this.ViewModel.TransferOwnership(targetScope);
 
                 if (!result.IsError)
                 {
-                    this.NavigationManager.NavigateTo(PageRoutes.GetPackageRoute(targetScope, this.ViewModel.Package.ShortName), true);
+                    this.NavigationManager.NavigateTo(PageRoutes.GetPackageRoute(targetScope.ShortName, this.ViewModel.Package.ShortName), replace: true);
                 }
             });
 

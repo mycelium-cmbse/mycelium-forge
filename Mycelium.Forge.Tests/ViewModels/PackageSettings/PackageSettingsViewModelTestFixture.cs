@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -132,16 +133,14 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
-            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
+            this.accountServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
 
             this.packagePermissionServiceMock = new Mock<IPackagePermissionService>();
 
-            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>()))
-                .ReturnsAsync(Result.Success);
-
-            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToDelete(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>()))
-                .ReturnsAsync(Result.Success);
+            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
+            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToDelete(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((func, _) => func(null!));
 
             this.viewModel = new PackageSettingsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.packagePermissionServiceMock.Object, this.notificationServiceMock.Object, this.loggerMock.Object);
         }
@@ -321,9 +320,91 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         [Test]
         public async Task VerifyTransferOwnership()
         {
-            var result = await this.viewModel.TransferOwnership("new-owner", CancellationToken.None);
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
 
-            Assert.That(result.IsError, Is.True);
+            // Case 1: Update fails (preserves original)
+            this.packageServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Update failed"));
+
+            var targetScope = new Account { Id = Guid.NewGuid(), Name = "Target User", ShortName = "target-user" };
+            var updateFailResult = await this.viewModel.TransferOwnership(targetScope);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(updateFailResult.IsError, Is.True);
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Transfer Error", NotificationType.Error), Times.Once);
+            }
+
+            // Case 2: Success transferring to Account (converts INTERNAL to PRIVATE, sets sole owner, updates maintainers)
+            var targetAccount = new Account { Id = Guid.NewGuid(), Name = "New Owner Account", ShortName = "new-owner" };
+            this.package.Visibility = VisibilityKind.INTERNAL;
+            this.viewModel.Package = this.package;
+
+            IPackage capturedAccountPackage = null!;
+            this.packageServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).Callback<IUserContext, IEnumerable<IPackage>, CancellationToken>((_, packages, _) => capturedAccountPackage = packages.First()).ReturnsAsync(Result.Updated);
+
+            var accountSuccessResult = await this.viewModel.TransferOwnership(targetAccount);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(accountSuccessResult.IsError, Is.False);
+                Assert.That(capturedAccountPackage.Owner, Is.EqualTo(targetAccount.Id));
+                Assert.That(capturedAccountPackage.PackageOwner, Is.EquivalentTo([targetAccount.Id]));
+                Assert.That(capturedAccountPackage.PackageMaintainer, Does.Contain(this.userAccount.Id));
+                Assert.That(capturedAccountPackage.Visibility, Is.EqualTo(VisibilityKind.PRIVATE));
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Ownership Transferred", NotificationType.Success), Times.Once);
+            }
+
+            // Case 3: Success transferring to Organization (preserves PUBLIC, sets org admins as owners, updates maintainers)
+            var orgAdmin = Guid.NewGuid();
+
+            var targetOrganization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Name = "Target Organization",
+                ShortName = "target-org",
+                Administrator = [orgAdmin]
+            };
+
+            this.package.Visibility = VisibilityKind.PUBLIC;
+            this.viewModel.Package = this.package;
+
+            IPackage capturedOrgPackage = null!;
+            this.packageServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).Callback<IUserContext, IEnumerable<IPackage>, CancellationToken>((_, packages, _) => capturedOrgPackage = packages.First()).ReturnsAsync(Result.Updated);
+
+            var orgSuccessResult = await this.viewModel.TransferOwnership(targetOrganization);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgSuccessResult.IsError, Is.False);
+                Assert.That(capturedOrgPackage.Owner, Is.EqualTo(targetOrganization.Id));
+                Assert.That(capturedOrgPackage.PackageOwner, Is.EquivalentTo([orgAdmin]));
+                Assert.That(capturedOrgPackage.PackageMaintainer, Does.Contain(this.userAccount.Id));
+                Assert.That(capturedOrgPackage.Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Ownership Transferred", NotificationType.Success), Times.Exactly(2));
+            }
+
+            // Case 4: Success transferring to existing maintainer (promotes to owner, removes from maintainers)
+            var maintainerAccountId = Guid.NewGuid();
+            var targetMaintainer = new Account { Id = maintainerAccountId, Name = "Promoted Maintainer", ShortName = "promoted-maintainer" };
+            this.package.PackageOwner = [this.userAccount.Id];
+            this.package.PackageMaintainer = [maintainerAccountId];
+            this.package.Visibility = VisibilityKind.PUBLIC;
+            this.viewModel.Package = this.package;
+
+            IPackage capturedPromotedPackage = null!;
+            this.packageServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).Callback<IUserContext, IEnumerable<IPackage>, CancellationToken>((_, packages, _) => capturedPromotedPackage = packages.First()).ReturnsAsync(Result.Updated);
+
+            var promoteSuccessResult = await this.viewModel.TransferOwnership(targetMaintainer);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(promoteSuccessResult.IsError, Is.False);
+                Assert.That(capturedPromotedPackage.Owner, Is.EqualTo(targetMaintainer.Id));
+                Assert.That(capturedPromotedPackage.PackageOwner, Is.EquivalentTo([maintainerAccountId]));
+                Assert.That(capturedPromotedPackage.PackageMaintainer, Does.Contain(this.userAccount.Id));
+                Assert.That(capturedPromotedPackage.PackageMaintainer, Does.Not.Contain(maintainerAccountId));
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Ownership Transferred", NotificationType.Success), Times.Exactly(3));
+            }
         }
 
         [Test]

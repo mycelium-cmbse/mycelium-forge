@@ -74,11 +74,6 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         private readonly IUserService userService;
 
         /// <summary>
-        /// The authenticated user context resolved on initialization.
-        /// </summary>
-        private IUserContext userContext;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PackageSettingsViewModel" /> class.
         /// </summary>
         /// <param name="databaseSource">The (injected) <see cref="IDatabaseSource" /> database connection provider.</param>
@@ -102,6 +97,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             this.notificationService = notificationService;
             this.logger = logger;
         }
+
+        /// <summary>
+        /// Gets the authenticated user context resolved on initialization.
+        /// </summary>
+        public IUserContext UserContext { get; private set; }
 
         /// <summary>
         /// Gets or sets the underlying package DTO.
@@ -146,8 +146,8 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         public async Task InitializeViewModel(string packageShortname, string scope)
         {
-            this.userContext = await this.userService.GetUserContext();
-            var packageResult = await this.packageService.ReadByCoordinateAsync(this.userContext, scope, packageShortname);
+            this.UserContext = await this.userService.GetUserContext();
+            var packageResult = await this.packageService.ReadByCoordinateAsync(this.UserContext, scope, packageShortname);
 
             if (packageResult.IsError)
             {
@@ -157,12 +157,12 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             this.Package = (Package)packageResult.Value;
 
-            var ownerTask = this.scopeService.ReadOrNull(this.userContext, this.Package.Owner);
-            var maintainersTask = this.accountService.ReadOrEmpty(this.userContext, this.Package.PackageMaintainer);
-            var ownersTask = this.accountService.ReadOrEmpty(this.userContext, this.Package.PackageOwner);
-            var versionsTask = this.packageVersionService.ReadOrEmpty(this.userContext, this.Package.Version);
-            var canUpdatePackageTask = this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.userContext, this.Package);
-            var canDeletePackageTask = this.packagePermissionService.IsAllowedToDelete(this.databaseSource, this.userContext, this.Package);
+            var ownerTask = this.scopeService.ReadOrNull(this.UserContext, this.Package.Owner);
+            var maintainersTask = this.accountService.ReadOrEmpty(this.UserContext, this.Package.PackageMaintainer);
+            var ownersTask = this.accountService.ReadOrEmpty(this.UserContext, this.Package.PackageOwner);
+            var versionsTask = this.packageVersionService.ReadOrEmpty(this.UserContext, this.Package.Version);
+            var canUpdatePackageTask = this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.UserContext, this.Package);
+            var canDeletePackageTask = this.packagePermissionService.IsAllowedToDelete(this.databaseSource, this.UserContext, this.Package);
 
             await Task.WhenAll(ownerTask, maintainersTask, ownersTask, versionsTask, canUpdatePackageTask, canDeletePackageTask);
 
@@ -184,7 +184,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         {
             var packageClone = this.Package.Clone();
             packageClone.Visibility = visibility;
-            var result = await this.packageService.UpdateAsync(this.userContext, [packageClone], token);
+            var result = await this.packageService.UpdateAsync(this.UserContext, [packageClone], token);
 
             if (result.IsError)
             {
@@ -209,7 +209,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         {
             var versionClone = version.Clone();
             versionClone.Listed = false;
-            var result = await this.packageVersionService.UpdateAsync(this.userContext, [versionClone], token);
+            var result = await this.packageVersionService.UpdateAsync(this.UserContext, [versionClone], token);
 
             if (result.IsError)
             {
@@ -234,7 +234,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         {
             var versionClone = version.Clone();
             versionClone.Listed = true;
-            var result = await this.packageVersionService.UpdateAsync(this.userContext, [versionClone], token);
+            var result = await this.packageVersionService.UpdateAsync(this.UserContext, [versionClone], token);
 
             if (result.IsError)
             {
@@ -259,7 +259,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         {
             var versionClone = version.Clone();
             versionClone.IsDeprecated = true;
-            var result = await this.packageVersionService.UpdateAsync(this.userContext, [versionClone], token);
+            var result = await this.packageVersionService.UpdateAsync(this.UserContext, [versionClone], token);
 
             if (result.IsError)
             {
@@ -277,12 +277,49 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <summary>
         /// Transfers package ownership to the specified recipient scope asynchronously.
         /// </summary>
-        /// <param name="targetScope">The target scope short name.</param>
+        /// <param name="targetScope">The recipient target scope.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
-        public Task<ErrorOr<Success>> TransferOwnership(string targetScope, CancellationToken token = default)
+        /// <remarks>
+        /// If the target scope is an <see cref="IAccount" />, the target account becomes the sole package owner and previous
+        /// owners become maintainers. If the target scope is an <see cref="IOrganization" />, the organization's administrators
+        /// become package owners and previous owners become maintainers.
+        /// </remarks>
+        public async Task<ErrorOr<Success>> TransferOwnership(IScope targetScope, CancellationToken token = default)
         {
-            return Task.FromResult<ErrorOr<Success>>(Error.Failure(description: "Not implemented"));
+            var packageClone = this.Package.Clone();
+            packageClone.Owner = targetScope.Id;
+
+            if (targetScope is IAccount targetAccount)
+            {
+                packageClone.PackageOwner = [targetAccount.Id];
+
+                if (packageClone.Visibility == VisibilityKind.INTERNAL)
+                {
+                    packageClone.Visibility = VisibilityKind.PRIVATE;
+                }
+            }
+            else if (targetScope is IOrganization targetOrganization)
+            {
+                packageClone.PackageOwner = [.. targetOrganization.Administrator.Distinct()];
+            }
+
+            // Demote previous owners to maintainers and exclude anyone who is now a package owner.
+            packageClone.PackageMaintainer = [.. packageClone.PackageMaintainer.Concat(this.Package.PackageOwner).Except(packageClone.PackageOwner).Distinct()];
+
+            var updateResult = await this.packageService.UpdateAsync(this.UserContext, [packageClone], token);
+
+            if (updateResult.IsError)
+            {
+                const string errorMessage = "Failed to transfer package ownership.";
+
+                this.logger.LogError(errorMessage + " Target: {TargetScope} Errors: {Errors}", targetScope.ShortName, updateResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Transfer Error", NotificationType.Error);
+                return updateResult.Errors;
+            }
+
+            this.notificationService.AddNotification($"Package ownership transferred to {targetScope.ShortName}.", "Ownership Transferred", NotificationType.Success);
+            return Result.Success;
         }
 
         /// <summary>
@@ -292,7 +329,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <returns>A task indicating the success or failure of the operation.</returns>
         public async Task<ErrorOr<Success>> DeletePackage(CancellationToken token = default)
         {
-            var deleteResult = await this.packageService.DeleteAsync(this.userContext, [this.Package.Id], token);
+            var deleteResult = await this.packageService.DeleteAsync(this.UserContext, [this.Package.Id], token);
 
             if (deleteResult.IsError)
             {

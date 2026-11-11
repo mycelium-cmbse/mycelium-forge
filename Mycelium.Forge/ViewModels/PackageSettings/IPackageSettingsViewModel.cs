@@ -19,6 +19,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
     public interface IPackageSettingsViewModel
     {
         /// <summary>
+        /// Gets the authenticated user context resolved on initialization.
+        /// </summary>
+        IUserContext UserContext { get; }
+
+        /// <summary>
         /// Gets or sets the underlying package DTO.
         /// </summary>
         Package Package { get; set; }
@@ -96,10 +101,15 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <summary>
         /// Transfers package ownership to the specified recipient scope asynchronously.
         /// </summary>
-        /// <param name="targetScope">The target scope short name.</param>
+        /// <param name="targetScope">The recipient target scope.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
-        Task<ErrorOr<Success>> TransferOwnership(string targetScope, CancellationToken token = default);
+        /// <remarks>
+        /// If the target scope is an <see cref="IAccount" />, the target account becomes the sole package owner and previous
+        /// owners become maintainers. If the target scope is an <see cref="IOrganization" />, the organization's administrators
+        /// become package owners and previous owners become maintainers.
+        /// </remarks>
+        Task<ErrorOr<Success>> TransferOwnership(IScope targetScope, CancellationToken token = default);
 
         /// <summary>
         /// Deletes the package asynchronously.

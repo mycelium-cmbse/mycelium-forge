@@ -13,13 +13,28 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
 
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Extensions;
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Dal.AutoGenDtoValidator;
+    using Mycelium.Forge.Dal.Services;
+    using Mycelium.Forge.Services;
 
     /// <summary>
     /// Represents a modal dialog for transferring package ownership to another account or organization.
     /// </summary>
     public partial class TransferPackageOwnershipDialog : ComponentBase
     {
+        /// <summary>
+        /// Gets or sets the (injected) <see cref="IScopeService" /> used to lookup the target scope.
+        /// </summary>
+        [Inject]
+        public IScopeService ScopeService { get; set; }
+
+        /// <summary>
+        /// Gets or sets the (injected) <see cref="IUserService" /> used to retrieve the current user context.
+        /// </summary>
+        [Inject]
+        public IUserService UserService { get; set; }
+
         /// <summary>
         /// Gets or sets the cascading dialog reference used to control and close the dialog.
         /// </summary>
@@ -42,7 +57,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         /// Gets or sets the event callback invoked with the target scope when ownership transfer is confirmed.
         /// </summary>
         [Parameter]
-        public EventCallback<string> OnResult { get; set; }
+        public EventCallback<IScope> OnResult { get; set; }
 
         /// <summary>
         /// Gets or sets the event callback invoked when the dialog is cancelled.
@@ -61,12 +76,28 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         public string ConfirmationPackageName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Determines whether the transfer action button is disabled.
+        /// Gets the validation manager used to validate dialog inputs.
         /// </summary>
-        /// <returns><see langword="true" /> if transfer should be disabled; otherwise, <see langword="false" />.</returns>
-        public bool IsTransferDisabled()
+        public ValidationManager ValidationManager { get; } = new();
+
+        /// <summary>
+        /// Handles changes to the target scope input and clears previous validation errors.
+        /// </summary>
+        /// <param name="value">The updated target scope input.</param>
+        public void OnTargetScopeChanged(string value)
         {
-            return string.IsNullOrWhiteSpace(this.TargetScope) || !string.Equals(this.ConfirmationPackageName, this.PackageName, StringComparison.Ordinal);
+            this.TargetScope = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.TargetScope));
+        }
+
+        /// <summary>
+        /// Handles changes to the confirmation package name input and clears previous validation errors.
+        /// </summary>
+        /// <param name="value">The updated confirmation package name input.</param>
+        public void OnConfirmationPackageNameChanged(string value)
+        {
+            this.ConfirmationPackageName = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.ConfirmationPackageName));
         }
 
         /// <summary>
@@ -84,19 +115,51 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         }
 
         /// <summary>
-        /// Handles the transfer confirmation action, closing the dialog and invoking the result callback.
+        /// Handles the transfer confirmation action, verifying target scope and confirmation before closing the dialog and
+        /// invoking
+        /// the result callback.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnTransferClicked()
         {
-            if (this.IsTransferDisabled())
+            var isTargetValid = !string.IsNullOrWhiteSpace(this.TargetScope) && AccountValidator.ShortNameFormatRegex().IsMatch(this.TargetScope);
+
+            var isValid = this.ValidationManager
+                .Check(nameof(this.TargetScope), isTargetValid, "Target scope must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.")
+                .Check(nameof(this.ConfirmationPackageName), string.Equals(this.ConfirmationPackageName, this.PackageName, StringComparison.Ordinal), "Confirmation name does not match.")
+                .IsValid;
+
+            if (!isValid)
             {
                 return;
             }
 
-            var cleanTarget = this.TargetScope.CleanScope();
+            var userContext = await this.UserService.GetUserContext();
+            var scopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, CancellationToken.None, [this.TargetScope]);
 
-            await this.OnResult.InvokeAsync(cleanTarget);
+            if (scopeResult.IsError || scopeResult.Value.Count == 0)
+            {
+                this.ValidationManager.Check(nameof(this.TargetScope), false, $"Scope '{this.TargetScope}' not found.");
+                return;
+            }
+
+            var scope = scopeResult.Value[0];
+
+            if (string.Equals(this.TargetScope, this.CurrentOwner, StringComparison.OrdinalIgnoreCase))
+            {
+                this.ValidationManager.Check(nameof(this.TargetScope), false, "You cannot transfer ownership to the current owner scope.");
+                return;
+            }
+
+            if (scope is IOrganization organization &&
+                (!userContext.AccountId.HasValue || !organization.Administrator.Contains(userContext.AccountId.Value)) &&
+                !PermissionGuard.HasPermission(userContext, PermissionKind.TransferPackageOwnership))
+            {
+                this.ValidationManager.Check(nameof(this.TargetScope), false, "You do not have administrative rights on the target organization.");
+                return;
+            }
+
+            await this.OnResult.InvokeAsync(scope);
 
             if (this.DialogReference != null)
             {

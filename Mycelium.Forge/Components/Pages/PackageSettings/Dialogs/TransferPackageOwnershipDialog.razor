@@ -10,32 +10,41 @@
 <DialogComponent>
     <ChildContent>
         <p class="text-sm leading-xs text-muted-foreground">
-            Transferring ownership moves this package to another account or organization. The recipient must accept the transfer before it is completed.
+            Transferring ownership moves this package to another account or organization. If the target scope is an organization, its administrators will become package owners, and current owners will become package maintainers.
         </p>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.TargetScope)))">
             <BbFieldLabel For="transfer-target-scope-input"
                           Class="form-field-label">
                 New owner
             </BbFieldLabel>
             <BbFieldContent>
                 <BbInput Id="transfer-target-scope-input"
-                         @bind-Value="this.TargetScope"
+                         Value="@(this.TargetScope)"
+                         ValueChanged="@(this.OnTargetScopeChanged)"
                          Placeholder="e.g. acme-corp or johndoe"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.TargetScope)])"/>
         </BbField>
 
-        <BbField Class="w-full flex flex-col gap-1.5">
-            <BbFieldLabel For="transfer-confirm-package-name-input">
-                To confirm, type "@(this.PackageName)" below:
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.ConfirmationPackageName)))">
+            <BbFieldLabel For="transfer-confirm-package-name-input"
+                          Class="form-field-label">
+                To confirm transfer to scope, type "@(this.PackageName)" below:
             </BbFieldLabel>
             <BbFieldContent>
                 <BbInput Id="transfer-confirm-package-name-input"
-                         @bind-Value="this.ConfirmationPackageName"
+                         Value="@(this.ConfirmationPackageName)"
+                         ValueChanged="@(this.OnConfirmationPackageNameChanged)"
                          Placeholder="@(this.PackageName)"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.ConfirmationPackageName)])"/>
         </BbField>
     </ChildContent>
     <Footer>
@@ -51,7 +60,6 @@
                   Variant="ButtonVariant.Outline"
                   Size="ButtonSize.Small"
                   Type="ButtonType.Button"
-                  Disabled="@(this.IsTransferDisabled())"
                   OnClick="@(this.OnTransferClicked)"
                   Class="btn-destructive-outline">
             Transfer ownership

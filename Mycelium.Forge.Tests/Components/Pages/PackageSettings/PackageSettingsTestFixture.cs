@@ -28,6 +28,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageSettings;
     using Mycelium.Forge.Components.Pages.PackageSettings.Dialogs;
+    using Mycelium.Forge.Dal.Services;
+    using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
     [TestFixture]
@@ -42,6 +44,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         private Account maintainerAccount;
         private PackageVersion activeVersion;
         private PackageVersion unlistedVersion;
+        private UserContext testUserContext;
 
         [SetUp]
         public void SetUp()
@@ -83,7 +86,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Id = ownerId,
                 Name = "Starion Group",
-                ShortName = "starion"
+                ShortName = "starion",
+                Administrator = [ownerAccountId]
             };
 
             this.testPackage = new Package
@@ -119,7 +123,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             this.viewModelMock.Setup(x => x.CanManagePackage).Returns(true);
             this.viewModelMock.Setup(x => x.CanDeletePackage).Returns(true);
 
+            this.testUserContext = new UserContext { AccountId = ownerAccountId };
+            this.viewModelMock.Setup(x => x.UserContext).Returns(this.testUserContext);
+
+            var userServiceMock = new Mock<IUserService>();
+            userServiceMock.Setup(x => x.GetUserContext(It.IsAny<bool>())).ReturnsAsync(this.testUserContext);
+
             this.context.Services.AddSingleton(this.viewModelMock.Object);
+            this.context.Services.AddSingleton(new Mock<IScopeService>().Object);
+            this.context.Services.AddSingleton(userServiceMock.Object);
             this.dialogProvider = this.context.Render<BbDialogProvider>();
         }
 
@@ -215,17 +227,46 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         [Test]
         public async Task VerifyOnTransferOwnership()
         {
-            this.viewModelMock.Setup(x => x.TransferOwnership("new-org", It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
+            var targetOrg = new Organization { Id = Guid.NewGuid(), ShortName = "new-org" };
+            this.viewModelMock.Setup(x => x.TransferOwnership(targetOrg, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
 
+            // Case 1: Button is not rendered when user is not a package owner and lacks TransferPackageOwnership permission
+            var nonOwnerContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            this.viewModelMock.Setup(x => x.UserContext).Returns(nonOwnerContext);
             var packageSettingsPage = this.context.Render<PackageSettings>();
-            var transferButton = packageSettingsPage.Find("#package-settings-transfer-button");
+            Assert.That(packageSettingsPage.FindAll("#package-settings-transfer-button"), Has.Count.EqualTo(0));
 
+            // Case 2: Button is not rendered when user context has no account id
+            var unauthenticatedContext = new UserContext { AccountId = null };
+            this.viewModelMock.Setup(x => x.UserContext).Returns(unauthenticatedContext);
+            packageSettingsPage.Render();
+            Assert.That(packageSettingsPage.FindAll("#package-settings-transfer-button"), Has.Count.EqualTo(0));
+
+            // Case 3: Button is rendered when user is in PackageOwner
+            this.viewModelMock.Setup(x => x.UserContext).Returns(this.testUserContext);
+            packageSettingsPage.Render();
+            Assert.That(packageSettingsPage.FindAll("#package-settings-transfer-button"), Has.Count.EqualTo(1));
+
+            // Case 4: Button is rendered when user is not in PackageOwner but has TransferPackageOwnership permission
+            var systemAdminContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.InstallationAdministrator] };
+            this.viewModelMock.Setup(x => x.UserContext).Returns(systemAdminContext);
+            packageSettingsPage.Render();
+
+            var transferButton = packageSettingsPage.Find("#package-settings-transfer-button");
+            Assert.That(transferButton, Is.Not.Null);
+
+            // Case 5: Clicking on the button opens dialog and invokes callback
             _ = packageSettingsPage.InvokeAsync(() => transferButton.ClickAsync());
 
             var dialog = this.dialogProvider.FindComponent<TransferPackageOwnershipDialog>();
-            await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync("new-org"));
+            await this.dialogProvider.InvokeAsync(() => dialog.Instance.OnResult.InvokeAsync(targetOrg));
 
-            this.viewModelMock.Verify(x => x.TransferOwnership("new-org", It.IsAny<CancellationToken>()), Times.Once);
+            using (Assert.EnterMultipleScope())
+            {
+                this.viewModelMock.Verify(x => x.TransferOwnership(targetOrg, It.IsAny<CancellationToken>()), Times.Once);
+                Assert.That(navigationManager.Uri, Does.EndWith(PageRoutes.GetPackageRoute(targetOrg.ShortName, this.testPackage.ShortName)));
+            }
         }
 
         [Test]

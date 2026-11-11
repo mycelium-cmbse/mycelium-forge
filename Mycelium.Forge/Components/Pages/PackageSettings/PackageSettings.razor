@@ -195,14 +195,17 @@
                     </span>
                 </div>
 
-                <BbButton id="package-settings-transfer-button"
-                          Variant="ButtonVariant.Outline"
-                          Size="ButtonSize.Small"
-                          Type="ButtonType.Button"
-                          OnClick="@(this.OnTransferOwnership)"
-                          Class="btn-destructive-outline shrink-0">
-                    Transfer
-                </BbButton>
+                @if (this.IsTransferOwnershipEnabled())
+                {
+                    <BbButton id="package-settings-transfer-button"
+                              Variant="ButtonVariant.Outline"
+                              Size="ButtonSize.Small"
+                              Type="ButtonType.Button"
+                              OnClick="@(this.OnTransferOwnership)"
+                              Class="btn-destructive-outline shrink-0">
+                        Transfer
+                    </BbButton>
+                }
             </div>
 
             @if (this.ViewModel.CanDeletePackage)
