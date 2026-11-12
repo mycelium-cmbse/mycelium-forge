@@ -42,7 +42,7 @@ namespace Mycelium.Forge.Orm
             await using (var connection = new NpgsqlConnection(connectionString))
             {
                 await connection.OpenAsync(cancellationToken);
-                await using var dropCommand = new NpgsqlCommand("DROP SCHEMA IF EXISTS \"Forge\" CASCADE; DROP TABLE IF EXISTS \"schemaversions\" CASCADE;", connection);
+                await using var dropCommand = new NpgsqlCommand("DROP SCHEMA IF EXISTS forge CASCADE; DROP TABLE IF EXISTS \"schemaversions\" CASCADE;", connection);
                 await dropCommand.ExecuteNonQueryAsync(cancellationToken);
             }
 

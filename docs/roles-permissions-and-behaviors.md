@@ -172,9 +172,9 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   ```sql
   @canViewOrganizationMemberList = true OR @canViewAllOrganizations = true OR @canViewAllAccounts = true
   OR (@callerAccountId IS NOT NULL AND (
-      "Address"."owner" = @callerAccountId
-      OR EXISTS (SELECT 1 FROM "Forge"."Organization_member__Account" WHERE "sourceOrganization" = "Address"."owner" AND "targetAccount" = @callerAccountId)
-      OR EXISTS (SELECT 1 FROM "Forge"."Organization_administrator__Account" WHERE "sourceOrganization" = "Address"."owner" AND "targetAccount" = @callerAccountId)
+      address.owner = @callerAccountId
+      OR EXISTS (SELECT 1 FROM forge.organization_member__account WHERE source_organization = address.owner AND target_account = @callerAccountId)
+      OR EXISTS (SELECT 1 FROM forge.organization_administrator__account WHERE source_organization = address.owner AND target_account = @callerAccountId)
   ))
   ```
 
@@ -220,11 +220,11 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
 - **SQL Read Filter:**
   Produces optimized conditional SQL filtering based on caller identity, organization membership, and package visibility:
   ```sql
-  "Package"."visibility" = 0 -- Public
+  package.visibility = 0 -- Public
   OR (@callerAccountId IS NOT NULL AND (
-      "Package"."owner" = @callerAccountId -- Personal scope owner
+      package.owner = @callerAccountId -- Personal scope owner
       OR (@canViewAllOrganizations = true OR @canManageOrganizations = true)
-      OR EXISTS (SELECT 1 FROM "Forge"."Organization_member__Account" WHERE "sourceOrganization" = "Package"."owner" AND "targetAccount" = @callerAccountId)
+      OR EXISTS (SELECT 1 FROM forge.organization_member__account WHERE source_organization = package.owner AND target_account = @callerAccountId)
   ))
   ```
 

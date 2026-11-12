@@ -21,9 +21,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
     using GeneratorClassExtensions = Mycelium.Forge.Generator.Extensions.ClassExtensions;
     using GeneratorPropertyExtension = Mycelium.Forge.Generator.Extensions.PropertyExtension;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="GeneratorPropertyExtension" /> class.
-    /// </summary>
     [TestFixture]
     public class PropertyExtensionTestFixture
     {
@@ -36,9 +33,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         private IProperty scopeAddressProperty;
         private IProperty orgInvitationTargetProperty;
 
-        /// <summary>
-        /// Sets up the test fixture before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -52,10 +46,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             this.orgInvitationTargetProperty = GetOwnedProperty("OrganizationInvitation", "target");
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryIsEnumPropertyWithDefaultValue" /> handles various enum
-        /// default value specifications.
-        /// </summary>
         [Test]
         public void VerifyQueryIsEnumPropertyWithDefaultValue()
         {
@@ -119,10 +109,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManySourcePropertyName" /> returns the source property
-        /// column name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManySourcePropertyName()
         {
@@ -131,14 +117,10 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManySourcePropertyName(null!), Throws.TypeOf<ArgumentNullException>());
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManySourcePropertyName(this.packageTypeProperty), Throws.TypeOf<ArgumentException>());
 
-                Assert.That(GeneratorPropertyExtension.QueryManyToManySourcePropertyName(this.administratorProperty), Is.EqualTo("sourceOrganization"));
+                Assert.That(GeneratorPropertyExtension.QueryManyToManySourcePropertyName(this.administratorProperty), Is.EqualTo("source_organization"));
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManySourcePropertyTypeName" /> returns the source owner
-        /// type name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManySourcePropertyTypeName()
         {
@@ -150,10 +132,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManyTableName" /> returns the formatted junction table
-        /// name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManyTableName()
         {
@@ -161,14 +139,10 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             {
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTableName(null!), Throws.TypeOf<ArgumentNullException>());
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTableName(this.packageTypeProperty), Throws.TypeOf<ArgumentException>());
-                Assert.That(GeneratorPropertyExtension.QueryManyToManyTableName(this.administratorProperty), Is.EqualTo("Organization_administrator__Account"));
+                Assert.That(GeneratorPropertyExtension.QueryManyToManyTableName(this.administratorProperty), Is.EqualTo("organization_administrator__account"));
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManyTargetPropertyName" /> returns the target property
-        /// column name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManyTargetPropertyName()
         {
@@ -177,14 +151,10 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(null!), Throws.TypeOf<ArgumentNullException>());
                 Assert.That(() => GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(this.packageTypeProperty), Throws.TypeOf<ArgumentException>());
 
-                Assert.That(GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(this.administratorProperty), Is.EqualTo("targetAccount"));
+                Assert.That(GeneratorPropertyExtension.QueryManyToManyTargetPropertyName(this.administratorProperty), Is.EqualTo("target_account"));
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryManyToManyTargetPropertyTypeName" /> returns the target type
-        /// name.
-        /// </summary>
         [Test]
         public void VerifyQueryManyToManyTargetPropertyTypeName()
         {
@@ -196,10 +166,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryOppositeAttributeNeedsSqlAttribute" /> evaluates opposite SQL
-        /// attribute requirement.
-        /// </summary>
         [Test]
         public void VerifyQueryOppositeAttributeNeedsSqlAttribute()
         {
@@ -233,10 +199,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryOwnedAttributeNeedsSqlAttribute" /> evaluates SQL attribute
-        /// requirement.
-        /// </summary>
         [Test]
         public void VerifyQueryOwnedAttributeNeedsSqlAttribute()
         {
@@ -272,10 +234,6 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QueryPropertyNameBasedOnUmlProperties" /> formats names according
-        /// to UML attributes.
-        /// </summary>
         [Test]
         public void VerifyQueryPropertyNameBasedOnUmlProperties()
         {
@@ -290,9 +248,21 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QuerySqlAttributeName" /> generates lower-camel-case column names.
-        /// </summary>
+        [Test]
+        public void VerifyQueryReadConversion()
+        {
+            var createdAtProp = GetOwnedProperty("Thing", "createdAt");
+            var visibilityProp = GetOwnedProperty("Package", "visibility");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => GeneratorPropertyExtension.QueryReadConversion(null!), Throws.TypeOf<ArgumentNullException>());
+                Assert.That(GeneratorPropertyExtension.QueryReadConversion(this.billingEmailProperty), Is.EqualTo("(string)reader[\"billing_email\"]"));
+                Assert.That(GeneratorPropertyExtension.QueryReadConversion(createdAtProp), Is.EqualTo("DateTime.Parse((string)reader[\"created_at\"], CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)"));
+                Assert.That(GeneratorPropertyExtension.QueryReadConversion(visibilityProp), Is.EqualTo("VisibilityKindProvider.Parse((string)reader[\"visibility\"])"));
+            }
+        }
+
         [Test]
         public void VerifyQuerySqlAttributeName()
         {
@@ -302,16 +272,13 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => GeneratorPropertyExtension.QuerySqlAttributeName(null!), Throws.TypeOf<ArgumentNullException>());
-                Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(this.billingEmailProperty), Is.EqualTo("billingEmail"));
+                Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(this.billingEmailProperty), Is.EqualTo("billing_email"));
                 Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(this.idProperty), Is.EqualTo("id"));
                 Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(nullNameProp), Is.EqualTo(string.Empty));
                 Assert.That(GeneratorPropertyExtension.QuerySqlAttributeName(emptyNameProp), Is.EqualTo(string.Empty));
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="GeneratorPropertyExtension.QuerySqlTypeName" /> maps UML types to SQL types correctly.
-        /// </summary>
         [Test]
         public void VerifyQuerySqlTypeName()
         {

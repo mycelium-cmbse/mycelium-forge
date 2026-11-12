@@ -40,6 +40,18 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             handlebars.RegisterHelper("Dao.UpdateAsyncAppendMultiReferencePropertiesToSqlBuilder", UpdateAsyncAppendMultiReferencePropertiesToSqlBuilder);
             handlebars.RegisterHelper("Dao.ReadAsyncWriteReadSQL", ReadAsyncWriteReadSql);
             handlebars.RegisterHelper("Dao.WriteMapToDto", WriteMapToDto);
+            handlebars.RegisterHelper("Dao.ToSnakeCase", WriteSnakeCase);
+        }
+
+        /// <summary>
+        /// Converts the single string argument to snake_case.
+        /// </summary>
+        /// <param name="context">The Handlebars <see cref="Context" />.</param>
+        /// <param name="arguments">The Handlebars <see cref="Arguments" />.</param>
+        /// <returns>The snake_case representation of the argument.</returns>
+        private static object WriteSnakeCase(Context context, Arguments arguments)
+        {
+            return arguments.QuerySingle<string>("Dao.ToSnakeCase").ToSnakeCase();
         }
 
         /// <summary>
@@ -55,14 +67,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             var valueTypeAndSingleReferenceProperties = new StringBuilder();
 
             valueTypeAndSingleReferenceProperties.AppendLine("                -- Thing");
-            valueTypeAndSingleReferenceProperties.AppendLine("                INSERT INTO \"Forge\".\"Thing\" (\"id\", \"classKind\", \"data\")");
+            valueTypeAndSingleReferenceProperties.AppendLine("                INSERT INTO forge.thing (id, class_kind, data)");
             valueTypeAndSingleReferenceProperties.AppendLine("                VALUES (@id, @classKind, @data);");
 
             var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
 
             foreach (var thingDerivedClass in allSuperClassesThatDeriveFromThing)
             {
-                var sqlColumns = new StringBuilder("\"id\"");
+                var sqlColumns = new StringBuilder("id");
                 var sqlParameters = new StringBuilder("@id");
 
                 var singleReferenceProperties = thingDerivedClass
@@ -72,13 +84,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                 foreach (var singleReferenceProperty in singleReferenceProperties)
                 {
-                    sqlColumns.Append($", \"{singleReferenceProperty.QuerySqlAttributeName()}\"");
+                    sqlColumns.Append($", {singleReferenceProperty.QuerySqlAttributeName()}");
                     sqlParameters.Append($", @{singleReferenceProperty.QuerySqlAttributeName()}");
                 }
 
                 valueTypeAndSingleReferenceProperties.AppendLine();
                 valueTypeAndSingleReferenceProperties.AppendLine($"                -- {thingDerivedClass.Name}");
-                valueTypeAndSingleReferenceProperties.AppendLine($"                INSERT INTO \"Forge\".\"{thingDerivedClass.Name}\" ({sqlColumns})");
+                valueTypeAndSingleReferenceProperties.AppendLine($"                INSERT INTO forge.{thingDerivedClass.QuerySqlTableName()} ({sqlColumns})");
                 valueTypeAndSingleReferenceProperties.AppendLine($"                VALUES ({sqlParameters});");
             }
 
@@ -113,13 +125,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
                     if (singleReferenceProperty.QueryIsNullable())
                     {
-                        commandParametersToWrite.AppendLine(
-                            $"                command.Parameters.Add(new NpgsqlParameter(\"@{paramName}\", NpgsqlDbType.Uuid) {{ Value = (object){dtoName}.{propCSharpName} ?? DBNull.Value }});");
+                        commandParametersToWrite.AppendLine($"                command.Parameters.Add(new NpgsqlParameter(\"@{paramName}\", NpgsqlDbType.Uuid) {{ Value = (object){dtoName}.{propCSharpName} ?? DBNull.Value }});");
                     }
                     else
                     {
-                        commandParametersToWrite.AppendLine(
-                            $"                command.Parameters.Add(new NpgsqlParameter(\"@{paramName}\", NpgsqlDbType.Uuid) {{ Value = {dtoName}.{propCSharpName} }});");
+                        commandParametersToWrite.AppendLine($"                command.Parameters.Add(new NpgsqlParameter(\"@{paramName}\", NpgsqlDbType.Uuid) {{ Value = {dtoName}.{propCSharpName} }});");
                     }
                 }
             }
@@ -168,7 +178,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     result.AppendLine();
                     result.AppendLine($"                foreach (var item in {dtoName}.{propCSharpName})");
                     result.AppendLine("                {");
-                    result.AppendLine($"                    sqlBuilder.AppendLine(\"INSERT INTO \\\"Forge\\\".\\\"{manyToManyTableName}\\\"(\\\"{sourcePropName}\\\",\\\"{targetPropName}\\\")\");");
+                    result.AppendLine($"                    sqlBuilder.AppendLine(\"INSERT INTO forge.{manyToManyTableName}({sourcePropName},{targetPropName})\");");
                     result.AppendLine($"                    sqlBuilder.AppendLine($\"VALUES (@id, @{propName}{{{propName}Counter}});\");");
                     result.AppendLine("                    sqlBuilder.AppendLine(\"\");");
                     result.AppendLine();
@@ -199,7 +209,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             var valueTypeAndSingleReferenceProperties = new StringBuilder();
 
             valueTypeAndSingleReferenceProperties.AppendLine("                -- Thing");
-            valueTypeAndSingleReferenceProperties.AppendLine("                UPDATE \"Forge\".\"Thing\" SET \"data\" = @data WHERE \"id\" = @id;");
+            valueTypeAndSingleReferenceProperties.AppendLine("                UPDATE forge.thing SET data = @data WHERE id = @id;");
 
             var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
 
@@ -211,14 +221,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     .ToList();
 
                 var sqlSetters = singleReferenceProperties
-                    .Select(prop => $"\"{prop.QuerySqlAttributeName()}\" = @{prop.QuerySqlAttributeName()}")
+                    .Select(prop => $"{prop.QuerySqlAttributeName()} = @{prop.QuerySqlAttributeName()}")
                     .ToList();
 
                 if (sqlSetters.Count != 0)
                 {
                     valueTypeAndSingleReferenceProperties.AppendLine();
                     valueTypeAndSingleReferenceProperties.AppendLine($"                -- {thingDerivedClass.Name}");
-                    valueTypeAndSingleReferenceProperties.AppendLine($"                UPDATE \"Forge\".\"{thingDerivedClass.Name}\"");
+                    valueTypeAndSingleReferenceProperties.AppendLine($"                UPDATE forge.{thingDerivedClass.QuerySqlTableName()}");
                     valueTypeAndSingleReferenceProperties.Append("                SET");
 
                     for (var i = 0; i < sqlSetters.Count; i++)
@@ -228,7 +238,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     }
 
                     valueTypeAndSingleReferenceProperties.AppendLine();
-                    valueTypeAndSingleReferenceProperties.AppendLine("                WHERE \"id\" = @id;");
+                    valueTypeAndSingleReferenceProperties.AppendLine("                WHERE id = @id;");
                 }
             }
 
@@ -271,19 +281,19 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     result.AppendLine();
                     result.AppendLine("                sqlBuilder.AppendLine(");
                     result.AppendLine("                \"\"\"");
-                    result.AppendLine($"                WITH \"wanted_{manyToManyTableName}\" AS (");
-                    result.AppendLine($"                    SELECT @id AS \"{sourcePropName}\", unnest(@{propName}::uuid[]) AS \"{targetPropName}\"");
+                    result.AppendLine($"                WITH wanted_{manyToManyTableName} AS (");
+                    result.AppendLine($"                    SELECT @id AS {sourcePropName}, unnest(@{propName}::uuid[]) AS {targetPropName}");
                     result.AppendLine("                )");
-                    result.AppendLine($"                MERGE INTO \"Forge\".\"{manyToManyTableName}\" \"current_{manyToManyTableName}\"");
-                    result.AppendLine($"                    USING \"wanted_{manyToManyTableName}\"");
-                    result.AppendLine($"                    ON \"current_{manyToManyTableName}\".\"{sourcePropName}\" = \"wanted_{manyToManyTableName}\".\"{sourcePropName}\" AND \"current_{manyToManyTableName}\".\"{targetPropName}\" = \"wanted_{manyToManyTableName}\".\"{targetPropName}\"");
+                    result.AppendLine($"                MERGE INTO forge.{manyToManyTableName} current_{manyToManyTableName}");
+                    result.AppendLine($"                    USING wanted_{manyToManyTableName}");
+                    result.AppendLine($"                    ON current_{manyToManyTableName}.{sourcePropName} = wanted_{manyToManyTableName}.{sourcePropName} AND current_{manyToManyTableName}.{targetPropName} = wanted_{manyToManyTableName}.{targetPropName}");
                     result.AppendLine("                WHEN NOT MATCHED THEN");
-                    result.AppendLine($"                    INSERT (\"{sourcePropName}\", \"{targetPropName}\")");
-                    result.AppendLine($"                        VALUES (\"wanted_{manyToManyTableName}\".\"{sourcePropName}\", \"wanted_{manyToManyTableName}\".\"{targetPropName}\");");
+                    result.AppendLine($"                    INSERT ({sourcePropName}, {targetPropName})");
+                    result.AppendLine($"                        VALUES (wanted_{manyToManyTableName}.{sourcePropName}, wanted_{manyToManyTableName}.{targetPropName});");
                     result.AppendLine();
-                    result.AppendLine($"                DELETE FROM \"Forge\".\"{manyToManyTableName}\"");
-                    result.AppendLine($"                    WHERE  \"{sourcePropName}\" = @id");
-                    result.AppendLine($"                      AND  \"{targetPropName}\" NOT IN (SELECT unnest(@{propName}::uuid[]));");
+                    result.AppendLine($"                DELETE FROM forge.{manyToManyTableName}");
+                    result.AppendLine($"                    WHERE  {sourcePropName} = @id");
+                    result.AppendLine($"                      AND  {targetPropName} NOT IN (SELECT unnest(@{propName}::uuid[]));");
                     result.AppendLine("                \"\"\");");
                     result.AppendLine();
                     result.AppendLine($"                command.Parameters.Add(new NpgsqlParameter(\"@{propName}\", (NpgsqlDbType)((int)NpgsqlDbType.Array | (int)NpgsqlDbType.Uuid)) {{ Value = ({dtoName}.{propCSharpName} ?? []).ToArray() }});");
@@ -337,8 +347,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             sql.AppendLine("                    -- READ Thing");
             sql.AppendLine("                    SELECT");
-            sql.AppendLine("                       \"Thing\".\"id\" AS \"id\",");
-            sql.AppendLine("                       \"Thing\".\"classKind\" AS \"classKind\",");
+            sql.AppendLine("                       thing.id AS id,");
+            sql.AppendLine("                       thing.class_kind AS class_kind,");
 
             AppendValueColumns(sql, valueProperties);
             AppendReferenceColumns(sql, referenceProperties, hierarchyClasses);
@@ -351,13 +361,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 sql.Remove(lastCommaIndex, 1);
             }
 
-            sql.AppendLine("                    FROM \"Forge\".\"Thing\" AS \"Thing\"");
+            sql.AppendLine("                    FROM forge.thing AS thing");
 
             AppendJoins(sql, hierarchyClasses);
             AppendLateralJoins(sql, referenceProperties, manyToManyReferenceProperties, @class);
 
             sql.AppendLine();
-            sql.Append($"                    WHERE \"{@class.Name}\".\"id\" = ANY(@include)");
+            sql.Append($"                    WHERE {@class.QuerySqlTableName()}.id = ANY(@include)");
 
             writer.WriteSafeString(sql);
         }
@@ -379,7 +389,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                     suffix = string.Empty;
                 }
 
-                sql.AppendLine($"                       (\"Thing\".\"data\"->>'{propertyName}'){suffix} AS \"{propertyName}\",");
+                sql.AppendLine($"                       (thing.data->>'{propertyName}'){suffix} AS {property.QuerySqlAttributeName()},");
             }
         }
 
@@ -395,24 +405,24 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             foreach (var property in referenceProperties)
             {
-                var propertyName = property.Name.LowerCaseFirstLetter();
+                var propertyName = property.QuerySqlAttributeName();
 
                 var ownerClass = hierarchyClassesList
                     .FirstOrDefault(c => c.QueryPropertiesThatAreOwnedAndUsableAndInheritedFromDirectNonDerivesFromClasses(ModelConstants.ThingName).Contains(property) || c.QueryOppositeCompositeProperties().Contains(property));
 
-                var ownerName = ownerClass?.Name ?? (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
+                var ownerName = (ownerClass?.Name ?? (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty).ToSnakeCase();
 
                 if (property.QueryIsEnumerable())
                 {
-                    sql.AppendLine($"                       COALESCE(\"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\".\"{propertyName}\",'{{}}'::uuid[]) AS \"{propertyName}\",");
+                    sql.AppendLine($"                       COALESCE({ownerName}_{propertyName}.{propertyName},'{{}}'::uuid[]) AS {propertyName},");
                 }
                 else if (property.IsComposite)
                 {
-                    sql.AppendLine($"                       \"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\".\"{propertyName}\"::uuid AS \"{propertyName}\",");
+                    sql.AppendLine($"                       {ownerName}_{propertyName}.{propertyName}::uuid AS {propertyName},");
                 }
                 else
                 {
-                    sql.AppendLine($"                       \"{ownerName.CapitalizeFirstLetter()}\".\"{propertyName}\" AS \"{propertyName}\",");
+                    sql.AppendLine($"                       {ownerName}.{propertyName} AS {propertyName},");
                 }
             }
         }
@@ -426,8 +436,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             foreach (var property in manyToManyReferenceProperties)
             {
-                var propertyName = property.Name.LowerCaseFirstLetter();
-                sql.AppendLine($"                       COALESCE(\"{property.QueryManyToManyTableName()}\".\"{propertyName}\",'{{}}'::uuid[]) AS \"{propertyName}\",");
+                var propertyName = property.QuerySqlAttributeName();
+                sql.AppendLine($"                       COALESCE({property.QueryManyToManyTableName()}.{propertyName},'{{}}'::uuid[]) AS {propertyName},");
             }
         }
 
@@ -440,12 +450,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             foreach (var usedClassName in hierarchyClasses
                          .Where(x => !x.IsThingClass())
-                         .Select(x => x.Name.CapitalizeFirstLetter()))
+                         .Select(x => x.QuerySqlTableName()))
             {
                 sql.AppendLine();
                 sql.AppendLine($"                    -- READ {usedClassName}");
-                sql.AppendLine($"                    INNER JOIN \"Forge\".\"{usedClassName}\" AS \"{usedClassName}\"");
-                sql.AppendLine($"                            ON \"{usedClassName}\".\"id\" = \"Thing\".\"id\"");
+                sql.AppendLine($"                    INNER JOIN forge.{usedClassName} AS {usedClassName}");
+                sql.AppendLine($"                            ON {usedClassName}.id = thing.id");
             }
         }
 
@@ -460,51 +470,53 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         {
             foreach (var property in referenceProperties)
             {
-                var propName = property.Name.LowerCaseFirstLetter();
-                var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
+                var propName = property.QuerySqlAttributeName();
+                var ownerName = ((property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty).ToSnakeCase();
+                var typeName = (property.Type?.Name ?? string.Empty).ToSnakeCase();
+                var oppositeName = property.Opposite?.QuerySqlAttributeName() ?? "owner";
 
                 if (property.QueryIsEnumerable())
                 {
                     sql.AppendLine();
-                    sql.AppendLine($"                    -- READ {ownerName.CapitalizeFirstLetter()}.{propName}");
+                    sql.AppendLine($"                    -- READ {ownerName}.{propName}");
                     sql.AppendLine("                    LEFT JOIN LATERAL(");
                     sql.AppendLine("                        SELECT");
-                    sql.AppendLine($"                            COALESCE(array_agg(\"{property.Type?.Name.CapitalizeFirstLetter()}\".\"id\"::uuid), '{{}}'::uuid[]) AS \"{propName}\"");
-                    sql.AppendLine($"                        FROM \"Forge\".\"{property.Type?.Name.CapitalizeFirstLetter()}\" AS \"{property.Type?.Name.CapitalizeFirstLetter()}\"");
-                    sql.AppendLine($"                        WHERE \"{property.Type?.Name.CapitalizeFirstLetter()}\".\"{property.Opposite?.Name.LowerCaseFirstLetter() ?? "owner"}\" = \"{ownerName.CapitalizeFirstLetter()}\".\"id\"");
-                    sql.AppendLine($"                    ) AS \"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\" ON true");
+                    sql.AppendLine($"                            COALESCE(array_agg({typeName}.id::uuid), '{{}}'::uuid[]) AS {propName}");
+                    sql.AppendLine($"                        FROM forge.{typeName} AS {typeName}");
+                    sql.AppendLine($"                        WHERE {typeName}.{oppositeName} = {ownerName}.id");
+                    sql.AppendLine($"                    ) AS {ownerName}_{propName} ON true");
                 }
                 else if (property.IsComposite)
                 {
                     sql.AppendLine();
-                    sql.AppendLine($"                    -- READ {ownerName.CapitalizeFirstLetter()}.{propName}");
+                    sql.AppendLine($"                    -- READ {ownerName}.{propName}");
                     sql.AppendLine("                    LEFT JOIN LATERAL(");
                     sql.AppendLine("                        SELECT");
-                    sql.AppendLine($"                            \"{property.Type?.Name.CapitalizeFirstLetter()}\".\"id\"::uuid AS \"{propName}\"");
-                    sql.AppendLine($"                        FROM \"Forge\".\"{property.Type?.Name.CapitalizeFirstLetter()}\" AS \"{property.Type?.Name.CapitalizeFirstLetter()}\"");
-                    sql.AppendLine($"                        WHERE \"{property.Type?.Name.CapitalizeFirstLetter()}\".\"{property.Opposite?.Name.LowerCaseFirstLetter() ?? "owner"}\" = \"{ownerName.CapitalizeFirstLetter()}\".\"id\"");
-                    sql.AppendLine($"                    ) AS \"{ownerName.CapitalizeFirstLetter()}_{property.Name.CapitalizeFirstLetter()}\" ON true");
+                    sql.AppendLine($"                            {typeName}.id::uuid AS {propName}");
+                    sql.AppendLine($"                        FROM forge.{typeName} AS {typeName}");
+                    sql.AppendLine($"                        WHERE {typeName}.{oppositeName} = {ownerName}.id");
+                    sql.AppendLine($"                    ) AS {ownerName}_{propName} ON true");
                 }
             }
 
             foreach (var property in manyToManyReferenceProperties)
             {
                 var manyToManyTableName = property.QueryManyToManyTableName();
-                var propName = property.Name.LowerCaseFirstLetter();
-                var ownerName = (property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty;
+                var propName = property.QuerySqlAttributeName();
+                var ownerName = ((property.Owner as INamedElement)?.Name ?? property.Namespace?.Name ?? string.Empty).ToSnakeCase();
 
                 sql.AppendLine();
-                sql.AppendLine($"                    -- READ {ownerName.CapitalizeFirstLetter()}.{propName}");
+                sql.AppendLine($"                    -- READ {ownerName}.{propName}");
                 sql.AppendLine("                    LEFT JOIN LATERAL(");
                 sql.AppendLine("                        SELECT");
-                sql.AppendLine($"                                \"{manyToManyTableName}\".\"{property.QueryManyToManySourcePropertyName()}\" AS \"id\",");
+                sql.AppendLine($"                                {manyToManyTableName}.{property.QueryManyToManySourcePropertyName()} AS id,");
                 sql.AppendLine("                           COALESCE(");
-                sql.AppendLine($"                               array_agg(\"{manyToManyTableName}\".\"{property.QueryManyToManyTargetPropertyName()}\"::uuid), '{{}}'::uuid[]");
-                sql.AppendLine($"                           ) AS \"{propName}\"");
-                sql.AppendLine($"                       FROM \"Forge\".\"{manyToManyTableName}\" AS \"{manyToManyTableName}\"");
-                sql.AppendLine($"                       WHERE \"{manyToManyTableName}\".\"{property.QueryManyToManySourcePropertyName()}\" = \"{@class.Name.CapitalizeFirstLetter()}\".\"id\"");
+                sql.AppendLine($"                               array_agg({manyToManyTableName}.{property.QueryManyToManyTargetPropertyName()}::uuid), '{{}}'::uuid[]");
+                sql.AppendLine($"                           ) AS {propName}");
+                sql.AppendLine($"                       FROM forge.{manyToManyTableName} AS {manyToManyTableName}");
+                sql.AppendLine($"                       WHERE {manyToManyTableName}.{property.QueryManyToManySourcePropertyName()} = {@class.QuerySqlTableName()}.id");
                 sql.AppendLine("                       GROUP BY 1");
-                sql.AppendLine($"                    ) AS \"{manyToManyTableName}\" ON true");
+                sql.AppendLine($"                    ) AS {manyToManyTableName} ON true");
             }
         }
 
@@ -560,7 +572,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <returns>The formatted mapping code string.</returns>
         private static string FormatDtoPropertyMapping(IProperty property, string comma)
         {
-            var propName = property.Name.LowerCaseFirstLetter();
+            var propName = property.QuerySqlAttributeName();
             var propCSharpName = property.Name.CapitalizeFirstLetter();
 
             if (!property.QueryIsDataType())
@@ -575,7 +587,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Formats the mapping line for an entity reference property.
         /// </summary>
         /// <param name="property">The reference property.</param>
-        /// <param name="propName">The lowerCamelCase property name.</param>
+        /// <param name="propName">The snake_case SQL column name.</param>
         /// <param name="propCSharpName">The PascalCase property name.</param>
         /// <param name="comma">The trailing comma if not the last property.</param>
         /// <returns>The formatted mapping code string.</returns>
@@ -603,7 +615,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// Formats the mapping line for a value/data type property.
         /// </summary>
         /// <param name="property">The data type property.</param>
-        /// <param name="propName">The lowerCamelCase property name.</param>
+        /// <param name="propName">The snake_case SQL column name.</param>
         /// <param name="propCSharpName">The PascalCase property name.</param>
         /// <param name="comma">The trailing comma if not the last property.</param>
         /// <returns>The formatted mapping code string.</returns>
