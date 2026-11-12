@@ -70,6 +70,22 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
+        /// Determines whether transferring package ownership is enabled and visible for the current user.
+        /// </summary>
+        /// <returns><c>true</c> if transferring package ownership is enabled; otherwise, <c>false</c>.</returns>
+        private bool IsTransferOwnershipEnabled()
+        {
+            if (PermissionGuard.HasRole(this.ViewModel.UserContext, RoleKind.InstallationAdministrator))
+            {
+                return true;
+            }
+
+            var accountId = this.ViewModel.UserContext.AccountId;
+
+            return accountId.HasValue && this.ViewModel.Package.PackageOwner.Contains(accountId.Value);
+        }
+
+        /// <summary>
         /// Gets the breadcrumb navigation items for the package settings page.
         /// </summary>
         /// <returns>A collection of <see cref="BreadcrumbItem" /> entries representing the trail.</returns>
@@ -190,19 +206,19 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task OnTransferOwnership()
         {
-            var onResult = new EventCallbackFactory().Create(this, async (string targetScope) =>
+            var onResult = new EventCallbackFactory().Create<IScope>(this, async targetScope =>
             {
                 var result = await this.ViewModel.TransferOwnership(targetScope);
 
                 if (!result.IsError)
                 {
-                    this.NavigationManager.NavigateTo(PageRoutes.GetPackageRoute(targetScope, this.ViewModel.Package.ShortName), true);
+                    this.NavigationManager.NavigateTo(PageRoutes.GetPackageRoute(targetScope.ShortName, this.ViewModel.Package.ShortName), replace: true);
                 }
             });
 
             var parameters = new Dictionary<string, object>
             {
-                { nameof(TransferPackageOwnershipDialog.PackageName), this.ViewModel.Package.Name },
+                { nameof(TransferPackageOwnershipDialog.Package), this.ViewModel.Package },
                 { nameof(TransferPackageOwnershipDialog.CurrentOwner), this.ViewModel.Owner.ShortName },
                 { nameof(TransferPackageOwnershipDialog.OnResult), onResult }
             };

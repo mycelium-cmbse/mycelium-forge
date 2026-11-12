@@ -49,6 +49,18 @@ namespace Mycelium.Forge.Common
         }
 
         /// <summary>
+        /// Determines whether the user described by <paramref name="userContext" /> holds the specified
+        /// <see cref="RoleKind" />.
+        /// </summary>
+        /// <param name="userContext">The contextual user information and assigned roles.</param>
+        /// <param name="role">The role to check.</param>
+        /// <returns><c>true</c> if the user holds the role; otherwise, <c>false</c>.</returns>
+        public static bool HasRole(IUserContext userContext, RoleKind role)
+        {
+            return userContext?.CurrentRoles != null && userContext.CurrentRoles.Contains(role);
+        }
+
+        /// <summary>
         /// Guards an operation by verifying that the user described by <paramref name="userContext" />
         /// has the specified <see cref="PermissionKind" />.
         /// </summary>

@@ -136,6 +136,13 @@ namespace Mycelium.Forge.Dal.Services
                 {
                     return permissionResult.Errors;
                 }
+
+                var beforeCreateResult = await this.BeforeCreate(userContext, transaction, dto, token);
+
+                if (beforeCreateResult.IsError)
+                {
+                    return beforeCreateResult.Errors;
+                }
             }
 
             foreach (var dto in dtoList)
@@ -323,6 +330,13 @@ namespace Mycelium.Forge.Dal.Services
                 if (permissionResult.IsError)
                 {
                     return permissionResult.Errors;
+                }
+
+                var beforeUpdateResult = await this.BeforeUpdate(userContext, transaction, existing, dto, token);
+
+                if (beforeUpdateResult.IsError)
+                {
+                    return beforeUpdateResult.Errors;
                 }
 
                 ServiceHelper.LogChanges(this.Logger, this.DtoComparer, existing, dto);
@@ -585,25 +599,32 @@ namespace Mycelium.Forge.Dal.Services
         }
 
         /// <summary>
-        /// Converts an array of typed index values into an array of string values matching their JSON database representation.
+        /// Hook invoked within the create transaction for each instance, after the create permission has been granted and before
+        /// it is persisted.
         /// </summary>
-        /// <typeparam name="TValue">The type of the index values.</typeparam>
-        /// <param name="values">The array of values to convert.</param>
-        /// <returns>An array of string representations.</returns>
-        private static string[] ConvertValuesToString<TValue>(TValue[] values)
+        /// <param name="userContext">The contextual user information and assigned roles.</param>
+        /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
+        /// <param name="dto">The <typeparamref name="T" /> instance about to be created.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the creation may proceed.</returns>
+        protected virtual Task<ErrorOr<Success>> BeforeCreate(IUserContext userContext, NpgsqlTransaction transaction, T dto, CancellationToken token)
         {
-            if (values is string[] stringArray)
-            {
-                return stringArray;
-            }
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
+        }
 
-            return values.Select(v => v switch
-            {
-                null => null,
-                Enum enumValue => enumValue.ToString(),
-                DateTime dateTime => dateTime.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture),
-                _ => v.ToString()
-            }).ToArray();
+        /// <summary>
+        /// Hook invoked within the update transaction for each instance, after the update permission has been granted and before
+        /// it is persisted.
+        /// </summary>
+        /// <param name="userContext">The contextual user information and assigned roles.</param>
+        /// <param name="transaction">The current <see cref="NpgsqlTransaction" /> to the database.</param>
+        /// <param name="existing">The currently persisted <typeparamref name="T" /> instance.</param>
+        /// <param name="dto">The updated <typeparamref name="T" /> instance.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the update may proceed.</returns>
+        protected virtual Task<ErrorOr<Success>> BeforeUpdate(IUserContext userContext, NpgsqlTransaction transaction, T existing, T dto, CancellationToken token)
+        {
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
 
         /// <summary>
@@ -624,6 +645,28 @@ namespace Mycelium.Forge.Dal.Services
             }
 
             return Result.Success;
+        }
+
+        /// <summary>
+        /// Converts an array of typed index values into an array of string values matching their JSON database representation.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the index values.</typeparam>
+        /// <param name="values">The array of values to convert.</param>
+        /// <returns>An array of string representations.</returns>
+        private static string[] ConvertValuesToString<TValue>(TValue[] values)
+        {
+            if (values is string[] stringArray)
+            {
+                return stringArray;
+            }
+
+            return values.Select(v => v switch
+            {
+                null => null,
+                Enum enumValue => enumValue.ToString(),
+                DateTime dateTime => dateTime.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture),
+                _ => v.ToString()
+            }).ToArray();
         }
     }
 }

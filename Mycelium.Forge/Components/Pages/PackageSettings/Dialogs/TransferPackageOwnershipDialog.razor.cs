@@ -13,7 +13,10 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
 
     using Microsoft.AspNetCore.Components;
 
-    using Mycelium.Forge.Extensions;
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Dal.AutoGenDtoValidator;
+    using Mycelium.Forge.Services;
+    using Mycelium.Forge.ViewModels.PackageSettings;
 
     /// <summary>
     /// Represents a modal dialog for transferring package ownership to another account or organization.
@@ -21,16 +24,22 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
     public partial class TransferPackageOwnershipDialog : ComponentBase
     {
         /// <summary>
+        /// Gets or sets the (injected) <see cref="ITransferPackageOwnershipDialogViewModel" /> used to validate the target scope.
+        /// </summary>
+        [Inject]
+        public ITransferPackageOwnershipDialogViewModel ViewModel { get; set; }
+
+        /// <summary>
         /// Gets or sets the cascading dialog reference used to control and close the dialog.
         /// </summary>
         [CascadingParameter]
         public IDialogReference DialogReference { get; set; }
 
         /// <summary>
-        /// Gets or sets the package name being transferred.
+        /// Gets or sets the package being transferred.
         /// </summary>
         [Parameter]
-        public string PackageName { get; set; } = string.Empty;
+        public IPackage Package { get; set; }
 
         /// <summary>
         /// Gets or sets the current owner short name or scope.
@@ -42,7 +51,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         /// Gets or sets the event callback invoked with the target scope when ownership transfer is confirmed.
         /// </summary>
         [Parameter]
-        public EventCallback<string> OnResult { get; set; }
+        public EventCallback<IScope> OnResult { get; set; }
 
         /// <summary>
         /// Gets or sets the event callback invoked when the dialog is cancelled.
@@ -61,12 +70,28 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         public string ConfirmationPackageName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Determines whether the transfer action button is disabled.
+        /// Gets the validation manager used to validate dialog inputs.
         /// </summary>
-        /// <returns><see langword="true" /> if transfer should be disabled; otherwise, <see langword="false" />.</returns>
-        public bool IsTransferDisabled()
+        public ValidationManager ValidationManager { get; } = new();
+
+        /// <summary>
+        /// Handles changes to the target scope input and clears previous validation errors.
+        /// </summary>
+        /// <param name="value">The updated target scope input.</param>
+        public void OnTargetScopeChanged(string value)
         {
-            return string.IsNullOrWhiteSpace(this.TargetScope) || !string.Equals(this.ConfirmationPackageName, this.PackageName, StringComparison.Ordinal);
+            this.TargetScope = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.TargetScope));
+        }
+
+        /// <summary>
+        /// Handles changes to the confirmation package name input and clears previous validation errors.
+        /// </summary>
+        /// <param name="value">The updated confirmation package name input.</param>
+        public void OnConfirmationPackageNameChanged(string value)
+        {
+            this.ConfirmationPackageName = value ?? string.Empty;
+            this.ValidationManager.ClearError(nameof(this.ConfirmationPackageName));
         }
 
         /// <summary>
@@ -84,19 +109,34 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         }
 
         /// <summary>
-        /// Handles the transfer confirmation action, closing the dialog and invoking the result callback.
+        /// Handles the transfer confirmation action, verifying target scope and confirmation before closing the dialog and
+        /// invoking
+        /// the result callback.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnTransferClicked()
         {
-            if (this.IsTransferDisabled())
+            var isTargetValid = !string.IsNullOrWhiteSpace(this.TargetScope) && AccountValidator.ShortNameFormatRegex().IsMatch(this.TargetScope);
+
+            var isValid = this.ValidationManager
+                .Check(nameof(this.TargetScope), isTargetValid, "Target scope must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.")
+                .Check(nameof(this.ConfirmationPackageName), string.Equals(this.ConfirmationPackageName, this.Package.Name, StringComparison.Ordinal), "Confirmation name does not match.")
+                .IsValid;
+
+            if (!isValid)
             {
                 return;
             }
 
-            var cleanTarget = this.TargetScope.CleanScope();
+            var targetResult = await this.ViewModel.ValidateTargetAsync(this.Package, this.CurrentOwner, this.TargetScope);
 
-            await this.OnResult.InvokeAsync(cleanTarget);
+            if (targetResult.IsError)
+            {
+                this.ValidationManager.Check(nameof(this.TargetScope), false, targetResult.FirstError.Description);
+                return;
+            }
+
+            await this.OnResult.InvokeAsync(targetResult.Value);
 
             if (this.DialogReference != null)
             {
