@@ -28,7 +28,6 @@ namespace Mycelium.Forge.Generator.Models
             var config = behavior.Configuration;
 
             var scopeEntity = GetValue(config, ConfigurationKeys.ScopeEntity, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.ScopeEntity}'.");
-            var ocp = GetValue(config, ConfigurationKeys.OrgCreatePermission, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OrgCreatePermission}'.");
 
             var visProp = GetValue(config, ConfigurationKeys.VisibilityProperty, definition.VisibilityProperty,
                 errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.VisibilityProperty}' or have a VisibilityProperty in entity permissions.");
@@ -49,7 +48,6 @@ namespace Mycelium.Forge.Generator.Models
             this.VisibilityPropertyLower = visProp.ToLowerInvariant();
             this.OwnerProperty = ownerProp;
             this.PersonalCreatePermission = personalCreatePerm;
-            this.OrgCreatePermission = ocp;
             this.AdminPermission = adminPerm;
             this.ScopeMemberProperties = SplitValues(scopeMembers);
             this.BypassPermissions = SplitValues(bypassPerms);
@@ -84,11 +82,6 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the permission required to create an entity in personal scope.
         /// </summary>
         public string PersonalCreatePermission { get; }
-
-        /// <summary>
-        /// Gets the permission required to create an entity in organization scope.
-        /// </summary>
-        public string OrgCreatePermission { get; }
 
         /// <summary>
         /// Gets the property names on the organization entity representing membership.

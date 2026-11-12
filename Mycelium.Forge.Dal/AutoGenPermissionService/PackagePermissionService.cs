@@ -74,13 +74,6 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Success;
             }
 
-            var orgGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.PublishPackageToOrganizationScope);
-
-            if (orgGuard.IsError)
-            {
-                return orgGuard;
-            }
-
             var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
 
             if (orgResult.IsError || orgResult.Value.Count == 0)

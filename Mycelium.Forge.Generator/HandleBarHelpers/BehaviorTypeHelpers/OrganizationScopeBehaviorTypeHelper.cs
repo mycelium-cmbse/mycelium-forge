@@ -86,13 +86,6 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine();
 
             stringBuilder.Append($$"""
-                                               var orgGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.OrgCreatePermission}});
-
-                                               if (orgGuard.IsError)
-                                               {
-                                                   return orgGuard;
-                                               }
-
                                                var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
 
                                                if (orgResult.IsError || orgResult.Value.Count == 0)
