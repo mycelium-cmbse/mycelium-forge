@@ -106,11 +106,75 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var accountResult = await this.permissionService.IsAllowedToCreate(this.accountUserContext, package, this.transaction);
             var anonymousResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, package, this.transaction);
 
+            var organizationId = Guid.NewGuid();
+            var memberId = Guid.NewGuid();
+            var organizationAdminId = Guid.NewGuid();
+            var nonMemberId = Guid.NewGuid();
+
+            var organizationMemberUserContext = new UserContext
+            {
+                AccountId = memberId,
+                Username = "orgMemberUser",
+                CurrentRoles = [RoleKind.Account]
+            };
+
+            var organizationAdminUserContext = new UserContext
+            {
+                AccountId = organizationAdminId,
+                Username = "orgAdminUser",
+                CurrentRoles = [RoleKind.Account]
+            };
+
+            var nonMemberUserContext = new UserContext
+            {
+                AccountId = nonMemberId,
+                Username = "nonMemberUser",
+                CurrentRoles = [RoleKind.Account]
+            };
+
+            var organization = new Organization
+            {
+                Id = organizationId,
+                Name = "Org",
+                ShortName = "org",
+                Administrator = [organizationAdminId],
+                Member = [memberId]
+            };
+
+            this.organizationServiceMock.Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(organizationId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var organizationPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = organizationId,
+                PackageOwner = [organizationId],
+                Visibility = VisibilityKind.PUBLIC
+            };
+
+            var missingOrganizationPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = Guid.NewGuid(),
+                PackageOwner = [Guid.NewGuid()],
+                Visibility = VisibilityKind.PUBLIC
+            };
+
+            var organizationMemberResult = await this.permissionService.IsAllowedToCreate(organizationMemberUserContext, organizationPackage, this.transaction);
+            var organizationAdminResult = await this.permissionService.IsAllowedToCreate(organizationAdminUserContext, organizationPackage, this.transaction);
+            var nonMemberResult = await this.permissionService.IsAllowedToCreate(nonMemberUserContext, organizationPackage, this.transaction);
+            var installationAdminResult = await this.permissionService.IsAllowedToCreate(this.adminUserContext, organizationPackage, this.transaction);
+            var missingOrganizationResult = await this.permissionService.IsAllowedToCreate(organizationMemberUserContext, missingOrganizationPackage, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(ownerResult.IsError, Is.False);
                 Assert.That(accountResult.IsError, Is.False);
                 Assert.That(anonymousResult.IsError, Is.True);
+                Assert.That(organizationMemberResult.IsError, Is.False);
+                Assert.That(organizationAdminResult.IsError, Is.False);
+                Assert.That(nonMemberResult.IsError, Is.True);
+                Assert.That(installationAdminResult.IsError, Is.False);
+                Assert.That(missingOrganizationResult.IsError, Is.True);
             }
         }
 
