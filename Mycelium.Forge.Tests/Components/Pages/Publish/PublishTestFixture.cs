@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Components.Pages.Publish
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -18,7 +19,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
 
     using ErrorOr;
 
-    using Microsoft.AspNetCore.Components.Forms;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -28,7 +28,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
     using Mycelium.Forge.Components.Pages.Publish;
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.Publish;
-    using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.ViewModels.Publish;
 
@@ -38,7 +37,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         private BunitContext context;
         private Mock<IPublishViewModel> viewModelMock;
         private DialogService dialogService;
-        private NotificationService notificationService;
+        private Mock<INotificationService> notificationServiceMock;
+        private PublishArtefactModel stagedArtefact;
 
         [SetUp]
         public void SetUp()
@@ -52,39 +52,22 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             var configurationManager = new ConfigurationManager();
             configurationManager["MaximumUploadFileSizeInMB"] = "100";
             this.context.Services.AddSingleton<IConfiguration>(configurationManager);
+            this.context.Services.AddSingleton(new Mock<IJsInterop>().Object);
+
+            this.stagedArtefact = new PublishArtefactModel { StagingToken = "token-1", IsManifestValid = true };
 
             this.viewModelMock = new Mock<IPublishViewModel>();
-
-            this.viewModelMock.Setup(x => x.Metadata).Returns(new PublishPackageMetadataModel
-            {
-                Scope = "@starion",
-                PackageName = "ECSS-MM-PWR",
-                Version = "1.3.0",
-                IsScopeVerified = true,
-                ArtefactFileName = "ECSS-MM-PWR-1.3.0.kpar",
-                ArtefactFormat = "SysML v2 (kpar)",
-                License = "Apache-2.0",
-                Visibility = VisibilityKind.PUBLIC,
-                Metamodel = "SysML v2 (2025-02)",
-                Tags = "mission-model, power",
-                Description = "ECSS mission model: Power subsystem."
-            });
-
-            this.viewModelMock.Setup(x => x.ValidationChecks).Returns(
-            [
-                new ValidationCheckModel("Schema validation"),
-                new ValidationCheckModel("License file", status: ValidationStatus.Warning)
-            ]);
-
-            this.viewModelMock.Setup(x => x.ScopeOptions).Returns(["@starion", "@esa"]);
-            this.viewModelMock.Setup(x => x.LicenseOptions).Returns(["Apache-2.0", "MIT"]);
-            this.viewModelMock.Setup(x => x.VisibilityOptions).Returns([VisibilityKind.PUBLIC, VisibilityKind.PRIVATE]);
-            this.viewModelMock.Setup(x => x.MetamodelOptions).Returns(["SysML v2 (2025-02)"]);
+            this.viewModelMock.Setup(x => x.SelectedScope).Returns(new Organization { ShortName = "starion" });
+            this.viewModelMock.Setup(x => x.Package).Returns(new Package { ShortName = "my-pkg" });
+            this.viewModelMock.Setup(x => x.PackageVersion).Returns(new PackageVersion { Version = "1.0.0" });
+            this.viewModelMock.Setup(x => x.PackageMetaData).Returns(new PackageMetaData());
+            this.viewModelMock.Setup(x => x.StagedArtefact).Returns(this.stagedArtefact);
+            this.viewModelMock.Setup(x => x.ValidationChecks).Returns([]);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
 
-            this.notificationService = new NotificationService();
-            this.context.Services.AddSingleton<INotificationService>(this.notificationService);
+            this.notificationServiceMock = new Mock<INotificationService>();
+            this.context.Services.AddSingleton(this.notificationServiceMock.Object);
 
             this.dialogService = this.context.Services.GetRequiredService<DialogService>();
         }
@@ -96,55 +79,62 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         }
 
         [Test]
-        public void VerifyCanOpenStep()
-        {
-            var publishPage = this.context.Render<Publish>();
-            var steps = publishPage.FindComponents<BbStep>();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(steps[0].Instance.Disabled, Is.False);
-                Assert.That(steps[1].Instance.Disabled, Is.True);
-                Assert.That(steps[2].Instance.Disabled, Is.True);
-                Assert.That(steps[3].Instance.Disabled, Is.True);
-            }
-
-            var fileMock = new Mock<IBrowserFile>();
-            fileMock.Setup(x => x.Name).Returns("test.kpar");
-            publishPage.Instance.OnUploadStepContinued(fileMock.Object);
-            publishPage.Render();
-
-            steps = publishPage.FindComponents<BbStep>();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(steps[0].Instance.Disabled, Is.False);
-                Assert.That(steps[1].Instance.Disabled, Is.False);
-                Assert.That(steps[2].Instance.Disabled, Is.True);
-                Assert.That(steps[3].Instance.Disabled, Is.True);
-            }
-        }
-
-        [Test]
-        public void VerifyGetStepClass()
+        public void VerifyIsUnauthorizedExistingPackage()
         {
             var publishPage = this.context.Render<Publish>();
 
-            var activeClass = publishPage.Instance.GetStepClass(0);
-            var inactiveClass = publishPage.Instance.GetStepClass(1);
-            var customActiveClass = publishPage.Instance.GetStepClass(0, "custom-class");
+            // Case 1: New package is never unauthorized
+            this.viewModelMock.Setup(x => x.IsExistingPackage).Returns(false);
+            Assert.That(publishPage.Instance.IsUnauthorizedExistingPackage, Is.False);
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(activeClass, Is.EqualTo("w-full"));
-                Assert.That(inactiveClass, Is.EqualTo("hidden"));
-                Assert.That(customActiveClass, Is.EqualTo("custom-class"));
-            }
+            // Case 2: Existing package where user cannot release is unauthorized
+            this.viewModelMock.Setup(x => x.IsExistingPackage).Returns(true);
+            this.viewModelMock.Setup(x => x.CanUserReleaseExistingPackageVersion).Returns(false);
+            Assert.That(publishPage.Instance.IsUnauthorizedExistingPackage, Is.True);
+
+            // Case 3: Existing package where user can release is authorized
+            this.viewModelMock.Setup(x => x.CanUserReleaseExistingPackageVersion).Returns(true);
+            Assert.That(publishPage.Instance.IsUnauthorizedExistingPackage, Is.False);
+
+            // Case 4: Null package reference is unauthorized
+            this.viewModelMock.Setup(x => x.Package).Returns((IPackage)null!);
+            Assert.That(publishPage.Instance.IsUnauthorizedExistingPackage, Is.True);
         }
 
         [Test]
-        public void VerifyOnInitialized()
+        public void VerifyOnBack()
         {
+            var publishPage = this.context.Render<Publish>();
+
+            // Case 1: Stepping back from review (3) goes to validation (2)
+            publishPage.Instance.ActiveStep = 3;
+            publishPage.Instance.OnBack();
+            Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(2));
+
+            // Case 2: Stepping back with valid manifest goes to metadata (1)
+            this.stagedArtefact.IsManifestValid = true;
+            publishPage.Instance.OnBack();
+            Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(1));
+
+            // Case 3: Stepping back from metadata goes to upload (0)
+            publishPage.Instance.OnBack();
+            Assert.That(publishPage.Instance.ActiveStep, Is.Zero);
+
+            // Case 4: Stepping back from upload remains at 0
+            publishPage.Instance.OnBack();
+            Assert.That(publishPage.Instance.ActiveStep, Is.Zero);
+
+            // Case 5: Stepping back from validation with invalid manifest skips metadata back to upload (0)
+            this.stagedArtefact.IsManifestValid = false;
+            publishPage.Instance.ActiveStep = 2;
+            publishPage.Instance.OnBack();
+            Assert.That(publishPage.Instance.ActiveStep, Is.Zero);
+        }
+
+        [Test]
+        public void VerifyOnInitializedAsync()
+        {
+            // Case 1: Parameterless route initializes default view model
             var publishPage = this.context.Render<Publish>();
 
             using (Assert.EnterMultipleScope())
@@ -152,105 +142,101 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
                 Assert.That(publishPage.Instance, Is.Not.Null);
                 this.viewModelMock.Verify(x => x.InitializeViewModel(), Times.Once);
             }
+
+            // Case 2: Parameterized scope and package route initializes existing package view model
+            var parameterizedPage = this.context.Render<Publish>(parameters =>
+            {
+                parameters.Add(x => x.Scope, "starion");
+                parameters.Add(x => x.Package, "my-pkg");
+            });
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(parameterizedPage.Instance, Is.Not.Null);
+                this.viewModelMock.Verify(x => x.InitializeViewModel("starion", "my-pkg"), Times.Once);
+            }
         }
 
         [Test]
-        public void VerifyOnMetadataChanged()
+        public async Task VerifyOnNavigateToStep()
         {
             var publishPage = this.context.Render<Publish>();
-            var metadata = publishPage.Instance.ViewModel.Metadata;
 
-            publishPage.Instance.OnScopeChanged("@esa");
-            publishPage.Instance.OnPackageNameChanged("my-package");
-            publishPage.Instance.OnVersionChanged("2.0.0");
-            publishPage.Instance.OnDescriptionChanged("A new description.");
-            publishPage.Instance.OnLicenseChanged("MIT");
-            publishPage.Instance.OnVisibilityChanged(VisibilityKind.PRIVATE);
-            publishPage.Instance.OnMetamodelChanged("SysML v1.6");
-            publishPage.Instance.OnTagsChanged("power, thermal");
+            // Case 1: Navigate to metadata step (1)
+            await publishPage.Instance.OnNavigateToStep(1);
+            Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(1));
+
+            // Case 2: Navigate to validation step (2) triggers Validate()
+            await publishPage.Instance.OnNavigateToStep(2);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(metadata.Scope, Is.EqualTo("@esa"));
-                Assert.That(metadata.PackageName, Is.EqualTo("my-package"));
-                Assert.That(metadata.Version, Is.EqualTo("2.0.0"));
-                Assert.That(metadata.Description, Is.EqualTo("A new description."));
-                Assert.That(metadata.License, Is.EqualTo("MIT"));
-                Assert.That(metadata.Visibility, Is.EqualTo(VisibilityKind.PRIVATE));
-                Assert.That(metadata.Metamodel, Is.EqualTo("SysML v1.6"));
-                Assert.That(metadata.Tags, Is.EqualTo("power, thermal"));
+                this.viewModelMock.Verify(x => x.Validate(null), Times.Once);
+                Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(2));
             }
+        }
 
-            publishPage.Instance.OnScopeChanged(null);
-            publishPage.Instance.OnPackageNameChanged(null);
-            publishPage.Instance.OnVersionChanged(null);
-            publishPage.Instance.OnDescriptionChanged(null);
-            publishPage.Instance.OnLicenseChanged(null);
-            publishPage.Instance.OnMetamodelChanged(null);
-            publishPage.Instance.OnTagsChanged(null);
+        [Test]
+        public async Task VerifyOnNext()
+        {
+            var publishPage = this.context.Render<Publish>();
+
+            // Case 1: Advancing from upload (step 0) to metadata (step 1)
+            publishPage.Instance.ActiveStep = 0;
+            await publishPage.Instance.OnNext();
+            Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(1));
+
+            // Case 2: Advancing from metadata (step 1) to validation (step 2) triggers Validate()
+            await publishPage.Instance.OnNext();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(metadata.Scope, Is.EqualTo(string.Empty));
-                Assert.That(metadata.PackageName, Is.EqualTo(string.Empty));
-                Assert.That(metadata.Version, Is.EqualTo(string.Empty));
-                Assert.That(metadata.Description, Is.EqualTo(string.Empty));
-                Assert.That(metadata.License, Is.EqualTo(string.Empty));
-                Assert.That(metadata.Metamodel, Is.EqualTo(string.Empty));
-                Assert.That(metadata.Tags, Is.EqualTo(string.Empty));
+                this.viewModelMock.Verify(x => x.Validate(null), Times.Once);
+                Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(2));
             }
+
+            // Case 3: Advancing from validation (step 2) to review (step 3)
+            await publishPage.Instance.OnNext();
+            Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(3));
+
+            // Case 4: Skipping metadata when manifest is invalid moves directly to validation
+            this.stagedArtefact.IsManifestValid = false;
+            publishPage.Instance.ActiveStep = 0;
+            await publishPage.Instance.OnNext();
+            Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(2));
         }
 
         [Test]
         public void VerifyOnReplaceArtefact()
         {
             var publishPage = this.context.Render<Publish>();
-            publishPage.Instance.ActiveStep = 1;
+            publishPage.Instance.ActiveStep = 2;
+
             publishPage.Instance.OnReplaceArtefact();
 
             using (Assert.EnterMultipleScope())
             {
-                this.viewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
+                this.viewModelMock.Verify(x => x.DiscardStagedFile(), Times.Once);
                 Assert.That(publishPage.Instance.ActiveStep, Is.Zero);
-            }
-        }
-
-        [Test]
-        public void VerifyOnUploadStepContinued()
-        {
-            var publishPage = this.context.Render<Publish>();
-            var fileMock = new Mock<IBrowserFile>();
-            fileMock.Setup(x => x.Name).Returns("test-file.kpar");
-
-            publishPage.Instance.OnUploadStepContinued(fileMock.Object);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(publishPage.Instance.ViewModel.Metadata.ArtefactFileName, Is.EqualTo("test-file.kpar"));
-                Assert.That(publishPage.Instance.ActiveStep, Is.EqualTo(1));
             }
         }
 
         [Test]
         public async Task VerifyPublishPackage()
         {
-            this.viewModelMock.Setup(x => x.Publish()).Returns(Result.Success);
+            // Case 1: Successful publication opens the PublishedToForge dialog
+            this.viewModelMock.Setup(x => x.Publish(It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
 
             var publishPage = this.context.Render<Publish>();
-            publishPage.Instance.ActiveStep = 1;
-            publishPage.Render();
+            _ = publishPage.Instance.PublishPackage();
 
-            var publishButton = publishPage.Find("#publish-submit-button");
-            Assert.That(publishButton, Is.Not.Null);
-
-            _ = publishPage.InvokeAsync(() => publishButton.ClickAsync());
             Assert.That(this.dialogService.Dialogs, Has.Count.EqualTo(1));
 
-            var failedResult = Error.Failure(description: "Package already exists.");
-            this.viewModelMock.Setup(x => x.Publish()).Returns(failedResult);
+            // Case 2: Publication failure displays error notification
+            this.viewModelMock.Setup(x => x.Publish(It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Publish failed"));
+            await publishPage.Instance.PublishPackage();
 
-            await publishPage.InvokeAsync(() => publishButton.ClickAsync());
-            Assert.That(this.notificationService.Results.Items, Has.Count.EqualTo(1));
+            this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), It.IsAny<string>(), NotificationType.Error), Times.Once);
         }
     }
 }

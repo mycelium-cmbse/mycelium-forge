@@ -107,5 +107,22 @@ namespace Mycelium.Forge.Dal.DatabaseSource
             await using var deferCommand = new NpgsqlCommand("SET CONSTRAINTS ALL DEFERRED;", transaction.Connection, transaction);
             await deferCommand.ExecuteNonQueryAsync(cancellationToken);
         }
+
+        /// <summary>
+        /// Asynchronously acquires a transaction-scoped advisory lock for a categorized resource.
+        /// </summary>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
+        /// <param name="category">The lock category or domain.</param>
+        /// <param name="resource">The resource identifier to lock.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task AcquireAdvisoryLockAsync(NpgsqlTransaction transaction, string category, string resource, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(transaction);
+
+            await using var lockCommand = new NpgsqlCommand("SELECT pg_advisory_xact_lock(hashtext(@lockKey));", transaction.Connection, transaction);
+            lockCommand.Parameters.AddWithValue("lockKey", $"{category}:{resource}");
+            await lockCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
     }
 }

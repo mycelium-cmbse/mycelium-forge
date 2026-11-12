@@ -65,12 +65,51 @@ namespace Mycelium.Forge.Dal.Tests.Services
         }
 
         [Test]
+        public async Task VerifyReadActiveByAccountAsync()
+        {
+            var accountId = Guid.NewGuid();
+            var activeAccount = new Account { Id = accountId, Name = "ActiveAcc", ShortName = "activeacc", Status = ScopeStatusKind.ACTIVE };
+            var inactiveAccount = new Account { Id = accountId, Name = "InactiveAcc", ShortName = "inactiveacc", Status = ScopeStatusKind.DEACTIVATED };
+            var activeOrg = new Organization { Id = Guid.NewGuid(), Name = "ActiveOrg", ShortName = "activeorg", Status = ScopeStatusKind.ACTIVE };
+            var inactiveOrg = new Organization { Id = Guid.NewGuid(), Name = "InactiveOrg", ShortName = "inactiveorg", Status = ScopeStatusKind.DEACTIVATED };
+
+            // Case 1: Active account and active member organizations are returned; inactive scopes filtered out
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids != null && ids.Length == 1 && ids[0] == accountId))).ReturnsAsync(ImmutableList.Create<IAccount>(activeAccount));
+            this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.userContext, accountId, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganization>(activeOrg, inactiveOrg));
+
+            var result = await this.service.ReadActiveByAccountAsync(this.userContext, accountId, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result, Has.Count.EqualTo(2));
+                Assert.That(result[0].Id, Is.EqualTo(activeAccount.Id));
+                Assert.That(result[1].Id, Is.EqualTo(activeOrg.Id));
+            }
+
+            // Case 2: Inactive account and organization error returns empty list
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids != null && ids.Length == 1 && ids[0] == accountId))).ReturnsAsync(ImmutableList.Create<IAccount>(inactiveAccount));
+            this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.userContext, accountId, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("OrgError"));
+
+            var inactiveResult = await this.service.ReadActiveByAccountAsync(this.userContext, accountId, CancellationToken.None);
+
+            Assert.That(inactiveResult, Is.Empty);
+
+            // Case 3: Account service error returns empty list
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids != null && ids.Length == 1 && ids[0] == accountId))).ReturnsAsync(Error.Failure("AccError"));
+            this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.userContext, accountId, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList<IOrganization>.Empty);
+
+            var errorResult = await this.service.ReadActiveByAccountAsync(this.userContext, accountId, CancellationToken.None);
+
+            Assert.That(errorResult, Is.Empty);
+        }
+
+        [Test]
         public async Task VerifyReadAsync()
         {
             var dummyTransaction = (NpgsqlTransaction)RuntimeHelpers.GetUninitializedObject(typeof(NpgsqlTransaction));
             var org = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
             var account = new Account { Id = Guid.NewGuid(), Name = "Acc", ShortName = "acc" };
-            var queryIds = new[] { org.Id, account.Id };
+            Guid[] queryIds = [org.Id, account.Id];
 
             // Null checks
             using (Assert.EnterMultipleScope())
@@ -157,7 +196,7 @@ namespace Mycelium.Forge.Dal.Tests.Services
             }
 
             // Case: Short-circuiting when all query IDs are found in Org service -> Account service is not called
-            var singleOrgQueryIds = new[] { org.Id };
+            Guid[] singleOrgQueryIds = [org.Id];
 
             this.organizationServiceMock.Setup(x => x.ReadAsync(this.userContext, dummyTransaction, It.IsAny<CancellationToken>(), singleOrgQueryIds))
                 .ReturnsAsync(ImmutableList.Create<IOrganization>(org));

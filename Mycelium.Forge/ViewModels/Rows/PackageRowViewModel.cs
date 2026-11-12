@@ -138,7 +138,7 @@ namespace Mycelium.Forge.ViewModels.Rows
                 var latestVersion = packageVersions
                     .Where(v => v.Owner == package.Id && v.Listed)
                     .OrderByDescending(v => v.PublicationDate)
-                    .ThenByDescending(v => v.Version)
+                    .ThenByDescending(v => v.Version, SemanticVersionComparer.Instance)
                     .FirstOrDefault();
 
                 var latestPublicationDate = latestVersion?.PublicationDate ?? package.CreatedAt;
@@ -150,7 +150,7 @@ namespace Mycelium.Forge.ViewModels.Rows
                     Description = package.Description,
                     Publisher = publisher,
                     Version = latestVersion != null ? latestVersion.Version : DefaultVersion,
-                    Format = packageType?.Name ?? PackageFormatConstants.SysMlV2,
+                    Format = packageType?.Name ?? "-",
                     Tags = ResolveTagsForPackage(package),
                     DownloadCount = package.ComputeDownloadCount(packageVersions),
                     DependentsCount = ResolveDependentsCountForPackage(package),

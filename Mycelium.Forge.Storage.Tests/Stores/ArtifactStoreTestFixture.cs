@@ -224,9 +224,11 @@ namespace Mycelium.Forge.Storage.Tests.Stores
         [Test]
         public async Task VerifyStoreArtifactAsync()
         {
+            // Case 1: Null stream returns failure error
             var nullStreamResult = await this.artifactStore.StoreArtifactAsync(null, null, CancellationToken.None);
             Assert.That(nullStreamResult.IsError, Is.True);
 
+            // Case 2: Already existing artifact is deduplicated (WasNewlyUploaded = false)
             var existingBytes = "any-data"u8.ToArray();
             var existingHash = Convert.ToHexStringLower(SHA256.HashData(existingBytes));
             this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.BucketName == "test-bucket" && r.Key == existingHash), It.IsAny<CancellationToken>())).ReturnsAsync(new GetObjectMetadataResponse());
@@ -237,9 +239,10 @@ namespace Mycelium.Forge.Storage.Tests.Stores
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(deduplicatedResult.IsError, Is.False);
-                Assert.That(deduplicatedResult.Value, Is.EqualTo(existingHash));
+                Assert.That(deduplicatedResult.Value, Is.EqualTo((existingHash, false)));
             }
 
+            // Case 3: New artifact uploads successfully (WasNewlyUploaded = true)
             var bytes = "new-artifact-bytes"u8.ToArray();
             var expectedHash = Convert.ToHexStringLower(SHA256.HashData(bytes));
 
@@ -253,9 +256,10 @@ namespace Mycelium.Forge.Storage.Tests.Stores
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(storeResult.IsError, Is.False);
-                Assert.That(storeResult.Value, Is.EqualTo(expectedHash));
+                Assert.That(storeResult.Value, Is.EqualTo((expectedHash, true)));
             }
 
+            // Case 4: Exception during upload returns failure error
             var failBytes = "fail-bytes"u8.ToArray();
             var failHash = Convert.ToHexStringLower(SHA256.HashData(failBytes));
             this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.Key == failHash), It.IsAny<CancellationToken>())).ThrowsAsync(new AmazonS3Exception("Not Found") { StatusCode = HttpStatusCode.NotFound });
@@ -268,6 +272,21 @@ namespace Mycelium.Forge.Storage.Tests.Stores
             {
                 Assert.That(failureResult.IsError, Is.True);
                 Assert.That(failureResult.FirstError.Type, Is.EqualTo(ErrorType.Failure));
+            }
+
+            // Case 5: ExistsAsync error returns error and never calls PutObjectAsync
+            var errorBytes = "error-bytes"u8.ToArray();
+            var errorHash = Convert.ToHexStringLower(SHA256.HashData(errorBytes));
+            this.amazonS3Mock.Invocations.Clear();
+            this.amazonS3Mock.Setup(x => x.GetObjectMetadataAsync(It.Is<GetObjectMetadataRequest>(r => r.Key == errorHash), It.IsAny<CancellationToken>())).ThrowsAsync(new AmazonS3Exception("Forbidden") { StatusCode = HttpStatusCode.Forbidden });
+
+            using var errorStream = new MemoryStream(errorBytes);
+            var existsErrorResult = await this.artifactStore.StoreArtifactAsync(errorStream, null, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(existsErrorResult.IsError, Is.True);
+                this.amazonS3Mock.Verify(x => x.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()), Times.Never);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -130,7 +130,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             };
 
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IPackage>(this.package));
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IPackage>(this.package));
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IScope>(this.org)));
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageType>(this.packageType)));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageVersion>(this.version)));
@@ -175,14 +175,10 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
 
             // Second call: loaded from cache
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion", PackageTabConstants.Overview);
-
-            this.packageServiceMock.Verify(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>()), Times.Once);
+            this.packageServiceMock.Verify(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>()), Times.Once);
 
             // Non-existent package: returns early and logs warning
-            this.packageServiceMock
-                .Setup(x => x.ReadByCoordinateAsync(this.userContext, "other-org", "nonexistent", It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Error.NotFound());
-
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "other-org", "nonexistent", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
             await this.viewModel.InitializeViewModel("nonexistent", "other-org");
 
             using (Assert.EnterMultipleScope())

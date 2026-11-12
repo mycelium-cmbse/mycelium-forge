@@ -9,7 +9,7 @@
 
 namespace Mycelium.Forge.Tests.Components.Pages.Publish
 {
-    using System.Collections.Generic;
+    using System;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -19,16 +19,26 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
 
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Forms;
+    using Microsoft.AspNetCore.Components.Web;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
-    using Mycelium.Forge.Components.Pages.Publish;
+    using Moq;
+
+    using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Pages.Publish.Steps;
+    using Mycelium.Forge.Enums;
+    using Mycelium.Forge.Models.Publish;
+    using Mycelium.Forge.Services;
+    using Mycelium.Forge.ViewModels.Publish;
 
     [TestFixture]
     public class PublishUploadStepTestFixture
     {
         private BunitContext context;
-        private IConfiguration configuration;
+        private Mock<IPublishViewModel> viewModelMock;
+        private Mock<IJsInterop> jsInteropMock;
+        private Mock<INotificationService> notificationServiceMock;
 
         [SetUp]
         public void SetUp()
@@ -39,10 +49,17 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var configurationManager = new ConfigurationManager();
-            configurationManager["MaximumUploadFileSizeInMB"] = "100";
-            this.configuration = configurationManager;
+            configurationManager[ConfigurationConstants.MaximumUploadFileSizeInMb] = "200";
+            this.context.Services.AddSingleton<IConfiguration>(configurationManager);
 
-            this.context.Services.AddSingleton(this.configuration);
+            this.jsInteropMock = new Mock<IJsInterop>();
+            this.context.Services.AddSingleton(this.jsInteropMock.Object);
+
+            this.notificationServiceMock = new Mock<INotificationService>();
+            this.context.Services.AddSingleton(this.notificationServiceMock.Object);
+
+            this.viewModelMock = new Mock<IPublishViewModel>();
+            this.viewModelMock.Setup(x => x.ExtractManifest(It.IsAny<PublishArtefactModel>())).ReturnsAsync(true);
         }
 
         [TearDown]
@@ -54,79 +71,105 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
         [Test]
         public async Task VerifyHandleContinue()
         {
-            var continuedFiles = new List<IBrowserFile>();
-            var onContinue = new EventCallbackFactory().Create(this, (IBrowserFile file) => { continuedFiles.Add(file); });
+            var continued = false;
+            var onContinue = new EventCallbackFactory().Create(this, () => { continued = true; });
 
-            var uploadStepComponent = this.context.Render<PublishUploadStep>(parameters => { parameters.Add(x => x.OnContinue, onContinue); });
+            this.jsInteropMock.Setup(x => x.UploadLargeFile(It.IsAny<string>(), ApiRoutes.UploadFileForStage)).ReturnsAsync("token-uploaded");
 
-            var inputFileComponent = uploadStepComponent.FindComponent<InputFile>();
-            inputFileComponent.UploadFiles(InputFileContent.CreateFromText("sample data", "library.kpar"));
+            var uploadStep = this.context.Render<PublishUploadStep>(parameters =>
+            {
+                parameters.Add(x => x.ViewModel, this.viewModelMock.Object);
+                parameters.Add(x => x.OnContinue, onContinue);
+            });
 
-            var continueButton = uploadStepComponent.Find("#publish-continue-button");
-            await uploadStepComponent.InvokeAsync(() => continueButton.ClickAsync());
+            // Case 1: Attempting to continue without a file selected does not proceed
+            var continueButton = uploadStep.Find("#publish-continue-button");
+            await continueButton.ClickAsync(new MouseEventArgs());
+
+            Assert.That(continued, Is.False);
+
+            // Case 2: Selecting a file and clicking continue stages the file and extracts manifest
+            var inputFile = uploadStep.FindComponent<InputFile>();
+            inputFile.UploadFiles(InputFileContent.CreateFromText("kpar data", "library.kpar"));
+
+            await continueButton.ClickAsync(new MouseEventArgs());
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(continuedFiles, Has.Count.EqualTo(1));
-                Assert.That(continuedFiles[0].Name, Is.EqualTo("library.kpar"));
+                Assert.That(continued, Is.True);
+                this.jsInteropMock.Verify(x => x.UploadLargeFile("publish-package-file-input", ApiRoutes.UploadFileForStage), Times.Once);
+                this.viewModelMock.Verify(x => x.ExtractManifest(It.Is<PublishArtefactModel>(a => a.StagingToken == "token-uploaded")), Times.Once);
+            }
+
+            // Case 3: Upload failure displays notification and prevents continuing
+            this.jsInteropMock.Setup(x => x.UploadLargeFile(It.IsAny<string>(), ApiRoutes.UploadFileForStage)).ThrowsAsync(new InvalidOperationException("Upload aborted"));
+            continued = false;
+
+            await continueButton.ClickAsync(new MouseEventArgs());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(continued, Is.False);
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), It.IsAny<string>(), NotificationType.Error), Times.Once);
+            }
+
+            // Case 4: Mismatched file format for existing package rejects upload and shows error
+            this.viewModelMock.Setup(x => x.ExpectedFormat).Returns(SupportedPackageFormat.All[0]);
+            this.jsInteropMock.Invocations.Clear();
+
+            var mismatchedStep = this.context.Render<PublishUploadStep>(parameters =>
+            {
+                parameters.Add(x => x.ViewModel, this.viewModelMock.Object);
+                parameters.Add(x => x.OnContinue, onContinue);
+            });
+
+            var mismatchedInput = mismatchedStep.FindComponent<InputFile>();
+            mismatchedInput.UploadFiles(InputFileContent.CreateFromText("zip payload", "model.zip"));
+
+            var mismatchedContinue = mismatchedStep.Find("#publish-continue-button");
+            continued = false;
+            await mismatchedContinue.ClickAsync(new MouseEventArgs());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(continued, Is.False);
+                this.jsInteropMock.Verify(x => x.UploadLargeFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+                Assert.That(mismatchedStep.Markup, Does.Contain($"Only {SupportedPackageFormat.All[0].Name} ({SupportedPackageFormat.All[0].Extension}) archives can be uploaded for this package."));
             }
         }
 
         [Test]
         public void VerifyHandleFilesSelected()
         {
-            var uploadStepComponent = this.context.Render<PublishUploadStep>();
+            var uploadStep = this.context.Render<PublishUploadStep>(parameters => { parameters.Add(x => x.ViewModel, this.viewModelMock.Object); });
 
-            var inputFileComponent = uploadStepComponent.FindComponent<InputFile>();
-            inputFileComponent.UploadFiles(InputFileContent.CreateFromText("kpar content", "model.kpar"));
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(uploadStepComponent.Markup, Does.Contain("model.kpar"));
-                Assert.That(uploadStepComponent.Markup, Does.Contain("SysML v2 (kpar)"));
-                Assert.That(uploadStepComponent.Find("#publish-continue-button").HasAttribute("disabled"), Is.False);
-            }
-
-            inputFileComponent.UploadFiles(InputFileContent.CreateFromText("zip content", "archive.zip"));
-            Assert.That(uploadStepComponent.Markup, Does.Contain("ECSS-E-TM-10-25"));
-
-            inputFileComponent.UploadFiles(InputFileContent.CreateFromText("tar content", "model.tar.gz"));
-            Assert.That(uploadStepComponent.Markup, Does.Contain("Capella"));
-
-            inputFileComponent.UploadFiles(InputFileContent.CreateFromText("xyz content", "archive.xyz"));
-            Assert.That(uploadStepComponent.Markup, Does.Contain(".xyz"));
-
-            inputFileComponent.UploadFiles(InputFileContent.CreateFromText("no ext content", "archive"));
-            Assert.That(uploadStepComponent.Markup, Does.Contain("unknown"));
-        }
-
-        [Test]
-        public void VerifyRendering()
-        {
-            var uploadStepComponent = this.context.Render<PublishUploadStep>();
-
-            var badges = uploadStepComponent.FindComponents<BbBadge>();
-            var continueButton = uploadStepComponent.Find("#publish-continue-button");
-            var publishingGuideLink = uploadStepComponent.FindComponent<BbButton>();
-            var defaultInput = uploadStepComponent.Find("#publish-package-file-input");
-
-            var customStepComponent = this.context.Render<PublishUploadStep>(parameters => { parameters.Add(x => x.InputId, "custom-input-id"); });
-            var customInput = customStepComponent.Find("#custom-input-id");
+            // Case 1: Uploading a .kpar archive automatically identifies the SysML v2 format
+            var inputFile = uploadStep.FindComponent<InputFile>();
+            inputFile.UploadFiles(InputFileContent.CreateFromText("kpar payload", "archive.kpar"));
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(uploadStepComponent.Instance, Is.Not.Null);
-                Assert.That(badges, Has.Count.EqualTo(3));
-                Assert.That(uploadStepComponent.Markup, Does.Contain("SysML v2 (kpar)"));
-                Assert.That(uploadStepComponent.Markup, Does.Contain("ECSS-E-TM-10-25"));
-                Assert.That(uploadStepComponent.Markup, Does.Contain("Capella"));
-                Assert.That(uploadStepComponent.Markup, Does.Contain("100 MB"));
-                Assert.That(uploadStepComponent.Markup, Does.Contain("BEFORE YOU UPLOAD"));
-                Assert.That(continueButton.HasAttribute("disabled"), Is.True);
-                Assert.That(publishingGuideLink, Is.Not.Null);
-                Assert.That(defaultInput, Is.Not.Null);
-                Assert.That(customInput, Is.Not.Null);
+                Assert.That(uploadStep.Find(".publish-file-name").TextContent, Does.Contain("archive.kpar"));
+                Assert.That(uploadStep.Find(".publish-file-format").TextContent, Does.Contain(PackageFormatConstants.SysMlV2));
             }
+
+            // Case 2: Uploading a .zip archive requires selecting model type
+            inputFile.UploadFiles(InputFileContent.CreateFromText("zip payload", "archive.zip"));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(uploadStep.Find(".publish-file-name").TextContent, Does.Contain("archive.zip"));
+                Assert.That(uploadStep.Find(".publish-model-type-toggle"), Is.Not.Null);
+            }
+
+            // Case 3: Existing package locks expected format
+            this.viewModelMock.Setup(x => x.ExpectedFormat).Returns(SupportedPackageFormat.All[0]);
+            var existingPackageStep = this.context.Render<PublishUploadStep>(parameters => { parameters.Add(x => x.ViewModel, this.viewModelMock.Object); });
+
+            var existingInputFile = existingPackageStep.FindComponent<InputFile>();
+            existingInputFile.UploadFiles(InputFileContent.CreateFromText("kpar payload", "model.kpar"));
+
+            Assert.That(existingPackageStep.Find(".publish-file-name").TextContent, Does.Contain("model.kpar"));
         }
     }
 }

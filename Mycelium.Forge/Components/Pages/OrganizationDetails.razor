@@ -71,7 +71,7 @@
                 {
                     @foreach (var package in this.ViewModel.Packages)
                     {
-                        <PackageRow @key="package.FullName"
+                        <PackageRow @key="package"
                                     Model="@package"/>
                     }
                 }

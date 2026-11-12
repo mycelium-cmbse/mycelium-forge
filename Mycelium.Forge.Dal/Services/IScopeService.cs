@@ -30,5 +30,15 @@ namespace Mycelium.Forge.Dal.Services
         /// <param name="shortNames">An optional array of short name values to read.</param>
         /// <returns>A <see cref="ErrorOr{TValue}" /> containing the permitted <see cref="IScope" /> instances.</returns>
         Task<ErrorOr<ImmutableList<IScope>>> ReadByShortNameAsync(IUserContext userContext, CancellationToken token, string[] shortNames = null);
+
+        /// <summary>
+        /// Asynchronously reads active <see cref="IScope" /> instances (the user account and active member organizations)
+        /// that the specified account identifier is eligible to publish under.
+        /// </summary>
+        /// <param name="userContext">The contextual user information and assigned roles.</param>
+        /// <param name="accountId">The unique identifier of the user account.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>A read-only collection of active <see cref="IScope" /> instances.</returns>
+        Task<IReadOnlyList<IScope>> ReadActiveByAccountAsync(IUserContext userContext, Guid accountId, CancellationToken token = default);
     }
 }

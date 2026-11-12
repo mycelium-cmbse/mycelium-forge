@@ -42,6 +42,25 @@ namespace Mycelium.Forge.Tests.Extensions
         }
 
         [Test]
+        public async Task VerifyIsAllowedToCreate()
+        {
+            // Case 1: Permission check succeeds within database transaction
+            this.serviceMock.Setup(x => x.IsAllowedToCreate(this.userContext, this.package, It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
+            var successResult = await this.serviceMock.Object.IsAllowedToCreate(this.databaseSourceMock.Object, this.userContext, this.package, CancellationToken.None);
+
+            // Case 2: Transaction execution failure returns error
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Failed to open connection"));
+            var failureResult = await this.serviceMock.Object.IsAllowedToCreate(this.databaseSourceMock.Object, this.userContext, this.package, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(successResult.IsError, Is.False);
+                Assert.That(failureResult.IsError, Is.True);
+                Assert.That(failureResult.FirstError.Description, Is.EqualTo("Failed to open connection"));
+            }
+        }
+
+        [Test]
         public async Task VerifyIsAllowedToDelete()
         {
             this.serviceMock

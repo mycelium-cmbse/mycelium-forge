@@ -14,7 +14,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Extensions;
 
     /// <summary>
     /// Represents a modal dialog component confirming the successful publication of a package to Mycelium Forge.
@@ -52,107 +51,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
         public string Version { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the modal dialog title.
-        /// </summary>
-        [Parameter]
-        public string Title { get; set; } = "Published to Forge";
-
-        /// <summary>
-        /// Gets or sets an optional custom description or body message override.
-        /// </summary>
-        [Parameter]
-        public string Description { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets an explicit target URL to navigate to when viewing the package.
-        /// </summary>
-        [Parameter]
-        public string PackageHref { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the event callback invoked when the dialog is closed.
-        /// </summary>
-        [Parameter]
-        public EventCallback OnClose { get; set; }
-
-        /// <summary>
-        /// Gets or sets the event callback invoked when the view package action is clicked.
-        /// </summary>
-        [Parameter]
-        public EventCallback OnViewPackage { get; set; }
-
-        /// <summary>
-        /// Gets the resolved full scoped package identifier string.
-        /// </summary>
-        /// <returns>The scoped package name representation.</returns>
-        public string GetPackageFullName()
-        {
-            var cleanScope = this.Scope.CleanScope();
-
-            if (!string.IsNullOrEmpty(cleanScope) && !string.IsNullOrEmpty(this.PackageShortname))
-            {
-                return $"@{cleanScope}/{this.PackageShortname}";
-            }
-
-            return this.PackageShortname ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Gets the formatted release version string prefixed with 'v'.
-        /// </summary>
-        /// <returns>The formatted version string.</returns>
-        public string GetFormattedVersion()
-        {
-            if (string.IsNullOrEmpty(this.Version))
-            {
-                return string.Empty;
-            }
-
-            return this.Version.StartsWith("v", StringComparison.OrdinalIgnoreCase)
-                ? this.Version
-                : $"v{this.Version}";
-        }
-
-        /// <summary>
-        /// Gets the description message explaining that the package is live and release validation is executing.
-        /// </summary>
-        /// <returns>The formatted description string.</returns>
-        public string GetDescriptionText()
-        {
-            if (!string.IsNullOrEmpty(this.Description))
-            {
-                return this.Description;
-            }
-
-            var packageFullName = this.GetPackageFullName();
-            var formattedVersion = this.GetFormattedVersion();
-
-            return $"{packageFullName} {formattedVersion} is live. It is discoverable and importable, and release validation is running now.";
-        }
-
-        /// <summary>
-        /// Gets the resolved navigation URL for the published package details page.
-        /// </summary>
-        /// <returns>The target package details relative URL.</returns>
-        public string GetPackageHref()
-        {
-            if (!string.IsNullOrEmpty(this.PackageHref))
-            {
-                return this.PackageHref;
-            }
-
-            var cleanScope = this.Scope.CleanScope();
-
-            if (!string.IsNullOrEmpty(this.PackageShortname))
-            {
-                return PageRoutes.GetPackageRoute(cleanScope, this.PackageShortname);
-            }
-
-            return PageRoutes.Packages;
-        }
-
-        /// <summary>
-        /// Handles the close action, dismissing the dialog and invoking the close callback.
+        /// Handles the close action, dismissing the dialog and navigating to the my packages page.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnCloseClicked()
@@ -162,11 +61,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
                 await this.DialogReference.CloseAsync(DialogResult.Ok());
             }
 
-            await this.OnClose.InvokeAsync();
+            this.NavigationManager.NavigateTo(PageRoutes.MyPackages);
         }
 
         /// <summary>
-        /// Handles the view package action, invoking callbacks, dismissing the dialog, and navigating to the package details.
+        /// Handles the view package action, dismissing the dialog and navigating to the package details.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnViewPackageClicked()
@@ -176,14 +75,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Dialogs
                 await this.DialogReference.CloseAsync(DialogResult.Ok());
             }
 
-            await this.OnViewPackage.InvokeAsync();
-
-            var href = this.GetPackageHref();
-
-            if (!string.IsNullOrEmpty(href))
-            {
-                this.NavigationManager.NavigateTo(href);
-            }
+            this.NavigationManager.NavigateTo(PageRoutes.GetPackageRoute(this.Scope, this.PackageShortname));
         }
     }
 }
