@@ -75,19 +75,14 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <returns><c>true</c> if transferring package ownership is enabled; otherwise, <c>false</c>.</returns>
         private bool IsTransferOwnershipEnabled()
         {
-            var accountId = this.ViewModel.UserContext.AccountId;
-
-            if (!accountId.HasValue)
-            {
-                return false;
-            }
-
-            if (this.ViewModel.Package.PackageOwner.Contains(accountId.Value))
+            if (PermissionGuard.HasRole(this.ViewModel.UserContext, RoleKind.InstallationAdministrator))
             {
                 return true;
             }
 
-            return PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.TransferPackageOwnership);
+            var accountId = this.ViewModel.UserContext.AccountId;
+
+            return accountId.HasValue && this.ViewModel.Package.PackageOwner.Contains(accountId.Value);
         }
 
         /// <summary>
@@ -223,7 +218,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
 
             var parameters = new Dictionary<string, object>
             {
-                { nameof(TransferPackageOwnershipDialog.PackageName), this.ViewModel.Package.Name },
+                { nameof(TransferPackageOwnershipDialog.Package), this.ViewModel.Package },
                 { nameof(TransferPackageOwnershipDialog.CurrentOwner), this.ViewModel.Owner.ShortName },
                 { nameof(TransferPackageOwnershipDialog.OnResult), onResult }
             };

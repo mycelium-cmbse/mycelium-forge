@@ -34,13 +34,13 @@
                  IsInvalid="@(this.ValidationManager.HasError(nameof(this.ConfirmationPackageName)))">
             <BbFieldLabel For="transfer-confirm-package-name-input"
                           Class="form-field-label">
-                To confirm transfer to scope, type "@(this.PackageName)" below:
+                To confirm transfer to scope, type "@(this.Package.Name)" below:
             </BbFieldLabel>
             <BbFieldContent>
                 <BbInput Id="transfer-confirm-package-name-input"
                          Value="@(this.ConfirmationPackageName)"
                          ValueChanged="@(this.OnConfirmationPackageNameChanged)"
-                         Placeholder="@(this.PackageName)"
+                         Placeholder="@(this.Package.Name)"
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
             <BbFieldError Class="form-field-error"

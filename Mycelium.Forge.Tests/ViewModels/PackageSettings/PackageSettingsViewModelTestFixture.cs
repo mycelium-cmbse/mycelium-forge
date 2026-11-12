@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -215,7 +215,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Package, Is.Null);
-                this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+                this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
             // Scenario 2: Happy path where user is owner and has delete permission
@@ -404,6 +404,32 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(capturedPromotedPackage.PackageMaintainer, Does.Contain(this.userAccount.Id));
                 Assert.That(capturedPromotedPackage.PackageMaintainer, Does.Not.Contain(maintainerAccountId));
                 this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Ownership Transferred", NotificationType.Success), Times.Exactly(3));
+            }
+
+            // Case 5: Maintainers pinned: owner [A], maintainers [B, C], target organization administrators [D, B] -> owners [D, B], maintainers [C, A] without duplicates
+            var ownerA = this.userAccount.Id;
+            var maintainerB = Guid.NewGuid();
+            var maintainerC = Guid.NewGuid();
+            var administratorD = Guid.NewGuid();
+
+            var pinnedOrganization = new Organization { Id = Guid.NewGuid(), Name = "Pinned Organization", ShortName = "pinned-org", Administrator = [administratorD, maintainerB] };
+            this.package.PackageOwner = [ownerA];
+            this.package.PackageMaintainer = [maintainerB, maintainerC];
+            this.package.Visibility = VisibilityKind.PUBLIC;
+            this.viewModel.Package = this.package;
+
+            IPackage capturedPinnedPackage = null!;
+            this.packageServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).Callback<IUserContext, IEnumerable<IPackage>, CancellationToken>((_, packages, _) => capturedPinnedPackage = packages.First()).ReturnsAsync(Result.Updated);
+
+            var pinnedResult = await this.viewModel.TransferOwnership(pinnedOrganization);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(pinnedResult.IsError, Is.False);
+                Assert.That(capturedPinnedPackage.PackageOwner, Is.EquivalentTo([administratorD, maintainerB]));
+                Assert.That(capturedPinnedPackage.PackageMaintainer, Is.EquivalentTo([maintainerC, ownerA]));
+                Assert.That(capturedPinnedPackage.PackageOwner.Intersect(capturedPinnedPackage.PackageMaintainer), Is.Empty);
+                Assert.That(capturedPinnedPackage.PackageMaintainer, Is.Unique);
             }
         }
 

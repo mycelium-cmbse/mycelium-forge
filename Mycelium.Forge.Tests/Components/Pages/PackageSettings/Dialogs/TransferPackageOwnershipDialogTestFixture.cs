@@ -11,7 +11,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -21,6 +20,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
 
     using Bunit;
 
+    using ErrorOr;
+
     using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -28,18 +29,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageSettings.Dialogs;
-    using Mycelium.Forge.Dal.Services;
-    using Mycelium.Forge.Services;
+    using Mycelium.Forge.ViewModels.PackageSettings;
 
     [TestFixture]
     public class TransferPackageOwnershipDialogTestFixture
     {
         private BunitContext context;
         private Mock<IDialogReference> dialogReferenceMock;
-        private Mock<IScopeService> scopeServiceMock;
-        private Mock<IUserService> userServiceMock;
-        private UserContext userContext;
-        private Guid currentUserId;
+        private Mock<ITransferPackageOwnershipDialogViewModel> viewModelMock;
+        private Package package;
 
         [SetUp]
         public void SetUp()
@@ -54,15 +52,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
             this.dialogReferenceMock.Setup(x => x.CloseAsync(It.IsAny<DialogResult>())).Returns(Task.CompletedTask);
             this.dialogReferenceMock.Setup(x => x.CancelAsync()).Returns(Task.CompletedTask);
 
-            this.currentUserId = Guid.NewGuid();
-            this.userContext = new UserContext { AccountId = this.currentUserId };
+            this.package = new Package { Id = Guid.NewGuid(), Name = "ECSS-MM-PWR", ShortName = "ecss-mm-pwr" };
+            this.viewModelMock = new Mock<ITransferPackageOwnershipDialogViewModel>();
 
-            this.scopeServiceMock = new Mock<IScopeService>();
-            this.userServiceMock = new Mock<IUserService>();
-            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-
-            this.context.Services.AddSingleton(this.scopeServiceMock.Object);
-            this.context.Services.AddSingleton(this.userServiceMock.Object);
+            this.context.Services.AddSingleton(this.viewModelMock.Object);
         }
 
         [TearDown]
@@ -80,6 +73,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
             var dialog = this.context.Render<TransferPackageOwnershipDialog>(parameters =>
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
+                parameters.Add(x => x.Package, this.package);
                 parameters.Add(x => x.OnCancel, onCancel);
             });
 
@@ -96,7 +90,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
         [Test]
         public async Task VerifyOnInputsChanged()
         {
-            var dialog = this.context.Render<TransferPackageOwnershipDialog>(parameters => { parameters.AddCascadingValue(this.dialogReferenceMock.Object); });
+            var dialog = this.context.Render<TransferPackageOwnershipDialog>(parameters =>
+            {
+                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
+                parameters.Add(x => x.Package, this.package);
+            });
 
             var inputs = dialog.FindComponents<BbInput>();
             var targetInput = inputs.First(i => i.Instance.Id == "transfer-target-scope-input");
@@ -105,13 +103,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
             await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("new-owner"));
             var targetWithValue = dialog.Instance.TargetScope;
 
-            dialog.Instance.OnTargetScopeChanged(null!);
+            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync(null!));
             var targetWithNull = dialog.Instance.TargetScope;
 
             await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("ECSS-MM-PWR"));
             var confirmWithValue = dialog.Instance.ConfirmationPackageName;
 
-            dialog.Instance.OnConfirmationPackageNameChanged(null!);
+            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync(null!));
             var confirmWithNull = dialog.Instance.ConfirmationPackageName;
 
             using (Assert.EnterMultipleScope())
@@ -132,7 +130,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
             var dialog = this.context.Render<TransferPackageOwnershipDialog>(parameters =>
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.PackageName, "ECSS-MM-PWR");
+                parameters.Add(x => x.Package, this.package);
                 parameters.Add(x => x.CurrentOwner, "starion");
                 parameters.Add(x => x.OnResult, onResult);
             });
@@ -179,8 +177,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
                 Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.ConfirmationPackageName)), Is.True);
             }
 
-            // Case 4: Scope not found
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("unknown")))).ReturnsAsync(ImmutableList<IScope>.Empty);
+            // Case 4: View model validation error is bound to the target scope validation error
+            this.viewModelMock.Setup(x => x.ValidateTargetAsync(this.package, "starion", "unknown", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound(description: "Scope 'unknown' not found."));
             await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("unknown"));
             await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("ECSS-MM-PWR"));
             await dialog.InvokeAsync(() => submitButton.ClickAsync());
@@ -189,58 +187,32 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings.Dialogs
             {
                 Assert.That(receivedScope, Is.Null);
                 Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetScope)), Is.True);
+                Assert.That(dialog.Instance.ValidationManager[nameof(dialog.Instance.TargetScope)].First(), Is.EqualTo("Scope 'unknown' not found."));
+                this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Never);
             }
 
-            // Case 5: Current owner scope transfer attempt fails
-            var currentScope = new Organization { Id = Guid.NewGuid(), ShortName = "starion" };
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("starion")))).ReturnsAsync(ImmutableList.Create<IScope>(currentScope));
+            // Case 5: Only the first error description is displayed
+            this.viewModelMock.Setup(x => x.ValidateTargetAsync(this.package, "starion", "starion", It.IsAny<CancellationToken>())).ReturnsAsync([Error.Validation(description: "You cannot transfer ownership to the current owner scope."), Error.Validation(description: "Second error.")]);
             await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("starion"));
-            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("ECSS-MM-PWR"));
             await dialog.InvokeAsync(() => submitButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(receivedScope, Is.Null);
-                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetScope)), Is.True);
+                Assert.That(dialog.Instance.ValidationManager[nameof(dialog.Instance.TargetScope)].ToList(), Is.EqualTo(["You cannot transfer ownership to the current owner scope."]));
             }
 
-            // Case 6: Target organization without administrative rights -> validation fails
-            var unownedOrg = new Organization { Id = Guid.NewGuid(), ShortName = "unownedorg", Administrator = [Guid.NewGuid()] };
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("unownedorg")))).ReturnsAsync(ImmutableList.Create<IScope>(unownedOrg));
-            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("unownedorg"));
-            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("ECSS-MM-PWR"));
-            await dialog.InvokeAsync(() => submitButton.ClickAsync());
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(receivedScope, Is.Null);
-                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetScope)), Is.True);
-            }
-
-            // Case 7: Valid transfer to target organization where user is an administrator -> success
-            var validOrg = new Organization { Id = Guid.NewGuid(), ShortName = "validorg", Administrator = [this.currentUserId] };
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("validorg")))).ReturnsAsync(ImmutableList.Create<IScope>(validOrg));
+            // Case 6: Valid target -> OnResult invoked with the resolved scope and dialog closed
+            var validOrg = new Organization { Id = Guid.NewGuid(), ShortName = "validorg" };
+            this.viewModelMock.Setup(x => x.ValidateTargetAsync(this.package, "starion", "validorg", It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IScope>(validOrg));
             await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("validorg"));
-            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("ECSS-MM-PWR"));
             await dialog.InvokeAsync(() => submitButton.ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(receivedScope, Is.EqualTo(validOrg));
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.TargetScope)), Is.False);
                 this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Once);
-            }
-
-            // Case 8: Valid transfer to target account -> success
-            var recipientAccount = new Account { Id = Guid.NewGuid(), ShortName = "recipientuser" };
-            this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => ((IEnumerable<string>)a).Contains("recipientuser")))).ReturnsAsync(ImmutableList.Create<IScope>(recipientAccount));
-            await dialog.InvokeAsync(() => targetInput.Instance.ValueChanged.InvokeAsync("recipientuser"));
-            await dialog.InvokeAsync(() => confirmInput.Instance.ValueChanged.InvokeAsync("ECSS-MM-PWR"));
-            await dialog.InvokeAsync(() => submitButton.ClickAsync());
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(receivedScope, Is.EqualTo(recipientAccount));
-                this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Exactly(2));
             }
         }
     }

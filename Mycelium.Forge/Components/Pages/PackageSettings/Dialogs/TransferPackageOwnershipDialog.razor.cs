@@ -15,8 +15,8 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Dal.AutoGenDtoValidator;
-    using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.ViewModels.PackageSettings;
 
     /// <summary>
     /// Represents a modal dialog for transferring package ownership to another account or organization.
@@ -24,16 +24,10 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
     public partial class TransferPackageOwnershipDialog : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the (injected) <see cref="IScopeService" /> used to lookup the target scope.
+        /// Gets or sets the (injected) <see cref="ITransferPackageOwnershipDialogViewModel" /> used to validate the target scope.
         /// </summary>
         [Inject]
-        public IScopeService ScopeService { get; set; }
-
-        /// <summary>
-        /// Gets or sets the (injected) <see cref="IUserService" /> used to retrieve the current user context.
-        /// </summary>
-        [Inject]
-        public IUserService UserService { get; set; }
+        public ITransferPackageOwnershipDialogViewModel ViewModel { get; set; }
 
         /// <summary>
         /// Gets or sets the cascading dialog reference used to control and close the dialog.
@@ -42,10 +36,10 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         public IDialogReference DialogReference { get; set; }
 
         /// <summary>
-        /// Gets or sets the package name being transferred.
+        /// Gets or sets the package being transferred.
         /// </summary>
         [Parameter]
-        public string PackageName { get; set; } = string.Empty;
+        public IPackage Package { get; set; }
 
         /// <summary>
         /// Gets or sets the current owner short name or scope.
@@ -126,7 +120,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
 
             var isValid = this.ValidationManager
                 .Check(nameof(this.TargetScope), isTargetValid, "Target scope must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.")
-                .Check(nameof(this.ConfirmationPackageName), string.Equals(this.ConfirmationPackageName, this.PackageName, StringComparison.Ordinal), "Confirmation name does not match.")
+                .Check(nameof(this.ConfirmationPackageName), string.Equals(this.ConfirmationPackageName, this.Package.Name, StringComparison.Ordinal), "Confirmation name does not match.")
                 .IsValid;
 
             if (!isValid)
@@ -134,32 +128,15 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
                 return;
             }
 
-            var userContext = await this.UserService.GetUserContext();
-            var scopeResult = await this.ScopeService.ReadByShortNameAsync(userContext, CancellationToken.None, [this.TargetScope]);
+            var targetResult = await this.ViewModel.ValidateTargetAsync(this.Package, this.CurrentOwner, this.TargetScope);
 
-            if (scopeResult.IsError || scopeResult.Value.Count == 0)
+            if (targetResult.IsError)
             {
-                this.ValidationManager.Check(nameof(this.TargetScope), false, $"Scope '{this.TargetScope}' not found.");
+                this.ValidationManager.Check(nameof(this.TargetScope), false, targetResult.FirstError.Description);
                 return;
             }
 
-            var scope = scopeResult.Value[0];
-
-            if (string.Equals(this.TargetScope, this.CurrentOwner, StringComparison.OrdinalIgnoreCase))
-            {
-                this.ValidationManager.Check(nameof(this.TargetScope), false, "You cannot transfer ownership to the current owner scope.");
-                return;
-            }
-
-            if (scope is IOrganization organization &&
-                (!userContext.AccountId.HasValue || !organization.Administrator.Contains(userContext.AccountId.Value)) &&
-                !PermissionGuard.HasPermission(userContext, PermissionKind.TransferPackageOwnership))
-            {
-                this.ValidationManager.Check(nameof(this.TargetScope), false, "You do not have administrative rights on the target organization.");
-                return;
-            }
-
-            await this.OnResult.InvokeAsync(scope);
+            await this.OnResult.InvokeAsync(targetResult.Value);
 
             if (this.DialogReference != null)
             {

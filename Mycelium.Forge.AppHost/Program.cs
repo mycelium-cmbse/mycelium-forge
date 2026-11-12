@@ -77,6 +77,7 @@ namespace Mycelium.Forge.AppHost
                 .WithDataVolume("forge-postgres-data")
                 .WithBindMount("../docker/postgres/00-create-roles.sh", "/docker-entrypoint-initdb.d/00-create-roles.sh", true)
                 .WithForgeContainerDefaults(AppHostConstants.Postgres)
+                .WithPgAdmin()
                 .WithPostgresPublishConfiguration(AppHostConstants.ForgeDatabase, AppHostConstants.ForgeDatabase);
 
             var authenticationPostgres = builder.AddPostgres(AppHostConstants.PostgresAuthentication, authenticationDatabaseUsername, authenticationDatabasePassword, 5433)

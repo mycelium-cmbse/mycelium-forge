@@ -91,6 +91,7 @@ namespace Mycelium.Forge.Extensions
                 builder.Services.AddTransient<IMyPackagesViewModel, MyPackagesViewModel>();
                 builder.Services.AddTransient<IApiKeysViewModel, ApiKeysViewModel>();
                 builder.Services.AddTransient<IPackageSettingsViewModel, PackageSettingsViewModel>();
+                builder.Services.AddTransient<ITransferPackageOwnershipDialogViewModel, TransferPackageOwnershipDialogViewModel>();
                 builder.Services.AddTransient<IAccountSettingsViewModel, AccountSettingsViewModel>();
                 builder.Services.AddTransient<IPendingRequestsManagerViewModel, PendingRequestsManagerViewModel>();
                 builder.Services.AddTransient<IOrganizationSettingsViewModel, OrganizationSettingsViewModel>();

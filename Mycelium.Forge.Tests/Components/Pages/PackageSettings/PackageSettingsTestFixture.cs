@@ -131,6 +131,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
             this.context.Services.AddSingleton(new Mock<IScopeService>().Object);
+            this.context.Services.AddSingleton(new Mock<ITransferPackageOwnershipDialogViewModel>().Object);
             this.context.Services.AddSingleton(userServiceMock.Object);
             this.dialogProvider = this.context.Render<BbDialogProvider>();
         }
@@ -202,9 +203,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         [Test]
         public void VerifyOnParametersSet()
         {
-            var packageSettingsPage = this.context.Render<PackageSettings>(parameters => parameters
-                .Add(p => p.Scope, "@starion")
-                .Add(p => p.PackageShortname, "ECSS-MM-PWR"));
+            var packageSettingsPage = this.context.Render<PackageSettings>(parameters => parameters.Add(p => p.Scope, "@starion").Add(p => p.PackageShortname, "ECSS-MM-PWR"));
 
             using (Assert.EnterMultipleScope())
             {
@@ -242,6 +241,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             this.viewModelMock.Setup(x => x.UserContext).Returns(unauthenticatedContext);
             packageSettingsPage.Render();
             Assert.That(packageSettingsPage.FindAll("#package-settings-transfer-button"), Has.Count.EqualTo(0));
+
+            // Case 2b: Button is not rendered for an organization administrator who is neither package owner nor installation administrator
+            var organizationAdministratorContext = new UserContext { AccountId = this.testOwner.Administrator[0], CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator] };
+            this.testPackage.PackageOwner = [Guid.NewGuid()];
+            this.viewModelMock.Setup(x => x.UserContext).Returns(organizationAdministratorContext);
+            packageSettingsPage.Render();
+            Assert.That(packageSettingsPage.FindAll("#package-settings-transfer-button"), Has.Count.EqualTo(0));
+            this.testPackage.PackageOwner = [this.ownerAccount.Id];
 
             // Case 3: Button is rendered when user is in PackageOwner
             this.viewModelMock.Setup(x => x.UserContext).Returns(this.testUserContext);
@@ -322,7 +329,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
             using (Assert.EnterMultipleScope())
             {
-                this.viewModelMock.Verify(x => x.UnlistVersion(this.activeVersion), Times.Once);
+                this.viewModelMock.Verify(x => x.UnlistVersion(this.activeVersion, It.IsAny<CancellationToken>()), Times.Once);
                 this.viewModelMock.Verify(x => x.RelistVersion(this.unlistedVersion, It.IsAny<CancellationToken>()), Times.Once);
             }
         }
