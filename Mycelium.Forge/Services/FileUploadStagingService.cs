@@ -92,7 +92,8 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
-        /// Opens a seekable read stream for the specified staged upload token.
+        /// Opens a seekable read stream for the specified staged upload token. The staged file and its token are kept until
+        /// <see cref="Cleanup" /> is called.
         /// </summary>
         /// <param name="uploadToken">The unique upload token identifying the staged file.</param>
         /// <returns>A readable <see cref="Stream" /> representing the staged package file.</returns>
@@ -103,8 +104,7 @@ namespace Mycelium.Forge.Services
                 throw new FileNotFoundException($"No staged upload found for token '{uploadToken}'.");
             }
 
-            this.stagedFiles.TryRemove(uploadToken, out _);
-            return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, FileOptions.Asynchronous | FileOptions.DeleteOnClose);
+            return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, FileOptions.Asynchronous);
         }
 
         /// <summary>
@@ -151,7 +151,8 @@ namespace Mycelium.Forge.Services
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing">
-        /// <see langword="true" /> to release both managed and unmanaged resources; <see langword="false" /> to release only unmanaged resources.
+        /// <see langword="true" /> to release both managed and unmanaged resources; <see langword="false" /> to release only
+        /// unmanaged resources.
         /// </param>
         protected virtual void Dispose(bool disposing)
         {

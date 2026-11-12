@@ -152,6 +152,14 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
+        /// Navigates to the publish page to publish a new version of the current package.
+        /// </summary>
+        private void OnPublishNewVersion()
+        {
+            this.NavigationManager.NavigateTo(PageRoutes.GetPublishVersionRoute(this.Scope, this.PackageShortname));
+        }
+
+        /// <summary>
         /// Prompts confirmation to unlist the specified package version.
         /// </summary>
         /// <param name="version">The package version to unlist.</param>

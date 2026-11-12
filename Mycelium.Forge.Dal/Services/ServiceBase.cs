@@ -517,7 +517,7 @@ namespace Mycelium.Forge.Dal.Services
             var filter = (SqlFilter)this.ReadFilter.FromUserContext(userContext);
 
             filter.Where($"""
-                          "Thing"."classKind" = '{ClassKind}' AND "Thing"."data"->>'{sqlAttributeName}' = ANY(@values)
+                          thing.class_kind = '{ClassKind}' AND thing.data->>'{sqlAttributeName}' = ANY(@values)
                           """);
 
             filter.AddParameter("@values", (NpgsqlDbType)((int)NpgsqlDbType.Array | (int)NpgsqlDbType.Text), stringValues);

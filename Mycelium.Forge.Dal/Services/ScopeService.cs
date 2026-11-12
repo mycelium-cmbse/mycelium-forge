@@ -220,5 +220,33 @@ namespace Mycelium.Forge.Dal.Services
 
             return Result.Success;
         }
+
+        /// <summary>
+        /// Asynchronously reads active <see cref="IScope" /> instances (the user account and active member organizations)
+        /// that the specified account identifier is eligible to publish under.
+        /// </summary>
+        /// <param name="userContext">The contextual user information and assigned roles.</param>
+        /// <param name="accountId">The unique identifier of the user account.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>A read-only collection of active <see cref="IScope" /> instances.</returns>
+        public async Task<IReadOnlyList<IScope>> ReadActiveByAccountAsync(IUserContext userContext, Guid accountId, CancellationToken token = default)
+        {
+            var scopes = new List<IScope>();
+            var accountResult = await this.accountService.ReadAsync(userContext, token, [accountId]);
+
+            if (!accountResult.IsError && accountResult.Value.Count > 0 && accountResult.Value[0].Status == ScopeStatusKind.ACTIVE)
+            {
+                scopes.Add(accountResult.Value[0]);
+            }
+
+            var organizationsResult = await this.organizationService.ReadByAccountMembershipAsync(userContext, accountId, token);
+
+            if (!organizationsResult.IsError)
+            {
+                scopes.AddRange(organizationsResult.Value.Where(x => x.Status == ScopeStatusKind.ACTIVE));
+            }
+
+            return scopes;
+        }
     }
 }

@@ -175,7 +175,7 @@ namespace Mycelium.Forge.ViewModels.MyPackages
             return this.versions
                 .Where(v => v.Owner == package.Id && v.Listed)
                 .OrderByDescending(v => v.PublicationDate)
-                .ThenByDescending(v => v.Version)
+                .ThenByDescending(v => v.Version, SemanticVersionComparer.Instance)
                 .FirstOrDefault();
         }
 

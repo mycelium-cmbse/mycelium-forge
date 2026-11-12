@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageSettingsViewModelTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -131,7 +131,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             };
 
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
             this.accountServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
@@ -208,7 +208,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         {
             // Scenario 1: Package not found
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "unknown", It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "unknown", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
 
             await this.viewModel.InitializeViewModel("unknown", "starion");
 
@@ -220,7 +220,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             // Scenario 2: Happy path where user is owner and has delete permission
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.adminUserContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.adminUserContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.adminUserContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
             this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
@@ -240,7 +240,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
 
             // Scenario 3: User is not owner but permission service allows update
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", It.IsAny<CancellationToken>())).ReturnsAsync(this.nonOwnerPackage);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.nonOwnerPackage);
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
             this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));

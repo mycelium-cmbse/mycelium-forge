@@ -13,6 +13,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
     using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.Models;
 
     using uml4net.StructuredClassifiers;
@@ -301,19 +302,15 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 bypassCondition = string.Join(" OR ", readPermParts.Select(p => $"@can{p} = true"));
             }
 
-            var roleChecks = config.ScopeRoles.Select(role =>
-            {
-                var rolePropCamel = char.ToLowerInvariant(role[0]) + role[1..];
-                return $"EXISTS (SELECT 1 FROM \"Forge\".\"{config.ScopeEntity}_{rolePropCamel}__Account\" WHERE \"source{config.ScopeEntity}\" = \"{entityName}\".\"{config.ScopeProperty.ToLowerInvariant()}\" AND \"targetAccount\" = @callerAccountId)";
-            });
+            var roleChecks = config.ScopeRoles.Select(role => ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, role, entityName, config.ScopeProperty));
 
             var roleChecksSql = "\r\n                                OR " + string.Join("\r\n                                OR ", roleChecks);
 
             return $"""
                                         {bypassCondition}
                                         OR (@callerAccountId IS NOT NULL AND (
-                                            "{entityName}"."{config.OwnerColumn}" = @callerAccountId
-                                            OR "{entityName}"."{config.InviteeColumn}" = @callerAccountId{roleChecksSql}
+                                            {entityName.ToSnakeCase()}.{config.OwnerColumn} = @callerAccountId
+                                            OR {entityName.ToSnakeCase()}.{config.InviteeColumn} = @callerAccountId{roleChecksSql}
                                         ))
                     """;
         }

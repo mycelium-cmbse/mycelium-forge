@@ -20,9 +20,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
     using uml4net.Extensions;
     using uml4net.StructuredClassifiers;
 
-    /// <summary>
-    /// Suite of tests for the <see cref="SqlSchemaHelper" /> class.
-    /// </summary>
     [TestFixture]
     public class SqlSchemaHelperTestFixture
     {
@@ -31,9 +28,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         private IClass organizationClass;
         private IClass thingClass;
 
-        /// <summary>
-        /// Sets up the test fixture before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -46,9 +40,6 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             this.thingClass = GetClass("Thing");
         }
 
-        /// <summary>
-        /// Verifies that DeleteBaseTableTriggerFunctions renders trigger functions and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyDeleteBaseTableTriggerFunctions()
         {
@@ -64,23 +55,17 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                     .ToList();
 
                 var result = template(allClasses);
-                Assert.That(result, Does.Contain("CREATE OR REPLACE FUNCTION \"Forge\".scope_delete()"));
-                Assert.That(result, Does.Contain("EXECUTE 'DELETE FROM \"Forge\".\"Scope\" WHERE id = $1' USING OLD.id;"));
+                Assert.That(result, Does.Contain("CREATE OR REPLACE FUNCTION forge.scope_delete()"));
+                Assert.That(result, Does.Contain("EXECUTE 'DELETE FROM forge.scope WHERE id = $1' USING OLD.id;"));
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="SqlSchemaHelper.RegisterSqlSchemaHelpers" /> registers helpers and handles null argument.
-        /// </summary>
         [Test]
         public void VerifyRegisterSqlSchemaHelpers()
         {
             Assert.That(() => SqlSchemaHelper.RegisterSqlSchemaHelpers(null!), Throws.TypeOf<ArgumentNullException>());
         }
 
-        /// <summary>
-        /// Verifies that WriteBaseTableDeleteTriggers renders base table triggers and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBaseTableDeleteTriggers()
         {
@@ -95,14 +80,11 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_scope_on_account_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".scope_delete()"));
+                Assert.That(accountResult, Does.Contain("AFTER DELETE ON forge.account"));
+                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION forge.scope_delete()"));
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteBasicTableDefinitions renders table DDL for classes and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBasicTableDefinitions()
         {
@@ -116,16 +98,13 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("CREATE TABLE \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("\"id\" uuid NOT NULL"));
-                Assert.That(accountResult, Does.Contain("\"owner\" uuid NOT NULL"));
-                Assert.That(accountResult, Does.Contain("PRIMARY KEY (\"id\")"));
+                Assert.That(accountResult, Does.Contain("CREATE TABLE forge.account"));
+                Assert.That(accountResult, Does.Contain("id uuid NOT NULL"));
+                Assert.That(accountResult, Does.Contain("owner uuid NOT NULL"));
+                Assert.That(accountResult, Does.Contain("PRIMARY KEY (id)"));
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteBasicTableThingConstraints renders FK constraints and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBasicTableThingConstraints()
         {
@@ -139,13 +118,10 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT \"Account_Thing_FK_Source\" FOREIGN KEY (\"id\") REFERENCES \"Forge\".\"Thing\" (\"id\")"));
+                Assert.That(accountResult, Does.Contain("ALTER TABLE forge.account ADD CONSTRAINT account_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id)"));
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteBasicTableThingDeleteTriggers renders thing delete triggers and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteBasicTableThingDeleteTriggers()
         {
@@ -160,14 +136,11 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
 
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Does.Contain("CREATE OR REPLACE TRIGGER trg_thing_delete"));
-                Assert.That(accountResult, Does.Contain("AFTER DELETE ON \"Forge\".\"Account\""));
-                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION \"Forge\".thing_delete()"));
+                Assert.That(accountResult, Does.Contain("AFTER DELETE ON forge.account"));
+                Assert.That(accountResult, Does.Contain("EXECUTE FUNCTION forge.thing_delete()"));
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteManyToManyTableDefinitionsAndConstraints renders junction tables and guards invalid context.
-        /// </summary>
         [Test]
         public void VerifyWriteManyToManyTableDefinitionsAndConstraints()
         {
@@ -181,17 +154,14 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var orgResult = template(this.organizationClass);
-                Assert.That(orgResult, Does.Contain("CREATE TABLE \"Forge\".\"Organization_administrator__Account\""));
-                Assert.That(orgResult, Does.Contain("CREATE TABLE \"Forge\".\"Organization_member__Account\""));
+                Assert.That(orgResult, Does.Contain("CREATE TABLE forge.organization_administrator__account"));
+                Assert.That(orgResult, Does.Contain("CREATE TABLE forge.organization_member__account"));
 
                 var accountResult = template(this.accountClass);
                 Assert.That(accountResult, Is.Empty);
             }
         }
 
-        /// <summary>
-        /// Verifies that WriteNormalReferenceConstraints renders FK constraints and indexes.
-        /// </summary>
         [Test]
         public void VerifyWriteNormalReferenceConstraints()
         {
@@ -205,7 +175,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(thingResult, Is.Empty);
 
                 var accountResult = template(this.accountClass);
-                Assert.That(accountResult, Does.Contain("ALTER TABLE \"Forge\".\"Account\" ADD CONSTRAINT"));
+                Assert.That(accountResult, Does.Contain("ALTER TABLE forge.account ADD CONSTRAINT"));
                 Assert.That(accountResult, Does.Contain("CREATE INDEX"));
             }
         }

@@ -42,8 +42,7 @@
     <div class="flex flex-col gap-2.5 mt-1">
         @foreach (var element in this.GetFilteredElements())
         {
-            <ModelElementCard @key="element.Name"
-                              Element="@element"/>
+            <ModelElementCard Element="@element"/>
         }
     </div>
 </ForgeCard>

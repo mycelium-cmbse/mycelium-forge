@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="ArtifactStore.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -108,8 +108,8 @@ namespace Mycelium.Forge.Storage.Stores
         /// <param name="contentStream">The stream containing artifact bytes.</param>
         /// <param name="contentType">The optional MIME type of the artifact.</param>
         /// <param name="token">The cancellation token.</param>
-        /// <returns>A result containing the stored content hash, or an error if storage fails.</returns>
-        public async Task<ErrorOr<string>> StoreArtifactAsync(Stream contentStream, string contentType = null, CancellationToken token = default)
+        /// <returns>A result containing a tuple with the stored content hash and a value indicating whether the artifact was newly uploaded, or an error if storage fails.</returns>
+        public async Task<ErrorOr<(string ContentHash, bool WasNewlyUploaded)>> StoreArtifactAsync(Stream contentStream, string contentType = null, CancellationToken token = default)
         {
             if (contentStream == null)
             {
@@ -135,9 +135,14 @@ namespace Mycelium.Forge.Storage.Stores
 
                 var existsResult = await this.ExistsAsync(key, token);
 
-                if (existsResult is { IsError: false, Value: true })
+                if (existsResult.IsError)
                 {
-                    return key;
+                    return existsResult.Errors;
+                }
+
+                if (existsResult.Value)
+                {
+                    return (key, false);
                 }
 
                 var isHttps = this.options.Value.ServiceUrl != null &&
@@ -163,7 +168,7 @@ namespace Mycelium.Forge.Storage.Stores
                 };
 
                 await this.amazonS3Client.PutObjectAsync(putRequest, token);
-                return key;
+                return (key, true);
             }
             catch (Exception exception)
             {

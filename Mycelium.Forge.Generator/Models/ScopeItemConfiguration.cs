@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Generator.Models
 {
     using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Extensions;
 
     /// <summary>
     /// Configuration class holding resolved values for scope item permission behavior.
@@ -47,7 +48,7 @@ namespace Mycelium.Forge.Generator.Models
             this.ScopeEntity = scopeEntity;
             this.ScopeServiceField = FormatServiceField(scopeEntity);
             this.OwnerProperty = ownerProp;
-            this.OwnerColumn = ownerProp.ToLowerInvariant();
+            this.OwnerColumn = ownerProp.ToSnakeCase();
             this.PersonalManagePermission = personalManage;
             this.PlatformManagePermission = platformManage;
             this.OrgManagePermission = orgManage;
@@ -70,7 +71,7 @@ namespace Mycelium.Forge.Generator.Models
         public string OwnerProperty { get; }
 
         /// <summary>
-        /// Gets the lower-case database column name for the owner property.
+        /// Gets the snake_case database column name for the owner property.
         /// </summary>
         public string OwnerColumn { get; }
 

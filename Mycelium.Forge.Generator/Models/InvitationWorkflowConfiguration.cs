@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Generator.Models
 {
     using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Extensions;
 
     /// <summary>
     /// Configuration class holding resolved values for invitation workflow permission behavior.
@@ -48,9 +49,9 @@ namespace Mycelium.Forge.Generator.Models
             this.ScopeServiceField = FormatServiceField(scopeEntity);
             this.ScopeVar = FormatVariableName(scopeEntity);
             this.InviteeProperty = inviteeProp;
-            this.InviteeColumn = char.ToLowerInvariant(inviteeProp[0]) + inviteeProp[1..];
+            this.InviteeColumn = inviteeProp.ToSnakeCase();
             this.OwnerProperty = ownerProp;
-            this.OwnerColumn = ownerProp.ToLowerInvariant();
+            this.OwnerColumn = ownerProp.ToSnakeCase();
             this.CreatePermission = createPerm;
             this.ReadPermission = readPerm;
             this.ScopeRoles = SplitValues(sr);
@@ -84,7 +85,7 @@ namespace Mycelium.Forge.Generator.Models
         public string InviteeProperty { get; }
 
         /// <summary>
-        /// Gets the invitee database column name.
+        /// Gets the invitee snake_case database column name.
         /// </summary>
         public string InviteeColumn { get; }
 
@@ -94,7 +95,7 @@ namespace Mycelium.Forge.Generator.Models
         public string OwnerProperty { get; }
 
         /// <summary>
-        /// Gets the owner database column name.
+        /// Gets the owner snake_case database column name.
         /// </summary>
         public string OwnerColumn { get; }
 

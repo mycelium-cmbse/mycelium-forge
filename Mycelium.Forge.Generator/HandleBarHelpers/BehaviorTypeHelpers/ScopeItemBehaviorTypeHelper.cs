@@ -13,6 +13,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
     using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.Models;
 
     using uml4net.StructuredClassifiers;
@@ -117,13 +118,15 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var entityName = behavior.EntityName;
             var config = this.GetConfiguration(definition, behavior);
             var bypassSql = string.Join(" OR ", config.ReadBypassPermissions.Select(p => $"@can{p} = true"));
+            var memberCheck = ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, "member", entityName, config.OwnerColumn);
+            var administratorCheck = ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, "administrator", entityName, config.OwnerColumn);
 
             return $"""
                                         {bypassSql}
                                         OR (@callerAccountId IS NOT NULL AND (
-                                            "{entityName}"."{config.OwnerColumn}" = @callerAccountId
-                                            OR EXISTS (SELECT 1 FROM "Forge"."{config.ScopeEntity}_member__Account" WHERE "source{config.ScopeEntity}" = "{entityName}"."{config.OwnerColumn}" AND "targetAccount" = @callerAccountId)
-                                            OR EXISTS (SELECT 1 FROM "Forge"."{config.ScopeEntity}_administrator__Account" WHERE "source{config.ScopeEntity}" = "{entityName}"."{config.OwnerColumn}" AND "targetAccount" = @callerAccountId)
+                                            {entityName.ToSnakeCase()}.{config.OwnerColumn} = @callerAccountId
+                                            OR {memberCheck}
+                                            OR {administratorCheck}
                                         ))
                     """;
         }

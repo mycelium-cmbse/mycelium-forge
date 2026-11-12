@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.DataLoaders.PermissionModels;
+    using Mycelium.Forge.Generator.Extensions;
     using Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers;
 
     using uml4net.Extensions;
@@ -155,7 +156,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             if (!string.IsNullOrWhiteSpace(permission.VisibilityProperty))
             {
                 var visibilityPropLower = permission.VisibilityProperty.LowerCaseFirstLetter();
-                parts.Add($"(\"Thing\".\"data\"->>'{visibilityPropLower}' = 'PUBLIC')");
+                parts.Add($"(thing.data->>'{visibilityPropLower}' = 'PUBLIC')");
             }
 
             if (!string.IsNullOrWhiteSpace(permission.ReadPermission))
@@ -199,23 +200,21 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             {
                 if (permission.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
                 {
-                    checks.Add($"\"{className}\".\"id\" = @callerAccountId");
+                    checks.Add($"{className.ToSnakeCase()}.id = @callerAccountId");
                 }
                 else if (permission.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
                 {
-                    checks.Add($"\"{className}\".\"owner\" = @callerAccountId");
+                    checks.Add($"{className.ToSnakeCase()}.owner = @callerAccountId");
                 }
                 else
                 {
-                    var ownerPropCamel = permission.OwnerProperty.LowerCaseFirstLetter();
-                    checks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{ownerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+                    checks.Add(ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(className, permission.OwnerProperty, className, PropertyNames.Id));
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(permission.MaintainerProperty))
             {
-                var maintainerPropCamel = permission.MaintainerProperty.LowerCaseFirstLetter();
-                checks.Add($"EXISTS (SELECT 1 FROM \"Forge\".\"{className}_{maintainerPropCamel}__Account\" WHERE \"source{className}\" = \"{className}\".\"id\" AND \"targetAccount\" = @callerAccountId)");
+                checks.Add(ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(className, permission.MaintainerProperty, className, PropertyNames.Id));
             }
 
             return checks;

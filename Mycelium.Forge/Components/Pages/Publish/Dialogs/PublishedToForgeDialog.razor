@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PublishedToForgeDialog.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -18,11 +18,11 @@
             </div>
 
             <h2 class="text-md leading-2xl font-semibold text-foreground text-center">
-                @(this.Title)
+                Published to Forge
             </h2>
 
             <p class="text-sm leading-xs font-normal text-muted-foreground text-center">
-                @(this.GetDescriptionText())
+                @($"@{this.Scope}/{this.PackageShortname} v{this.Version} is live. It is discoverable and importable, and release validation is running now.")
             </p>
         </div>
     </ChildContent>

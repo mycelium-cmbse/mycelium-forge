@@ -17,6 +17,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
     using Bunit;
 
     using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.Web;
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
@@ -29,19 +30,20 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
     {
         private BunitContext context;
         private Mock<IDialogReference> dialogReferenceMock;
+        private NavigationManager navigationManager;
 
         [SetUp]
         public void SetUp()
         {
             this.context = new BunitContext();
-
             this.context.Services.AddBlazorBlueprintPrimitives();
             this.context.Services.AddBlazorBlueprintComponents();
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
 
             this.dialogReferenceMock = new Mock<IDialogReference>();
             this.dialogReferenceMock.Setup(x => x.CloseAsync(It.IsAny<DialogResult>())).Returns(Task.CompletedTask);
-            this.dialogReferenceMock.Setup(x => x.CancelAsync()).Returns(Task.CompletedTask);
+
+            this.navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
         }
 
         [TearDown]
@@ -51,213 +53,45 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Dialogs
         }
 
         [Test]
-        public void VerifyGetDescriptionText()
-        {
-            var dialog1 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Description, "Custom description.");
-            });
-
-            var customDescription = dialog1.Instance.GetDescriptionText();
-
-            var dialog2 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Description, string.Empty);
-                parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
-                parameters.Add(x => x.Version, "v1.3.0");
-            });
-
-            var builtDescription = dialog2.Instance.GetDescriptionText();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(customDescription, Is.EqualTo("Custom description."));
-                Assert.That(builtDescription, Does.Contain("@starion/ECSS-MM-PWR"));
-                Assert.That(builtDescription, Does.Contain("v1.3.0"));
-                Assert.That(builtDescription, Does.Contain("is live"));
-            }
-        }
-
-        [Test]
-        public void VerifyGetFormattedVersion()
-        {
-            var dialog1 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Version, "3.0.0");
-            });
-
-            var fromVersionField = dialog1.Instance.GetFormattedVersion();
-
-            var dialog2 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Version, "v3.0.0");
-            });
-
-            var fromVersionFieldWithPrefix = dialog2.Instance.GetFormattedVersion();
-
-            var dialog3 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Version, string.Empty);
-            });
-
-            var defaultVersion = dialog3.Instance.GetFormattedVersion();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(fromVersionField, Is.EqualTo("v3.0.0"));
-                Assert.That(fromVersionFieldWithPrefix, Is.EqualTo("v3.0.0"));
-                Assert.That(defaultVersion, Is.Empty);
-            }
-        }
-
-        [Test]
-        public void VerifyGetPackageFullName()
-        {
-            var dialog1 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Scope, "starion");
-                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
-            });
-
-            var withScopeNoAt = dialog1.Instance.GetPackageFullName();
-
-            var dialog2 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
-            });
-
-            var withScopeWithAt = dialog2.Instance.GetPackageFullName();
-
-            var dialog3 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Scope, string.Empty);
-                parameters.Add(x => x.PackageShortname, "MyPackage");
-            });
-
-            var withPackageNameOnly = dialog3.Instance.GetPackageFullName();
-
-            var dialog4 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.Scope, string.Empty);
-                parameters.Add(x => x.PackageShortname, string.Empty);
-            });
-
-            var defaultResult = dialog4.Instance.GetPackageFullName();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(withScopeNoAt, Is.EqualTo("@starion/ECSS-MM-PWR"));
-                Assert.That(withScopeWithAt, Is.EqualTo("@starion/ECSS-MM-PWR"));
-                Assert.That(withPackageNameOnly, Is.EqualTo("MyPackage"));
-                Assert.That(defaultResult, Is.Empty);
-            }
-        }
-
-        [Test]
-        public void VerifyGetPackageHref()
-        {
-            var dialog1 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.PackageHref, "/explicit/href");
-            });
-
-            var explicitHref = dialog1.Instance.GetPackageHref();
-
-            var dialog2 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.PackageHref, string.Empty);
-                parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
-            });
-
-            var builtHref = dialog2.Instance.GetPackageHref();
-
-            var dialog3 = this.context.Render<PublishedToForgeDialog>(parameters =>
-            {
-                parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.PackageHref, string.Empty);
-                parameters.Add(x => x.Scope, string.Empty);
-                parameters.Add(x => x.PackageShortname, string.Empty);
-            });
-
-            var fallbackHref = dialog3.Instance.GetPackageHref();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(explicitHref, Is.EqualTo("/explicit/href"));
-                Assert.That(builtHref, Does.Contain("starion").And.Contain("ECSS-MM-PWR"));
-                Assert.That(fallbackHref, Is.EqualTo(PageRoutes.Packages));
-            }
-        }
-
-        [Test]
         public async Task VerifyOnCloseClicked()
         {
-            var onCloseCalled = false;
-            var onClose = new EventCallbackFactory().Create(this, () => { onCloseCalled = true; });
-
             var dialog = this.context.Render<PublishedToForgeDialog>(parameters =>
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.OnClose, onClose);
+                parameters.Add(x => x.Scope, "starion");
+                parameters.Add(x => x.PackageShortname, "test-pkg");
+                parameters.Add(x => x.Version, "1.0.0");
             });
 
-            await dialog.InvokeAsync(() => dialog.Instance.OnCloseClicked());
+            var closeButton = dialog.Find("#published-to-forge-close-button");
+            await closeButton.ClickAsync(new MouseEventArgs());
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(onCloseCalled, Is.True);
                 this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Once);
+                Assert.That(this.navigationManager.Uri, Does.EndWith(PageRoutes.MyPackages));
             }
-
-            var dialogNoRef = this.context.Render<PublishedToForgeDialog>(parameters => { parameters.AddCascadingValue(new Mock<IDialogReference>().Object); });
-
-            dialogNoRef.Instance.DialogReference = null;
-            Assert.DoesNotThrowAsync(() => dialogNoRef.InvokeAsync(() => dialogNoRef.Instance.OnCloseClicked()));
         }
 
         [Test]
         public async Task VerifyOnViewPackageClicked()
         {
-            var onViewPackageCalled = false;
-            var onViewPackage = new EventCallbackFactory().Create(this, () => { onViewPackageCalled = true; });
-
             var dialog = this.context.Render<PublishedToForgeDialog>(parameters =>
             {
                 parameters.AddCascadingValue(this.dialogReferenceMock.Object);
-                parameters.Add(x => x.OnViewPackage, onViewPackage);
-                parameters.Add(x => x.Scope, "@starion");
-                parameters.Add(x => x.PackageShortname, "ECSS-MM-PWR");
+                parameters.Add(x => x.Scope, "starion");
+                parameters.Add(x => x.PackageShortname, "test-pkg");
+                parameters.Add(x => x.Version, "1.0.0");
             });
 
-            await dialog.InvokeAsync(() => dialog.Instance.OnViewPackageClicked());
-
-            var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
+            var viewButton = dialog.Find("#published-to-forge-view-button");
+            await viewButton.ClickAsync(new MouseEventArgs());
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(onViewPackageCalled, Is.True);
                 this.dialogReferenceMock.Verify(x => x.CloseAsync(It.IsAny<DialogResult>()), Times.Once);
-                Assert.That(navigationManager.Uri, Is.Not.EqualTo("http://localhost/"));
+                Assert.That(this.navigationManager.Uri, Does.EndWith(PageRoutes.GetPackageRoute("starion", "test-pkg")));
             }
-
-            var dialogNoRef = this.context.Render<PublishedToForgeDialog>(parameters => { parameters.AddCascadingValue(new Mock<IDialogReference>().Object); });
-
-            dialogNoRef.Instance.DialogReference = null;
-            Assert.DoesNotThrowAsync(() => dialogNoRef.InvokeAsync(() => dialogNoRef.Instance.OnViewPackageClicked()));
         }
     }
 }

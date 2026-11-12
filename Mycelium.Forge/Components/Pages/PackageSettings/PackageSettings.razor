@@ -1,4 +1,4 @@
-﻿@* ------------------------------------------------------------------------------------------------
+@* ------------------------------------------------------------------------------------------------
 <copyright file="PackageSettings.razor" company="Starion Group S.A.">
 
   Copyright 2026 Starion Group S.A.
@@ -87,13 +87,16 @@
                                                  Description="Only the package Maintainers, and Accounts explicitly granted the Reader role, can see or download it."/>
                 </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
 
-                <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
-                                                                        Value="VisibilityKind.INTERNAL"
-                                                                        class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
-                    <PackageVisibilityOptionCard IsCurrent="@(this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL)"
-                                                 Title="Organization"
-                                                 Description="@($"Every member of {this.ViewModel.Owner.ShortName} can see and download it. Outside the organization it is invisible.")"/>
-                </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
+                @if (this.ViewModel.Owner is not IAccount)
+                {
+                    <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
+                                                                            Value="VisibilityKind.INTERNAL"
+                                                                            class="flex items-start gap-3 py-2.5 w-full cursor-pointer text-left bg-transparent border-0 p-0 focus:outline-none">
+                        <PackageVisibilityOptionCard IsCurrent="@(this.ViewModel.Package.Visibility == VisibilityKind.INTERNAL)"
+                                                     Title="Organization"
+                                                     Description="@($"Every member of {this.ViewModel.Owner.ShortName} can see and download it. Outside the organization it is invisible.")"/>
+                    </BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem>
+                }
 
                 <BlazorBlueprint.Primitives.RadioGroup.BbRadioGroupItem TValue="VisibilityKind"
                                                                         Value="VisibilityKind.PUBLIC"
@@ -110,10 +113,22 @@
         </div>
 
         <ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
-            <div class="flex items-center gap-2 w-full">
+            <div class="flex items-center justify-between gap-2 w-full h-7.5">
                 <h2 class="text-lg leading-lg font-semibold text-foreground flex-1">
                     Versions
                 </h2>
+
+                <BbButton id="package-settings-publish-version-button"
+                          Variant="ButtonVariant.Default"
+                          Size="ButtonSize.Small"
+                          Type="ButtonType.Button"
+                          OnClick="@(this.OnPublishNewVersion)"
+                          Class="shrink-0">
+                    <LucideIcon Name="plus"
+                                Size="14"
+                                Class="shrink-0"/>
+                    <span>Publish new version</span>
+                </BbButton>
             </div>
 
             <div class="flex flex-col gap-3.5 w-full">
