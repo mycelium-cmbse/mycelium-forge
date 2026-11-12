@@ -101,7 +101,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
                 return Error.Failure(description: "Could not verify that the package name is available in the target scope.");
             }
 
-            return ErrorOrFactory.From(scope);
+            return await ErrorOrFactory.FromAsync(scope);
         }
     }
 }
