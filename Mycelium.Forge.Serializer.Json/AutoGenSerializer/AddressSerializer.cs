@@ -75,48 +75,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="IAddress"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="IAddress"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not IAddress iAddress)
-            {
-                throw new ArgumentException("The object shall be an IAddress", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("Address"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iAddress.Id);
-
-            writer.WritePropertyName("addressLine1"u8);
-            writer.WriteStringValue(iAddress.AddressLine1);
-            writer.WritePropertyName("addressLine2"u8);
-            writer.WriteStringValue(iAddress.AddressLine2);
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iAddress.CreatedAt);
-            writer.WritePropertyName("locality"u8);
-            writer.WriteStringValue(iAddress.Locality);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iAddress.ModifiedAt);
-            writer.WritePropertyName("postalCode"u8);
-            writer.WriteStringValue(iAddress.PostalCode);
-            writer.WritePropertyName("region"u8);
-            writer.WriteStringValue(iAddress.Region);
-
-            writer.WriteEndObject();
-        }
     }
 }
 

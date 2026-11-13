@@ -67,40 +67,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="IProfileLink"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="IProfileLink"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not IProfileLink iProfileLink)
-            {
-                throw new ArgumentException("The object shall be an IProfileLink", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("ProfileLink"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iProfileLink.Id);
-
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iProfileLink.CreatedAt);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iProfileLink.ModifiedAt);
-            writer.WritePropertyName("uri"u8);
-            writer.WriteStringValue(iProfileLink.Uri);
-
-            writer.WriteEndObject();
-        }
     }
 }
 

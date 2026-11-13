@@ -131,33 +131,5 @@ namespace Mycelium.Forge.Serializer.Json
             serializationAction(thing, writer);
             await writer.FlushAsync(cancellationToken);
         }
-
-        /// <summary>
-        /// Asynchronously serialize only the value properties of an <see cref="IThing" /> as JSON to a target
-        /// <see cref="Stream" />
-        /// </summary>
-        /// <param name="thing">
-        /// The <see cref="IThing" /> that shall be serialized
-        /// </param>
-        /// <param name="stream">
-        /// The target <see cref="Stream" />
-        /// </param>
-        /// <param name="jsonWriterOptions">
-        /// The <see cref="JsonWriterOptions" /> to use
-        /// </param>
-        /// <param name="cancellationToken">
-        /// The <see cref="CancellationToken" /> used to cancel the operation
-        /// </param>
-        /// <returns>
-        /// A <see cref="Task" /> representing the asynchronous serialization operation.
-        /// </returns>
-        public async Task SerializeValuePropertiesAsync(IThing thing, Stream stream, JsonWriterOptions jsonWriterOptions, CancellationToken cancellationToken)
-        {
-            await using var writer = new Utf8JsonWriter(stream, jsonWriterOptions);
-
-            var serializationAction = SerializationProvider.ProvideValuePropertiesSerializer(thing.GetType());
-            serializationAction(thing, writer);
-            await writer.FlushAsync(cancellationToken);
-        }
     }
 }

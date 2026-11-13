@@ -68,46 +68,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="ICountry"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="ICountry"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not ICountry iCountry)
-            {
-                throw new ArgumentException("The object shall be an ICountry", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("Country"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iCountry.Id);
-
-            writer.WritePropertyName("alpha2Code"u8);
-            writer.WriteStringValue(iCountry.Alpha2Code);
-            writer.WritePropertyName("alpha3Code"u8);
-            writer.WriteStringValue(iCountry.Alpha3Code);
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iCountry.CreatedAt);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iCountry.ModifiedAt);
-            writer.WritePropertyName("name"u8);
-            writer.WriteStringValue(iCountry.Name);
-            writer.WritePropertyName("numericCode"u8);
-            writer.WriteStringValue(iCountry.NumericCode);
-
-            writer.WriteEndObject();
-        }
     }
 }
 

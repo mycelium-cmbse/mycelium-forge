@@ -17,8 +17,6 @@ namespace Mycelium.Forge.Serializer.Json
     using System.Collections.Generic;
     using System.Text.Json;
 
-    using Mycelium.Forge.Common;
-
     /// <summary>
     /// Delegate provider for the appropriate serialization method to serialize a <see cref="Type" />
     /// </summary>
@@ -26,92 +24,52 @@ namespace Mycelium.Forge.Serializer.Json
     {
         /// <summary>
         /// Caches the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for the
-        /// <see cref="System.Type" /> that is to be serialized
+        /// <see cref="System.Type"/> that is to be serialized
         /// </summary>
-        private static readonly Dictionary<Type, Action<object, Utf8JsonWriter>> SerializerActionMap = new()
+        private static readonly Dictionary<System.Type, Action<object, Utf8JsonWriter>> SerializerActionMap = new Dictionary<System.Type, Action<object, Utf8JsonWriter>>
         {
-            { typeof(Account), AccountSerializer.Serialize },
-            { typeof(Address), AddressSerializer.Serialize },
-            { typeof(APIKey), APIKeySerializer.Serialize },
-            { typeof(Country), CountrySerializer.Serialize },
-            { typeof(Forge), ForgeSerializer.Serialize },
-            { typeof(Organization), OrganizationSerializer.Serialize },
-            { typeof(OrganizationInvitation), OrganizationInvitationSerializer.Serialize },
-            { typeof(Package), PackageSerializer.Serialize },
-            { typeof(PackageInvitation), PackageInvitationSerializer.Serialize },
-            { typeof(PackageMetaData), PackageMetaDataSerializer.Serialize },
-            { typeof(PackageType), PackageTypeSerializer.Serialize },
-            { typeof(PackageVersion), PackageVersionSerializer.Serialize },
-            { typeof(ProfileLink), ProfileLinkSerializer.Serialize },
-            { typeof(ProfileType), ProfileTypeSerializer.Serialize }
-        };
-
-        /// <summary>
-        /// Caches the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for value-property-only
-        /// serialization of the <see cref="System.Type" />
-        /// </summary>
-        private static readonly Dictionary<Type, Action<object, Utf8JsonWriter>> ValuePropertiesSerializerActionMap = new()
-        {
-            { typeof(Account), AccountSerializer.SerializeValueProperties },
-            { typeof(Address), AddressSerializer.SerializeValueProperties },
-            { typeof(APIKey), APIKeySerializer.SerializeValueProperties },
-            { typeof(Country), CountrySerializer.SerializeValueProperties },
-            { typeof(Forge), ForgeSerializer.SerializeValueProperties },
-            { typeof(Organization), OrganizationSerializer.SerializeValueProperties },
-            { typeof(OrganizationInvitation), OrganizationInvitationSerializer.SerializeValueProperties },
-            { typeof(Package), PackageSerializer.SerializeValueProperties },
-            { typeof(PackageInvitation), PackageInvitationSerializer.SerializeValueProperties },
-            { typeof(PackageMetaData), PackageMetaDataSerializer.SerializeValueProperties },
-            { typeof(PackageType), PackageTypeSerializer.SerializeValueProperties },
-            { typeof(PackageVersion), PackageVersionSerializer.SerializeValueProperties },
-            { typeof(ProfileLink), ProfileLinkSerializer.SerializeValueProperties },
-            { typeof(ProfileType), ProfileTypeSerializer.SerializeValueProperties }
+            { typeof(Mycelium.Forge.Common.Account), AccountSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Address), AddressSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.APIKey), APIKeySerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Country), CountrySerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Forge), ForgeSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Organization), OrganizationSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.OrganizationInvitation), OrganizationInvitationSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Package), PackageSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageInvitation), PackageInvitationSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageMetaData), PackageMetaDataSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageType), PackageTypeSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.PackageVersion), PackageVersionSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.ProfileLink), ProfileLinkSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.ProfileType), ProfileTypeSerializer.Serialize },
         };
 
         /// <summary>
         /// Provides the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for the
-        /// <see cref="System.Type" /> that is to be serialized
+        /// <see cref="System.Type"/> that is to be serialized
         /// </summary>
         /// <param name="type">
-        /// The subject <see cref="System.Type" /> that is to be serialized
+        /// The subject <see cref="System.Type"/> that is to be serialized
         /// </param>
         /// <returns>
         /// A Delegate of <c>Action&lt;object, Utf8JsonWriter&gt;</c>
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// Thrown when the <see cref="System.Type" /> is not supported.
+        /// Thrown when the <see cref="System.Type"/> is not supported.
         /// </exception>
-        internal static Action<object, Utf8JsonWriter> Provide(Type type)
+        internal static Action<object, Utf8JsonWriter> Provide(System.Type type)
         {
             return !SerializerActionMap.TryGetValue(type, out var action) ? throw new NotSupportedException($"The {type.Name} is not supported by the SerializationProvider.") : action;
         }
 
         /// <summary>
-        /// Provides the delegate <c>Action&lt;object, Utf8JsonWriter&gt;</c> for value-property-only
-        /// serialization of the <see cref="System.Type" />
+        /// Asserts whether the <paramref name="type"/> is supported by the provider
         /// </summary>
         /// <param name="type">
-        /// The subject <see cref="System.Type" /> that is to be serialized
-        /// </param>
-        /// <returns>
-        /// A Delegate of <c>Action&lt;object, Utf8JsonWriter&gt;</c>
-        /// </returns>
-        /// <exception cref="NotSupportedException">
-        /// Thrown when the <see cref="System.Type" /> is not supported.
-        /// </exception>
-        internal static Action<object, Utf8JsonWriter> ProvideValuePropertiesSerializer(Type type)
-        {
-            return !ValuePropertiesSerializerActionMap.TryGetValue(type, out var action) ? throw new NotSupportedException($"The {type.Name} is not supported by the SerializationProvider.") : action;
-        }
-
-        /// <summary>
-        /// Asserts whether the <paramref name="type" /> is supported by the provider
-        /// </summary>
-        /// <param name="type">
-        /// The <see cref="System.Type" /> for which support is asserted
+        /// The <see cref="System.Type"/> for which support is asserted
         /// </param>
         /// <returns></returns>
-        internal static bool IsTypeSupported(Type type)
+        internal static bool IsTypeSupported(System.Type type)
         {
             return SerializerActionMap.ContainsKey(type);
         }

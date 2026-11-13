@@ -150,56 +150,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="IAccount"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="IAccount"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not IAccount iAccount)
-            {
-                throw new ArgumentException("The object shall be an IAccount", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("Account"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iAccount.Id);
-
-            writer.WritePropertyName("avatarBlobReference"u8);
-            writer.WriteStringValue(iAccount.AvatarBlobReference);
-            writer.WritePropertyName("billingEmail"u8);
-            writer.WriteStringValue(iAccount.BillingEmail);
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iAccount.CreatedAt);
-            writer.WritePropertyName("defaultPackageVisibility"u8);
-            writer.WriteStringValue(VisibilityKindProvider.ToUtf8LowerBytes(iAccount.DefaultPackageVisibility));
-            writer.WritePropertyName("email"u8);
-            writer.WriteStringValue(iAccount.Email);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iAccount.ModifiedAt);
-            writer.WritePropertyName("name"u8);
-            writer.WriteStringValue(iAccount.Name);
-            writer.WritePropertyName("origin"u8);
-            writer.WriteStringValue(iAccount.Origin);
-            writer.WritePropertyName("shortName"u8);
-            writer.WriteStringValue(iAccount.ShortName);
-            writer.WritePropertyName("status"u8);
-            writer.WriteStringValue(ScopeStatusKindProvider.ToUtf8LowerBytes(iAccount.Status));
-            writer.WritePropertyName("website"u8);
-            writer.WriteStringValue(iAccount.Website);
-
-            writer.WriteEndObject();
-        }
     }
 }
 

@@ -64,42 +64,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="IPackageType"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="IPackageType"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not IPackageType iPackageType)
-            {
-                throw new ArgumentException("The object shall be an IPackageType", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("PackageType"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iPackageType.Id);
-
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iPackageType.CreatedAt);
-            writer.WritePropertyName("description"u8);
-            writer.WriteStringValue(iPackageType.Description);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iPackageType.ModifiedAt);
-            writer.WritePropertyName("name"u8);
-            writer.WriteStringValue(iPackageType.Name);
-
-            writer.WriteEndObject();
-        }
     }
 }
 

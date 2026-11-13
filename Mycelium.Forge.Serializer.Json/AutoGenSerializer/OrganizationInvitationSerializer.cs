@@ -76,44 +76,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="IOrganizationInvitation"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="IOrganizationInvitation"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not IOrganizationInvitation iOrganizationInvitation)
-            {
-                throw new ArgumentException("The object shall be an IOrganizationInvitation", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("OrganizationInvitation"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iOrganizationInvitation.Id);
-
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iOrganizationInvitation.CreatedAt);
-            writer.WritePropertyName("experiesAt"u8);
-            writer.WriteStringValue(iOrganizationInvitation.ExperiesAt);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iOrganizationInvitation.ModifiedAt);
-            writer.WritePropertyName("organizationInvitationKind"u8);
-            writer.WriteStringValue(OrganizationInvitationKindProvider.ToUtf8LowerBytes(iOrganizationInvitation.OrganizationInvitationKind));
-            writer.WritePropertyName("status"u8);
-            writer.WriteStringValue(InvitationStatusKindProvider.ToUtf8LowerBytes(iOrganizationInvitation.Status));
-
-            writer.WriteEndObject();
-        }
     }
 }
 

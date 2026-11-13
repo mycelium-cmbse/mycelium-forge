@@ -73,46 +73,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="IPackageVersion"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="IPackageVersion"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not IPackageVersion iPackageVersion)
-            {
-                throw new ArgumentException("The object shall be an IPackageVersion", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("PackageVersion"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iPackageVersion.Id);
-
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iPackageVersion.CreatedAt);
-            writer.WritePropertyName("downloadCount"u8);
-            writer.WriteNumberValue(iPackageVersion.DownloadCount);
-            writer.WritePropertyName("listed"u8);
-            writer.WriteBooleanValue(iPackageVersion.Listed);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iPackageVersion.ModifiedAt);
-            writer.WritePropertyName("publicationDate"u8);
-            writer.WriteStringValue(iPackageVersion.PublicationDate);
-            writer.WritePropertyName("version"u8);
-            writer.WriteStringValue(iPackageVersion.Version);
-
-            writer.WriteEndObject();
-        }
     }
 }
 

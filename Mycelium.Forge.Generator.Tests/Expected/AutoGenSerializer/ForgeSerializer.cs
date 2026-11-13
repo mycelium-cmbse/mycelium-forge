@@ -138,44 +138,6 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
-
-        /// <summary>
-        /// Serializes only the value properties of an instance of <see cref="IForge"/> using an <see cref="Utf8JsonWriter"/>
-        /// </summary>
-        /// <param name="obj">
-        /// The <see cref="IForge"/> to serialize
-        /// </param>
-        /// <param name="writer">
-        /// The target <see cref="Utf8JsonWriter"/>
-        /// </param>
-        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
-        {
-            if (obj is not IForge iForge)
-            {
-                throw new ArgumentException("The object shall be an IForge", nameof(obj));
-            }
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("Forge"u8);
-
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iForge.Id);
-
-            writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iForge.CreatedAt);
-            writer.WritePropertyName("description"u8);
-            writer.WriteStringValue(iForge.Description);
-            writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iForge.ModifiedAt);
-            writer.WritePropertyName("name"u8);
-            writer.WriteStringValue(iForge.Name);
-            writer.WritePropertyName("shortName"u8);
-            writer.WriteStringValue(iForge.ShortName);
-
-            writer.WriteEndObject();
-        }
     }
 }
 
