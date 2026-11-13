@@ -1,0 +1,77 @@
+﻿@using Mycelium.Forge.ViewModels.Rows
+@* ------------------------------------------------------------------------------------------------
+<copyright file="PendingRequestRow.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="flex items-center gap-3 py-2.25 w-full">
+    @if (this.Row is OrganizationInvitationRowViewModel organizationRow)
+    {
+        <CollaboratorAvatar Name="@(organizationRow.Organization.Name)"
+                            Size="w-7 h-7"/>
+
+        <a href="@(PageRoutes.GetOrganizationRoute(organizationRow.Organization.ShortName))"
+           class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
+            @(organizationRow.Organization.ShortName)
+        </a>
+
+        <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
+            @(organizationRow.Organization.Name)
+        </span>
+    }
+    else if (this.Row is PackageInvitationRowViewModel packageRow)
+    {
+        <div class="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0">
+            <LucideIcon Name="box"
+                        Size="14"
+                        Class="text-foreground-muted shrink-0"/>
+        </div>
+
+        @if (packageRow.Package != null && packageRow.Scope != null)
+        {
+            <a href="@(PageRoutes.GetPackageRoute(packageRow.Scope.ShortName, packageRow.Package.ShortName))"
+               class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
+                @($"@{packageRow.Scope.ShortName}/{packageRow.Package.ShortName}")
+            </a>
+        }
+        else
+        {
+            <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
+                Private package
+            </span>
+        }
+
+        <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
+            @(packageRow.Package?.Name ?? "Package invitation")
+        </span>
+    }
+
+    <BbBadge Variant="BadgeVariant.Secondary"
+             Class="badge-role text-muted-foreground shrink-0">
+        @(this.Row.RoleName)
+    </BbBadge>
+
+    <span class="text-xs leading-2xs font-normal text-muted-foreground truncate min-w-0">
+        @(this.Row.ExpiresIn)
+    </span>
+
+    <BbButton Variant="ButtonVariant.Default"
+              Size="ButtonSize.Small"
+              Type="ButtonType.Button"
+              OnClick="@(() => this.OnAccept.InvokeAsync(this.Row.Invitation))"
+              Class="pending-accept-button button-sm shrink-0">
+        Accept
+    </BbButton>
+
+    <BbButton Variant="ButtonVariant.Outline"
+              Size="ButtonSize.Small"
+              Type="ButtonType.Button"
+              OnClick="@(() => this.OnReject.InvokeAsync(this.Row.Invitation))"
+              Class="pending-reject-button button-sm shrink-0">
+        Reject
+    </BbButton>
+</div>

@@ -11,11 +11,11 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 {
     using Microsoft.AspNetCore.Components;
 
+    using Mycelium.Forge.Common;
     using Mycelium.Forge.ViewModels.AccountSettings;
-    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
-    /// Represents the pending organization invitations manager component in the account settings page.
+    /// Represents the pending organization and package invitations manager component in the account settings page.
     /// </summary>
     public partial class PendingRequestsManager : ComponentBase
     {
@@ -33,24 +33,24 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         public IPendingRequestsManagerViewModel ViewModel { get; set; }
 
         /// <summary>
-        /// Handles accepting a pending organization invitation asynchronously.
+        /// Handles accepting a pending organization or package invitation asynchronously.
         /// </summary>
-        /// <param name="row">The pending invitation row to accept.</param>
+        /// <param name="invitation">The pending invitation to accept.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnAcceptInvitation(OrganizationInvitationRowViewModel row)
+        private async Task OnAcceptInvitation(IInvitation invitation)
         {
-            await this.ViewModel.AcceptInvitation(row);
+            await this.ViewModel.AcceptInvitation(invitation);
             await this.InvokeAsync(this.StateHasChanged);
         }
 
         /// <summary>
-        /// Handles rejecting a pending organization invitation asynchronously.
+        /// Handles rejecting a pending organization or package invitation asynchronously.
         /// </summary>
-        /// <param name="row">The pending invitation row to reject.</param>
+        /// <param name="invitation">The pending invitation to reject.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnRejectInvitation(OrganizationInvitationRowViewModel row)
+        private async Task OnRejectInvitation(IInvitation invitation)
         {
-            await this.ViewModel.RejectInvitation(row);
+            await this.ViewModel.RejectInvitation(invitation);
             await this.InvokeAsync(this.StateHasChanged);
         }
     }

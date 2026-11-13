@@ -141,13 +141,13 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
+            if (existingThing.Status != InvitationStatusKind.PENDING)
+            {
+                return Error.Forbidden(description: $"Cannot update invitation that is already {existingThing.Status}.");
+            }
+
             if (existingThing.Status != updatedThing.Status)
             {
-                if (existingThing.Status != InvitationStatusKind.PENDING)
-                {
-                    return Error.Forbidden(description: $"Cannot change status of invitation that is already {existingThing.Status}.");
-                }
-
                 if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                 {
                     if (existingThing.ExperiesAt <= DateTime.UtcNow)
@@ -197,7 +197,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Error.Forbidden(description: $"Unsupported invitation status transition to {updatedThing.Status}.");
             }
 
-            if (existingThing.Owner == accountId || existingThing.Target == accountId)
+            if (existingThing.Owner == accountId)
             {
                 return Result.Success;
             }
@@ -205,6 +205,18 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
             {
                 return Result.Success;
+            }
+
+            var updateScopeResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Organization]);
+
+            if (!updateScopeResult.IsError && updateScopeResult.Value.Count > 0)
+            {
+                var organization = updateScopeResult.Value[0];
+
+                if (organization.Administrator.Contains(accountId))
+                {
+                    return Result.Success;
+                }
             }
 
             return Error.Forbidden(description: "Access denied: you are not a party to this invitation.");

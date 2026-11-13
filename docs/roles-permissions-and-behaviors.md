@@ -1,4 +1,4 @@
-# Mycelium Forge — Roles, Permissions, and Behaviors Specification
+﻿# Mycelium Forge — Roles, Permissions, and Behaviors Specification
 
 **Applies to:** `mycelium-forge`  
 **Component:** `Mycelium.Forge.Generator`, `Mycelium.Forge.Dal`, `Mycelium.Forge`  
@@ -236,17 +236,23 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
 - **Configuration Keys:** `ConfigurationKeys`
   - `ScopeEntity`: Scope entity the user is invited to (`Organization` or `Package`).
   - `ScopeProperty`: Property referencing the target scope on the invitation (`Scope` or defaults to `ScopeEntity`).
-  - `ScopeRoles`: Roles on the scope entity that have authority to issue/revoke invitations (`Administrator`, `PackageOwner`, `PackageMaintainer`).
+  - `ScopeRoles`: Roles on the scope entity authorized to create, read, resend, and revoke invitations (`Administrator` for `Organization`, `PackageOwner` for `Package`).
   - `InviteeProperty`: Property holding the target invited account (`Target`).
   - `OwnerProperty`: Property holding the invitation sender/creator (`Owner`).
   - `CreatePermission`: Permission required to send invitation (`ManageOrganizationMembers` / `ManagePackageTeam`).
   - `ReadPermission`: Permission required to view invitations (`ViewOrganizationMemberList` / `ManagePackageTeam`).
-  - `AdminPermission`: Administrative override permission (`ManageOrganizations` / `ManagePackageTeam`).
+  - `AdminPermission`: Administrative override permission (`ManageOrganizations` for `OrganizationInvitation`, `ManagePackageTeam` for `PackageInvitation`).
   - `BypassPermissions`: Permissions that bypass read filtering.
+- **Configured Permission Asymmetry (Intentional):**
+  - `OrganizationInvitation` sets `AdminPermission` to `ManageOrganizations`, which only `InstallationAdministrator` holds.
+  - `PackageInvitation` sets `AdminPermission` to `ManagePackageTeam`, which `OrganizationAdministrator` also holds globally in `RolePermissionMap`. Consequently, `OrganizationAdministrator` holds the global administrative override for `PackageInvitation` actions (including accepting/rejecting or resending/revoking any `PackageInvitation`), whereas for `OrganizationInvitation` only `InstallationAdministrator` has that global override.
 - **Enforcement Logic:**
-  - **Accept:** Permitted only if the caller's Account ID matches the invitation's `InviteeProperty` (`Target`).
-  - **Revoke:** Permitted if the caller is the invitation creator, an administrator/maintainer of the scope entity, or has `AdminPermission`.
-  - **Read:** Permitted for the invitee, the invitation creator, and scope administrators.
+  - **Create:** Permitted for callers with `AdminPermission` or membership in `ScopeRoles` on the target scope entity (`Administrator` / `PackageOwner`).
+  - **Accept / Reject:** Permitted only while `Status == PENDING` and not expired (`ExperiesAt > DateTime.UtcNow`), without modifying non-status fields (`ExperiesAt`, `*InvitationKind`, `Organization`/`Package`, `Target`, `Owner`), and only if the caller matches `Target` or holds `AdminPermission`.
+  - **Revoke:** Permitted while `Status == PENDING` if the caller is the invitation creator (`Owner`), belongs to `ScopeRoles`, or holds revoke override permission (`ManageOrganizations` / `ManageOrganizationMembers` for orgs; `AdminPermission` for packages).
+  - **Resend (same-status `PENDING` update):** Permitted for the creator (`Owner`), `ScopeRoles`, or `AdminPermission`.
+  - **Terminal State Guard:** Updates are denied once `Status` is no longer `PENDING`.
+  - **Read:** Permitted for the invitee (`Target`), creator (`Owner`), members of `ScopeRoles`, or callers with read/admin permission.
 
 ---
 

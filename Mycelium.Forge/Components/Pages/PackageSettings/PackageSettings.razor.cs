@@ -16,6 +16,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageSettings.Dialogs;
     using Mycelium.Forge.Models.Common;
+    using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
     /// <summary>
@@ -119,18 +120,155 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
-        /// Handles the action to add a new maintainer to the package.
+        /// Handles opening the modal dialog to invite a new maintainer or owner to the package asynchronously.
         /// </summary>
-        private static void OnAddMaintainer()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnAddMaintainer()
         {
+            var onResult = new EventCallbackFactory().Create<InvitePackageCollaboratorResult>(this, async result =>
+            {
+                await this.ViewModel.InviteCollaborator(result.TargetAccount, result.Role);
+                await this.InvokeAsync(this.StateHasChanged);
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(AddMaintainerDialog.Package), this.ViewModel.Package },
+                { nameof(AddMaintainerDialog.PendingInvitations), this.ViewModel.PendingInvitations },
+                { nameof(AddMaintainerDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Add maintainer"
+            };
+
+            await this.DialogService.OpenAsync<AddMaintainerDialog>(parameters, options);
         }
 
         /// <summary>
-        /// Handles opening the options menu for the specified maintainer.
+        /// Handles opening the modal dialog to change the role of the specified collaborator asynchronously.
         /// </summary>
-        /// <param name="maintainer">The target maintainer account.</param>
-        private static void OnMaintainerMenu(IAccount maintainer)
+        /// <param name="collaborator">The target collaborator account.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnChangeCollaboratorRole(IAccount collaborator)
         {
+            var currentRole = this.GetCollaboratorRole(collaborator);
+
+            var onResult = new EventCallbackFactory().Create<PackageInvitationKind>(this, async newRole =>
+            {
+                if (newRole != currentRole)
+                {
+                    await this.ViewModel.ChangeCollaboratorRole(collaborator, newRole);
+                    await this.InvokeAsync(this.StateHasChanged);
+                }
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(ChangeCollaboratorRoleDialog.Collaborator), collaborator },
+                { nameof(ChangeCollaboratorRoleDialog.CurrentRole), currentRole },
+                { nameof(ChangeCollaboratorRoleDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Change role"
+            };
+
+            await this.DialogService.OpenAsync<ChangeCollaboratorRoleDialog>(parameters, options);
+        }
+
+        /// <summary>
+        /// Navigates to the profile page of the specified collaborator account.
+        /// </summary>
+        /// <param name="collaborator">The target collaborator account.</param>
+        private void OnViewCollaboratorProfile(IAccount collaborator)
+        {
+            this.NavigationManager.NavigateTo(PageRoutes.GetAccountRoute(collaborator.ShortName));
+        }
+
+        /// <summary>
+        /// Prompts confirmation to remove the specified collaborator from the package asynchronously.
+        /// </summary>
+        /// <param name="collaborator">The target collaborator account.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnRemoveCollaborator(IAccount collaborator)
+        {
+            var dialogOptions = new ConfirmDialogOptions
+            {
+                Destructive = true
+            };
+
+            var dialogResult = await this.DialogService.ConfirmAsync("Collaborator Removal", "Are you sure you want to remove this collaborator from the package?", dialogOptions);
+
+            if (dialogResult.Confirmed)
+            {
+                await this.ViewModel.RemoveCollaborator(collaborator);
+            }
+        }
+
+        /// <summary>
+        /// Handles resending a pending package invitation asynchronously.
+        /// </summary>
+        /// <param name="invitation">The invitation to resend.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnResendInvitation(PackageInvitation invitation)
+        {
+            await this.ViewModel.ResendInvitation(invitation);
+        }
+
+        /// <summary>
+        /// Handles revoking a pending package invitation asynchronously.
+        /// </summary>
+        /// <param name="invitation">The invitation to revoke.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnRevokeInvitation(PackageInvitation invitation)
+        {
+            await this.ViewModel.RevokeInvitation(invitation);
+        }
+
+        /// <summary>
+        /// Resolves the role of the specified collaborator within the package.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account.</param>
+        /// <returns>The <see cref="PackageInvitationKind" /> representing the collaborator's role.</returns>
+        private PackageInvitationKind GetCollaboratorRole(IAccount collaborator)
+        {
+            return this.ViewModel.Package.PackageOwner.Contains(collaborator.Id)
+                ? PackageInvitationKind.OWNER
+                : PackageInvitationKind.MAINTAINER;
+        }
+
+        /// <summary>
+        /// Determines whether role change or removal actions are disabled for the specified collaborator.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account.</param>
+        /// <returns><c>true</c> if the actions are disabled; otherwise, <c>false</c>.</returns>
+        private bool IsCollaboratorActionDisabled(IAccount collaborator)
+        {
+            return !this.ViewModel.CanManagePackageTeam || collaborator.Id == this.ViewModel.CurrentUserId || this.IsSolePackageOwner(collaborator);
+        }
+
+        /// <summary>
+        /// Determines whether the specified collaborator is the sole owner of the package.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account.</param>
+        /// <returns><c>true</c> if the collaborator is the sole package owner; otherwise, <c>false</c>.</returns>
+        private bool IsSolePackageOwner(IAccount collaborator)
+        {
+            return this.ViewModel.Package.PackageOwner.Count == 1 && this.ViewModel.Package.PackageOwner.Contains(collaborator.Id);
+        }
+
+        /// <summary>
+        /// Gets the display short name of the target account associated with a given package invitation.
+        /// </summary>
+        /// <param name="invitation">The package invitation.</param>
+        /// <returns>The short name of the target account.</returns>
+        private string GetInvitationTargetName(IPackageInvitation invitation)
+        {
+            var target = this.ViewModel.InvitedAccounts.FirstOrDefault(a => a.Id == invitation.Target);
+            return target?.ShortName ?? "Unknown";
         }
 
         /// <summary>

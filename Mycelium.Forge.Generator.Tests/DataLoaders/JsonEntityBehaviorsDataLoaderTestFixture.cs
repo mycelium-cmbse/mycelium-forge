@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="JsonEntityBehaviorsDataLoaderTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -47,6 +47,11 @@ namespace Mycelium.Forge.Generator.Tests.DataLoaders
                 Assert.That(packageBehavior.Configuration.ContainsKey("PersonalCreatePermission"), Is.True);
                 Assert.That(packageBehavior.Configuration["BypassPermissions"], Is.EqualTo("ViewAllOrganizations,ManageOrganizations"));
                 Assert.That(packageBehavior.Configuration["bypasspermissions"], Is.EqualTo("ViewAllOrganizations,ManageOrganizations"));
+
+                var packageInvitationBehavior = result["PackageInvitation"];
+                Assert.That(packageInvitationBehavior.EntityName, Is.EqualTo("PackageInvitation"));
+                Assert.That(packageInvitationBehavior.BehaviorType, Is.EqualTo("InvitationWorkflow"));
+                Assert.That(packageInvitationBehavior.Configuration["ScopeRoles"], Is.EqualTo("PackageOwner"));
             }
         }
     }

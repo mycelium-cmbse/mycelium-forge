@@ -57,7 +57,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
+            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)").ToList();
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -100,7 +100,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
+            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)").ToList();
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -143,11 +143,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var isAsync = this.IsAsyncMethod(Operations.Update);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
+            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)").ToList();
             var revokePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
-            
+
             var failUnauth = PermissionStatementHelper.GetUnauthorizedReturn("\"Unauthenticated user cannot respond to an invitation.\"", isAsync);
-            var failAlready = PermissionStatementHelper.GetFailReturn("$\"Cannot change status of invitation that is already {existingThing.Status}.\"", isAsync);
+            var failAlready = PermissionStatementHelper.GetFailReturn("$\"Cannot update invitation that is already {existingThing.Status}.\"", isAsync);
             var failExpired = PermissionStatementHelper.GetFailReturn("\"Cannot respond to an invitation that has expired.\"", isAsync);
             var failModified = PermissionStatementHelper.GetFailReturn("\"Cannot modify invitation details when accepting or rejecting an invitation.\"", isAsync);
             var failNotInvitee = PermissionStatementHelper.GetFailReturn("\"Access denied: only the invited target account can accept or reject the invitation.\"", isAsync);
@@ -164,13 +164,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var accountId = userContext.AccountId.Value;
 
+                                               if (existingThing.Status != InvitationStatusKind.PENDING)
+                                               {
+                                                   {{failAlready}}
+                                               }
+
                                                if (existingThing.Status != updatedThing.Status)
                                                {
-                                                   if (existingThing.Status != InvitationStatusKind.PENDING)
-                                                   {
-                                                       {{failAlready}}
-                                                   }
-
                                                    if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                                                    {
                                                        if (existingThing.ExperiesAt <= DateTime.UtcNow)
@@ -220,7 +220,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                    {{failUnsupported}}
                                                }
 
-                                               if (existingThing.Owner == accountId || existingThing.{{config.InviteeProperty}} == accountId)
+                                               if (existingThing.Owner == accountId)
                                                {
                                                    {{okParty}}
                                                }
@@ -228,6 +228,18 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
                                                {
                                                    {{okAdmin}}
+                                               }
+
+                                               var updateScopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.{{config.ScopeProperty}}]);
+
+                                               if (!updateScopeResult.IsError && updateScopeResult.Value.Count > 0)
+                                               {
+                                                   var {{config.ScopeVar}} = updateScopeResult.Value[0];
+
+                                                   if ({{string.Join(" || ", scopeRoleChecks)}})
+                                                   {
+                                                       {{okParty}}
+                                                   }
                                                }
 
                                                {{failNotParty}}
@@ -244,7 +256,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
+            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)").ToList();
             var deletePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
 
             stringBuilder.Append($$"""

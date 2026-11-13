@@ -29,6 +29,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
     public class PackageSettingsViewModel : IPackageSettingsViewModel
     {
         /// <summary>
+        /// The default number of days before a sent or resent invitation expires.
+        /// </summary>
+        private const int InvitationExpirationDays = 7;
+
+        /// <summary>
         /// The (injected) <see cref="IAccountService" /> used to retrieve account data.
         /// </summary>
         private readonly IAccountService accountService;
@@ -47,6 +52,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// The (injected) <see cref="INotificationService" /> used to emit notifications.
         /// </summary>
         private readonly INotificationService notificationService;
+
+        /// <summary>
+        /// The (injected) <see cref="IPackageInvitationService" /> used to manage package invitations.
+        /// </summary>
+        private readonly IPackageInvitationService packageInvitationService;
 
         /// <summary>
         /// The (injected) <see cref="IPackagePermissionService" /> used to validate package permissions.
@@ -81,17 +91,19 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <param name="scopeService">The (injected) <see cref="IScopeService" />.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" />.</param>
         /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
+        /// <param name="packageInvitationService">The (injected) <see cref="IPackageInvitationService" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="packagePermissionService">The (injected) <see cref="IPackagePermissionService" />.</param>
         /// <param name="notificationService">The (injected) <see cref="INotificationService" />.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackageSettingsViewModel}" />.</param>
-        public PackageSettingsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IAccountService accountService, IUserService userService, IPackagePermissionService packagePermissionService, INotificationService notificationService, ILogger<PackageSettingsViewModel> logger)
+        public PackageSettingsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IAccountService accountService, IPackageInvitationService packageInvitationService, IUserService userService, IPackagePermissionService packagePermissionService, INotificationService notificationService, ILogger<PackageSettingsViewModel> logger)
         {
             this.databaseSource = databaseSource;
             this.packageService = packageService;
             this.scopeService = scopeService;
             this.packageVersionService = packageVersionService;
             this.accountService = accountService;
+            this.packageInvitationService = packageInvitationService;
             this.userService = userService;
             this.packagePermissionService = packagePermissionService;
             this.notificationService = notificationService;
@@ -124,6 +136,16 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         public List<IAccount> Owners { get; set; } = [];
 
         /// <summary>
+        /// Gets or sets the collection of pending invitations for the package.
+        /// </summary>
+        public List<PackageInvitation> PendingInvitations { get; set; } = [];
+
+        /// <summary>
+        /// Gets or sets the collection of accounts that have pending invitations for the package.
+        /// </summary>
+        public List<IAccount> InvitedAccounts { get; set; } = [];
+
+        /// <summary>
         /// Gets or sets the collection of released package versions.
         /// </summary>
         public List<PackageVersion> Versions { get; set; } = [];
@@ -134,9 +156,19 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         public bool CanManagePackage { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage the package team.
+        /// </summary>
+        public bool CanManagePackageTeam { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to delete the package.
         /// </summary>
         public bool CanDeletePackage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique identifier of the currently authenticated user.
+        /// </summary>
+        public Guid CurrentUserId { get; set; }
 
         /// <summary>
         /// Initializes the package settings view model state for the specified package short name and scope asynchronously.
@@ -151,11 +183,16 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             if (packageResult.IsError)
             {
+                this.PendingInvitations = [];
+                this.InvitedAccounts = [];
+                this.CanManagePackageTeam = false;
                 this.logger.LogWarning("Package {Scope}/{Name} not found during settings initialization: {Errors}", scope.SanitizeForLog(), packageShortname.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
                 return;
             }
 
             this.Package = (Package)packageResult.Value;
+            this.CurrentUserId = this.UserContext.AccountId ?? Guid.Empty;
+            this.CanManagePackageTeam = (this.UserContext.AccountId.HasValue && this.Package.PackageOwner.Contains(this.UserContext.AccountId.Value)) || PermissionGuard.HasPermission(this.UserContext, PermissionKind.ManagePackageTeam);
 
             var ownerTask = this.scopeService.ReadOrNull(this.UserContext, this.Package.Owner);
             var maintainersTask = this.accountService.ReadOrEmpty(this.UserContext, this.Package.PackageMaintainer);
@@ -163,8 +200,9 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             var versionsTask = this.packageVersionService.ReadOrEmpty(this.UserContext, this.Package.Version);
             var canUpdatePackageTask = this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.UserContext, this.Package);
             var canDeletePackageTask = this.packagePermissionService.IsAllowedToDelete(this.databaseSource, this.UserContext, this.Package);
+            var invitationsTask = this.packageInvitationService.ReadByPackageAsync(this.UserContext, this.Package.Id);
 
-            await Task.WhenAll(ownerTask, maintainersTask, ownersTask, versionsTask, canUpdatePackageTask, canDeletePackageTask);
+            await Task.WhenAll(ownerTask, maintainersTask, ownersTask, versionsTask, canUpdatePackageTask, canDeletePackageTask, invitationsTask);
 
             this.Owner = ownerTask.Result;
             this.Maintainers = [.. maintainersTask.Result];
@@ -172,6 +210,18 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             this.Versions = [.. versionsTask.Result.Cast<PackageVersion>().OrderByDescending(v => v.PublicationDate)];
             this.CanManagePackage = canUpdatePackageTask.Result.IsSuccess;
             this.CanDeletePackage = canDeletePackageTask.Result.IsSuccess;
+
+            if (!invitationsTask.Result.IsError)
+            {
+                this.PendingInvitations = [.. invitationsTask.Result.Value.OfType<PackageInvitation>().Where(i => i.Package == this.Package.Id && i.Status == InvitationStatusKind.PENDING)];
+                var pendingTargetIds = this.PendingInvitations.Select(i => i.Target).Distinct().ToList();
+                this.InvitedAccounts = [.. await this.accountService.ReadOrEmpty(this.UserContext, pendingTargetIds)];
+            }
+            else
+            {
+                this.PendingInvitations = [];
+                this.InvitedAccounts = [];
+            }
         }
 
         /// <summary>
@@ -342,6 +392,175 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             this.notificationService.AddNotification("Package deleted successfully.", "Package Deleted", NotificationType.Success);
             return Result.Success;
+        }
+
+        /// <summary>
+        /// Invites an account to collaborate on the package with the specified role asynchronously.
+        /// </summary>
+        /// <param name="target">The target account being invited.</param>
+        /// <param name="role">The invitation role to grant.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A task indicating the success or failure of the operation.</returns>
+        public async Task<ErrorOr<Success>> InviteCollaborator(IAccount target, PackageInvitationKind role, CancellationToken token = default)
+        {
+            var invitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Package = this.Package.Id,
+                Target = target.Id,
+                Owner = this.CurrentUserId,
+                PackageInvitationKind = role,
+                Status = InvitationStatusKind.PENDING,
+                ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays)
+            };
+
+            var createResult = await this.packageInvitationService.CreateAsync(this.UserContext, [invitation], token);
+
+            if (createResult.IsError)
+            {
+                const string errorMessage = "Failed to send invitation.";
+
+                this.logger.LogError(errorMessage + " Target: {TargetId} Errors: {Errors}", target.Id, createResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
+                return createResult.Errors;
+            }
+
+            this.PendingInvitations.Add(invitation);
+            this.InvitedAccounts.AddOrReplace(target);
+
+            this.notificationService.AddNotification($"Invitation sent to {target.Name}.", "Invitation Sent", NotificationType.Success);
+            return Result.Success;
+        }
+
+        /// <summary>
+        /// Resends the specified pending package invitation asynchronously.
+        /// </summary>
+        /// <param name="invitation">The invitation to resend.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task ResendInvitation(PackageInvitation invitation, CancellationToken token = default)
+        {
+            var invitationClone = invitation.Clone();
+            invitationClone.ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays);
+
+            var updateResult = await this.packageInvitationService.UpdateAsync(this.UserContext, [invitationClone], token);
+
+            if (updateResult.IsError)
+            {
+                const string errorMessage = "Failed to resend invitation.";
+
+                this.logger.LogError(errorMessage + " Invitation: {InvitationId} Errors: {Errors}", invitation.Id, updateResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
+                return;
+            }
+
+            this.PendingInvitations.Replace(invitation, invitationClone);
+            this.notificationService.AddNotification("Invitation resent successfully.", "Invitation Resent", NotificationType.Success);
+        }
+
+        /// <summary>
+        /// Revokes the specified pending package invitation asynchronously.
+        /// </summary>
+        /// <param name="invitation">The invitation to revoke.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task RevokeInvitation(PackageInvitation invitation, CancellationToken token = default)
+        {
+            var invitationClone = invitation.Clone();
+            invitationClone.Status = InvitationStatusKind.REVOKED;
+
+            var updateResult = await this.packageInvitationService.UpdateAsync(this.UserContext, [invitationClone], token);
+
+            if (updateResult.IsError)
+            {
+                const string errorMessage = "Failed to revoke invitation.";
+
+                this.logger.LogError(errorMessage + " Invitation: {InvitationId} Errors: {Errors}", invitation.Id, updateResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
+                return;
+            }
+
+            this.PendingInvitations.Remove(invitation);
+            this.notificationService.AddNotification("Invitation revoked successfully.", "Invitation Revoked", NotificationType.Success);
+        }
+
+        /// <summary>
+        /// Changes the role of the specified package collaborator asynchronously.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account whose role is changing.</param>
+        /// <param name="newRole">The new package role to assign.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task ChangeCollaboratorRole(IAccount collaborator, PackageInvitationKind newRole, CancellationToken token = default)
+        {
+            var packageClone = this.Package.Clone();
+
+            if (newRole == PackageInvitationKind.OWNER)
+            {
+                packageClone.PackageOwner.AddIfNotExisting(collaborator.Id);
+                packageClone.PackageMaintainer.Remove(collaborator.Id);
+            }
+            else
+            {
+                packageClone.PackageOwner.Remove(collaborator.Id);
+                packageClone.PackageMaintainer.AddIfNotExisting(collaborator.Id);
+            }
+
+            var updateResult = await this.packageService.UpdateAsync(this.UserContext, [packageClone], token);
+
+            if (updateResult.IsError)
+            {
+                const string errorMessage = "Failed to update collaborator role.";
+
+                this.logger.LogError(errorMessage + " Account: {AccountId} Errors: {Errors}", collaborator.Id, updateResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Role Update Error", NotificationType.Error);
+                return;
+            }
+
+            this.Package = packageClone;
+
+            if (newRole == PackageInvitationKind.OWNER)
+            {
+                this.Maintainers.RemoveAll(account => account.Id == collaborator.Id);
+                this.Owners.AddOrReplace(collaborator);
+            }
+            else
+            {
+                this.Owners.RemoveAll(account => account.Id == collaborator.Id);
+                this.Maintainers.AddOrReplace(collaborator);
+            }
+
+            this.notificationService.AddNotification($"Role updated to {newRole.ToUpperCaseFirst()} for {collaborator.Name}.", "Role Updated", NotificationType.Success);
+        }
+
+        /// <summary>
+        /// Removes the specified collaborator from the package asynchronously.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account to remove.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public async Task RemoveCollaborator(IAccount collaborator, CancellationToken token = default)
+        {
+            var packageClone = this.Package.Clone();
+            packageClone.PackageOwner.Remove(collaborator.Id);
+            packageClone.PackageMaintainer.Remove(collaborator.Id);
+
+            var updateResult = await this.packageService.UpdateAsync(this.UserContext, [packageClone], token);
+
+            if (updateResult.IsError)
+            {
+                const string errorMessage = "Failed to remove collaborator from package.";
+
+                this.logger.LogError(errorMessage + " Account: {AccountId} Errors: {Errors}", collaborator.Id, updateResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Removal Error", NotificationType.Error);
+                return;
+            }
+
+            this.Package = packageClone;
+            this.Owners.RemoveAll(account => account.Id == collaborator.Id);
+            this.Maintainers.RemoveAll(account => account.Id == collaborator.Id);
+
+            this.notificationService.AddNotification($"{collaborator.Name} has been removed from the package.", "Collaborator Removed", NotificationType.Success);
         }
     }
 }

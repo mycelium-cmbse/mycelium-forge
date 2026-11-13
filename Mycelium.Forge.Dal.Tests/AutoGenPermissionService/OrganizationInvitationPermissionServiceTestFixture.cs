@@ -21,9 +21,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
     using NUnit.Framework;
 
-    /// <summary>
-    /// Test fixture for <see cref="OrganizationInvitationPermissionService" />.
-    /// </summary>
     [TestFixture]
     public class OrganizationInvitationPermissionServiceTestFixture
     {
@@ -39,9 +36,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         private UserContext adminUserContext;
         private UserContext anonymousUserContext;
 
-        /// <summary>
-        /// Sets up mock dependencies and test context before each test.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -89,112 +83,227 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             };
         }
 
-        /// <summary>
-        /// Verifies the <see cref="OrganizationInvitationPermissionService.IsAllowedToCreate" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToCreate()
         {
-            var org = new Organization
-            {
-                Id = this.organizationId,
-                Administrator = [this.userId],
-                Member = [this.userId]
-            };
+            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId], Member = [this.userId] };
+            var invitation = this.CreateInvitation(this.organizationId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
 
-            var invitation = new OrganizationInvitation
-            {
-                Id = Guid.NewGuid(),
-                Owner = this.organizationId,
-                Target = this.otherUserId
-            };
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
 
-            this.organizationServiceMock.Setup(x => x.ReadAsync(
-                    It.IsAny<IUserContext>(),
-                    It.IsAny<NpgsqlTransaction>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<Guid[]>()))
-                .ReturnsAsync(ImmutableList.Create<IOrganization>(org));
-
+            // Case 1: Anonymous user is denied
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, invitation, this.transaction);
-            var targetResult = await this.permissionService.IsAllowedToCreate(this.targetUserContext, invitation, this.transaction);
-            var adminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, invitation, this.transaction);
+            Assert.That(unauthResult.IsError, Is.True);
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(unauthResult.IsError, Is.True);
-                Assert.That(targetResult.IsError, Is.True);
-                Assert.That(adminResult.IsError, Is.False);
-            }
+            // Case 2: Non-administrator target user is denied
+            var targetResult = await this.permissionService.IsAllowedToCreate(this.targetUserContext, invitation, this.transaction);
+            Assert.That(targetResult.IsError, Is.True);
+
+            // Case 3: Organization administrator is allowed
+            var adminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, invitation, this.transaction);
+            Assert.That(adminResult.IsError, Is.False);
         }
 
-        /// <summary>
-        /// Verifies the <see cref="OrganizationInvitationPermissionService.IsAllowedToRead" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
+        [Test]
+        public async Task VerifyIsAllowedToDelete()
+        {
+            var orgAdmin2Id = Guid.NewGuid();
+            var orgAdmin2Context = CreateOrganizationAdminContext(orgAdmin2Id);
+            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId, orgAdmin2Id], Member = [this.userId, orgAdmin2Id] };
+            var invitation = this.CreateInvitation(this.userId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
+
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            // Case 1: Anonymous user is denied
+            var unauthResult = await this.permissionService.IsAllowedToDelete(this.anonymousUserContext, invitation, this.transaction);
+            Assert.That(unauthResult.IsError, Is.True);
+
+            // Case 2: Creator is allowed
+            var creatorResult = await this.permissionService.IsAllowedToDelete(this.orgAdminUserContext, invitation, this.transaction);
+            Assert.That(creatorResult.IsError, Is.False);
+
+            // Case 3: Organization administrator is allowed
+            var orgAdminNotCreatorResult = await this.permissionService.IsAllowedToDelete(orgAdmin2Context, invitation, this.transaction);
+            Assert.That(orgAdminNotCreatorResult.IsError, Is.False);
+
+            // Case 4: Third party is denied
+            var thirdPartyResult = await this.permissionService.IsAllowedToDelete(this.thirdPartyUserContext, invitation, this.transaction);
+            Assert.That(thirdPartyResult.IsError, Is.True);
+
+            // Case 5: Installation administrator is allowed
+            var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, invitation, this.transaction);
+            Assert.That(adminResult.IsError, Is.False);
+        }
+
         [Test]
         public async Task VerifyIsAllowedToRead()
         {
-            var invitation = new OrganizationInvitation
-            {
-                Id = Guid.NewGuid(),
-                Owner = this.userId,
-                Target = this.otherUserId
-            };
+            var invitation = this.CreateInvitation(this.userId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
 
-            this.organizationServiceMock.Setup(x => x.ReadAsync(
-                    It.IsAny<IUserContext>(),
-                    It.IsAny<NpgsqlTransaction>(),
-                    It.IsAny<CancellationToken>(),
-                    It.IsAny<Guid[]>()))
-                .ReturnsAsync(ImmutableList<IOrganization>.Empty);
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IOrganization>.Empty);
 
+            // Case 1: Owner is allowed
             var ownerResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, invitation, this.transaction);
-            var targetResult = await this.permissionService.IsAllowedToRead(this.targetUserContext, invitation, this.transaction);
-            var thirdPartyResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation, this.transaction);
+            Assert.That(ownerResult.IsError, Is.False);
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(ownerResult.IsError, Is.False);
-                Assert.That(targetResult.IsError, Is.False);
-                Assert.That(thirdPartyResult.IsError, Is.True);
-            }
+            // Case 2: Target user is allowed
+            var targetResult = await this.permissionService.IsAllowedToRead(this.targetUserContext, invitation, this.transaction);
+            Assert.That(targetResult.IsError, Is.False);
+
+            // Case 3: Third party user is denied when organization cannot be resolved
+            var thirdPartyResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation, this.transaction);
+            Assert.That(thirdPartyResult.IsError, Is.True);
         }
 
-        /// <summary>
-        /// Verifies the <see cref="OrganizationInvitationPermissionService.IsAllowedToUpdate" /> method.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyIsAllowedToUpdate()
         {
-            var existingInvitation = new OrganizationInvitation
-            {
-                Id = Guid.NewGuid(),
-                Owner = this.userId,
-                Target = this.otherUserId
-            };
+            var orgAdmin2Id = Guid.NewGuid();
+            var orgAdmin2Context = CreateOrganizationAdminContext(orgAdmin2Id);
+            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId, orgAdmin2Id], Member = [this.userId, orgAdmin2Id] };
+            var existingInvitation = this.CreateInvitation(this.userId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
+            var updatedInvitation = existingInvitation.Clone();
 
-            var updatedInvitation = new OrganizationInvitation
-            {
-                Id = existingInvitation.Id,
-                Owner = this.userId,
-                Target = this.otherUserId
-            };
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
 
+            // Case 1: Target keeping PENDING status unchanged is denied
             var targetResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, updatedInvitation, this.transaction);
+            Assert.That(targetResult.IsError, Is.True);
+
+            // Case 2: Creator updating PENDING invitation is allowed
             var creatorResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingInvitation, updatedInvitation, this.transaction);
+            Assert.That(creatorResult.IsError, Is.False);
+
+            // Case 3: Other organization administrator updating PENDING invitation is allowed
+            var orgAdminNotCreatorResult = await this.permissionService.IsAllowedToUpdate(orgAdmin2Context, existingInvitation, updatedInvitation, this.transaction);
+            Assert.That(orgAdminNotCreatorResult.IsError, Is.False);
+
+            // Case 4: Third party is denied
             var thirdPartyResult = await this.permissionService.IsAllowedToUpdate(this.thirdPartyUserContext, existingInvitation, updatedInvitation, this.transaction);
+            Assert.That(thirdPartyResult.IsError, Is.True);
+
+            // Case 5: Installation administrator is allowed
             var adminResult = await this.permissionService.IsAllowedToUpdate(this.adminUserContext, existingInvitation, updatedInvitation, this.transaction);
+            Assert.That(adminResult.IsError, Is.False);
+
+            // Case 6: Target modifying expiration while keeping PENDING is denied
+            var targetModifiedExpiryWhilePending = existingInvitation.Clone();
+            targetModifiedExpiryWhilePending.ExperiesAt = existingInvitation.ExperiesAt.AddDays(1);
+            var targetModifiedExpiryPendingResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, targetModifiedExpiryWhilePending, this.transaction);
+            Assert.That(targetModifiedExpiryPendingResult.IsError, Is.True);
+
+            // Case 7: Target modifying role kind while keeping PENDING is denied
+            var targetModifiedKindWhilePending = existingInvitation.Clone();
+            targetModifiedKindWhilePending.OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR;
+            var targetModifiedKindPendingResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, targetModifiedKindWhilePending, this.transaction);
+            Assert.That(targetModifiedKindPendingResult.IsError, Is.True);
+
+            // Case 8: Target accepting valid PENDING invitation is allowed; third party is denied
+            var acceptInvitation = existingInvitation.Clone();
+            acceptInvitation.Status = InvitationStatusKind.ACCEPTED;
+            var targetAcceptResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, acceptInvitation, this.transaction);
+            var thirdPartyAcceptResult = await this.permissionService.IsAllowedToUpdate(this.thirdPartyUserContext, existingInvitation, acceptInvitation, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(targetResult.IsError, Is.False);
-                Assert.That(creatorResult.IsError, Is.False);
-                Assert.That(thirdPartyResult.IsError, Is.True);
-                Assert.That(adminResult.IsError, Is.False);
+                Assert.That(targetAcceptResult.IsError, Is.False);
+                Assert.That(thirdPartyAcceptResult.IsError, Is.True);
             }
+
+            // Case 9: Target modifying expiration or role while accepting is denied
+            var acceptModifiedExpiry = acceptInvitation.Clone();
+            acceptModifiedExpiry.ExperiesAt = existingInvitation.ExperiesAt.AddDays(2);
+            var targetAcceptModifiedExpiryResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, acceptModifiedExpiry, this.transaction);
+
+            var acceptModifiedKind = acceptInvitation.Clone();
+            acceptModifiedKind.OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR;
+            var targetAcceptModifiedKindResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, acceptModifiedKind, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(targetAcceptModifiedExpiryResult.IsError, Is.True);
+                Assert.That(targetAcceptModifiedKindResult.IsError, Is.True);
+            }
+
+            // Case 10: Expired invitation accept and reject are denied
+            var expiredInvitation = this.CreateInvitation(this.userId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddMinutes(-5));
+            var expiredAccept = expiredInvitation.Clone();
+            expiredAccept.Status = InvitationStatusKind.ACCEPTED;
+            var expiredReject = expiredInvitation.Clone();
+            expiredReject.Status = InvitationStatusKind.REJECTED;
+            var expiredAcceptResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, expiredInvitation, expiredAccept, this.transaction);
+            var expiredRejectResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, expiredInvitation, expiredReject, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(expiredAcceptResult.IsError, Is.True);
+                Assert.That(expiredRejectResult.IsError, Is.True);
+            }
+
+            // Case 11: Existing ACCEPTED invitation cannot be transitioned or modified
+            var acceptedExisting = this.CreateInvitation(this.userId, InvitationStatusKind.ACCEPTED, DateTime.UtcNow.AddDays(5));
+            var acceptedToRejected = acceptedExisting.Clone();
+            acceptedToRejected.Status = InvitationStatusKind.REJECTED;
+            var acceptedModifiedDetails = acceptedExisting.Clone();
+            acceptedModifiedDetails.ExperiesAt = acceptedExisting.ExperiesAt.AddDays(3);
+            acceptedModifiedDetails.OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR;
+            var updateAcceptedResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, acceptedExisting, acceptedToRejected, this.transaction);
+            var modifyAcceptedDetailsResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, acceptedExisting, acceptedModifiedDetails, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(updateAcceptedResult.IsError, Is.True);
+                Assert.That(modifyAcceptedDetailsResult.IsError, Is.True);
+            }
+
+            // Case 12: Existing REVOKED and REJECTED invitations cannot be updated
+            var revokedExisting = this.CreateInvitation(this.userId, InvitationStatusKind.REVOKED, DateTime.UtcNow.AddDays(5));
+            var updateRevokedResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, revokedExisting, revokedExisting.Clone(), this.transaction);
+
+            var rejectedExisting = this.CreateInvitation(this.userId, InvitationStatusKind.REJECTED, DateTime.UtcNow.AddDays(5));
+            var updateRejectedResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, rejectedExisting, rejectedExisting.Clone(), this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(updateRevokedResult.IsError, Is.True);
+                Assert.That(updateRejectedResult.IsError, Is.True);
+            }
+
+            // Case 13: Organization administrator revoking PENDING invitation is allowed; third party is denied
+            var revokeInvitation = existingInvitation.Clone();
+            revokeInvitation.Status = InvitationStatusKind.REVOKED;
+            var orgAdminRevokeResult = await this.permissionService.IsAllowedToUpdate(orgAdmin2Context, existingInvitation, revokeInvitation, this.transaction);
+            var thirdPartyRevokeResult = await this.permissionService.IsAllowedToUpdate(this.thirdPartyUserContext, existingInvitation, revokeInvitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgAdminRevokeResult.IsError, Is.False);
+                Assert.That(thirdPartyRevokeResult.IsError, Is.True);
+            }
+        }
+
+        private static UserContext CreateOrganizationAdminContext(Guid accountId)
+        {
+            return new UserContext
+            {
+                AccountId = accountId,
+                Username = "orgAdmin2",
+                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+            };
+        }
+
+        private OrganizationInvitation CreateInvitation(Guid ownerId, InvitationStatusKind status, DateTime expiresAt)
+        {
+            return new OrganizationInvitation
+            {
+                Id = Guid.NewGuid(),
+                Owner = ownerId,
+                Organization = this.organizationId,
+                Target = this.otherUserId,
+                Status = status,
+                OrganizationInvitationKind = OrganizationInvitationKind.MEMBER,
+                ExperiesAt = expiresAt
+            };
         }
     }
 }

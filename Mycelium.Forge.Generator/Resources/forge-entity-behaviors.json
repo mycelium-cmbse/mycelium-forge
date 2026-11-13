@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "./forge-entity-behaviors.schema.json",
   "behaviors": [
     {
@@ -78,8 +78,7 @@
       "configuration": {
         "ScopeEntity": "Package",
         "ScopeRoles": [
-          "PackageOwner",
-          "PackageMaintainer"
+          "PackageOwner"
         ],
         "InviteeProperty": "Target",
         "AdminPermission": "ManagePackageTeam"

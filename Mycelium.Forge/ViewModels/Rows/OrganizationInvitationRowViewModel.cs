@@ -15,7 +15,7 @@ namespace Mycelium.Forge.ViewModels.Rows
     /// <summary>
     /// Represents a row in the pending organization invitations list on the account settings page.
     /// </summary>
-    public sealed class OrganizationInvitationRowViewModel
+    public sealed class OrganizationInvitationRowViewModel : IInvitationRowViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizationInvitationRowViewModel" /> class.
@@ -23,6 +23,11 @@ namespace Mycelium.Forge.ViewModels.Rows
         private OrganizationInvitationRowViewModel()
         {
         }
+
+        /// <summary>
+        /// Gets the underlying invitation entity.
+        /// </summary>
+        IInvitation IInvitationRowViewModel.Invitation => this.Invitation;
 
         /// <summary>
         /// Gets the pending organization invitation.

@@ -15,14 +15,14 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
     using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
-    /// Defines the view model contract for managing pending organization invitations for the user account.
+    /// Defines the view model contract for managing pending organization and package invitations for the user account.
     /// </summary>
     public interface IPendingRequestsManagerViewModel
     {
         /// <summary>
-        /// Gets or sets the collection of pending invitations for the user account.
+        /// Gets or sets the unified collection of pending organization and package invitations for the user account.
         /// </summary>
-        List<OrganizationInvitationRowViewModel> PendingInvitations { get; set; }
+        List<IInvitationRowViewModel> PendingInvitations { get; set; }
 
         /// <summary>
         /// Gets or sets the action invoked when an organization invitation has been accepted.
@@ -36,19 +36,19 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         Task InitializeViewModel();
 
         /// <summary>
-        /// Accepts the specified pending organization invitation asynchronously.
+        /// Accepts the specified pending organization or package invitation asynchronously.
         /// </summary>
-        /// <param name="row">The pending invitation row to accept.</param>
+        /// <param name="invitation">The pending invitation to accept.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
-        Task<ErrorOr<Success>> AcceptInvitation(OrganizationInvitationRowViewModel row, CancellationToken token = default);
+        Task<ErrorOr<Success>> AcceptInvitation(IInvitation invitation, CancellationToken token = default);
 
         /// <summary>
-        /// Rejects the specified pending organization invitation asynchronously.
+        /// Rejects the specified pending organization or package invitation asynchronously.
         /// </summary>
-        /// <param name="row">The pending invitation row to reject.</param>
+        /// <param name="invitation">The pending invitation to reject.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
-        Task<ErrorOr<Success>> RejectInvitation(OrganizationInvitationRowViewModel row, CancellationToken token = default);
+        Task<ErrorOr<Success>> RejectInvitation(IInvitation invitation, CancellationToken token = default);
     }
 }

@@ -28,13 +28,37 @@
         </span>
     </div>
 
-    <BbButton Variant="ButtonVariant.Ghost"
-              Size="ButtonSize.IconSmall"
-              OnClick="@(() => this.OnMenu.InvokeAsync(this.Account))"
-              AriaLabel="Options"
-              Class="package-maintainer-menu-button shrink-0">
-        <LucideIcon Name="ellipsis-vertical"
-                    Size="18"
-                    Class="text-muted-foreground shrink-0"/>
-    </BbButton>
+    <BbDropdownMenu>
+        <BbDropdownMenuTrigger>
+            <BbButton Variant="ButtonVariant.Ghost"
+                      Size="ButtonSize.IconSmall"
+                      Type="ButtonType.Button"
+                      AriaLabel="Options"
+                      Class="package-maintainer-menu-button shrink-0">
+                <LucideIcon Name="ellipsis-vertical"
+                            Size="18"
+                            Class="text-muted-foreground shrink-0"/>
+            </BbButton>
+        </BbDropdownMenuTrigger>
+        <BbDropdownMenuContent Side="PopoverSide.Bottom"
+                               Align="PopoverAlign.End"
+                               Offset="4"
+                               Class="w-[210px] p-1.5 bg-card border border-border shadow-menu rounded-lg z-50 flex flex-col gap-0.5">
+            <BbDropdownMenuItem Disabled="@(this.IsRoleChangeDisabled)"
+                                OnClick="@(() => this.OnChangeRole.InvokeAsync(this.Account))"
+                                Class="package-maintainer-change-role-item flex items-center px-3 py-2 h-8.5 rounded-md text-[13px] leading-4 font-medium text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                Change role
+            </BbDropdownMenuItem>
+            <BbDropdownMenuItem OnClick="@(() => this.OnViewProfile.InvokeAsync(this.Account))"
+                                Class="package-maintainer-view-profile-item flex items-center px-3 py-2 h-8.5 rounded-md text-[13px] leading-4 font-medium text-foreground hover:bg-muted/60 transition-colors w-full cursor-pointer select-none">
+                View profile
+            </BbDropdownMenuItem>
+            <div class="w-full h-px bg-border"></div>
+            <BbDropdownMenuItem Disabled="@(this.IsRemoveDisabled)"
+                                OnClick="@(() => this.OnRemove.InvokeAsync(this.Account))"
+                                Class="package-maintainer-remove-item flex items-center px-3 py-2 h-8.5 rounded-md text-[13px] leading-4 font-medium text-destructive hover:bg-destructive/10 transition-colors w-full cursor-pointer select-none">
+                Remove maintainer
+            </BbDropdownMenuItem>
+        </BbDropdownMenuContent>
+    </BbDropdownMenu>
 </div>

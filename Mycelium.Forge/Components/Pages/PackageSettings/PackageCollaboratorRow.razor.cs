@@ -31,9 +31,33 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         public string Role { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the event callback invoked when the options menu button is clicked.
+        /// Gets or sets a value indicating whether changing the collaborator's role is disabled.
         /// </summary>
         [Parameter]
-        public EventCallback<IAccount> OnMenu { get; set; }
+        public bool IsRoleChangeDisabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether removing the collaborator is disabled.
+        /// </summary>
+        [Parameter]
+        public bool IsRemoveDisabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the event callback invoked when the change role menu option is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<IAccount> OnChangeRole { get; set; }
+
+        /// <summary>
+        /// Gets or sets the event callback invoked when the view profile menu option is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<IAccount> OnViewProfile { get; set; }
+
+        /// <summary>
+        /// Gets or sets the event callback invoked when the remove maintainer menu option is clicked.
+        /// </summary>
+        [Parameter]
+        public EventCallback<IAccount> OnRemove { get; set; }
     }
 }

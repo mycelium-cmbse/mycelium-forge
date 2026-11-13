@@ -41,6 +41,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         private Mock<IScopeService> scopeServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
         private Mock<IAccountService> accountServiceMock;
+        private Mock<IPackageInvitationService> packageInvitationServiceMock;
         private Mock<IUserService> userServiceMock;
         private Mock<IPackagePermissionService> packagePermissionServiceMock;
         private Mock<INotificationService> notificationServiceMock;
@@ -62,6 +63,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             this.scopeServiceMock = new Mock<IScopeService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
             this.accountServiceMock = new Mock<IAccountService>();
+            this.packageInvitationServiceMock = new Mock<IPackageInvitationService>();
             this.userServiceMock = new Mock<IUserService>();
             this.notificationServiceMock = new Mock<INotificationService>();
             this.loggerMock = new Mock<ILogger<PackageSettingsViewModel>>();
@@ -135,6 +137,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
             this.accountServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
+            this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(It.IsAny<IUserContext>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList<IPackageInvitation>.Empty);
 
             this.packagePermissionServiceMock = new Mock<IPackagePermissionService>();
 
@@ -142,7 +145,84 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToDelete(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((func, _) => func(null!));
 
-            this.viewModel = new PackageSettingsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.packagePermissionServiceMock.Object, this.notificationServiceMock.Object, this.loggerMock.Object);
+            this.viewModel = new PackageSettingsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.accountServiceMock.Object, this.packageInvitationServiceMock.Object, this.userServiceMock.Object, this.packagePermissionServiceMock.Object, this.notificationServiceMock.Object, this.loggerMock.Object);
+        }
+
+        [Test]
+        public async Task VerifyChangeCollaboratorRole()
+        {
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            var coOwner = new Account { Id = Guid.NewGuid(), Name = "Co Owner", ShortName = "co-owner" };
+            var maintainer = new Account { Id = Guid.NewGuid(), Name = "Maintainer User", ShortName = "maintainer" };
+            var staleMaintainer = new Account { Id = maintainer.Id, Name = "Stale Maintainer", ShortName = "maintainer" };
+
+            this.package.PackageOwner = [this.userAccount.Id];
+            this.package.PackageMaintainer = [maintainer.Id];
+            this.viewModel.Package = this.package;
+            this.viewModel.Owners = [this.userAccount];
+            this.viewModel.Maintainers = [maintainer];
+
+            // Scenario 1: Update fails
+            this.packageServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Update failed"));
+
+            await this.viewModel.ChangeCollaboratorRole(maintainer, PackageInvitationKind.OWNER, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Owners, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.Maintainers, Has.Count.EqualTo(1));
+                this.notificationServiceMock.Verify(x => x.AddNotification("Failed to update collaborator role.", "Role Update Error", NotificationType.Error), Times.Once);
+            }
+
+            // Scenario 2: Promote maintainer to owner succeeds
+            this.packageServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+
+            await this.viewModel.ChangeCollaboratorRole(maintainer, PackageInvitationKind.OWNER, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Package.PackageOwner, Does.Contain(maintainer.Id));
+                Assert.That(this.viewModel.Package.PackageMaintainer, Does.Not.Contain(maintainer.Id));
+                Assert.That(this.viewModel.Owners.Select(o => o.Id), Does.Contain(maintainer.Id));
+                Assert.That(this.viewModel.Maintainers.Select(m => m.Id), Does.Not.Contain(maintainer.Id));
+                this.notificationServiceMock.Verify(x => x.AddNotification($"Role updated to Owner for {maintainer.Name}.", "Role Updated", NotificationType.Success), Times.Once);
+            }
+
+            // Scenario 3: Promoting an updated instance with the same account ID deduplicates existing owner entry
+            var refreshedMaintainer = new Account { Id = maintainer.Id, Name = "Maintainer Refreshed", ShortName = "maintainer" };
+            await this.viewModel.ChangeCollaboratorRole(refreshedMaintainer, PackageInvitationKind.OWNER, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Owners.Count(o => o.Id == maintainer.Id), Is.EqualTo(1));
+                Assert.That(this.viewModel.Owners.First(o => o.Id == maintainer.Id).Name, Is.EqualTo("Maintainer Refreshed"));
+            }
+
+            // Scenario 4: Demote co-owner to maintainer succeeds when multiple owners exist and deduplicates existing maintainer entry
+            this.viewModel.Package.PackageOwner = [this.userAccount.Id, coOwner.Id];
+            this.viewModel.Owners = [this.userAccount, coOwner];
+            this.viewModel.Maintainers = [staleMaintainer];
+
+            var demotedMaintainer = new Account { Id = staleMaintainer.Id, Name = "Updated Maintainer", ShortName = "maintainer" };
+            await this.viewModel.ChangeCollaboratorRole(demotedMaintainer, PackageInvitationKind.MAINTAINER, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Maintainers.Count(m => m.Id == staleMaintainer.Id), Is.EqualTo(1));
+                Assert.That(this.viewModel.Maintainers.First(m => m.Id == staleMaintainer.Id).Name, Is.EqualTo("Updated Maintainer"));
+            }
+
+            await this.viewModel.ChangeCollaboratorRole(coOwner, PackageInvitationKind.MAINTAINER, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Package.PackageOwner, Does.Not.Contain(coOwner.Id));
+                Assert.That(this.viewModel.Package.PackageMaintainer, Does.Contain(coOwner.Id));
+                Assert.That(this.viewModel.Owners.Select(o => o.Id), Does.Not.Contain(coOwner.Id));
+                Assert.That(this.viewModel.Maintainers.Select(m => m.Id), Does.Contain(coOwner.Id));
+                this.notificationServiceMock.Verify(x => x.AddNotification($"Role updated to Maintainer for {coOwner.Name}.", "Role Updated", NotificationType.Success), Times.Once);
+            }
         }
 
         [Test]
@@ -206,6 +286,35 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         [Test]
         public async Task VerifyInitializeViewModel()
         {
+            var invitedAccount = new Account { Id = Guid.NewGuid(), Name = "Invited User", ShortName = "invited-user" };
+
+            var pendingInvitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Package = this.package.Id,
+                Target = invitedAccount.Id,
+                Status = InvitationStatusKind.PENDING,
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER
+            };
+
+            var acceptedInvitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Package = this.package.Id,
+                Target = Guid.NewGuid(),
+                Status = InvitationStatusKind.ACCEPTED,
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER
+            };
+
+            var otherPackageInvitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Package = Guid.NewGuid(),
+                Target = Guid.NewGuid(),
+                Status = InvitationStatusKind.PENDING,
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER
+            };
+
             // Scenario 1: Package not found
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "unknown", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
@@ -218,12 +327,14 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
-            // Scenario 2: Happy path where user is owner and has delete permission
+            // Scenario 2: Happy path where user is owner, has delete permission, and pending invitations load
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.adminUserContext);
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.adminUserContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
-            this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(this.userAccount.Id)))).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(invitedAccount.Id)))).ReturnsAsync(ImmutableList.Create<IAccount>(invitedAccount));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
+            this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(this.adminUserContext, this.package.Id, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IPackageInvitation>(pendingInvitation, acceptedInvitation, otherPackageInvitation));
 
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
 
@@ -235,17 +346,35 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(this.viewModel.Owners, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.Versions, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.CanManagePackage, Is.True);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.True);
                 Assert.That(this.viewModel.CanDeletePackage, Is.True);
+                Assert.That(this.viewModel.CurrentUserId, Is.EqualTo(this.adminUserContext.AccountId));
+                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.PendingInvitations[0].Id, Is.EqualTo(pendingInvitation.Id));
+                Assert.That(this.viewModel.InvitedAccounts, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.InvitedAccounts[0].Id, Is.EqualTo(invitedAccount.Id));
             }
 
-            // Scenario 3: User is not owner but permission service allows update
+            // Scenario 2b: Subsequent ReadByCoordinateAsync error clears invitations and team permissions
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.adminUserContext, "starion", "unknown", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
+
+            await this.viewModel.InitializeViewModel("unknown", "starion");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations, Is.Empty);
+                Assert.That(this.viewModel.InvitedAccounts, Is.Empty);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
+            }
+
+            // Scenario 3: PackageMaintainer without ManagePackageTeam permission cannot manage package team and invitations read error clears invitations
+            this.nonOwnerPackage.PackageMaintainer = [this.userAccount.Id];
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.nonOwnerPackage);
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
             this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
-
-            // Permission service throws or fails:
+            this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(this.userContext, this.nonOwnerPackage.Id, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Read failed"));
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure());
 
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
@@ -253,7 +382,73 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.CanManagePackage, Is.False);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
                 Assert.That(this.viewModel.CanDeletePackage, Is.False);
+                Assert.That(this.viewModel.PendingInvitations, Is.Empty);
+                Assert.That(this.viewModel.InvitedAccounts, Is.Empty);
+            }
+
+            // Scenario 4: User with PermissionKind.ManagePackageTeam but not in PackageOwner has CanManagePackageTeam == true
+            var nonOwnerAdminContext = new UserContext
+            {
+                AccountId = Guid.NewGuid(),
+                CurrentRoles = [RoleKind.InstallationAdministrator]
+            };
+
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(nonOwnerAdminContext);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(nonOwnerAdminContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.nonOwnerPackage);
+            this.scopeServiceMock.Setup(x => x.ReadAsync(nonOwnerAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
+            this.accountServiceMock.Setup(x => x.ReadAsync(nonOwnerAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(nonOwnerAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
+            this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(nonOwnerAdminContext, this.nonOwnerPackage.Id, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList<IPackageInvitation>.Empty);
+
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            Assert.That(this.viewModel.CanManagePackageTeam, Is.True);
+        }
+
+        [Test]
+        public async Task VerifyInviteCollaborator()
+        {
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            var target = new Account { Id = Guid.NewGuid(), Name = "Target Collaborator", ShortName = "target-collab" };
+
+            // Scenario 1: Create fails
+            this.packageInvitationServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Create failed"));
+
+            var failResult = await this.viewModel.InviteCollaborator(target, PackageInvitationKind.MAINTAINER, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(failResult.IsError, Is.True);
+                Assert.That(this.viewModel.PendingInvitations, Is.Empty);
+                Assert.That(this.viewModel.InvitedAccounts, Is.Empty);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Failed to send invitation.", "Invitation Error", NotificationType.Error), Times.Once);
+            }
+
+            // Scenario 2: Create succeeds and deduplicates existing invited account by identifier
+            var staleTarget = new Account { Id = target.Id, Name = "Stale Target", ShortName = "target-collab" };
+            this.viewModel.InvitedAccounts = [staleTarget];
+
+            IPackageInvitation capturedInvitation = null!;
+            this.packageInvitationServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>())).Callback<IUserContext, IEnumerable<IPackageInvitation>, CancellationToken>((_, invitations, _) => capturedInvitation = invitations.First()).ReturnsAsync(Result.Created);
+
+            var successResult = await this.viewModel.InviteCollaborator(target, PackageInvitationKind.OWNER, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(successResult.IsError, Is.False);
+                Assert.That(capturedInvitation, Is.Not.Null);
+                Assert.That(capturedInvitation.Package, Is.EqualTo(this.package.Id));
+                Assert.That(capturedInvitation.Target, Is.EqualTo(target.Id));
+                Assert.That(capturedInvitation.Owner, Is.EqualTo(this.userAccount.Id));
+                Assert.That(capturedInvitation.PackageInvitationKind, Is.EqualTo(PackageInvitationKind.OWNER));
+                Assert.That(capturedInvitation.Status, Is.EqualTo(InvitationStatusKind.PENDING));
+                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.InvitedAccounts, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.InvitedAccounts[0].Name, Is.EqualTo(target.Name));
+                this.notificationServiceMock.Verify(x => x.AddNotification($"Invitation sent to {target.Name}.", "Invitation Sent", NotificationType.Success), Times.Once);
             }
         }
 
@@ -285,6 +480,144 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(this.viewModel.Versions[0].Listed, Is.True);
                 Assert.That(this.version.Listed, Is.False);
                 this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been relisted.", "Version Relisted", NotificationType.Success), Times.Once);
+            }
+        }
+
+        [Test]
+        public async Task VerifyRemoveCollaborator()
+        {
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            var maintainer = new Account { Id = Guid.NewGuid(), Name = "Maintainer User", ShortName = "maintainer" };
+            this.package.PackageOwner = [this.userAccount.Id];
+            this.package.PackageMaintainer = [maintainer.Id];
+            this.viewModel.Package = this.package;
+            this.viewModel.Owners = [this.userAccount];
+            this.viewModel.Maintainers = [maintainer];
+
+            // Scenario 1: Update fails
+            this.packageServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Removal failed"));
+
+            await this.viewModel.RemoveCollaborator(maintainer, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Maintainers, Has.Count.EqualTo(1));
+                this.notificationServiceMock.Verify(x => x.AddNotification("Failed to remove collaborator from package.", "Removal Error", NotificationType.Error), Times.Once);
+            }
+
+            // Scenario 2: Update succeeds for maintainer
+            this.packageServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+
+            await this.viewModel.RemoveCollaborator(maintainer, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Package.PackageMaintainer, Does.Not.Contain(maintainer.Id));
+                Assert.That(this.viewModel.Maintainers, Is.Empty);
+                this.notificationServiceMock.Verify(x => x.AddNotification($"{maintainer.Name} has been removed from the package.", "Collaborator Removed", NotificationType.Success), Times.Once);
+            }
+
+            // Scenario 3: Removing one co-owner succeeds when multiple owners exist
+            var coOwner = new Account { Id = Guid.NewGuid(), Name = "Co Owner", ShortName = "co-owner" };
+            this.viewModel.Package.PackageOwner = [this.userAccount.Id, coOwner.Id];
+            this.viewModel.Owners = [this.userAccount, coOwner];
+
+            await this.viewModel.RemoveCollaborator(coOwner, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Package.PackageOwner, Does.Not.Contain(coOwner.Id));
+                Assert.That(this.viewModel.Package.PackageOwner, Does.Contain(this.userAccount.Id));
+                Assert.That(this.viewModel.Owners.Select(o => o.Id), Does.Not.Contain(coOwner.Id));
+                Assert.That(this.viewModel.Owners.Select(o => o.Id), Does.Contain(this.userAccount.Id));
+                this.notificationServiceMock.Verify(x => x.AddNotification($"{coOwner.Name} has been removed from the package.", "Collaborator Removed", NotificationType.Success), Times.Once);
+            }
+        }
+
+        [Test]
+        public async Task VerifyResendInvitation()
+        {
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            var initialExpiry = DateTime.UtcNow.AddDays(1);
+
+            var invitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Package = this.package.Id,
+                Target = Guid.NewGuid(),
+                Status = InvitationStatusKind.PENDING,
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER,
+                ExperiesAt = initialExpiry
+            };
+
+            this.viewModel.PendingInvitations = [invitation];
+
+            // Scenario 1: Update fails
+            this.packageInvitationServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Resend failed"));
+
+            await this.viewModel.ResendInvitation(invitation, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations[0], Is.SameAs(invitation));
+                Assert.That(this.viewModel.PendingInvitations[0].ExperiesAt, Is.EqualTo(initialExpiry));
+                this.notificationServiceMock.Verify(x => x.AddNotification("Failed to resend invitation.", "Invitation Error", NotificationType.Error), Times.Once);
+            }
+
+            // Scenario 2: Update succeeds
+            this.packageInvitationServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
+
+            await this.viewModel.ResendInvitation(invitation, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations[0], Is.Not.SameAs(invitation));
+                Assert.That(this.viewModel.PendingInvitations[0].ExperiesAt, Is.GreaterThan(initialExpiry));
+                this.notificationServiceMock.Verify(x => x.AddNotification("Invitation resent successfully.", "Invitation Resent", NotificationType.Success), Times.Once);
+            }
+        }
+
+        [Test]
+        public async Task VerifyRevokeInvitation()
+        {
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            var invitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Package = this.package.Id,
+                Target = Guid.NewGuid(),
+                Status = InvitationStatusKind.PENDING,
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER,
+                ExperiesAt = DateTime.UtcNow.AddDays(3)
+            };
+
+            this.viewModel.PendingInvitations = [invitation];
+
+            // Scenario 1: Update fails
+            this.packageInvitationServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Revoke failed"));
+
+            await this.viewModel.RevokeInvitation(invitation, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
+                this.notificationServiceMock.Verify(x => x.AddNotification("Failed to revoke invitation.", "Invitation Error", NotificationType.Error), Times.Once);
+            }
+
+            // Scenario 2: Update succeeds
+            IPackageInvitation capturedInvitation = null!;
+            this.packageInvitationServiceMock.Setup(x => x.UpdateAsync(this.userContext, It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>())).Callback<IUserContext, IEnumerable<IPackageInvitation>, CancellationToken>((_, invitations, _) => capturedInvitation = invitations.First()).ReturnsAsync(Result.Updated);
+
+            await this.viewModel.RevokeInvitation(invitation, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(capturedInvitation.Status, Is.EqualTo(InvitationStatusKind.REVOKED));
+                Assert.That(this.viewModel.PendingInvitations, Is.Empty);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Invitation revoked successfully.", "Invitation Revoked", NotificationType.Success), Times.Once);
             }
         }
 
