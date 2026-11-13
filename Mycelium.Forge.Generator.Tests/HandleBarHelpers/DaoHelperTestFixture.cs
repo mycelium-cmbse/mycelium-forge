@@ -44,18 +44,15 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         public void VerifyCreateAsyncWriteValueTypeAndSingleReferenceProperties()
         {
             var template = this.handlebars.Compile("{{#Dao.CreateAsyncWriteValueTypeAndSingleReferenceProperties this}}");
+            var packageResult = template(this.packageClass);
+            var countryResult = template(this.countryClass);
+            var thingResult = template(this.thingClass);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
-
-                var packageResult = template(this.packageClass);
                 Assert.That(packageResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version']);"));
-
-                var countryResult = template(this.countryClass);
                 Assert.That(countryResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['owner']);"));
-
-                var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Does.Contain("VALUES (@id, @classKind, @data);"));
             }
         }
@@ -70,18 +67,15 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
         public void VerifyUpdateAsyncWriteValueTypeAndSingleReferenceProperties()
         {
             var template = this.handlebars.Compile("{{#Dao.UpdateAsyncWriteValueTypeAndSingleReferenceProperties this}}");
+            var packageResult = template(this.packageClass);
+            var countryResult = template(this.countryClass);
+            var thingResult = template(this.thingClass);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
-
-                var packageResult = template(this.packageClass);
                 Assert.That(packageResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version'] WHERE id = @id;"));
-
-                var countryResult = template(this.countryClass);
                 Assert.That(countryResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['owner'] WHERE id = @id;"));
-
-                var thingResult = template(this.thingClass);
                 Assert.That(thingResult, Does.Contain("UPDATE forge.thing SET data = @data WHERE id = @id;"));
             }
         }

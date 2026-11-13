@@ -19,8 +19,7 @@ namespace Mycelium.Forge.Serializer.Json
 
     /// <summary>
     /// The purpose of the <see cref="Serializer" /> is to write an <see cref="IThing" /> and
-    /// <see cref="IEnumerable{IThing}" />
-    /// as JSON to a <see cref="Stream" />
+    /// <see cref="IEnumerable{IThing}" /> as JSON to a <see cref="Stream" />
     /// </summary>
     public class Serializer : ISerializer
     {

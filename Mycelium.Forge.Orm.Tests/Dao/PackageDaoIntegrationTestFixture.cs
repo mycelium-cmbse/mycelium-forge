@@ -274,7 +274,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             }
         }
 
-        private async Task VerifyJsonbDataAsync(Guid id, string expectedType, IPackage expectedPackage)
+        private async Task VerifyJsonbDataAsync(Guid id, string expectedType, Package expectedPackage)
         {
             await using var command = new NpgsqlCommand("SELECT data::text FROM forge.thing WHERE id = @id;", this.Connection);
             command.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = id });
