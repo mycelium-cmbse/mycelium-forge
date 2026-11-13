@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Orm.Tests.Dao
 {
+    using System.Text.Json;
+
     using Microsoft.Extensions.Logging;
 
     using Mycelium.Forge.Common;
@@ -17,6 +19,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
     using Mycelium.Forge.Orm.Tests.Helper;
 
     using Npgsql;
+
+    using NpgsqlTypes;
 
     using NUnit.Framework;
 
@@ -47,7 +51,9 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Owner = this.accountId,
                 PackageType = this.packageTypeId,
                 Listed = true,
-                Visibility = VisibilityKind.PUBLIC
+                Visibility = VisibilityKind.PUBLIC,
+                PackageMaintainer = [this.accountId],
+                PackageOwner = [this.accountId]
             };
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
@@ -57,6 +63,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
                 Assert.That(result.IsSuccess, Is.True);
             }
+
+            await this.VerifyJsonbDataAsync(packageId, "Package", package);
 
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
@@ -72,6 +80,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                     Assert.That(readResult.Value[0].ShortName, Is.EqualTo("test-pkg-create"));
                     Assert.That(readResult.Value[0].Owner, Is.EqualTo(this.accountId));
                     Assert.That(readResult.Value[0].PackageType, Is.EqualTo(this.packageTypeId));
+                    Assert.That(readResult.Value[0].PackageMaintainer, Is.EqualTo(package.PackageMaintainer));
+                    Assert.That(readResult.Value[0].PackageOwner, Is.EqualTo(package.PackageOwner));
                     Assert.That(readResult.Value[0].CreatedAt, Is.Not.Default);
                     Assert.That(readResult.Value[0].ModifiedAt, Is.EqualTo(readResult.Value[0].CreatedAt));
                 }
@@ -227,7 +237,9 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Owner = this.accountId,
                 PackageType = this.packageTypeId,
                 Listed = false,
-                Visibility = VisibilityKind.PRIVATE
+                Visibility = VisibilityKind.PRIVATE,
+                PackageMaintainer = [this.accountId],
+                PackageOwner = [this.accountId]
             };
 
             await this.Insert(transaction => this.packageDao.CreateAsync(transaction, package, CancellationToken.None));
@@ -235,6 +247,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
             package.Name = "UpdatedPackageName";
             package.Listed = true;
             package.Visibility = VisibilityKind.PUBLIC;
+            package.PackageMaintainer = [this.accountId, this.otherAccountId];
 
             await using (var transaction = await this.Connection.BeginTransactionAsync())
             {
@@ -242,6 +255,8 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 await transaction.CommitAsync();
                 Assert.That(updateResult.IsSuccess, Is.True);
             }
+
+            await this.VerifyJsonbDataAsync(packageId, "Package", package);
 
             await using (var readTransaction = await this.Connection.BeginTransactionAsync())
             {
@@ -253,36 +268,57 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                     Assert.That(readResult.Value[0].Name, Is.EqualTo("UpdatedPackageName"));
                     Assert.That(readResult.Value[0].Listed, Is.True);
                     Assert.That(readResult.Value[0].Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
+                    Assert.That(readResult.Value[0].PackageMaintainer, Is.EqualTo(package.PackageMaintainer));
                     Assert.That(readResult.Value[0].ModifiedAt, Is.GreaterThan(readResult.Value[0].CreatedAt));
                 }
             }
         }
 
+        private async Task VerifyJsonbDataAsync(Guid id, string expectedType, Package expectedPackage)
+        {
+            await using var command = new NpgsqlCommand("SELECT data::text FROM forge.thing WHERE id = @id;", this.Connection);
+            command.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = id });
+            var jsonData = (string)await command.ExecuteScalarAsync();
+
+            using var document = JsonDocument.Parse(jsonData!);
+            var root = document.RootElement;
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(root.TryGetProperty("@type", out var typeProperty), Is.True);
+                Assert.That(typeProperty.GetString(), Is.EqualTo(expectedType));
+                Assert.That(root.TryGetProperty("@id", out var idProperty), Is.True);
+                Assert.That(idProperty.GetGuid(), Is.EqualTo(id));
+
+                Assert.That(root.TryGetProperty("name", out var nameProperty), Is.True);
+                Assert.That(nameProperty.GetString(), Is.EqualTo(expectedPackage.Name));
+                Assert.That(root.TryGetProperty("shortName", out var shortNameProperty), Is.True);
+                Assert.That(shortNameProperty.GetString(), Is.EqualTo(expectedPackage.ShortName));
+                Assert.That(root.TryGetProperty("description", out var descriptionProperty), Is.True);
+                Assert.That(descriptionProperty.GetString(), Is.EqualTo(expectedPackage.Description));
+                Assert.That(root.TryGetProperty("listed", out var listedProperty), Is.True);
+                Assert.That(listedProperty.GetBoolean(), Is.EqualTo(expectedPackage.Listed));
+                Assert.That(root.TryGetProperty("visibility", out var visibilityProperty), Is.True);
+                Assert.That(visibilityProperty.GetString(), Is.EqualTo(expectedPackage.Visibility.ToString()).IgnoreCase);
+                Assert.That(root.TryGetProperty("createdAt", out _), Is.True);
+                Assert.That(root.TryGetProperty("modifiedAt", out _), Is.True);
+
+                Assert.That(root.TryGetProperty("owner", out _), Is.False);
+                Assert.That(root.TryGetProperty("packageType", out _), Is.False);
+                Assert.That(root.TryGetProperty("version", out _), Is.False);
+                Assert.That(root.TryGetProperty("packageMaintainer", out _), Is.False);
+                Assert.That(root.TryGetProperty("packageOwner", out _), Is.False);
+            }
+        }
+
         protected override async Task PostSetup()
         {
-            this.packageDao = new PackageDao(
-                this.TestLoggerFactory.CreateLogger<PackageDao>(),
-                this.Serializer);
-
-            this.packageTypeDao = new PackageTypeDao(
-                this.TestLoggerFactory.CreateLogger<PackageTypeDao>(),
-                this.Serializer);
-
-            var forgeDao = new ForgeDao(
-                this.TestLoggerFactory.CreateLogger<ForgeDao>(),
-                this.Serializer);
-
-            var countryDao = new CountryDao(
-                this.TestLoggerFactory.CreateLogger<CountryDao>(),
-                this.Serializer);
-
-            var addressDao = new AddressDao(
-                this.TestLoggerFactory.CreateLogger<AddressDao>(),
-                this.Serializer);
-
-            var accountDao = new AccountDao(
-                this.TestLoggerFactory.CreateLogger<AccountDao>(),
-                this.Serializer);
+            this.packageDao = new PackageDao(this.TestLoggerFactory.CreateLogger<PackageDao>(), this.Serializer);
+            this.packageTypeDao = new PackageTypeDao(this.TestLoggerFactory.CreateLogger<PackageTypeDao>(), this.Serializer);
+            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);
+            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer);
+            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer);
+            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer);
 
             this.forgeId = Guid.NewGuid();
 
@@ -396,9 +432,7 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 return await accountDao.CreateAsync(transaction, otherAccount, CancellationToken.None);
             });
 
-            var organizationDao = new OrganizationDao(
-                this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
+            var organizationDao = new OrganizationDao(this.TestLoggerFactory.CreateLogger<OrganizationDao>(), this.Serializer);
 
             this.org1Id = Guid.NewGuid();
             this.org2Id = Guid.NewGuid();
