@@ -145,6 +145,56 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndObject();
         }
+
+        /// <summary>
+        /// Serializes only the value properties of an instance of <see cref="IOrganization"/> using an <see cref="Utf8JsonWriter"/>
+        /// </summary>
+        /// <param name="obj">
+        /// The <see cref="IOrganization"/> to serialize
+        /// </param>
+        /// <param name="writer">
+        /// The target <see cref="Utf8JsonWriter"/>
+        /// </param>
+        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
+        {
+            if (obj is not IOrganization iOrganization)
+            {
+                throw new ArgumentException("The object shall be an IOrganization", nameof(obj));
+            }
+
+            writer.WriteStartObject();
+
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("Organization"u8);
+
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(iOrganization.Id);
+
+            writer.WritePropertyName("billingEmail"u8);
+            writer.WriteStringValue(iOrganization.BillingEmail);
+            writer.WritePropertyName("createdAt"u8);
+            writer.WriteStringValue(iOrganization.CreatedAt);
+            writer.WritePropertyName("defaultPackageVisibility"u8);
+            writer.WriteStringValue(VisibilityKindProvider.ToUtf8LowerBytes(iOrganization.DefaultPackageVisibility));
+            writer.WritePropertyName("email"u8);
+            writer.WriteStringValue(iOrganization.Email);
+            writer.WritePropertyName("logoBlobReference"u8);
+            writer.WriteStringValue(iOrganization.LogoBlobReference);
+            writer.WritePropertyName("modifiedAt"u8);
+            writer.WriteStringValue(iOrganization.ModifiedAt);
+            writer.WritePropertyName("name"u8);
+            writer.WriteStringValue(iOrganization.Name);
+            writer.WritePropertyName("origin"u8);
+            writer.WriteStringValue(iOrganization.Origin);
+            writer.WritePropertyName("shortName"u8);
+            writer.WriteStringValue(iOrganization.ShortName);
+            writer.WritePropertyName("status"u8);
+            writer.WriteStringValue(ScopeStatusKindProvider.ToUtf8LowerBytes(iOrganization.Status));
+            writer.WritePropertyName("website"u8);
+            writer.WriteStringValue(iOrganization.Website);
+
+            writer.WriteEndObject();
+        }
     }
 }
 

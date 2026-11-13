@@ -58,6 +58,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return @class.QueryDtoClassProperties();
             });
 
+            handlebars.RegisterHelper("Class.QueryDtoValueProperties", (_, arguments) =>
+            {
+                var @class = arguments.QuerySingle<IClass>("Class.QueryDtoValueProperties");
+
+                return @class.QueryDtoClassProperties().Where(p => p.QueryIsDataType());
+            });
+
             handlebars.RegisterHelper("Class.QueryIndexableProperties", (_, arguments) =>
             {
                 var @class = arguments.QuerySingle<IClass>("Class.QueryIndexableProperties");

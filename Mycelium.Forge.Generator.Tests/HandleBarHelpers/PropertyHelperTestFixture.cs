@@ -54,6 +54,21 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             this.thingIdProperty = this.thingClass.OwnedAttribute.Single(x => x.Name == "id");
         }
 
+        [Test]
+        public void VerifyQueryDtoValuePropertiesHelper()
+        {
+            var valuePropertiesTemplate = this.handlebars.Compile("{{#each (Class.QueryDtoValueProperties this)}}{{this.Name}} {{/each}}");
+            var accountValueProperties = valuePropertiesTemplate(this.accountClass);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(accountValueProperties, Does.Contain("name"));
+                Assert.That(accountValueProperties, Does.Not.Contain("owner"));
+                Assert.That(accountValueProperties, Does.Not.Contain("primaryAddress"));
+                Assert.That(() => valuePropertiesTemplate("not-a-class"), Throws.TypeOf<HandlebarsException>());
+            }
+        }
+
         /// <summary>
         /// Verifies that <see cref="PropertyHelper.RegisterPropertyHelper" /> registers helpers and executes them correctly.
         /// </summary>

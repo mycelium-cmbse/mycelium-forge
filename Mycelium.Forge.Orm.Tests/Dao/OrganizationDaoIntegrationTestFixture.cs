@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Orm.Tests.Dao
 {
+    using System.Text.Json;
+
     using Microsoft.Extensions.Logging;
 
     using Mycelium.Forge.Common;
@@ -18,11 +20,10 @@ namespace Mycelium.Forge.Orm.Tests.Dao
 
     using Npgsql;
 
+    using NpgsqlTypes;
+
     using NUnit.Framework;
 
-    /// <summary>
-    /// Suite of integration tests for the <see cref="OrganizationDao" /> class verifying read filter execution.
-    /// </summary>
     [TestFixture]
     [Category("Database")]
     public class OrganizationDaoIntegrationTestFixture : BaseIntegrationTestClassFixture
@@ -34,11 +35,6 @@ namespace Mycelium.Forge.Orm.Tests.Dao
         private Guid org1Id;
         private Guid org2Id;
 
-        /// <summary>
-        /// Verifies that <see cref="OrganizationDao.ReadAsync" /> and <see cref="OrganizationDao.ReadIdentifiersAsync" />
-        /// apply the SQL read visibility filter correctly.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         [Test]
         public async Task VerifyReadAsync()
         {
@@ -99,33 +95,38 @@ namespace Mycelium.Forge.Orm.Tests.Dao
                 Assert.That(anonIdentifiers, Does.Contain(this.org1Id));
                 Assert.That(anonIdentifiers, Does.Contain(this.org2Id));
             }
+
+            await using var command = new NpgsqlCommand("SELECT data::text FROM forge.thing WHERE id = @id;", this.Connection);
+            command.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = this.org1Id });
+            var jsonData = (string)await command.ExecuteScalarAsync();
+
+            using var document = JsonDocument.Parse(jsonData!);
+            var root = document.RootElement;
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(root.TryGetProperty("@type", out var typeProperty), Is.True);
+                Assert.That(typeProperty.GetString(), Is.EqualTo("Organization"));
+                Assert.That(root.TryGetProperty("name", out var nameProperty), Is.True);
+                Assert.That(nameProperty.GetString(), Is.EqualTo("AdminOrg"));
+
+                Assert.That(root.TryGetProperty("owner", out _), Is.False);
+                Assert.That(root.TryGetProperty("primaryAddress", out _), Is.False);
+                Assert.That(root.TryGetProperty("address", out _), Is.False);
+                Assert.That(root.TryGetProperty("administrator", out _), Is.False);
+                Assert.That(root.TryGetProperty("member", out _), Is.False);
+                Assert.That(root.TryGetProperty("ownedPackage", out _), Is.False);
+                Assert.That(root.TryGetProperty("profileLink", out _), Is.False);
+            }
         }
 
-        /// <summary>
-        /// Sets up DAOs and prerequisite records before each test.
-        /// </summary>
-        /// <returns>An awaitable <see cref="Task" />.</returns>
         protected override async Task PostSetup()
         {
-            this.organizationDao = new OrganizationDao(
-                this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
-
-            var forgeDao = new ForgeDao(
-                this.TestLoggerFactory.CreateLogger<ForgeDao>(),
-                this.Serializer);
-
-            var countryDao = new CountryDao(
-                this.TestLoggerFactory.CreateLogger<CountryDao>(),
-                this.Serializer);
-
-            var addressDao = new AddressDao(
-                this.TestLoggerFactory.CreateLogger<AddressDao>(),
-                this.Serializer);
-
-            var accountDao = new AccountDao(
-                this.TestLoggerFactory.CreateLogger<AccountDao>(),
-                this.Serializer);
+            this.organizationDao = new OrganizationDao(this.TestLoggerFactory.CreateLogger<OrganizationDao>(), this.Serializer);
+            var forgeDao = new ForgeDao(this.TestLoggerFactory.CreateLogger<ForgeDao>(), this.Serializer);
+            var countryDao = new CountryDao(this.TestLoggerFactory.CreateLogger<CountryDao>(), this.Serializer);
+            var addressDao = new AddressDao(this.TestLoggerFactory.CreateLogger<AddressDao>(), this.Serializer);
+            var accountDao = new AccountDao(this.TestLoggerFactory.CreateLogger<AccountDao>(), this.Serializer);
 
             this.forgeId = Guid.NewGuid();
 

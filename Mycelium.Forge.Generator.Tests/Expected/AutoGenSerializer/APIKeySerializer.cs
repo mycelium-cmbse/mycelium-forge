@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="APIKeySerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -63,6 +63,62 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iAPIKey.Owner);
             writer.WriteEndObject();
+            writer.WriteStartArray("permissions"u8);
+
+            foreach (var item in iAPIKey.Permissions)
+            {
+                writer.WriteStringValue(item);
+            }
+
+            writer.WriteEndArray();
+            writer.WritePropertyName("revokedAt"u8);
+            writer.WriteStringValue(iAPIKey.RevokedAt);
+            writer.WriteStartArray("secretHash"u8);
+
+            foreach (var item in iAPIKey.SecretHash)
+            {
+                writer.WriteNumberValue(item);
+            }
+
+            writer.WriteEndArray();
+
+            writer.WriteEndObject();
+        }
+
+        /// <summary>
+        /// Serializes only the value properties of an instance of <see cref="IAPIKey"/> using an <see cref="Utf8JsonWriter"/>
+        /// </summary>
+        /// <param name="obj">
+        /// The <see cref="IAPIKey"/> to serialize
+        /// </param>
+        /// <param name="writer">
+        /// The target <see cref="Utf8JsonWriter"/>
+        /// </param>
+        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
+        {
+            if (obj is not IAPIKey iAPIKey)
+            {
+                throw new ArgumentException("The object shall be an IAPIKey", nameof(obj));
+            }
+
+            writer.WriteStartObject();
+
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("APIKey"u8);
+
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(iAPIKey.Id);
+
+            writer.WritePropertyName("createdAt"u8);
+            writer.WriteStringValue(iAPIKey.CreatedAt);
+            writer.WritePropertyName("expiresAt"u8);
+            writer.WriteStringValue(iAPIKey.ExpiresAt);
+            writer.WritePropertyName("lastUsedAt"u8);
+            writer.WriteStringValue(iAPIKey.LastUsedAt);
+            writer.WritePropertyName("modifiedAt"u8);
+            writer.WriteStringValue(iAPIKey.ModifiedAt);
+            writer.WritePropertyName("name"u8);
+            writer.WriteStringValue(iAPIKey.Name);
             writer.WriteStartArray("permissions"u8);
 
             foreach (var item in iAPIKey.Permissions)

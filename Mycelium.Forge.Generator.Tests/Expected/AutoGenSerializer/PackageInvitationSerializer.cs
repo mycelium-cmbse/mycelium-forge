@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageInvitationSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -73,6 +73,44 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackageInvitation.Target);
             writer.WriteEndObject();
+
+            writer.WriteEndObject();
+        }
+
+        /// <summary>
+        /// Serializes only the value properties of an instance of <see cref="IPackageInvitation"/> using an <see cref="Utf8JsonWriter"/>
+        /// </summary>
+        /// <param name="obj">
+        /// The <see cref="IPackageInvitation"/> to serialize
+        /// </param>
+        /// <param name="writer">
+        /// The target <see cref="Utf8JsonWriter"/>
+        /// </param>
+        internal static void SerializeValueProperties(object obj, Utf8JsonWriter writer)
+        {
+            if (obj is not IPackageInvitation iPackageInvitation)
+            {
+                throw new ArgumentException("The object shall be an IPackageInvitation", nameof(obj));
+            }
+
+            writer.WriteStartObject();
+
+            writer.WritePropertyName("@type"u8);
+            writer.WriteStringValue("PackageInvitation"u8);
+
+            writer.WritePropertyName("@id"u8);
+            writer.WriteStringValue(iPackageInvitation.Id);
+
+            writer.WritePropertyName("createdAt"u8);
+            writer.WriteStringValue(iPackageInvitation.CreatedAt);
+            writer.WritePropertyName("experiesAt"u8);
+            writer.WriteStringValue(iPackageInvitation.ExperiesAt);
+            writer.WritePropertyName("modifiedAt"u8);
+            writer.WriteStringValue(iPackageInvitation.ModifiedAt);
+            writer.WritePropertyName("packageInvitationKind"u8);
+            writer.WriteStringValue(PackageInvitationKindProvider.ToUtf8LowerBytes(iPackageInvitation.PackageInvitationKind));
+            writer.WritePropertyName("status"u8);
+            writer.WriteStringValue(InvitationStatusKindProvider.ToUtf8LowerBytes(iPackageInvitation.Status));
 
             writer.WriteEndObject();
         }
