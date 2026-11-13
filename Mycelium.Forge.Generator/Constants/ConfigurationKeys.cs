@@ -70,11 +70,6 @@ namespace Mycelium.Forge.Generator.Constants
         public const string PersonalCreatePermission = "PersonalCreatePermission";
 
         /// <summary>
-        /// Configuration key for OrgCreatePermission.
-        /// </summary>
-        public const string OrgCreatePermission = "OrgCreatePermission";
-
-        /// <summary>
         /// Configuration key for ParentEntity.
         /// </summary>
         public const string ParentEntity = "ParentEntity";

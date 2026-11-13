@@ -117,11 +117,6 @@ namespace Mycelium.Forge.Common
         PublishPackageToPersonalScope,
 
         /// <summary>
-        /// Permission: PublishPackageToOrganizationScope.
-        /// </summary>
-        PublishPackageToOrganizationScope,
-
-        /// <summary>
         /// Permission: PublishPackageVersion.
         /// </summary>
         PublishPackageVersion,

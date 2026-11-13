@@ -90,7 +90,6 @@
       "behaviorType": "OrganizationScope",
       "configuration": {
         "PersonalCreatePermission": "PublishPackageToPersonalScope",
-        "OrgCreatePermission": "PublishPackageToOrganizationScope",
         "AdminPermission": "ManageOrganizations",
         "BypassPermissions": [
           "ViewAllOrganizations",

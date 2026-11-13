@@ -89,7 +89,6 @@ Permissions are atomic privileges representing discrete actions. They are config
 ### 3.3 Package Permissions
 
 - `PublishPackageToPersonalScope`: Publish a new package under the caller's personal namespace (`@user/pkg`).
-- `PublishPackageToOrganizationScope`: Publish a new package under an organization's namespace (`@org/pkg`).
 - `PublishPackageVersion`: Publish a new SemVer version for an existing package.
 - `UnlistPackageVersion`: Unlist an existing package version from search results and index listings.
 - `RelistPackageVersion`: Relist a previously unlisted package version.
@@ -206,13 +205,12 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
 - **Configuration Keys:** `ConfigurationKeys`
   - `ScopeEntity`: Scope container entity name (e.g., `Organization`).
   - `PersonalCreatePermission`: Permission required for personal scope creation (`PublishPackageToPersonalScope`).
-  - `OrgCreatePermission`: Permission required for organization scope creation (`PublishPackageToOrganizationScope`).
   - `VisibilityProperty`: Property name storing visibility (e.g., `Visibility`).
   - `OwnerProperty`: Property name referencing the owning scope (`Owner`).
   - `ScopeMemberProperties`: Properties on organization entity representing membership (`Member,Administrator`).
   - `BypassPermissions`: Permissions that bypass tenant checks for internal items (`ViewAllOrganizations,ManageOrganizations`).
 - **Enforcement Logic:**
-  - **Create:** Checks whether target scope is an account (requires `PersonalCreatePermission`) or organization (requires `OrgCreatePermission` + caller is an organization member).
+  - **Create:** Checks whether target scope is an account (requires `PersonalCreatePermission`) or organization (requires caller to be an organization member or administrator).
   - **Read:**
     - `Public`: Allowed for any user (including Anonymous).
     - `Internal`: Allowed for members/administrators of the owning organization, or callers with `BypassPermissions`.
@@ -313,7 +311,7 @@ if (permissionResult.IsFailed)
 #### In Razor Pages and ViewModels
 Inject `IUserContext` to perform client-side authorization checks:
 ```csharp
-if (PermissionGuard.HasPermission(userContext, PermissionKind.PublishPackageToOrganizationScope))
+if (PermissionGuard.HasPermission(userContext, PermissionKind.PublishPackageToPersonalScope))
 {
     // Render publish button or allow navigation
 }
