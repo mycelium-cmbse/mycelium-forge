@@ -51,7 +51,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 AccountId = this.userId,
                 Username = "orgAdminUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.targetUserContext = new UserContext
@@ -288,7 +288,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 AccountId = accountId,
                 Username = "orgAdmin2",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                CurrentRoles = [RoleKind.Account]
             };
         }
 

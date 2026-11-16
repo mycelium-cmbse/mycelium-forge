@@ -50,7 +50,7 @@
                 <ForgeBadge Text="@(this.GetReleaseStatus())"
                             Class="badge-lifecycle-open"/>
             }
-            @if (this.ViewModel.IsUserAdmin)
+            @if (this.CanAccessSettings)
             {
                 <div class="flex-1"></div>
 

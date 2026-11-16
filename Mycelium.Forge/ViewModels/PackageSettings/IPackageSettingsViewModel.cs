@@ -64,6 +64,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         bool CanManagePackage { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage versions of the package.
+        /// </summary>
+        bool CanManageVersions { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to manage the package team.
         /// </summary>
         bool CanManagePackageTeam { get; set; }

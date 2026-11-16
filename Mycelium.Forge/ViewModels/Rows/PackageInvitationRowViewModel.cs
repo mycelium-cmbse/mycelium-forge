@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.ViewModels.Rows
 {
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Models;
     using Mycelium.Forge.Extensions;
 
     /// <summary>
@@ -35,14 +36,19 @@ namespace Mycelium.Forge.ViewModels.Rows
         public PackageInvitation Invitation { get; private init; }
 
         /// <summary>
-        /// Gets the target package, if visible to the caller.
+        /// Gets the minimal display metadata of the target package.
         /// </summary>
-        public Package Package { get; private init; }
+        public PackageTargetSummary Package { get; private init; }
 
         /// <summary>
-        /// Gets the owning scope of the target package, if visible to the caller.
+        /// Gets the owning scope of the target package.
         /// </summary>
         public IScope Scope { get; private init; }
+
+        /// <summary>
+        /// Gets a value indicating whether the caller currently has read access to the package.
+        /// </summary>
+        public bool IsPackageReadable { get; private init; }
 
         /// <summary>
         /// Gets the human-readable display role name for the invitation.
@@ -55,27 +61,39 @@ namespace Mycelium.Forge.ViewModels.Rows
         public string ExpiresIn { get; private init; } = string.Empty;
 
         /// <summary>
-        /// Generates <see cref="PackageInvitationRowViewModel" /> instances for the specified invitations and related entities.
+        /// Generates <see cref="PackageInvitationRowViewModel" /> instances for the specified invitations, target package
+        /// summaries, and owning scopes.
         /// </summary>
         /// <param name="invitations">The collection of package invitations.</param>
-        /// <param name="relatedThings">The collection of related Things (packages and scopes).</param>
+        /// <param name="packageTargets">The collection of minimal target package summaries.</param>
+        /// <param name="scopes">The collection of owning scopes.</param>
+        /// <param name="readablePackageIds">
+        /// Optional identifiers of packages the caller can currently read; when <c>null</c>, resolved packages are treated as readable.
+        /// </param>
         /// <returns>An enumerable of <see cref="PackageInvitationRowViewModel" /> instances.</returns>
-        public static IEnumerable<PackageInvitationRowViewModel> GenerateRows(IEnumerable<IPackageInvitation> invitations, IEnumerable<IThing> relatedThings)
+        public static IEnumerable<PackageInvitationRowViewModel> GenerateRows(IEnumerable<IPackageInvitation> invitations, IEnumerable<PackageTargetSummary> packageTargets, IEnumerable<IScope> scopes, IReadOnlyCollection<Guid> readablePackageIds = null)
         {
-            var relatedThingsList = relatedThings?.ToList() ?? [];
-            var packages = relatedThingsList.OfType<Package>().ToList();
-            var scopes = relatedThingsList.OfType<IScope>().ToList();
+            var targetsList = packageTargets.ToList();
+            var scopesList = scopes.ToList();
 
             foreach (var invitation in invitations.OfType<PackageInvitation>())
             {
-                var package = packages.FirstOrDefault(packageItem => packageItem.Id == invitation.Package);
-                var scope = package != null ? scopes.FirstOrDefault(scopeItem => scopeItem.Id == package.Owner) : null;
+                var package = targetsList.FirstOrDefault(packageItem => packageItem.Id == invitation.Package);
+                var scope = package != null ? scopesList.FirstOrDefault(scopeItem => scopeItem.Id == package.Owner) : null;
+
+                if (package == null || scope == null)
+                {
+                    continue;
+                }
+
+                var isPackageReadable = readablePackageIds == null || readablePackageIds.Contains(package.Id);
 
                 yield return new PackageInvitationRowViewModel
                 {
                     Invitation = invitation,
                     Package = package,
                     Scope = scope,
+                    IsPackageReadable = isPackageReadable,
                     RoleName = invitation.PackageInvitationKind == PackageInvitationKind.OWNER ? "Owner" : "Maintainer",
                     ExpiresIn = invitation.ExperiesAt <= DateTime.UtcNow ? "Expired" : $"Expires in {invitation.ExperiesAt.ToTimeToCome()}"
                 };

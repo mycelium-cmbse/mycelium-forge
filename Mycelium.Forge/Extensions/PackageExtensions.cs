@@ -20,6 +20,24 @@ namespace Mycelium.Forge.Extensions
         extension(IPackage package)
         {
             /// <summary>
+            /// Determines whether the specified user context is authorized to manage versions of the package.
+            /// </summary>
+            /// <param name="userContext">The contextual user information and assigned roles.</param>
+            /// <returns><c>true</c> if the user can manage package versions; otherwise, <c>false</c>.</returns>
+            public bool CanManageVersions(IUserContext userContext)
+            {
+                if (package == null || userContext is not { AccountId: not null })
+                {
+                    return false;
+                }
+
+                var accountId = userContext.AccountId.Value;
+
+                return (package.Owner == accountId || package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
+                    && PermissionGuard.HasAnyPermission(userContext, PermissionKind.PublishPackageVersion, PermissionKind.UnlistPackageVersion, PermissionKind.RelistPackageVersion);
+            }
+
+            /// <summary>
             /// Computes the fully qualified package name in the format @scope/packageName.
             /// </summary>
             /// <param name="owner">The owning scope instance.</param>

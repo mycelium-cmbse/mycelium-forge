@@ -23,6 +23,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageSettings;
+    using Mycelium.Forge.Tests.TestHelpers;
 
     [TestFixture]
     public class PackageCollaboratorRowTestFixture
@@ -120,9 +121,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             await disabledRow.InvokeAsync(() => disabledMenuButton.ClickAsync());
 
             var menuItems = this.providers.FindComponents<BbDropdownMenuItem>();
-            var changeRoleMenuItem = menuItems.LastOrDefault(x => HasClass(x.Instance, "package-maintainer-change-role-item"));
-            var viewProfileMenuItem = menuItems.LastOrDefault(x => HasClass(x.Instance, "package-maintainer-view-profile-item"));
-            var removeMenuItem = menuItems.LastOrDefault(x => HasClass(x.Instance, "package-maintainer-remove-item"));
+            var changeRoleMenuItem = menuItems.LastOrDefault(x => x.Instance.HasClass("package-maintainer-change-role-item"));
+            var viewProfileMenuItem = menuItems.LastOrDefault(x => x.Instance.HasClass("package-maintainer-view-profile-item"));
+            var removeMenuItem = menuItems.LastOrDefault(x => x.Instance.HasClass("package-maintainer-remove-item"));
 
             using (Assert.EnterMultipleScope())
             {
@@ -135,12 +136,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 Assert.That(viewProfileMenuItem!.Instance.Disabled, Is.False);
                 Assert.That(removeMenuItem!.Instance.Disabled, Is.True);
             }
-        }
-
-        private static bool HasClass(BbDropdownMenuItem menuItem, string expectedClass)
-        {
-            var classList = menuItem.Class ?? string.Empty;
-            return !string.IsNullOrWhiteSpace(classList) && classList.Split(' ', StringSplitOptions.RemoveEmptyEntries).Contains(expectedClass, StringComparer.Ordinal);
         }
     }
 }

@@ -156,6 +156,11 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         public bool CanManagePackage { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage versions of the package.
+        /// </summary>
+        public bool CanManageVersions { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the current user is allowed to manage the package team.
         /// </summary>
         public bool CanManagePackageTeam { get; set; }
@@ -185,7 +190,10 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             {
                 this.PendingInvitations = [];
                 this.InvitedAccounts = [];
+                this.CanManagePackage = false;
                 this.CanManagePackageTeam = false;
+                this.CanManageVersions = false;
+                this.CanDeletePackage = false;
                 this.logger.LogWarning("Package {Scope}/{Name} not found during settings initialization: {Errors}", scope.SanitizeForLog(), packageShortname.SanitizeForLog(), packageResult.Errors.ToJoinedDescriptions());
                 return;
             }
@@ -200,18 +208,19 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             var versionsTask = this.packageVersionService.ReadOrEmpty(this.UserContext, this.Package.Version);
             var canUpdatePackageTask = this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, this.UserContext, this.Package);
             var canDeletePackageTask = this.packagePermissionService.IsAllowedToDelete(this.databaseSource, this.UserContext, this.Package);
-            var invitationsTask = this.packageInvitationService.ReadByPackageAsync(this.UserContext, this.Package.Id);
+            var invitationsTask = this.CanManagePackageTeam ? this.packageInvitationService.ReadByPackageAsync(this.UserContext, this.Package.Id) : null;
 
-            await Task.WhenAll(ownerTask, maintainersTask, ownersTask, versionsTask, canUpdatePackageTask, canDeletePackageTask, invitationsTask);
+            await Task.WhenAll(ownerTask, maintainersTask, ownersTask, versionsTask, canUpdatePackageTask, canDeletePackageTask, invitationsTask ?? Task.CompletedTask);
 
             this.Owner = ownerTask.Result;
             this.Maintainers = [.. maintainersTask.Result];
             this.Owners = [.. ownersTask.Result];
             this.Versions = [.. versionsTask.Result.Cast<PackageVersion>().OrderByDescending(v => v.PublicationDate)];
             this.CanManagePackage = canUpdatePackageTask.Result.IsSuccess;
+            this.CanManageVersions = this.Package.CanManageVersions(this.UserContext);
             this.CanDeletePackage = canDeletePackageTask.Result.IsSuccess;
 
-            if (!invitationsTask.Result.IsError)
+            if (invitationsTask is { Result.IsError: false })
             {
                 this.PendingInvitations = [.. invitationsTask.Result.Value.OfType<PackageInvitation>().Where(i => i.Package == this.Package.Id && i.Status == InvitationStatusKind.PENDING)];
                 var pendingTargetIds = this.PendingInvitations.Select(i => i.Target).Distinct().ToList();

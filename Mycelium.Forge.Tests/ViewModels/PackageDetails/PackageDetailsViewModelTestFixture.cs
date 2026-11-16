@@ -129,13 +129,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 QualityChecks = [("Schema check", "Passed", true)]
             };
 
-            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IPackage>(this.package));
-            this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IScope>(this.org)));
-            this.packageTypeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageType>(this.packageType)));
-            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageVersion>(this.version)));
-            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IAccount>(this.maintainer)));
-            this.packageMetaDataServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageMetaData>(this.metaData)));
+            this.SetupPackageReadServices(this.userContext);
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Error.Unauthorized());
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Unauthorized());
 
@@ -170,6 +164,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.Dependents, Has.Count.EqualTo(0));
                 Assert.That(this.viewModel.QualityChecks, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.IsUserAdmin, Is.False);
+                Assert.That(this.viewModel.CanManageVersions, Is.False);
                 Assert.That(this.viewModel.DownloadCount, Is.Zero);
             }
 
@@ -177,15 +172,67 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion", PackageTabConstants.Overview);
             this.packageServiceMock.Verify(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>()), Times.Once);
 
-            // Non-existent package: returns early and logs warning
+            // Maintainer with Account role has CanManageVersions == true even when IsUserAdmin == false
+            var maintainerContext = new UserContext
+            {
+                AccountId = this.maintainer.Id,
+                Username = "maintainer",
+                CurrentRoles = [RoleKind.Account]
+            };
+
+            this.SetupPackageReadServices(maintainerContext);
+
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.IsUserAdmin, Is.False);
+                Assert.That(this.viewModel.CanManageVersions, Is.True);
+            }
+
+            // Non-member administrator has IsUserAdmin == true and CanManageVersions == false
+            var nonMemberAdminContext = new UserContext
+            {
+                AccountId = Guid.NewGuid(),
+                Username = "admin",
+                CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator]
+            };
+
+            this.SetupPackageReadServices(nonMemberAdminContext);
+            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(nonMemberAdminContext, this.package, this.package, It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
+            this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((func, _) => func(null!));
+
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.IsUserAdmin, Is.True);
+                Assert.That(this.viewModel.CanManageVersions, Is.False);
+            }
+
+            // Non-existent package: resets permission flags, returns early and logs warning
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "other-org", "nonexistent", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
             await this.viewModel.InitializeViewModel("nonexistent", "other-org");
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Package, Is.EqualTo(this.package));
-                this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(2));
+                Assert.That(this.viewModel.IsUserAdmin, Is.False);
+                Assert.That(this.viewModel.CanManageVersions, Is.False);
+                this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(2));
             }
+        }
+
+        private void SetupPackageReadServices(UserContext context)
+        {
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(context);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(context, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IPackage>(this.package));
+            this.scopeServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IScope>(this.org)));
+            this.packageTypeServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageType>(this.packageType)));
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageVersion>(this.version)));
+            this.accountServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IAccount>(this.maintainer)));
+            this.packageMetaDataServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageMetaData>(this.metaData)));
         }
     }
 }

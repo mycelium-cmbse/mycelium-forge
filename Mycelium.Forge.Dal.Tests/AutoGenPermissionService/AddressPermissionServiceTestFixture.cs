@@ -35,7 +35,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         private Guid organizationId;
         private UserContext ownerUserContext;
         private UserContext otherUserContext;
-        private UserContext orgAdminUserContext;
         private UserContext adminUserContext;
         private UserContext anonymousUserContext;
 
@@ -65,13 +64,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 AccountId = this.otherUserId,
                 Username = "otherUser",
                 CurrentRoles = [RoleKind.Account]
-            };
-
-            this.orgAdminUserContext = new UserContext
-            {
-                AccountId = this.userId,
-                Username = "orgAdminUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
             };
 
             this.adminUserContext = new UserContext
@@ -129,7 +121,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, personalAddress, this.transaction);
             var personalOwnerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, personalAddress, this.transaction);
             var personalOtherResult = await this.permissionService.IsAllowedToCreate(this.otherUserContext, personalAddress, this.transaction);
-            var orgAdminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, orgAddress, this.transaction);
             var orgMemberResult = await this.permissionService.IsAllowedToCreate(this.otherUserContext, orgAddress, this.transaction);
 
             using (Assert.EnterMultipleScope())
@@ -137,7 +128,6 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(unauthResult.IsError, Is.True);
                 Assert.That(personalOwnerResult.IsError, Is.False);
                 Assert.That(personalOtherResult.IsError, Is.True);
-                Assert.That(orgAdminResult.IsError, Is.False);
                 Assert.That(orgMemberResult.IsError, Is.True);
             }
         }

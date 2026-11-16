@@ -91,7 +91,7 @@ namespace Mycelium.Forge.Data
             AccountRoles = new Dictionary<Guid, IReadOnlyList<RoleKind>>
             {
                 { RegisAccount.Id, [RoleKind.InstallationAdministrator, RoleKind.Account] },
-                { StefanAccount.Id, [RoleKind.OrganizationAdministrator, RoleKind.Account] },
+                { StefanAccount.Id, [RoleKind.Account] },
                 { KleinAccount.Id, [RoleKind.PlatformOperator, RoleKind.Account] },
                 { BlancAccount.Id, [RoleKind.Account] },
                 { NovakAccount.Id, [RoleKind.Account] }

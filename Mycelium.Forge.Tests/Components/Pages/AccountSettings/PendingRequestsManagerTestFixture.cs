@@ -23,8 +23,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
     using Moq;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Models;
     using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings;
+    using Mycelium.Forge.Tests.TestHelpers;
     using Mycelium.Forge.ViewModels.AccountSettings;
     using Mycelium.Forge.ViewModels.Rows;
 
@@ -90,19 +92,29 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
                 ExperiesAt = DateTime.UtcNow.AddDays(7)
             };
 
+            var privatePackageSummary = new PackageTargetSummary(new Package
+            {
+                Id = Guid.NewGuid(),
+                Name = "Secret Propulsion",
+                ShortName = "secret-propulsion",
+                Owner = organizationId
+            });
+
             var privatePackageInvitation = new PackageInvitation
             {
                 Id = Guid.NewGuid(),
-                Package = Guid.NewGuid(),
+                Package = privatePackageSummary.Id,
                 Target = Guid.NewGuid(),
                 Status = InvitationStatusKind.PENDING,
                 PackageInvitationKind = PackageInvitationKind.OWNER,
                 ExperiesAt = DateTime.UtcNow.AddDays(7)
             };
 
+            var testPackageSummary = new PackageTargetSummary(this.testPackage);
+
             this.testRow = OrganizationInvitationRowViewModel.GenerateRows([this.testInvitation], [this.testOrganization]).First();
-            this.testPackageRow = PackageInvitationRowViewModel.GenerateRows([this.testPackageInvitation], [this.testPackage, this.testOrganization]).First();
-            this.testPrivatePackageRow = PackageInvitationRowViewModel.GenerateRows([privatePackageInvitation], []).First();
+            this.testPackageRow = PackageInvitationRowViewModel.GenerateRows([this.testPackageInvitation], [testPackageSummary], [this.testOrganization]).First();
+            this.testPrivatePackageRow = PackageInvitationRowViewModel.GenerateRows([privatePackageInvitation], [privatePackageSummary], [this.testOrganization], []).First();
         }
 
         [TearDown]
@@ -117,9 +129,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testRow, this.testPackageRow]);
             var component = this.context.Render<PendingRequestsManager>(parameters => parameters.Add(x => x.ViewModel, this.viewModelMock.Object));
 
-            var acceptButtons = component.FindAll(".pending-accept-button");
-            await component.InvokeAsync(() => acceptButtons[0].ClickAsync());
-            await component.InvokeAsync(() => acceptButtons[1].ClickAsync());
+            var acceptButtons = component.FindComponents<BbButton>().Where(x => x.Instance.HasClass("pending-accept-button")).ToList();
+            Assert.That(acceptButtons, Has.Count.EqualTo(2));
+            await component.InvokeAsync(() => acceptButtons[0].Find("button").ClickAsync());
+            await component.InvokeAsync(() => acceptButtons[1].Find("button").ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
@@ -134,9 +147,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testRow, this.testPackageRow]);
             var component = this.context.Render<PendingRequestsManager>(parameters => parameters.Add(x => x.ViewModel, this.viewModelMock.Object));
 
-            var rejectButtons = component.FindAll(".pending-reject-button");
-            await component.InvokeAsync(() => rejectButtons[0].ClickAsync());
-            await component.InvokeAsync(() => rejectButtons[1].ClickAsync());
+            var rejectButtons = component.FindComponents<BbButton>().Where(x => x.Instance.HasClass("pending-reject-button")).ToList();
+            Assert.That(rejectButtons, Has.Count.EqualTo(2));
+            await component.InvokeAsync(() => rejectButtons[0].Find("button").ClickAsync());
+            await component.InvokeAsync(() => rejectButtons[1].Find("button").ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
@@ -188,8 +202,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
                 Assert.That(rows[2].FindComponents<CollaboratorAvatar>(), Is.Empty);
                 Assert.That(rows[2].FindComponents<LucideIcon>(), Has.Count.EqualTo(1));
                 Assert.That(rows[2].FindAll("a"), Is.Empty);
-                Assert.That(rows[2].Markup, Does.Contain("Private package"));
-                Assert.That(rows[2].Markup, Does.Contain("Package invitation"));
+                Assert.That(rows[2].Markup, Does.Contain("@starion/secret-propulsion"));
+                Assert.That(rows[2].Markup, Does.Contain("Secret Propulsion"));
                 Assert.That(populatedComponent.Markup, Does.Not.Contain("No pending invitations."));
             }
         }

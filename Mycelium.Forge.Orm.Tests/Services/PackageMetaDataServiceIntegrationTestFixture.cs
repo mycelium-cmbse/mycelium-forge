@@ -168,7 +168,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
             {
                 AccountId = orgAdminId,
                 Username = "packageOwner",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.appAdminUserContext = new UserContext

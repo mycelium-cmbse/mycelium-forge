@@ -77,6 +77,11 @@ namespace Mycelium.Forge.Components.Common
         public EventCallback<TInvitation> OnRevoke { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether the alert description is populated.
+        /// </summary>
+        private bool HasAlertDescription => !string.IsNullOrWhiteSpace(this.AlertDescription);
+
+        /// <summary>
         /// Gets the formatted expiration text for the specified invitation.
         /// </summary>
         /// <param name="invitation">The invitation instance.</param>

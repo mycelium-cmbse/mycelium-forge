@@ -132,11 +132,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 PublicationDate = DateTime.UtcNow
             };
 
-            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
-            this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
-            this.accountServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
-            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
+            this.SetupPackageReadServices(this.userContext, this.package);
             this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(It.IsAny<IUserContext>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList<IPackageInvitation>.Empty);
 
             this.packagePermissionServiceMock = new Mock<IPackagePermissionService>();
@@ -328,12 +324,9 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             }
 
             // Scenario 2: Happy path where user is owner, has delete permission, and pending invitations load
-            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.adminUserContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.adminUserContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.package);
-            this.scopeServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
+            this.SetupPackageReadServices(this.adminUserContext, this.package);
             this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(this.userAccount.Id)))).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(invitedAccount.Id)))).ReturnsAsync(ImmutableList.Create<IAccount>(invitedAccount));
-            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
             this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(this.adminUserContext, this.package.Id, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IPackageInvitation>(pendingInvitation, acceptedInvitation, otherPackageInvitation));
 
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
@@ -347,6 +340,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(this.viewModel.Versions, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.CanManagePackage, Is.True);
                 Assert.That(this.viewModel.CanManagePackageTeam, Is.True);
+                Assert.That(this.viewModel.CanManageVersions, Is.True);
                 Assert.That(this.viewModel.CanDeletePackage, Is.True);
                 Assert.That(this.viewModel.CurrentUserId, Is.EqualTo(this.adminUserContext.AccountId));
                 Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
@@ -355,7 +349,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(this.viewModel.InvitedAccounts[0].Id, Is.EqualTo(invitedAccount.Id));
             }
 
-            // Scenario 2b: Subsequent ReadByCoordinateAsync error clears invitations and team permissions
+            // Scenario 2b: Subsequent ReadByCoordinateAsync error clears invitations and permissions
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.adminUserContext, "starion", "unknown", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
 
             await this.viewModel.InitializeViewModel("unknown", "starion");
@@ -364,17 +358,15 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             {
                 Assert.That(this.viewModel.PendingInvitations, Is.Empty);
                 Assert.That(this.viewModel.InvitedAccounts, Is.Empty);
+                Assert.That(this.viewModel.CanManagePackage, Is.False);
                 Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
+                Assert.That(this.viewModel.CanManageVersions, Is.False);
+                Assert.That(this.viewModel.CanDeletePackage, Is.False);
             }
 
-            // Scenario 3: PackageMaintainer without ManagePackageTeam permission cannot manage package team and invitations read error clears invitations
+            // Scenario 3: PackageMaintainer without ManagePackageTeam permission cannot manage package team (skips ReadByPackageAsync) but can manage versions
             this.nonOwnerPackage.PackageMaintainer = [this.userAccount.Id];
-            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.nonOwnerPackage);
-            this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
-            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
-            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
-            this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(this.userContext, this.nonOwnerPackage.Id, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Read failed"));
+            this.SetupPackageReadServices(this.userContext, this.nonOwnerPackage);
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure());
 
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
@@ -383,28 +375,31 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
             {
                 Assert.That(this.viewModel.CanManagePackage, Is.False);
                 Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
+                Assert.That(this.viewModel.CanManageVersions, Is.True);
                 Assert.That(this.viewModel.CanDeletePackage, Is.False);
                 Assert.That(this.viewModel.PendingInvitations, Is.Empty);
                 Assert.That(this.viewModel.InvitedAccounts, Is.Empty);
+                this.packageInvitationServiceMock.Verify(x => x.ReadByPackageAsync(this.userContext, this.nonOwnerPackage.Id, It.IsAny<CancellationToken>()), Times.Never);
             }
 
-            // Scenario 4: User with PermissionKind.ManagePackageTeam but not in PackageOwner has CanManagePackageTeam == true
+            // Scenario 4: User with PermissionKind.ManagePackageTeam but not in PackageOwner/Maintainer has CanManagePackageTeam == true and CanManageVersions == false
             var nonOwnerAdminContext = new UserContext
             {
                 AccountId = Guid.NewGuid(),
                 CurrentRoles = [RoleKind.InstallationAdministrator]
             };
 
-            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(nonOwnerAdminContext);
-            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(nonOwnerAdminContext, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(this.nonOwnerPackage);
-            this.scopeServiceMock.Setup(x => x.ReadAsync(nonOwnerAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
-            this.accountServiceMock.Setup(x => x.ReadAsync(nonOwnerAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
-            this.packageVersionServiceMock.Setup(x => x.ReadAsync(nonOwnerAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
-            this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(nonOwnerAdminContext, this.nonOwnerPackage.Id, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList<IPackageInvitation>.Empty);
+            this.SetupPackageReadServices(nonOwnerAdminContext, this.nonOwnerPackage);
+            this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(nonOwnerAdminContext, this.nonOwnerPackage.Id, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Read failed"));
 
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
 
-            Assert.That(this.viewModel.CanManagePackageTeam, Is.True);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.True);
+                Assert.That(this.viewModel.CanManageVersions, Is.False);
+                Assert.That(this.viewModel.PendingInvitations, Is.Empty);
+            }
         }
 
         [Test]
@@ -795,6 +790,15 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(this.version.Listed, Is.True);
                 this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been unlisted.", "Version Unlisted", NotificationType.Success), Times.Once);
             }
+        }
+
+        private void SetupPackageReadServices(UserContext context, Package targetPackage)
+        {
+            this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(context);
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(context, "starion", "ecss-mm-pwr", false, It.IsAny<CancellationToken>())).ReturnsAsync(targetPackage);
+            this.scopeServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IScope>(this.ownerScope));
+            this.accountServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(this.version));
         }
     }
 }

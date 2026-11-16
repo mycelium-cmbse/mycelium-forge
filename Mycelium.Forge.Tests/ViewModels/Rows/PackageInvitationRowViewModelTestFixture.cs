@@ -13,6 +13,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Rows
     using System.Linq;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Models;
     using Mycelium.Forge.ViewModels.Rows;
 
     [TestFixture]
@@ -33,21 +34,9 @@ namespace Mycelium.Forge.Tests.ViewModels.Rows
                 ShortName = "starion"
             };
 
-            var packageWithScope = new Package
-            {
-                Id = packageWithScopeId,
-                Name = "ECSS Power",
-                ShortName = "ecss-power",
-                Owner = organizationId
-            };
-
-            var packageWithoutScope = new Package
-            {
-                Id = packageWithoutScopeId,
-                Name = "Standalone Tool",
-                ShortName = "standalone-tool",
-                Owner = Guid.NewGuid()
-            };
+            var packageWithScope = new PackageTargetSummary(new Package { Id = packageWithScopeId, Name = "ECSS Power", ShortName = "ecss-power", Owner = organizationId });
+            var packageWithoutScope = new PackageTargetSummary(new Package { Id = packageWithoutScopeId, Name = "Standalone Tool", ShortName = "standalone-tool", Owner = Guid.NewGuid() });
+            var privatePackage = new PackageTargetSummary(new Package { Id = privatePackageId, Name = "Secret Propulsion", ShortName = "secret-propulsion", Owner = organizationId });
 
             var ownerInvitation = new PackageInvitation
             {
@@ -76,35 +65,39 @@ namespace Mycelium.Forge.Tests.ViewModels.Rows
                 Target = Guid.NewGuid(),
                 PackageInvitationKind = PackageInvitationKind.MAINTAINER,
                 Status = InvitationStatusKind.PENDING,
+                ExperiesAt = DateTime.UtcNow.AddHours(-1)
+            };
+
+            var missingPackageInvitation = new PackageInvitation
+            {
+                Id = Guid.NewGuid(),
+                Package = Guid.NewGuid(),
+                Target = Guid.NewGuid(),
+                PackageInvitationKind = PackageInvitationKind.MAINTAINER,
+                Status = InvitationStatusKind.PENDING,
                 ExperiesAt = DateTime.UtcNow.AddDays(2)
             };
 
-            var rows = PackageInvitationRowViewModel.GenerateRows([ownerInvitation, maintainerInvitation, privateInvitation], [organization, packageWithScope, packageWithoutScope]).ToList();
-            var nullRelatedRows = PackageInvitationRowViewModel.GenerateRows([privateInvitation], null!).ToList();
+            var rows = PackageInvitationRowViewModel.GenerateRows([ownerInvitation, maintainerInvitation, privateInvitation, missingPackageInvitation], [packageWithScope, packageWithoutScope, privatePackage], [organization], [packageWithScopeId]).ToList();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(rows, Has.Count.EqualTo(3));
+                Assert.That(rows, Has.Count.EqualTo(2));
 
                 Assert.That(rows[0].Invitation, Is.EqualTo(ownerInvitation));
                 Assert.That(((IInvitationRowViewModel)rows[0]).Invitation, Is.EqualTo(ownerInvitation));
                 Assert.That(rows[0].Package, Is.EqualTo(packageWithScope));
                 Assert.That(rows[0].Scope, Is.EqualTo(organization));
+                Assert.That(rows[0].IsPackageReadable, Is.True);
                 Assert.That(rows[0].RoleName, Is.EqualTo("Owner"));
                 Assert.That(rows[0].ExpiresIn, Does.StartWith("Expires in "));
 
-                Assert.That(rows[1].Package, Is.EqualTo(packageWithoutScope));
-                Assert.That(rows[1].Scope, Is.Null);
+                Assert.That(rows[1].Invitation, Is.EqualTo(privateInvitation));
+                Assert.That(rows[1].Package, Is.EqualTo(privatePackage));
+                Assert.That(rows[1].Scope, Is.EqualTo(organization));
+                Assert.That(rows[1].IsPackageReadable, Is.False);
                 Assert.That(rows[1].RoleName, Is.EqualTo("Maintainer"));
                 Assert.That(rows[1].ExpiresIn, Is.EqualTo("Expired"));
-
-                Assert.That(rows[2].Package, Is.Null);
-                Assert.That(rows[2].Scope, Is.Null);
-                Assert.That(rows[2].RoleName, Is.EqualTo("Maintainer"));
-
-                Assert.That(nullRelatedRows, Has.Count.EqualTo(1));
-                Assert.That(nullRelatedRows[0].Package, Is.Null);
-                Assert.That(nullRelatedRows[0].Scope, Is.Null);
             }
         }
     }

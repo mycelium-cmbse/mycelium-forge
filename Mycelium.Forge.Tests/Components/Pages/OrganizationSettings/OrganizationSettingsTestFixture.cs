@@ -88,7 +88,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             };
 
             var adminId = Guid.NewGuid();
-            this.testUserContext = new UserContext { AccountId = adminId, CurrentRoles = [RoleKind.OrganizationAdministrator, RoleKind.Account] };
+            this.testUserContext = new UserContext { AccountId = adminId, CurrentRoles = [RoleKind.Account] };
 
             this.viewModelMock.Setup(x => x.Organization).Returns(this.testOrganization);
             this.viewModelMock.Setup(x => x.CurrentUserRole).Returns(OrganizationRole.Administrator);

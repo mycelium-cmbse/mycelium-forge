@@ -42,10 +42,8 @@ graph TD
     PlatformOperator[PlatformOperator]
     Account[Account]
     InstallationAdministrator[InstallationAdministrator]
-    OrganizationAdministrator[OrganizationAdministrator]
 
     Account --> InstallationAdministrator
-    Account --> OrganizationAdministrator
 ```
 
 ### 2.2 System Roles Catalog
@@ -54,9 +52,14 @@ graph TD
 |---|---|---|---|
 | `InstallationAdministrator` | `Account` | Super-administrator across the entire Forge deployment. | Full administrative access across all accounts, organizations, packages, and system metrics. |
 | `PlatformOperator` | *None* | Infrastructure operations and SRE team. | SaaS health monitoring, metrics, and platform-wide defaults. |
-| `OrganizationAdministrator` | `Account` | Tenant administrator for a specific Organization. | Manage organization profile, invite/remove members, configure publishing policies and visibility, manage org packages. |
-| `Account` | *None* | Standard authenticated user account. | Manage own profile, manage personal packages (`@username/*`), issue/revoke personal API keys, create organizations. |
+| `Account` | *None* | Standard authenticated user account. | Manage own profile, manage personal packages (`@username/*`), publish packages to organizations they belong to, issue/revoke personal API keys, create organizations. |
 | `Anonymous` | *None* | Unauthenticated visitor, crawler, or package consumer. | Read public packages, download published versions, view reference data (countries, package types). |
+
+### 2.3 Removal of Global `OrganizationAdministrator` Role
+
+- Previously, `RoleKind.OrganizationAdministrator` (defined in `forge-roles-and-permissions.csv` and `docker/keycloak/forge-realm.json`) existed as a **global Keycloak realm role**, granting `ManageOrganizationSettings`, `ManageOrganizationMembers`, `ConfigurePublishingPolicy`, `TransferOrganizationAdministration`, `ConfigureDefaultPackageVisibility`, `ViewOrganizationPackageList`, `ViewOrganizationMemberList`, `PublishPackageToOrganizationScope`, `ManagePackageSettings`, `ManagePackageTeam`, `TransferPackageOwnership`, `SetPackageVisibility`, `PublishPackageVersion`, `UnlistPackageVersion`, and `RelistPackageVersion` across **all** organizations and packages rather than being tenant-scoped.
+- That global `OrganizationAdministrator` role has been **removed** from `RoleKind`, `RolePermissionMap`, `docker/keycloak/forge-realm.json`, and seed data.
+- Organization-scoped and package-scoped administration is enforced per entity via `Organization.Administrator`, `Package.PackageOwner`, and `Package.PackageMaintainer`, while `Account` grants `PublishPackageToOrganizationScope` (guarded by organization membership/administration in `PackagePermissionService`). Cross-tenant administrative overrides remain exclusive to `InstallationAdministrator`.
 
 ---
 
@@ -243,9 +246,8 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   - `ReadPermission`: Permission required to view invitations (`ViewOrganizationMemberList` / `ManagePackageTeam`).
   - `AdminPermission`: Administrative override permission (`ManageOrganizations` for `OrganizationInvitation`, `ManagePackageTeam` for `PackageInvitation`).
   - `BypassPermissions`: Permissions that bypass read filtering.
-- **Configured Permission Asymmetry (Intentional):**
-  - `OrganizationInvitation` sets `AdminPermission` to `ManageOrganizations`, which only `InstallationAdministrator` holds.
-  - `PackageInvitation` sets `AdminPermission` to `ManagePackageTeam`, which `OrganizationAdministrator` also holds globally in `RolePermissionMap`. Consequently, `OrganizationAdministrator` holds the global administrative override for `PackageInvitation` actions (including accepting/rejecting or resending/revoking any `PackageInvitation`), whereas for `OrganizationInvitation` only `InstallationAdministrator` has that global override.
+- **Configured Permission Asymmetry (Historical):**
+  - `OrganizationInvitation` sets `AdminPermission` to `ManageOrganizations`, whereas `PackageInvitation` sets `AdminPermission` to `ManagePackageTeam`. Since removing the global `OrganizationAdministrator` role, both permissions are held globally only by `InstallationAdministrator`, while per-entity access is granted to `Organization.Administrator` and `Package.PackageOwner` respectively.
 - **Enforcement Logic:**
   - **Create:** Permitted for callers with `AdminPermission` or membership in `ScopeRoles` on the target scope entity (`Administrator` / `PackageOwner`).
   - **Accept / Reject:** Permitted only while `Status == PENDING` and not expired (`ExperiesAt > DateTime.UtcNow`), without modifying non-status fields (`ExperiesAt`, `*InvitationKind`, `Organization`/`Package`, `Target`, `Owner`), and only if the caller matches `Target` or holds `AdminPermission`.

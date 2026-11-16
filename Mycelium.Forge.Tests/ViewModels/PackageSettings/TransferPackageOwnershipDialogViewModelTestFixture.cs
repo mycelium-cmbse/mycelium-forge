@@ -99,17 +99,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(foreignOrganizationResult.FirstError.Description, Is.EqualTo("You do not have administrative rights on the target organization."));
             }
 
-            // Case 5: Organization administrator of a different organization is rejected
-            this.userContext.CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator];
-            var otherOrganizationResult = await this.viewModel.ValidateTargetAsync(this.package, "starion", "foreign-org", CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(otherOrganizationResult.IsError, Is.True);
-                Assert.That(otherOrganizationResult.FirstError.Description, Is.EqualTo("You do not have administrative rights on the target organization."));
-            }
-
-            // Case 6: Installation administrator may target an organization they do not administer
+            // Case 5: Installation administrator may target an organization they do not administer
             this.userContext.CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator];
             var installationAdministratorResult = await this.viewModel.ValidateTargetAsync(this.package, "starion", "foreign-org", CancellationToken.None);
 
@@ -119,7 +109,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(installationAdministratorResult.Value, Is.SameAs(foreignOrganization));
             }
 
-            // Case 7: Account that is not the user's own account is rejected
+            // Case 6: Account that is not the user's own account is rejected
             this.userContext.CurrentRoles = [RoleKind.Account];
             var foreignAccount = new Account { Id = Guid.NewGuid(), ShortName = "foreign-user" };
             this.SetupScope("foreign-user", foreignAccount);

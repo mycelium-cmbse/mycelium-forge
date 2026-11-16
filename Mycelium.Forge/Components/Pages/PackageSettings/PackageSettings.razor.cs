@@ -55,6 +55,16 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether the package settings page can be rendered for the current user.
+        /// </summary>
+        private bool CanRenderSettings => this.ViewModel.Package != null && this.ViewModel.Owner != null && (this.ViewModel.CanManagePackage || this.ViewModel.CanManageVersions);
+
+        /// <summary>
+        /// Gets a value indicating whether the package is owned by an organization rather than an individual account.
+        /// </summary>
+        private bool IsOrganizationOwned => this.ViewModel.Owner is not IAccount;
+
+        /// <summary>
         /// Handles component parameter updates and initializes the view model with the route parameters asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -71,12 +81,22 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
+        /// Gets the CSS text color class for a package version based on its listed state.
+        /// </summary>
+        /// <param name="version">The package version to evaluate.</param>
+        /// <returns>The CSS text color class string.</returns>
+        private static string GetVersionTextClass(IPackageVersion version)
+        {
+            return !version.Listed ? "text-muted-foreground" : "text-foreground";
+        }
+
+        /// <summary>
         /// Determines whether transferring package ownership is enabled and visible for the current user.
         /// </summary>
         /// <returns><c>true</c> if transferring package ownership is enabled; otherwise, <c>false</c>.</returns>
         private bool IsTransferOwnershipEnabled()
         {
-            if (PermissionGuard.HasRole(this.ViewModel.UserContext, RoleKind.InstallationAdministrator))
+            if (PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.TransferPackageOwnership))
             {
                 return true;
             }

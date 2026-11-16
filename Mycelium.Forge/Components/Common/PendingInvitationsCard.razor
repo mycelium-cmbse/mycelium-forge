@@ -56,7 +56,7 @@
         }
     </div>
 
-    @if (!string.IsNullOrWhiteSpace(this.AlertDescription))
+    @if (this.HasAlertDescription)
     {
         <ForgeAlert Variant="ForgeAlertVariant.Default"
                     Description="@(this.AlertDescription)"/>

@@ -31,7 +31,7 @@
                         Class="text-foreground-muted shrink-0"/>
         </div>
 
-        @if (packageRow.Package != null && packageRow.Scope != null)
+        @if (packageRow.IsPackageReadable)
         {
             <a href="@(PageRoutes.GetPackageRoute(packageRow.Scope.ShortName, packageRow.Package.ShortName))"
                class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
@@ -41,12 +41,12 @@
         else
         {
             <span class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground truncate">
-                Private package
+                @($"@{packageRow.Scope.ShortName}/{packageRow.Package.ShortName}")
             </span>
         }
 
         <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
-            @(packageRow.Package?.Name ?? "Package invitation")
+            @(packageRow.Package.Name)
         </span>
     }
 
