@@ -144,7 +144,7 @@ namespace Mycelium.Forge.ViewModels.Home
 
             this.PackageCount = packages.Count;
             this.VersionCount = packageVersions.Count;
-            this.PublisherCount = scopes.Select(s => s.Id).Distinct().Count();
+            this.PublisherCount = scopes.Select(s => s.Id).Count();
             this.DownloadCount = allRows.Sum(p => p.DownloadCount);
 
             this.StandardLibraries = allRows

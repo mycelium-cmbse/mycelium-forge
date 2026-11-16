@@ -121,7 +121,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            if (thing.Target == accountId)
+            if (thing.Target == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
             {
                 return Result.Success;
             }
@@ -150,7 +150,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
+            return Error.Forbidden(description: "Access denied: cannot view this invitation.");
         }
 
         /// <summary>

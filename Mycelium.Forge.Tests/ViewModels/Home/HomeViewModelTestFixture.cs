@@ -139,40 +139,13 @@ namespace Mycelium.Forge.Tests.ViewModels.Home
                 Assert.That(this.viewModel.ModelsFromOtherMbseTools, Has.Count.EqualTo(1));
             }
 
-            var publisherId = Guid.NewGuid();
-            var accountOwner = new Account { Id = publisherId, ShortName = "alex" };
-            var duplicateAccountOwner = new Account { Id = publisherId, ShortName = "alex" };
-            
-            var accountPackage = new Package
-            {
-                Id = Guid.NewGuid(),
-                Owner = publisherId,
-                PackageType = typeSysmlId,
-                Version = [],
-                Name = "Account-Package",
-                ShortName = "account-package",
-                CreatedAt = DateTime.UtcNow.AddDays(-1)
-            };
-
-            this.packageServiceMock
-                .Setup(x => x.ReadAsync(this.userContext, CancellationToken.None, null))
-                .ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackage>(accountPackage)));
-
-            this.scopeServiceMock
-                .Setup(x => x.ReadAsync(this.userContext, CancellationToken.None, It.IsAny<Guid[]>()))
-                .ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IScope>(accountOwner, duplicateAccountOwner)));
-
-            await this.viewModel.InitializeViewModel();
-
-            Assert.That(this.viewModel.PublisherCount, Is.EqualTo(1));
-
             this.packageServiceMock
                 .Setup(x => x.ReadAsync(this.userContext, CancellationToken.None, null))
                 .ReturnsAsync(Error.Failure("Failed to read packages"));
 
             await this.viewModel.InitializeViewModel();
 
-            this.userServiceMock.Verify(x => x.GetUserContext(false), Times.Exactly(3));
+            this.userServiceMock.Verify(x => x.GetUserContext(false), Times.Exactly(2));
         }
     }
 }

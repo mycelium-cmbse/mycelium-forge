@@ -368,7 +368,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="propertyName">The property name to inspect on the entity.</param>
         /// <param name="targetEntityName">The parameter name of the target entity instance.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        public static void WritePropertyOwnershipCheck(StringBuilder stringBuilder, IClass @class, string propertyName, string targetEntityName, bool isAsync = false)
+        /// <param name="checkAccountIdHasValue">Whether to emit a <c>userContext.AccountId.HasValue</c> guard instead of referencing a pre-resolved <c>accountId</c> local.</param>
+        public static void WritePropertyOwnershipCheck(StringBuilder stringBuilder, IClass @class, string propertyName, string targetEntityName, bool isAsync = false, bool checkAccountIdHasValue = true)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -381,10 +382,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             var isEnumerable = property != null && property.QueryIsEnumerable();
 
             var okReturn = PermissionStatementHelper.GetOkReturn(isAsync);
+            var accountIdExpr = checkAccountIdHasValue ? "userContext.AccountId.Value" : "accountId";
+            var guardPrefix = checkAccountIdHasValue ? "userContext.AccountId.HasValue && " : string.Empty;
 
             var condition = isEnumerable
-                ? $"userContext.AccountId.HasValue && {targetEntityName}.{propertyName}.Contains(userContext.AccountId.Value)"
-                : $"userContext.AccountId.HasValue && {targetEntityName}.{propertyName} == userContext.AccountId.Value";
+                ? $"{guardPrefix}{targetEntityName}.{propertyName}.Contains({accountIdExpr})"
+                : $"{guardPrefix}{targetEntityName}.{propertyName} == {accountIdExpr}";
 
             stringBuilder.AppendLine($$"""
                                                    if ({{condition}})

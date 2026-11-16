@@ -110,9 +110,15 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var maintainerResult = await this.permissionService.IsAllowedToCreate(maintainerUserContext, invitation, this.transaction);
             Assert.That(maintainerResult.IsError, Is.True);
 
-            // Case 4: Package owner is allowed
+            // Case 4: Package owner and installation administrator are allowed
             var ownerResult = await this.permissionService.IsAllowedToCreate(this.packageOwnerUserContext, invitation, this.transaction);
-            Assert.That(ownerResult.IsError, Is.False);
+            var adminCreateResult = await this.permissionService.IsAllowedToCreate(this.adminUserContext, invitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(ownerResult.IsError, Is.False);
+                Assert.That(adminCreateResult.IsError, Is.False);
+            }
 
             // Case 5: Organization administrator of owning organization is allowed; member is denied
             var orgId = Guid.NewGuid();
@@ -240,10 +246,18 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(orgMemberReadResult.IsError, Is.True);
             }
 
-            // Case 7: Fail-closed when package lookup returns empty
+            // Case 7: Fail-closed when package lookup returns empty; anonymous denied; installation administrator allowed
             this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IPackage>.Empty);
             var failClosedResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation, this.transaction);
-            Assert.That(failClosedResult.IsError, Is.True);
+            var unauthReadResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, invitation, this.transaction);
+            var adminReadResult = await this.permissionService.IsAllowedToRead(this.adminUserContext, invitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(failClosedResult.IsError, Is.True);
+                Assert.That(unauthReadResult.IsError, Is.True);
+                Assert.That(adminReadResult.IsError, Is.False);
+            }
         }
 
         [Test]
@@ -447,14 +461,38 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(changedPackageResult.IsError, Is.True);
-                Assert.That(changedPackageResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedPackageResult.FirstError.Type, Is.EqualTo(ErrorType.Forbidden));
                 Assert.That(changedTargetResult.IsError, Is.True);
-                Assert.That(changedTargetResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedTargetResult.FirstError.Type, Is.EqualTo(ErrorType.Forbidden));
                 Assert.That(changedOwnerResult.IsError, Is.True);
-                Assert.That(changedOwnerResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedOwnerResult.FirstError.Type, Is.EqualTo(ErrorType.Forbidden));
                 Assert.That(changedKindResult.IsError, Is.True);
-                Assert.That(changedKindResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedKindResult.FirstError.Type, Is.EqualTo(ErrorType.Forbidden));
                 Assert.That(validResendResult.IsError, Is.False);
+            }
+
+            // Case 17: Anonymous denied; target rejecting valid PENDING is allowed; package owner and org admin accepting/rejecting are denied; target revoking is denied
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var rejectInvitation = existingInvitation.Clone();
+            rejectInvitation.Status = InvitationStatusKind.REJECTED;
+
+            var unauthUpdateResult = await this.permissionService.IsAllowedToUpdate(this.anonymousUserContext, existingInvitation, acceptInvitation, this.transaction);
+            var targetRejectResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, rejectInvitation, this.transaction);
+            var ownerAcceptResult = await this.permissionService.IsAllowedToUpdate(coOwnerUserContext, existingInvitation, acceptInvitation, this.transaction);
+            var ownerRejectResult = await this.permissionService.IsAllowedToUpdate(coOwnerUserContext, existingInvitation, rejectInvitation, this.transaction);
+            var orgAdminAcceptResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, existingInvitation, acceptInvitation, this.transaction);
+            var targetRevokeResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, revokeInvitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(unauthUpdateResult.IsError, Is.True);
+                Assert.That(targetRejectResult.IsError, Is.False);
+                Assert.That(ownerAcceptResult.IsError, Is.True);
+                Assert.That(ownerRejectResult.IsError, Is.True);
+                Assert.That(orgAdminAcceptResult.IsError, Is.True);
+                Assert.That(targetRevokeResult.IsError, Is.True);
             }
         }
 

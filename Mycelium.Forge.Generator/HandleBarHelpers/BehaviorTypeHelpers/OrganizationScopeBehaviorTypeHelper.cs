@@ -247,10 +247,32 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
         {
             var config = this.GetConfiguration(definition, behavior);
+            var entityLower = @class.Name.ToLowerInvariant();
+
+            stringBuilder.AppendLine($$"""
+                                                   if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                                   {
+                                                       return Error.Unauthorized(description: "Unauthenticated user cannot update a {{entityLower}}.");
+                                                   }
+
+                                                   var accountId = userContext.AccountId.Value;
+
+                                       """);
 
             if (definition != null)
             {
-                PermissionHelper.WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", true);
+                PermissionHelper.WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", true, false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.AdminPermission))
+            {
+                stringBuilder.AppendLine($$"""
+                                                       if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                                       {
+                                                           return Result.Success;
+                                                       }
+
+                                           """);
             }
 
             WriteScopeAdminCheck(stringBuilder, config, "existingThing");
@@ -273,14 +295,38 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
+            var entityLower = @class.Name.ToLowerInvariant();
+
+            stringBuilder.AppendLine($$"""
+                                                   if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                                   {
+                                                       return Error.Unauthorized(description: "Unauthenticated user cannot delete a {{entityLower}}.");
+                                                   }
+
+                                                   var accountId = userContext.AccountId.Value;
+
+                                       """);
 
             if (definition != null)
             {
-                PermissionHelper.WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", true);
+                PermissionHelper.WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", true, false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(definition?.DeletePermission))
+            {
+                var deleteCheck = PermissionStatementHelper.FormatHasPermissionCheck(definition.DeletePermission.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+                stringBuilder.AppendLine($$"""
+                                                       if ({{deleteCheck}})
+                                                       {
+                                                           return Result.Success;
+                                                       }
+
+                                           """);
             }
 
             WriteScopeAdminCheck(stringBuilder, config, "thing");
-            PermissionHelper.AppendPermissionGuardOrOk(stringBuilder, definition?.DeletePermission, true);
+            stringBuilder.Append($"            return Error.Forbidden(description: \"Access denied: cannot delete this {entityLower}.\");");
         }
 
         /// <summary>
@@ -372,19 +418,15 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var adminChecks = string.Join(" || ", config.ScopeAdminProperties.Select(prop => $"{scopeVar}.{prop}.Contains(accountId)"));
 
             stringBuilder.AppendLine($$"""
-                                                   if (userContext.AccountId.HasValue)
+                                                   var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [{{targetEntityName}}.Owner]);
+
+                                                   if (!orgResult.IsError && orgResult.Value.Count > 0)
                                                    {
-                                                       var accountId = userContext.AccountId.Value;
-                                                       var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [{{targetEntityName}}.Owner]);
+                                                       var {{scopeVar}} = orgResult.Value[0];
 
-                                                       if (!orgResult.IsError && orgResult.Value.Count > 0)
+                                                       if ({{adminChecks}})
                                                        {
-                                                           var {{scopeVar}} = orgResult.Value[0];
-
-                                                           if ({{adminChecks}})
-                                                           {
-                                                               return Result.Success;
-                                                           }
+                                                           return Result.Success;
                                                        }
                                                    }
 

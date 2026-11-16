@@ -154,14 +154,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var accountId = userContext.AccountId.Value;
 
-                                               if (thing.{{config.InviteeProperty}} == accountId)
+                                               if (thing.{{config.InviteeProperty}} == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.{{config.ReadPermission}}))
                                                {
                                                    return Result.Success;
                                                }
 
                                    {{scopeCheckBlock}}
 
-                                               return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.ReadPermission}});
+                                               return Error.Forbidden(description: "Access denied: cannot view this invitation.");
                                    """);
         }
 
@@ -191,6 +191,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var failUnsupported = PermissionStatementHelper.GetFailReturn("$\"Unsupported invitation status transition to {updatedThing.Status}.\"", isAsync);
             var okParty = PermissionStatementHelper.GetOkReturn(isAsync);
             var okAdmin = PermissionStatementHelper.GetOkReturn(isAsync);
+            var revokeRoleDescription = FormatRevokeActorDescription(config);
             var failNotParty = PermissionStatementHelper.GetFailReturn("\"Access denied: you are not a party to this invitation.\"", isAsync);
 
             stringBuilder.Append($$"""
@@ -245,7 +246,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                    {{revokeScopeBlock}}
 
-                                                       return Error.Forbidden(description: "Access denied: only administrators or {{config.ScopeRoleDescription}}s can revoke the invitation.");
+                                                       return Error.Forbidden(description: "Access denied: only {{revokeRoleDescription}} can revoke the invitation.");
                                                    }
 
                                                    {{failUnsupported}}
@@ -279,6 +280,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
             var deletePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
             var scopeCheckBlock = BuildScopeAccessBlock(config, $"thing.{config.ScopeProperty}", ScopeResultVariableName);
+            var revokeRoleDescription = FormatRevokeActorDescription(config);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -295,7 +297,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                    {{scopeCheckBlock}}
 
-                                               return Error.Forbidden(description: "Access denied: only administrators or {{config.ScopeRoleDescription}}s can revoke invitations.");
+                                               return Error.Forbidden(description: "Access denied: only {{revokeRoleDescription}} can revoke invitations.");
                                    """);
         }
 
@@ -398,6 +400,21 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             block.Append($"{indent}}}");
 
             return block.ToString();
+        }
+
+        /// <summary>
+        /// Formats the human-readable actor description used in invitation revocation error messages.
+        /// </summary>
+        /// <param name="config">The invitation workflow configuration.</param>
+        /// <returns>The formatted actor description.</returns>
+        private static string FormatRevokeActorDescription(InvitationWorkflowConfiguration config)
+        {
+            if (config.ScopeRoles.Length == 1 && config.ScopeRoles[0].Equals("Administrator", StringComparison.OrdinalIgnoreCase))
+            {
+                return "administrators";
+            }
+
+            return $"administrators or {config.ScopeRoleDescription}s";
         }
 
         /// <summary>

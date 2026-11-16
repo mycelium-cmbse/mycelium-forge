@@ -138,7 +138,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         {
             switch (invitation)
             {
-                case IOrganizationInvitation organizationInvitation:
+                case OrganizationInvitation organizationInvitation:
                 {
                     var acceptResult = await this.organizationInvitationService.AcceptInvitationAsync(this.userContext, organizationInvitation, token);
 
@@ -153,7 +153,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
                     break;
                 }
 
-                case IPackageInvitation packageInvitation:
+                case PackageInvitation packageInvitation:
                 {
                     var acceptResult = await this.packageInvitationService.AcceptInvitationAsync(this.userContext, packageInvitation, token);
 

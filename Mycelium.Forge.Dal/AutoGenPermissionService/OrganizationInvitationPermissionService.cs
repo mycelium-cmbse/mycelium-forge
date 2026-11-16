@@ -102,7 +102,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            if (thing.Target == accountId)
+            if (thing.Target == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ViewOrganizationMemberList))
             {
                 return Result.Success;
             }
@@ -119,7 +119,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return PermissionGuard.GuardPermission(userContext, PermissionKind.ViewOrganizationMemberList);
+            return Error.Forbidden(description: "Access denied: cannot view this invitation.");
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                         }
                     }
 
-                    return Error.Forbidden(description: "Access denied: only administrators or administrators can revoke the invitation.");
+                    return Error.Forbidden(description: "Access denied: only administrators can revoke the invitation.");
                 }
 
                 return Error.Forbidden(description: $"Unsupported invitation status transition to {updatedThing.Status}.");
@@ -257,7 +257,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return Error.Forbidden(description: "Access denied: only administrators or administrators can revoke invitations.");
+            return Error.Forbidden(description: "Access denied: only administrators can revoke invitations.");
         }
     }
 }

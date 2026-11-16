@@ -86,22 +86,32 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         [Test]
         public async Task VerifyIsAllowedToCreate()
         {
-            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId], Member = [this.userId] };
+            var orgMemberId = Guid.NewGuid();
+            var orgMemberContext = CreateOrganizationAdminContext(orgMemberId);
+            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId], Member = [this.userId, orgMemberId] };
             var invitation = this.CreateInvitation(this.organizationId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
 
             this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
 
             // Case 1: Anonymous user is denied
             var unauthResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, invitation, this.transaction);
-            Assert.That(unauthResult.IsError, Is.True);
 
-            // Case 2: Non-administrator target user is denied
+            // Case 2: Non-administrator target user and non-admin organization member are denied
             var targetResult = await this.permissionService.IsAllowedToCreate(this.targetUserContext, invitation, this.transaction);
-            Assert.That(targetResult.IsError, Is.True);
+            var orgMemberResult = await this.permissionService.IsAllowedToCreate(orgMemberContext, invitation, this.transaction);
 
-            // Case 3: Organization administrator is allowed
-            var adminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, invitation, this.transaction);
-            Assert.That(adminResult.IsError, Is.False);
+            // Case 3: Organization administrator and installation administrator are allowed
+            var orgAdminResult = await this.permissionService.IsAllowedToCreate(this.orgAdminUserContext, invitation, this.transaction);
+            var adminResult = await this.permissionService.IsAllowedToCreate(this.adminUserContext, invitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(unauthResult.IsError, Is.True);
+                Assert.That(targetResult.IsError, Is.True);
+                Assert.That(orgMemberResult.IsError, Is.True);
+                Assert.That(orgAdminResult.IsError, Is.False);
+                Assert.That(adminResult.IsError, Is.False);
+            }
         }
 
         [Test]
@@ -134,37 +144,62 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, invitation, this.transaction);
             Assert.That(adminResult.IsError, Is.False);
 
-            // Case 6: Removed/non-admin creator is denied
+            // Case 6: Removed/non-admin creator and non-admin organization member are denied
+            var orgMemberId = Guid.NewGuid();
+            var orgMemberContext = CreateOrganizationAdminContext(orgMemberId);
+            organization.Member.Add(orgMemberId);
             var removedCreatorInvitation = this.CreateInvitation(this.thirdPartyUserContext.AccountId!.Value, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
             var removedCreatorResult = await this.permissionService.IsAllowedToDelete(this.thirdPartyUserContext, removedCreatorInvitation, this.transaction);
-            Assert.That(removedCreatorResult.IsError, Is.True);
+            var orgMemberDeleteResult = await this.permissionService.IsAllowedToDelete(orgMemberContext, invitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(removedCreatorResult.IsError, Is.True);
+                Assert.That(orgMemberDeleteResult.IsError, Is.True);
+            }
         }
 
         [Test]
         public async Task VerifyIsAllowedToRead()
         {
-            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId], Member = [this.userId] };
+            var orgMemberId = Guid.NewGuid();
+            var orgMemberContext = CreateOrganizationAdminContext(orgMemberId);
+            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId], Member = [this.userId, orgMemberId] };
             var nonAdminCreatorInvitation = this.CreateInvitation(this.thirdPartyUserContext.AccountId!.Value, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
             var invitation = this.CreateInvitation(this.userId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
 
             this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
 
-            // Case 1: Current organization administrator is allowed
+            // Case 1: Anonymous user is denied
+            var unauthResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, invitation, this.transaction);
+
+            // Case 2: Current organization administrator is allowed
             var ownerResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, invitation, this.transaction);
-            Assert.That(ownerResult.IsError, Is.False);
 
-            // Case 2: Target user is allowed
+            // Case 3: Target user is allowed
             var targetResult = await this.permissionService.IsAllowedToRead(this.targetUserContext, invitation, this.transaction);
-            Assert.That(targetResult.IsError, Is.False);
 
-            // Case 3: Removed/non-admin creator is denied
+            // Case 4: Installation administrator is allowed
+            var adminResult = await this.permissionService.IsAllowedToRead(this.adminUserContext, invitation, this.transaction);
+
+            // Case 5: Removed/non-admin creator and non-admin organization member are denied
             var removedCreatorResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, nonAdminCreatorInvitation, this.transaction);
-            Assert.That(removedCreatorResult.IsError, Is.True);
+            var orgMemberResult = await this.permissionService.IsAllowedToRead(orgMemberContext, invitation, this.transaction);
 
-            // Case 4: Third party user is denied when organization cannot be resolved
+            // Case 6: Third party user is denied when organization cannot be resolved
             this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IOrganization>.Empty);
             var thirdPartyResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation, this.transaction);
-            Assert.That(thirdPartyResult.IsError, Is.True);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(unauthResult.IsError, Is.True);
+                Assert.That(ownerResult.IsError, Is.False);
+                Assert.That(targetResult.IsError, Is.False);
+                Assert.That(adminResult.IsError, Is.False);
+                Assert.That(removedCreatorResult.IsError, Is.True);
+                Assert.That(orgMemberResult.IsError, Is.True);
+                Assert.That(thirdPartyResult.IsError, Is.True);
+            }
         }
 
         [Test]
@@ -337,6 +372,33 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(changedKindResult.IsError, Is.True);
                 Assert.That(changedKindResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
                 Assert.That(validResendResult.IsError, Is.False);
+            }
+
+            // Case 16: Anonymous user denied; target rejecting valid PENDING is allowed; org admin accepting/rejecting is denied; target revoking is denied; non-admin org member is denied
+            var orgMemberId = Guid.NewGuid();
+            var orgMemberContext = CreateOrganizationAdminContext(orgMemberId);
+            organization.Member.Add(orgMemberId);
+
+            var rejectInvitation = existingInvitation.Clone();
+            rejectInvitation.Status = InvitationStatusKind.REJECTED;
+
+            var unauthUpdateResult = await this.permissionService.IsAllowedToUpdate(this.anonymousUserContext, existingInvitation, acceptInvitation, this.transaction);
+            var targetRejectResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, rejectInvitation, this.transaction);
+            var orgAdminAcceptResult = await this.permissionService.IsAllowedToUpdate(orgAdmin2Context, existingInvitation, acceptInvitation, this.transaction);
+            var orgAdminRejectResult = await this.permissionService.IsAllowedToUpdate(orgAdmin2Context, existingInvitation, rejectInvitation, this.transaction);
+            var targetRevokeResult = await this.permissionService.IsAllowedToUpdate(this.targetUserContext, existingInvitation, revokeInvitation, this.transaction);
+            var orgMemberResendResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, existingInvitation, updatedInvitation, this.transaction);
+            var orgMemberRevokeResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, existingInvitation, revokeInvitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(unauthUpdateResult.IsError, Is.True);
+                Assert.That(targetRejectResult.IsError, Is.False);
+                Assert.That(orgAdminAcceptResult.IsError, Is.True);
+                Assert.That(orgAdminRejectResult.IsError, Is.True);
+                Assert.That(targetRevokeResult.IsError, Is.True);
+                Assert.That(orgMemberResendResult.IsError, Is.True);
+                Assert.That(orgMemberRevokeResult.IsError, Is.True);
             }
         }
 
