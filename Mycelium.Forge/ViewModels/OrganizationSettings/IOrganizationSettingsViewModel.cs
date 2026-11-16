@@ -13,6 +13,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Enums;
+    using Mycelium.Forge.ViewModels.Invitations;
 
     /// <summary>
     /// Defines the view model contract for managing organization settings, members, and team roles.
@@ -50,14 +51,9 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         IReadOnlyList<IAccount> Members { get; }
 
         /// <summary>
-        /// Gets the collection of pending invitations for the organization.
+        /// Gets the view model responsible for managing pending organization invitations.
         /// </summary>
-        IReadOnlyList<OrganizationInvitation> PendingInvitations { get; }
-
-        /// <summary>
-        /// Gets the collection of accounts that have been invited to join the organization.
-        /// </summary>
-        IReadOnlyList<IAccount> InvitedAccounts { get; }
+        IInvitationManagerViewModel<IOrganizationInvitation> InvitationManager { get; }
 
         /// <summary>
         /// Initializes the view model state for the specified organization short name asynchronously.
@@ -80,20 +76,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <param name="member">The member to remove.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         Task RemoveMember(IAccount member);
-
-        /// <summary>
-        /// Resends the specified pending invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to resend.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task ResendInvitation(OrganizationInvitation invitation);
-
-        /// <summary>
-        /// Revokes the specified pending invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to revoke.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task RevokeInvitation(OrganizationInvitation invitation);
 
         /// <summary>
         /// Transfers ownership of the organization to the specified recipient account asynchronously.

@@ -210,6 +210,31 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.CanManageVersions, Is.False);
             }
 
+            // Owning organization administrator (not in PackageOwner/PackageMaintainer) has IsUserAdmin == true and CanManageVersions == true, and duplicate maintainer DTOs are deduplicated
+            var orgAdminId = Guid.NewGuid();
+            this.org.Administrator = [orgAdminId];
+            
+            var orgAdminContext = new UserContext
+            {
+                AccountId = orgAdminId,
+                Username = "orgadmin",
+                CurrentRoles = [RoleKind.Account]
+            };
+
+            var duplicateMaintainer = new Account { Id = this.maintainer.Id, Name = this.maintainer.Name, IsVerified = true };
+            this.SetupPackageReadServices(orgAdminContext);
+            this.accountServiceMock.Setup(x => x.ReadAsync(orgAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IAccount>(this.maintainer, duplicateMaintainer)));
+            this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(orgAdminContext, this.package, this.package, It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
+
+            await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.IsUserAdmin, Is.True);
+                Assert.That(this.viewModel.CanManageVersions, Is.True);
+                Assert.That(this.viewModel.Maintainers, Has.Count.EqualTo(1));
+            }
+
             // Non-existent package: resets permission flags, returns early and logs warning
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.userContext);
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "other-org", "nonexistent", false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());

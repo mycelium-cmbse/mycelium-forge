@@ -12,6 +12,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
     using ErrorOr;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.ViewModels.Invitations;
 
     /// <summary>
     /// Defines the view model contract for the Mycelium Forge package settings page.
@@ -44,14 +45,9 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         List<IAccount> Owners { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of pending invitations for the package.
+        /// Gets the view model responsible for managing pending package invitations.
         /// </summary>
-        List<PackageInvitation> PendingInvitations { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of accounts that have pending invitations for the package.
-        /// </summary>
-        List<IAccount> InvitedAccounts { get; set; }
+        IInvitationManagerViewModel<IPackageInvitation> InvitationManager { get; }
 
         /// <summary>
         /// Gets or sets the collection of released package versions.
@@ -90,6 +86,32 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <param name="scope">The owning scope or publisher identifier.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         Task InitializeViewModel(string packageShortname, string scope);
+
+        /// <summary>
+        /// Invites an account to collaborate on the package with the specified role asynchronously.
+        /// </summary>
+        /// <param name="target">The target account being invited.</param>
+        /// <param name="role">The invitation role to grant.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A task indicating the success or failure of the operation.</returns>
+        Task<ErrorOr<Success>> InviteCollaborator(IAccount target, PackageInvitationKind role, CancellationToken token = default);
+
+        /// <summary>
+        /// Changes the role of the specified package collaborator asynchronously.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account whose role is changing.</param>
+        /// <param name="newRole">The new package role to assign.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task ChangeCollaboratorRole(IAccount collaborator, PackageInvitationKind newRole, CancellationToken token = default);
+
+        /// <summary>
+        /// Removes the specified collaborator from the package asynchronously.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account to remove.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        Task RemoveCollaborator(IAccount collaborator, CancellationToken token = default);
 
         /// <summary>
         /// Updates the package visibility setting asynchronously.
@@ -142,47 +164,5 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         /// <param name="token">The cancellation token.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
         Task<ErrorOr<Success>> DeletePackage(CancellationToken token = default);
-
-        /// <summary>
-        /// Invites an account to collaborate on the package with the specified role asynchronously.
-        /// </summary>
-        /// <param name="target">The target account being invited.</param>
-        /// <param name="role">The invitation role to grant.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>A task indicating the success or failure of the operation.</returns>
-        Task<ErrorOr<Success>> InviteCollaborator(IAccount target, PackageInvitationKind role, CancellationToken token = default);
-
-        /// <summary>
-        /// Resends the specified pending package invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to resend.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task ResendInvitation(PackageInvitation invitation, CancellationToken token = default);
-
-        /// <summary>
-        /// Revokes the specified pending package invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to revoke.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task RevokeInvitation(PackageInvitation invitation, CancellationToken token = default);
-
-        /// <summary>
-        /// Changes the role of the specified package collaborator asynchronously.
-        /// </summary>
-        /// <param name="collaborator">The collaborator account whose role is changing.</param>
-        /// <param name="newRole">The new package role to assign.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task ChangeCollaboratorRole(IAccount collaborator, PackageInvitationKind newRole, CancellationToken token = default);
-
-        /// <summary>
-        /// Removes the specified collaborator from the package asynchronously.
-        /// </summary>
-        /// <param name="collaborator">The collaborator account to remove.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task RemoveCollaborator(IAccount collaborator, CancellationToken token = default);
     }
 }

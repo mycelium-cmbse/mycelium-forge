@@ -22,6 +22,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
     using Bunit;
 
+    using DynamicData;
+
     using ErrorOr;
 
     using Microsoft.AspNetCore.Components;
@@ -38,6 +40,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.Tests.TestHelpers;
+    using Mycelium.Forge.ViewModels.Invitations;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
     [TestFixture]
@@ -45,6 +48,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
     {
         private BunitContext context;
         private Mock<IPackageSettingsViewModel> viewModelMock;
+        private Mock<IInvitationManagerViewModel<IPackageInvitation>> invitationManagerMock;
+        private SourceList<IPackageInvitation> pendingInvitations;
         private IRenderedComponent<BbDialogProvider> dialogProvider;
         private IRenderedComponent<BbPortalHost> portalHost;
         private Package testPackage;
@@ -145,12 +150,18 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 ExperiesAt = DateTime.UtcNow.AddDays(3)
             };
 
+            this.pendingInvitations = new SourceList<IPackageInvitation>();
+            this.pendingInvitations.Add(this.testInvitation);
+
+            this.invitationManagerMock = new Mock<IInvitationManagerViewModel<IPackageInvitation>>();
+            this.invitationManagerMock.Setup(x => x.PendingInvitations).Returns(this.pendingInvitations);
+            this.invitationManagerMock.Setup(x => x.GetTargetName(this.testInvitation)).Returns(this.invitedAccount.ShortName);
+
             this.viewModelMock.Setup(x => x.Package).Returns(this.testPackage);
             this.viewModelMock.Setup(x => x.Owner).Returns(this.testOwner);
             this.viewModelMock.Setup(x => x.Owners).Returns([this.ownerAccount]);
             this.viewModelMock.Setup(x => x.Maintainers).Returns([this.maintainerAccount]);
-            this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testInvitation]);
-            this.viewModelMock.Setup(x => x.InvitedAccounts).Returns([this.invitedAccount]);
+            this.viewModelMock.Setup(x => x.InvitationManager).Returns(this.invitationManagerMock.Object);
             this.viewModelMock.Setup(x => x.Versions).Returns([this.activeVersion, this.unlistedVersion]);
             this.SetupPermissions();
             this.viewModelMock.Setup(x => x.CurrentUserId).Returns(ownerAccountId);
@@ -173,9 +184,27 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         [TearDown]
         public async Task TearDown()
         {
+            this.pendingInvitations.Dispose();
             this.portalHost.Dispose();
             this.dialogProvider.Dispose();
             await this.context.DisposeAsync();
+        }
+
+        [Test]
+        public void VerifyCollaboratorsRendering()
+        {
+            this.viewModelMock.Setup(x => x.Owners).Returns([this.ownerAccount]);
+            this.viewModelMock.Setup(x => x.Maintainers).Returns([this.ownerAccount, this.maintainerAccount]);
+
+            var packageSettingsPage = this.context.Render<PackageSettings>();
+            var collaboratorRows = packageSettingsPage.FindComponents<PackageCollaboratorRow>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(collaboratorRows, Has.Count.EqualTo(2));
+                Assert.That(collaboratorRows[0].Instance.Account.Id, Is.EqualTo(this.ownerAccount.Id));
+                Assert.That(collaboratorRows[1].Instance.Account.Id, Is.EqualTo(this.maintainerAccount.Id));
+            }
         }
 
         [Test]
@@ -362,24 +391,24 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         public async Task VerifyOnResendInvitation()
         {
             var packageSettingsPage = this.context.Render<PackageSettings>();
-            var resendButton = packageSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasClass("package-resend-invitation-button"));
+            var resendButton = packageSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasClass("resend-invitation-button"));
             Assert.That(resendButton, Is.Not.Null);
 
             await packageSettingsPage.InvokeAsync(() => resendButton!.Find("button").ClickAsync());
 
-            this.viewModelMock.Verify(x => x.ResendInvitation(this.testInvitation, It.IsAny<CancellationToken>()), Times.Once);
+            this.invitationManagerMock.Verify(x => x.ResendInvitation(this.testInvitation, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
         public async Task VerifyOnRevokeInvitation()
         {
             var packageSettingsPage = this.context.Render<PackageSettings>();
-            var revokeButton = packageSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasClass("package-revoke-invitation-button"));
+            var revokeButton = packageSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasClass("revoke-invitation-button"));
             Assert.That(revokeButton, Is.Not.Null);
 
             await packageSettingsPage.InvokeAsync(() => revokeButton!.Find("button").ClickAsync());
 
-            this.viewModelMock.Verify(x => x.RevokeInvitation(this.testInvitation, It.IsAny<CancellationToken>()), Times.Once);
+            this.invitationManagerMock.Verify(x => x.RevokeInvitation(this.testInvitation, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -414,6 +443,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
             // Case 3: Button is rendered when user is in PackageOwner
             this.viewModelMock.Setup(x => x.UserContext).Returns(this.testUserContext);
+            packageSettingsPage.Render();
+            Assert.That(packageSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-settings-transfer-button")), Is.Not.Null);
+
+            // Case 3b: Button is rendered when user is an administrator of the owning organization (even if not in PackageOwner)
+            var orgAdminId = Guid.NewGuid();
+            this.testOwner.Administrator = [this.ownerAccount.Id, orgAdminId];
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, CurrentRoles = [RoleKind.Account] };
+            this.viewModelMock.Setup(x => x.UserContext).Returns(orgAdminContext);
             packageSettingsPage.Render();
             Assert.That(packageSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-settings-transfer-button")), Is.Not.Null);
 
@@ -468,7 +505,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 ExperiesAt = DateTime.UtcNow.AddHours(-1)
             };
 
-            this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testInvitation, unknownTargetInvitation]);
+            this.invitationManagerMock.Setup(x => x.GetTargetName(unknownTargetInvitation)).Returns("Unknown");
+            this.pendingInvitations.Add(unknownTargetInvitation);
 
             var packageSettingsPage = this.context.Render<PackageSettings>();
 
@@ -477,8 +515,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 Assert.That(packageSettingsPage.Markup, Does.Contain("invited.user"));
                 Assert.That(packageSettingsPage.Markup, Does.Contain("Unknown"));
                 Assert.That(packageSettingsPage.Markup, Does.Contain("Expired"));
-                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("package-resend-invitation-button")).ToList(), Has.Count.EqualTo(2));
-                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("package-revoke-invitation-button")).ToList(), Has.Count.EqualTo(2));
+                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("resend-invitation-button")).ToList(), Has.Count.EqualTo(2));
+                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("revoke-invitation-button")).ToList(), Has.Count.EqualTo(2));
             }
 
             // When user cannot manage package team, resend/revoke buttons are hidden
@@ -487,8 +525,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("package-resend-invitation-button")).ToList(), Is.Empty);
-                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("package-revoke-invitation-button")).ToList(), Is.Empty);
+                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("resend-invitation-button")).ToList(), Is.Empty);
+                Assert.That(packageSettingsPage.FindComponents<BbButton>().Where(x => x.Instance.HasClass("revoke-invitation-button")).ToList(), Is.Empty);
             }
         }
 
@@ -499,7 +537,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var nullPage = this.context.Render<PackageSettings>();
 
             this.viewModelMock.Setup(x => x.Package).Returns(this.testPackage);
-            this.SetupPermissions(canManagePackage: false, canManageVersions: false);
+            this.SetupPermissions(false, canManageVersions: false);
             var unauthorizedPage = this.context.Render<PackageSettings>();
 
             this.SetupPermissions(canDeletePackage: false);
@@ -555,7 +593,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 Assert.That(badges[1].Markup, Does.Contain("Unlisted"));
             }
 
-            this.SetupPermissions(canManagePackage: false, canManagePackageTeam: false, canManageVersions: true, canDeletePackage: false);
+            this.SetupPermissions(false, false, true, false);
 
             var maintainerSettingsPage = this.context.Render<PackageSettings>();
             var publishVersionButton = maintainerSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-settings-publish-version-button"));
@@ -564,7 +602,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Assert.That(publishVersionButton, Is.Not.Null);
                 Assert.That(maintainerSettingsPage.Markup, Does.Not.Contain("VISIBILITY"));
-                Assert.That(maintainerSettingsPage.FindComponents<PendingInvitationsCard<PackageInvitation>>(), Is.Empty);
+                Assert.That(maintainerSettingsPage.FindComponents<PendingInvitationsCard<IPackageInvitation>>(), Is.Empty);
                 Assert.That(maintainerSettingsPage.Markup, Does.Not.Contain("Danger zone"));
             }
         }

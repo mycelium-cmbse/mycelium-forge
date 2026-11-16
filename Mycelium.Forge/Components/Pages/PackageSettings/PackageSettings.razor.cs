@@ -15,6 +15,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageSettings.Dialogs;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.PackageSettings;
@@ -65,6 +66,11 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         private bool IsOrganizationOwned => this.ViewModel.Owner is not IAccount;
 
         /// <summary>
+        /// Gets the deduplicated collection of package collaborators ordered with owners before maintainers.
+        /// </summary>
+        private IEnumerable<IAccount> Collaborators => this.ViewModel.Owners.Concat(this.ViewModel.Maintainers).DistinctBy(collaborator => collaborator.Id);
+
+        /// <summary>
         /// Handles component parameter updates and initializes the view model with the route parameters asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -103,7 +109,14 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
 
             var accountId = this.ViewModel.UserContext.AccountId;
 
-            return accountId.HasValue && this.ViewModel.Package.PackageOwner.Contains(accountId.Value);
+            if (!accountId.HasValue)
+            {
+                return false;
+            }
+
+            var isOrganizationAdmin = this.ViewModel.Package.IsOrganizationAdministrator(accountId.Value, this.ViewModel.Owner);
+
+            return this.ViewModel.Package.PackageOwner.Contains(accountId.Value) || isOrganizationAdmin;
         }
 
         /// <summary>
@@ -154,7 +167,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
             var parameters = new Dictionary<string, object>
             {
                 { nameof(AddMaintainerDialog.Package), this.ViewModel.Package },
-                { nameof(AddMaintainerDialog.PendingInvitations), this.ViewModel.PendingInvitations },
+                { nameof(AddMaintainerDialog.PendingInvitations), this.ViewModel.InvitationManager.PendingInvitations.Items },
                 { nameof(AddMaintainerDialog.OnResult), onResult }
             };
 
@@ -229,26 +242,6 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
-        /// Handles resending a pending package invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to resend.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnResendInvitation(PackageInvitation invitation)
-        {
-            await this.ViewModel.ResendInvitation(invitation);
-        }
-
-        /// <summary>
-        /// Handles revoking a pending package invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to revoke.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnRevokeInvitation(PackageInvitation invitation)
-        {
-            await this.ViewModel.RevokeInvitation(invitation);
-        }
-
-        /// <summary>
         /// Resolves the role of the specified collaborator within the package.
         /// </summary>
         /// <param name="collaborator">The collaborator account.</param>
@@ -278,17 +271,6 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         private bool IsSolePackageOwner(IAccount collaborator)
         {
             return this.ViewModel.Package.PackageOwner.Count == 1 && this.ViewModel.Package.PackageOwner.Contains(collaborator.Id);
-        }
-
-        /// <summary>
-        /// Gets the display short name of the target account associated with a given package invitation.
-        /// </summary>
-        /// <param name="invitation">The package invitation.</param>
-        /// <returns>The short name of the target account.</returns>
-        private string GetInvitationTargetName(IPackageInvitation invitation)
-        {
-            var target = this.ViewModel.InvitedAccounts.FirstOrDefault(a => a.Id == invitation.Target);
-            return target?.ShortName ?? "Unknown";
         }
 
         /// <summary>

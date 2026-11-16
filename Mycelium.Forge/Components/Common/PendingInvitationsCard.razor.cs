@@ -13,25 +13,20 @@ namespace Mycelium.Forge.Components.Common
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Extensions;
+    using Mycelium.Forge.ViewModels.Invitations;
 
     /// <summary>
     /// Displays pending invitations with target names, assigned roles, expiration state, and optional resend/revoke controls.
     /// </summary>
-    /// <typeparam name="TInvitation">The concrete invitation type.</typeparam>
-    public partial class PendingInvitationsCard<TInvitation> : ComponentBase where TInvitation : IInvitation
+    /// <typeparam name="TInvitation">The invitation domain interface type.</typeparam>
+    public partial class PendingInvitationsCard<TInvitation> : DisposableComponent where TInvitation : class, IInvitation
     {
         /// <summary>
-        /// Gets or sets the pending invitations to display.
-        /// </summary>
-        [Parameter]
-        public IReadOnlyList<TInvitation> Invitations { get; set; } = [];
-
-        /// <summary>
-        /// Gets or sets the selector resolving the display short name for an invitation's target account.
+        /// Gets or sets the invitation manager view model providing pending invitations and actions.
         /// </summary>
         [Parameter]
         [EditorRequired]
-        public Func<TInvitation, string> TargetNameSelector { get; set; }
+        public IInvitationManagerViewModel<TInvitation> ViewModel { get; set; }
 
         /// <summary>
         /// Gets or sets the selector resolving the role display text for an invitation.
@@ -53,33 +48,20 @@ namespace Mycelium.Forge.Components.Common
         public string AlertDescription { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the CSS class applied to each resend button.
-        /// </summary>
-        [Parameter]
-        public string ResendButtonClass { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the CSS class applied to each revoke button.
-        /// </summary>
-        [Parameter]
-        public string RevokeButtonClass { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the event callback invoked when the resend button is clicked.
-        /// </summary>
-        [Parameter]
-        public EventCallback<TInvitation> OnResend { get; set; }
-
-        /// <summary>
-        /// Gets or sets the event callback invoked when the revoke button is clicked.
-        /// </summary>
-        [Parameter]
-        public EventCallback<TInvitation> OnRevoke { get; set; }
-
-        /// <summary>
         /// Gets a value indicating whether the alert description is populated.
         /// </summary>
         private bool HasAlertDescription => !string.IsNullOrWhiteSpace(this.AlertDescription);
+
+        /// <summary>
+        /// Subscribes to reactive pending invitation changes on component initialization.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        protected override async Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+
+            this.Disposables.Add(this.ViewModel.PendingInvitations.Connect().SubscribeAsync(_ => this.InvokeAsync(this.StateHasChanged)));
+        }
 
         /// <summary>
         /// Gets the formatted expiration text for the specified invitation.

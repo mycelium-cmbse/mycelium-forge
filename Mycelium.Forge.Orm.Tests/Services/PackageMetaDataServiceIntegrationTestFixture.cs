@@ -133,7 +133,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
             var packageVersionDao = new PackageVersionDao(this.TestLoggerFactory.CreateLogger<PackageVersionDao>(), this.Serializer);
 
-            var packageVersionPermissionService = new PackageVersionPermissionService(packageService, packagePermissionService);
+            var packageVersionPermissionService = new PackageVersionPermissionService(packageService, packagePermissionService, organizationService);
 
             this.packageVersionService = new PackageVersionService(packageVersionDao, new PackageVersionValidator(), packageVersionPermissionService, new PackageVersionComparer(), this.TestLoggerFactory.CreateLogger<PackageVersionService>(), databaseSourceMock.Object, new PackageVersionReadFilter());
 

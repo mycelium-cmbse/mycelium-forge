@@ -78,13 +78,29 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers.BehaviorTypeHelpers
             var bypassHelper = new InvitationWorkflowBehaviorTypeHelper();
             var bypassPredicate = bypassHelper.BuildReadFilterPredicate(this.packageInvitationClass, this.definition, bypassBehavior, _ => string.Empty);
 
+            var ownerScopeBehavior = new EntityBehaviorDefinition
+            {
+                EntityName = "PackageInvitation",
+                BehaviorType = "InvitationWorkflow",
+                Configuration = new Dictionary<string, string>(this.behavior.Configuration, StringComparer.OrdinalIgnoreCase)
+                {
+                    { ConfigurationKeys.OwnerScopeEntity, "Organization" },
+                    { ConfigurationKeys.OwnerScopeProperty, "Owner" },
+                    { ConfigurationKeys.OwnerScopeRoles, "Administrator" }
+                }
+            };
+
+            var ownerScopeHelper = new InvitationWorkflowBehaviorTypeHelper();
+            var ownerScopePredicate = ownerScopeHelper.BuildReadFilterPredicate(this.packageInvitationClass, this.definition, ownerScopeBehavior, _ => string.Empty);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(defaultPredicate, Does.Contain("@canViewAllPackageInvitations = true"));
-                Assert.That(defaultPredicate, Does.Contain("package_invitation.owner = @callerAccountId"));
+                Assert.That(defaultPredicate, Does.Not.Contain("package_invitation.owner = @callerAccountId"));
                 Assert.That(defaultPredicate, Does.Contain("package_invitation.target = @callerAccountId"));
                 Assert.That(defaultPredicate, Does.Contain("package_package_owner__account"));
                 Assert.That(bypassPredicate, Does.Contain("@canManagePackageTeam = true OR @canViewAllPackageInvitations = true"));
+                Assert.That(ownerScopePredicate, Does.Contain("INNER JOIN forge.organization_administrator__account ON source_organization = package.owner"));
             }
         }
 
@@ -119,11 +135,29 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers.BehaviorTypeHelpers
             this.helper.WriteIsAllowedToCreate(stringBuilder, this.packageInvitationClass, this.definition, this.behavior);
             var generated = stringBuilder.ToString();
 
+            var ownerScopeBehavior = new EntityBehaviorDefinition
+            {
+                EntityName = "PackageInvitation",
+                BehaviorType = "InvitationWorkflow",
+                Configuration = new Dictionary<string, string>(this.behavior.Configuration, StringComparer.OrdinalIgnoreCase)
+                {
+                    { ConfigurationKeys.OwnerScopeEntity, "Organization" },
+                    { ConfigurationKeys.OwnerScopeProperty, "Owner" },
+                    { ConfigurationKeys.OwnerScopeRoles, "Administrator" }
+                }
+            };
+
+            var ownerScopeBuilder = new StringBuilder();
+            new InvitationWorkflowBehaviorTypeHelper().WriteIsAllowedToCreate(ownerScopeBuilder, this.packageInvitationClass, this.definition, ownerScopeBehavior);
+            var ownerScopeGenerated = ownerScopeBuilder.ToString();
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(generated, Does.Contain("PermissionKind.InvitePackageMaintainer"));
                 Assert.That(generated, Does.Contain("this.packageService.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Package])"));
                 Assert.That(generated, Does.Contain("package.PackageOwner.Contains(accountId)"));
+                Assert.That(ownerScopeGenerated, Does.Contain("this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner])"));
+                Assert.That(ownerScopeGenerated, Does.Contain("organization.Administrator.Contains(accountId)"));
             }
         }
 
@@ -136,7 +170,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers.BehaviorTypeHelpers
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(generated, Does.Contain("thing.Owner == accountId"));
+                Assert.That(generated, Does.Not.Contain("thing.Owner == accountId"));
                 Assert.That(generated, Does.Contain("PermissionKind.ManagePackageTeam"));
                 Assert.That(generated, Does.Contain("this.packageService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Package])"));
                 Assert.That(generated, Does.Contain("package.PackageOwner.Contains(accountId)"));
@@ -153,7 +187,8 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers.BehaviorTypeHelpers
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(generated, Does.Contain("PermissionKind.ViewAllPackageInvitations"));
-                Assert.That(generated, Does.Contain("thing.Owner == accountId || thing.Target == accountId"));
+                Assert.That(generated, Does.Not.Contain("thing.Owner == accountId"));
+                Assert.That(generated, Does.Contain("thing.Target == accountId"));
                 Assert.That(generated, Does.Contain("this.packageService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Package])"));
                 Assert.That(generated, Does.Contain("package.PackageOwner.Contains(accountId)"));
             }
@@ -168,6 +203,10 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers.BehaviorTypeHelpers
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(generated, Does.Contain("existingThing.Package != updatedThing.Package"));
+                Assert.That(generated, Does.Contain("existingThing.Target != updatedThing.Target"));
+                Assert.That(generated, Does.Contain("existingThing.Owner != updatedThing.Owner"));
+                Assert.That(generated, Does.Contain("existingThing.PackageInvitationKind != updatedThing.PackageInvitationKind"));
                 Assert.That(generated, Does.Contain("existingThing.Status != updatedThing.Status"));
                 Assert.That(generated, Does.Contain("updatedThing.Status == InvitationStatusKind.REVOKED"));
                 Assert.That(generated, Does.Contain("var updateScopeResult = await this.packageService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Package]);"));

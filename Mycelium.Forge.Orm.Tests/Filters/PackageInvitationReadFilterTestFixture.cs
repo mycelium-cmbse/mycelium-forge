@@ -70,9 +70,10 @@ namespace Mycelium.Forge.Orm.Tests.Filters
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(anonymousFilter.ToSqlPredicate(), Does.Contain("package_invitation.owner = @callerAccountId"));
+                Assert.That(anonymousFilter.ToSqlPredicate(), Does.Not.Contain("package_invitation.owner = @callerAccountId"));
                 Assert.That(anonymousFilter.ToSqlPredicate(), Does.Contain("package_invitation.target = @callerAccountId"));
                 Assert.That(anonymousFilter.ToSqlPredicate(), Does.Contain("forge.package_package_owner__account"));
+                Assert.That(anonymousFilter.ToSqlPredicate(), Does.Contain("forge.package INNER JOIN forge.organization_administrator__account ON source_organization = package.owner"));
                 Assert.That(anonymousFilter.ToSqlPredicate(), Does.Not.Contain("forge.package_package_maintainer__account"));
                 Assert.That(anonymousCommand.Parameters["@callerAccountId"].Value, Is.EqualTo(DBNull.Value));
                 Assert.That(anonymousCommand.Parameters["@canManagePackageTeam"].Value, Is.EqualTo(false));

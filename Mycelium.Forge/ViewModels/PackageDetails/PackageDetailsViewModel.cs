@@ -214,7 +214,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             var updatePermissionResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Package);
             this.IsUserAdmin = updatePermissionResult.IsSuccess;
-            this.CanManageVersions = this.Package.CanManageVersions(userContext);
+            this.CanManageVersions = this.Package.CanManageVersions(userContext, this.Owner);
 
             var isVersionsTab = string.Equals(tab, PackageTabConstants.Versions, StringComparison.OrdinalIgnoreCase);
 
@@ -281,7 +281,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 .ToList();
 
             var selectedVersion = versions[0];
-            var maintainers = maintainersTask.Result;
+            List<IAccount> maintainers = [.. maintainersTask.Result.DistinctBy(account => account.Id)];
 
             var metaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, [selectedVersion.MetaData])).ToList();
 

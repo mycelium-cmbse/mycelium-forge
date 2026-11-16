@@ -140,7 +140,7 @@ namespace Mycelium.Forge.Services
                 Name = displayName,
                 ShortName = username,
                 Email = principal.FindFirstValue(EmailClaimType) ?? principal.FindFirstValue(ClaimTypes.Email),
-                OwnedPackageInvitation = Guid.NewGuid(), // Remove this line once the domain model is updated and OwnedPackageInvitation is no longer mandatory (#138).
+                OwnedPackageInvitation = Guid.NewGuid(), // Remove once Account.OwnedPackageInvitation is updated to UML multiplicity 0..* (non-mandatory) (#138) so AccountDao.ReadAsync stops returning duplicate rows.
                 CreatedAt = DateTime.UtcNow,
                 ModifiedAt = DateTime.UtcNow
             };

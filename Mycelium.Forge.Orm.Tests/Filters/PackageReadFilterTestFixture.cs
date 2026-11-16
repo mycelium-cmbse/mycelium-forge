@@ -76,6 +76,7 @@ namespace Mycelium.Forge.Orm.Tests.Filters
                 Assert.That(anonymousCommand.Parameters["@canManageOrganizations"].Value, Is.EqualTo(false));
 
                 Assert.That(accountFilter.ToSqlPredicate(), Does.Contain("package.owner = @callerAccountId"));
+                Assert.That(accountFilter.ToSqlPredicate(), Does.Contain("EXISTS (SELECT 1 FROM forge.organization_administrator__account WHERE source_organization = package.owner AND target_account = @callerAccountId)"));
                 Assert.That(accountFilter.ToSqlPredicate(), Does.Contain("EXISTS (SELECT 1 FROM forge.organization_member__account"));
                 Assert.That(accountCommand.Parameters["@callerAccountId"].Value, Is.EqualTo(this.userId));
                 Assert.That(accountCommand.Parameters["@canViewAllOrganizations"].Value, Is.EqualTo(false));

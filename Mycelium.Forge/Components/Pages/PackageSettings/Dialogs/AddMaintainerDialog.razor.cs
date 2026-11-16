@@ -52,7 +52,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings.Dialogs
         /// Gets or sets the list of existing pending invitations for the package.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<PackageInvitation> PendingInvitations { get; set; } = [];
+        public IReadOnlyList<IPackageInvitation> PendingInvitations { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the event callback invoked with the invitation result when confirmed.

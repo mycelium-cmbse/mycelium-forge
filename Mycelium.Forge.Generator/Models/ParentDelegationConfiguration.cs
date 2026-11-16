@@ -55,6 +55,7 @@ namespace Mycelium.Forge.Generator.Models
             this.StateProperty = stateProp;
             this.StateActivePermission = stateActivePerm;
             this.StateInactivePermission = stateInactivePerm;
+            this.OwnerScope = new OwnerScopeConfiguration(config);
         }
 
         /// <summary>
@@ -121,5 +122,10 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the permission required to delete a child entity.
         /// </summary>
         public string DeletePermission { get; }
+
+        /// <summary>
+        /// Gets the optional secondary owner scope configuration.
+        /// </summary>
+        public OwnerScopeConfiguration OwnerScope { get; }
     }
 }

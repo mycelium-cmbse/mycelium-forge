@@ -268,7 +268,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="class">The <see cref="IClass" /> being generated.</param>
         /// <param name="propertyDefs">The list of property permission definitions.</param>
         /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
-        private static void WritePropertyChangePermissionChecks(StringBuilder stringBuilder, IClass @class, List<PropertyPermissionDefinition> propertyDefs, bool isAsync)
+        public static void WritePropertyChangePermissionChecks(StringBuilder stringBuilder, IClass @class, List<PropertyPermissionDefinition> propertyDefs, bool isAsync)
         {
             var allProperties = @class.QueryDtoClassProperties().ToList();
 
@@ -368,7 +368,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="propertyName">The property name to inspect on the entity.</param>
         /// <param name="targetEntityName">The parameter name of the target entity instance.</param>
         /// <param name="isAsync">Whether the enclosing method is asynchronous.</param>
-        private static void WritePropertyOwnershipCheck(StringBuilder stringBuilder, IClass @class, string propertyName, string targetEntityName, bool isAsync = false)
+        public static void WritePropertyOwnershipCheck(StringBuilder stringBuilder, IClass @class, string propertyName, string targetEntityName, bool isAsync = false)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -461,7 +461,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="stringBuilder">The <see cref="StringBuilder" /> to append to.</param>
         /// <param name="permission">The required permission expression.</param>
         /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
-        private static void AppendPermissionGuardOrOk(StringBuilder stringBuilder, string permission, bool isAsync)
+        public static void AppendPermissionGuardOrOk(StringBuilder stringBuilder, string permission, bool isAsync)
         {
             if (!string.IsNullOrWhiteSpace(permission))
             {

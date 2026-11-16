@@ -128,11 +128,26 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, package, this.transaction);
             var accountResult = await this.permissionService.IsAllowedToDelete(this.accountUserContext, package, this.transaction);
 
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var organization = new Organization { Id = orgId, Name = "Org", ShortName = "org", Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.organizationServiceMock.Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgOwnedPackage = new Package { Id = Guid.NewGuid(), Owner = orgId, PackageOwner = [this.otherUserId] };
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
+            var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
+
+            var orgAdminDeleteResult = await this.permissionService.IsAllowedToDelete(orgAdminContext, orgOwnedPackage, this.transaction);
+            var orgMemberDeleteResult = await this.permissionService.IsAllowedToDelete(orgMemberContext, orgOwnedPackage, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(adminResult.IsError, Is.False);
                 Assert.That(ownerResult.IsError, Is.True);
                 Assert.That(accountResult.IsError, Is.True);
+                Assert.That(orgAdminDeleteResult.IsError, Is.False);
+                Assert.That(orgMemberDeleteResult.IsError, Is.True);
             }
         }
 
@@ -194,13 +209,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var orgAId = Guid.NewGuid();
             var orgBId = Guid.NewGuid();
 
+            var orgAMemberId = Guid.NewGuid();
             var organizationA = new Organization
             {
                 Id = orgAId,
                 Name = "OrgA",
                 ShortName = "org-a",
                 Administrator = [this.userId],
-                Member = [this.userId]
+                Member = [this.userId, orgAMemberId]
             };
 
             var organizationB = new Organization
@@ -228,6 +244,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Visibility = VisibilityKind.INTERNAL
             };
 
+            var orgAPrivatePackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = orgAId,
+                PackageOwner = [orgAId],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
             var orgBMemberUserContext = new UserContext
             {
                 AccountId = this.otherUserId,
@@ -242,8 +266,18 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 CurrentRoles = [RoleKind.Account]
             };
 
+            var orgANonAdminMemberContext = new UserContext
+            {
+                AccountId = orgAMemberId,
+                Username = "orgANonAdminMember",
+                CurrentRoles = [RoleKind.Account]
+            };
+
             var otherOrgMemberResult = await this.permissionService.IsAllowedToRead(orgBMemberUserContext, orgAInternalPackage, this.transaction);
             var owningOrgMemberResult = await this.permissionService.IsAllowedToRead(orgAMemberUserContext, orgAInternalPackage, this.transaction);
+            var owningOrgAdminPrivateResult = await this.permissionService.IsAllowedToRead(orgAMemberUserContext, orgAPrivatePackage, this.transaction);
+            var owningOrgNonAdminPrivateResult = await this.permissionService.IsAllowedToRead(orgANonAdminMemberContext, orgAPrivatePackage, this.transaction);
+            var otherOrgAdminPrivateResult = await this.permissionService.IsAllowedToRead(orgBMemberUserContext, orgAPrivatePackage, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
@@ -257,6 +291,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(privateAdminResult.IsError, Is.False);
                 Assert.That(otherOrgMemberResult.IsError, Is.True);
                 Assert.That(owningOrgMemberResult.IsError, Is.False);
+                Assert.That(owningOrgAdminPrivateResult.IsError, Is.False);
+                Assert.That(owningOrgNonAdminPrivateResult.IsError, Is.True);
+                Assert.That(otherOrgAdminPrivateResult.IsError, Is.True);
             }
         }
 
@@ -309,6 +346,23 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var visibilityOwnerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingPackage, updatedVisibilityPackage, this.transaction);
             var visibilityMaintainerResult = await this.permissionService.IsAllowedToUpdate(this.maintainerUserContext, existingPackage, updatedVisibilityPackage, this.transaction);
 
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var organization = new Organization { Id = orgId, Name = "Org", ShortName = "org", Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.organizationServiceMock.Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgPackage = new Package { Id = Guid.NewGuid(), Owner = orgId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.PRIVATE };
+            var orgPackageVisibilityUpdated = new Package { Id = orgPackage.Id, Owner = orgId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.PUBLIC };
+            var orgPackageTransferred = new Package { Id = orgPackage.Id, Owner = orgAdminId, PackageOwner = [orgAdminId], Visibility = VisibilityKind.PRIVATE };
+
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
+            var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
+
+            var orgAdminVisibilityResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, orgPackage, orgPackageVisibilityUpdated, this.transaction);
+            var orgAdminTransferResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, orgPackage, orgPackageTransferred, this.transaction);
+            var orgMemberUpdateResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, orgPackage, orgPackageVisibilityUpdated, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(settingsOwnerResult.IsError, Is.False);
@@ -317,6 +371,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(ownershipMaintainerResult.IsError, Is.True);
                 Assert.That(visibilityOwnerResult.IsError, Is.False);
                 Assert.That(visibilityMaintainerResult.IsError, Is.True);
+                Assert.That(orgAdminVisibilityResult.IsError, Is.False);
+                Assert.That(orgAdminTransferResult.IsError, Is.False);
+                Assert.That(orgMemberUpdateResult.IsError, Is.True);
             }
         }
     }

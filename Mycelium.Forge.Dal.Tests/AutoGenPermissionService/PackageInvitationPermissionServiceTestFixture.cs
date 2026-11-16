@@ -11,6 +11,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 {
     using System.Collections.Immutable;
 
+    using ErrorOr;
+
     using Moq;
 
     using Mycelium.Forge.Common;
@@ -25,6 +27,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     public class PackageInvitationPermissionServiceTestFixture
     {
         private Mock<IPackageService> packageServiceMock;
+        private Mock<IOrganizationService> organizationServiceMock;
         private PackageInvitationPermissionService permissionService;
         private NpgsqlTransaction transaction;
         private Guid userId;
@@ -41,7 +44,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
         {
             this.transaction = null;
             this.packageServiceMock = new Mock<IPackageService>();
-            this.permissionService = new PackageInvitationPermissionService(this.packageServiceMock.Object);
+            this.organizationServiceMock = new Mock<IOrganizationService>();
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(Error.NotFound());
+            this.permissionService = new PackageInvitationPermissionService(this.packageServiceMock.Object, this.organizationServiceMock.Object);
 
             this.userId = Guid.NewGuid();
             this.otherUserId = Guid.NewGuid();
@@ -108,6 +113,24 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             // Case 4: Package owner is allowed
             var ownerResult = await this.permissionService.IsAllowedToCreate(this.packageOwnerUserContext, invitation, this.transaction);
             Assert.That(ownerResult.IsError, Is.False);
+
+            // Case 5: Organization administrator of owning organization is allowed; member is denied
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var orgPackage = new Package { Id = this.packageId, Owner = orgId, PackageOwner = [this.userId], PackageMaintainer = [] };
+            var organization = new Organization { Id = orgId, Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgAdminResult = await this.permissionService.IsAllowedToCreate(CreateAccountUserContext(orgAdminId, "orgAdmin"), invitation, this.transaction);
+            var orgMemberResult = await this.permissionService.IsAllowedToCreate(CreateAccountUserContext(orgMemberId, "orgMember"), invitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgAdminResult.IsError, Is.False);
+                Assert.That(orgMemberResult.IsError, Is.True);
+            }
         }
 
         [Test]
@@ -147,6 +170,24 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             // Case 5: Installation administrator is allowed
             var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, invitation, this.transaction);
             Assert.That(adminResult.IsError, Is.False);
+
+            // Case 6: Organization administrator of owning organization is allowed; member is denied
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var orgPackage = new Package { Id = this.packageId, Owner = orgId, PackageOwner = [this.userId], PackageMaintainer = [] };
+            var organization = new Organization { Id = orgId, Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgAdminDeleteResult = await this.permissionService.IsAllowedToDelete(CreateAccountUserContext(orgAdminId, "orgAdmin"), invitation, this.transaction);
+            var orgMemberDeleteResult = await this.permissionService.IsAllowedToDelete(CreateAccountUserContext(orgMemberId, "orgMember"), invitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgAdminDeleteResult.IsError, Is.False);
+                Assert.That(orgMemberDeleteResult.IsError, Is.True);
+            }
         }
 
         [Test]
@@ -181,7 +222,25 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var thirdPartyResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation, this.transaction);
             Assert.That(thirdPartyResult.IsError, Is.True);
 
-            // Case 6: Fail-closed when package lookup returns empty
+            // Case 6: Organization administrator of owning organization is allowed; member is denied
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var orgPackage = new Package { Id = this.packageId, Owner = orgId, PackageOwner = [this.userId], PackageMaintainer = [] };
+            var organization = new Organization { Id = orgId, Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgAdminReadResult = await this.permissionService.IsAllowedToRead(CreateAccountUserContext(orgAdminId, "orgAdmin"), invitation, this.transaction);
+            var orgMemberReadResult = await this.permissionService.IsAllowedToRead(CreateAccountUserContext(orgMemberId, "orgMember"), invitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgAdminReadResult.IsError, Is.False);
+                Assert.That(orgMemberReadResult.IsError, Is.True);
+            }
+
+            // Case 7: Fail-closed when package lookup returns empty
             this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IPackage>.Empty);
             var failClosedResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation, this.transaction);
             Assert.That(failClosedResult.IsError, Is.True);
@@ -319,6 +378,83 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 Assert.That(coOwnerRevokeResult.IsError, Is.False);
                 Assert.That(maintainerRevokeResult.IsError, Is.True);
+            }
+
+            // Case 14: Removed/non-owner creator cannot read, resend, revoke, or delete
+            var removedCreatorExisting = this.CreateInvitation(maintainerId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
+            var removedCreatorResend = removedCreatorExisting.Clone();
+            var removedCreatorRevoke = removedCreatorExisting.Clone();
+            removedCreatorRevoke.Status = InvitationStatusKind.REVOKED;
+
+            var removedCreatorReadResult = await this.permissionService.IsAllowedToRead(maintainerUserContext, removedCreatorExisting, this.transaction);
+            var removedCreatorResendResult = await this.permissionService.IsAllowedToUpdate(maintainerUserContext, removedCreatorExisting, removedCreatorResend, this.transaction);
+            var removedCreatorRevokeResult = await this.permissionService.IsAllowedToUpdate(maintainerUserContext, removedCreatorExisting, removedCreatorRevoke, this.transaction);
+            var removedCreatorDeleteResult = await this.permissionService.IsAllowedToDelete(maintainerUserContext, removedCreatorExisting, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(removedCreatorReadResult.IsError, Is.True);
+                Assert.That(removedCreatorResendResult.IsError, Is.True);
+                Assert.That(removedCreatorRevokeResult.IsError, Is.True);
+                Assert.That(removedCreatorDeleteResult.IsError, Is.True);
+            }
+
+            // Case 15: Organization administrator of owning organization can resend and revoke; member is denied
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var orgPackage = new Package { Id = this.packageId, Owner = orgId, PackageOwner = [this.userId], PackageMaintainer = [] };
+            var organization = new Organization { Id = orgId, Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgAdminContext = CreateAccountUserContext(orgAdminId, "orgAdmin");
+            var orgMemberContext = CreateAccountUserContext(orgMemberId, "orgMember");
+
+            var orgAdminResendResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, existingInvitation, updatedInvitation, this.transaction);
+            var orgAdminRevokeResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, existingInvitation, revokeInvitation, this.transaction);
+            var orgMemberResendResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, existingInvitation, updatedInvitation, this.transaction);
+            var orgMemberRevokeResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, existingInvitation, revokeInvitation, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(orgAdminResendResult.IsError, Is.False);
+                Assert.That(orgAdminRevokeResult.IsError, Is.False);
+                Assert.That(orgMemberResendResult.IsError, Is.True);
+                Assert.That(orgMemberRevokeResult.IsError, Is.True);
+            }
+
+            // Case 16: PENDING -> PENDING updates cannot change Package, Target, Owner, or Kind, while valid ExperiesAt resend succeeds
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(package));
+
+            var changedPackage = existingInvitation.Clone();
+            changedPackage.Package = Guid.NewGuid();
+            var changedTarget = existingInvitation.Clone();
+            changedTarget.Target = Guid.NewGuid();
+            var changedOwner = existingInvitation.Clone();
+            changedOwner.Owner = Guid.NewGuid();
+            var changedKind = existingInvitation.Clone();
+            changedKind.PackageInvitationKind = PackageInvitationKind.OWNER;
+            var validResend = existingInvitation.Clone();
+            validResend.ExperiesAt = existingInvitation.ExperiesAt.AddDays(3);
+
+            var changedPackageResult = await this.permissionService.IsAllowedToUpdate(this.packageOwnerUserContext, existingInvitation, changedPackage, this.transaction);
+            var changedTargetResult = await this.permissionService.IsAllowedToUpdate(this.packageOwnerUserContext, existingInvitation, changedTarget, this.transaction);
+            var changedOwnerResult = await this.permissionService.IsAllowedToUpdate(this.packageOwnerUserContext, existingInvitation, changedOwner, this.transaction);
+            var changedKindResult = await this.permissionService.IsAllowedToUpdate(this.packageOwnerUserContext, existingInvitation, changedKind, this.transaction);
+            var validResendResult = await this.permissionService.IsAllowedToUpdate(this.packageOwnerUserContext, existingInvitation, validResend, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(changedPackageResult.IsError, Is.True);
+                Assert.That(changedPackageResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedTargetResult.IsError, Is.True);
+                Assert.That(changedTargetResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedOwnerResult.IsError, Is.True);
+                Assert.That(changedOwnerResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedKindResult.IsError, Is.True);
+                Assert.That(changedKindResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(validResendResult.IsError, Is.False);
             }
         }
 

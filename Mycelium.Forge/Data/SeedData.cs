@@ -518,7 +518,14 @@ namespace Mycelium.Forge.Data
                 package.Version = PackageVersions.Where(x => x.Owner == package.Id).Select(x => x.Id).ToList();
             }
 
-            PackageInvitations = Accounts.Select(CreatePackageInvitation).ToList();
+            PackageInvitations =
+            [
+                CreatePackageInvitation(RegisAccount, SysmlIsqQuantitiesPackage, BlancAccount, PackageInvitationKind.MAINTAINER),
+                CreatePackageInvitation(StefanAccount, Cdp4CometCorePackage, NovakAccount, PackageInvitationKind.MAINTAINER),
+                CreatePackageInvitation(KleinAccount, CapellaSystemTemplatePackage, BlancAccount, PackageInvitationKind.MAINTAINER),
+                CreatePackageInvitation(NovakAccount, EcssEnvironmentPackage, KleinAccount, PackageInvitationKind.MAINTAINER),
+                CreatePackageInvitation(BlancAccount, EcssPowerSubsystemPackage, KleinAccount, PackageInvitationKind.MAINTAINER)
+            ];
 
             OrganizationInvitations =
             [
@@ -537,7 +544,7 @@ namespace Mycelium.Forge.Data
                     Id = Guid.NewGuid(),
                     Owner = RegisAccount.Id,
                     Organization = StarionOrganization.Id,
-                    Target = StefanAccount.Id,
+                    Target = BlancAccount.Id,
                     OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR,
                     Status = InvitationStatusKind.PENDING,
                     ExperiesAt = DateTime.UtcNow.AddDays(7)
@@ -761,25 +768,28 @@ namespace Mycelium.Forge.Data
         }
 
         /// <summary>
-        /// Creates a <see cref="PackageInvitation" /> instance linked to the specified <see cref="Account" /> using only
-        /// codegenerated properties.
+        /// Creates a <see cref="PackageInvitation" /> instance linked to the specified owning <see cref="Account" />, target
+        /// <see cref="Package" />, and recipient <see cref="Account" />.
         /// </summary>
-        /// <param name="account">The owning account.</param>
+        /// <param name="owner">The owning account.</param>
+        /// <param name="package">The target package.</param>
+        /// <param name="target">The invited target account.</param>
+        /// <param name="kind">The invited package role.</param>
         /// <returns>A configured <see cref="PackageInvitation" /> entity.</returns>
-        private static PackageInvitation CreatePackageInvitation(Account account)
+        private static PackageInvitation CreatePackageInvitation(Account owner, Package package, Account target, PackageInvitationKind kind)
         {
             var invitation = new PackageInvitation
             {
                 Id = Guid.NewGuid(),
-                Owner = account.Id,
-                Package = SysmlIsqQuantitiesPackage.Id,
-                Target = StefanAccount.Id == account.Id ? RegisAccount.Id : StefanAccount.Id,
-                PackageInvitationKind = PackageInvitationKind.MAINTAINER,
+                Owner = owner.Id,
+                Package = package.Id,
+                Target = target.Id,
+                PackageInvitationKind = kind,
                 Status = InvitationStatusKind.PENDING,
                 ExperiesAt = DateTime.UtcNow.AddDays(14)
             };
 
-            account.OwnedPackageInvitation = invitation.Id;
+            owner.OwnedPackageInvitation = invitation.Id;
             return invitation;
         }
     }

@@ -39,7 +39,6 @@ namespace Mycelium.Forge.Common
                     PermissionKind.RevokeAnyApiKey,
                     PermissionKind.ConfigurePlatformDefaults,
                     PermissionKind.SuspendOrganizations,
-                    PermissionKind.ManageOrganizationSettings,
                     PermissionKind.ManageOrganizationMembers,
                     PermissionKind.ConfigurePublishingPolicy,
                     PermissionKind.TransferOrganizationAdministration,

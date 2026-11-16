@@ -133,16 +133,23 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             // Case 5: Installation administrator is allowed
             var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, invitation, this.transaction);
             Assert.That(adminResult.IsError, Is.False);
+
+            // Case 6: Removed/non-admin creator is denied
+            var removedCreatorInvitation = this.CreateInvitation(this.thirdPartyUserContext.AccountId!.Value, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
+            var removedCreatorResult = await this.permissionService.IsAllowedToDelete(this.thirdPartyUserContext, removedCreatorInvitation, this.transaction);
+            Assert.That(removedCreatorResult.IsError, Is.True);
         }
 
         [Test]
         public async Task VerifyIsAllowedToRead()
         {
+            var organization = new Organization { Id = this.organizationId, Administrator = [this.userId], Member = [this.userId] };
+            var nonAdminCreatorInvitation = this.CreateInvitation(this.thirdPartyUserContext.AccountId!.Value, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
             var invitation = this.CreateInvitation(this.userId, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
 
-            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IOrganization>.Empty);
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
 
-            // Case 1: Owner is allowed
+            // Case 1: Current organization administrator is allowed
             var ownerResult = await this.permissionService.IsAllowedToRead(this.orgAdminUserContext, invitation, this.transaction);
             Assert.That(ownerResult.IsError, Is.False);
 
@@ -150,7 +157,12 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var targetResult = await this.permissionService.IsAllowedToRead(this.targetUserContext, invitation, this.transaction);
             Assert.That(targetResult.IsError, Is.False);
 
-            // Case 3: Third party user is denied when organization cannot be resolved
+            // Case 3: Removed/non-admin creator is denied
+            var removedCreatorResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, nonAdminCreatorInvitation, this.transaction);
+            Assert.That(removedCreatorResult.IsError, Is.True);
+
+            // Case 4: Third party user is denied when organization cannot be resolved
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IOrganization>.Empty);
             var thirdPartyResult = await this.permissionService.IsAllowedToRead(this.thirdPartyUserContext, invitation, this.transaction);
             Assert.That(thirdPartyResult.IsError, Is.True);
         }
@@ -279,6 +291,52 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 Assert.That(orgAdminRevokeResult.IsError, Is.False);
                 Assert.That(thirdPartyRevokeResult.IsError, Is.True);
+            }
+
+            // Case 14: Removed/non-admin creator cannot resend or revoke
+            var removedCreatorExisting = this.CreateInvitation(this.thirdPartyUserContext.AccountId!.Value, InvitationStatusKind.PENDING, DateTime.UtcNow.AddDays(5));
+            var removedCreatorResend = removedCreatorExisting.Clone();
+            var removedCreatorRevoke = removedCreatorExisting.Clone();
+            removedCreatorRevoke.Status = InvitationStatusKind.REVOKED;
+
+            var removedCreatorResendResult = await this.permissionService.IsAllowedToUpdate(this.thirdPartyUserContext, removedCreatorExisting, removedCreatorResend, this.transaction);
+            var removedCreatorRevokeResult = await this.permissionService.IsAllowedToUpdate(this.thirdPartyUserContext, removedCreatorExisting, removedCreatorRevoke, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(removedCreatorResendResult.IsError, Is.True);
+                Assert.That(removedCreatorRevokeResult.IsError, Is.True);
+            }
+
+            // Case 15: PENDING -> PENDING updates cannot change Organization, Target, Owner, or Kind, while valid ExperiesAt resend succeeds
+            var changedOrganization = existingInvitation.Clone();
+            changedOrganization.Organization = Guid.NewGuid();
+            var changedTarget = existingInvitation.Clone();
+            changedTarget.Target = Guid.NewGuid();
+            var changedOwner = existingInvitation.Clone();
+            changedOwner.Owner = Guid.NewGuid();
+            var changedKind = existingInvitation.Clone();
+            changedKind.OrganizationInvitationKind = OrganizationInvitationKind.ADMINISTRATOR;
+            var validResend = existingInvitation.Clone();
+            validResend.ExperiesAt = existingInvitation.ExperiesAt.AddDays(3);
+
+            var changedOrganizationResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingInvitation, changedOrganization, this.transaction);
+            var changedTargetResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingInvitation, changedTarget, this.transaction);
+            var changedOwnerResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingInvitation, changedOwner, this.transaction);
+            var changedKindResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingInvitation, changedKind, this.transaction);
+            var validResendResult = await this.permissionService.IsAllowedToUpdate(this.orgAdminUserContext, existingInvitation, validResend, this.transaction);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(changedOrganizationResult.IsError, Is.True);
+                Assert.That(changedOrganizationResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedTargetResult.IsError, Is.True);
+                Assert.That(changedTargetResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedOwnerResult.IsError, Is.True);
+                Assert.That(changedOwnerResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(changedKindResult.IsError, Is.True);
+                Assert.That(changedKindResult.FirstError.Type, Is.EqualTo(ErrorOr.ErrorType.Forbidden));
+                Assert.That(validResendResult.IsError, Is.False);
             }
         }
 

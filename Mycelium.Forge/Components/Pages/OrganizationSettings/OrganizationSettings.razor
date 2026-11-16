@@ -113,15 +113,9 @@
             </p>
         </ForgeCard>
 
-        <PendingInvitationsCard TInvitation="OrganizationInvitation"
-                                Invitations="@(this.ViewModel.PendingInvitations)"
-                                TargetNameSelector="@(this.GetInvitationTargetName)"
+        <PendingInvitationsCard ViewModel="@(this.ViewModel.InvitationManager)"
                                 RoleTextSelector="@(invitation => invitation.OrganizationInvitationKind.ToString())"
-                                ResendButtonClass="org-resend-invitation-button"
-                                RevokeButtonClass="org-revoke-invitation-button"
-                                AlertDescription="An invitation admits an Account only after explicit acceptance, and expires automatically."
-                                OnResend="@(this.OnResendInvitation)"
-                                OnRevoke="@(this.OnRevokeInvitation)"/>
+                                AlertDescription="An invitation admits an Account only after explicit acceptance, and expires automatically."/>
 
         <ForgeCard Class="p-5 sm:px-5.5 gap-3.5">
             <div class="flex items-center gap-2.5 w-full">

@@ -42,7 +42,6 @@ namespace Mycelium.Forge.Generator.Models
 
             var personalManage = GetValue(config, ConfigurationKeys.PersonalManagePermission, string.Empty, true);
             var platformManage = GetValue(config, ConfigurationKeys.PlatformManagePermission, string.Empty, true);
-            var orgManage = GetValue(config, ConfigurationKeys.OrgManagePermission, string.Empty, true);
             var readBypassRaw = config.TryGetValue(ConfigurationKeys.ReadBypassPermissions, out var rbp) && !string.IsNullOrWhiteSpace(rbp) ? rbp : string.Empty;
 
             this.ScopeEntity = scopeEntity;
@@ -51,7 +50,6 @@ namespace Mycelium.Forge.Generator.Models
             this.OwnerColumn = ownerProp.ToSnakeCase();
             this.PersonalManagePermission = personalManage;
             this.PlatformManagePermission = platformManage;
-            this.OrgManagePermission = orgManage;
             this.ReadBypassPermissions = SplitValues(readBypassRaw);
         }
 
@@ -84,11 +82,6 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the permission required to manage items as a platform administrator.
         /// </summary>
         public string PlatformManagePermission { get; }
-
-        /// <summary>
-        /// Gets the permission required to manage organization scope items.
-        /// </summary>
-        public string OrgManagePermission { get; }
 
         /// <summary>
         /// Gets the permissions that bypass membership checks for read access.
