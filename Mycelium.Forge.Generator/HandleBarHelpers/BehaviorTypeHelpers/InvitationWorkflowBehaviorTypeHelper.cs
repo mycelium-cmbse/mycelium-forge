@@ -28,6 +28,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     public class InvitationWorkflowBehaviorTypeHelper : ScopedBehaviorTypeHelperBase<InvitationWorkflowConfiguration>
     {
         /// <summary>
+        /// The default local variable name used for scope lookup results in generated permission checks.
+        /// </summary>
+        private const string ScopeResultVariableName = "scopeResult";
+
+        /// <summary>
         /// Determines whether this behavior helper handles the specified operation.
         /// </summary>
         /// <param name="operation">The permission operation.</param>
@@ -108,7 +113,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var createPermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
-            var scopeCheckBlock = BuildScopeAccessBlock(config, $"toCreate.{config.ScopeProperty}", "scopeResult");
+            var scopeCheckBlock = BuildScopeAccessBlock(config, $"toCreate.{config.ScopeProperty}", ScopeResultVariableName);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -139,7 +144,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var scopeCheckBlock = BuildScopeAccessBlock(config, $"thing.{config.ScopeProperty}", "scopeResult");
+            var scopeCheckBlock = BuildScopeAccessBlock(config, $"thing.{config.ScopeProperty}", ScopeResultVariableName);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -173,7 +178,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
             var isAsync = this.IsAsyncMethod(Operations.Update);
             var revokePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
-            var revokeScopeBlock = BuildScopeAccessBlock(config, $"existingThing.{config.ScopeProperty}", "scopeResult", "                    ");
+            var revokeScopeBlock = BuildScopeAccessBlock(config, $"existingThing.{config.ScopeProperty}", ScopeResultVariableName, "                    ");
             var updateScopeBlock = BuildScopeAccessBlock(config, $"existingThing.{config.ScopeProperty}", "updateScopeResult");
 
             var failUnauth = PermissionStatementHelper.GetUnauthorizedReturn("\"Unauthenticated user cannot respond to an invitation.\"", isAsync);
@@ -273,7 +278,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var deletePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
-            var scopeCheckBlock = BuildScopeAccessBlock(config, $"thing.{config.ScopeProperty}", "scopeResult");
+            var scopeCheckBlock = BuildScopeAccessBlock(config, $"thing.{config.ScopeProperty}", ScopeResultVariableName);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)

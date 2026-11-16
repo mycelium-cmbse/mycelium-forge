@@ -41,7 +41,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Invitations
         private Mock<ILogger<InvitationManagerViewModel<IPackageInvitation>>> packageLoggerMock;
         private InvitationManagerViewModel<IOrganizationInvitation> orgViewModel;
         private InvitationManagerViewModel<IPackageInvitation> packageViewModel;
-        private IUserContext userContext;
+        private UserContext userContext;
 
         [SetUp]
         public void SetUp()

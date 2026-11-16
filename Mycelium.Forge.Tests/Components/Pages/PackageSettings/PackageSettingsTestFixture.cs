@@ -279,13 +279,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             // Verify disabled change-role item on owner row
             var ownerMenuButton = ownerRow.Find(".package-maintainer-menu-button");
             await ownerRow.InvokeAsync(() => ownerMenuButton.ClickAsync());
-            var ownerChangeRoleItem = this.portalHost.FindAll(".package-maintainer-change-role-item").Last();
+            var ownerChangeRoleItem = this.portalHost.FindAll(".package-maintainer-change-role-item")[^1];
             Assert.That(ownerChangeRoleItem.HasAttribute("data-disabled"), Is.True);
 
             // Triggering OnChangeRole on maintainer row opens dialog
             var menuButton = maintainerRow.Find(".package-maintainer-menu-button");
             await maintainerRow.InvokeAsync(() => menuButton.ClickAsync());
-            var changeRoleItem = this.portalHost.FindAll(".package-maintainer-change-role-item").Last();
+            var changeRoleItem = this.portalHost.FindAll(".package-maintainer-change-role-item")[^1];
             _ = packageSettingsPage.InvokeAsync(() => changeRoleItem.ClickAsync());
 
             IRenderedComponent<ChangeCollaboratorRoleDialog> dialog = null!;
@@ -370,13 +370,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             // Verify disabled remove item on owner row
             var ownerMenuButton = ownerRow.Find(".package-maintainer-menu-button");
             await ownerRow.InvokeAsync(() => ownerMenuButton.ClickAsync());
-            var ownerRemoveItem = this.portalHost.FindAll(".package-maintainer-remove-item").Last();
+            var ownerRemoveItem = this.portalHost.FindAll(".package-maintainer-remove-item")[^1];
             Assert.That(ownerRemoveItem.HasAttribute("data-disabled"), Is.True);
 
             // Clicking Remove maintainer on maintainer row opens confirm dialog and invokes RemoveCollaborator
             var menuButton = maintainerRow.Find(".package-maintainer-menu-button");
             await maintainerRow.InvokeAsync(() => menuButton.ClickAsync());
-            var removeItem = this.portalHost.FindAll(".package-maintainer-remove-item").Last();
+            var removeItem = this.portalHost.FindAll(".package-maintainer-remove-item")[^1];
             _ = packageSettingsPage.InvokeAsync(() => removeItem.ClickAsync());
 
             IElement continueButton = null!;
@@ -486,7 +486,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
 
             var menuButton = maintainerRow.Find(".package-maintainer-menu-button");
             await maintainerRow.InvokeAsync(() => menuButton.ClickAsync());
-            var viewProfileItem = this.portalHost.FindAll(".package-maintainer-view-profile-item").Last();
+            var viewProfileItem = this.portalHost.FindAll(".package-maintainer-view-profile-item")[^1];
             await packageSettingsPage.InvokeAsync(() => viewProfileItem.ClickAsync());
 
             Assert.That(navigationManager.Uri, Does.EndWith(PageRoutes.GetAccountRoute(this.maintainerAccount.ShortName)));

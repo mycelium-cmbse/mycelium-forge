@@ -109,8 +109,6 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The account profile page route path.
         /// </summary>
-
-        // TODO: Create account profile page at /accounts/{shortName}.
         public const string Account = "/accounts/{shortName}";
 
         /// <summary>
@@ -177,8 +175,6 @@ namespace Mycelium.Forge.Common
         /// </summary>
         /// <param name="shortName">The account short name.</param>
         /// <returns>The formatted account route path.</returns>
-
-        // TODO: Create account profile page at /accounts/{shortName}.
         public static string GetAccountRoute(string shortName)
         {
             var cleanShortName = shortName.CleanScope();
