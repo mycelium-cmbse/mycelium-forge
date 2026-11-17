@@ -87,6 +87,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         bool IsUserAdmin { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage versions of the package.
+        /// </summary>
+        bool CanManageVersions { get; set; }
+
+        /// <summary>
         /// Initializes the package view model state for the specified package short name and scope asynchronously.
         /// </summary>
         /// <param name="packageShortname">The short name of the package.</param>

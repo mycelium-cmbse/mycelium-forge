@@ -70,7 +70,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 AccountId = this.userId,
                 Username = "orgAdminUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.anonymousUserContext = new UserContext

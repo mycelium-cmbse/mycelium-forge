@@ -33,56 +33,33 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="transaction">The database transaction.</param>
         /// <param name="personalManagePermission">The optional permission required for personal scope management.</param>
         /// <param name="platformManagePermission">The optional permission required for platform administrator management.</param>
-        /// <param name="orgManagePermission">The optional permission required for organization management.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether management is permitted.</returns>
-        public static async Task<ErrorOr<Success>> IsAllowedToManageScopeItem(
-            IUserContext userContext,
-            Guid ownerScopeId,
-            IOrganizationService organizationService,
-            string itemName,
-            NpgsqlTransaction transaction,
-            PermissionKind? personalManagePermission = null,
-            PermissionKind? platformManagePermission = null,
-            PermissionKind? orgManagePermission = null)
+        public static async Task<ErrorOr<Success>> IsAllowedToManageScopeItem(IUserContext userContext, Guid ownerScopeId, IOrganizationService organizationService, string itemName, NpgsqlTransaction transaction, PermissionKind? personalManagePermission = null, PermissionKind? platformManagePermission = null)
         {
-            // Verify that the user is authenticated and possesses a valid account identifier
             if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
                 return Error.Unauthorized(description: $"Unauthenticated user cannot manage a {itemName}.");
             }
 
-            // Allow personal scope owners who possess the personal manage permission
-            if (personalManagePermission.HasValue &&
-                ownerScopeId == userContext.AccountId.Value &&
-                PermissionGuard.HasPermission(userContext, personalManagePermission.Value))
+            if (personalManagePermission.HasValue && ownerScopeId == userContext.AccountId.Value && PermissionGuard.HasPermission(userContext, personalManagePermission.Value))
             {
                 return Result.Success;
             }
 
-            // Allow platform administrators who possess platform management authority
-            if (platformManagePermission.HasValue &&
-                PermissionGuard.HasPermission(userContext, platformManagePermission.Value))
+            if (platformManagePermission.HasValue && PermissionGuard.HasPermission(userContext, platformManagePermission.Value))
             {
                 return Result.Success;
-            }
-
-            // Verify organization administration permissions when managing an organization-scoped item
-            if (!orgManagePermission.HasValue || !PermissionGuard.HasPermission(userContext, orgManagePermission.Value))
-            {
-                return Error.Forbidden(description: $"Access denied: cannot manage {itemName} for this scope.");
             }
 
             var organizationResult = await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
 
-            // Verify that the owning organization exists
-            if (organizationResult.IsError || organizationResult.Value.Count == 0)
+            if (organizationResult.IsError || organizationResult.Value == null || organizationResult.Value.Count == 0)
             {
                 return Error.Forbidden(description: "Access denied: user is not an administrator of the target organization.");
             }
 
             var organization = organizationResult.Value[0];
 
-            // Verify that the current user is an administrator of the organization
             if (organization.Administrator.Contains(userContext.AccountId.Value))
             {
                 return Result.Success;
@@ -101,14 +78,9 @@ namespace Mycelium.Forge.Dal.PermissionService
         /// <param name="transaction">The database transaction.</param>
         /// <param name="readBypassPermissions">The optional permissions that bypass membership checks for read access.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}" /> indicating whether reading is permitted.</returns>
-        public static async Task<ErrorOr<Success>> IsAllowedToReadScopeItem(
-            IUserContext userContext,
-            Guid ownerScopeId,
-            IOrganizationService organizationService,
-            NpgsqlTransaction transaction,
-            IEnumerable<PermissionKind> readBypassPermissions = null)
+        public static async Task<ErrorOr<Success>> IsAllowedToReadScopeItem(IUserContext userContext, Guid ownerScopeId, IOrganizationService organizationService, NpgsqlTransaction transaction, IEnumerable<PermissionKind> readBypassPermissions = null)
         {
-            if (userContext.AccountId != null && ownerScopeId == userContext.AccountId.Value)
+            if (userContext.AccountId.HasValue && ownerScopeId == userContext.AccountId.Value)
             {
                 return Result.Success;
             }
@@ -120,22 +92,21 @@ namespace Mycelium.Forge.Dal.PermissionService
                 return Result.Success;
             }
 
-            if (userContext.AccountId == null)
+            if (!userContext.AccountId.HasValue)
             {
                 return Error.Forbidden(description: "Access denied: cannot view this item.");
             }
 
             var organizationResult = await organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [ownerScopeId]);
 
-            if (organizationResult.IsError || organizationResult.Value.Count == 0)
+            if (organizationResult.IsError || organizationResult.Value == null || organizationResult.Value.Count == 0)
             {
                 return Error.Forbidden(description: "Access denied: cannot read this item.");
             }
 
             var organization = organizationResult.Value[0];
 
-            if (organization.Member.Contains(userContext.AccountId.Value) ||
-                organization.Administrator.Contains(userContext.AccountId.Value))
+            if (organization.Member.Contains(userContext.AccountId.Value) || organization.Administrator.Contains(userContext.AccountId.Value))
             {
                 return Result.Success;
             }

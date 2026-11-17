@@ -59,7 +59,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether creation is permitted.</returns>
         protected override async Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IAddress toCreate, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
         protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IAddress existingThing, IAddress updatedThing, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether deletion is permitted.</returns>
         protected override async Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IAddress thing, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationSettings);
+            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations);
         }
     }
 }

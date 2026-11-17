@@ -14,7 +14,7 @@
         </span>
     </div>
 
-    @if (this.ViewModel?.PendingInvitations == null || this.ViewModel.PendingInvitations.Count == 0)
+    @if (this.ViewModel.PendingInvitations.Count == 0)
     {
         <span class="text-xs leading-2xs font-normal text-muted-foreground">
             No pending invitations.
@@ -26,45 +26,10 @@
              class="flex flex-col w-full divide-y divide-border">
             @foreach (var row in this.ViewModel.PendingInvitations)
             {
-                <div @key="row.Invitation.Id"
-                     class="flex items-center gap-3 py-2.25 w-full">
-                    <CollaboratorAvatar Name="@(row.Organization.Name)"
-                                        Size="w-7 h-7"/>
-
-                    <a href="@(PageRoutes.GetOrganizationRoute(row.Organization.ShortName))"
-                       class="w-[180px] shrink-0 text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
-                        @(row.Organization.ShortName)
-                    </a>
-
-                    <span class="flex-1 text-sm leading-xs font-normal text-muted-foreground truncate min-w-0">
-                        @(row.Organization.Name)
-                    </span>
-
-                    <BbBadge Variant="BadgeVariant.Secondary"
-                             Class="badge-role text-muted-foreground">
-                        @(row.RoleName)
-                    </BbBadge>
-
-                    <span class="text-xs leading-2xs font-normal text-muted-foreground truncate min-w-0">
-                        @(row.ExpiresIn)
-                    </span>
-
-                    <BbButton Variant="ButtonVariant.Default"
-                              Size="ButtonSize.Small"
-                              Type="ButtonType.Button"
-                              OnClick="@(() => this.OnAcceptInvitation(row))"
-                              Class="pending-accept-button button-sm shrink-0">
-                        Accept
-                    </BbButton>
-
-                    <BbButton Variant="ButtonVariant.Outline"
-                              Size="ButtonSize.Small"
-                              Type="ButtonType.Button"
-                              OnClick="@(() => this.OnRejectInvitation(row))"
-                              Class="pending-reject-button button-sm shrink-0">
-                        Reject
-                    </BbButton>
-                </div>
+                <PendingRequestRow @key="row.Invitation.Id"
+                                   Row="@row"
+                                   OnAccept="@(this.OnAcceptInvitation)"
+                                   OnReject="@(this.OnRejectInvitation)"/>
             }
         </div>
     }

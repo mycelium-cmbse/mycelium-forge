@@ -180,6 +180,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public bool IsUserAdmin { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage versions of the package.
+        /// </summary>
+        public bool CanManageVersions { get; set; }
+
+        /// <summary>
         /// Initializes the package view model state for the specified package short name and scope asynchronously.
         /// </summary>
         /// <param name="packageShortname">The short name of the package.</param>
@@ -193,6 +198,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             if (cachedData.Package == null)
             {
+                this.IsUserAdmin = false;
+                this.CanManageVersions = false;
                 this.logger.LogWarning("Package {Scope}/{Name} not found during details initialization", scope.SanitizeForLog(), packageShortname.SanitizeForLog());
                 return;
             }
@@ -207,6 +214,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
 
             var updatePermissionResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Package);
             this.IsUserAdmin = updatePermissionResult.IsSuccess;
+            this.CanManageVersions = this.Package.CanManageVersions(userContext, this.Owner);
 
             var isVersionsTab = string.Equals(tab, PackageTabConstants.Versions, StringComparison.OrdinalIgnoreCase);
 
@@ -273,7 +281,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 .ToList();
 
             var selectedVersion = versions[0];
-            var maintainers = maintainersTask.Result;
+            List<IAccount> maintainers = [.. maintainersTask.Result.DistinctBy(account => account.Id)];
 
             var metaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, [selectedVersion.MetaData])).ToList();
 

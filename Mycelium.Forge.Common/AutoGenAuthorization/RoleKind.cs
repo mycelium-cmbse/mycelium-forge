@@ -32,11 +32,6 @@ namespace Mycelium.Forge.Common
         PlatformOperator,
 
         /// <summary>
-        /// Owner and administrator of an Organization tenant.
-        /// </summary>
-        OrganizationAdministrator,
-
-        /// <summary>
         /// Authenticated user account with personal scope and self-service capabilities.
         /// </summary>
         Account,

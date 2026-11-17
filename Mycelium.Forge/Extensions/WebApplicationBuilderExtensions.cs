@@ -20,6 +20,7 @@ namespace Mycelium.Forge.Extensions
     using Mycelium.Forge.ViewModels.ApiKeys;
     using Mycelium.Forge.ViewModels.Documentation;
     using Mycelium.Forge.ViewModels.Home;
+    using Mycelium.Forge.ViewModels.Invitations;
     using Mycelium.Forge.ViewModels.MyPackages;
     using Mycelium.Forge.ViewModels.OrganizationDetails;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
@@ -96,6 +97,7 @@ namespace Mycelium.Forge.Extensions
                 builder.Services.AddTransient<ITransferPackageOwnershipDialogViewModel, TransferPackageOwnershipDialogViewModel>();
                 builder.Services.AddTransient<IAccountSettingsViewModel, AccountSettingsViewModel>();
                 builder.Services.AddTransient<IPendingRequestsManagerViewModel, PendingRequestsManagerViewModel>();
+                builder.Services.AddTransient(typeof(IInvitationManagerViewModel<>), typeof(InvitationManagerViewModel<>));
                 builder.Services.AddTransient<IOrganizationSettingsViewModel, OrganizationSettingsViewModel>();
                 builder.Services.AddTransient<IAdminAccountsViewModel, AdminAccountsViewModel>();
                 builder.Services.AddTransient<IDocumentationViewModel, DocumentationViewModel>();

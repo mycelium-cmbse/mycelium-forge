@@ -15,7 +15,9 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageSettings.Dialogs;
+    using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
+    using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.ViewModels.PackageSettings;
 
     /// <summary>
@@ -54,6 +56,21 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         public NavigationManager NavigationManager { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether the package settings page can be rendered for the current user.
+        /// </summary>
+        private bool CanRenderSettings => this.ViewModel.Package != null && this.ViewModel.Owner != null && (this.ViewModel.CanManagePackage || this.ViewModel.CanManageVersions);
+
+        /// <summary>
+        /// Gets a value indicating whether the package is owned by an organization rather than an individual account.
+        /// </summary>
+        private bool IsOrganizationOwned => this.ViewModel.Owner is not IAccount;
+
+        /// <summary>
+        /// Gets the deduplicated collection of package collaborators ordered with owners before maintainers.
+        /// </summary>
+        private IEnumerable<IAccount> Collaborators => this.ViewModel.Owners.Concat(this.ViewModel.Maintainers).DistinctBy(collaborator => collaborator.Id);
+
+        /// <summary>
         /// Handles component parameter updates and initializes the view model with the route parameters asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -70,19 +87,36 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
+        /// Gets the CSS text color class for a package version based on its listed state.
+        /// </summary>
+        /// <param name="version">The package version to evaluate.</param>
+        /// <returns>The CSS text color class string.</returns>
+        private static string GetVersionTextClass(IPackageVersion version)
+        {
+            return !version.Listed ? "text-muted-foreground" : "text-foreground";
+        }
+
+        /// <summary>
         /// Determines whether transferring package ownership is enabled and visible for the current user.
         /// </summary>
         /// <returns><c>true</c> if transferring package ownership is enabled; otherwise, <c>false</c>.</returns>
         private bool IsTransferOwnershipEnabled()
         {
-            if (PermissionGuard.HasRole(this.ViewModel.UserContext, RoleKind.InstallationAdministrator))
+            if (PermissionGuard.HasPermission(this.ViewModel.UserContext, PermissionKind.TransferPackageOwnership))
             {
                 return true;
             }
 
             var accountId = this.ViewModel.UserContext.AccountId;
 
-            return accountId.HasValue && this.ViewModel.Package.PackageOwner.Contains(accountId.Value);
+            if (!accountId.HasValue)
+            {
+                return false;
+            }
+
+            var isOrganizationAdmin = this.ViewModel.Package.IsOrganizationAdministrator(accountId.Value, this.ViewModel.Owner);
+
+            return this.ViewModel.Package.PackageOwner.Contains(accountId.Value) || isOrganizationAdmin;
         }
 
         /// <summary>
@@ -119,18 +153,124 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
-        /// Handles the action to add a new maintainer to the package.
+        /// Handles opening the modal dialog to invite a new maintainer or owner to the package asynchronously.
         /// </summary>
-        private static void OnAddMaintainer()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnAddMaintainer()
         {
+            var onResult = new EventCallbackFactory().Create<InvitePackageCollaboratorResult>(this, async result =>
+            {
+                await this.ViewModel.InviteCollaborator(result.TargetAccount, result.Role);
+                await this.InvokeAsync(this.StateHasChanged);
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(AddMaintainerDialog.Package), this.ViewModel.Package },
+                { nameof(AddMaintainerDialog.PendingInvitations), this.ViewModel.InvitationManager.PendingInvitations.Items },
+                { nameof(AddMaintainerDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Add maintainer"
+            };
+
+            await this.DialogService.OpenAsync<AddMaintainerDialog>(parameters, options);
         }
 
         /// <summary>
-        /// Handles opening the options menu for the specified maintainer.
+        /// Handles opening the modal dialog to change the role of the specified collaborator asynchronously.
         /// </summary>
-        /// <param name="maintainer">The target maintainer account.</param>
-        private static void OnMaintainerMenu(IAccount maintainer)
+        /// <param name="collaborator">The target collaborator account.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnChangeCollaboratorRole(IAccount collaborator)
         {
+            var currentRole = this.GetCollaboratorRole(collaborator);
+
+            var onResult = new EventCallbackFactory().Create<PackageInvitationKind>(this, async newRole =>
+            {
+                if (newRole != currentRole)
+                {
+                    await this.ViewModel.ChangeCollaboratorRole(collaborator, newRole);
+                    await this.InvokeAsync(this.StateHasChanged);
+                }
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(ChangeCollaboratorRoleDialog.Collaborator), collaborator },
+                { nameof(ChangeCollaboratorRoleDialog.CurrentRole), currentRole },
+                { nameof(ChangeCollaboratorRoleDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Change role"
+            };
+
+            await this.DialogService.OpenAsync<ChangeCollaboratorRoleDialog>(parameters, options);
+        }
+
+        /// <summary>
+        /// Navigates to the profile page of the specified collaborator account.
+        /// </summary>
+        /// <param name="collaborator">The target collaborator account.</param>
+        private void OnViewCollaboratorProfile(IAccount collaborator)
+        {
+            this.NavigationManager.NavigateTo(PageRoutes.GetAccountRoute(collaborator.ShortName));
+        }
+
+        /// <summary>
+        /// Prompts confirmation to remove the specified collaborator from the package asynchronously.
+        /// </summary>
+        /// <param name="collaborator">The target collaborator account.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnRemoveCollaborator(IAccount collaborator)
+        {
+            var dialogOptions = new ConfirmDialogOptions
+            {
+                Destructive = true
+            };
+
+            var dialogResult = await this.DialogService.ConfirmAsync("Collaborator Removal", "Are you sure you want to remove this collaborator from the package?", dialogOptions);
+
+            if (dialogResult.Confirmed)
+            {
+                await this.ViewModel.RemoveCollaborator(collaborator);
+            }
+        }
+
+        /// <summary>
+        /// Resolves the role of the specified collaborator within the package.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account.</param>
+        /// <returns>The <see cref="PackageInvitationKind" /> representing the collaborator's role.</returns>
+        private PackageInvitationKind GetCollaboratorRole(IAccount collaborator)
+        {
+            return this.ViewModel.Package.PackageOwner.Contains(collaborator.Id)
+                ? PackageInvitationKind.OWNER
+                : PackageInvitationKind.MAINTAINER;
+        }
+
+        /// <summary>
+        /// Determines whether role change or removal actions are disabled for the specified collaborator.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account.</param>
+        /// <returns><c>true</c> if the actions are disabled; otherwise, <c>false</c>.</returns>
+        private bool IsCollaboratorActionDisabled(IAccount collaborator)
+        {
+            return !this.ViewModel.CanManagePackageTeam || collaborator.Id == this.ViewModel.CurrentUserId || this.IsSolePackageOwner(collaborator);
+        }
+
+        /// <summary>
+        /// Determines whether the specified collaborator is the sole owner of the package.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account.</param>
+        /// <returns><c>true</c> if the collaborator is the sole package owner; otherwise, <c>false</c>.</returns>
+        private bool IsSolePackageOwner(IAccount collaborator)
+        {
+            return this.ViewModel.Package.PackageOwner.Count == 1 && this.ViewModel.Package.PackageOwner.Contains(collaborator.Id);
         }
 
         /// <summary>

@@ -40,11 +40,13 @@ namespace Mycelium.Forge.Generator.Models
                 errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.PersonalCreatePermission}' or have a '{ConfigurationKeys.CreatePermission}'.");
 
             var scopeMembers = GetValue(config, ConfigurationKeys.ScopeMemberProperties, "Member,Administrator", true);
+            var scopeAdmins = GetValue(config, ConfigurationKeys.ScopeAdminProperties, string.Empty, true);
             var bypassPerms = GetValue(config, ConfigurationKeys.BypassPermissions, string.Empty, true);
             var adminPerm = GetValue(config, ConfigurationKeys.AdminPermission, string.Empty, true);
 
             this.ScopeEntity = scopeEntity;
             this.ScopeServiceField = FormatServiceField(scopeEntity);
+            this.ScopeVar = FormatVariableName(scopeEntity);
             this.VisibilityProperty = visProp;
             this.VisibilityPropertyLower = visProp.ToLowerInvariant();
             this.OwnerProperty = ownerProp;
@@ -52,6 +54,7 @@ namespace Mycelium.Forge.Generator.Models
             this.OrgCreatePermission = ocp;
             this.AdminPermission = adminPerm;
             this.ScopeMemberProperties = SplitValues(scopeMembers);
+            this.ScopeAdminProperties = SplitValues(scopeAdmins);
             this.BypassPermissions = SplitValues(bypassPerms);
         }
 
@@ -64,6 +67,11 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the injected domain service field name for the scope entity.
         /// </summary>
         public string ScopeServiceField { get; }
+
+        /// <summary>
+        /// Gets the local variable name used for the scope entity instance.
+        /// </summary>
+        public string ScopeVar { get; }
 
         /// <summary>
         /// Gets the visibility property name on the entity.
@@ -94,6 +102,11 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the property names on the organization entity representing membership.
         /// </summary>
         public string[] ScopeMemberProperties { get; }
+
+        /// <summary>
+        /// Gets the property names on the organization entity representing administrators with full ownership rights.
+        /// </summary>
+        public string[] ScopeAdminProperties { get; }
 
         /// <summary>
         /// Gets the optional administrative permission that allows creating entities in any organization scope.

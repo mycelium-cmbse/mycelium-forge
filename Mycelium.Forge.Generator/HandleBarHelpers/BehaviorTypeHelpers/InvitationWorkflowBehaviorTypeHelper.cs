@@ -28,6 +28,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
     public class InvitationWorkflowBehaviorTypeHelper : ScopedBehaviorTypeHelperBase<InvitationWorkflowConfiguration>
     {
         /// <summary>
+        /// The default local variable name used for scope lookup results in generated permission checks.
+        /// </summary>
+        private const string ScopeResultVariableName = "scopeResult";
+
+        /// <summary>
         /// Determines whether this behavior helper handles the specified operation.
         /// </summary>
         /// <param name="operation">The permission operation.</param>
@@ -48,6 +53,56 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         }
 
         /// <summary>
+        /// Writes fields, constructors, and dependency injection parameters for the entity class.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
+        /// <param name="class">The UML <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="behavior">The behavior definition.</param>
+        public override void WriteFieldsAndConstructors(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
+        {
+            var config = this.GetConfiguration(definition, behavior);
+
+            if (!config.OwnerScope.IsConfigured)
+            {
+                base.WriteFieldsAndConstructors(stringBuilder, @class, definition, behavior);
+                return;
+            }
+
+            var scopeService = $"I{config.ScopeEntity}Service";
+
+            stringBuilder.AppendLine($$"""
+                                               /// <summary>
+                                               /// The (injected) <see cref="{{scopeService}}" /> domain service.
+                                               /// </summary>
+                                               private readonly {{scopeService}} {{config.ScopeServiceField}};
+
+                                               /// <summary>
+                                               /// The (injected) <see cref="{{config.OwnerScope.ServiceType}}" /> domain service.
+                                               /// </summary>
+                                               private readonly {{config.OwnerScope.ServiceType}} {{config.OwnerScope.ServiceField}};
+
+                                               /// <summary>
+                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
+                                               /// </summary>
+                                               public {{@class.Name}}PermissionService()
+                                               {
+                                               }
+
+                                               /// <summary>
+                                               /// Initializes a new instance of the <see cref="{{@class.Name}}PermissionService"/> class.
+                                               /// </summary>
+                                               /// <param name="{{config.ScopeServiceField}}">The (injected) <see cref="{{scopeService}}" /> domain service.</param>
+                                               /// <param name="{{config.OwnerScope.ServiceField}}">The (injected) <see cref="{{config.OwnerScope.ServiceType}}" /> domain service.</param>
+                                               public {{@class.Name}}PermissionService({{scopeService}} {{config.ScopeServiceField}}, {{config.OwnerScope.ServiceType}} {{config.OwnerScope.ServiceField}})
+                                               {
+                                                   this.{{config.ScopeServiceField}} = {{config.ScopeServiceField}};
+                                                   this.{{config.OwnerScope.ServiceField}} = {{config.OwnerScope.ServiceField}};
+                                               }
+                                       """);
+        }
+
+        /// <summary>
         /// Writes the create permission verification implementation body.
         /// </summary>
         /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
@@ -57,7 +112,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
+            var createPermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
+            var scopeCheckBlock = BuildScopeAccessBlock(config, $"toCreate.{config.ScopeProperty}", ScopeResultVariableName);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -67,24 +123,12 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var accountId = userContext.AccountId.Value;
 
-                                               var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
-
-                                               if (!guard.IsError)
+                                               if ({{createPermCheck}})
                                                {
                                                    return Result.Success;
                                                }
 
-                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.{{config.ScopeProperty}}]);
-
-                                               if (!scopeResult.IsError && scopeResult.Value.Count > 0)
-                                               {
-                                                   var {{config.ScopeVar}} = scopeResult.Value[0];
-
-                                                   if ({{string.Join(" || ", scopeRoleChecks)}})
-                                                   {
-                                                       return Result.Success;
-                                                   }
-                                               }
+                                   {{scopeCheckBlock}}
 
                                                return Error.Forbidden(description: "Access denied: only {{config.ScopeRoleDescription}}s can invite members.");
                                    """);
@@ -100,7 +144,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToRead(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
+            var scopeCheckBlock = BuildScopeAccessBlock(config, $"thing.{config.ScopeProperty}", ScopeResultVariableName);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -110,24 +154,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var accountId = userContext.AccountId.Value;
 
-                                               if (thing.Owner == accountId || thing.{{config.InviteeProperty}} == accountId)
+                                               if (thing.{{config.InviteeProperty}} == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.{{config.ReadPermission}}))
                                                {
                                                    return Result.Success;
                                                }
 
-                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
+                                   {{scopeCheckBlock}}
 
-                                               if (!scopeResult.IsError && scopeResult.Value.Count > 0)
-                                               {
-                                                   var {{config.ScopeVar}} = scopeResult.Value[0];
-
-                                                   if ({{string.Join(" || ", scopeRoleChecks)}})
-                                                   {
-                                                       return Result.Success;
-                                                   }
-                                               }
-
-                                               return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.ReadPermission}});
+                                               return Error.Forbidden(description: "Access denied: cannot view this invitation.");
                                    """);
         }
 
@@ -143,17 +177,21 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var isAsync = this.IsAsyncMethod(Operations.Update);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
             var revokePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
-            
+            var revokeScopeBlock = BuildScopeAccessBlock(config, $"existingThing.{config.ScopeProperty}", ScopeResultVariableName, "                    ");
+            var updateScopeBlock = BuildScopeAccessBlock(config, $"existingThing.{config.ScopeProperty}", "updateScopeResult");
+
             var failUnauth = PermissionStatementHelper.GetUnauthorizedReturn("\"Unauthenticated user cannot respond to an invitation.\"", isAsync);
-            var failAlready = PermissionStatementHelper.GetFailReturn("$\"Cannot change status of invitation that is already {existingThing.Status}.\"", isAsync);
+            var failAlready = PermissionStatementHelper.GetFailReturn("$\"Cannot update invitation that is already {existingThing.Status}.\"", isAsync);
+            var failImmutableScopeOrParty = PermissionStatementHelper.GetFailReturn("\"Cannot modify invitation scope, target, or owner.\"", isAsync);
             var failExpired = PermissionStatementHelper.GetFailReturn("\"Cannot respond to an invitation that has expired.\"", isAsync);
             var failModified = PermissionStatementHelper.GetFailReturn("\"Cannot modify invitation details when accepting or rejecting an invitation.\"", isAsync);
+            var failKindModified = PermissionStatementHelper.GetFailReturn("\"Cannot change invitation role kind when updating an invitation.\"", isAsync);
             var failNotInvitee = PermissionStatementHelper.GetFailReturn("\"Access denied: only the invited target account can accept or reject the invitation.\"", isAsync);
             var failUnsupported = PermissionStatementHelper.GetFailReturn("$\"Unsupported invitation status transition to {updatedThing.Status}.\"", isAsync);
             var okParty = PermissionStatementHelper.GetOkReturn(isAsync);
             var okAdmin = PermissionStatementHelper.GetOkReturn(isAsync);
+            var revokeRoleDescription = FormatRevokeActorDescription(config);
             var failNotParty = PermissionStatementHelper.GetFailReturn("\"Access denied: you are not a party to this invitation.\"", isAsync);
 
             stringBuilder.Append($$"""
@@ -164,13 +202,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var accountId = userContext.AccountId.Value;
 
+                                               if (existingThing.Status != InvitationStatusKind.PENDING)
+                                               {
+                                                   {{failAlready}}
+                                               }
+
+                                               if (existingThing.{{config.ScopeProperty}} != updatedThing.{{config.ScopeProperty}} ||
+                                                   existingThing.{{config.InviteeProperty}} != updatedThing.{{config.InviteeProperty}} ||
+                                                   existingThing.{{config.OwnerProperty}} != updatedThing.{{config.OwnerProperty}})
+                                               {
+                                                   {{failImmutableScopeOrParty}}
+                                               }
+
                                                if (existingThing.Status != updatedThing.Status)
                                                {
-                                                   if (existingThing.Status != InvitationStatusKind.PENDING)
-                                                   {
-                                                       {{failAlready}}
-                                                   }
-
                                                    if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                                                    {
                                                        if (existingThing.ExperiesAt <= DateTime.UtcNow)
@@ -179,10 +224,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                                                        }
 
                                                        if (existingThing.ExperiesAt != updatedThing.ExperiesAt ||
-                                                           existingThing.{{config.EntityName}}Kind != updatedThing.{{config.EntityName}}Kind ||
-                                                           existingThing.{{config.ScopeProperty}} != updatedThing.{{config.ScopeProperty}} ||
-                                                           existingThing.{{config.InviteeProperty}} != updatedThing.{{config.InviteeProperty}} ||
-                                                           existingThing.{{config.OwnerProperty}} != updatedThing.{{config.OwnerProperty}})
+                                                           existingThing.{{config.EntityName}}Kind != updatedThing.{{config.EntityName}}Kind)
                                                        {
                                                            {{failModified}}
                                                        }
@@ -197,38 +239,30 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                    if (updatedThing.Status == InvitationStatusKind.REVOKED)
                                                    {
-                                                       if (existingThing.Owner == accountId || {{revokePermCheck}})
+                                                       if ({{revokePermCheck}})
                                                        {
                                                            {{okParty}}
                                                        }
 
-                                                       var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.{{config.ScopeProperty}}]);
+                                   {{revokeScopeBlock}}
 
-                                                       if (!scopeResult.IsError && scopeResult.Value.Count > 0)
-                                                       {
-                                                           var {{config.ScopeVar}} = scopeResult.Value[0];
-
-                                                           if ({{string.Join(" || ", scopeRoleChecks)}})
-                                                           {
-                                                               {{okParty}}
-                                                           }
-                                                       }
-
-                                                       return Error.Forbidden(description: "Access denied: only the invitation creator or {{config.ScopeRoleDescription}}s can revoke the invitation.");
+                                                       return Error.Forbidden(description: "Access denied: only {{revokeRoleDescription}} can revoke the invitation.");
                                                    }
 
                                                    {{failUnsupported}}
                                                }
 
-                                               if (existingThing.Owner == accountId || existingThing.{{config.InviteeProperty}} == accountId)
+                                               if (existingThing.{{config.EntityName}}Kind != updatedThing.{{config.EntityName}}Kind)
                                                {
-                                                   {{okParty}}
+                                                   {{failKindModified}}
                                                }
 
-                                               if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                               if ({{revokePermCheck}})
                                                {
                                                    {{okAdmin}}
                                                }
+
+                                   {{updateScopeBlock}}
 
                                                {{failNotParty}}
                                    """);
@@ -244,8 +278,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var scopeRoleChecks = config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)");
             var deletePermCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.AdminPermission, config.CreatePermission);
+            var scopeCheckBlock = BuildScopeAccessBlock(config, $"thing.{config.ScopeProperty}", ScopeResultVariableName);
+            var revokeRoleDescription = FormatRevokeActorDescription(config);
 
             stringBuilder.Append($$"""
                                                if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
@@ -255,24 +290,14 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                var accountId = userContext.AccountId.Value;
 
-                                               if (thing.{{config.OwnerProperty}} == accountId || {{deletePermCheck}})
+                                               if ({{deletePermCheck}})
                                                {
                                                    return Result.Success;
                                                }
 
-                                               var scopeResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.{{config.ScopeProperty}}]);
+                                   {{scopeCheckBlock}}
 
-                                               if (!scopeResult.IsError && scopeResult.Value.Count > 0)
-                                               {
-                                                   var {{config.ScopeVar}} = scopeResult.Value[0];
-
-                                                   if ({{string.Join(" || ", scopeRoleChecks)}})
-                                                   {
-                                                       return Result.Success;
-                                                   }
-                                               }
-
-                                               return Error.Forbidden(description: "Access denied: only the invitation creator or {{config.ScopeRoleDescription}}s can revoke invitations.");
+                                               return Error.Forbidden(description: "Access denied: only {{revokeRoleDescription}} can revoke invitations.");
                                    """);
         }
 
@@ -302,17 +327,94 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 bypassCondition = string.Join(" OR ", readPermParts.Select(p => $"@can{p} = true"));
             }
 
-            var roleChecks = config.ScopeRoles.Select(role => ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, role, entityName, config.ScopeProperty));
+            var roleChecks = config.ScopeRoles.Select(role => ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, role, entityName, config.ScopeProperty)).ToList();
+
+            if (config.OwnerScope.IsConfigured)
+            {
+                var scopeTable = config.ScopeEntity.ToSnakeCase();
+                var entityTable = entityName.ToSnakeCase();
+                var scopeColumn = config.ScopeProperty.ToSnakeCase();
+                var ownerScopeTable = config.OwnerScope.Entity.ToSnakeCase();
+                var ownerScopeColumn = config.OwnerScope.Property.ToSnakeCase();
+
+                foreach (var role in config.OwnerScope.Roles)
+                {
+                    var junctionTable = $"{ownerScopeTable}_{role.ToSnakeCase()}__account";
+                    roleChecks.Add($"EXISTS (SELECT 1 FROM forge.{scopeTable} INNER JOIN forge.{junctionTable} ON source_{ownerScopeTable} = {scopeTable}.{ownerScopeColumn} WHERE {scopeTable}.id = {entityTable}.{scopeColumn} AND target_account = @callerAccountId)");
+                }
+            }
 
             var roleChecksSql = "\r\n                                OR " + string.Join("\r\n                                OR ", roleChecks);
 
             return $"""
                                         {bypassCondition}
                                         OR (@callerAccountId IS NOT NULL AND (
-                                            {entityName.ToSnakeCase()}.{config.OwnerColumn} = @callerAccountId
-                                            OR {entityName.ToSnakeCase()}.{config.InviteeColumn} = @callerAccountId{roleChecksSql}
+                                            {entityName.ToSnakeCase()}.{config.InviteeColumn} = @callerAccountId{roleChecksSql}
                                         ))
                     """;
+        }
+
+        /// <summary>
+        /// Builds the asynchronous scope lookup and role/owner-scope verification block.
+        /// </summary>
+        /// <param name="config">The invitation workflow configuration.</param>
+        /// <param name="scopeIdExpression">The C# expression yielding the scope identifier.</param>
+        /// <param name="resultVarName">The local variable name for the scope read result.</param>
+        /// <param name="indent">The indentation prefix for generated lines.</param>
+        /// <returns>The formatted C# scope verification block.</returns>
+        private static string BuildScopeAccessBlock(InvitationWorkflowConfiguration config, string scopeIdExpression, string resultVarName, string indent = "            ")
+        {
+            var scopeRoleChecks = string.Join(" || ", config.ScopeRoles.Select(role => $"{config.ScopeVar}.{role}.Contains(accountId)"));
+
+            var ownerScopeLines = new StringBuilder();
+
+            if (config.OwnerScope.IsConfigured)
+            {
+                var roleChecks = string.Join(" || ", config.OwnerScope.Roles.Select(role => $"{config.OwnerScope.VarName}.{role}.Contains(accountId)"));
+                ownerScopeLines.AppendLine();
+                ownerScopeLines.AppendLine();
+                ownerScopeLines.AppendLine($"{indent}        var {config.OwnerScope.VarName}Result = await this.{config.OwnerScope.ServiceField}.ReadAsync(userContext, transaction, CancellationToken.None, [{config.ScopeVar}.{config.OwnerScope.Property}]);");
+                ownerScopeLines.AppendLine();
+                ownerScopeLines.AppendLine($"{indent}        if (!{config.OwnerScope.VarName}Result.IsError && {config.OwnerScope.VarName}Result.Value.Count > 0)");
+                ownerScopeLines.AppendLine($"{indent}        {{");
+                ownerScopeLines.AppendLine($"{indent}            var {config.OwnerScope.VarName} = {config.OwnerScope.VarName}Result.Value[0];");
+                ownerScopeLines.AppendLine();
+                ownerScopeLines.AppendLine($"{indent}            if ({roleChecks})");
+                ownerScopeLines.AppendLine($"{indent}            {{");
+                ownerScopeLines.AppendLine($"{indent}                return Result.Success;");
+                ownerScopeLines.AppendLine($"{indent}            }}");
+                ownerScopeLines.AppendLine($"{indent}        }}");
+            }
+
+            var block = new StringBuilder();
+            block.AppendLine($"{indent}var {resultVarName} = await this.{config.ScopeServiceField}.ReadAsync(userContext, transaction, CancellationToken.None, [{scopeIdExpression}]);");
+            block.AppendLine();
+            block.AppendLine($"{indent}if (!{resultVarName}.IsError && {resultVarName}.Value.Count > 0)");
+            block.AppendLine($"{indent}{{");
+            block.AppendLine($"{indent}    var {config.ScopeVar} = {resultVarName}.Value[0];");
+            block.AppendLine();
+            block.AppendLine($"{indent}    if ({scopeRoleChecks})");
+            block.AppendLine($"{indent}    {{");
+            block.AppendLine($"{indent}        return Result.Success;");
+            block.AppendLine($"{indent}    }}{ownerScopeLines.ToString().TrimEnd()}");
+            block.Append($"{indent}}}");
+
+            return block.ToString();
+        }
+
+        /// <summary>
+        /// Formats the human-readable actor description used in invitation revocation error messages.
+        /// </summary>
+        /// <param name="config">The invitation workflow configuration.</param>
+        /// <returns>The formatted actor description.</returns>
+        private static string FormatRevokeActorDescription(InvitationWorkflowConfiguration config)
+        {
+            if (config.ScopeRoles.Length == 1 && config.ScopeRoles[0].Equals("Administrator", StringComparison.OrdinalIgnoreCase))
+            {
+                return "administrators";
+            }
+
+            return $"administrators or {config.ScopeRoleDescription}s";
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-# Mycelium Forge — Roles, Permissions, and Behaviors Specification
+﻿# Mycelium Forge — Roles, Permissions, and Behaviors Specification
 
 **Applies to:** `mycelium-forge`  
 **Component:** `Mycelium.Forge.Generator`, `Mycelium.Forge.Dal`, `Mycelium.Forge`  
@@ -42,10 +42,8 @@ graph TD
     PlatformOperator[PlatformOperator]
     Account[Account]
     InstallationAdministrator[InstallationAdministrator]
-    OrganizationAdministrator[OrganizationAdministrator]
 
     Account --> InstallationAdministrator
-    Account --> OrganizationAdministrator
 ```
 
 ### 2.2 System Roles Catalog
@@ -54,9 +52,14 @@ graph TD
 |---|---|---|---|
 | `InstallationAdministrator` | `Account` | Super-administrator across the entire Forge deployment. | Full administrative access across all accounts, organizations, packages, and system metrics. |
 | `PlatformOperator` | *None* | Infrastructure operations and SRE team. | SaaS health monitoring, metrics, and platform-wide defaults. |
-| `OrganizationAdministrator` | `Account` | Tenant administrator for a specific Organization. | Manage organization profile, invite/remove members, configure publishing policies and visibility, manage org packages. |
-| `Account` | *None* | Standard authenticated user account. | Manage own profile, manage personal packages (`@username/*`), issue/revoke personal API keys, create organizations. |
+| `Account` | *None* | Standard authenticated user account. | Manage own profile, manage personal packages (`@username/*`), publish packages to organizations they belong to, issue/revoke personal API keys, create organizations. |
 | `Anonymous` | *None* | Unauthenticated visitor, crawler, or package consumer. | Read public packages, download published versions, view reference data (countries, package types). |
+
+### 2.3 Removal of Global `OrganizationAdministrator` Role
+
+- Previously, `RoleKind.OrganizationAdministrator` (defined in `forge-roles-and-permissions.csv` and `docker/keycloak/forge-realm.json`) existed as a **global Keycloak realm role**, granting `ManageOrganizationMembers`, `ConfigurePublishingPolicy`, `TransferOrganizationAdministration`, `ConfigureDefaultPackageVisibility`, `ViewOrganizationPackageList`, `ViewOrganizationMemberList`, `PublishPackageToOrganizationScope`, `ManagePackageSettings`, `ManagePackageTeam`, `TransferPackageOwnership`, `SetPackageVisibility`, `PublishPackageVersion`, `UnlistPackageVersion`, and `RelistPackageVersion` across **all** organizations and packages rather than being tenant-scoped.
+- That global `OrganizationAdministrator` role has been **removed** from `RoleKind`, `RolePermissionMap`, `docker/keycloak/forge-realm.json`, and seed data.
+- Organization-scoped and package-scoped administration is enforced per entity via `Organization.Administrator`, `Package.PackageOwner`, and `Package.PackageMaintainer`, while `Account` grants `PublishPackageToOrganizationScope` (guarded by organization membership/administration in `PackagePermissionService`). Cross-tenant administrative overrides remain exclusive to `InstallationAdministrator`.
 
 ---
 
@@ -78,7 +81,6 @@ Permissions are atomic privileges representing discrete actions. They are config
 - `ViewAllOrganizations`: Read and list all organizations in the platform (bypass membership checks).
 - `ManageOrganizations`: Manage, update, or administratively configure any organization.
 - `CreateOrganization`: Create a new organization tenant.
-- `ManageOrganizationSettings`: Update settings, description, links, and avatar of the organization.
 - `ManageOrganizationMembers`: Manage members, invite prospective members or administrators, and revoke pending invitations.
 - `ConfigurePublishingPolicy`: Enforce package signing, validation rules, or release workflows on the organization.
 - `TransferOrganizationAdministration`: Transfer the primary administrator ownership of the organization.
@@ -118,7 +120,7 @@ Configured in `forge-entity-permissions.csv` and `forge-property-permissions.csv
 | Entity | Create Permission | Read Permission | Update Permission | Delete Permission | Owner Property | Maintainer Property | Visibility Property |
 |---|---|---|---|---|---|---|---|
 | `Package` | `PublishPackageToPersonalScope` | *(Handled by OrganizationScope)* | `ManagePackageSettings` | `DeletePackage` | `PackageOwner` | `PackageMaintainer` | `Visibility` |
-| `Organization` | `CreateOrganization` | *(Public)* | `ManageOrganizationSettings \| ManageOrganizations` | `ManageOrganizations` | `Administrator` | `Member` | |
+| `Organization` | `CreateOrganization` | *(Public)* | `ManageOrganizations` | `ManageOrganizations` | `Administrator` | `Member` | |
 | `APIKey` | `IssueApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `Owner` | | |
 | `Account` | `ManageAccounts` | `ViewAllAccounts \| ManageAccounts` | `ManageAccounts` | `ManageAccounts` | `Id` | | |
 | `OrganizationInvitation` | `ManageOrganizationMembers` | `ViewOrganizationMemberList` | | | `Owner` | | |
@@ -163,7 +165,6 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   - `ReadBypassPermissions`: Array of permissions that bypass ownership checks on read (e.g., `ViewOrganizationMemberList`, `ViewAllOrganizations`, `ViewAllAccounts`).
   - `PersonalManagePermission`: Permission required when managing personal items (`ManageOwnProfile`).
   - `PlatformManagePermission`: Permission bypassing organization management (`ManageOrganizations`).
-  - `OrgManagePermission`: Permission required to manage organization items (`ManageOrganizationSettings`).
 - **Enforcement Logic:**
   - Delegates management to `ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, ownerId, scopeService, entityName)`.
   - Reading delegates to `ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, ownerId, scopeService)`.
@@ -236,17 +237,22 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
 - **Configuration Keys:** `ConfigurationKeys`
   - `ScopeEntity`: Scope entity the user is invited to (`Organization` or `Package`).
   - `ScopeProperty`: Property referencing the target scope on the invitation (`Scope` or defaults to `ScopeEntity`).
-  - `ScopeRoles`: Roles on the scope entity that have authority to issue/revoke invitations (`Administrator`, `PackageOwner`, `PackageMaintainer`).
+  - `ScopeRoles`: Roles on the scope entity authorized to create, read, resend, and revoke invitations (`Administrator` for `Organization`, `PackageOwner` for `Package`).
   - `InviteeProperty`: Property holding the target invited account (`Target`).
   - `OwnerProperty`: Property holding the invitation sender/creator (`Owner`).
   - `CreatePermission`: Permission required to send invitation (`ManageOrganizationMembers` / `ManagePackageTeam`).
   - `ReadPermission`: Permission required to view invitations (`ViewOrganizationMemberList` / `ManagePackageTeam`).
-  - `AdminPermission`: Administrative override permission (`ManageOrganizations` / `ManagePackageTeam`).
+  - `AdminPermission`: Administrative override permission (`ManageOrganizations` for `OrganizationInvitation`, `ManagePackageTeam` for `PackageInvitation`).
   - `BypassPermissions`: Permissions that bypass read filtering.
+- **Configured Permission Asymmetry (Historical):**
+  - `OrganizationInvitation` sets `AdminPermission` to `ManageOrganizations`, whereas `PackageInvitation` sets `AdminPermission` to `ManagePackageTeam`. Since removing the global `OrganizationAdministrator` role, both permissions are held globally only by `InstallationAdministrator`, while per-entity access is granted to `Organization.Administrator` and `Package.PackageOwner` respectively.
 - **Enforcement Logic:**
-  - **Accept:** Permitted only if the caller's Account ID matches the invitation's `InviteeProperty` (`Target`).
-  - **Revoke:** Permitted if the caller is the invitation creator, an administrator/maintainer of the scope entity, or has `AdminPermission`.
-  - **Read:** Permitted for the invitee, the invitation creator, and scope administrators.
+  - **Create:** Permitted for callers with `AdminPermission` or membership in `ScopeRoles` on the target scope entity (`Administrator` / `PackageOwner`).
+  - **Accept / Reject:** Permitted only while `Status == PENDING` and not expired (`ExperiesAt > DateTime.UtcNow`), without modifying non-status fields (`ExperiesAt`, `*InvitationKind`, `Organization`/`Package`, `Target`, `Owner`), and only if the caller matches `Target` or holds `AdminPermission`.
+  - **Revoke:** Permitted while `Status == PENDING` if the caller is the invitation creator (`Owner`), belongs to `ScopeRoles`, or holds revoke override permission (`ManageOrganizations` / `ManageOrganizationMembers` for orgs; `AdminPermission` for packages).
+  - **Resend (same-status `PENDING` update):** Permitted for the creator (`Owner`), `ScopeRoles`, or `AdminPermission`.
+  - **Terminal State Guard:** Updates are denied once `Status` is no longer `PENDING`.
+  - **Read:** Permitted for the invitee (`Target`), creator (`Owner`), members of `ScopeRoles`, or callers with read/admin permission.
 
 ---
 
