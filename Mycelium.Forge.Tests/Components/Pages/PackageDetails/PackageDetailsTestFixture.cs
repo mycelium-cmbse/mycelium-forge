@@ -188,7 +188,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             var packageDetailsPage = this.context.Render<PackageDetails>();
             var status = packageDetailsPage.Instance.GetReleaseStatus();
 
-            this.package.IsDeprecated = true;
+            this.packageVersion.IsDeprecated = true;
             var deprecatedStatus = packageDetailsPage.Instance.GetReleaseStatus();
 
             using (Assert.EnterMultipleScope())

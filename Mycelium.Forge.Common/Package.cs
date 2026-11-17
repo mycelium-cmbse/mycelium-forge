@@ -48,24 +48,6 @@ namespace Mycelium.Forge.Common
         public List<string> Tags { get; set; } = ["sysml-v2", "spacecraft", "power-system", "small-sat", "electrical"];
 
         /// <summary>
-        /// Gets or sets a value indicating whether the package is deprecated.
-        /// </summary>
-        /// <remarks>
-        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the
-        /// domain model.
-        /// </remarks>
-        public bool IsDeprecated { get; set; }
-
-        /// <summary>
-        /// Gets or sets the human-readable explanation or migration guidance for why the package was deprecated.
-        /// </summary>
-        /// <remarks>
-        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the
-        /// domain model.
-        /// </remarks>
-        public string DeprecationReason { get; set; } = string.Empty;
-
-        /// <summary>
         /// Gets or sets a value indicating whether the package publisher has verified credentials and cryptographic signatures.
         /// </summary>
         public bool IsVerified { get; set; } = true;

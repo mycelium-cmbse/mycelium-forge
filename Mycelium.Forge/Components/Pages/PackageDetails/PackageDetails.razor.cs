@@ -129,12 +129,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <returns>A string indicating the release status label.</returns>
         public string GetReleaseStatus()
         {
-            if (this.ViewModel.Package.IsDeprecated || this.ViewModel.CurrentVersion.IsDeprecated)
-            {
-                return "Deprecated";
-            }
-
-            return "Latest stable";
+            return this.ViewModel.CurrentVersion.IsDeprecated ? "Deprecated" : "Latest stable";
         }
 
         /// <summary>

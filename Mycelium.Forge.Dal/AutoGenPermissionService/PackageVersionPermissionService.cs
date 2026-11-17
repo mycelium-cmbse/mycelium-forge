@@ -149,10 +149,8 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Error.Unauthorized(description: "Unauthenticated user cannot update packageversion.");
             }
 
-            if (existingThing.CreatedAt != updatedThing.CreatedAt ||
-                    existingThing.DownloadCount != updatedThing.DownloadCount ||
+            if (existingThing.DownloadCount != updatedThing.DownloadCount ||
                     existingThing.MetaData != updatedThing.MetaData ||
-                    existingThing.ModifiedAt != updatedThing.ModifiedAt ||
                     existingThing.Owner != updatedThing.Owner ||
                     existingThing.PublicationDate != updatedThing.PublicationDate ||
                     existingThing.Version != updatedThing.Version)
