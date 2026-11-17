@@ -52,6 +52,11 @@ namespace Mycelium.Forge.Common
         public const string Organization = "/organizations/{shortName}";
 
         /// <summary>
+        /// The user account publisher profile page route path.
+        /// </summary>
+        public const string Account = "/accounts/{shortName}";
+
+        /// <summary>
         /// The sign-in endpoint route path, which redirects to the OpenID Connect identity provider.
         /// </summary>
         public const string Login = "/login";
@@ -163,6 +168,32 @@ namespace Mycelium.Forge.Common
         {
             var cleanShortName = shortName.CleanScope();
             return $"/organizations/{cleanShortName}";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for the account profile page.
+        /// </summary>
+        /// <param name="shortName">The account identifier or scope.</param>
+        /// <returns>The formatted account route path.</returns>
+        public static string GetAccountRoute(string shortName)
+        {
+            var cleanShortName = shortName.CleanScope();
+            return $"/accounts/{cleanShortName}";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for the profile page of the specified scope (account or organization).
+        /// </summary>
+        /// <param name="scope">The owning <see cref="IScope" /> instance.</param>
+        /// <returns>The formatted account or organization route path.</returns>
+        public static string GetScopeRoute(IScope scope)
+        {
+            return scope switch
+            {
+                IAccount account => GetAccountRoute(account.ShortName),
+                IOrganization organization => GetOrganizationRoute(organization.ShortName),
+                _ => string.Empty
+            };
         }
 
         /// <summary>

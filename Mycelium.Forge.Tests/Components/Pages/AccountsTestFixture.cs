@@ -210,6 +210,7 @@ namespace Mycelium.Forge.Tests.Components.Pages
                 Assert.That(emptyPage.Markup, Does.Contain("No accounts match the current filter."));
                 Assert.That(pendingPage.Markup, Does.Contain("Pending"));
                 Assert.That(pendingPage.Markup, Does.Contain("DEACTIVATED"));
+                Assert.That(pendingPage.FindAll($"a[href='{PageRoutes.GetAccountRoute("pending.user")}']"), Has.Count.GreaterThan(0));
             }
         }
     }

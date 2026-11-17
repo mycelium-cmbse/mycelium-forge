@@ -144,6 +144,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             {
                 Assert.That(orgSettingsPage.Markup, Does.Contain("@starion"));
                 Assert.That(orgSettingsPage.Markup, Does.Contain("Settings"));
+                Assert.That(orgSettingsPage.FindAll($"a[href='{PageRoutes.GetAccountRoute(this.testMember.ShortName)}']"), Has.Count.GreaterThan(0));
             }
         }
 

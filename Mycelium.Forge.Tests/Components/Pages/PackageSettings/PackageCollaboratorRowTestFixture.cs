@@ -50,6 +50,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Id = Guid.NewGuid(),
                 Name = "Alex Rivera",
+                ShortName = "alex-rivera",
                 IsVerified = true
             };
 
@@ -64,10 +65,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var menuButton = row.Find(".package-maintainer-menu-button");
             await row.InvokeAsync(() => menuButton.ClickAsync());
 
+            var profileLink = row.Find("a");
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(row.Markup, Does.Contain("Alex Rivera"));
                 Assert.That(row.Markup, Does.Contain("Owner"));
+                Assert.That(profileLink.GetAttribute("href"), Is.EqualTo(PageRoutes.GetAccountRoute("alex-rivera")));
                 Assert.That(clickedAccount, Is.EqualTo(verifiedAccount));
             }
 
@@ -75,6 +79,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Id = Guid.NewGuid(),
                 Name = "Jane Doe",
+                ShortName = "jane-doe",
                 IsVerified = false
             };
 

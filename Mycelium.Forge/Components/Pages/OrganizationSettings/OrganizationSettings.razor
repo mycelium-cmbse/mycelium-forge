@@ -77,9 +77,10 @@
                                             Size="w-7 h-7"/>
 
                         <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
-                            <span class="text-sm leading-xs font-medium text-foreground truncate">
+                            <a href="@(PageRoutes.GetAccountRoute(member.ShortName))"
+                               class="text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
                                 @(member.Name)
-                            </span>
+                            </a>
                             <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
                                 @(member.ShortName)
                             </span>

@@ -265,12 +265,20 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             }
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
+            var maintainer = new Account { Id = Guid.NewGuid(), Name = "R. Andre", ShortName = "r-andre", IsVerified = true };
+            this.viewModelMock.SetupGet(x => x.Maintainers).Returns([maintainer]);
             var activeComponent = this.context.Render<PackageDetails>();
+
+            this.viewModelMock.SetupGet(x => x.Owner).Returns(maintainer);
+            var accountOwnerComponent = this.context.Render<PackageDetails>();
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(activeComponent.Markup, Does.Contain("ECSS-MM-PWR"));
                 Assert.That(activeComponent.Markup, Does.Contain("Power subsystem metamodel"));
+                Assert.That(activeComponent.FindAll($"a[href='{PageRoutes.GetOrganizationRoute("starion")}']"), Has.Count.GreaterThan(0));
+                Assert.That(activeComponent.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']"), Has.Count.GreaterThan(0));
+                Assert.That(accountOwnerComponent.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']"), Has.Count.GreaterThan(0));
             }
         }
 

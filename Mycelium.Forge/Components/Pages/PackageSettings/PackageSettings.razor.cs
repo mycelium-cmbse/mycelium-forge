@@ -104,7 +104,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
                 new BreadcrumbItem
                 {
                     Name = $"@{publisher}",
-                    Link = PageRoutes.GetOrganizationRoute(publisher)
+                    Link = PageRoutes.GetScopeRoute(this.ViewModel.Owner)
                 },
                 new BreadcrumbItem
                 {

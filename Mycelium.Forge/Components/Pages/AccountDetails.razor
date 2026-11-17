@@ -1,0 +1,19 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="AccountDetails.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@attribute [Route(PageRoutes.Account)]
+
+@if (this.ViewModel.Account == null)
+{
+    return;
+}
+
+<ScopeDetails Scope="@(this.ViewModel.Account)"
+              Packages="@(this.ViewModel.Packages)"
+              ShowSettingsButton="@(this.ViewModel.IsCurrentUser)"/>

@@ -185,7 +185,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
                 new BreadcrumbItem
                 {
                     Name = $"@{this.ViewModel.Owner.ShortName}",
-                    Link = PageRoutes.GetOrganizationRoute(this.ViewModel.Owner.ShortName)
+                    Link = PageRoutes.GetScopeRoute(this.ViewModel.Owner)
                 },
                 new BreadcrumbItem
                 {

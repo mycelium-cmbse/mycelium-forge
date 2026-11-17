@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Extensions
     using Mycelium.Forge.Extractors.Extensions;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.Storage.Extensions;
+    using Mycelium.Forge.ViewModels.AccountDetails;
     using Mycelium.Forge.ViewModels.AccountSettings;
     using Mycelium.Forge.ViewModels.AdminAccounts;
     using Mycelium.Forge.ViewModels.ApiKeys;
@@ -84,6 +85,7 @@ namespace Mycelium.Forge.Extensions
             {
                 builder.Services.AddTransient<IHomeViewModel, HomeViewModel>();
                 builder.Services.AddTransient<IPackagesViewModel, PackagesViewModel>();
+                builder.Services.AddTransient<IAccountDetailsViewModel, AccountDetailsViewModel>();
                 builder.Services.AddTransient<IOrganizationDetailsViewModel, OrganizationDetailsViewModel>();
                 builder.Services.AddTransient<IPackageDetailsViewModel, PackageDetailsViewModel>();
                 builder.Services.AddTransient<IPackageDetailsActionsViewModel, PackageDetailsActionsViewModel>();

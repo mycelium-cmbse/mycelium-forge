@@ -13,9 +13,10 @@
 
     <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
         <div class="flex items-center gap-1.5">
-            <span class="text-sm leading-xs font-semibold text-foreground truncate">
+            <a href="@(PageRoutes.GetAccountRoute(this.Account.ShortName))"
+               class="text-sm leading-xs font-semibold text-foreground hover:text-primary transition-colors truncate">
                 @(this.Account.Name)
-            </span>
+            </a>
             @if (this.Account.IsVerified)
             {
                 <LucideIcon Name="badge-check"
