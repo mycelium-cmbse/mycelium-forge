@@ -43,7 +43,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 AccountId = this.userId,
                 Username = "orgAdmin",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.orgMemberUserContext = new UserContext

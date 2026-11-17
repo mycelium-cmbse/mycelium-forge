@@ -122,20 +122,25 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Result.Success;
             }
 
-            if (thing.Visibility == VisibilityKind.INTERNAL)
+            var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+
+            if (!orgResult.IsError && orgResult.Value.Count > 0)
             {
-                var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+                var organization = orgResult.Value[0];
 
-                if (!orgResult.IsError && orgResult.Value.Count > 0)
+                if (organization.Administrator.Contains(accountId))
                 {
-                    var organization = orgResult.Value[0];
-
-                    if (organization.Member.Contains(accountId) || organization.Administrator.Contains(accountId))
-                    {
-                        return Result.Success;
-                    }
+                    return Result.Success;
                 }
 
+                if (thing.Visibility == VisibilityKind.INTERNAL && (organization.Member.Contains(accountId)))
+                {
+                    return Result.Success;
+                }
+            }
+
+            if (thing.Visibility == VisibilityKind.INTERNAL)
+            {
                 return Error.Forbidden(description: "Access denied: user is not a member of the owning organization.");
             }
 
@@ -150,11 +155,35 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="updatedThing">The updated entity state.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IPackage existingThing, IPackage updatedThing, NpgsqlTransaction transaction)
+        protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IPackage existingThing, IPackage updatedThing, NpgsqlTransaction transaction)
         {
-            if (userContext.AccountId.HasValue && existingThing.PackageOwner.Contains(userContext.AccountId.Value))
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
-                return Task.FromResult<ErrorOr<Success>>(Result.Success);
+                return Error.Unauthorized(description: "Unauthenticated user cannot update a package.");
+            }
+
+            var accountId = userContext.AccountId.Value;
+
+            if (existingThing.PackageOwner.Contains(accountId))
+            {
+                return Result.Success;
+            }
+
+            if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+            {
+                return Result.Success;
+            }
+
+            var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Owner]);
+
+            if (!orgResult.IsError && orgResult.Value.Count > 0)
+            {
+                var organization = orgResult.Value[0];
+
+                if (organization.Administrator.Contains(accountId))
+                {
+                    return Result.Success;
+                }
             }
 
             if (existingThing.Visibility != updatedThing.Visibility)
@@ -163,7 +192,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (guard.IsError)
                 {
-                    return Task.FromResult(guard);
+                    return guard;
                 }
             }
 
@@ -173,7 +202,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (guard.IsError)
                 {
-                    return Task.FromResult(guard);
+                    return guard;
                 }
             }
 
@@ -183,7 +212,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (guard.IsError)
                 {
-                    return Task.FromResult(guard);
+                    return guard;
                 }
             }
 
@@ -193,11 +222,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (guard.IsError)
                 {
-                    return Task.FromResult(guard);
+                    return guard;
                 }
             }
 
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageSettings));
+            return PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageSettings);
         }
 
         /// <summary>
@@ -207,14 +236,38 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <param name="thing">The entity to delete.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether deletion is permitted.</returns>
-        protected override Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IPackage thing, NpgsqlTransaction transaction)
+        protected override async Task<ErrorOr<Success>> IsAllowedToDeleteImplementation(IUserContext userContext, IPackage thing, NpgsqlTransaction transaction)
         {
-            if (userContext.AccountId.HasValue && thing.PackageOwner.Contains(userContext.AccountId.Value))
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
             {
-                return Task.FromResult<ErrorOr<Success>>(Result.Success);
+                return Error.Unauthorized(description: "Unauthenticated user cannot delete a package.");
             }
 
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.DeletePackage));
+            var accountId = userContext.AccountId.Value;
+
+            if (thing.PackageOwner.Contains(accountId))
+            {
+                return Result.Success;
+            }
+
+            if (PermissionGuard.HasPermission(userContext, PermissionKind.DeletePackage))
+            {
+                return Result.Success;
+            }
+
+            var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+
+            if (!orgResult.IsError && orgResult.Value.Count > 0)
+            {
+                var organization = orgResult.Value[0];
+
+                if (organization.Administrator.Contains(accountId))
+                {
+                    return Result.Success;
+                }
+            }
+
+            return Error.Forbidden(description: "Access denied: cannot delete this package.");
         }
     }
 }

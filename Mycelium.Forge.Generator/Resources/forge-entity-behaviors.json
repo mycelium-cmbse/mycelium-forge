@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "./forge-entity-behaviors.schema.json",
   "behaviors": [
     {
@@ -9,7 +9,6 @@
         "ScopeEntity": "Organization",
         "PersonalManagePermission": "ManageOwnProfile",
         "PlatformManagePermission": "ManageOrganizations",
-        "OrgManagePermission": "ManageOrganizationSettings",
         "ReadBypassPermissions": [
           "ViewOrganizationMemberList",
           "ViewAllOrganizations",
@@ -25,7 +24,6 @@
         "ScopeEntity": "Organization",
         "PersonalManagePermission": "ManageOwnProfile",
         "PlatformManagePermission": "ManageOrganizations",
-        "OrgManagePermission": "ManageOrganizationSettings",
         "ReadBypassPermissions": [
           "ViewOrganizationMemberList",
           "ViewAllOrganizations",
@@ -42,6 +40,11 @@
         "ParentOwnerProperties": [
           "PackageOwner",
           "PackageMaintainer"
+        ],
+        "OwnerScopeEntity": "Organization",
+        "OwnerScopeProperty": "Owner",
+        "OwnerScopeRoles": [
+          "Administrator"
         ],
         "CreatePermission": "PublishPackageVersion",
         "DeletePermission": "ErasePackageVersion",
@@ -78,8 +81,12 @@
       "configuration": {
         "ScopeEntity": "Package",
         "ScopeRoles": [
-          "PackageOwner",
-          "PackageMaintainer"
+          "PackageOwner"
+        ],
+        "OwnerScopeEntity": "Organization",
+        "OwnerScopeProperty": "Owner",
+        "OwnerScopeRoles": [
+          "Administrator"
         ],
         "InviteeProperty": "Target",
         "AdminPermission": "ManagePackageTeam"
@@ -98,6 +105,9 @@
         "ScopeEntity": "Organization",
         "ScopeMemberProperties": [
           "Member",
+          "Administrator"
+        ],
+        "ScopeAdminProperties": [
           "Administrator"
         ]
       }

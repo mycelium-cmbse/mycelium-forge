@@ -11,12 +11,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
     using BlazorBlueprint.Primitives.Extensions;
 
     using Bunit;
+
+    using DynamicData;
 
     using ErrorOr;
 
@@ -32,6 +35,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.ViewModels.Invitations;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
     [TestFixture]
@@ -39,6 +43,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
     {
         private BunitContext context;
         private Mock<IOrganizationSettingsViewModel> viewModelMock;
+        private Mock<IInvitationManagerViewModel<IOrganizationInvitation>> invitationManagerMock;
+        private SourceList<IOrganizationInvitation> pendingInvitations;
         private Organization testOrganization;
         private Account testMember;
         private OrganizationInvitation testInvitation;
@@ -88,7 +94,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             };
 
             var adminId = Guid.NewGuid();
-            this.testUserContext = new UserContext { AccountId = adminId, CurrentRoles = [RoleKind.OrganizationAdministrator, RoleKind.Account] };
+            this.testUserContext = new UserContext { AccountId = adminId, CurrentRoles = [RoleKind.Account] };
+
+            this.pendingInvitations = new SourceList<IOrganizationInvitation>();
+            this.pendingInvitations.Add(this.testInvitation);
+
+            this.invitationManagerMock = new Mock<IInvitationManagerViewModel<IOrganizationInvitation>>();
+            this.invitationManagerMock.Setup(x => x.PendingInvitations).Returns(this.pendingInvitations);
+            this.invitationManagerMock.Setup(x => x.GetTargetName(this.testInvitation)).Returns("Unknown");
 
             this.viewModelMock.Setup(x => x.Organization).Returns(this.testOrganization);
             this.viewModelMock.Setup(x => x.CurrentUserRole).Returns(OrganizationRole.Administrator);
@@ -96,8 +109,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
             this.viewModelMock.Setup(x => x.CurrentUserId).Returns(adminId);
             this.viewModelMock.Setup(x => x.UserContext).Returns(this.testUserContext);
             this.viewModelMock.Setup(x => x.Members).Returns([this.testMember]);
-            this.viewModelMock.Setup(x => x.PendingInvitations).Returns([this.testInvitation]);
-            this.viewModelMock.Setup(x => x.InvitedAccounts).Returns([]);
+            this.viewModelMock.Setup(x => x.InvitationManager).Returns(this.invitationManagerMock.Object);
 
             var userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(x => x.GetUserContext(It.IsAny<bool>())).ReturnsAsync(this.testUserContext);
@@ -111,6 +123,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         [TearDown]
         public async Task TearDown()
         {
+            this.pendingInvitations.Dispose();
             this.dialogProvider.Dispose();
             await this.context.DisposeAsync();
         }
@@ -235,22 +248,22 @@ namespace Mycelium.Forge.Tests.Components.Pages.OrganizationSettings
         public async Task VerifyResendInvitation()
         {
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
-            var resendButton = orgSettingsPage.Find(".org-resend-invitation-button");
+            var resendButton = orgSettingsPage.Find(".resend-invitation-button");
 
             await orgSettingsPage.InvokeAsync(() => resendButton.ClickAsync());
 
-            this.viewModelMock.Verify(x => x.ResendInvitation(this.testInvitation), Times.Once);
+            this.invitationManagerMock.Verify(x => x.ResendInvitation(this.testInvitation, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
         public async Task VerifyRevokeInvitation()
         {
             var orgSettingsPage = this.context.Render<OrganizationSettings>();
-            var revokeButton = orgSettingsPage.Find(".org-revoke-invitation-button");
+            var revokeButton = orgSettingsPage.Find(".revoke-invitation-button");
 
             await orgSettingsPage.InvokeAsync(() => revokeButton.ClickAsync());
 
-            this.viewModelMock.Verify(x => x.RevokeInvitation(this.testInvitation), Times.Once);
+            this.invitationManagerMock.Verify(x => x.RevokeInvitation(this.testInvitation, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]

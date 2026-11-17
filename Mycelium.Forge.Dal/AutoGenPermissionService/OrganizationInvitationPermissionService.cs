@@ -66,9 +66,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOrganizationMembers);
-
-            if (!guard.IsError)
+            if (PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
             {
                 return Result.Success;
             }
@@ -104,7 +102,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            if (thing.Owner == accountId || thing.Target == accountId)
+            if (thing.Target == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ViewOrganizationMemberList))
             {
                 return Result.Success;
             }
@@ -121,7 +119,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return PermissionGuard.GuardPermission(userContext, PermissionKind.ViewOrganizationMemberList);
+            return Error.Forbidden(description: "Access denied: cannot view this invitation.");
         }
 
         /// <summary>
@@ -141,13 +139,20 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
+            if (existingThing.Status != InvitationStatusKind.PENDING)
+            {
+                return Error.Forbidden(description: $"Cannot update invitation that is already {existingThing.Status}.");
+            }
+
+            if (existingThing.Organization != updatedThing.Organization ||
+                existingThing.Target != updatedThing.Target ||
+                existingThing.Owner != updatedThing.Owner)
+            {
+                return Error.Forbidden(description: "Cannot modify invitation scope, target, or owner.");
+            }
+
             if (existingThing.Status != updatedThing.Status)
             {
-                if (existingThing.Status != InvitationStatusKind.PENDING)
-                {
-                    return Error.Forbidden(description: $"Cannot change status of invitation that is already {existingThing.Status}.");
-                }
-
                 if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                 {
                     if (existingThing.ExperiesAt <= DateTime.UtcNow)
@@ -156,10 +161,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                     }
 
                     if (existingThing.ExperiesAt != updatedThing.ExperiesAt ||
-                        existingThing.OrganizationInvitationKind != updatedThing.OrganizationInvitationKind ||
-                        existingThing.Organization != updatedThing.Organization ||
-                        existingThing.Target != updatedThing.Target ||
-                        existingThing.Owner != updatedThing.Owner)
+                        existingThing.OrganizationInvitationKind != updatedThing.OrganizationInvitationKind)
                     {
                         return Error.Forbidden(description: "Cannot modify invitation details when accepting or rejecting an invitation.");
                     }
@@ -174,7 +176,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (updatedThing.Status == InvitationStatusKind.REVOKED)
                 {
-                    if (existingThing.Owner == accountId || PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
+                    if (PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
                     {
                         return Result.Success;
                     }
@@ -191,20 +193,32 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                         }
                     }
 
-                    return Error.Forbidden(description: "Access denied: only the invitation creator or administrators can revoke the invitation.");
+                    return Error.Forbidden(description: "Access denied: only administrators can revoke the invitation.");
                 }
 
                 return Error.Forbidden(description: $"Unsupported invitation status transition to {updatedThing.Status}.");
             }
 
-            if (existingThing.Owner == accountId || existingThing.Target == accountId)
+            if (existingThing.OrganizationInvitationKind != updatedThing.OrganizationInvitationKind)
+            {
+                return Error.Forbidden(description: "Cannot change invitation role kind when updating an invitation.");
+            }
+
+            if (PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
             {
                 return Result.Success;
             }
 
-            if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
+            var updateScopeResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Organization]);
+
+            if (!updateScopeResult.IsError && updateScopeResult.Value.Count > 0)
             {
-                return Result.Success;
+                var organization = updateScopeResult.Value[0];
+
+                if (organization.Administrator.Contains(accountId))
+                {
+                    return Result.Success;
+                }
             }
 
             return Error.Forbidden(description: "Access denied: you are not a party to this invitation.");
@@ -226,7 +240,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            if (thing.Owner == accountId || PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
+            if (PermissionGuard.HasAnyPermission(userContext, PermissionKind.ManageOrganizations, PermissionKind.ManageOrganizationMembers))
             {
                 return Result.Success;
             }
@@ -243,7 +257,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 }
             }
 
-            return Error.Forbidden(description: "Access denied: only the invitation creator or administrators can revoke invitations.");
+            return Error.Forbidden(description: "Access denied: only administrators can revoke invitations.");
         }
     }
 }

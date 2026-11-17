@@ -13,6 +13,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
     using HandlebarsDotNet;
 
+    using Mycelium.Forge.Generator.Constants;
     using Mycelium.Forge.Generator.Extensions;
 
     using uml4net.Classification;
@@ -68,7 +69,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
 
             valueTypeAndSingleReferenceProperties.AppendLine("                -- Thing");
             valueTypeAndSingleReferenceProperties.AppendLine("                INSERT INTO forge.thing (id, class_kind, data)");
-            valueTypeAndSingleReferenceProperties.AppendLine("                VALUES (@id, @classKind, @data);");
+            valueTypeAndSingleReferenceProperties.AppendLine($"                VALUES (@id, @classKind, {BuildDataJsonbExpression(@class)});");
 
             var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
 
@@ -209,7 +210,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             var valueTypeAndSingleReferenceProperties = new StringBuilder();
 
             valueTypeAndSingleReferenceProperties.AppendLine("                -- Thing");
-            valueTypeAndSingleReferenceProperties.AppendLine("                UPDATE forge.thing SET data = @data WHERE id = @id;");
+            valueTypeAndSingleReferenceProperties.AppendLine($"                UPDATE forge.thing SET data = {BuildDataJsonbExpression(@class)} WHERE id = @id;");
 
             var allSuperClassesThatDeriveFromThing = @class.QuerySuperClassesDerivingFromThing();
 
@@ -627,6 +628,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             }
 
             return $"                {propCSharpName} = {property.QueryReadConversion()}{comma}";
+        }
+
+        /// <summary>
+        /// Builds the SQL expression for the JSONB <c>data</c> parameter, stripping reference property keys when present.
+        /// </summary>
+        /// <param name="class">The UML class for which the SQL expression is generated.</param>
+        /// <returns>The SQL expression for the <c>data</c> column.</returns>
+        private static string BuildDataJsonbExpression(IClass @class)
+        {
+            var referencePropertyNames = @class.QueryDtoClassProperties()
+                .Where(x => !x.IsDerived && !x.IsDerivedUnion && !x.Name.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase) && !x.TryQueryRedefinedByProperty(@class, out _) && !x.QueryIsDataType())
+                .Select(x => $"'{x.Name.LowerCaseFirstLetter()}'")
+                .Distinct()
+                .ToList();
+
+            return referencePropertyNames.Count == 0 ? "@data" : $"@data - ARRAY[{string.Join(", ", referencePropertyNames)}]";
         }
     }
 }

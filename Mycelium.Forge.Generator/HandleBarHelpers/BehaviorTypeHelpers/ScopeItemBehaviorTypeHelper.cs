@@ -54,8 +54,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg}, {orgArg});");
+            var (personalArg, platformArg) = FormatManageArguments(config);
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, toCreate.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg});");
         }
 
         /// <summary>
@@ -87,8 +87,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg}, {orgArg});");
+            var (personalArg, platformArg) = FormatManageArguments(config);
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg});");
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             var config = this.GetConfiguration(definition, behavior);
-            var (personalArg, platformArg, orgArg) = FormatManageArguments(config);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg}, {orgArg});");
+            var (personalArg, platformArg) = FormatManageArguments(config);
+            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, thing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg});");
         }
 
         /// <summary>
@@ -146,8 +146,8 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// Formats the permission arguments for calling IsAllowedToManageScopeItem
         /// </summary>
         /// <param name="config">The scope item configuration.</param>
-        /// <returns>A tuple containing the personal, platform, and organization permission argument expressions.</returns>
-        private static (string PersonalArg, string PlatformArg, string OrgArg) FormatManageArguments(ScopeItemConfiguration config)
+        /// <returns>A tuple containing the personal and platform permission argument expressions.</returns>
+        private static (string PersonalArg, string PlatformArg) FormatManageArguments(ScopeItemConfiguration config)
         {
             var personalArg = !string.IsNullOrWhiteSpace(config.PersonalManagePermission)
                 ? $"PermissionKind.{config.PersonalManagePermission}"
@@ -157,11 +157,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 ? $"PermissionKind.{config.PlatformManagePermission}"
                 : "null";
 
-            var orgArg = !string.IsNullOrWhiteSpace(config.OrgManagePermission)
-                ? $"PermissionKind.{config.OrgManagePermission}"
-                : "null";
-
-            return (personalArg, platformArg, orgArg);
+            return (personalArg, platformArg);
         }
     }
 }

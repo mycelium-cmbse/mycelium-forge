@@ -107,6 +107,11 @@ namespace Mycelium.Forge.Common
         public const string Accounts = "/admin/accounts";
 
         /// <summary>
+        /// The account profile page route path.
+        /// </summary>
+        public const string Account = "/accounts/{shortName}";
+
+        /// <summary>
         /// Generates the relative URL for listing a new version of an existing package.
         /// </summary>
         /// <param name="scope">The owning scope or publisher name.</param>
@@ -163,6 +168,17 @@ namespace Mycelium.Forge.Common
         {
             var cleanShortName = shortName.CleanScope();
             return $"/organizations/{cleanShortName}";
+        }
+
+        /// <summary>
+        /// Generates the relative URL for the account profile page.
+        /// </summary>
+        /// <param name="shortName">The account short name.</param>
+        /// <returns>The formatted account route path.</returns>
+        public static string GetAccountRoute(string shortName)
+        {
+            var cleanShortName = shortName.CleanScope();
+            return $"/accounts/{cleanShortName}";
         }
 
         /// <summary>

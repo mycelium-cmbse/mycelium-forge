@@ -78,14 +78,14 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
                 return Error.Validation(description: "You cannot transfer ownership to the current owner scope.");
             }
 
-            var isInstallationAdministrator = PermissionGuard.HasRole(userContext, RoleKind.InstallationAdministrator);
+            var hasTransferPackageOwnershipPermission = PermissionGuard.HasPermission(userContext, PermissionKind.TransferPackageOwnership);
             var isOwnAccount = userContext.AccountId.HasValue && scope.Id == userContext.AccountId.Value;
 
             switch (scope)
             {
-                case IOrganization organization when !isInstallationAdministrator && (!userContext.AccountId.HasValue || !organization.Administrator.Contains(userContext.AccountId.Value)):
+                case IOrganization organization when !hasTransferPackageOwnershipPermission && (!userContext.AccountId.HasValue || !organization.Administrator.Contains(userContext.AccountId.Value)):
                     return Error.Validation(description: "You do not have administrative rights on the target organization.");
-                case IAccount when !isInstallationAdministrator && !isOwnAccount:
+                case IAccount when !hasTransferPackageOwnershipPermission && !isOwnAccount:
                     return Error.Validation(description: "Ownership can only be transferred to your own account or to an organization you administer.");
             }
 

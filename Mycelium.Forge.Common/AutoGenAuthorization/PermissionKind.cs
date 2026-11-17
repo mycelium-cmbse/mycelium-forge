@@ -77,11 +77,6 @@ namespace Mycelium.Forge.Common
         CreateOrganization,
 
         /// <summary>
-        /// Permission: ManageOrganizationSettings.
-        /// </summary>
-        ManageOrganizationSettings,
-
-        /// <summary>
         /// Permission: ManageOrganizationMembers.
         /// </summary>
         ManageOrganizationMembers,

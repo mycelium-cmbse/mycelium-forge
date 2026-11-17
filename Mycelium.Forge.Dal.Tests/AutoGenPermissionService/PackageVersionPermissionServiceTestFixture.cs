@@ -11,6 +11,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 {
     using System.Collections.Immutable;
 
+    using ErrorOr;
+
     using Moq;
 
     using Mycelium.Forge.Common;
@@ -29,6 +31,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
     {
         private Mock<IPackageService> packageServiceMock;
         private Mock<IPackagePermissionService> packagePermissionServiceMock;
+        private Mock<IOrganizationService> organizationServiceMock;
         private PackageVersionPermissionService permissionService;
         private NpgsqlTransaction transaction;
         private Guid userId;
@@ -48,10 +51,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             this.transaction = null;
             this.packageServiceMock = new Mock<IPackageService>();
             this.packagePermissionServiceMock = new Mock<IPackagePermissionService>();
+            this.organizationServiceMock = new Mock<IOrganizationService>();
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(Error.NotFound());
 
-            this.permissionService = new PackageVersionPermissionService(
-                this.packageServiceMock.Object,
-                this.packagePermissionServiceMock.Object);
+            this.permissionService = new PackageVersionPermissionService(this.packageServiceMock.Object, this.packagePermissionServiceMock.Object, this.organizationServiceMock.Object);
 
             this.userId = Guid.NewGuid();
             this.otherUserId = Guid.NewGuid();
@@ -120,11 +123,26 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var otherResult = await this.permissionService.IsAllowedToCreate(this.otherUserContext, version, this.transaction);
             var ownerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, version, this.transaction);
 
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var orgPackage = new Package { Id = this.packageId, Owner = orgId, PackageOwner = [this.userId], PackageMaintainer = [] };
+            var organization = new Organization { Id = orgId, Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
+            var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
+            var orgAdminResult = await this.permissionService.IsAllowedToCreate(orgAdminContext, version, this.transaction);
+            var orgMemberResult = await this.permissionService.IsAllowedToCreate(orgMemberContext, version, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(unauthResult.IsError, Is.True);
                 Assert.That(otherResult.IsError, Is.True);
                 Assert.That(ownerResult.IsError, Is.False);
+                Assert.That(orgAdminResult.IsError, Is.False);
+                Assert.That(orgMemberResult.IsError, Is.True);
             }
         }
 
@@ -159,6 +177,18 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, version, this.transaction);
             var otherResult = await this.permissionService.IsAllowedToDelete(this.otherUserContext, version, this.transaction);
 
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgPackage = new Package { Id = this.packageId, Owner = orgId, PackageOwner = [this.userId] };
+            var organization = new Organization { Id = orgId, Administrator = [orgAdminId], Member = [orgAdminId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
+            var orgAdminInstallAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdminInstallAdmin", CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+            var orgAdminResult = await this.permissionService.IsAllowedToDelete(orgAdminContext, version, this.transaction);
+            var orgAdminInstallAdminResult = await this.permissionService.IsAllowedToDelete(orgAdminInstallAdminContext, version, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 // Only admins (InstallationAdministrator) can delete package versions.
@@ -167,6 +197,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(adminResult.IsError, Is.False);
                 Assert.That(ownerResult.IsError, Is.True);
                 Assert.That(otherResult.IsError, Is.True);
+                Assert.That(orgAdminResult.IsError, Is.True);
+                Assert.That(orgAdminInstallAdminResult.IsError, Is.False);
             }
         }
 
@@ -269,11 +301,26 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var unlistResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingVersion, unlistedVersion, this.transaction);
             var otherResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingVersion, unlistedVersion, this.transaction);
 
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var orgPackage = new Package { Id = this.packageId, Owner = orgId, PackageOwner = [this.userId] };
+            var organization = new Organization { Id = orgId, Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(orgPackage));
+            this.organizationServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
+            var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
+            var orgAdminUnlistResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, existingVersion, unlistedVersion, this.transaction);
+            var orgMemberUnlistResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, existingVersion, unlistedVersion, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(immutableResult.IsError, Is.True);
                 Assert.That(unlistResult.IsError, Is.False);
                 Assert.That(otherResult.IsError, Is.True);
+                Assert.That(orgAdminUnlistResult.IsError, Is.False);
+                Assert.That(orgMemberUnlistResult.IsError, Is.True);
             }
         }
     }

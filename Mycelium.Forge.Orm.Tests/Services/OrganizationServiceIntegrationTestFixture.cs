@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationServiceIntegrationTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -163,9 +163,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
 
         protected override async Task PostSetup()
         {
-            var organizationDao = new OrganizationDao(
-                this.TestLoggerFactory.CreateLogger<OrganizationDao>(),
-                this.Serializer);
+            var organizationDao = new OrganizationDao(this.TestLoggerFactory.CreateLogger<OrganizationDao>(), this.Serializer);
 
             var orgPermissionService = new OrganizationPermissionService();
 
@@ -209,7 +207,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
             {
                 AccountId = this.adminAccountId,
                 Username = "adminUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.memberUserContext = new UserContext

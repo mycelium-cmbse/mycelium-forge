@@ -31,7 +31,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <returns><c>true</c> if the behavior handles the operation; otherwise <c>false</c>.</returns>
         public override bool HandlesOperation(Operations operation)
         {
-            return operation is Operations.Create or Operations.Read;
+            return true;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <returns><c>true</c> if the operation is asynchronous; otherwise <c>false</c>.</returns>
         public override bool IsAsyncMethod(Operations operation)
         {
-            return operation is Operations.Create or Operations.Read;
+            return true;
         }
 
         /// <summary>
@@ -116,7 +116,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
             var entityLower = @class.Name.ToLowerInvariant();
             var bypassCheck = PermissionStatementHelper.FormatHasPermissionCheck(config.BypassPermissions);
-            var scopeRoleChecks = config.ScopeMemberProperties.Select(prop => $"organization.{prop}.Contains(accountId)");
+            var scopeVar = config.ScopeVar;
+            var scopeAdminChecks = config.ScopeAdminProperties.Select(prop => $"{scopeVar}.{prop}.Contains(accountId)").ToArray();
+            var internalMemberProps = config.ScopeAdminProperties.Length > 0 ? config.ScopeMemberProperties.Where(prop => !config.ScopeAdminProperties.Contains(prop, StringComparer.OrdinalIgnoreCase)).ToArray() : config.ScopeMemberProperties;
+            var scopeRoleChecks = internalMemberProps.Select(prop => $"{scopeVar}.{prop}.Contains(accountId)").ToArray();
 
             var ownershipChecks = new List<string> { $"thing.{PropertyNames.Owner} == accountId" };
 
@@ -165,26 +168,65 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine();
             stringBuilder.AppendLine();
 
-            stringBuilder.Append($$"""
-                                               if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
-                                               {
+            if (config.ScopeAdminProperties.Length > 0)
+            {
+                var adminCheckExpr = string.Join(" || ", scopeAdminChecks);
+
+                var memberCheckBlock = scopeRoleChecks.Length > 0
+                    ? $$"""
+
+
+                                            if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL && ({{string.Join(" || ", scopeRoleChecks)}}))
+                                            {
+                                                return Result.Success;
+                                            }
+                        """
+                    : string.Empty;
+
+                stringBuilder.Append($$"""
                                                    var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
 
                                                    if (!orgResult.IsError && orgResult.Value.Count > 0)
                                                    {
-                                                       var organization = orgResult.Value[0];
+                                                       var {{scopeVar}} = orgResult.Value[0];
 
-                                                       if ({{string.Join(" || ", scopeRoleChecks)}})
+                                                       if ({{adminCheckExpr}})
                                                        {
                                                            return Result.Success;
-                                                       }
+                                                       }{{memberCheckBlock}}
                                                    }
 
-                                                   return Error.Forbidden(description: "Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.");
-                                               }
+                                                   if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
+                                                   {
+                                                       return Error.Forbidden(description: "Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.");
+                                                   }
 
-                                               return Error.Forbidden(description: "Access denied: cannot view this {{entityLower}}.");
-                                   """);
+                                                   return Error.Forbidden(description: "Access denied: cannot view this {{entityLower}}.");
+                                       """);
+            }
+            else
+            {
+                stringBuilder.Append($$"""
+                                                   if (thing.{{config.VisibilityProperty}} == VisibilityKind.INTERNAL)
+                                                   {
+                                                       var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [thing.Owner]);
+
+                                                       if (!orgResult.IsError && orgResult.Value.Count > 0)
+                                                       {
+                                                           var {{scopeVar}} = orgResult.Value[0];
+
+                                                           if ({{string.Join(" || ", scopeRoleChecks)}})
+                                                           {
+                                                               return Result.Success;
+                                                           }
+                                                       }
+
+                                                       return Error.Forbidden(description: "Access denied: user is not a member of the owning {{config.ScopeEntity.ToLowerInvariant()}}.");
+                                                   }
+
+                                                   return Error.Forbidden(description: "Access denied: cannot view this {{entityLower}}.");
+                                       """);
+            }
         }
 
         /// <summary>
@@ -197,8 +239,43 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="propertyDefinitions">The list of property-level permission definitions for this entity.</param>
         public override void WriteIsAllowedToUpdate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior, List<PropertyPermissionDefinition> propertyDefinitions)
         {
-            // Empty because OrganizationScope entities do not require custom behavior logic for updates;
-            // update permissions are handled by standard entity ownership, property-level permissions, and UpdatePermission in PermissionHelper.
+            var config = this.GetConfiguration(definition, behavior);
+            var entityLower = @class.Name.ToLowerInvariant();
+
+            stringBuilder.AppendLine($$"""
+                                                   if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                                   {
+                                                       return Error.Unauthorized(description: "Unauthenticated user cannot update a {{entityLower}}.");
+                                                   }
+
+                                                   var accountId = userContext.AccountId.Value;
+
+                                       """);
+
+            if (definition != null)
+            {
+                PermissionHelper.WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", true, false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.AdminPermission))
+            {
+                stringBuilder.AppendLine($$"""
+                                                       if (PermissionGuard.HasPermission(userContext, PermissionKind.{{config.AdminPermission}}))
+                                                       {
+                                                           return Result.Success;
+                                                       }
+
+                                           """);
+            }
+
+            WriteScopeAdminCheck(stringBuilder, config, "existingThing");
+
+            if (propertyDefinitions != null)
+            {
+                PermissionHelper.WritePropertyChangePermissionChecks(stringBuilder, @class, propertyDefinitions, true);
+            }
+
+            PermissionHelper.AppendPermissionGuardOrOk(stringBuilder, definition?.UpdatePermission, true);
         }
 
         /// <summary>
@@ -210,8 +287,39 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="behavior">The behavior definition.</param>
         public override void WriteIsAllowedToDelete(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
-            // Empty because OrganizationScope entities do not require custom behavior logic for deletion;
-            // delete permissions are handled by standard entity ownership checks and DeletePermission in PermissionHelper.
+            var config = this.GetConfiguration(definition, behavior);
+            var entityLower = @class.Name.ToLowerInvariant();
+
+            stringBuilder.AppendLine($$"""
+                                                   if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                                   {
+                                                       return Error.Unauthorized(description: "Unauthenticated user cannot delete a {{entityLower}}.");
+                                                   }
+
+                                                   var accountId = userContext.AccountId.Value;
+
+                                       """);
+
+            if (definition != null)
+            {
+                PermissionHelper.WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "thing", true, false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(definition?.DeletePermission))
+            {
+                var deleteCheck = PermissionStatementHelper.FormatHasPermissionCheck(definition.DeletePermission.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+                stringBuilder.AppendLine($$"""
+                                                       if ({{deleteCheck}})
+                                                       {
+                                                           return Result.Success;
+                                                       }
+
+                                           """);
+            }
+
+            WriteScopeAdminCheck(stringBuilder, config, "thing");
+            stringBuilder.Append($"            return Error.Forbidden(description: \"Access denied: cannot delete this {entityLower}.\");");
         }
 
         /// <summary>
@@ -243,10 +351,20 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 ownerChecks.Add(ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(entityName, definition.MaintainerProperty, entityName, PropertyNames.Id));
             }
 
+            foreach (var adminProp in config.ScopeAdminProperties)
+            {
+                ownerChecks.Add(ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, adminProp, entityName, PropertyNames.Owner));
+            }
+
             var ownerChecksSql = string.Join("\r\n                        OR ", ownerChecks);
             var bypassSql = string.Join(" OR ", config.BypassPermissions.Select(p => $"@can{p} = true"));
 
-            var scopeLinkChecks = config.ScopeMemberProperties.Select(prop => ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, prop, entityName, PropertyNames.Owner));
+            var internalMemberProps = config.ScopeAdminProperties.Length > 0
+                ? config.ScopeMemberProperties.Where(p => !config.ScopeAdminProperties.Contains(p, StringComparer.OrdinalIgnoreCase)).ToArray()
+                : config.ScopeMemberProperties;
+
+            var scopeLinkChecks = (internalMemberProps.Length > 0 ? internalMemberProps : config.ScopeMemberProperties)
+                .Select(prop => ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(config.ScopeEntity, prop, entityName, PropertyNames.Owner));
 
             var scopeLinksSql = string.Join("\r\n                                        OR ", scopeLinkChecks);
 
@@ -274,6 +392,38 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         protected override OrganizationScopeConfiguration CreateConfiguration(EntityPermissionDefinition definition, EntityBehaviorDefinition behavior)
         {
             return new OrganizationScopeConfiguration(definition, behavior);
+        }
+
+        /// <summary>
+        /// Writes a scope administrator ownership check for the specified target entity parameter when configured.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to write code into.</param>
+        /// <param name="config">The organization scope configuration.</param>
+        /// <param name="targetEntityName">The parameter name of the target entity instance.</param>
+        private static void WriteScopeAdminCheck(StringBuilder stringBuilder, OrganizationScopeConfiguration config, string targetEntityName)
+        {
+            if (config.ScopeAdminProperties.Length == 0)
+            {
+                return;
+            }
+
+            var scopeVar = config.ScopeVar;
+            var adminChecks = string.Join(" || ", config.ScopeAdminProperties.Select(prop => $"{scopeVar}.{prop}.Contains(accountId)"));
+
+            stringBuilder.AppendLine($$"""
+                                                   var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [{{targetEntityName}}.Owner]);
+
+                                                   if (!orgResult.IsError && orgResult.Value.Count > 0)
+                                                   {
+                                                       var {{scopeVar}} = orgResult.Value[0];
+
+                                                       if ({{adminChecks}})
+                                                       {
+                                                           return Result.Success;
+                                                       }
+                                                   }
+
+                                       """);
         }
     }
 }

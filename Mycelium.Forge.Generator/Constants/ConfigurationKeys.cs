@@ -35,6 +35,26 @@ namespace Mycelium.Forge.Generator.Constants
         public const string ScopeMemberProperties = "ScopeMemberProperties";
 
         /// <summary>
+        /// Configuration key for ScopeAdminProperties.
+        /// </summary>
+        public const string ScopeAdminProperties = "ScopeAdminProperties";
+
+        /// <summary>
+        /// Configuration key for OwnerScopeEntity.
+        /// </summary>
+        public const string OwnerScopeEntity = "OwnerScopeEntity";
+
+        /// <summary>
+        /// Configuration key for OwnerScopeProperty.
+        /// </summary>
+        public const string OwnerScopeProperty = "OwnerScopeProperty";
+
+        /// <summary>
+        /// Configuration key for OwnerScopeRoles.
+        /// </summary>
+        public const string OwnerScopeRoles = "OwnerScopeRoles";
+
+        /// <summary>
         /// Configuration key for InviteeProperty.
         /// </summary>
         public const string InviteeProperty = "InviteeProperty";
@@ -123,10 +143,5 @@ namespace Mycelium.Forge.Generator.Constants
         /// Configuration key for PlatformManagePermission.
         /// </summary>
         public const string PlatformManagePermission = "PlatformManagePermission";
-
-        /// <summary>
-        /// Configuration key for OrgManagePermission.
-        /// </summary>
-        public const string OrgManagePermission = "OrgManagePermission";
     }
 }

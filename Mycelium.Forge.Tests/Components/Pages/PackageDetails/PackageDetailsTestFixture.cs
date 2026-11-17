@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -25,11 +26,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageDetails;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.Tests.TestHelpers;
     using Mycelium.Forge.ViewModels.PackageDetails;
 
-    /// <summary>
-    /// Test fixture for <see cref="PackageDetails" /> component.
-    /// </summary>
     [TestFixture]
     public class PackageDetailsTestFixture
     {
@@ -42,9 +41,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         private PackageMetaData packageMetaData;
         private PackageType packageType;
 
-        /// <summary>
-        /// Sets up the test context and mocks before each test execution.
-        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -118,34 +114,27 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 ("Dependency check", "Passed", true)
             ]);
 
-            this.viewModelMock.SetupGet(x => x.IsUserAdmin).Returns(true);
+            this.SetupAccessFlags(true, false);
 
             this.context.Services.AddSingleton(this.viewModelMock.Object);
             this.context.Services.AddSingleton(this.actionsViewModelMock.Object);
             this.context.Services.AddSingleton(new Mock<IJsInterop>().Object);
         }
 
-        /// <summary>
-        /// Tears down the test context after each test execution.
-        /// </summary>
-        /// <returns>A <see cref="Task" /> representing the asynchronous tear down.</returns>
         [TearDown]
         public async Task TearDown()
         {
             await this.context.DisposeAsync();
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDetails.GetContentTabClass(string)" /> computes correct styling classes.
-        /// </summary>
         [Test]
         public void VerifyGetContentTabClass()
         {
-            var component = this.context.Render<PackageDetails>();
+            var packageDetailsPage = this.context.Render<PackageDetails>();
 
-            component.Instance.SelectedContentTab = PackageTabConstants.Overview;
-            var activeClass = component.Instance.GetContentTabClass(PackageTabConstants.Overview);
-            var inactiveClass = component.Instance.GetContentTabClass(PackageTabConstants.Contents);
+            packageDetailsPage.Instance.SelectedContentTab = PackageTabConstants.Overview;
+            var activeClass = packageDetailsPage.Instance.GetContentTabClass(PackageTabConstants.Overview);
+            var inactiveClass = packageDetailsPage.Instance.GetContentTabClass(PackageTabConstants.Contents);
 
             using (Assert.EnterMultipleScope())
             {
@@ -155,26 +144,20 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDetails.GetPackageUrl" /> generates a purl route identifier.
-        /// </summary>
         [Test]
         public void VerifyGetPackageUrl()
         {
-            var component = this.context.Render<PackageDetails>();
-            var purl = component.Instance.GetPackageUrl();
+            var packageDetailsPage = this.context.Render<PackageDetails>();
+            var purl = packageDetailsPage.Instance.GetPackageUrl();
 
             Assert.That(purl, Is.EqualTo("pkg:forge/starion/ecss-mm-pwr@1.3.0"));
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDetails.GetPublishedAgo" /> formats publication date correctly.
-        /// </summary>
         [Test]
         public void VerifyGetPublishedAgo()
         {
-            var component = this.context.Render<PackageDetails>();
-            var publishedAgo = component.Instance.GetPublishedAgo();
+            var packageDetailsPage = this.context.Render<PackageDetails>();
+            var publishedAgo = packageDetailsPage.Instance.GetPublishedAgo();
 
             using (Assert.EnterMultipleScope())
             {
@@ -183,116 +166,123 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             }
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDetails.GetQualityScore" /> formats quality score correctly.
-        /// </summary>
         [Test]
         public void VerifyGetQualityScore()
         {
-            var component = this.context.Render<PackageDetails>();
-            var score = component.Instance.GetQualityScore();
+            var packageDetailsPage = this.context.Render<PackageDetails>();
+            var score = packageDetailsPage.Instance.GetQualityScore();
+
+            this.viewModelMock.SetupGet(x => x.QualityChecks).Returns([]);
+            var emptyScore = packageDetailsPage.Instance.GetQualityScore();
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(score, Is.EqualTo("2/2 checks"));
+                Assert.That(emptyScore, Is.Empty);
             }
-
-            this.viewModelMock.SetupGet(x => x.QualityChecks).Returns([]);
-            var emptyScore = component.Instance.GetQualityScore();
-
-            Assert.That(emptyScore, Is.EqualTo(string.Empty));
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDetails.GetReleaseStatus" /> returns correct status for active and deprecated packages.
-        /// </summary>
         [Test]
         public void VerifyGetReleaseStatus()
         {
-            var component = this.context.Render<PackageDetails>();
-            var status = component.Instance.GetReleaseStatus();
+            var packageDetailsPage = this.context.Render<PackageDetails>();
+            var status = packageDetailsPage.Instance.GetReleaseStatus();
+
+            this.package.IsDeprecated = true;
+            var deprecatedStatus = packageDetailsPage.Instance.GetReleaseStatus();
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(status, Is.EqualTo("Latest stable"));
+                Assert.That(deprecatedStatus, Is.EqualTo("Deprecated"));
             }
-
-            this.package.IsDeprecated = true;
-            var deprecatedStatus = component.Instance.GetReleaseStatus();
-
-            Assert.That(deprecatedStatus, Is.EqualTo("Deprecated"));
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDetails.OnInitializedAsync" /> initializes the view model.
-        /// </summary>
         [Test]
         public void VerifyOnInitializedAsync()
         {
-            var component = this.context.Render<PackageDetails>(parameters => parameters
-                .Add(p => p.Scope, "starion")
-                .Add(p => p.PackageShortname, "ecss-mm-pwr")
-                .Add(p => p.Tab, PackageTabConstants.Contents));
+            var packageDetailsPage = this.context.Render<PackageDetails>(parameters =>
+            {
+                parameters.Add(p => p.Scope, "starion");
+                parameters.Add(p => p.PackageShortname, "ecss-mm-pwr");
+                parameters.Add(p => p.Tab, PackageTabConstants.Contents);
+            });
+
+            var defaultPackageDetailsPage = this.context.Render<PackageDetails>(parameters =>
+            {
+                parameters.Add(p => p.Scope, "starion");
+                parameters.Add(p => p.PackageShortname, "ecss-mm-pwr");
+            });
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(component.Instance.SelectedContentTab, Is.EqualTo(PackageTabConstants.Contents));
+                Assert.That(packageDetailsPage.Instance.SelectedContentTab, Is.EqualTo(PackageTabConstants.Contents));
                 this.viewModelMock.Verify(x => x.InitializeViewModel("ecss-mm-pwr", "starion", PackageTabConstants.Contents), Times.Once);
-            }
-
-            var defaultComponent = this.context.Render<PackageDetails>(parameters => parameters
-                .Add(p => p.Scope, "starion")
-                .Add(p => p.PackageShortname, "ecss-mm-pwr"));
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(defaultComponent.Instance.SelectedContentTab, Is.EqualTo(PackageTabConstants.Overview));
+                Assert.That(defaultPackageDetailsPage.Instance.SelectedContentTab, Is.EqualTo(PackageTabConstants.Overview));
+                this.viewModelMock.Verify(x => x.InitializeViewModel("ecss-mm-pwr", "starion", PackageTabConstants.Overview), Times.Once);
             }
         }
 
-        /// <summary>
-        /// Verifies rendering behavior when package is null or populated.
-        /// </summary>
         [Test]
         public void VerifyRendering()
         {
             this.viewModelMock.SetupGet(x => x.Package).Returns((IPackage)null!);
-            var nullComponent = this.context.Render<PackageDetails>();
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(nullComponent.Markup.Trim(), Has.Length.LessThan(5));
-            }
+            var nullPackageDetailsPage = this.context.Render<PackageDetails>();
+            Assert.That(nullPackageDetailsPage.Markup.Trim(), Has.Length.LessThan(5));
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
-            var activeComponent = this.context.Render<PackageDetails>();
+            this.SetupAccessFlags(true, false);
+            var activePackageDetailsPage = this.context.Render<PackageDetails>();
+            var activeSettingsButton = activePackageDetailsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-details-settings-button"));
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(activeComponent.Markup, Does.Contain("ECSS-MM-PWR"));
-                Assert.That(activeComponent.Markup, Does.Contain("Power subsystem metamodel"));
+                Assert.That(activePackageDetailsPage.Markup, Does.Contain("ECSS-MM-PWR"));
+                Assert.That(activePackageDetailsPage.Markup, Does.Contain("Power subsystem metamodel"));
+                Assert.That(activeSettingsButton, Is.Not.Null);
             }
+
+            this.SetupAccessFlags(false, true);
+            var maintainerPackageDetailsPage = this.context.Render<PackageDetails>();
+            var maintainerSettingsButton = maintainerPackageDetailsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-details-settings-button"));
+            var maintainerMigrateButton = maintainerPackageDetailsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-details-migrate-in-bloom-button"));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(maintainerSettingsButton, Is.Not.Null);
+                Assert.That(maintainerMigrateButton, Is.Null);
+            }
+
+            this.SetupAccessFlags(false, false);
+            var readerPackageDetailsPage = this.context.Render<PackageDetails>();
+            var readerSettingsButton = readerPackageDetailsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-details-settings-button"));
+            Assert.That(readerSettingsButton, Is.Null);
         }
 
-        /// <summary>
-        /// Verifies that <see cref="PackageDetails.SelectContentTab(string)" /> navigates to tab route.
-        /// </summary>
         [Test]
         public void VerifySelectContentTab()
         {
             var navigationManager = this.context.Services.GetRequiredService<NavigationManager>();
 
-            var component = this.context.Render<PackageDetails>(parameters => parameters
-                .Add(p => p.Scope, "starion")
-                .Add(p => p.PackageShortname, "ecss-mm-pwr"));
+            var packageDetailsPage = this.context.Render<PackageDetails>(parameters =>
+            {
+                parameters.Add(p => p.Scope, "starion");
+                parameters.Add(p => p.PackageShortname, "ecss-mm-pwr");
+            });
 
-            component.Instance.SelectContentTab(PackageTabConstants.Dependencies);
+            packageDetailsPage.Instance.SelectContentTab(PackageTabConstants.Dependencies);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(component.Instance.SelectedContentTab, Is.EqualTo(PackageTabConstants.Dependencies));
+                Assert.That(packageDetailsPage.Instance.SelectedContentTab, Is.EqualTo(PackageTabConstants.Dependencies));
                 Assert.That(navigationManager.Uri, Does.Contain("/packages/starion/ecss-mm-pwr/dependencies"));
             }
+        }
+
+        private void SetupAccessFlags(bool isUserAdmin, bool canManageVersions)
+        {
+            this.viewModelMock.SetupGet(x => x.IsUserAdmin).Returns(isUserAdmin);
+            this.viewModelMock.SetupGet(x => x.CanManageVersions).Returns(canManageVersions);
         }
     }
 }

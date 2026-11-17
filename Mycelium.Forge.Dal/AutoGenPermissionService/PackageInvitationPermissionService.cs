@@ -35,6 +35,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         private readonly IPackageService packageService;
 
         /// <summary>
+        /// The (injected) <see cref="IOrganizationService" /> domain service.
+        /// </summary>
+        private readonly IOrganizationService organizationService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PackageInvitationPermissionService"/> class.
         /// </summary>
         public PackageInvitationPermissionService()
@@ -45,9 +50,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// Initializes a new instance of the <see cref="PackageInvitationPermissionService"/> class.
         /// </summary>
         /// <param name="packageService">The (injected) <see cref="IPackageService" /> domain service.</param>
-        public PackageInvitationPermissionService(IPackageService packageService)
+        /// <param name="organizationService">The (injected) <see cref="IOrganizationService" /> domain service.</param>
+        public PackageInvitationPermissionService(IPackageService packageService, IOrganizationService organizationService)
         {
             this.packageService = packageService;
+            this.organizationService = organizationService;
         }
 
         /// <summary>
@@ -66,9 +73,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
-
-            if (!guard.IsError)
+            if (PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
             {
                 return Result.Success;
             }
@@ -79,13 +84,25 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             {
                 var package = scopeResult.Value[0];
 
-                if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
+                if (package.PackageOwner.Contains(accountId))
                 {
                     return Result.Success;
                 }
+
+                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                {
+                    var organization = organizationResult.Value[0];
+
+                    if (organization.Administrator.Contains(accountId))
+                    {
+                        return Result.Success;
+                    }
+                }
             }
 
-            return Error.Forbidden(description: "Access denied: only packageOwner or packageMaintainers can invite members.");
+            return Error.Forbidden(description: "Access denied: only packageOwners can invite members.");
         }
 
         /// <summary>
@@ -104,7 +121,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            if (thing.Owner == accountId || thing.Target == accountId)
+            if (thing.Target == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
             {
                 return Result.Success;
             }
@@ -115,13 +132,25 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             {
                 var package = scopeResult.Value[0];
 
-                if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
+                if (package.PackageOwner.Contains(accountId))
                 {
                     return Result.Success;
                 }
+
+                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                {
+                    var organization = organizationResult.Value[0];
+
+                    if (organization.Administrator.Contains(accountId))
+                    {
+                        return Result.Success;
+                    }
+                }
             }
 
-            return PermissionGuard.GuardPermission(userContext, PermissionKind.ManagePackageTeam);
+            return Error.Forbidden(description: "Access denied: cannot view this invitation.");
         }
 
         /// <summary>
@@ -141,13 +170,20 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
+            if (existingThing.Status != InvitationStatusKind.PENDING)
+            {
+                return Error.Forbidden(description: $"Cannot update invitation that is already {existingThing.Status}.");
+            }
+
+            if (existingThing.Package != updatedThing.Package ||
+                existingThing.Target != updatedThing.Target ||
+                existingThing.Owner != updatedThing.Owner)
+            {
+                return Error.Forbidden(description: "Cannot modify invitation scope, target, or owner.");
+            }
+
             if (existingThing.Status != updatedThing.Status)
             {
-                if (existingThing.Status != InvitationStatusKind.PENDING)
-                {
-                    return Error.Forbidden(description: $"Cannot change status of invitation that is already {existingThing.Status}.");
-                }
-
                 if (updatedThing.Status is InvitationStatusKind.ACCEPTED or InvitationStatusKind.REJECTED)
                 {
                     if (existingThing.ExperiesAt <= DateTime.UtcNow)
@@ -156,10 +192,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                     }
 
                     if (existingThing.ExperiesAt != updatedThing.ExperiesAt ||
-                        existingThing.PackageInvitationKind != updatedThing.PackageInvitationKind ||
-                        existingThing.Package != updatedThing.Package ||
-                        existingThing.Target != updatedThing.Target ||
-                        existingThing.Owner != updatedThing.Owner)
+                        existingThing.PackageInvitationKind != updatedThing.PackageInvitationKind)
                     {
                         return Error.Forbidden(description: "Cannot modify invitation details when accepting or rejecting an invitation.");
                     }
@@ -174,7 +207,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
                 if (updatedThing.Status == InvitationStatusKind.REVOKED)
                 {
-                    if (existingThing.Owner == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
+                    if (PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
                     {
                         return Result.Success;
                     }
@@ -185,26 +218,62 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                     {
                         var package = scopeResult.Value[0];
 
-                        if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
+                        if (package.PackageOwner.Contains(accountId))
                         {
                             return Result.Success;
                         }
+
+                        var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                        if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                        {
+                            var organization = organizationResult.Value[0];
+
+                            if (organization.Administrator.Contains(accountId))
+                            {
+                                return Result.Success;
+                            }
+                        }
                     }
 
-                    return Error.Forbidden(description: "Access denied: only the invitation creator or packageOwner or packageMaintainers can revoke the invitation.");
+                    return Error.Forbidden(description: "Access denied: only administrators or packageOwners can revoke the invitation.");
                 }
 
                 return Error.Forbidden(description: $"Unsupported invitation status transition to {updatedThing.Status}.");
             }
 
-            if (existingThing.Owner == accountId || existingThing.Target == accountId)
+            if (existingThing.PackageInvitationKind != updatedThing.PackageInvitationKind)
             {
-                return Result.Success;
+                return Error.Forbidden(description: "Cannot change invitation role kind when updating an invitation.");
             }
 
             if (PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
             {
                 return Result.Success;
+            }
+
+            var updateScopeResult = await this.packageService.ReadAsync(userContext, transaction, CancellationToken.None, [existingThing.Package]);
+
+            if (!updateScopeResult.IsError && updateScopeResult.Value.Count > 0)
+            {
+                var package = updateScopeResult.Value[0];
+
+                if (package.PackageOwner.Contains(accountId))
+                {
+                    return Result.Success;
+                }
+
+                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                {
+                    var organization = organizationResult.Value[0];
+
+                    if (organization.Administrator.Contains(accountId))
+                    {
+                        return Result.Success;
+                    }
+                }
             }
 
             return Error.Forbidden(description: "Access denied: you are not a party to this invitation.");
@@ -226,7 +295,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            if (thing.Owner == accountId || PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
+            if (PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam))
             {
                 return Result.Success;
             }
@@ -237,13 +306,25 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
             {
                 var package = scopeResult.Value[0];
 
-                if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
+                if (package.PackageOwner.Contains(accountId))
                 {
                     return Result.Success;
                 }
+
+                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                {
+                    var organization = organizationResult.Value[0];
+
+                    if (organization.Administrator.Contains(accountId))
+                    {
+                        return Result.Success;
+                    }
+                }
             }
 
-            return Error.Forbidden(description: "Access denied: only the invitation creator or packageOwner or packageMaintainers can revoke invitations.");
+            return Error.Forbidden(description: "Access denied: only administrators or packageOwners can revoke invitations.");
         }
     }
 }
