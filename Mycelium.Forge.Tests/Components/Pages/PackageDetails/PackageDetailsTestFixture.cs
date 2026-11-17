@@ -253,6 +253,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Assert.That(maintainerMigrateButton, Is.Null);
             }
 
+            this.SetupAccessFlags(false, false, true);
+            var teamManagerDetailsPage = this.context.Render<PackageDetails>();
+            var teamManagerSettingsButton = teamManagerDetailsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-details-settings-button"));
+            Assert.That(teamManagerSettingsButton, Is.Not.Null);
+
             this.SetupAccessFlags(false, false);
             var readerPackageDetailsPage = this.context.Render<PackageDetails>();
             var readerSettingsButton = readerPackageDetailsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-details-settings-button"));
@@ -279,10 +284,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             }
         }
 
-        private void SetupAccessFlags(bool isUserAdmin, bool canManageVersions)
+        private void SetupAccessFlags(bool isUserAdmin, bool canManageVersions, bool canManagePackageTeam = false)
         {
             this.viewModelMock.SetupGet(x => x.IsUserAdmin).Returns(isUserAdmin);
             this.viewModelMock.SetupGet(x => x.CanManageVersions).Returns(canManageVersions);
+            this.viewModelMock.SetupGet(x => x.CanManagePackageTeam).Returns(canManagePackageTeam);
         }
     }
 }

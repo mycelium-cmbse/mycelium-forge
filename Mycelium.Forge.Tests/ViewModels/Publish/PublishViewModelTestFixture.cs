@@ -71,8 +71,8 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             this.memoryCacheMock = new Mock<IMemoryCache>();
 
             var accountId = Guid.NewGuid();
-            this.userContext = new UserContext { AccountId = accountId, Username = "testPublisher" };
-            this.activeScope = new Organization { Id = Guid.NewGuid(), Name = "Starion", ShortName = "starion", Status = ScopeStatusKind.ACTIVE, DefaultPackageVisibility = VisibilityKind.PUBLIC };
+            this.userContext = new UserContext { AccountId = accountId, Username = "testPublisher", CurrentRoles = [RoleKind.Account] };
+            this.activeScope = new Organization { Id = Guid.NewGuid(), Name = "Starion", ShortName = "starion", Status = ScopeStatusKind.ACTIVE, DefaultPackageVisibility = VisibilityKind.PUBLIC, Member = [accountId] };
             this.packageType = new PackageType { Id = Guid.NewGuid(), Name = PackageFormatConstants.SysMlV2 };
 
             this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(this.userContext);
@@ -206,6 +206,46 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             await this.viewModel.InitializeViewModel("starion", "unknown");
 
             Assert.That(this.viewModel.CanUserReleaseExistingPackageVersion, Is.False);
+
+            // Case 5: ScopeOptions filters out non-member organizations for regular accounts
+            var personalAccount = new Account { Id = this.userContext.AccountId!.Value, Name = "Personal", ShortName = "personal", DefaultPackageVisibility = VisibilityKind.PRIVATE };
+            var nonMemberOrg = new Organization { Id = Guid.NewGuid(), Name = "Other Org", ShortName = "other-org", Status = ScopeStatusKind.ACTIVE, Member = [], Administrator = [] };
+            this.scopeServiceMock.Setup(x => x.ReadActiveByAccountAsync(this.userContext, this.userContext.AccountId.Value, It.IsAny<CancellationToken>())).ReturnsAsync([personalAccount, nonMemberOrg, this.activeScope]);
+
+            await this.viewModel.InitializeViewModel();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.ScopeOptions, Has.Count.EqualTo(2));
+                Assert.That(this.viewModel.ScopeOptions, Does.Not.Contain(nonMemberOrg));
+                Assert.That(this.viewModel.SelectedScope, Is.EqualTo(personalAccount));
+                Assert.That(this.viewModel.Package.Visibility, Is.EqualTo(VisibilityKind.PRIVATE));
+            }
+
+            // Case 6: InstallationAdministrator includes non-member organizations; PlatformOperator gets empty ScopeOptions
+            var adminContext = new UserContext { AccountId = this.userContext.AccountId, Username = "admin", CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+            this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(adminContext);
+            this.scopeServiceMock.Setup(x => x.ReadActiveByAccountAsync(adminContext, adminContext.AccountId.Value, It.IsAny<CancellationToken>())).ReturnsAsync([nonMemberOrg]);
+
+            await this.viewModel.InitializeViewModel();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.ScopeOptions, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.ScopeOptions[0], Is.EqualTo(nonMemberOrg));
+            }
+
+            var operatorContext = new UserContext { AccountId = this.userContext.AccountId, Username = "operator", CurrentRoles = [RoleKind.PlatformOperator] };
+            this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(operatorContext);
+            this.scopeServiceMock.Setup(x => x.ReadActiveByAccountAsync(operatorContext, operatorContext.AccountId.Value, It.IsAny<CancellationToken>())).ReturnsAsync([personalAccount, this.activeScope]);
+
+            await this.viewModel.InitializeViewModel();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.ScopeOptions, Is.Empty);
+                Assert.That(this.viewModel.SelectedScope, Is.Null);
+            }
         }
 
         [Test]

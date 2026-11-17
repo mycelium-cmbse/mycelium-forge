@@ -57,9 +57,9 @@ graph TD
 
 ### 2.3 Removal of Global `OrganizationAdministrator` Role
 
-- Previously, `RoleKind.OrganizationAdministrator` (defined in `forge-roles-and-permissions.csv` and `docker/keycloak/forge-realm.json`) existed as a **global Keycloak realm role**, granting `ManageOrganizationMembers`, `ConfigurePublishingPolicy`, `TransferOrganizationAdministration`, `ConfigureDefaultPackageVisibility`, `ViewOrganizationPackageList`, `ViewOrganizationMemberList`, `PublishPackageToOrganizationScope`, `ManagePackageSettings`, `ManagePackageTeam`, `TransferPackageOwnership`, `SetPackageVisibility`, `PublishPackageVersion`, `UnlistPackageVersion`, and `RelistPackageVersion` across **all** organizations and packages rather than being tenant-scoped.
+- Previously, `RoleKind.OrganizationAdministrator` (defined in `forge-roles-and-permissions.csv` and `docker/keycloak/forge-realm.json`) existed as a **global Keycloak realm role**, granting `ManageOrganizationMembers`, `ConfigurePublishingPolicy`, `TransferOrganizationAdministration`, `ConfigureDefaultPackageVisibility`, `ViewOrganizationPackageList`, `ViewOrganizationMemberList`, `PublishPackage`, `ManagePackageSettings`, `ManagePackageTeam`, `TransferPackageOwnership`, `SetPackageVisibility`, `PublishPackageVersion`, `UnlistPackageVersion`, and `RelistPackageVersion` across **all** organizations and packages rather than being tenant-scoped.
 - That global `OrganizationAdministrator` role has been **removed** from `RoleKind`, `RolePermissionMap`, `docker/keycloak/forge-realm.json`, and seed data.
-- Organization-scoped and package-scoped administration is enforced per entity via `Organization.Administrator`, `Package.PackageOwner`, and `Package.PackageMaintainer`, while `Account` grants `PublishPackageToOrganizationScope` (guarded by organization membership/administration in `PackagePermissionService`). Cross-tenant administrative overrides remain exclusive to `InstallationAdministrator`.
+- Organization-scoped and package-scoped administration is enforced per entity via `Organization.Administrator`, `Package.PackageOwner`, and `Package.PackageMaintainer`, while `Account` grants `PublishPackage` (guarded by target scope ownership or organization membership/administration in `PackagePermissionService`). Cross-tenant administrative overrides remain exclusive to `InstallationAdministrator`.
 
 ---
 
@@ -90,7 +90,7 @@ Permissions are atomic privileges representing discrete actions. They are config
 
 ### 3.3 Package Permissions
 
-- `PublishPackageToPersonalScope`: Publish a new package under the caller's personal namespace (`@user/pkg`).
+- `PublishPackage`: Publish a new package under the caller's personal namespace (`@user/pkg`) or an organization's namespace (`@org/pkg`).
 - `PublishPackageVersion`: Publish a new SemVer version for an existing package.
 - `UnlistPackageVersion`: Unlist an existing package version from search results and index listings.
 - `RelistPackageVersion`: Relist a previously unlisted package version.
@@ -118,7 +118,7 @@ Configured in `forge-entity-permissions.csv` and `forge-property-permissions.csv
 
 | Entity | Create Permission | Read Permission | Update Permission | Delete Permission | Owner Property | Maintainer Property | Visibility Property |
 |---|---|---|---|---|---|---|---|
-| `Package` | `PublishPackageToPersonalScope` | *(Handled by OrganizationScope)* | `ManagePackageSettings` | `DeletePackage` | `PackageOwner` | `PackageMaintainer` | `Visibility` |
+| `Package` | `PublishPackage` | *(Handled by OrganizationScope)* | `ManagePackageSettings` | `DeletePackage` | `PackageOwner` | `PackageMaintainer` | `Visibility` |
 | `Organization` | `CreateOrganization` | *(Public)* | `ManageOrganizations` | `ManageOrganizations` | `Administrator` | `Member` | |
 | `APIKey` | `IssueApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `RevokeAnyApiKey` | `Owner` | | |
 | `Account` | `ManageAccounts` | `ViewAllAccounts \| ManageAccounts` | `ManageAccounts` | `ManageAccounts` | `Id` | | |
@@ -166,6 +166,7 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   - `PlatformManagePermission`: Permission bypassing organization management (`ManageOrganizations`).
 - **Enforcement Logic:**
   - Delegates management to `ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, ownerId, scopeService, entityName)`.
+  - On update, changing the owner property (`existingThing.Owner != updatedThing.Owner`) additionally requires `PlatformManagePermission`.
   - Reading delegates to `ScopeItemPermissionHelper.IsAllowedToReadScopeItem(userContext, ownerId, scopeService)`.
 - **SQL Read Filter:**
   Generates an SQL predicate verifying whether the caller is the owner or a member/administrator of the owning organization:
@@ -194,6 +195,7 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
   - `StateInactivePermission`: Permission required to deactivate state (e.g., `UnlistPackageVersion`).
 - **Enforcement Logic:**
   - **Read:** Loads the parent entity via `IParentService.ReadAsync`. Since the service already filters results through `IParentPermissionService.IsAllowedToRead` internally, a non-empty result implies read access is granted — no additional permission check is performed.
+  - **Delete:** When `DeletePermission` is configured (e.g., `ErasePackageVersion` / `DeletePackage`), directly guards deletion with `DeletePermission` without requiring parent ownership; otherwise delegates to parent ownership verification.
   - State changes (such as listing/unlisting) verify `StateActivePermission` or `StateInactivePermission` against the parent maintainer list.
 - **SQL Read Filter:**
   None (`SqlFilter.Empty`). Read filtering is implicitly delegated to the parent entity by calling `IParentService.ReadAsync`, which internally enforces `IParentPermissionService.IsAllowedToRead`, avoiding complex nested subqueries.
@@ -205,13 +207,13 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
 - **Purpose:** Entities that can be created in either personal scope (`@username`) or organization scope (`@organization`), with visibility levels (`Public`, `Internal`, `Private`) (e.g., `Package`).
 - **Configuration Keys:** `ConfigurationKeys`
   - `ScopeEntity`: Scope container entity name (e.g., `Organization`).
-  - `PersonalCreatePermission`: Permission required for personal scope creation (`PublishPackageToPersonalScope`).
+  - `CreatePermission`: Permission required for package creation in personal or organization scope (`PublishPackage`).
   - `VisibilityProperty`: Property name storing visibility (e.g., `Visibility`).
   - `OwnerProperty`: Property name referencing the owning scope (`Owner`).
   - `ScopeMemberProperties`: Properties on organization entity representing membership (`Member,Administrator`).
   - `BypassPermissions`: Permissions that bypass tenant checks for internal items (`ViewAllOrganizations,ManageOrganizations`).
 - **Enforcement Logic:**
-  - **Create:** Checks whether target scope is an account (requires `PersonalCreatePermission`) or organization (requires caller to be an organization member or administrator).
+  - **Create:** Checks whether target scope is an account (requires `CreatePermission`) or organization (requires `CreatePermission` + caller is an organization member or administrator, or holds `AdminPermission`).
   - **Read:**
     - `Public`: Allowed for any user (including Anonymous).
     - `Internal`: Allowed for members/administrators of the owning organization, or callers with `BypassPermissions`.
@@ -219,11 +221,16 @@ All behavior keys are defined under `ConfigurationKeys` in `Mycelium.Forge.Gener
 - **SQL Read Filter:**
   Produces optimized conditional SQL filtering based on caller identity, organization membership, and package visibility:
   ```sql
-  package.visibility = 0 -- Public
+  (thing.data->>'visibility' = 'PUBLIC')
   OR (@callerAccountId IS NOT NULL AND (
-      package.owner = @callerAccountId -- Personal scope owner
-      OR (@canViewAllOrganizations = true OR @canManageOrganizations = true)
-      OR EXISTS (SELECT 1 FROM forge.organization_member__account WHERE source_organization = package.owner AND target_account = @callerAccountId)
+      EXISTS (SELECT 1 FROM forge.package_package_owner__account WHERE source_package = package.id AND target_account = @callerAccountId)
+      OR EXISTS (SELECT 1 FROM forge.package_package_maintainer__account WHERE source_package = package.id AND target_account = @callerAccountId)
+      OR EXISTS (SELECT 1 FROM forge.organization_administrator__account WHERE source_organization = package.owner AND target_account = @callerAccountId)
+      OR @canViewAllOrganizations = true OR @canManageOrganizations = true
+      OR (
+          thing.data->>'visibility' = 'INTERNAL'
+          AND EXISTS (SELECT 1 FROM forge.organization_member__account WHERE source_organization = package.owner AND target_account = @callerAccountId)
+      )
   ))
   ```
 
@@ -317,7 +324,7 @@ if (permissionResult.IsFailed)
 #### In Razor Pages and ViewModels
 Inject `IUserContext` to perform client-side authorization checks:
 ```csharp
-if (PermissionGuard.HasPermission(userContext, PermissionKind.PublishPackageToPersonalScope))
+if (PermissionGuard.HasPermission(userContext, PermissionKind.PublishPackage))
 {
     // Render publish button or allow navigation
 }

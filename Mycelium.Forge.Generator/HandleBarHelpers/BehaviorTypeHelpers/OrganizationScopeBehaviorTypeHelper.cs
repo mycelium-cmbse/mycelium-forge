@@ -65,7 +65,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
                                                if (toCreate.Owner == userContext.AccountId.Value)
                                                {
-                                                   return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.PersonalCreatePermission}});
+                                                   return PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
                                                }
                                    """);
 
@@ -86,6 +86,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             stringBuilder.AppendLine();
 
             stringBuilder.Append($$"""
+                                               var createGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.{{config.CreatePermission}});
+
+                                               if (createGuard.IsError)
+                                               {
+                                                   return createGuard;
+                                               }
+
                                                var orgResult = await this.{{config.ScopeServiceField}}.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
 
                                                if (orgResult.IsError || orgResult.Value.Count == 0)
@@ -121,9 +128,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var internalMemberProps = config.ScopeAdminProperties.Length > 0 ? config.ScopeMemberProperties.Where(prop => !config.ScopeAdminProperties.Contains(prop, StringComparer.OrdinalIgnoreCase)).ToArray() : config.ScopeMemberProperties;
             var scopeRoleChecks = internalMemberProps.Select(prop => $"{scopeVar}.{prop}.Contains(accountId)").ToArray();
 
-            var ownershipChecks = new List<string> { $"thing.{PropertyNames.Owner} == accountId" };
+            var ownershipChecks = new List<string>();
 
-            if (!string.IsNullOrWhiteSpace(config.OwnerProperty) && !config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(config.OwnerProperty) || config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
+            {
+                ownershipChecks.Add($"thing.{PropertyNames.Owner} == accountId");
+            }
+            else
             {
                 ownershipChecks.Add($"thing.{config.OwnerProperty}.Contains(accountId)");
             }
@@ -335,13 +346,13 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var entityName = behavior.EntityName;
             var config = this.GetConfiguration(definition, behavior);
 
-            var ownerChecks = new List<string>
-            {
-                $"{entityName.ToSnakeCase()}.owner = @callerAccountId"
-            };
+            var ownerChecks = new List<string>();
 
-            if (!config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase) &&
-                !config.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(config.OwnerProperty) || config.OwnerProperty.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
+            {
+                ownerChecks.Add($"{entityName.ToSnakeCase()}.owner = @callerAccountId");
+            }
+            else
             {
                 ownerChecks.Add(ManyToManyPredicateBuilder.BuildCallerAccountExistsClause(entityName, config.OwnerProperty, entityName, PropertyNames.Id));
             }

@@ -58,7 +58,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <summary>
         /// Gets a value indicating whether the package settings page can be rendered for the current user.
         /// </summary>
-        private bool CanRenderSettings => this.ViewModel.Package != null && this.ViewModel.Owner != null && (this.ViewModel.CanManagePackage || this.ViewModel.CanManageVersions);
+        private bool CanRenderSettings => this.ViewModel.Package != null && this.ViewModel.Owner != null && (this.ViewModel.CanManagePackage || this.ViewModel.CanManageVersions || this.ViewModel.CanManagePackageTeam);
 
         /// <summary>
         /// Gets a value indicating whether the package is owned by an organization rather than an individual account.
@@ -260,7 +260,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// <returns><c>true</c> if the actions are disabled; otherwise, <c>false</c>.</returns>
         private bool IsCollaboratorActionDisabled(IAccount collaborator)
         {
-            return !this.ViewModel.CanManagePackageTeam || collaborator.Id == this.ViewModel.CurrentUserId || this.IsSolePackageOwner(collaborator);
+            return !this.ViewModel.CanManagePackageTeam || collaborator.Id == this.ViewModel.CurrentUserId || this.IsSolePackageOwner(collaborator) || this.IsPersonalScopeOwner(collaborator);
         }
 
         /// <summary>
@@ -271,6 +271,16 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         private bool IsSolePackageOwner(IAccount collaborator)
         {
             return this.ViewModel.Package.PackageOwner.Count == 1 && this.ViewModel.Package.PackageOwner.Contains(collaborator.Id);
+        }
+
+        /// <summary>
+        /// Determines whether the specified collaborator is the owning personal account of the package scope.
+        /// </summary>
+        /// <param name="collaborator">The collaborator account.</param>
+        /// <returns><c>true</c> if the package is owned by an individual account and <paramref name="collaborator" /> is that account; otherwise, <c>false</c>.</returns>
+        private bool IsPersonalScopeOwner(IAccount collaborator)
+        {
+            return !this.IsOrganizationOwned && collaborator.Id == this.ViewModel.Package.Owner;
         }
 
         /// <summary>

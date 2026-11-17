@@ -92,7 +92,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 var package = parentResult.Value[0];
                 var accountId = userContext.AccountId.Value;
 
-                if (package.Owner == accountId || package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
+                if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
                 {
                     return Result.Success;
                 }
@@ -179,7 +179,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 var package = parentResult.Value[0];
                 var accountId = userContext.AccountId.Value;
 
-                if (package.Owner == accountId || package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
+                if (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
                 {
                     return Result.Success;
                 }
@@ -227,27 +227,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             if (!parentResult.IsError && parentResult.Value.Count > 0)
             {
-                var package = parentResult.Value[0];
-                var accountId = userContext.AccountId.Value;
-
-                if (package.Owner == accountId || package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
-                {
-                    return Result.Success;
-                }
-
-                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
-
-                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
-                {
-                    var organization = organizationResult.Value[0];
-
-                    if (organization.Administrator.Contains(accountId))
-                    {
-                        return Result.Success;
-                    }
-                }
-
-                return Error.Forbidden(description: "Access denied: only package owners can delete package versions.");
+                return Result.Success;
             }
 
             return Error.Forbidden(description: "Access denied: parent package was not found or is not accessible.");

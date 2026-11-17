@@ -187,8 +187,7 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
             this.CurrentUserId = this.UserContext.AccountId ?? Guid.Empty;
 
             this.Owner = await this.scopeService.ReadOrNull(this.UserContext, this.Package.Owner);
-            var isOrganizationAdmin = this.UserContext.AccountId.HasValue && this.Package.IsOrganizationAdministrator(this.UserContext.AccountId.Value, this.Owner);
-            this.CanManagePackageTeam = (this.UserContext.AccountId.HasValue && (this.Package.PackageOwner.Contains(this.UserContext.AccountId.Value) || isOrganizationAdmin)) || PermissionGuard.HasPermission(this.UserContext, PermissionKind.ManagePackageTeam);
+            this.CanManagePackageTeam = this.Package.CanManageTeam(this.UserContext, this.Owner);
 
             var maintainersTask = this.accountService.ReadOrEmpty(this.UserContext, this.Package.PackageMaintainer);
             var ownersTask = this.accountService.ReadOrEmpty(this.UserContext, this.Package.PackageOwner);

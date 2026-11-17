@@ -85,11 +85,6 @@ namespace Mycelium.Forge.Generator.Constants
         public const string DeletePermission = "DeletePermission";
 
         /// <summary>
-        /// Configuration key for PersonalCreatePermission.
-        /// </summary>
-        public const string PersonalCreatePermission = "PersonalCreatePermission";
-
-        /// <summary>
         /// Configuration key for ParentEntity.
         /// </summary>
         public const string ParentEntity = "ParentEntity";

@@ -107,9 +107,9 @@ namespace Mycelium.Forge.Common
         ViewOrganizationMemberList,
 
         /// <summary>
-        /// Permission: PublishPackageToPersonalScope.
+        /// Permission: PublishPackage.
         /// </summary>
-        PublishPackageToPersonalScope,
+        PublishPackage,
 
         /// <summary>
         /// Permission: PublishPackageVersion.

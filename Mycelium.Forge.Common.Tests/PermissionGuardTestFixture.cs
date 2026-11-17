@@ -43,5 +43,23 @@ namespace Mycelium.Forge.Common.Tests
                 Assert.That(PermissionGuard.HasRole(null, RoleKind.InstallationAdministrator), Is.False);
             }
         }
+
+        [Test]
+        public void VerifyHasPermission()
+        {
+            var installationAdministratorContext = new UserContext { AccountId = Guid.NewGuid(), Username = "admin", CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+            var accountContext = new UserContext { AccountId = Guid.NewGuid(), Username = "account-user", CurrentRoles = [RoleKind.Account] };
+            var operatorContext = new UserContext { AccountId = Guid.NewGuid(), Username = "operator-user", CurrentRoles = [RoleKind.PlatformOperator] };
+            var anonymousContext = UserContext.CreateAnonymous();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(PermissionGuard.HasPermission(installationAdministratorContext, PermissionKind.PublishPackage), Is.True);
+                Assert.That(PermissionGuard.HasPermission(accountContext, PermissionKind.PublishPackage), Is.True);
+                Assert.That(PermissionGuard.HasPermission(operatorContext, PermissionKind.PublishPackage), Is.False);
+                Assert.That(PermissionGuard.HasPermission(anonymousContext, PermissionKind.PublishPackage), Is.False);
+                Assert.That(PermissionGuard.HasPermission(null, PermissionKind.PublishPackage), Is.False);
+            }
+        }
     }
 }

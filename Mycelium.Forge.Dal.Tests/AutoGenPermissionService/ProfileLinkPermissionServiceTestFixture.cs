@@ -177,13 +177,26 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Uri = "https://github.com/alice-updated"
             };
 
+            var reassignedLink = new ProfileLink
+            {
+                Id = existingLink.Id,
+                Owner = this.otherUserId,
+                Uri = "https://github.com/alice-updated"
+            };
+
+            var nonOwnerAdminContext = new UserContext { AccountId = Guid.NewGuid(), Username = "nonOwnerAdmin", CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+
             var ownerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingLink, updatedLink, this.transaction);
             var otherResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingLink, updatedLink, this.transaction);
+            var ownerReassignResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingLink, reassignedLink, this.transaction);
+            var adminReassignResult = await this.permissionService.IsAllowedToUpdate(nonOwnerAdminContext, existingLink, reassignedLink, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(ownerResult.IsError, Is.False);
                 Assert.That(otherResult.IsError, Is.True);
+                Assert.That(ownerReassignResult.IsError, Is.True);
+                Assert.That(adminReassignResult.IsError, Is.False);
             }
         }
     }

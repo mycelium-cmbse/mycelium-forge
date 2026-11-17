@@ -84,7 +84,14 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
         protected override async Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IAddress existingThing, IAddress updatedThing, NpgsqlTransaction transaction)
         {
-            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations);
+            var existingResult = await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.Owner, this.organizationService, "address", transaction, PermissionKind.ManageOwnProfile, PermissionKind.ManageOrganizations);
+
+            if (existingResult.IsError || existingThing.Owner == updatedThing.Owner)
+            {
+                return existingResult;
+            }
+
+            return PermissionGuard.GuardPermission(userContext, PermissionKind.ManageOrganizations);
         }
 
         /// <summary>

@@ -45,7 +45,24 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether creation is permitted.</returns>
         protected override Task<ErrorOr<Success>> IsAllowedToCreateImplementation(IUserContext userContext, IAPIKey toCreate, NpgsqlTransaction transaction)
         {
-            return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.IssueApiKey));
+            if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+            {
+                return Task.FromResult<ErrorOr<Success>>(Error.Unauthorized(description: "Unauthenticated user cannot create a apikey."));
+            }
+
+            var guard = PermissionGuard.GuardPermission(userContext, PermissionKind.IssueApiKey);
+
+            if (guard.IsError)
+            {
+                return Task.FromResult(guard);
+            }
+
+            if (toCreate.Owner != userContext.AccountId.Value)
+            {
+                return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.RevokeAnyApiKey));
+            }
+
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
         }
 
         /// <summary>
@@ -75,6 +92,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// <returns>An awaitable <see cref="Task{ErrorOr}"/> indicating whether updating is permitted.</returns>
         protected override Task<ErrorOr<Success>> IsAllowedToUpdateImplementation(IUserContext userContext, IAPIKey existingThing, IAPIKey updatedThing, NpgsqlTransaction transaction)
         {
+            if (existingThing.Owner != updatedThing.Owner)
+            {
+                return Task.FromResult(PermissionGuard.GuardPermission(userContext, PermissionKind.RevokeAnyApiKey));
+            }
+
             if (userContext.AccountId.HasValue && existingThing.Owner == userContext.AccountId.Value)
             {
                 return Task.FromResult<ErrorOr<Success>>(Result.Success);

@@ -88,7 +88,22 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         {
             var config = this.GetConfiguration(definition, behavior);
             var (personalArg, platformArg) = FormatManageArguments(config);
-            stringBuilder.Append($"            return await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{config.OwnerProperty}, this.{config.ScopeServiceField}, \"{@class.Name.ToLowerInvariant()}\", transaction, {personalArg}, {platformArg});");
+            var entityLower = @class.Name.ToLowerInvariant();
+
+            var ownerChangeStatement = !string.IsNullOrWhiteSpace(config.PlatformManagePermission)
+                ? $"PermissionGuard.GuardPermission(userContext, PermissionKind.{config.PlatformManagePermission})"
+                : $"Error.Forbidden(description: \"Access denied: cannot reassign {entityLower} owner.\")";
+
+            stringBuilder.Append($$"""
+                                               var existingResult = await ScopeItemPermissionHelper.IsAllowedToManageScopeItem(userContext, existingThing.{{config.OwnerProperty}}, this.{{config.ScopeServiceField}}, "{{entityLower}}", transaction, {{personalArg}}, {{platformArg}});
+
+                                               if (existingResult.IsError || existingThing.{{config.OwnerProperty}} == updatedThing.{{config.OwnerProperty}})
+                                               {
+                                                   return existingResult;
+                                               }
+
+                                               return {{ownerChangeStatement}};
+                                   """);
         }
 
         /// <summary>

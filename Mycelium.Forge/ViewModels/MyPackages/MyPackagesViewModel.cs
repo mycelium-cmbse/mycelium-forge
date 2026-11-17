@@ -186,7 +186,7 @@ namespace Mycelium.Forge.ViewModels.MyPackages
         /// <returns>The <see cref="PackageInvitationKind" /> role value.</returns>
         public PackageInvitationKind GetRole(IPackage package)
         {
-            if (package.Owner == this.currentUserId || package.PackageOwner.Contains(this.currentUserId))
+            if (package.PackageOwner.Contains(this.currentUserId))
             {
                 return PackageInvitationKind.OWNER;
             }

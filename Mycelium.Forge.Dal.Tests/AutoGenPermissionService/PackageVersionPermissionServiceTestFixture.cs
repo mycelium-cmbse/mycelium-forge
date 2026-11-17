@@ -136,6 +136,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var orgAdminResult = await this.permissionService.IsAllowedToCreate(orgAdminContext, version, this.transaction);
             var orgMemberResult = await this.permissionService.IsAllowedToCreate(orgMemberContext, version, this.transaction);
 
+            var scopeOwnerOnlyPackage = new Package { Id = this.packageId, Owner = this.userId, PackageOwner = [this.otherUserId], PackageMaintainer = [] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(scopeOwnerOnlyPackage));
+            var scopeOwnerOnlyResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, version, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(unauthResult.IsError, Is.True);
@@ -143,6 +147,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(ownerResult.IsError, Is.False);
                 Assert.That(orgAdminResult.IsError, Is.False);
                 Assert.That(orgMemberResult.IsError, Is.True);
+                Assert.That(scopeOwnerOnlyResult.IsError, Is.True);
             }
         }
 
@@ -186,8 +191,13 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
 
             var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
             var orgAdminInstallAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdminInstallAdmin", CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+            var nonOwnerInstallAdminContext = new UserContext { AccountId = Guid.NewGuid(), Username = "nonOwnerInstallAdmin", CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
             var orgAdminResult = await this.permissionService.IsAllowedToDelete(orgAdminContext, version, this.transaction);
             var orgAdminInstallAdminResult = await this.permissionService.IsAllowedToDelete(orgAdminInstallAdminContext, version, this.transaction);
+            var nonOwnerInstallAdminResult = await this.permissionService.IsAllowedToDelete(nonOwnerInstallAdminContext, version, this.transaction);
+
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<IPackage>.Empty);
+            var missingParentAdminResult = await this.permissionService.IsAllowedToDelete(nonOwnerInstallAdminContext, version, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
@@ -199,6 +209,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(otherResult.IsError, Is.True);
                 Assert.That(orgAdminResult.IsError, Is.True);
                 Assert.That(orgAdminInstallAdminResult.IsError, Is.False);
+                Assert.That(nonOwnerInstallAdminResult.IsError, Is.False);
+                Assert.That(missingParentAdminResult.IsError, Is.True);
+                Assert.That(missingParentAdminResult.FirstError.Type, Is.EqualTo(ErrorType.Forbidden));
             }
         }
 
@@ -314,6 +327,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var orgAdminUnlistResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, existingVersion, unlistedVersion, this.transaction);
             var orgMemberUnlistResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, existingVersion, unlistedVersion, this.transaction);
 
+            var scopeOwnerOnlyPackage = new Package { Id = this.packageId, Owner = this.userId, PackageOwner = [this.otherUserId] };
+            this.packageServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackage>(scopeOwnerOnlyPackage));
+            var scopeOwnerOnlyResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingVersion, unlistedVersion, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(immutableResult.IsError, Is.True);
@@ -321,6 +338,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(otherResult.IsError, Is.True);
                 Assert.That(orgAdminUnlistResult.IsError, Is.False);
                 Assert.That(orgMemberUnlistResult.IsError, Is.True);
+                Assert.That(scopeOwnerOnlyResult.IsError, Is.True);
             }
         }
     }

@@ -66,12 +66,19 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             if (toCreate.Owner == userContext.AccountId.Value)
             {
-                return PermissionGuard.GuardPermission(userContext, PermissionKind.PublishPackageToPersonalScope);
+                return PermissionGuard.GuardPermission(userContext, PermissionKind.PublishPackage);
             }
 
             if (PermissionGuard.HasPermission(userContext, PermissionKind.ManageOrganizations))
             {
                 return Result.Success;
+            }
+
+            var createGuard = PermissionGuard.GuardPermission(userContext, PermissionKind.PublishPackage);
+
+            if (createGuard.IsError)
+            {
+                return createGuard;
             }
 
             var orgResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [toCreate.Owner]);
@@ -112,7 +119,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
 
             var accountId = userContext.AccountId.Value;
 
-            if (thing.Owner == accountId || thing.PackageOwner.Contains(accountId) || thing.PackageMaintainer.Contains(accountId))
+            if (thing.PackageOwner.Contains(accountId) || thing.PackageMaintainer.Contains(accountId))
             {
                 return Result.Success;
             }

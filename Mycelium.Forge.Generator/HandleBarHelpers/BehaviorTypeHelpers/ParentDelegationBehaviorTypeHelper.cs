@@ -283,7 +283,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             }
 
             stringBuilder.Append(ModelConstants.DoubleNewLine);
-            stringBuilder.Append(BuildParentOwnershipBlock(config, $"thing.{config.ParentKey}", "IsAllowedToDelete(userContext, parentResult.Value[0], transaction)", $"Access denied: only {config.ParentEntity.ToLowerInvariant()} owners can delete {config.ParentEntity.ToLowerInvariant()} versions."));
+            stringBuilder.Append(BuildParentOwnershipBlock(config, $"thing.{config.ParentKey}", "IsAllowedToDelete(userContext, parentResult.Value[0], transaction)", $"Access denied: only {config.ParentEntity.ToLowerInvariant()} owners can delete {config.ParentEntity.ToLowerInvariant()} versions.", !string.IsNullOrWhiteSpace(config.DeletePermission)));
         }
 
         /// <summary>
@@ -332,8 +332,9 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
         /// <param name="parentIdExpression">The C# expression yielding the parent identifier.</param>
         /// <param name="fallbackMethodCall">The delegated permission method call when no direct owner properties are configured.</param>
         /// <param name="forbiddenMessage">The error message returned when ownership verification fails.</param>
+        /// <param name="bypassParentOwnershipCheck">Whether to bypass direct parent ownership checks once parent existence is verified.</param>
         /// <returns>The formatted C# parent ownership verification block.</returns>
-        private static string BuildParentOwnershipBlock(ParentDelegationConfiguration config, string parentIdExpression, string fallbackMethodCall, string forbiddenMessage)
+        private static string BuildParentOwnershipBlock(ParentDelegationConfiguration config, string parentIdExpression, string fallbackMethodCall, string forbiddenMessage, bool bypassParentOwnershipCheck = false)
         {
             var ownershipChecks = BuildOwnershipChecks(config);
 
@@ -341,21 +342,28 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             if (ownershipChecks.Count > 0)
             {
-                var ownerScopeBlock = config.OwnerScope.IsConfigured
-                    ? "\r\n" + config.OwnerScope.BuildAsyncAccessCheck(config.ParentVar)
-                    : string.Empty;
+                if (bypassParentOwnershipCheck)
+                {
+                    ownershipBlock = "                return Result.Success;";
+                }
+                else
+                {
+                    var ownerScopeBlock = config.OwnerScope.IsConfigured
+                        ? "\r\n" + config.OwnerScope.BuildAsyncAccessCheck(config.ParentVar)
+                        : string.Empty;
 
-                ownershipBlock = $$"""
-                                                   var {{config.ParentVar}} = parentResult.Value[0];
-                                                   var accountId = userContext.AccountId.Value;
+                    ownershipBlock = $$"""
+                                                       var {{config.ParentVar}} = parentResult.Value[0];
+                                                       var accountId = userContext.AccountId.Value;
 
-                                                   if ({{string.Join(" || ", ownershipChecks)}})
-                                                   {
-                                                       return Result.Success;
-                                                   }{{ownerScopeBlock}}
+                                                       if ({{string.Join(" || ", ownershipChecks)}})
+                                                       {
+                                                           return Result.Success;
+                                                       }{{ownerScopeBlock}}
 
-                                                   return Error.Forbidden(description: "{{forbiddenMessage}}");
-                                   """;
+                                                       return Error.Forbidden(description: "{{forbiddenMessage}}");
+                                       """;
+                }
             }
             else
             {
@@ -386,13 +394,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
                 return [];
             }
 
-            var ownershipChecks = new List<string> { $"{config.ParentVar}.{PropertyNames.Owner} == accountId" };
-
-            ownershipChecks.AddRange(config.ParentOwnerProperties
-                .Where(prop => !prop.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase))
-                .Select(prop => $"{config.ParentVar}.{prop}.Contains(accountId)"));
-
-            return ownershipChecks;
+            return [.. config.ParentOwnerProperties.Select(prop => prop.Equals(PropertyNames.Owner, StringComparison.OrdinalIgnoreCase) ? $"{config.ParentVar}.{PropertyNames.Owner} == accountId" : $"{config.ParentVar}.{prop}.Contains(accountId)")];
         }
     }
 }

@@ -18,60 +18,105 @@ namespace Mycelium.Forge.Tests.Extensions
     public class PackageExtensionsTestFixture
     {
         [Test]
-        public void VerifyCanManageVersions()
+        public void VerifyCanManageTeam()
         {
-            var ownerAccountId = Guid.NewGuid();
-            var organizationId = Guid.NewGuid();
-            var otherOrganizationId = Guid.NewGuid();
-            var packageOwnerId = Guid.NewGuid();
-            var maintainerId = Guid.NewGuid();
-            var organizationAdminId = Guid.NewGuid();
-            var organizationMemberId = Guid.NewGuid();
-            var outsiderId = Guid.NewGuid();
-
-            var package = new Package
-            {
-                Owner = ownerAccountId,
-                PackageOwner = [packageOwnerId],
-                PackageMaintainer = [maintainerId]
-            };
-
-            var orgPackage = new Package
-            {
-                Owner = organizationId,
-                PackageOwner = [packageOwnerId],
-                PackageMaintainer = [maintainerId]
-            };
+            var scopeOwnerContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var packageOwnerContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var maintainerContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var organizationAdminContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var organizationMemberContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var outsiderAdminContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+            var unauthenticatedContext = new UserContext { AccountId = null, CurrentRoles = [RoleKind.Anonymous] };
 
             var organization = new Organization
             {
-                Id = organizationId,
-                Administrator = [organizationAdminId],
-                Member = [organizationAdminId, organizationMemberId]
+                Id = Guid.NewGuid(),
+                Administrator = [organizationAdminContext.AccountId.Value],
+                Member = [organizationAdminContext.AccountId.Value, organizationMemberContext.AccountId.Value]
             };
 
             var otherOrganization = new Organization
             {
-                Id = otherOrganizationId,
-                Administrator = [organizationAdminId]
+                Id = Guid.NewGuid(),
+                Administrator = [organizationAdminContext.AccountId.Value]
             };
 
-            var scopeOwnerContext = new UserContext { AccountId = ownerAccountId, CurrentRoles = [RoleKind.Account] };
-            var packageOwnerContext = new UserContext { AccountId = packageOwnerId, CurrentRoles = [RoleKind.Account] };
-            var maintainerContext = new UserContext { AccountId = maintainerId, CurrentRoles = [RoleKind.Account] };
-            var organizationAdminContext = new UserContext { AccountId = organizationAdminId, CurrentRoles = [RoleKind.Account] };
-            var organizationMemberContext = new UserContext { AccountId = organizationMemberId, CurrentRoles = [RoleKind.Account] };
-            var organizationAdminWithoutPermissionContext = new UserContext { AccountId = organizationAdminId, CurrentRoles = [RoleKind.Anonymous] };
-            var outsiderAdminContext = new UserContext { AccountId = outsiderId, CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
-            var memberWithoutPermissionContext = new UserContext { AccountId = maintainerId, CurrentRoles = [RoleKind.Anonymous] };
+            var package = new Package
+            {
+                Owner = scopeOwnerContext.AccountId.Value,
+                PackageOwner = [packageOwnerContext.AccountId.Value],
+                PackageMaintainer = [maintainerContext.AccountId.Value]
+            };
+
+            var orgPackage = new Package
+            {
+                Owner = organization.Id,
+                PackageOwner = [packageOwnerContext.AccountId.Value],
+                PackageMaintainer = [maintainerContext.AccountId.Value]
+            };
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(((IPackage)null!).CanManageTeam(scopeOwnerContext), Is.False);
+                Assert.That(package.CanManageTeam(null!), Is.False);
+                Assert.That(package.CanManageTeam(unauthenticatedContext), Is.False);
+                Assert.That(package.CanManageTeam(scopeOwnerContext), Is.False);
+                Assert.That(package.CanManageTeam(packageOwnerContext), Is.True);
+                Assert.That(package.CanManageTeam(maintainerContext), Is.False);
+                Assert.That(package.CanManageTeam(outsiderAdminContext), Is.True);
+                Assert.That(orgPackage.CanManageTeam(organizationAdminContext, organization), Is.True);
+                Assert.That(orgPackage.CanManageTeam(organizationAdminContext), Is.False);
+                Assert.That(orgPackage.CanManageTeam(organizationAdminContext, otherOrganization), Is.False);
+                Assert.That(orgPackage.CanManageTeam(organizationMemberContext, organization), Is.False);
+            }
+        }
+
+        [Test]
+        public void VerifyCanManageVersions()
+        {
+            var scopeOwnerContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var packageOwnerContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var maintainerContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var organizationAdminContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var organizationMemberContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account] };
+            var organizationAdminWithoutPermissionContext = new UserContext { AccountId = organizationAdminContext.AccountId, CurrentRoles = [RoleKind.Anonymous] };
+            var outsiderAdminContext = new UserContext { AccountId = Guid.NewGuid(), CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+            var memberWithoutPermissionContext = new UserContext { AccountId = maintainerContext.AccountId, CurrentRoles = [RoleKind.Anonymous] };
             var unauthenticatedContext = new UserContext { AccountId = null, CurrentRoles = [RoleKind.Account] };
+
+            var organization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Administrator = [organizationAdminContext.AccountId.Value],
+                Member = [organizationAdminContext.AccountId.Value, organizationMemberContext.AccountId.Value]
+            };
+
+            var otherOrganization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Administrator = [organizationAdminContext.AccountId.Value]
+            };
+
+            var package = new Package
+            {
+                Owner = scopeOwnerContext.AccountId.Value,
+                PackageOwner = [packageOwnerContext.AccountId.Value],
+                PackageMaintainer = [maintainerContext.AccountId.Value]
+            };
+
+            var orgPackage = new Package
+            {
+                Owner = organization.Id,
+                PackageOwner = [packageOwnerContext.AccountId.Value],
+                PackageMaintainer = [maintainerContext.AccountId.Value]
+            };
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(((IPackage)null!).CanManageVersions(scopeOwnerContext), Is.False);
                 Assert.That(package.CanManageVersions(null!), Is.False);
                 Assert.That(package.CanManageVersions(unauthenticatedContext), Is.False);
-                Assert.That(package.CanManageVersions(scopeOwnerContext), Is.True);
+                Assert.That(package.CanManageVersions(scopeOwnerContext), Is.False);
                 Assert.That(package.CanManageVersions(packageOwnerContext), Is.True);
                 Assert.That(package.CanManageVersions(maintainerContext), Is.True);
                 Assert.That(package.CanManageVersions(outsiderAdminContext), Is.False);
@@ -116,15 +161,13 @@ namespace Mycelium.Forge.Tests.Extensions
         [Test]
         public void VerifyIsOrganizationAdministrator()
         {
-            var organizationId = Guid.NewGuid();
-            var otherOrganizationId = Guid.NewGuid();
             var adminId = Guid.NewGuid();
             var memberId = Guid.NewGuid();
 
-            var package = new Package { Owner = organizationId };
-            var organization = new Organization { Id = organizationId, Administrator = [adminId], Member = [adminId, memberId] };
-            var otherOrganization = new Organization { Id = otherOrganizationId, Administrator = [adminId] };
-            var accountScope = new Account { Id = organizationId };
+            var organization = new Organization { Id = Guid.NewGuid(), Administrator = [adminId], Member = [adminId, memberId] };
+            var otherOrganization = new Organization { Id = Guid.NewGuid(), Administrator = [adminId] };
+            var package = new Package { Owner = organization.Id };
+            var accountScope = new Account { Id = organization.Id };
 
             using (Assert.EnterMultipleScope())
             {

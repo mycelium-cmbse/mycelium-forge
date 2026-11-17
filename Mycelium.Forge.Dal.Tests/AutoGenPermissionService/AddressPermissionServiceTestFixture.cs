@@ -229,13 +229,26 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 AddressLine1 = "123 Main St Suite 200"
             };
 
+            var reassignedAddress = new Address
+            {
+                Id = existingAddress.Id,
+                Owner = this.otherUserId,
+                AddressLine1 = "123 Main St Suite 200"
+            };
+
+            var nonOwnerAdminContext = new UserContext { AccountId = Guid.NewGuid(), Username = "nonOwnerAdmin", CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator] };
+
             var ownerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAddress, updatedAddress, this.transaction);
             var otherResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingAddress, updatedAddress, this.transaction);
+            var ownerReassignResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingAddress, reassignedAddress, this.transaction);
+            var adminReassignResult = await this.permissionService.IsAllowedToUpdate(nonOwnerAdminContext, existingAddress, reassignedAddress, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(ownerResult.IsError, Is.False);
                 Assert.That(otherResult.IsError, Is.True);
+                Assert.That(ownerReassignResult.IsError, Is.True);
+                Assert.That(adminReassignResult.IsError, Is.False);
             }
         }
     }

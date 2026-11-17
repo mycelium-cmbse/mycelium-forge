@@ -185,6 +185,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public bool CanManageVersions { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the current user is allowed to manage the package team.
+        /// </summary>
+        public bool CanManagePackageTeam { get; set; }
+
+        /// <summary>
         /// Initializes the package view model state for the specified package short name and scope asynchronously.
         /// </summary>
         /// <param name="packageShortname">The short name of the package.</param>
@@ -200,6 +205,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             {
                 this.IsUserAdmin = false;
                 this.CanManageVersions = false;
+                this.CanManagePackageTeam = false;
                 this.logger.LogWarning("Package {Scope}/{Name} not found during details initialization", scope.SanitizeForLog(), packageShortname.SanitizeForLog());
                 return;
             }
@@ -215,6 +221,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             var updatePermissionResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Package);
             this.IsUserAdmin = updatePermissionResult.IsSuccess;
             this.CanManageVersions = this.Package.CanManageVersions(userContext, this.Owner);
+            this.CanManagePackageTeam = this.Package.CanManageTeam(userContext, this.Owner);
 
             var isVersionsTab = string.Equals(tab, PackageTabConstants.Versions, StringComparison.OrdinalIgnoreCase);
 
