@@ -1,0 +1,48 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ChangeCollaboratorRoleDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        <p class="text-sm leading-xs text-muted-foreground">
+            Update the package role for <span class="font-medium text-foreground">@(this.Collaborator.Name)</span>.
+        </p>
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="change-collaborator-role-select"
+                          Class="form-field-label">
+                Role
+            </BbFieldLabel>
+            <BbFieldContent>
+                <ForgeSelect TValue="PackageInvitationKind"
+                             Value="@(this.SelectedRole)"
+                             ValueChanged="@(this.OnRoleChanged)"
+                             Items="@(this.RoleOptions)"
+                             DisplayTextSelector="@(role => role.ToUpperCaseFirst())"
+                             Id="change-collaborator-role-select"/>
+            </BbFieldContent>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton id="change-collaborator-role-cancel-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton id="change-collaborator-role-submit-button"
+                  Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnSaveClicked)">
+            Save role
+        </BbButton>
+    </Footer>
+</DialogComponent>

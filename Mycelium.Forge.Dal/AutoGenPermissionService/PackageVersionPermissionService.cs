@@ -40,6 +40,11 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         private readonly IPackagePermissionService packagePermissionService;
 
         /// <summary>
+        /// The (injected) <see cref="IOrganizationService" /> domain service.
+        /// </summary>
+        private readonly IOrganizationService organizationService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PackageVersionPermissionService"/> class.
         /// </summary>
         public PackageVersionPermissionService()
@@ -51,10 +56,12 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
         /// </summary>
         /// <param name="packageService">The (injected) <see cref="IPackageService" /> domain service.</param>
         /// <param name="packagePermissionService">The (injected) <see cref="IPackagePermissionService" /> domain service.</param>
-        public PackageVersionPermissionService(IPackageService packageService, IPackagePermissionService packagePermissionService)
+        /// <param name="organizationService">The (injected) <see cref="IOrganizationService" /> domain service.</param>
+        public PackageVersionPermissionService(IPackageService packageService, IPackagePermissionService packagePermissionService, IOrganizationService organizationService)
         {
             this.packageService = packageService;
             this.packagePermissionService = packagePermissionService;
+            this.organizationService = organizationService;
         }
 
         /// <summary>
@@ -88,6 +95,18 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 if (package.Owner == accountId || package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
                 {
                     return Result.Success;
+                }
+
+                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                {
+                    var organization = organizationResult.Value[0];
+
+                    if (organization.Administrator.Contains(accountId))
+                    {
+                        return Result.Success;
+                    }
                 }
 
                 return Error.Forbidden(description: "Access denied: user is not an owner or maintainer of the package.");
@@ -165,6 +184,18 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                     return Result.Success;
                 }
 
+                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                {
+                    var organization = organizationResult.Value[0];
+
+                    if (organization.Administrator.Contains(accountId))
+                    {
+                        return Result.Success;
+                    }
+                }
+
                 return Error.Forbidden(description: "Access denied: user is not an owner or maintainer of the package.");
             }
 
@@ -202,6 +233,18 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 if (package.Owner == accountId || package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId))
                 {
                     return Result.Success;
+                }
+
+                var organizationResult = await this.organizationService.ReadAsync(userContext, transaction, CancellationToken.None, [package.Owner]);
+
+                if (!organizationResult.IsError && organizationResult.Value.Count > 0)
+                {
+                    var organization = organizationResult.Value[0];
+
+                    if (organization.Administrator.Contains(accountId))
+                    {
+                        return Result.Success;
+                    }
                 }
 
                 return Error.Forbidden(description: "Access denied: only package owners can delete package versions.");

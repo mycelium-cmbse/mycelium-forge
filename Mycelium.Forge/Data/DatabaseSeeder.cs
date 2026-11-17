@@ -187,7 +187,7 @@ namespace Mycelium.Forge.Data
                 {
                     AccountId = SeedData.RegisAccount.Id,
                     Username = SeedData.RegisAccount.ShortName,
-                    CurrentRoles = [RoleKind.InstallationAdministrator, RoleKind.Account, RoleKind.OrganizationAdministrator]
+                    CurrentRoles = [RoleKind.InstallationAdministrator, RoleKind.Account]
                 };
 
                 var seedingResult = await this.databaseSource.ExecuteInTransactionAsync<bool>(

@@ -39,7 +39,6 @@ namespace Mycelium.Forge.Common
                     PermissionKind.RevokeAnyApiKey,
                     PermissionKind.ConfigurePlatformDefaults,
                     PermissionKind.SuspendOrganizations,
-                    PermissionKind.ManageOrganizationSettings,
                     PermissionKind.ManageOrganizationMembers,
                     PermissionKind.ConfigurePublishingPolicy,
                     PermissionKind.TransferOrganizationAdministration,
@@ -69,34 +68,10 @@ namespace Mycelium.Forge.Common
                 ]
             },
             {
-                RoleKind.OrganizationAdministrator, [
-                    PermissionKind.ManageOrganizationSettings,
-                    PermissionKind.ManageOrganizationMembers,
-                    PermissionKind.ConfigurePublishingPolicy,
-                    PermissionKind.TransferOrganizationAdministration,
-                    PermissionKind.ConfigureDefaultPackageVisibility,
-                    PermissionKind.ViewOrganizationPackageList,
-                    PermissionKind.ViewOrganizationMemberList,
-                    PermissionKind.PublishPackageToOrganizationScope,
-                    PermissionKind.PublishPackageVersion,
-                    PermissionKind.UnlistPackageVersion,
-                    PermissionKind.RelistPackageVersion,
-                    PermissionKind.SetPackageVisibility,
-                    PermissionKind.ManagePackageTeam,
-                    PermissionKind.TransferPackageOwnership,
-                    PermissionKind.ManagePackageSettings,
-                    PermissionKind.CreateOrganization,
-                    PermissionKind.PublishPackageToPersonalScope,
-                    PermissionKind.ManageOwnProfile,
-                    PermissionKind.IssueApiKey,
-                    PermissionKind.RevokeOwnApiKey,
-                    PermissionKind.ListOwnApiKeys,
-                ]
-            },
-            {
                 RoleKind.Account, [
                     PermissionKind.CreateOrganization,
                     PermissionKind.PublishPackageToPersonalScope,
+                    PermissionKind.PublishPackageToOrganizationScope,
                     PermissionKind.PublishPackageVersion,
                     PermissionKind.UnlistPackageVersion,
                     PermissionKind.RelistPackageVersion,

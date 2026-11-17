@@ -57,6 +57,7 @@ namespace Mycelium.Forge.Generator.Models
             this.ScopeRoles = SplitValues(sr);
             this.ScopeRoleDescription = string.Join(" or ", this.ScopeRoles.Select(r => char.ToLowerInvariant(r[0]) + r[1..]));
             this.AdminPermission = adminPerm;
+            this.OwnerScope = new OwnerScopeConfiguration(config);
         }
 
         /// <summary>
@@ -123,5 +124,10 @@ namespace Mycelium.Forge.Generator.Models
         /// Gets the administrative permission name that bypasses role checks.
         /// </summary>
         public string AdminPermission { get; }
+
+        /// <summary>
+        /// Gets the optional secondary owner scope configuration.
+        /// </summary>
+        public OwnerScopeConfiguration OwnerScope { get; }
     }
 }

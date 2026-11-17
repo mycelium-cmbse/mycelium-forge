@@ -23,7 +23,6 @@
   "roles": {
     "realm": [
       { "name": "Account", "description": "Registered Forge account" },
-      { "name": "OrganizationAdministrator", "description": "Administers an organization" },
       { "name": "PlatformOperator", "description": "Operates the Forge platform" },
       { "name": "InstallationAdministrator", "description": "Administers the whole Forge installation" }
     ]

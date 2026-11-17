@@ -24,11 +24,11 @@ namespace Mycelium.Forge.Common.Tests
                 CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator]
             };
 
-            var organizationAdministratorContext = new UserContext
+            var accountContext = new UserContext
             {
                 AccountId = Guid.NewGuid(),
-                Username = "organization-admin",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                Username = "account-user",
+                CurrentRoles = [RoleKind.Account]
             };
 
             var anonymousContext = UserContext.CreateAnonymous();
@@ -36,9 +36,9 @@ namespace Mycelium.Forge.Common.Tests
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(PermissionGuard.HasRole(installationAdministratorContext, RoleKind.InstallationAdministrator), Is.True);
-                Assert.That(PermissionGuard.HasRole(installationAdministratorContext, RoleKind.OrganizationAdministrator), Is.False);
-                Assert.That(PermissionGuard.HasRole(organizationAdministratorContext, RoleKind.InstallationAdministrator), Is.False);
-                Assert.That(PermissionGuard.HasRole(organizationAdministratorContext, RoleKind.OrganizationAdministrator), Is.True);
+                Assert.That(PermissionGuard.HasRole(installationAdministratorContext, RoleKind.Account), Is.True);
+                Assert.That(PermissionGuard.HasRole(accountContext, RoleKind.InstallationAdministrator), Is.False);
+                Assert.That(PermissionGuard.HasRole(accountContext, RoleKind.Account), Is.True);
                 Assert.That(PermissionGuard.HasRole(anonymousContext, RoleKind.InstallationAdministrator), Is.False);
                 Assert.That(PermissionGuard.HasRole(null, RoleKind.InstallationAdministrator), Is.False);
             }

@@ -207,7 +207,7 @@ namespace Mycelium.Forge.Orm.Tests.Services
             {
                 AccountId = this.adminAccountId,
                 Username = "adminUser",
-                CurrentRoles = [RoleKind.Account, RoleKind.OrganizationAdministrator]
+                CurrentRoles = [RoleKind.Account]
             };
 
             this.memberUserContext = new UserContext

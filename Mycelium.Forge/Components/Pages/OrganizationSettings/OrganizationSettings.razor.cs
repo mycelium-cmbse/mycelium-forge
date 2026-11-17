@@ -139,26 +139,6 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         }
 
         /// <summary>
-        /// Handles the action to resend a pending membership invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to resend.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnResendInvitation(OrganizationInvitation invitation)
-        {
-            await this.ViewModel.ResendInvitation(invitation);
-        }
-
-        /// <summary>
-        /// Handles the action to revoke a pending membership invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to revoke.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnRevokeInvitation(OrganizationInvitation invitation)
-        {
-            await this.ViewModel.RevokeInvitation(invitation);
-        }
-
-        /// <summary>
         /// Handles the action to initiate an organization transfer asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -199,7 +179,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
             var parameters = new Dictionary<string, object>
             {
                 { nameof(InviteMemberDialog.Organization), this.ViewModel.Organization },
-                { nameof(InviteMemberDialog.PendingInvitations), this.ViewModel.PendingInvitations },
+                { nameof(InviteMemberDialog.PendingInvitations), this.ViewModel.InvitationManager.PendingInvitations.Items },
                 { nameof(InviteMemberDialog.OnResult), onResult }
             };
 
@@ -262,17 +242,6 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings
         {
             return this.ViewModel.Organization.Administrator.Count == 1 &&
                    this.ViewModel.Organization.Administrator.Contains(member.Id);
-        }
-
-        /// <summary>
-        /// Gets the display name of the target account associated with a given organization invitation.
-        /// </summary>
-        /// <param name="invitation">The organization invitation.</param>
-        /// <returns>The display name of the target account.</returns>
-        private string GetInvitationTargetName(IOrganizationInvitation invitation)
-        {
-            var target = this.ViewModel.InvitedAccounts.FirstOrDefault(a => a.Id == invitation.Target);
-            return target?.ShortName ?? "Unknown";
         }
     }
 }

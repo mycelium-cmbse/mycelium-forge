@@ -9,8 +9,6 @@
 
 namespace Mycelium.Forge.ViewModels.OrganizationSettings
 {
-    using DynamicData;
-
     using ErrorOr;
 
     using Mycelium.Forge.Common;
@@ -21,17 +19,13 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.ViewModels.Invitations;
 
     /// <summary>
     /// Provides view model state and operations for managing organization members, invitations, and scope configuration.
     /// </summary>
     public class OrganizationSettingsViewModel : IOrganizationSettingsViewModel
     {
-        /// <summary>
-        /// The default number of days before a resent invitation expires.
-        /// </summary>
-        private const int InvitationExpirationDays = 7;
-
         /// <summary>
         /// The (injected) <see cref="IAccountService" /> domain service.
         /// </summary>
@@ -53,11 +47,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         private readonly INotificationService notificationService;
 
         /// <summary>
-        /// The (injected) <see cref="IOrganizationInvitationService" /> domain service.
-        /// </summary>
-        private readonly IOrganizationInvitationService organizationInvitationService;
-
-        /// <summary>
         /// The (injected) <see cref="IOrganizationPermissionService" /> used to validate organization permissions.
         /// </summary>
         private readonly IOrganizationPermissionService organizationPermissionService;
@@ -73,19 +62,9 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         private readonly IUserService userService;
 
         /// <summary>
-        /// The collection of accounts that have been invited to join the organization.
-        /// </summary>
-        private List<IAccount> invitedAccounts = [];
-
-        /// <summary>
         /// The collection of members belonging to the organization.
         /// </summary>
         private List<IAccount> members = [];
-
-        /// <summary>
-        /// The collection of pending invitations for the organization.
-        /// </summary>
-        private List<OrganizationInvitation> pendingInvitations = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrganizationSettingsViewModel" /> class.
@@ -93,17 +72,17 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         /// <param name="databaseSource">The (injected) <see cref="IDatabaseSource" /> database connection provider.</param>
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" />.</param>
         /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
-        /// <param name="organizationInvitationService">The (injected) <see cref="IOrganizationInvitationService" />.</param>
+        /// <param name="invitationManager">The (injected) <see cref="IInvitationManagerViewModel{IOrganizationInvitation}" />.</param>
         /// <param name="organizationPermissionService">The (injected) <see cref="IOrganizationPermissionService" />.</param>
         /// <param name="notificationService">The (injected) <see cref="INotificationService" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{OrganizationSettingsViewModel}" />.</param>
-        public OrganizationSettingsViewModel(IDatabaseSource databaseSource, IOrganizationService organizationService, IAccountService accountService, IOrganizationInvitationService organizationInvitationService, IOrganizationPermissionService organizationPermissionService, INotificationService notificationService, IUserService userService, ILogger<OrganizationSettingsViewModel> logger)
+        public OrganizationSettingsViewModel(IDatabaseSource databaseSource, IOrganizationService organizationService, IAccountService accountService, IInvitationManagerViewModel<IOrganizationInvitation> invitationManager, IOrganizationPermissionService organizationPermissionService, INotificationService notificationService, IUserService userService, ILogger<OrganizationSettingsViewModel> logger)
         {
             this.databaseSource = databaseSource;
             this.organizationService = organizationService;
             this.accountService = accountService;
-            this.organizationInvitationService = organizationInvitationService;
+            this.InvitationManager = invitationManager;
             this.organizationPermissionService = organizationPermissionService;
             this.notificationService = notificationService;
             this.userService = userService;
@@ -141,14 +120,9 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         public IReadOnlyList<IAccount> Members => this.members.AsReadOnly();
 
         /// <summary>
-        /// Gets the collection of accounts that have been invited to join the organization.
+        /// Gets the view model responsible for managing pending organization invitations.
         /// </summary>
-        public IReadOnlyList<IAccount> InvitedAccounts => this.invitedAccounts.AsReadOnly();
-
-        /// <summary>
-        /// Gets the collection of pending invitations for the organization.
-        /// </summary>
-        public IReadOnlyList<OrganizationInvitation> PendingInvitations => this.pendingInvitations.AsReadOnly();
+        public IInvitationManagerViewModel<IOrganizationInvitation> InvitationManager { get; }
 
         /// <summary>
         /// Initializes the view model state for the specified organization short name asynchronously.
@@ -165,6 +139,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
             {
                 var errors = orgResult.IsError ? orgResult.Errors.ToJoinedDescriptions() : "Organization not found or Account ID missing in user context";
                 this.logger.LogWarning("Organization {ShortName} not found: {Errors}", shortName.SanitizeForLog(), errors);
+                await this.InvitationManager.InitializeViewModel(this.UserContext, Guid.Empty, false);
                 return;
             }
 
@@ -173,20 +148,10 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
 
             await this.ComputeCurrentUserPermissions();
 
-            var invitationsResult = await this.organizationInvitationService.ReadAsync(this.UserContext, CancellationToken.None);
+            List<Guid> memberIds = [.. this.Organization.Member.Concat(this.Organization.Administrator).Distinct()];
+            this.members = [.. (await this.accountService.ReadOrEmpty(this.UserContext, memberIds)).DistinctBy(account => account.Id)];
 
-            if (!invitationsResult.IsError)
-            {
-                this.pendingInvitations = [.. invitationsResult.Value.Cast<OrganizationInvitation>().Where(i => i.Organization == this.Organization.Id && i.Status == InvitationStatusKind.PENDING)];
-            }
-
-            List<Guid> memberIds = [.. this.Organization.Member, .. this.Organization.Administrator];
-            var pendingInvitationTargets = this.pendingInvitations.Select(i => i.Target).ToList();
-
-            var accountsOfInterest = await this.accountService.ReadOrEmpty(this.UserContext, [.. memberIds, .. pendingInvitationTargets]);
-
-            this.members = accountsOfInterest.Where(a => memberIds.Contains(a.Id)).ToList();
-            this.invitedAccounts = accountsOfInterest.Where(a => pendingInvitationTargets.Contains(a.Id)).ToList();
+            await this.InvitationManager.InitializeViewModel(this.UserContext, this.Organization.Id, this.CanManageOrganization);
         }
 
         /// <summary>
@@ -251,54 +216,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
         }
 
         /// <summary>
-        /// Resends the specified pending invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to resend.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task ResendInvitation(OrganizationInvitation invitation)
-        {
-            var invitationClone = invitation.Clone();
-            invitationClone.ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays);
-
-            var updateResult = await this.organizationInvitationService.UpdateAsync(this.UserContext, [invitationClone], CancellationToken.None);
-
-            if (updateResult.IsError)
-            {
-                const string errorMessage = "Failed to resend invitation.";
-                this.logger.LogError(errorMessage + " Invitation: {InvitationId} Errors: {Errors}", invitation.Id, updateResult.Errors.ToJoinedDescriptions());
-                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
-                return;
-            }
-
-            this.pendingInvitations.Replace(invitation, invitationClone);
-            this.notificationService.AddNotification("Invitation resent successfully.", "Invitation Resent", NotificationType.Success);
-        }
-
-        /// <summary>
-        /// Revokes the specified pending invitation asynchronously.
-        /// </summary>
-        /// <param name="invitation">The invitation to revoke.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task RevokeInvitation(OrganizationInvitation invitation)
-        {
-            var invitationClone = invitation.Clone();
-            invitationClone.Status = InvitationStatusKind.REVOKED;
-
-            var updateResult = await this.organizationInvitationService.UpdateAsync(this.UserContext, [invitationClone], CancellationToken.None);
-
-            if (updateResult.IsError)
-            {
-                const string errorMessage = "Failed to revoke invitation.";
-                this.logger.LogError(errorMessage + " Invitation: {InvitationId}", invitation.Id);
-                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
-                return;
-            }
-
-            this.pendingInvitations.Remove(invitation);
-            this.notificationService.AddNotification("Invitation revoked successfully.", "Invitation Revoked", NotificationType.Success);
-        }
-
-        /// <summary>
         /// Transfers ownership of the organization to the specified recipient account asynchronously.
         /// </summary>
         /// <param name="recipient">The recipient account to transfer ownership to.</param>
@@ -347,27 +264,10 @@ namespace Mycelium.Forge.ViewModels.OrganizationSettings
                 Organization = this.Organization.Id,
                 Target = target.Id,
                 Owner = this.CurrentUserId,
-                OrganizationInvitationKind = role,
-                Status = InvitationStatusKind.PENDING,
-                ExperiesAt = DateTime.UtcNow.AddDays(InvitationExpirationDays)
+                OrganizationInvitationKind = role
             };
 
-            var createResult = await this.organizationInvitationService.CreateAsync(this.UserContext, [invitation], token);
-
-            if (createResult.IsError)
-            {
-                const string errorMessage = "Failed to send invitation.";
-
-                this.logger.LogError(errorMessage + " Target: {TargetId} Errors: {Errors}", target.Id, createResult.Errors.ToJoinedDescriptions());
-                this.notificationService.AddNotification(errorMessage, "Invitation Error", NotificationType.Error);
-                return createResult.Errors;
-            }
-
-            this.pendingInvitations.Add(invitation);
-            this.invitedAccounts.AddOrReplace(target);
-
-            this.notificationService.AddNotification($"Invitation sent to {target.Name}.", "Invitation Sent", NotificationType.Success);
-            return Result.Success;
+            return await this.InvitationManager.SendInvitation(invitation, target, token);
         }
 
         /// <summary>

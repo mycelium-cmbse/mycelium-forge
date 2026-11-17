@@ -102,15 +102,34 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Visibility = VisibilityKind.PUBLIC
             };
 
+            var orgId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var nonMemberId = Guid.NewGuid();
+            var organization = new Organization { Id = orgId, Name = "Org", ShortName = "org", Administrator = [], Member = [orgMemberId] };
+            this.organizationServiceMock.Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgPackage = new Package { Id = Guid.NewGuid(), Owner = orgId, PackageOwner = [orgMemberId], Visibility = VisibilityKind.PRIVATE };
+            var missingOrgPackage = new Package { Id = Guid.NewGuid(), Owner = Guid.NewGuid(), PackageOwner = [orgMemberId], Visibility = VisibilityKind.PRIVATE };
+            var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
+            var nonMemberContext = new UserContext { AccountId = nonMemberId, Username = "nonMember", CurrentRoles = [RoleKind.Account] };
+
             var ownerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, package, this.transaction);
             var accountResult = await this.permissionService.IsAllowedToCreate(this.accountUserContext, package, this.transaction);
             var anonymousResult = await this.permissionService.IsAllowedToCreate(this.anonymousUserContext, package, this.transaction);
+            var orgMemberResult = await this.permissionService.IsAllowedToCreate(orgMemberContext, orgPackage, this.transaction);
+            var nonMemberResult = await this.permissionService.IsAllowedToCreate(nonMemberContext, orgPackage, this.transaction);
+            var missingOrgResult = await this.permissionService.IsAllowedToCreate(orgMemberContext, missingOrgPackage, this.transaction);
+            var adminOrgResult = await this.permissionService.IsAllowedToCreate(this.adminUserContext, orgPackage, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(ownerResult.IsError, Is.False);
                 Assert.That(accountResult.IsError, Is.False);
                 Assert.That(anonymousResult.IsError, Is.True);
+                Assert.That(orgMemberResult.IsError, Is.False);
+                Assert.That(nonMemberResult.IsError, Is.True);
+                Assert.That(missingOrgResult.IsError, Is.True);
+                Assert.That(adminOrgResult.IsError, Is.False);
             }
         }
 
@@ -121,18 +140,46 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             {
                 Id = Guid.NewGuid(),
                 Owner = this.otherUserId,
-                PackageOwner = [this.otherUserId]
+                PackageOwner = [this.otherUserId],
+                PackageMaintainer = [this.userId]
             };
 
+            var ownedPackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = this.userId,
+                PackageOwner = [this.userId]
+            };
+
+            var anonymousResult = await this.permissionService.IsAllowedToDelete(this.anonymousUserContext, package, this.transaction);
             var adminResult = await this.permissionService.IsAllowedToDelete(this.adminUserContext, package, this.transaction);
-            var ownerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, package, this.transaction);
-            var accountResult = await this.permissionService.IsAllowedToDelete(this.accountUserContext, package, this.transaction);
+            var directOwnerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, ownedPackage, this.transaction);
+            var maintainerResult = await this.permissionService.IsAllowedToDelete(this.ownerUserContext, package, this.transaction);
+            var readerResult = await this.permissionService.IsAllowedToDelete(this.readerUserContext, package, this.transaction);
+
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var organization = new Organization { Id = orgId, Name = "Org", ShortName = "org", Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.organizationServiceMock.Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgOwnedPackage = new Package { Id = Guid.NewGuid(), Owner = orgId, PackageOwner = [this.otherUserId] };
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
+            var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
+
+            var orgAdminDeleteResult = await this.permissionService.IsAllowedToDelete(orgAdminContext, orgOwnedPackage, this.transaction);
+            var orgMemberDeleteResult = await this.permissionService.IsAllowedToDelete(orgMemberContext, orgOwnedPackage, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(anonymousResult.IsError, Is.True);
+                Assert.That(anonymousResult.FirstError.Type, Is.EqualTo(ErrorType.Unauthorized));
                 Assert.That(adminResult.IsError, Is.False);
-                Assert.That(ownerResult.IsError, Is.True);
-                Assert.That(accountResult.IsError, Is.True);
+                Assert.That(directOwnerResult.IsError, Is.False);
+                Assert.That(maintainerResult.IsError, Is.True);
+                Assert.That(readerResult.IsError, Is.True);
+                Assert.That(orgAdminDeleteResult.IsError, Is.False);
+                Assert.That(orgMemberDeleteResult.IsError, Is.True);
             }
         }
 
@@ -194,13 +241,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var orgAId = Guid.NewGuid();
             var orgBId = Guid.NewGuid();
 
+            var orgAMemberId = Guid.NewGuid();
             var organizationA = new Organization
             {
                 Id = orgAId,
                 Name = "OrgA",
                 ShortName = "org-a",
                 Administrator = [this.userId],
-                Member = [this.userId]
+                Member = [this.userId, orgAMemberId]
             };
 
             var organizationB = new Organization
@@ -228,6 +276,14 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Visibility = VisibilityKind.INTERNAL
             };
 
+            var orgAPrivatePackage = new Package
+            {
+                Id = Guid.NewGuid(),
+                Owner = orgAId,
+                PackageOwner = [orgAId],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
             var orgBMemberUserContext = new UserContext
             {
                 AccountId = this.otherUserId,
@@ -242,13 +298,37 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 CurrentRoles = [RoleKind.Account]
             };
 
+            var orgANonAdminMemberContext = new UserContext
+            {
+                AccountId = orgAMemberId,
+                Username = "orgANonAdminMember",
+                CurrentRoles = [RoleKind.Account]
+            };
+
+            var maintainerId = Guid.NewGuid();
+            var maintainerContext = new UserContext { AccountId = maintainerId, Username = "maintainer", CurrentRoles = [RoleKind.Account] };
+            var maintainerPrivatePackage = new Package { Id = Guid.NewGuid(), Owner = orgAId, PackageOwner = [orgAId], PackageMaintainer = [maintainerId], Visibility = VisibilityKind.PRIVATE };
+            var maintainerInternalPackage = new Package { Id = Guid.NewGuid(), Owner = orgAId, PackageOwner = [orgAId], PackageMaintainer = [maintainerId], Visibility = VisibilityKind.INTERNAL };
+
+            var internalAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, orgAInternalPackage, this.transaction);
+            var privateAnonResult = await this.permissionService.IsAllowedToRead(this.anonymousUserContext, orgAPrivatePackage, this.transaction);
+            var maintainerPrivateResult = await this.permissionService.IsAllowedToRead(maintainerContext, maintainerPrivatePackage, this.transaction);
+            var maintainerInternalResult = await this.permissionService.IsAllowedToRead(maintainerContext, maintainerInternalPackage, this.transaction);
+
             var otherOrgMemberResult = await this.permissionService.IsAllowedToRead(orgBMemberUserContext, orgAInternalPackage, this.transaction);
             var owningOrgMemberResult = await this.permissionService.IsAllowedToRead(orgAMemberUserContext, orgAInternalPackage, this.transaction);
+            var owningOrgAdminPrivateResult = await this.permissionService.IsAllowedToRead(orgAMemberUserContext, orgAPrivatePackage, this.transaction);
+            var owningOrgNonAdminPrivateResult = await this.permissionService.IsAllowedToRead(orgANonAdminMemberContext, orgAPrivatePackage, this.transaction);
+            var otherOrgAdminPrivateResult = await this.permissionService.IsAllowedToRead(orgBMemberUserContext, orgAPrivatePackage, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(publicAnonResult.IsError, Is.False);
                 Assert.That(publicAccountResult.IsError, Is.False);
+                Assert.That(internalAnonResult.IsError, Is.True);
+                Assert.That(privateAnonResult.IsError, Is.True);
+                Assert.That(maintainerPrivateResult.IsError, Is.False);
+                Assert.That(maintainerInternalResult.IsError, Is.False);
                 Assert.That(internalAccountResult.IsError, Is.True);
                 Assert.That(internalOwnerResult.IsError, Is.False);
                 Assert.That(privateAccountResult.IsError, Is.True);
@@ -257,6 +337,9 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(privateAdminResult.IsError, Is.False);
                 Assert.That(otherOrgMemberResult.IsError, Is.True);
                 Assert.That(owningOrgMemberResult.IsError, Is.False);
+                Assert.That(owningOrgAdminPrivateResult.IsError, Is.False);
+                Assert.That(owningOrgNonAdminPrivateResult.IsError, Is.True);
+                Assert.That(otherOrgAdminPrivateResult.IsError, Is.True);
             }
         }
 
@@ -309,14 +392,66 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var visibilityOwnerResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingPackage, updatedVisibilityPackage, this.transaction);
             var visibilityMaintainerResult = await this.permissionService.IsAllowedToUpdate(this.maintainerUserContext, existingPackage, updatedVisibilityPackage, this.transaction);
 
+            var orgId = Guid.NewGuid();
+            var orgAdminId = Guid.NewGuid();
+            var orgMemberId = Guid.NewGuid();
+            var organization = new Organization { Id = orgId, Name = "Org", ShortName = "org", Administrator = [orgAdminId], Member = [orgAdminId, orgMemberId] };
+            this.organizationServiceMock.Setup(s => s.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ((IEnumerable<Guid>)ids).Contains(orgId)))).ReturnsAsync(ImmutableList.Create<IOrganization>(organization));
+
+            var orgPackage = new Package { Id = Guid.NewGuid(), Owner = orgId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.PRIVATE };
+            var orgPackageVisibilityUpdated = new Package { Id = orgPackage.Id, Owner = orgId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.PUBLIC };
+            var orgPackageTransferred = new Package { Id = orgPackage.Id, Owner = orgAdminId, PackageOwner = [orgAdminId], Visibility = VisibilityKind.PRIVATE };
+
+            var orgAdminContext = new UserContext { AccountId = orgAdminId, Username = "orgAdmin", CurrentRoles = [RoleKind.Account] };
+            var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
+
+            var updatedTeamPackage = new Package
+            {
+                Id = existingPackage.Id,
+                Owner = this.userId,
+                PackageOwner = [this.userId, Guid.NewGuid()],
+                PackageMaintainer = [this.otherUserId, Guid.NewGuid()],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
+            var orgPackageTeamUpdated = new Package
+            {
+                Id = orgPackage.Id,
+                Owner = orgId,
+                PackageOwner = [this.otherUserId, orgAdminId],
+                PackageMaintainer = [orgMemberId],
+                Visibility = VisibilityKind.PRIVATE
+            };
+
+            var anonUpdateResult = await this.permissionService.IsAllowedToUpdate(this.anonymousUserContext, existingPackage, updatedSettingsPackage, this.transaction);
+            var adminUpdateResult = await this.permissionService.IsAllowedToUpdate(this.adminUserContext, existingPackage, updatedSettingsPackage, this.transaction);
+            var ownerTeamUpdateResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingPackage, updatedTeamPackage, this.transaction);
+            var maintainerTeamUpdateResult = await this.permissionService.IsAllowedToUpdate(this.maintainerUserContext, existingPackage, updatedTeamPackage, this.transaction);
+            var thirdPartyTeamUpdateResult = await this.permissionService.IsAllowedToUpdate(this.readerUserContext, existingPackage, updatedTeamPackage, this.transaction);
+            var orgAdminTeamUpdateResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, orgPackage, orgPackageTeamUpdated, this.transaction);
+
+            var orgAdminVisibilityResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, orgPackage, orgPackageVisibilityUpdated, this.transaction);
+            var orgAdminTransferResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, orgPackage, orgPackageTransferred, this.transaction);
+            var orgMemberUpdateResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, orgPackage, orgPackageVisibilityUpdated, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(anonUpdateResult.IsError, Is.True);
+                Assert.That(anonUpdateResult.FirstError.Type, Is.EqualTo(ErrorType.Unauthorized));
+                Assert.That(adminUpdateResult.IsError, Is.False);
+                Assert.That(ownerTeamUpdateResult.IsError, Is.False);
+                Assert.That(maintainerTeamUpdateResult.IsError, Is.True);
+                Assert.That(thirdPartyTeamUpdateResult.IsError, Is.True);
+                Assert.That(orgAdminTeamUpdateResult.IsError, Is.False);
                 Assert.That(settingsOwnerResult.IsError, Is.False);
                 Assert.That(settingsMaintainerResult.IsError, Is.True);
                 Assert.That(ownershipOwnerResult.IsError, Is.False);
                 Assert.That(ownershipMaintainerResult.IsError, Is.True);
                 Assert.That(visibilityOwnerResult.IsError, Is.False);
                 Assert.That(visibilityMaintainerResult.IsError, Is.True);
+                Assert.That(orgAdminVisibilityResult.IsError, Is.False);
+                Assert.That(orgAdminTransferResult.IsError, Is.False);
+                Assert.That(orgMemberUpdateResult.IsError, Is.True);
             }
         }
     }

@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -27,6 +28,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Enums;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.ViewModels.Invitations;
     using Mycelium.Forge.ViewModels.OrganizationSettings;
 
     using Npgsql;
@@ -37,7 +39,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         private Mock<IDatabaseSource> databaseSourceMock;
         private Mock<IOrganizationService> organizationServiceMock;
         private Mock<IAccountService> accountServiceMock;
-        private Mock<IOrganizationInvitationService> organizationInvitationServiceMock;
+        private Mock<IInvitationManagerViewModel<IOrganizationInvitation>> invitationManagerMock;
         private Mock<IOrganizationPermissionService> organizationPermissionServiceMock;
         private Mock<INotificationService> notificationServiceMock;
         private Mock<IUserService> userServiceMock;
@@ -47,9 +49,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
         private Organization org;
         private Account adminAccount;
         private Account memberAccount;
-        private OrganizationInvitation matchingInvitation;
-        private OrganizationInvitation acceptedInvitation;
-        private OrganizationInvitation otherOrgInvitation;
         private UserContext adminUserContext;
         private UserContext memberUserContext;
 
@@ -59,7 +58,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             this.databaseSourceMock = new Mock<IDatabaseSource>();
             this.organizationServiceMock = new Mock<IOrganizationService>();
             this.accountServiceMock = new Mock<IAccountService>();
-            this.organizationInvitationServiceMock = new Mock<IOrganizationInvitationService>();
+            this.invitationManagerMock = new Mock<IInvitationManagerViewModel<IOrganizationInvitation>>();
             this.organizationPermissionServiceMock = new Mock<IOrganizationPermissionService>();
             this.notificationServiceMock = new Mock<INotificationService>();
             this.userServiceMock = new Mock<IUserService>();
@@ -68,7 +67,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             var orgId = Guid.NewGuid();
             var adminId = Guid.NewGuid();
             var memberId = Guid.NewGuid();
-            var targetUserId = Guid.NewGuid();
 
             this.adminAccount = new Account { Id = adminId, Name = "Admin User" };
             this.memberAccount = new Account { Id = memberId, Name = "Member User" };
@@ -81,31 +79,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
                 Member = [memberId]
             };
 
-            this.matchingInvitation = new OrganizationInvitation
-            {
-                Id = Guid.NewGuid(),
-                Organization = orgId,
-                Target = targetUserId,
-                Status = InvitationStatusKind.PENDING,
-                ExperiesAt = DateTime.UtcNow.AddDays(3)
-            };
-
-            this.acceptedInvitation = new OrganizationInvitation
-            {
-                Id = Guid.NewGuid(),
-                Organization = orgId,
-                Target = Guid.NewGuid(),
-                Status = InvitationStatusKind.ACCEPTED
-            };
-
-            this.otherOrgInvitation = new OrganizationInvitation
-            {
-                Id = Guid.NewGuid(),
-                Organization = Guid.NewGuid(),
-                Target = Guid.NewGuid(),
-                Status = InvitationStatusKind.PENDING
-            };
-
             this.adminUserContext = new UserContext { AccountId = adminId };
             this.memberUserContext = new UserContext { AccountId = memberId };
 
@@ -115,9 +88,8 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.adminUserContext);
             this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("starion")))).ReturnsAsync(ImmutableList.Create<IOrganization>(this.org));
             this.accountServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.adminAccount, this.memberAccount));
-            this.organizationInvitationServiceMock.Setup(x => x.ReadAsync(this.adminUserContext, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganizationInvitation>(this.matchingInvitation, this.acceptedInvitation, this.otherOrgInvitation));
 
-            this.viewModel = new OrganizationSettingsViewModel(this.databaseSourceMock.Object, this.organizationServiceMock.Object, this.accountServiceMock.Object, this.organizationInvitationServiceMock.Object, this.organizationPermissionServiceMock.Object, this.notificationServiceMock.Object, this.userServiceMock.Object, this.loggerMock.Object);
+            this.viewModel = new OrganizationSettingsViewModel(this.databaseSourceMock.Object, this.organizationServiceMock.Object, this.accountServiceMock.Object, this.invitationManagerMock.Object, this.organizationPermissionServiceMock.Object, this.notificationServiceMock.Object, this.userServiceMock.Object, this.loggerMock.Object);
         }
 
         [Test]
@@ -157,6 +129,7 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             {
                 Assert.That(this.viewModel.Organization, Is.Null);
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+                this.invitationManagerMock.Verify(x => x.InitializeViewModel(this.adminUserContext, Guid.Empty, false, It.IsAny<CancellationToken>()), Times.Once);
             }
 
             // Scenario 2: Happy path where user is Administrator (verifies mixed-case short name normalization)
@@ -167,18 +140,23 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
                 Assert.That(this.viewModel.Organization, Is.EqualTo(this.org));
                 Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Administrator));
                 Assert.That(this.viewModel.Members, Has.Count.EqualTo(2));
-                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
+                this.invitationManagerMock.Verify(x => x.InitializeViewModel(this.adminUserContext, this.org.Id, true, It.IsAny<CancellationToken>()), Times.Once);
             }
 
-            // Scenario 3: User is Member, not Administrator
+            // Scenario 3: User is Member, not Administrator, and duplicate account DTOs from IAccountService are deduplicated
+            var duplicateAdminAccount = new Account { Id = this.adminAccount.Id, Name = "Admin User" };
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.memberUserContext);
             this.organizationServiceMock.Setup(x => x.ReadByShortNameAsync(this.memberUserContext, It.IsAny<CancellationToken>(), It.Is<string[]>(a => a.Contains("starion")))).ReturnsAsync(ImmutableList.Create<IOrganization>(this.org));
-            this.accountServiceMock.Setup(x => x.ReadAsync(this.memberUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.adminAccount, this.memberAccount));
-            this.organizationInvitationServiceMock.Setup(x => x.ReadAsync(this.memberUserContext, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganizationInvitation>(this.matchingInvitation));
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.memberUserContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.adminAccount, duplicateAdminAccount, this.memberAccount));
 
             await this.viewModel.InitializeViewModel("starion");
 
-            Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Member));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.CurrentUserRole, Is.EqualTo(OrganizationRole.Member));
+                Assert.That(this.viewModel.Members, Has.Count.EqualTo(2));
+                Assert.That(this.viewModel.Members.Select(m => m.Id), Is.Unique);
+            }
         }
 
         [Test]
@@ -193,28 +171,23 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
             };
 
             // Scenario 1: Failure path
-            this.organizationInvitationServiceMock.Setup(x => x.CreateAsync(this.adminUserContext, It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Invitation creation failed"));
+            this.invitationManagerMock.Setup(x => x.SendInvitation(It.Is<IOrganizationInvitation>(inv => inv.Id != Guid.Empty && inv.Organization == this.org.Id && inv.Target == targetAccount.Id && inv.Owner == this.adminAccount.Id && inv.OrganizationInvitationKind == OrganizationInvitationKind.MEMBER), targetAccount, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Invitation creation failed"));
             var failureResult = await this.viewModel.InviteMember(targetAccount, OrganizationInvitationKind.MEMBER);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(failureResult.IsError, Is.True);
-                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.InvitedAccounts, Has.Count.EqualTo(0));
-                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Invitation Error", NotificationType.Error), Times.Once);
+                this.invitationManagerMock.Verify(x => x.SendInvitation(It.Is<IOrganizationInvitation>(inv => inv.Organization == this.org.Id && inv.Target == targetAccount.Id && inv.Owner == this.adminAccount.Id && inv.OrganizationInvitationKind == OrganizationInvitationKind.MEMBER), targetAccount, It.IsAny<CancellationToken>()), Times.Once);
             }
 
             // Scenario 2: Happy path
-            this.organizationInvitationServiceMock.Setup(x => x.CreateAsync(this.adminUserContext, It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
+            this.invitationManagerMock.Setup(x => x.SendInvitation(It.Is<IOrganizationInvitation>(inv => inv.Id != Guid.Empty && inv.Organization == this.org.Id && inv.Target == targetAccount.Id && inv.Owner == this.adminAccount.Id && inv.OrganizationInvitationKind == OrganizationInvitationKind.ADMINISTRATOR), targetAccount, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
             var successResult = await this.viewModel.InviteMember(targetAccount, OrganizationInvitationKind.ADMINISTRATOR);
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(successResult.IsError, Is.False);
-                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(2));
-                Assert.That(this.viewModel.InvitedAccounts, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.InvitedAccounts, Does.Contain(targetAccount));
-                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), "Invitation Sent", NotificationType.Success), Times.Once);
+                this.invitationManagerMock.Verify(x => x.SendInvitation(It.Is<IOrganizationInvitation>(inv => inv.Organization == this.org.Id && inv.Target == targetAccount.Id && inv.Owner == this.adminAccount.Id && inv.OrganizationInvitationKind == OrganizationInvitationKind.ADMINISTRATOR), targetAccount, It.IsAny<CancellationToken>()), Times.Once);
             }
         }
 
@@ -245,61 +218,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationSettings
                 Assert.That(this.viewModel.Members, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.Organization.Member, Does.Not.Contain(this.memberAccount.Id));
             }
-        }
-
-        [Test]
-        public async Task VerifyResendInvitation()
-        {
-            await this.viewModel.InitializeViewModel("starion");
-            var originalExpiresAt = this.matchingInvitation.ExperiesAt;
-
-            // Scenario 1: Failure preserves the original
-            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
-
-            await this.viewModel.ResendInvitation(this.matchingInvitation);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(this.viewModel.PendingInvitations[0], Is.SameAs(this.matchingInvitation));
-                Assert.That(this.matchingInvitation.ExperiesAt, Is.EqualTo(originalExpiresAt));
-                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
-            }
-
-            // Scenario 2: Success replaces the invitation with the updated clone
-            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
-
-            await this.viewModel.ResendInvitation(this.matchingInvitation);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(this.viewModel.PendingInvitations[0], Is.Not.SameAs(this.matchingInvitation));
-                Assert.That(this.viewModel.PendingInvitations[0].ExperiesAt, Is.GreaterThan(DateTime.UtcNow));
-                Assert.That(this.matchingInvitation.ExperiesAt, Is.EqualTo(originalExpiresAt));
-            }
-        }
-
-        [Test]
-        public async Task VerifyRevokeInvitation()
-        {
-            await this.viewModel.InitializeViewModel("starion");
-
-            // Scenario 1: Failure
-            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
-
-            await this.viewModel.RevokeInvitation(this.matchingInvitation);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(1));
-                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
-            }
-
-            // Scenario 2: Success
-            this.organizationInvitationServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
-
-            await this.viewModel.RevokeInvitation(this.matchingInvitation);
-
-            Assert.That(this.viewModel.PendingInvitations, Has.Count.EqualTo(0));
         }
 
         [Test]

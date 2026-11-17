@@ -52,7 +52,7 @@ namespace Mycelium.Forge.Components.Pages.OrganizationSettings.Dialogs
         /// Gets or sets the list of existing pending invitations for the organization.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<OrganizationInvitation> PendingInvitations { get; set; } = [];
+        public IReadOnlyList<IOrganizationInvitation> PendingInvitations { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the event callback invoked with the invitation result when confirmed.
