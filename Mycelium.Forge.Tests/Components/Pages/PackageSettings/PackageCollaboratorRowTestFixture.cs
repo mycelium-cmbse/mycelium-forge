@@ -83,8 +83,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var menuButton = row.Find(".package-maintainer-menu-button");
             await row.InvokeAsync(() => menuButton.ClickAsync());
 
-            var profileLink = row.Find("a");
-
             var changeRoleItem = this.providers.Find(".package-maintainer-change-role-item");
             await this.providers.InvokeAsync(() => changeRoleItem.ClickAsync());
 
@@ -100,7 +98,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Assert.That(row.Markup, Does.Contain("Alex Rivera"));
                 Assert.That(row.Markup, Does.Contain("Owner"));
-                Assert.That(profileLink.GetAttribute("href"), Is.EqualTo(PageRoutes.GetAccountRoute("alex-rivera")));
+                Assert.That(row.FindAll("a"), Is.Empty);
                 Assert.That(changeRoleAccount, Is.EqualTo(verifiedAccount));
                 Assert.That(viewProfileAccount, Is.EqualTo(verifiedAccount));
                 Assert.That(removeAccount, Is.EqualTo(verifiedAccount));

@@ -267,21 +267,23 @@
 
                 @foreach (var maintainer in this.ViewModel.Maintainers)
                 {
-                    <a @key="maintainer.Id"
-                       href="@(PageRoutes.GetAccountRoute(maintainer.ShortName))"
-                       class="flex items-center gap-2 h-6.5 group">
+                    <div @key="maintainer.Id"
+                         class="flex items-center gap-2 h-6.5">
                         <CollaboratorAvatar Name="@(maintainer.Name)"
                                             Size="w-6.5 h-6.5"/>
-                        <span class="text-xs leading-2xs font-medium text-foreground group-hover:text-primary transition-colors flex-1 truncate">
-                            @(maintainer.Name)
-                        </span>
+                        <div class="flex-1 min-w-0 flex items-center">
+                            <a href="@(PageRoutes.GetAccountRoute(maintainer.ShortName))"
+                               class="text-xs leading-2xs font-medium text-foreground hover:text-primary transition-colors truncate">
+                                @(maintainer.Name)
+                            </a>
+                        </div>
                         @if (maintainer.IsVerified)
                         {
                             <LucideIcon Name="badge-check"
                                         Size="14"
                                         Class="text-primary shrink-0"/>
                         }
-                    </a>
+                    </div>
                 }
             </ForgeCard>
 

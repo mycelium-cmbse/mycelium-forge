@@ -241,12 +241,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             var accountOwnerComponent = this.context.Render<PackageDetails>();
             this.viewModelMock.SetupGet(x => x.Owner).Returns(this.organization);
 
+            var maintainerLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']");
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("ECSS-MM-PWR"));
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("Power subsystem metamodel"));
                 Assert.That(activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetOrganizationRoute("starion")}']"), Has.Count.GreaterThan(0));
-                Assert.That(activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']"), Has.Count.GreaterThan(0));
+                Assert.That(maintainerLinks, Has.Count.EqualTo(1));
+                Assert.That(maintainerLinks[0].TextContent.Trim(), Is.EqualTo("R. Andre"));
                 Assert.That(accountOwnerComponent.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']"), Has.Count.GreaterThan(0));
                 Assert.That(activeSettingsButton, Is.Not.Null);
             }
