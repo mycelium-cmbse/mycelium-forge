@@ -185,6 +185,16 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
 
             await this.viewModel.InitializeViewModel("starion");
             Assert.That(this.viewModel.IsUserAdmin, Is.False);
+
+            // Scenario 6: Re-initializing with missing organization clears previous state
+            await this.viewModel.InitializeViewModel("unknown");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.Organization, Is.Null);
+                Assert.That(this.viewModel.IsUserAdmin, Is.False);
+                Assert.That(this.viewModel.Packages, Has.Count.EqualTo(0));
+            }
         }
     }
 }

@@ -48,24 +48,6 @@ namespace Mycelium.Forge.Common
         List<string> Tags { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the package is deprecated.
-        /// </summary>
-        /// <remarks>
-        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the
-        /// domain model.
-        /// </remarks>
-        bool IsDeprecated { get; set; }
-
-        /// <summary>
-        /// Gets or sets the human-readable explanation or migration guidance for why the package was deprecated.
-        /// </summary>
-        /// <remarks>
-        /// This property is temporary and will be removed once dedicated deprecation lifecycle entities are implemented in the
-        /// domain model.
-        /// </remarks>
-        string DeprecationReason { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the package publisher has verified credentials and cryptographic signatures.
         /// </summary>
         bool IsVerified { get; set; }

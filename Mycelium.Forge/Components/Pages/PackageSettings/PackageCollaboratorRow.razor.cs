@@ -22,6 +22,7 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         /// Gets or sets the collaborator account details.
         /// </summary>
         [Parameter]
+        [EditorRequired]
         public IAccount Account { get; set; }
 
         /// <summary>

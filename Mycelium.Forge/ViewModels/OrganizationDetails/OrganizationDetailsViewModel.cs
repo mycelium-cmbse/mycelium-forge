@@ -16,12 +16,11 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Services;
-    using Mycelium.Forge.ViewModels.Rows;
 
     /// <summary>
     /// Provides view model state and operations for the Mycelium Forge organization and publisher profile page.
     /// </summary>
-    public class OrganizationDetailsViewModel : IOrganizationDetailsViewModel
+    public class OrganizationDetailsViewModel : ScopeDetailsViewModelBase, IOrganizationDetailsViewModel
     {
         /// <summary>
         /// The (injected) <see cref="IDatabaseSource" /> database connection provider.
@@ -44,26 +43,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         private readonly IOrganizationService organizationService;
 
         /// <summary>
-        /// The (injected) <see cref="IPackageService" /> used to retrieve package data.
-        /// </summary>
-        private readonly IPackageService packageService;
-
-        /// <summary>
-        /// The (injected) <see cref="IPackageTypeService" /> used to retrieve package type data.
-        /// </summary>
-        private readonly IPackageTypeService packageTypeService;
-
-        /// <summary>
-        /// The (injected) <see cref="IPackageVersionService" /> used to retrieve package version data.
-        /// </summary>
-        private readonly IPackageVersionService packageVersionService;
-
-        /// <summary>
-        /// The (injected) <see cref="IUserService" /> used to retrieve the current user context.
-        /// </summary>
-        private readonly IUserService userService;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="OrganizationDetailsViewModel" /> class.
         /// </summary>
         /// <param name="databaseSource">The (injected) <see cref="IDatabaseSource" /> database connection provider.</param>
@@ -74,14 +53,10 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="organizationPermissionService">The (injected) <see cref="IOrganizationPermissionService" />.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{OrganizationDetailsViewModel}" />.</param>
-        public OrganizationDetailsViewModel(IDatabaseSource databaseSource, IOrganizationService organizationService, IPackageService packageService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, IUserService userService, IOrganizationPermissionService organizationPermissionService, ILogger<OrganizationDetailsViewModel> logger)
+        public OrganizationDetailsViewModel(IDatabaseSource databaseSource, IOrganizationService organizationService, IPackageService packageService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, IUserService userService, IOrganizationPermissionService organizationPermissionService, ILogger<OrganizationDetailsViewModel> logger) : base(packageService, packageVersionService, packageTypeService, userService)
         {
             this.databaseSource = databaseSource;
             this.organizationService = organizationService;
-            this.packageService = packageService;
-            this.packageVersionService = packageVersionService;
-            this.packageTypeService = packageTypeService;
-            this.userService = userService;
             this.organizationPermissionService = organizationPermissionService;
             this.logger = logger;
         }
@@ -90,11 +65,6 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         /// Gets or sets the organization profile details.
         /// </summary>
         public IOrganization Organization { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of package rows published by the organization.
-        /// </summary>
-        public IReadOnlyList<PackageRowViewModel> Packages { get; set; } = [];
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is an administrator of the organization.
@@ -109,9 +79,13 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         public async Task InitializeViewModel(string shortName, CancellationToken cancellationToken = default)
         {
+            this.Organization = null;
+            this.IsUserAdmin = false;
+            this.Packages = [];
+
             try
             {
-                var userContext = await this.userService.GetUserContext();
+                var userContext = await this.UserService.GetUserContext();
 
                 var organizationResult = await this.organizationService.ReadByShortNameAsync(userContext, cancellationToken, [shortName.ToLowerInvariant()]);
 
@@ -127,20 +101,7 @@ namespace Mycelium.Forge.ViewModels.OrganizationDetails
                 var updatePermissionResult = await this.organizationPermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Organization, cancellationToken);
                 this.IsUserAdmin = updatePermissionResult.IsSuccess;
 
-                var packages = await this.packageService.ReadOrEmpty(userContext, this.Organization.OwnedPackage, token: cancellationToken);
-
-                var versionIds = packages.SelectMany(package => package.Version).Distinct().ToList();
-                var packageTypeIds = packages.Select(package => package.PackageType).Distinct().ToList();
-
-                var versionsTask = this.packageVersionService.ReadOrEmpty(userContext, versionIds, token: cancellationToken);
-                var packageTypesTask = this.packageTypeService.ReadOrEmpty(userContext, packageTypeIds, token: cancellationToken);
-
-                await Task.WhenAll(versionsTask, packageTypesTask);
-
-                var packageVersions = versionsTask.Result;
-                var packageTypes = packageTypesTask.Result;
-
-                this.Packages = PackageRowViewModel.GenerateRows(packages, [this.Organization, .. packageVersions, .. packageTypes], false);
+                await this.LoadOwnedPackagesAsync(userContext, this.Organization, cancellationToken);
             }
             catch (Exception ex)
             {

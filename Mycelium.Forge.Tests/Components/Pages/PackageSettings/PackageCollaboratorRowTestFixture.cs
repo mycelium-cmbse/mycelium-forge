@@ -57,6 +57,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Id = Guid.NewGuid(),
                 Name = "Alex Rivera",
+                ShortName = "alex-rivera",
                 IsVerified = true
             };
 
@@ -97,6 +98,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Assert.That(row.Markup, Does.Contain("Alex Rivera"));
                 Assert.That(row.Markup, Does.Contain("Owner"));
+                Assert.That(row.FindAll("a"), Is.Empty);
                 Assert.That(changeRoleAccount, Is.EqualTo(verifiedAccount));
                 Assert.That(viewProfileAccount, Is.EqualTo(verifiedAccount));
                 Assert.That(removeAccount, Is.EqualTo(verifiedAccount));
@@ -106,6 +108,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Id = Guid.NewGuid(),
                 Name = "Jane Doe",
+                ShortName = "jane-doe",
                 IsVerified = false
             };
 

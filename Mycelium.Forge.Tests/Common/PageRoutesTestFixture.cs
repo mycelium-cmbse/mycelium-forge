@@ -19,8 +19,22 @@ namespace Mycelium.Forge.Tests.Common
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(PageRoutes.GetAccountRoute("alice"), Is.EqualTo("/accounts/alice"));
-                Assert.That(PageRoutes.GetAccountRoute("@alice"), Is.EqualTo("/accounts/alice"));
+                Assert.That(PageRoutes.GetAccountRoute("r-andre"), Is.EqualTo("/accounts/r-andre"));
+                Assert.That(PageRoutes.GetAccountRoute("@R-Andre "), Is.EqualTo("/accounts/r-andre"));
+            }
+        }
+
+        [Test]
+        public void VerifyGetScopeRoute()
+        {
+            var account = new Account { ShortName = "@R-Andre" };
+            var organization = new Organization { ShortName = "@Starion" };
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(PageRoutes.GetScopeRoute(account), Is.EqualTo("/accounts/r-andre"));
+                Assert.That(PageRoutes.GetScopeRoute(organization), Is.EqualTo("/organizations/starion"));
+                Assert.That(PageRoutes.GetScopeRoute(null), Is.EqualTo(string.Empty));
             }
         }
     }

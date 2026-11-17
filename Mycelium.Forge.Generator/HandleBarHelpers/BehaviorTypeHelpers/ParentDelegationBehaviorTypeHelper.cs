@@ -204,7 +204,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             var immutableProperties = @class.QueryDtoClassProperties()
                 .Select(p => p.Name.CapitalizeFirstLetter())
-                .Where(p => !p.Equals("Id", StringComparison.OrdinalIgnoreCase) && (string.IsNullOrWhiteSpace(config.StateProperty) || !p.Equals(config.StateProperty, StringComparison.OrdinalIgnoreCase)))
+                .Where(p => !p.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase) && !p.Equals(PropertyNames.CreatedAt, StringComparison.OrdinalIgnoreCase) && !p.Equals(PropertyNames.ModifiedAt, StringComparison.OrdinalIgnoreCase) && (string.IsNullOrWhiteSpace(config.StateProperty) || !p.Equals(config.StateProperty, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
             stringBuilder.Append($$"""

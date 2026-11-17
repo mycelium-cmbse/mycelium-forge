@@ -188,7 +188,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             var packageDetailsPage = this.context.Render<PackageDetails>();
             var status = packageDetailsPage.Instance.GetReleaseStatus();
 
-            this.package.IsDeprecated = true;
+            this.packageVersion.IsDeprecated = true;
             var deprecatedStatus = packageDetailsPage.Instance.GetReleaseStatus();
 
             using (Assert.EnterMultipleScope())
@@ -231,14 +231,26 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             Assert.That(nullPackageDetailsPage.Markup.Trim(), Has.Length.LessThan(5));
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
+            var maintainer = new Account { Id = Guid.NewGuid(), Name = "R. Andre", ShortName = "r-andre", IsVerified = true };
+            this.viewModelMock.SetupGet(x => x.Maintainers).Returns([maintainer]);
             this.SetupAccessFlags(true, false);
             var activePackageDetailsPage = this.context.Render<PackageDetails>();
             var activeSettingsButton = activePackageDetailsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-details-settings-button"));
+
+            this.viewModelMock.SetupGet(x => x.Owner).Returns(maintainer);
+            var accountOwnerComponent = this.context.Render<PackageDetails>();
+            this.viewModelMock.SetupGet(x => x.Owner).Returns(this.organization);
+
+            var maintainerLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']");
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("ECSS-MM-PWR"));
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("Power subsystem metamodel"));
+                Assert.That(activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetOrganizationRoute("starion")}']"), Has.Count.GreaterThan(0));
+                Assert.That(maintainerLinks, Has.Count.EqualTo(1));
+                Assert.That(maintainerLinks[0].TextContent.Trim(), Is.EqualTo("R. Andre"));
+                Assert.That(accountOwnerComponent.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']"), Has.Count.GreaterThan(0));
                 Assert.That(activeSettingsButton, Is.Not.Null);
             }
 

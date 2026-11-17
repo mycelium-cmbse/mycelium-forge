@@ -1,4 +1,4 @@
-@using Mycelium.Forge.Models.Admin
+﻿@using Mycelium.Forge.Models.Admin
 @* ------------------------------------------------------------------------------------------------
 <copyright file="Accounts.razor" company="Starion Group S.A.">
 
@@ -111,9 +111,10 @@
 
                                     <div class="flex-1 flex flex-col justify-center gap-0.5 min-w-0">
                                         <div class="flex items-center gap-1.5 min-w-0">
-                                            <span class="text-sm leading-xs font-medium text-foreground truncate">
+                                            <a href="@(PageRoutes.GetAccountRoute(account.Username))"
+                                               class="text-sm leading-xs font-medium text-foreground hover:text-primary transition-colors truncate">
                                                 @(account.Name)
-                                            </span>
+                                            </a>
                                             @if (account.IsAdministrator)
                                             {
                                                 <BbBadge Variant="BadgeVariant.Secondary"

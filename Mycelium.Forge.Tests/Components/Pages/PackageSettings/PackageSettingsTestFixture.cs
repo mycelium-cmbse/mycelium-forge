@@ -224,11 +224,17 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
         {
             var packageSettingsPage = this.context.Render<PackageSettings>();
 
+            this.ownerAccount.ShortName = "alex.rivera";
+            this.viewModelMock.Setup(x => x.Owner).Returns(this.ownerAccount);
+            var accountOwnedPage = this.context.Render<PackageSettings>();
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(packageSettingsPage.Markup, Does.Contain("@starion"));
                 Assert.That(packageSettingsPage.Markup, Does.Contain("ECSS-MM-PWR"));
                 Assert.That(packageSettingsPage.Markup, Does.Contain("Settings"));
+                Assert.That(packageSettingsPage.FindAll($"a[href='{PageRoutes.GetOrganizationRoute("starion")}']"), Has.Count.GreaterThan(0));
+                Assert.That(accountOwnedPage.FindAll($"a[href='{PageRoutes.GetAccountRoute("alex.rivera")}']"), Has.Count.GreaterThan(0));
             }
         }
 
