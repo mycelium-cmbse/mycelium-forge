@@ -9,12 +9,11 @@
 
 namespace Mycelium.Forge.Data
 {
-    using System.Net.Http.Headers;
-    using System.Text.Json;
-
     using Microsoft.Extensions.Options;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
+    using Mycelium.Forge.Services;
 
     /// <summary>
     /// Seeds the development users into Forge's Keycloak through its admin REST API.
@@ -22,9 +21,9 @@ namespace Mycelium.Forge.Data
     public class KeycloakUserSeeder : IKeycloakUserSeeder
     {
         /// <summary>
-        /// The injected <see cref="HttpClient" /> used to call Keycloak.
+        /// The injected <see cref="IKeycloakAdminClient" /> used to call Keycloak.
         /// </summary>
-        private readonly HttpClient httpClient;
+        private readonly IKeycloakAdminClient keycloakAdminClient;
 
         /// <summary>
         /// The injected <see cref="ILogger{KeycloakUserSeeder}" /> used for logging.
@@ -39,15 +38,14 @@ namespace Mycelium.Forge.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="KeycloakUserSeeder" /> class.
         /// </summary>
-        /// <param name="httpClient">The injected <see cref="HttpClient" />.</param>
+        /// <param name="keycloakAdminClient">The injected <see cref="IKeycloakAdminClient" />.</param>
         /// <param name="options">The injected <see cref="KeycloakOptions" />.</param>
         /// <param name="logger">The injected <see cref="ILogger{KeycloakUserSeeder}" />.</param>
-        public KeycloakUserSeeder(HttpClient httpClient, IOptions<KeycloakOptions> options, ILogger<KeycloakUserSeeder> logger)
+        public KeycloakUserSeeder(IKeycloakAdminClient keycloakAdminClient, IOptions<KeycloakOptions> options, ILogger<KeycloakUserSeeder> logger)
         {
-            this.httpClient = httpClient;
+            this.keycloakAdminClient = keycloakAdminClient;
             this.options = options.Value;
             this.logger = logger;
-            this.httpClient.BaseAddress = new Uri(this.options.BaseUrl);
         }
 
         /// <summary>
@@ -66,15 +64,19 @@ namespace Mycelium.Forge.Data
         {
             try
             {
-                this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await this.GetAdminTokenAsync(cancellationToken));
+                var deleteResult = await this.keycloakAdminClient.DeleteAllUsersAsync(cancellationToken);
 
-                await this.DeleteExistingUsersAsync(cancellationToken);
+                if (deleteResult.IsError)
+                {
+                    this.logger.LogError("Failed to delete existing Keycloak users: {Errors}", deleteResult.Errors.ToJoinedDescriptions());
+                    return false;
+                }
 
                 var users = SeedData.Accounts.Select(account =>
                 {
-                    var nameParts = account.Name.Split(' ');
-                    var firstName = nameParts.FirstOrDefault();
-                    var lastName = nameParts.Length > 1 ? nameParts.LastOrDefault() : null;
+                    var (firstName, lastName) = account.Name.SplitFullName();
+                    string[] requiredActions = [];
+                    object[] credentials = [new { type = "password", value = this.options.SeedUserPassword, temporary = false }];
 
                     return new
                     {
@@ -85,16 +87,27 @@ namespace Mycelium.Forge.Data
                         lastName,
                         enabled = true,
                         emailVerified = true,
-                        requiredActions = Array.Empty<string>(),
-                        credentials = new[] { new { type = "password", value = this.options.SeedUserPassword, temporary = false } },
+                        requiredActions,
+                        credentials,
                         realmRoles = SeedData.AccountRoles[account.Id].Select(role => role.ToString())
                     };
                 });
 
-                using var response = await this.httpClient.PostAsJsonAsync($"admin/realms/{this.options.Realm}/partialImport", new { ifResourceExists = "OVERWRITE", users }, cancellationToken);
-                response.EnsureSuccessStatusCode();
+                var importResult = await this.keycloakAdminClient.PartialImportUsersAsync(users, cancellationToken);
 
-                await Task.WhenAll(SeedData.Accounts.Select(account => this.AssignRolesAsync(account, cancellationToken)));
+                if (importResult.IsError)
+                {
+                    this.logger.LogError("Failed to import Keycloak users: {Errors}", importResult.Errors.ToJoinedDescriptions());
+                    return false;
+                }
+
+                var roleResults = await Task.WhenAll(SeedData.Accounts.Select(account => this.keycloakAdminClient.AssignRealmRolesAsync(account.Id, SeedData.AccountRoles[account.Id].Select(role => role.ToString()), cancellationToken)));
+
+                if (Array.Exists(roleResults, result => result.IsError))
+                {
+                    this.logger.LogError("Failed to assign realm roles to seeded Keycloak users");
+                    return false;
+                }
 
                 if (this.logger.IsEnabled(LogLevel.Information))
                 {
@@ -108,81 +121,6 @@ namespace Mycelium.Forge.Data
                 this.logger.LogError(exception, "Failed to seed the Keycloak users");
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Deletes all existing users in the realm to ensure a clean seeding state.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task DeleteExistingUsersAsync(CancellationToken cancellationToken)
-        {
-            var existingUsers = await this.httpClient.GetFromJsonAsync<List<JsonElement>>($"admin/realms/{this.options.Realm}/users", cancellationToken);
-
-            if (existingUsers is not { Count: > 0 })
-            {
-                return;
-            }
-
-            var deleteTasks = existingUsers
-                .Select(user => user.GetProperty("id").GetString())
-                .Select(id => this.DeleteUserAsync(id, cancellationToken));
-
-            await Task.WhenAll(deleteTasks);
-        }
-
-        /// <summary>
-        /// Deletes an individual user by their identifier from the realm.
-        /// </summary>
-        /// <param name="userId">The unique identifier of the user to delete.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task DeleteUserAsync(string userId, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                return;
-            }
-
-            using var response = await this.httpClient.DeleteAsync($"admin/realms/{this.options.Realm}/users/{userId}", cancellationToken);
-            response.EnsureSuccessStatusCode();
-        }
-
-        /// <summary>
-        /// Maps the realm roles of a seeded account onto its Keycloak user.
-        /// </summary>
-        /// <param name="account">The seeded account.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task AssignRolesAsync(Account account, CancellationToken cancellationToken)
-        {
-            var roleTasks = SeedData.AccountRoles[account.Id].Select(role => this.httpClient.GetFromJsonAsync<JsonElement>($"admin/realms/{this.options.Realm}/roles/{role}", cancellationToken));
-            var roles = await Task.WhenAll(roleTasks);
-
-            using var response = await this.httpClient.PostAsJsonAsync($"admin/realms/{this.options.Realm}/users/{account.Id}/role-mappings/realm", roles, cancellationToken);
-            response.EnsureSuccessStatusCode();
-        }
-
-        /// <summary>
-        /// Requests an access token of the Keycloak administrator from the master realm.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The access token.</returns>
-        private async Task<string> GetAdminTokenAsync(CancellationToken cancellationToken)
-        {
-            var form = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                { "grant_type", "password" },
-                { "client_id", "admin-cli" },
-                { "username", this.options.AdminUsername },
-                { "password", this.options.AdminPassword }
-            });
-
-            using var response = await this.httpClient.PostAsync("realms/master/protocol/openid-connect/token", form, cancellationToken);
-            response.EnsureSuccessStatusCode();
-
-            using var document = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync(cancellationToken), cancellationToken: cancellationToken);
-            return document.RootElement.GetProperty("access_token").GetString();
         }
     }
 }

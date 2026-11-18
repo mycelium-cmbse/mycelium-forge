@@ -22,6 +22,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
     using DynamicData;
 
+    using ErrorOr;
+
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
@@ -165,6 +167,34 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         }
 
         [Test]
+        public async Task VerifyOnEditDisplayName()
+        {
+            this.viewModelMock.Setup(x => x.UpdateProfile(It.IsAny<Account>())).ReturnsAsync(Result.Success);
+
+            var accountSettingsPage = this.context.Render<AccountSettings>();
+            var editDisplayNameBtn = accountSettingsPage.Find("#account-settings-edit-displayname-button");
+
+            // Case 1: Confirm with trimmed display name
+            _ = accountSettingsPage.InvokeAsync(() => editDisplayNameBtn.ClickAsync());
+
+            var input = this.dialogProvider.FindComponent<BbInput>();
+            await this.dialogProvider.InvokeAsync(() => input.Instance.ValueChanged.InvokeAsync("  Alex Updated  "));
+
+            var saveButton = this.dialogProvider.FindAll("button").First(b => b.TextContent.Trim() == "Save");
+            await this.dialogProvider.InvokeAsync(() => saveButton.ClickAsync());
+
+            this.viewModelMock.Verify(x => x.UpdateProfile(It.Is<Account>(a => a.Id == this.testAccount.Id && a.Name == "Alex Updated")), Times.Once);
+
+            // Case 2: Cancel does not update profile
+            _ = accountSettingsPage.InvokeAsync(() => editDisplayNameBtn.ClickAsync());
+
+            var cancelButton = this.dialogProvider.FindAll("button").First(b => b.TextContent.Trim() == "Cancel");
+            await this.dialogProvider.InvokeAsync(() => cancelButton.ClickAsync());
+
+            this.viewModelMock.Verify(x => x.UpdateProfile(It.IsAny<Account>()), Times.Once);
+        }
+
+        [Test]
         public void VerifyOnInitialized()
         {
             var accountSettingsPage = this.context.Render<AccountSettings>();
@@ -198,7 +228,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
             var changeUsernameBtn = accountSettingsPage.Find("#account-settings-change-username-button");
             var changeEmailBtn = accountSettingsPage.Find("#account-settings-change-email-button");
-            var editDisplayNameBtn = accountSettingsPage.Find("#account-settings-edit-displayname-button");
             var editLocationBtn = accountSettingsPage.Find("#account-settings-edit-location-button");
             var editWebsiteBtn = accountSettingsPage.Find("#account-settings-edit-website-button");
 
@@ -206,7 +235,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             {
                 await accountSettingsPage.InvokeAsync(() => changeUsernameBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => changeEmailBtn.ClickAsync());
-                await accountSettingsPage.InvokeAsync(() => editDisplayNameBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => editLocationBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => editWebsiteBtn.ClickAsync());
             }, Throws.Nothing);

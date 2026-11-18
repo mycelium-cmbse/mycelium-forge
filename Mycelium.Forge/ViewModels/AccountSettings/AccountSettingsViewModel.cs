@@ -93,16 +93,13 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             this.userService = userService;
             this.logger = logger;
 
-            this.PendingRequestsManagerViewModel.OnOrganizationAccepted = acceptedOrg =>
-            {
-                this.Organizations.Edit(innerList => innerList.AddOrReplace(acceptedOrg));
-            };
+            this.PendingRequestsManagerViewModel.OnOrganizationAccepted = acceptedOrg => { this.Organizations.Edit(innerList => innerList.AddOrReplace(acceptedOrg)); };
         }
 
         /// <summary>
         /// Gets or sets the user profile account DTO.
         /// </summary>
-        public IAccount Profile { get; set; }
+        public Account Profile { get; set; }
 
         /// <summary>
         /// Gets the collection of organizations associated with the user account.
@@ -134,7 +131,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             }
 
             this.currentUserId = this.userContext.AccountId.Value;
-            this.Profile = await this.accountService.ReadOrNull(this.userContext, this.currentUserId);
+            this.Profile = await this.accountService.ReadOrNull(this.userContext, this.currentUserId) as Account;
 
             if (this.Profile == null)
             {
@@ -195,6 +192,29 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
 
             this.Organizations.Add(org);
             this.notificationService.AddNotification($"Organization {org.Name} created successfully.", "Organization Created", NotificationType.Success);
+            return Result.Success;
+        }
+
+        /// <summary>
+        /// Updates the user profile account and synchronizes identity changes asynchronously.
+        /// </summary>
+        /// <param name="updatedAccount">The updated <see cref="Account" /> DTO.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
+        public async Task<ErrorOr<Success>> UpdateProfile(Account updatedAccount)
+        {
+            const string errorMessage = "Failed to update profile.";
+
+            var updateResult = await this.accountService.UpdateAndSyncAsync(this.userContext, [updatedAccount], CancellationToken.None);
+
+            if (updateResult.IsError)
+            {
+                this.logger.LogError(errorMessage + " {AccountId} Errors: {Errors}", updatedAccount.Id.SanitizeForLog(), updateResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
+                return updateResult.Errors;
+            }
+
+            this.Profile = updatedAccount;
+            this.notificationService.AddNotification("Display name updated successfully.", "Profile Updated", NotificationType.Success);
             return Result.Success;
         }
 

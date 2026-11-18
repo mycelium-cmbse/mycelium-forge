@@ -40,11 +40,10 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <summary>
         /// Method invoked when the component is ready to start, having received its
         /// initial parameters from its parent in the render tree.
-        ///
         /// Override this method if you will perform an asynchronous operation and
         /// want the component to refresh when that operation is completed.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing any asynchronous operation.</returns>
+        /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -131,8 +130,26 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <summary>
         /// Handles the action to edit the user's display name.
         /// </summary>
-        private static void OnEditDisplayName()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnEditDisplayName()
         {
+            var options = new PromptDialogOptions
+            {
+                DefaultValue = this.ViewModel.Profile.Name,
+                Placeholder = "Display name",
+                Required = true,
+                ConfirmText = "Save",
+                CancelText = "Cancel"
+            };
+
+            var result = await this.DialogService.PromptAsync("Edit display name", "Enter your new display name.", options);
+
+            if (!result.Cancelled && !string.IsNullOrWhiteSpace(result.Value))
+            {
+                var updated = this.ViewModel.Profile.Clone();
+                updated.Name = result.Value.Trim();
+                await this.ViewModel.UpdateProfile(updated);
+            }
         }
 
         /// <summary>

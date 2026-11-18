@@ -42,6 +42,68 @@ namespace Mycelium.Forge.Extensions
         private const string RolesProperty = "roles";
 
         /// <summary>
+        /// Adds the realm roles of the access token to the signed-in identity and provisions or reconciles the Forge account
+        /// of the user on sign-in.
+        /// </summary>
+        /// <remarks>
+        /// The ID token does not carry the realm roles, the access token does. Roles unknown to <see cref="RoleKind" /> are
+        /// ignored. Claims are currently reconciled on sign-in; periodic cookie/token validation and refresh can be added later
+        /// via <see cref="CookieAuthenticationEvents.OnValidatePrincipal" /> together with the refresh token or UserInfo
+        /// endpoint.
+        /// </remarks>
+        /// <param name="context">The <see cref="TokenValidatedContext" /> of the sign-in.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public static async Task OnTokenValidated(TokenValidatedContext context)
+        {
+            if (context.Principal?.Identity is not ClaimsIdentity identity)
+            {
+                context.Fail("The validated token principal has no claims identity.");
+                return;
+            }
+
+            foreach (var role in ReadRealmRoles(context.TokenEndpointResponse?.AccessToken))
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Role, role.ToString()));
+            }
+
+            var provisioner = context.HttpContext.RequestServices.GetRequiredService<IAccountProvisioner>();
+            var result = await provisioner.ProvisionAsync(context.Principal, context.HttpContext.RequestAborted);
+
+            if (result.IsError)
+            {
+                context.Fail(string.Join(", ", result.Errors.Select(error => error.Description)));
+            }
+        }
+
+        /// <summary>
+        /// Reads the Forge roles from the <c>realm_access</c> claim of an access token.
+        /// </summary>
+        /// <param name="accessToken">The access token issued by the identity provider.</param>
+        /// <returns>The distinct <see cref="RoleKind" /> values the token grants.</returns>
+        private static IEnumerable<RoleKind> ReadRealmRoles(string accessToken)
+        {
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                return [];
+            }
+
+            var token = new JsonWebTokenHandler().ReadJsonWebToken(accessToken);
+
+            if (!token.TryGetPayloadValue<JsonElement>(RealmAccessClaimType, out var realmAccess) ||
+                !realmAccess.TryGetProperty(RolesProperty, out var roles) ||
+                roles.ValueKind != JsonValueKind.Array)
+            {
+                return [];
+            }
+
+            return roles.EnumerateArray()
+                .Select(role => Enum.TryParse<RoleKind>(role.GetString(), out var kind) ? kind : (RoleKind?)null)
+                .Where(role => role.HasValue)
+                .Select(role => role.Value)
+                .Distinct();
+        }
+
+        /// <summary>
         /// Adds the Forge authentication services to the specified <see cref="IServiceCollection" />.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to configure.</param>
@@ -118,66 +180,6 @@ namespace Mycelium.Forge.Extensions
 
                 return services;
             }
-        }
-
-        /// <summary>
-        /// Adds the realm roles of the access token to the signed-in identity and provisions the Forge account of the user
-        /// on first sign-in.
-        /// </summary>
-        /// <remarks>
-        /// The ID token does not carry the realm roles, the access token does. Roles unknown to <see cref="RoleKind" /> are
-        /// ignored.
-        /// </remarks>
-        /// <param name="context">The <see cref="TokenValidatedContext" /> of the sign-in.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public static async Task OnTokenValidated(TokenValidatedContext context)
-        {
-            if (context.Principal?.Identity is not ClaimsIdentity identity)
-            {
-                context.Fail("The validated token principal has no claims identity.");
-                return;
-            }
-
-            foreach (var role in ReadRealmRoles(context.TokenEndpointResponse?.AccessToken))
-            {
-                identity.AddClaim(new Claim(ClaimTypes.Role, role.ToString()));
-            }
-
-            var provisioner = context.HttpContext.RequestServices.GetRequiredService<IAccountProvisioner>();
-            var result = await provisioner.ProvisionAsync(context.Principal, context.HttpContext.RequestAborted);
-
-            if (result.IsError)
-            {
-                context.Fail(string.Join(", ", result.Errors.Select(error => error.Description)));
-            }
-        }
-
-        /// <summary>
-        /// Reads the Forge roles from the <c>realm_access</c> claim of an access token.
-        /// </summary>
-        /// <param name="accessToken">The access token issued by the identity provider.</param>
-        /// <returns>The distinct <see cref="RoleKind" /> values the token grants.</returns>
-        private static IEnumerable<RoleKind> ReadRealmRoles(string accessToken)
-        {
-            if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                return [];
-            }
-
-            var token = new JsonWebTokenHandler().ReadJsonWebToken(accessToken);
-
-            if (!token.TryGetPayloadValue<JsonElement>(RealmAccessClaimType, out var realmAccess) ||
-                !realmAccess.TryGetProperty(RolesProperty, out var roles) ||
-                roles.ValueKind != JsonValueKind.Array)
-            {
-                return [];
-            }
-
-            return roles.EnumerateArray()
-                .Select(role => Enum.TryParse<RoleKind>(role.GetString(), out var kind) ? kind : (RoleKind?)null)
-                .Where(role => role.HasValue)
-                .Select(role => role.Value)
-                .Distinct();
         }
     }
 }

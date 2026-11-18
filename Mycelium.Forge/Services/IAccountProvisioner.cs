@@ -14,17 +14,17 @@ namespace Mycelium.Forge.Services
     using ErrorOr;
 
     /// <summary>
-    /// Provisions the Forge account of an identity provider user on first sign-in (SSS-FG-AUTH-A2F).
+    /// Provisions and synchronizes the Forge account of an identity provider user on sign-in (SSS-FG-AUTH-A2F).
     /// </summary>
     public interface IAccountProvisioner
     {
         /// <summary>
-        /// Ensures a Forge account exists for the authenticated principal, creating it from the identity provider claims
-        /// when it does not exist yet.
+        /// Ensures a Forge account exists for the authenticated principal, creating it on first sign-in and reconciling
+        /// <see cref="IAccount.Name" /> and <see cref="IAccount.Email" /> from identity provider claims on subsequent sign-ins.
         /// </summary>
         /// <param name="principal">The principal authenticated by the identity provider.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{TValue}" /> indicating whether the account exists after the call.</returns>
+        /// <returns>An <see cref="ErrorOr{TValue}" /> indicating whether the account exists and is synchronized after the call.</returns>
         Task<ErrorOr<Success>> ProvisionAsync(ClaimsPrincipal principal, CancellationToken cancellationToken);
     }
 }
