@@ -57,6 +57,21 @@ namespace Mycelium.Forge.AppHost.Extensions
             }
 
             /// <summary>
+            /// Adds the <c>Keycloak</c> administration settings used by Forge and the seeder to reach Keycloak's Admin REST API.
+            /// </summary>
+            /// <param name="baseUrl">The base URL of the Keycloak server.</param>
+            /// <param name="keycloakAdminPassword">The Keycloak administrator password parameter.</param>
+            /// <returns>The configured <see cref="IResourceBuilder{ProjectResource}" /> instance.</returns>
+            public IResourceBuilder<ProjectResource> WithKeycloakAdminEnvironment(string baseUrl, IResourceBuilder<ParameterResource> keycloakAdminPassword)
+            {
+                return project
+                    .WithEnvironment("Keycloak__BaseUrl", baseUrl)
+                    .WithEnvironment("Keycloak__Realm", "forge")
+                    .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
+                    .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword);
+            }
+
+            /// <summary>
             /// Configures the Forge application service for run mode or Docker Compose publishing mode.
             /// </summary>
             /// <param name="builder">The distributed application builder.</param>
@@ -72,19 +87,13 @@ namespace Mycelium.Forge.AppHost.Extensions
                     project.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Production")
                         .WithEnvironment("Authentication__Authority", $"{keycloakPublicUrlParameter}/realms/forge")
                         .WithEnvironment("Authentication__MetadataAddress", $"http://{AppHostConstants.Keycloak}:8080/realms/forge/.well-known/openid-configuration")
-                        .WithEnvironment("Keycloak__BaseUrl", $"http://{AppHostConstants.Keycloak}:8080")
-                        .WithEnvironment("Keycloak__Realm", "forge")
-                        .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
-                        .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword)
+                        .WithKeycloakAdminEnvironment($"http://{AppHostConstants.Keycloak}:8080", keycloakAdminPassword)
                         .WaitForCompletion(migrator);
                 }
                 else
                 {
                     project.WithEnvironment("Authentication__Authority", $"{AppHostConstants.DevelopmentKeycloakPublicUrl}/realms/forge")
-                        .WithEnvironment("Keycloak__BaseUrl", AppHostConstants.DevelopmentKeycloakPublicUrl)
-                        .WithEnvironment("Keycloak__Realm", "forge")
-                        .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
-                        .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword)
+                        .WithKeycloakAdminEnvironment(AppHostConstants.DevelopmentKeycloakPublicUrl, keycloakAdminPassword)
                         .WaitForCompletion(seeder);
                 }
 

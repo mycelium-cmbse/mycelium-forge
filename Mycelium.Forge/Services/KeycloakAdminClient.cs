@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Services
 {
     using System.Net.Http.Headers;
     using System.Text.Json;
+    using System.Text.Json.Nodes;
 
     using ErrorOr;
 
@@ -63,10 +64,11 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
-        /// Asynchronously updates the profile attributes of an existing Keycloak user.
+        /// Asynchronously updates the profile attributes of an existing Keycloak user by fetching the current representation
+        /// and merging the updated fields so existing metadata such as <c>createdTimestamp</c> is preserved.
         /// </summary>
         /// <remarks>
-        /// The <c>username</c> field is intentionally excluded because <c>editUsernameAllowed</c> is <c>false</c> in
+        /// The <c>username</c> field is intentionally left untouched because <c>editUsernameAllowed</c> is <c>false</c> in
         /// <c>forge-realm.json</c> and scope rename (<c>ScopeAlias</c>, design section 8.5) is not yet implemented.
         /// </remarks>
         /// <param name="userId">The unique identifier of the Keycloak user.</param>
@@ -77,13 +79,33 @@ namespace Mycelium.Forge.Services
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the update succeeded.</returns>
         public Task<ErrorOr<Success>> UpdateUserAsync(Guid userId, string email, string firstName, string lastName, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(this.options.BaseUrl))
-            {
-                this.logger.LogWarning("Keycloak BaseUrl is not configured; skipping Keycloak user update for {UserId}", userId.SanitizeForLog());
-                return Task.FromResult<ErrorOr<Success>>(Result.Success);
-            }
+            return this.ExecuteAdminOperationAsync(async accessToken =>
+                {
+                    var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}";
+                    using var getResponse = await this.SendAuthenticatedAsync(HttpMethod.Get, requestUri, accessToken, null, cancellationToken);
+                    var getStatusResult = this.EnsureSuccessStatus(getResponse, HttpMethod.Get, requestUri);
 
-            return this.ExecuteAdminOperationAsync(accessToken => this.UpdateUserCoreAsync(userId, email, firstName, lastName, accessToken, cancellationToken), $"update Keycloak user {userId}", cancellationToken);
+                    if (getStatusResult.IsError)
+                    {
+                        return getStatusResult.Errors;
+                    }
+
+                    var user = await getResponse.Content.ReadFromJsonAsync<JsonObject>(cancellationToken);
+
+                    if (user == null)
+                    {
+                        return Error.Failure(SyncFailedErrorCode, $"Keycloak returned an empty user representation for {userId}.");
+                    }
+
+                    user["email"] = email;
+                    user["firstName"] = firstName;
+                    user["lastName"] = lastName;
+
+                    using var content = JsonContent.Create(user);
+                    using var putResponse = await this.SendAuthenticatedAsync(HttpMethod.Put, requestUri, accessToken, content, cancellationToken);
+
+                    return this.EnsureSuccessStatus(putResponse, HttpMethod.Put, requestUri);
+                }, $"update Keycloak user {userId}", true, cancellationToken);
         }
 
         /// <summary>
@@ -93,7 +115,29 @@ namespace Mycelium.Forge.Services
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the deletion succeeded.</returns>
         public Task<ErrorOr<Success>> DeleteAllUsersAsync(CancellationToken cancellationToken = default)
         {
-            return this.ExecuteAdminOperationAsync(accessToken => this.DeleteAllUsersCoreAsync(accessToken, cancellationToken), "delete existing Keycloak users", cancellationToken);
+            return this.ExecuteAdminOperationAsync(async accessToken =>
+            {
+                var requestUri = $"admin/realms/{this.options.Realm}/users";
+                using var response = await this.SendAuthenticatedAsync(HttpMethod.Get, requestUri, accessToken, null, cancellationToken);
+                var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Get, requestUri);
+
+                if (statusResult.IsError)
+                {
+                    return statusResult.Errors;
+                }
+
+                var existingUsers = await response.Content.ReadFromJsonAsync<List<JsonElement>>(cancellationToken);
+
+                if (existingUsers is not { Count: > 0 })
+                {
+                    return Result.Success;
+                }
+
+                var deleteResults = await Task.WhenAll(existingUsers.Select(user => this.DeleteUserAsync(user.GetProperty("id").GetString(), accessToken, cancellationToken)));
+                var failed = Array.Find(deleteResults, result => result.IsError);
+
+                return failed.IsError ? failed.Errors : Result.Success;
+            }, "delete existing Keycloak users", false, cancellationToken);
         }
 
         /// <summary>
@@ -104,7 +148,20 @@ namespace Mycelium.Forge.Services
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the import succeeded.</returns>
         public Task<ErrorOr<Success>> PartialImportUsersAsync(IEnumerable<object> users, CancellationToken cancellationToken = default)
         {
-            return this.ExecuteAdminOperationAsync(accessToken => this.PartialImportUsersCoreAsync(users, accessToken, cancellationToken), "import Keycloak users", cancellationToken);
+            return this.ExecuteAdminOperationAsync(async accessToken =>
+            {
+                var payload = new
+                {
+                    ifResourceExists = "OVERWRITE",
+                    users
+                };
+
+                using var content = JsonContent.Create(payload);
+                var requestUri = $"admin/realms/{this.options.Realm}/partialImport";
+                using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
+
+                return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
+            }, "import Keycloak users", false, cancellationToken);
         }
 
         /// <summary>
@@ -116,20 +173,51 @@ namespace Mycelium.Forge.Services
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the role assignment succeeded.</returns>
         public Task<ErrorOr<Success>> AssignRealmRolesAsync(Guid userId, IEnumerable<string> roleNames, CancellationToken cancellationToken = default)
         {
-            return this.ExecuteAdminOperationAsync(accessToken => this.AssignRealmRolesCoreAsync(userId, roleNames, accessToken, cancellationToken), $"assign Keycloak roles to user {userId}", cancellationToken);
+            return this.ExecuteAdminOperationAsync(async accessToken =>
+                {
+                    var roleResults = await Task.WhenAll(roleNames.Select(roleName => this.GetRealmRoleAsync(roleName, accessToken, cancellationToken)));
+                    var failedRole = Array.Find(roleResults, result => result.IsError);
+
+                    if (failedRole.IsError)
+                    {
+                        return failedRole.Errors;
+                    }
+
+                    var roles = roleResults.Select(result => result.Value).ToArray();
+                    using var content = JsonContent.Create(roles);
+                    var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}/role-mappings/realm";
+                    using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
+
+                    return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
+                }, $"assign Keycloak roles to user {userId}", false, cancellationToken);
         }
 
         /// <summary>
         /// Acquires an administrator access token, runs the supplied Keycloak operation, and translates failures into
         /// <see cref="ErrorOr{TValue}" /> errors.
         /// </summary>
-        /// <typeparam name="T">The operation result type.</typeparam>
         /// <param name="operation">The operation to execute with the acquired bearer token.</param>
         /// <param name="operationDescription">A short description of the operation for error logging.</param>
+        /// <param name="skipWhenUnconfigured">
+        /// <see langword="true" /> to log a warning and return <see cref="Result.Success" /> when
+        /// <see cref="KeycloakOptions.BaseUrl" /> is not configured; <see langword="false" /> to return a failure error.
+        /// </param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{TValue}" /> containing the operation result or an error.</returns>
-        private async Task<ErrorOr<T>> ExecuteAdminOperationAsync<T>(Func<string, Task<ErrorOr<T>>> operation, string operationDescription, CancellationToken cancellationToken)
+        /// <returns>An <see cref="ErrorOr{Success}" /> containing the operation result or an error.</returns>
+        private async Task<ErrorOr<Success>> ExecuteAdminOperationAsync(Func<string, Task<ErrorOr<Success>>> operation, string operationDescription, bool skipWhenUnconfigured, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(this.options.BaseUrl))
+            {
+                if (skipWhenUnconfigured)
+                {
+                    this.logger.LogWarning("Keycloak BaseUrl is not configured; skipping operation to {Operation}", operationDescription.SanitizeForLog());
+                    return Result.Success;
+                }
+
+                this.logger.LogError("Keycloak BaseUrl is not configured; cannot {Operation}", operationDescription.SanitizeForLog());
+                return Error.Failure(SyncFailedErrorCode, "Keycloak BaseUrl is not configured.");
+            }
+
             try
             {
                 var tokenResult = await this.GetAdminTokenAsync(cancellationToken);
@@ -150,62 +238,6 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
-        /// Updates the profile attributes of a Keycloak user using the supplied administrator access token.
-        /// </summary>
-        /// <param name="userId">The unique identifier of the Keycloak user.</param>
-        /// <param name="email">The updated email address.</param>
-        /// <param name="firstName">The updated first name.</param>
-        /// <param name="lastName">The updated last name.</param>
-        /// <param name="accessToken">The Keycloak administrator access token.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the update succeeded.</returns>
-        private async Task<ErrorOr<Success>> UpdateUserCoreAsync(Guid userId, string email, string firstName, string lastName, string accessToken, CancellationToken cancellationToken)
-        {
-            var payload = new
-            {
-                email,
-                firstName,
-                lastName
-            };
-
-            using var content = JsonContent.Create(payload);
-            var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}";
-            using var response = await this.SendAuthenticatedAsync(HttpMethod.Put, requestUri, accessToken, content, cancellationToken);
-
-            return this.EnsureSuccessStatus(response, HttpMethod.Put, requestUri);
-        }
-
-        /// <summary>
-        /// Deletes all existing users in the configured Keycloak realm using the supplied administrator access token.
-        /// </summary>
-        /// <param name="accessToken">The Keycloak administrator access token.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the deletion succeeded.</returns>
-        private async Task<ErrorOr<Success>> DeleteAllUsersCoreAsync(string accessToken, CancellationToken cancellationToken)
-        {
-            var requestUri = $"admin/realms/{this.options.Realm}/users";
-            using var response = await this.SendAuthenticatedAsync(HttpMethod.Get, requestUri, accessToken, null, cancellationToken);
-            var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Get, requestUri);
-
-            if (statusResult.IsError)
-            {
-                return statusResult.Errors;
-            }
-
-            var existingUsers = await response.Content.ReadFromJsonAsync<List<JsonElement>>(cancellationToken);
-
-            if (existingUsers is not { Count: > 0 })
-            {
-                return Result.Success;
-            }
-
-            var deleteResults = await Task.WhenAll(existingUsers.Select(user => this.DeleteUserAsync(user.GetProperty("id").GetString(), accessToken, cancellationToken)));
-            var failed = Array.Find(deleteResults, result => result.IsError);
-
-            return failed.IsError ? failed.Errors : Result.Success;
-        }
-
-        /// <summary>
         /// Deletes an individual user by identifier using the supplied administrator access token.
         /// </summary>
         /// <param name="userId">The unique identifier of the user to delete.</param>
@@ -223,54 +255,6 @@ namespace Mycelium.Forge.Services
             using var response = await this.SendAuthenticatedAsync(HttpMethod.Delete, requestUri, accessToken, null, cancellationToken);
 
             return this.EnsureSuccessStatus(response, HttpMethod.Delete, requestUri);
-        }
-
-        /// <summary>
-        /// Imports user representations into the configured Keycloak realm using the supplied administrator access token.
-        /// </summary>
-        /// <param name="users">The user representation payloads to import.</param>
-        /// <param name="accessToken">The Keycloak administrator access token.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the import succeeded.</returns>
-        private async Task<ErrorOr<Success>> PartialImportUsersCoreAsync(IEnumerable<object> users, string accessToken, CancellationToken cancellationToken)
-        {
-            var payload = new
-            {
-                ifResourceExists = "OVERWRITE",
-                users
-            };
-
-            using var content = JsonContent.Create(payload);
-            var requestUri = $"admin/realms/{this.options.Realm}/partialImport";
-            using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
-
-            return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
-        }
-
-        /// <summary>
-        /// Assigns realm roles to a Keycloak user using the supplied administrator access token.
-        /// </summary>
-        /// <param name="userId">The unique identifier of the Keycloak user.</param>
-        /// <param name="roleNames">The names of the realm roles to assign.</param>
-        /// <param name="accessToken">The Keycloak administrator access token.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>An <see cref="ErrorOr{Success}" /> indicating whether the role assignment succeeded.</returns>
-        private async Task<ErrorOr<Success>> AssignRealmRolesCoreAsync(Guid userId, IEnumerable<string> roleNames, string accessToken, CancellationToken cancellationToken)
-        {
-            var roleResults = await Task.WhenAll(roleNames.Select(roleName => this.GetRealmRoleAsync(roleName, accessToken, cancellationToken)));
-            var failedRole = Array.Find(roleResults, result => result.IsError);
-
-            if (failedRole.IsError)
-            {
-                return failedRole.Errors;
-            }
-
-            var roles = roleResults.Select(result => result.Value).ToArray();
-            using var content = JsonContent.Create(roles);
-            var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}/role-mappings/realm";
-            using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
-
-            return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
         }
 
         /// <summary>

@@ -142,6 +142,16 @@ div[role="dialog"] {
     overflow: hidden;
 }
 
+/* Built-in PromptAsync dialogs render field and footer directly inside role="dialog" without DialogComponent */
+[role="dialog"] > [data-slot="field"] {
+  padding-left: var(--spacing-24);
+  padding-right: var(--spacing-24);
+}
+
+[role="dialog"]:has(> [data-slot="field"]) > div:last-child {
+  padding: 0 var(--spacing-24) var(--spacing-20) var(--spacing-24);
+}
+
 div[role="dialog"],
 div[role="alertdialog"] {
     border-color: var(--border);

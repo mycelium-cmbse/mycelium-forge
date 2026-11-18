@@ -72,6 +72,8 @@ namespace Mycelium.Forge.Data
                     return false;
                 }
 
+                var createdTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
                 var users = SeedData.Accounts.Select(account =>
                 {
                     var (firstName, lastName) = account.Name.SplitFullName();
@@ -85,6 +87,7 @@ namespace Mycelium.Forge.Data
                         email = account.Email,
                         firstName,
                         lastName,
+                        createdTimestamp,
                         enabled = true,
                         emailVerified = true,
                         requiredActions,

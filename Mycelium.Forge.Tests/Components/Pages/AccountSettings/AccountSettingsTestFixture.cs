@@ -192,6 +192,20 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             await this.dialogProvider.InvokeAsync(() => cancelButton.ClickAsync());
 
             this.viewModelMock.Verify(x => x.UpdateProfile(It.IsAny<Account>()), Times.Once);
+
+            // Case 3: Single-word display name shows alert and does not update profile
+            _ = accountSettingsPage.InvokeAsync(() => editDisplayNameBtn.ClickAsync());
+
+            var singleWordInput = this.dialogProvider.FindComponent<BbInput>();
+            await this.dialogProvider.InvokeAsync(() => singleWordInput.Instance.ValueChanged.InvokeAsync("Regis"));
+
+            var saveSingleButton = this.dialogProvider.FindAll("button").First(b => b.TextContent.Trim() == "Save");
+            _ = this.dialogProvider.InvokeAsync(() => saveSingleButton.ClickAsync());
+
+            var okButton = this.dialogProvider.FindAll("button").First(b => b.TextContent.Trim() == "OK");
+            await this.dialogProvider.InvokeAsync(() => okButton.ClickAsync());
+
+            this.viewModelMock.Verify(x => x.UpdateProfile(It.IsAny<Account>()), Times.Once);
         }
 
         [Test]

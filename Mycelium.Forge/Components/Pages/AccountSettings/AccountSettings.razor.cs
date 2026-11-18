@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
@@ -144,12 +145,24 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 
             var result = await this.DialogService.PromptAsync("Edit display name", "Enter your new display name.", options);
 
-            if (!result.Cancelled && !string.IsNullOrWhiteSpace(result.Value))
+            if (result.Cancelled || string.IsNullOrWhiteSpace(result.Value))
             {
-                var updated = this.ViewModel.Profile.Clone();
-                updated.Name = result.Value.Trim();
-                await this.ViewModel.UpdateProfile(updated);
+                return;
             }
+
+            var displayName = result.Value.Trim();
+            var (firstName, lastName) = displayName.SplitFullName();
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            {
+                // TODO: change this to use notification
+                await this.DialogService.AlertAsync("Invalid display name", "Please enter both your first and last name (at least two words).");
+                return;
+            }
+
+            var updated = this.ViewModel.Profile.Clone();
+            updated.Name = displayName;
+            await this.ViewModel.UpdateProfile(updated);
         }
 
         /// <summary>

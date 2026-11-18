@@ -17,10 +17,11 @@ namespace Mycelium.Forge.Services
     public interface IKeycloakAdminClient
     {
         /// <summary>
-        /// Asynchronously updates the profile attributes of an existing Keycloak user.
+        /// Asynchronously updates the profile attributes of an existing Keycloak user by fetching the current representation
+        /// and merging the updated fields so existing metadata such as <c>createdTimestamp</c> is preserved.
         /// </summary>
         /// <remarks>
-        /// The <c>username</c> field is intentionally excluded because <c>editUsernameAllowed</c> is <c>false</c> in
+        /// The <c>username</c> field is intentionally left untouched because <c>editUsernameAllowed</c> is <c>false</c> in
         /// <c>forge-realm.json</c> and scope rename (<c>ScopeAlias</c>, design section 8.5) is not yet implemented.
         /// </remarks>
         /// <param name="userId">The unique identifier of the Keycloak user.</param>

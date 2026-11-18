@@ -76,34 +76,6 @@ namespace Mycelium.Forge.Extensions
         }
 
         /// <summary>
-        /// Reads the Forge roles from the <c>realm_access</c> claim of an access token.
-        /// </summary>
-        /// <param name="accessToken">The access token issued by the identity provider.</param>
-        /// <returns>The distinct <see cref="RoleKind" /> values the token grants.</returns>
-        private static IEnumerable<RoleKind> ReadRealmRoles(string accessToken)
-        {
-            if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                return [];
-            }
-
-            var token = new JsonWebTokenHandler().ReadJsonWebToken(accessToken);
-
-            if (!token.TryGetPayloadValue<JsonElement>(RealmAccessClaimType, out var realmAccess) ||
-                !realmAccess.TryGetProperty(RolesProperty, out var roles) ||
-                roles.ValueKind != JsonValueKind.Array)
-            {
-                return [];
-            }
-
-            return roles.EnumerateArray()
-                .Select(role => Enum.TryParse<RoleKind>(role.GetString(), out var kind) ? kind : (RoleKind?)null)
-                .Where(role => role.HasValue)
-                .Select(role => role.Value)
-                .Distinct();
-        }
-
-        /// <summary>
         /// Adds the Forge authentication services to the specified <see cref="IServiceCollection" />.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to configure.</param>
@@ -180,6 +152,34 @@ namespace Mycelium.Forge.Extensions
 
                 return services;
             }
+        }
+
+        /// <summary>
+        /// Reads the Forge roles from the <c>realm_access</c> claim of an access token.
+        /// </summary>
+        /// <param name="accessToken">The access token issued by the identity provider.</param>
+        /// <returns>The distinct <see cref="RoleKind" /> values the token grants.</returns>
+        private static IEnumerable<RoleKind> ReadRealmRoles(string accessToken)
+        {
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                return [];
+            }
+
+            var token = new JsonWebTokenHandler().ReadJsonWebToken(accessToken);
+
+            if (!token.TryGetPayloadValue<JsonElement>(RealmAccessClaimType, out var realmAccess) ||
+                !realmAccess.TryGetProperty(RolesProperty, out var roles) ||
+                roles.ValueKind != JsonValueKind.Array)
+            {
+                return [];
+            }
+
+            return roles.EnumerateArray()
+                .Select(role => Enum.TryParse<RoleKind>(role.GetString(), out var kind) ? kind : (RoleKind?)null)
+                .Where(role => role.HasValue)
+                .Select(role => role.Value)
+                .Distinct();
         }
     }
 }
