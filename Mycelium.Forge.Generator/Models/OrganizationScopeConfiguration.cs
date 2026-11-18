@@ -28,16 +28,12 @@ namespace Mycelium.Forge.Generator.Models
             var config = behavior.Configuration;
 
             var scopeEntity = GetValue(config, ConfigurationKeys.ScopeEntity, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.ScopeEntity}'.");
-            var ocp = GetValue(config, ConfigurationKeys.OrgCreatePermission, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OrgCreatePermission}'.");
 
-            var visProp = GetValue(config, ConfigurationKeys.VisibilityProperty, definition.VisibilityProperty,
-                errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.VisibilityProperty}' or have a VisibilityProperty in entity permissions.");
+            var visProp = GetValue(config, ConfigurationKeys.VisibilityProperty, definition.VisibilityProperty, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.VisibilityProperty}' or have a VisibilityProperty in entity permissions.");
 
-            var ownerProp = GetValue(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty,
-                errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
+            var ownerProp = GetValue(config, ConfigurationKeys.OwnerProperty, definition.OwnerProperty, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.OwnerProperty}' or have an OwnerProperty in entity permissions.");
 
-            var personalCreatePerm = GetValue(config, ConfigurationKeys.PersonalCreatePermission, definition.CreatePermission,
-                errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.PersonalCreatePermission}' or have a '{ConfigurationKeys.CreatePermission}'.");
+            var createPerm = GetValue(config, ConfigurationKeys.CreatePermission, definition.CreatePermission, errorMessage: $"Entity '{this.EntityName}' with OrganizationScope behavior must configure '{ConfigurationKeys.CreatePermission}'.");
 
             var scopeMembers = GetValue(config, ConfigurationKeys.ScopeMemberProperties, "Member,Administrator", true);
             var scopeAdmins = GetValue(config, ConfigurationKeys.ScopeAdminProperties, string.Empty, true);
@@ -50,8 +46,7 @@ namespace Mycelium.Forge.Generator.Models
             this.VisibilityProperty = visProp;
             this.VisibilityPropertyLower = visProp.ToLowerInvariant();
             this.OwnerProperty = ownerProp;
-            this.PersonalCreatePermission = personalCreatePerm;
-            this.OrgCreatePermission = ocp;
+            this.CreatePermission = createPerm;
             this.AdminPermission = adminPerm;
             this.ScopeMemberProperties = SplitValues(scopeMembers);
             this.ScopeAdminProperties = SplitValues(scopeAdmins);
@@ -89,14 +84,9 @@ namespace Mycelium.Forge.Generator.Models
         public string OwnerProperty { get; }
 
         /// <summary>
-        /// Gets the permission required to create an entity in personal scope.
+        /// Gets the permission required to create an entity in personal or organization scope.
         /// </summary>
-        public string PersonalCreatePermission { get; }
-
-        /// <summary>
-        /// Gets the permission required to create an entity in organization scope.
-        /// </summary>
-        public string OrgCreatePermission { get; }
+        public string CreatePermission { get; }
 
         /// <summary>
         /// Gets the property names on the organization entity representing membership.

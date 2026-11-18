@@ -44,7 +44,8 @@ namespace Mycelium.Forge.Generator.Tests.DataLoaders
                 var packageBehavior = result["Package"];
                 Assert.That(packageBehavior.EntityName, Is.EqualTo("Package"));
                 Assert.That(packageBehavior.BehaviorType, Is.EqualTo("OrganizationScope"));
-                Assert.That(packageBehavior.Configuration.ContainsKey("PersonalCreatePermission"), Is.True);
+                Assert.That(packageBehavior.Configuration.ContainsKey("CreatePermission"), Is.True);
+                Assert.That(packageBehavior.Configuration["CreatePermission"], Is.EqualTo("PublishPackage"));
                 Assert.That(packageBehavior.Configuration["BypassPermissions"], Is.EqualTo("ViewAllOrganizations,ManageOrganizations"));
                 Assert.That(packageBehavior.Configuration["bypasspermissions"], Is.EqualTo("ViewAllOrganizations,ManageOrganizations"));
 

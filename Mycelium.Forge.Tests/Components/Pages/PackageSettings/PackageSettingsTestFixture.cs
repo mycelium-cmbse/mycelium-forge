@@ -391,6 +391,24 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             await this.dialogProvider.InvokeAsync(() => continueButton.ClickAsync());
 
             this.viewModelMock.Verify(x => x.RemoveCollaborator(this.maintainerAccount, It.IsAny<CancellationToken>()), Times.Once);
+
+            // Personal scope owner's remove action remains disabled even when another co-owner is viewing
+            var personalScopeAccount = new Account { Id = this.ownerAccount.Id, Name = this.ownerAccount.Name, ShortName = this.ownerAccount.ShortName };
+            var coOwnerAccount = new Account { Id = Guid.NewGuid(), Name = "Co Owner", ShortName = "co.owner" };
+            this.testPackage.Owner = personalScopeAccount.Id;
+            this.testPackage.PackageOwner = [personalScopeAccount.Id, coOwnerAccount.Id];
+            this.viewModelMock.Setup(x => x.Owner).Returns(personalScopeAccount);
+            this.viewModelMock.Setup(x => x.Owners).Returns([personalScopeAccount, coOwnerAccount]);
+            this.viewModelMock.Setup(x => x.CurrentUserId).Returns(coOwnerAccount.Id);
+            packageSettingsPage.Render();
+
+            var personalRows = packageSettingsPage.FindComponents<PackageCollaboratorRow>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(personalRows[0].Instance.IsRemoveDisabled, Is.True);
+                Assert.That(personalRows[0].Instance.IsRoleChangeDisabled, Is.True);
+            }
         }
 
         [Test]
@@ -543,8 +561,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             var nullPage = this.context.Render<PackageSettings>();
 
             this.viewModelMock.Setup(x => x.Package).Returns(this.testPackage);
-            this.SetupPermissions(false, canManageVersions: false);
+            this.SetupPermissions(false, canManagePackageTeam: false, canManageVersions: false);
             var unauthorizedPage = this.context.Render<PackageSettings>();
+
+            this.SetupPermissions(false, canManagePackageTeam: true, canManageVersions: false);
+            var teamManagerOnlyPage = this.context.Render<PackageSettings>();
 
             this.SetupPermissions(canDeletePackage: false);
             var customPage = this.context.Render<PackageSettings>();
@@ -553,6 +574,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Assert.That(nullPage.Markup.Trim(), Has.Length.LessThan(5));
                 Assert.That(unauthorizedPage.Markup.Trim(), Has.Length.LessThan(5));
+                Assert.That(teamManagerOnlyPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("package-settings-add-maintainer-button")), Is.Not.Null);
                 Assert.That(customPage.Markup, Does.Contain("Deleting a package"));
                 Assert.That(customPage.Markup, Does.Contain("Organization"));
             }

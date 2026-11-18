@@ -232,7 +232,7 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
             // testPackage1: user is in PackageOwner -> OWNER
             var role1 = this.viewModel.GetRole(this.testPackage1);
 
-            // testPackage2: user is Owner (scope) -> OWNER
+            // testPackage2: user is Owner (scope) and in PackageMaintainer (not PackageOwner) -> MAINTAINER
             var role2 = this.viewModel.GetRole(this.testPackage2);
 
             // Maintainer-only package
@@ -249,7 +249,7 @@ namespace Mycelium.Forge.Tests.ViewModels.MyPackages
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(role1, Is.EqualTo(PackageInvitationKind.OWNER));
-                Assert.That(role2, Is.EqualTo(PackageInvitationKind.OWNER));
+                Assert.That(role2, Is.EqualTo(PackageInvitationKind.MAINTAINER));
                 Assert.That(maintainerRole, Is.EqualTo(PackageInvitationKind.MAINTAINER));
             }
         }

@@ -34,8 +34,25 @@ namespace Mycelium.Forge.Extensions
 
                 var accountId = userContext.AccountId.Value;
 
-                return (package.Owner == accountId || package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId) || package.IsOrganizationAdministrator(accountId, owner))
+                return (package.PackageOwner.Contains(accountId) || package.PackageMaintainer.Contains(accountId) || package.IsOrganizationAdministrator(accountId, owner))
                     && PermissionGuard.HasAnyPermission(userContext, PermissionKind.PublishPackageVersion, PermissionKind.UnlistPackageVersion, PermissionKind.RelistPackageVersion);
+            }
+
+            /// <summary>
+            /// Determines whether the specified user context is authorized to manage collaborators and ownership of the package.
+            /// </summary>
+            /// <param name="userContext">The contextual user information and assigned roles.</param>
+            /// <param name="owner">The optional owning scope of the package, used to verify organization administrator privileges.</param>
+            /// <returns><c>true</c> if the user can manage the package team; otherwise, <c>false</c>.</returns>
+            public bool CanManageTeam(IUserContext userContext, IScope owner = null)
+            {
+                if (package == null || userContext == null)
+                {
+                    return false;
+                }
+
+                return (userContext.AccountId.HasValue && (package.PackageOwner.Contains(userContext.AccountId.Value) || package.IsOrganizationAdministrator(userContext.AccountId.Value, owner)))
+                    || PermissionGuard.HasPermission(userContext, PermissionKind.ManagePackageTeam);
             }
 
             /// <summary>

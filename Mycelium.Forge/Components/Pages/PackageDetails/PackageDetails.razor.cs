@@ -72,7 +72,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         /// <summary>
         /// Gets a value indicating whether the current user can access the package settings page.
         /// </summary>
-        private bool CanAccessSettings => this.ViewModel.IsUserAdmin || this.ViewModel.CanManageVersions;
+        private bool CanAccessSettings => this.ViewModel.IsUserAdmin || this.ViewModel.CanManageVersions || this.ViewModel.CanManagePackageTeam;
 
         /// <summary>
         /// Selects a main content navigation tab and navigates to its route.

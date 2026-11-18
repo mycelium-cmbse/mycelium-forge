@@ -165,6 +165,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.QualityChecks, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.IsUserAdmin, Is.False);
                 Assert.That(this.viewModel.CanManageVersions, Is.False);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
                 Assert.That(this.viewModel.DownloadCount, Is.Zero);
             }
 
@@ -188,9 +189,10 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             {
                 Assert.That(this.viewModel.IsUserAdmin, Is.False);
                 Assert.That(this.viewModel.CanManageVersions, Is.True);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
             }
 
-            // Non-member administrator has IsUserAdmin == true and CanManageVersions == false
+            // Non-member administrator has IsUserAdmin == true, CanManagePackageTeam == true, and CanManageVersions == false
             var nonMemberAdminContext = new UserContext
             {
                 AccountId = Guid.NewGuid(),
@@ -208,9 +210,10 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             {
                 Assert.That(this.viewModel.IsUserAdmin, Is.True);
                 Assert.That(this.viewModel.CanManageVersions, Is.False);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.True);
             }
 
-            // Owning organization administrator (not in PackageOwner/PackageMaintainer) has IsUserAdmin == true and CanManageVersions == true, and duplicate maintainer DTOs are deduplicated
+            // Owning organization administrator (not in PackageOwner/PackageMaintainer) has IsUserAdmin == true, CanManageVersions == true, CanManagePackageTeam == true, and duplicate maintainer DTOs are deduplicated
             var orgAdminId = Guid.NewGuid();
             this.org.Administrator = [orgAdminId];
             
@@ -232,6 +235,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             {
                 Assert.That(this.viewModel.IsUserAdmin, Is.True);
                 Assert.That(this.viewModel.CanManageVersions, Is.True);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.True);
                 Assert.That(this.viewModel.Maintainers, Has.Count.EqualTo(1));
             }
 
@@ -245,6 +249,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.Package, Is.EqualTo(this.package));
                 Assert.That(this.viewModel.IsUserAdmin, Is.False);
                 Assert.That(this.viewModel.CanManageVersions, Is.False);
+                Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(2));
             }
         }

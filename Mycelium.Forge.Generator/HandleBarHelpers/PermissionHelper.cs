@@ -147,19 +147,56 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <param name="handlebars">The <see cref="IHandlebars" /> instance to register with.</param>
         private static void RegisterIsAllowedToCreate(IHandlebars handlebars)
         {
-            RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToCreate", Operations.Create,
-                (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior); },
-                (stringBuilder, _, definition, isAsync) =>
-                {
-                    if (definition != null)
-                    {
-                        AppendPermissionGuardOrOk(stringBuilder, definition.CreatePermission, isAsync);
-                    }
-                    else
-                    {
-                        stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
-                    }
-                });
+            RegisterOperationHelper(handlebars, "Permission.WriteIsAllowedToCreate", Operations.Create, (stringBuilder, @class, definition, behavior, helper, _) => { helper.WriteIsAllowedToCreate(stringBuilder, @class, definition, behavior); }, WriteDefaultAllowedToCreate);
+        }
+
+        /// <summary>
+        /// Writes the default create permission check when no custom behavior is configured.
+        /// </summary>
+        /// <param name="stringBuilder">The <see cref="StringBuilder" /> to append to.</param>
+        /// <param name="class">The <see cref="IClass" /> being generated.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <param name="isAsync">A value indicating whether the enclosing method is asynchronous.</param>
+        private static void WriteDefaultAllowedToCreate(StringBuilder stringBuilder, IClass @class, EntityPermissionDefinition definition, bool isAsync)
+        {
+            if (definition == null)
+            {
+                stringBuilder.Append($"            {PermissionStatementHelper.GetOkReturn(isAsync)}");
+                return;
+            }
+
+            if (HasMutableScalarOwnerProperty(@class, definition) && !string.IsNullOrWhiteSpace(definition.CreatePermission))
+            {
+                var entityLower = @class.Name.ToLowerInvariant();
+                var createGuardExpr = EmitPermissionGuard(definition.CreatePermission);
+                var overridePermission = !string.IsNullOrWhiteSpace(definition.UpdatePermission) ? definition.UpdatePermission : definition.DeletePermission;
+                var overrideStatement = !string.IsNullOrWhiteSpace(overridePermission) ? PermissionStatementHelper.GetReturnStatement(EmitPermissionGuard(overridePermission), isAsync) : PermissionStatementHelper.GetFailReturn($"\"Access denied: cannot create {entityLower} for another owner.\"", isAsync);
+
+                stringBuilder.Append($$"""
+                                                   if (!userContext.IsAuthenticated || !userContext.AccountId.HasValue)
+                                                   {
+                                                       {{PermissionStatementHelper.GetUnauthorizedReturn($"\"Unauthenticated user cannot create a {entityLower}.\"", isAsync)}}
+                                                   }
+
+                                                   var guard = {{createGuardExpr}};
+
+                                                   if (guard.IsError)
+                                                   {
+                                                       {{PermissionStatementHelper.GetReturnStatement("guard", isAsync)}}
+                                                   }
+
+                                                   if (toCreate.{{definition.OwnerProperty}} != userContext.AccountId.Value)
+                                                   {
+                                                       {{overrideStatement}}
+                                                   }
+
+                                                   {{PermissionStatementHelper.GetOkReturn(isAsync)}}
+                                       """);
+
+                return;
+            }
+
+            AppendPermissionGuardOrOk(stringBuilder, definition.CreatePermission, isAsync);
         }
 
         /// <summary>
@@ -249,9 +286,24 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                 return;
             }
 
-            WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", isAsync);
-
             propertyPermissions.TryGetValue(@class.Name, out var propertyDefs);
+
+            if (HasMutableScalarOwnerProperty(@class, definition) && (propertyDefs == null || !propertyDefs.Any(p => p.Property.Equals(definition.OwnerProperty, StringComparison.OrdinalIgnoreCase))))
+            {
+                var entityLower = @class.Name.ToLowerInvariant();
+                var overridePermission = !string.IsNullOrWhiteSpace(definition.UpdatePermission) ? definition.UpdatePermission : definition.DeletePermission;
+                var overrideStatement = !string.IsNullOrWhiteSpace(overridePermission) ? PermissionStatementHelper.GetReturnStatement(EmitPermissionGuard(overridePermission), isAsync) : PermissionStatementHelper.GetFailReturn($"\"Access denied: cannot reassign {entityLower} owner.\"", isAsync);
+
+                stringBuilder.AppendLine($$"""
+                                                       if (existingThing.{{definition.OwnerProperty}} != updatedThing.{{definition.OwnerProperty}})
+                                                       {
+                                                           {{overrideStatement}}
+                                                       }
+
+                                           """);
+            }
+
+            WritePropertyOwnershipCheck(stringBuilder, @class, definition.OwnerProperty, "existingThing", isAsync);
 
             if (propertyDefs != null)
             {
@@ -259,6 +311,23 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
             }
 
             AppendPermissionGuardOrOk(stringBuilder, definition.UpdatePermission, isAsync);
+        }
+
+        /// <summary>
+        /// Determines whether the entity defines a mutable scalar owner property (excluding <c>Id</c> and collection properties).
+        /// </summary>
+        /// <param name="class">The <see cref="IClass" /> being inspected.</param>
+        /// <param name="definition">The entity permission definition.</param>
+        /// <returns><c>true</c> if the entity has a mutable scalar owner property; otherwise <c>false</c>.</returns>
+        private static bool HasMutableScalarOwnerProperty(IClass @class, EntityPermissionDefinition definition)
+        {
+            if (definition == null || string.IsNullOrWhiteSpace(definition.OwnerProperty) || definition.OwnerProperty.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var property = @class.QueryDtoClassProperties().FirstOrDefault(p => p.Name.Equals(definition.OwnerProperty, StringComparison.OrdinalIgnoreCase));
+            return property == null || !property.QueryIsEnumerable();
         }
 
         /// <summary>

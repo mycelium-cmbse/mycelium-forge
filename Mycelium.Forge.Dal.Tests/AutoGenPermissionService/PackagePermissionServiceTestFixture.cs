@@ -112,6 +112,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var missingOrgPackage = new Package { Id = Guid.NewGuid(), Owner = Guid.NewGuid(), PackageOwner = [orgMemberId], Visibility = VisibilityKind.PRIVATE };
             var orgMemberContext = new UserContext { AccountId = orgMemberId, Username = "orgMember", CurrentRoles = [RoleKind.Account] };
             var nonMemberContext = new UserContext { AccountId = nonMemberId, Username = "nonMember", CurrentRoles = [RoleKind.Account] };
+            var operatorPersonalPackage = new Package { Id = Guid.NewGuid(), Owner = Guid.NewGuid(), Visibility = VisibilityKind.PRIVATE };
+            var platformOperatorContext = new UserContext { AccountId = operatorPersonalPackage.Owner, Username = "platformOperator", CurrentRoles = [RoleKind.PlatformOperator] };
 
             var ownerResult = await this.permissionService.IsAllowedToCreate(this.ownerUserContext, package, this.transaction);
             var accountResult = await this.permissionService.IsAllowedToCreate(this.accountUserContext, package, this.transaction);
@@ -120,6 +122,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var nonMemberResult = await this.permissionService.IsAllowedToCreate(nonMemberContext, orgPackage, this.transaction);
             var missingOrgResult = await this.permissionService.IsAllowedToCreate(orgMemberContext, missingOrgPackage, this.transaction);
             var adminOrgResult = await this.permissionService.IsAllowedToCreate(this.adminUserContext, orgPackage, this.transaction);
+            var operatorPersonalResult = await this.permissionService.IsAllowedToCreate(platformOperatorContext, operatorPersonalPackage, this.transaction);
+            var operatorOrgResult = await this.permissionService.IsAllowedToCreate(platformOperatorContext, orgPackage, this.transaction);
 
             using (Assert.EnterMultipleScope())
             {
@@ -130,6 +134,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(nonMemberResult.IsError, Is.True);
                 Assert.That(missingOrgResult.IsError, Is.True);
                 Assert.That(adminOrgResult.IsError, Is.False);
+                Assert.That(operatorPersonalResult.IsError, Is.True);
+                Assert.That(operatorOrgResult.IsError, Is.True);
             }
         }
 
@@ -315,6 +321,11 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var maintainerPrivateResult = await this.permissionService.IsAllowedToRead(maintainerContext, maintainerPrivatePackage, this.transaction);
             var maintainerInternalResult = await this.permissionService.IsAllowedToRead(maintainerContext, maintainerInternalPackage, this.transaction);
 
+            var scopeOwnerOnlyPrivatePackage = new Package { Id = Guid.NewGuid(), Owner = this.userId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.PRIVATE };
+            var scopeOwnerOnlyInternalPackage = new Package { Id = Guid.NewGuid(), Owner = this.userId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.INTERNAL };
+            var scopeOwnerOnlyPrivateResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, scopeOwnerOnlyPrivatePackage, this.transaction);
+            var scopeOwnerOnlyInternalResult = await this.permissionService.IsAllowedToRead(this.ownerUserContext, scopeOwnerOnlyInternalPackage, this.transaction);
+
             var otherOrgMemberResult = await this.permissionService.IsAllowedToRead(orgBMemberUserContext, orgAInternalPackage, this.transaction);
             var owningOrgMemberResult = await this.permissionService.IsAllowedToRead(orgAMemberUserContext, orgAInternalPackage, this.transaction);
             var owningOrgAdminPrivateResult = await this.permissionService.IsAllowedToRead(orgAMemberUserContext, orgAPrivatePackage, this.transaction);
@@ -329,6 +340,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(privateAnonResult.IsError, Is.True);
                 Assert.That(maintainerPrivateResult.IsError, Is.False);
                 Assert.That(maintainerInternalResult.IsError, Is.False);
+                Assert.That(scopeOwnerOnlyPrivateResult.IsError, Is.True);
+                Assert.That(scopeOwnerOnlyInternalResult.IsError, Is.True);
                 Assert.That(internalAccountResult.IsError, Is.True);
                 Assert.That(internalOwnerResult.IsError, Is.False);
                 Assert.That(privateAccountResult.IsError, Is.True);
@@ -434,6 +447,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             var orgAdminTransferResult = await this.permissionService.IsAllowedToUpdate(orgAdminContext, orgPackage, orgPackageTransferred, this.transaction);
             var orgMemberUpdateResult = await this.permissionService.IsAllowedToUpdate(orgMemberContext, orgPackage, orgPackageVisibilityUpdated, this.transaction);
 
+            var scopeOwnerOnlyExisting = new Package { Id = Guid.NewGuid(), Owner = this.userId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.PRIVATE };
+            var scopeOwnerOnlyUpdated = new Package { Id = scopeOwnerOnlyExisting.Id, Owner = this.userId, PackageOwner = [this.otherUserId], Visibility = VisibilityKind.PUBLIC };
+            var scopeOwnerOnlyUpdateResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, scopeOwnerOnlyExisting, scopeOwnerOnlyUpdated, this.transaction);
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(anonUpdateResult.IsError, Is.True);
@@ -452,6 +469,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Assert.That(orgAdminVisibilityResult.IsError, Is.False);
                 Assert.That(orgAdminTransferResult.IsError, Is.False);
                 Assert.That(orgMemberUpdateResult.IsError, Is.True);
+                Assert.That(scopeOwnerOnlyUpdateResult.IsError, Is.True);
             }
         }
     }

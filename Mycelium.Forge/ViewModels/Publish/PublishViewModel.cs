@@ -187,7 +187,8 @@ namespace Mycelium.Forge.ViewModels.Publish
         {
             await this.InitializeBase();
 
-            this.ScopeOptions = await this.scopeService.ReadActiveByAccountAsync(this.userContext, this.currentUserId);
+            var availableScopes = await this.scopeService.ReadActiveByAccountAsync(this.userContext, this.currentUserId);
+            this.ScopeOptions = [.. availableScopes.Where(this.CanPublishToScope)];
             this.SelectedScope = this.ScopeOptions.Count > 0 ? this.ScopeOptions[0] : null;
 
             var packageId = Guid.NewGuid();
@@ -397,6 +398,30 @@ namespace Mycelium.Forge.ViewModels.Publish
                 Dependencies = [],
                 Elements = [],
                 QualityChecks = []
+            };
+        }
+
+        /// <summary>
+        /// Determines whether the current user is permitted to publish a new package under the specified scope.
+        /// </summary>
+        /// <param name="scope">The candidate publishing scope.</param>
+        /// <returns><see langword="true" /> if the user can publish a package to the scope; otherwise, <see langword="false" />.</returns>
+        private bool CanPublishToScope(IScope scope)
+        {
+            if (this.userContext is not { AccountId: not null })
+            {
+                return false;
+            }
+
+            var accountId = this.userContext.AccountId.Value;
+            var canPublish = PermissionGuard.HasPermission(this.userContext, PermissionKind.PublishPackage);
+
+            return scope switch
+            {
+                IAccount account => account.Id == accountId && canPublish,
+                IOrganization organization => PermissionGuard.HasPermission(this.userContext, PermissionKind.ManageOrganizations)
+                    || (canPublish && (organization.Member.Contains(accountId) || organization.Administrator.Contains(accountId))),
+                _ => false
             };
         }
     }

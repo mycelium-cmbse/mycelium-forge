@@ -45,7 +45,7 @@ namespace Mycelium.Forge.Common
                     PermissionKind.ConfigureDefaultPackageVisibility,
                     PermissionKind.ViewOrganizationPackageList,
                     PermissionKind.ViewOrganizationMemberList,
-                    PermissionKind.PublishPackageToOrganizationScope,
+                    PermissionKind.PublishPackage,
                     PermissionKind.PublishPackageVersion,
                     PermissionKind.UnlistPackageVersion,
                     PermissionKind.RelistPackageVersion,
@@ -54,7 +54,6 @@ namespace Mycelium.Forge.Common
                     PermissionKind.TransferPackageOwnership,
                     PermissionKind.ManagePackageSettings,
                     PermissionKind.CreateOrganization,
-                    PermissionKind.PublishPackageToPersonalScope,
                     PermissionKind.ManageOwnProfile,
                     PermissionKind.IssueApiKey,
                     PermissionKind.RevokeOwnApiKey,
@@ -70,8 +69,7 @@ namespace Mycelium.Forge.Common
             {
                 RoleKind.Account, [
                     PermissionKind.CreateOrganization,
-                    PermissionKind.PublishPackageToPersonalScope,
-                    PermissionKind.PublishPackageToOrganizationScope,
+                    PermissionKind.PublishPackage,
                     PermissionKind.PublishPackageVersion,
                     PermissionKind.UnlistPackageVersion,
                     PermissionKind.RelistPackageVersion,

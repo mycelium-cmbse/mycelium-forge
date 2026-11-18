@@ -96,8 +96,7 @@
       "entity": "Package",
       "behaviorType": "OrganizationScope",
       "configuration": {
-        "PersonalCreatePermission": "PublishPackageToPersonalScope",
-        "OrgCreatePermission": "PublishPackageToOrganizationScope",
+        "CreatePermission": "PublishPackage",
         "AdminPermission": "ManageOrganizations",
         "BypassPermissions": [
           "ViewAllOrganizations",
