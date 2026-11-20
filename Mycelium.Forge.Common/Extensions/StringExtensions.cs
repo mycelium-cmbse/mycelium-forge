@@ -46,6 +46,28 @@ namespace Mycelium.Forge.Common.Extensions
 
                 return char.ToLowerInvariant(value[0]) + value[1..];
             }
+
+            /// <summary>
+            /// Splits a display name into first name and last name components on the last space character.
+            /// </summary>
+            /// <returns>
+            /// A tuple containing the first name and last name, or <c>(null, null)</c> if the input is null, empty, or whitespace.
+            /// If no space is present, <c>LastName</c> is <see langword="null" />.
+            /// </returns>
+            public (string FirstName, string LastName) SplitFullName()
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return (null, null);
+                }
+
+                var trimmed = value.Trim();
+                var lastSpace = trimmed.LastIndexOf(' ');
+
+                return lastSpace < 0
+                    ? (trimmed, null)
+                    : (trimmed[..lastSpace].TrimEnd(), trimmed[(lastSpace + 1)..]);
+            }
         }
     }
 }

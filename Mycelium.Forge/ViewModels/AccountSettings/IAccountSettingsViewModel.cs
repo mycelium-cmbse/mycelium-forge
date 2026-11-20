@@ -24,7 +24,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <summary>
         /// Gets or sets the user profile account DTO.
         /// </summary>
-        IAccount Profile { get; set; }
+        Account Profile { get; set; }
 
         /// <summary>
         /// Gets the collection of organizations associated with the user account.
@@ -53,6 +53,13 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <param name="result">The organization creation data.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
         Task<ErrorOr<Success>> CreateOrganization(CreateOrganizationResult result);
+
+        /// <summary>
+        /// Updates the user profile account and synchronizes identity changes asynchronously.
+        /// </summary>
+        /// <param name="updatedAccount">The updated <see cref="Account" /> DTO.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
+        Task<ErrorOr<Success>> UpdateProfile(Account updatedAccount);
 
         /// <summary>
         /// Handles the deactivation of the current user account asynchronously.

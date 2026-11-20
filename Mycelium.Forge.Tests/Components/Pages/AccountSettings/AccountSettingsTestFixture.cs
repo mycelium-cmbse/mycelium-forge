@@ -22,16 +22,20 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
     using DynamicData;
 
+    using ErrorOr;
+
     using Microsoft.Extensions.DependencyInjection;
 
     using Moq;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
     using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.Tests.TestHelpers;
     using Mycelium.Forge.ViewModels.AccountSettings;
 
     [TestFixture]
@@ -165,6 +169,67 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
         }
 
         [Test]
+        public async Task VerifyOnEditDisplayName()
+        {
+            this.viewModelMock.Setup(x => x.UpdateProfile(It.IsAny<Account>())).ReturnsAsync(Result.Success);
+
+            var accountSettingsPage = this.context.Render<AccountSettings>();
+            var editDisplayNameButton = accountSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("account-settings-edit-displayname-button"));
+            Assert.That(editDisplayNameButton, Is.Not.Null);
+
+            // Case 1: Confirm with trimmed display name
+            _ = accountSettingsPage.InvokeAsync(() => editDisplayNameButton!.Find("button").ClickAsync());
+
+            var dialog = this.dialogProvider.FindComponent<InputPromptDialog>();
+            var input = dialog.FindComponents<BbInput>().FirstOrDefault(x => x.Instance.HasId("input-prompt-dialog-input"));
+            var saveButton = dialog.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("input-prompt-dialog-confirm-button"));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(input, Is.Not.Null);
+                Assert.That(saveButton, Is.Not.Null);
+            }
+
+            await this.dialogProvider.InvokeAsync(() => input!.Instance.ValueChanged.InvokeAsync("  Alex Updated  "));
+            await this.dialogProvider.InvokeAsync(() => saveButton!.Find("button").ClickAsync());
+
+            this.viewModelMock.Verify(x => x.UpdateProfile(It.Is<Account>(a => a.Id == this.testAccount.Id && a.Name == "Alex Updated")), Times.Once);
+
+            // Case 2: Cancel does not update profile
+            _ = accountSettingsPage.InvokeAsync(() => editDisplayNameButton!.Find("button").ClickAsync());
+
+            var cancelDialog = this.dialogProvider.FindComponent<InputPromptDialog>();
+            var cancelButton = cancelDialog.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("input-prompt-dialog-cancel-button"));
+            Assert.That(cancelButton, Is.Not.Null);
+
+            await this.dialogProvider.InvokeAsync(() => cancelButton!.Find("button").ClickAsync());
+
+            this.viewModelMock.Verify(x => x.UpdateProfile(It.IsAny<Account>()), Times.Once);
+
+            // Case 3: Single-word display name fails inline validation and does not update profile
+            _ = accountSettingsPage.InvokeAsync(() => editDisplayNameButton!.Find("button").ClickAsync());
+
+            var invalidDialog = this.dialogProvider.FindComponent<InputPromptDialog>();
+            var singleWordInput = invalidDialog.FindComponents<BbInput>().FirstOrDefault(x => x.Instance.HasId("input-prompt-dialog-input"));
+            var saveSingleButton = invalidDialog.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("input-prompt-dialog-confirm-button"));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(singleWordInput, Is.Not.Null);
+                Assert.That(saveSingleButton, Is.Not.Null);
+            }
+
+            await this.dialogProvider.InvokeAsync(() => singleWordInput!.Instance.ValueChanged.InvokeAsync("Regis"));
+            await this.dialogProvider.InvokeAsync(() => saveSingleButton!.Find("button").ClickAsync());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(invalidDialog.Instance.ValidationManager.HasError(nameof(InputPromptDialog.InputValue)), Is.True);
+                this.viewModelMock.Verify(x => x.UpdateProfile(It.IsAny<Account>()), Times.Once);
+            }
+        }
+
+        [Test]
         public void VerifyOnInitialized()
         {
             var accountSettingsPage = this.context.Render<AccountSettings>();
@@ -198,7 +263,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
 
             var changeUsernameBtn = accountSettingsPage.Find("#account-settings-change-username-button");
             var changeEmailBtn = accountSettingsPage.Find("#account-settings-change-email-button");
-            var editDisplayNameBtn = accountSettingsPage.Find("#account-settings-edit-displayname-button");
             var editLocationBtn = accountSettingsPage.Find("#account-settings-edit-location-button");
             var editWebsiteBtn = accountSettingsPage.Find("#account-settings-edit-website-button");
 
@@ -206,7 +270,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             {
                 await accountSettingsPage.InvokeAsync(() => changeUsernameBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => changeEmailBtn.ClickAsync());
-                await accountSettingsPage.InvokeAsync(() => editDisplayNameBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => editLocationBtn.ClickAsync());
                 await accountSettingsPage.InvokeAsync(() => editWebsiteBtn.ClickAsync());
             }, Throws.Nothing);

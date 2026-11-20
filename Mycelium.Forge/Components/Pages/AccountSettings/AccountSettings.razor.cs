@@ -11,9 +11,13 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 {
     using BlazorBlueprint.Components;
 
+    using ErrorOr;
+
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Common.Extensions;
+    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
@@ -40,11 +44,10 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <summary>
         /// Method invoked when the component is ready to start, having received its
         /// initial parameters from its parent in the render tree.
-        ///
         /// Override this method if you will perform an asynchronous operation and
         /// want the component to refresh when that operation is completed.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing any asynchronous operation.</returns>
+        /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -129,10 +132,53 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         }
 
         /// <summary>
+        /// Validates that the entered display name includes both a first and last name.
+        /// </summary>
+        /// <param name="displayName">The trimmed display name entered by the user.</param>
+        /// <returns>A <see cref="Task{TResult}" /> resolving to <see cref="Result.Success" /> or a validation error.</returns>
+        private static Task<ErrorOr<Success>> ValidateDisplayNameAsync(string displayName)
+        {
+            var (firstName, lastName) = displayName.SplitFullName();
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            {
+                return Task.FromResult<ErrorOr<Success>>(Error.Validation(description: "Please enter both your first and last name (at least two words)."));
+            }
+
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
+        }
+
+        /// <summary>
         /// Handles the action to edit the user's display name.
         /// </summary>
-        private static void OnEditDisplayName()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnEditDisplayName()
         {
+            var onResult = new EventCallbackFactory().Create(this, async (string displayName) =>
+            {
+                var updated = this.ViewModel.Profile.Clone();
+                updated.Name = displayName;
+                await this.ViewModel.UpdateProfile(updated);
+            });
+
+            var validate = ValidateDisplayNameAsync;
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(InputPromptDialog.Description), "Enter your new display name." },
+                { nameof(InputPromptDialog.Placeholder), "Display name" },
+                { nameof(InputPromptDialog.InitialValue), this.ViewModel.Profile.Name },
+                { nameof(InputPromptDialog.Required), true },
+                { nameof(InputPromptDialog.ValidateAsync), validate },
+                { nameof(InputPromptDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Edit display name"
+            };
+
+            await this.DialogService.OpenAsync<InputPromptDialog>(parameters, options);
         }
 
         /// <summary>

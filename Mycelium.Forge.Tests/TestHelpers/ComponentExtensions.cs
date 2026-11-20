@@ -22,51 +22,6 @@ namespace Mycelium.Forge.Tests.TestHelpers
     /// </summary>
     public static class ComponentExtensions
     {
-        /// <param name="component">The component instance to inspect.</param>
-        extension(IComponent component)
-        {
-            /// <summary>
-            /// Determines whether the component has an <c>id</c> attribute matching <paramref name="id" />.
-            /// </summary>
-            /// <param name="id">The expected element identifier.</param>
-            /// <returns><c>true</c> if the component defines the matching identifier; otherwise, <c>false</c>.</returns>
-            public bool HasId(string id)
-            {
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                    return false;
-                }
-
-                var attributes = GetAdditionalAttributes(component);
-
-                return attributes.TryGetValue("id", out var value) && string.Equals(value.ToString(), id, StringComparison.Ordinal);
-            }
-
-            /// <summary>
-            /// Determines whether the component contains the CSS class <paramref name="cssClass" />.
-            /// </summary>
-            /// <param name="cssClass">The expected CSS class token.</param>
-            /// <returns><c>true</c> if the component includes the CSS class; otherwise, <c>false</c>.</returns>
-            public bool HasClass(string cssClass)
-            {
-                if (string.IsNullOrWhiteSpace(cssClass))
-                {
-                    return false;
-                }
-
-                var classValue = GetClassString(component);
-
-                if (!string.IsNullOrWhiteSpace(classValue) && ContainsClassToken(classValue, cssClass))
-                {
-                    return true;
-                }
-
-                var attributes = GetAdditionalAttributes(component);
-
-                return attributes.TryGetValue("class", out var attributeClass) && ContainsClassToken(attributeClass.ToString() ?? string.Empty, cssClass);
-            }
-        }
-
         /// <summary>
         /// Checks whether a space-delimited class string contains the specified token.
         /// </summary>
@@ -106,8 +61,59 @@ namespace Mycelium.Forge.Tests.TestHelpers
                 BbButton button => button.Class ?? string.Empty,
                 BbBadge badge => badge.Class ?? string.Empty,
                 BbDropdownMenuItem menuItem => menuItem.Class ?? string.Empty,
+                BbInput input => input.Class ?? string.Empty,
                 _ => string.Empty
             };
+        }
+
+        /// <param name="component">The component instance to inspect.</param>
+        extension(IComponent component)
+        {
+            /// <summary>
+            /// Determines whether the component has an <c>id</c> attribute matching <paramref name="id" />.
+            /// </summary>
+            /// <param name="id">The expected element identifier.</param>
+            /// <returns><c>true</c> if the component defines the matching identifier; otherwise, <c>false</c>.</returns>
+            public bool HasId(string id)
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return false;
+                }
+
+                if (component is BbInput input)
+                {
+                    return string.Equals(input.Id, id, StringComparison.Ordinal);
+                }
+
+                var attributes = GetAdditionalAttributes(component);
+
+                return attributes.TryGetValue("id", out var value) && string.Equals(value.ToString(), id, StringComparison.Ordinal);
+            }
+
+            /// <summary>
+            /// Determines whether the component contains the CSS class <paramref name="cssClass" />.
+            /// </summary>
+            /// <param name="cssClass">The expected CSS class token.</param>
+            /// <returns><c>true</c> if the component includes the CSS class; otherwise, <c>false</c>.</returns>
+            public bool HasClass(string cssClass)
+            {
+                if (string.IsNullOrWhiteSpace(cssClass))
+                {
+                    return false;
+                }
+
+                var classValue = GetClassString(component);
+
+                if (!string.IsNullOrWhiteSpace(classValue) && ContainsClassToken(classValue, cssClass))
+                {
+                    return true;
+                }
+
+                var attributes = GetAdditionalAttributes(component);
+
+                return attributes.TryGetValue("class", out var attributeClass) && ContainsClassToken(attributeClass.ToString() ?? string.Empty, cssClass);
+            }
         }
     }
 }
