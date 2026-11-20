@@ -50,6 +50,18 @@ namespace Mycelium.Forge.Tests.Services
                 this.keycloakAdminClientMock.Verify(x => x.UpdateUserAsync(updatedMultiWord.Id, "alex@example.com", "Alex", "Rivera", CancellationToken.None), Times.Once);
             }
 
+            // Case 2: Blank name passes null firstName and null lastName
+            var updatedBlankName = new Account { Id = existing.Id, Name = "   ", Email = "alex@example.com" };
+            this.keycloakAdminClientMock.Setup(x => x.UpdateUserAsync(updatedBlankName.Id, "alex@example.com", null, null, CancellationToken.None)).ReturnsAsync(Result.Success);
+
+            var blankNameResult = await this.handler.SyncAccountAsync(existing, updatedBlankName, CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(blankNameResult.IsError, Is.False);
+                this.keycloakAdminClientMock.Verify(x => x.UpdateUserAsync(updatedBlankName.Id, "alex@example.com", null, null, CancellationToken.None), Times.Once);
+            }
+
             // Case 3: Single-word name passes null lastName
             var updatedSingleWord = new Account { Id = existing.Id, Name = "Alex", Email = "alex@example.com" };
             this.keycloakAdminClientMock.Setup(x => x.UpdateUserAsync(updatedSingleWord.Id, "alex@example.com", "Alex", null, CancellationToken.None)).ReturnsAsync(Result.Success);

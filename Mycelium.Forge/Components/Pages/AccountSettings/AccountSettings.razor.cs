@@ -11,10 +11,13 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
 {
     using BlazorBlueprint.Components;
 
+    using ErrorOr;
+
     using Microsoft.AspNetCore.Components;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Common.Extensions;
+    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
@@ -129,40 +132,53 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         }
 
         /// <summary>
+        /// Validates that the entered display name includes both a first and last name.
+        /// </summary>
+        /// <param name="displayName">The trimmed display name entered by the user.</param>
+        /// <returns>A <see cref="Task{TResult}" /> resolving to <see cref="Result.Success" /> or a validation error.</returns>
+        private static Task<ErrorOr<Success>> ValidateDisplayNameAsync(string displayName)
+        {
+            var (firstName, lastName) = displayName.SplitFullName();
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            {
+                return Task.FromResult<ErrorOr<Success>>(Error.Validation(description: "Please enter both your first and last name (at least two words)."));
+            }
+
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
+        }
+
+        /// <summary>
         /// Handles the action to edit the user's display name.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task OnEditDisplayName()
         {
-            var options = new PromptDialogOptions
+            var onResult = new EventCallbackFactory().Create(this, async (string displayName) =>
             {
-                DefaultValue = this.ViewModel.Profile.Name,
-                Placeholder = "Display name",
-                Required = true,
-                ConfirmText = "Save",
-                CancelText = "Cancel"
+                var updated = this.ViewModel.Profile.Clone();
+                updated.Name = displayName;
+                await this.ViewModel.UpdateProfile(updated);
+            });
+
+            var validate = ValidateDisplayNameAsync;
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(InputPromptDialog.Description), "Enter your new display name." },
+                { nameof(InputPromptDialog.Placeholder), "Display name" },
+                { nameof(InputPromptDialog.InitialValue), this.ViewModel.Profile.Name },
+                { nameof(InputPromptDialog.Required), true },
+                { nameof(InputPromptDialog.ValidateAsync), validate },
+                { nameof(InputPromptDialog.OnResult), onResult }
             };
 
-            var result = await this.DialogService.PromptAsync("Edit display name", "Enter your new display name.", options);
-
-            if (result.Cancelled || string.IsNullOrWhiteSpace(result.Value))
+            var options = new DialogOpenOptions
             {
-                return;
-            }
+                Title = "Edit display name"
+            };
 
-            var displayName = result.Value.Trim();
-            var (firstName, lastName) = displayName.SplitFullName();
-
-            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
-            {
-                // TODO: change this to use notification
-                await this.DialogService.AlertAsync("Invalid display name", "Please enter both your first and last name (at least two words).");
-                return;
-            }
-
-            var updated = this.ViewModel.Profile.Clone();
-            updated.Name = displayName;
-            await this.ViewModel.UpdateProfile(updated);
+            await this.DialogService.OpenAsync<InputPromptDialog>(parameters, options);
         }
 
         /// <summary>

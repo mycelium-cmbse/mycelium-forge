@@ -214,7 +214,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             }
 
             this.Profile = updatedAccount;
-            this.notificationService.AddNotification("Display name updated successfully.", "Profile Updated", NotificationType.Success);
+            this.notificationService.AddNotification("Profile updated successfully.", "Profile Updated", NotificationType.Success);
             return Result.Success;
         }
 

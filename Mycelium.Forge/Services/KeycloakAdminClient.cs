@@ -105,7 +105,7 @@ namespace Mycelium.Forge.Services
                     using var putResponse = await this.SendAuthenticatedAsync(HttpMethod.Put, requestUri, accessToken, content, cancellationToken);
 
                     return this.EnsureSuccessStatus(putResponse, HttpMethod.Put, requestUri);
-                }, $"update Keycloak user {userId}", true, cancellationToken);
+                }, $"update Keycloak user {userId}", cancellationToken);
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Mycelium.Forge.Services
                 var failed = Array.Find(deleteResults, result => result.IsError);
 
                 return failed.IsError ? failed.Errors : Result.Success;
-            }, "delete existing Keycloak users", false, cancellationToken);
+            }, "delete existing Keycloak users", cancellationToken);
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace Mycelium.Forge.Services
                 using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
 
                 return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
-            }, "import Keycloak users", false, cancellationToken);
+            }, "import Keycloak users", cancellationToken);
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace Mycelium.Forge.Services
                     using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
 
                     return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
-                }, $"assign Keycloak roles to user {userId}", false, cancellationToken);
+                }, $"assign Keycloak roles to user {userId}", cancellationToken);
         }
 
         /// <summary>
@@ -198,24 +198,16 @@ namespace Mycelium.Forge.Services
         /// </summary>
         /// <param name="operation">The operation to execute with the acquired bearer token.</param>
         /// <param name="operationDescription">A short description of the operation for error logging.</param>
-        /// <param name="skipWhenUnconfigured">
-        /// <see langword="true" /> to log a warning and return <see cref="Result.Success" /> when
-        /// <see cref="KeycloakOptions.BaseUrl" /> is not configured; <see langword="false" /> to return a failure error.
-        /// </param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> containing the operation result or an error.</returns>
-        private async Task<ErrorOr<Success>> ExecuteAdminOperationAsync(Func<string, Task<ErrorOr<Success>>> operation, string operationDescription, bool skipWhenUnconfigured, CancellationToken cancellationToken)
+        private async Task<ErrorOr<Success>> ExecuteAdminOperationAsync(Func<string, Task<ErrorOr<Success>>> operation, string operationDescription, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(this.options.BaseUrl))
-            {
-                if (skipWhenUnconfigured)
-                {
-                    this.logger.LogWarning("Keycloak BaseUrl is not configured; skipping operation to {Operation}", operationDescription.SanitizeForLog());
-                    return Result.Success;
-                }
+            var sanitizedDescription = operationDescription.SanitizeForLog();
 
-                this.logger.LogError("Keycloak BaseUrl is not configured; cannot {Operation}", operationDescription.SanitizeForLog());
-                return Error.Failure(SyncFailedErrorCode, "Keycloak BaseUrl is not configured.");
+            if (string.IsNullOrWhiteSpace(this.options.BaseUrl) || string.IsNullOrWhiteSpace(this.options.AdminUsername) || string.IsNullOrWhiteSpace(this.options.AdminPassword))
+            {
+                this.logger.LogError("Keycloak admin client is not configured; cannot {Operation}", sanitizedDescription);
+                return Error.Failure(SyncFailedErrorCode, "Keycloak admin client is not configured.");
             }
 
             try
@@ -224,15 +216,19 @@ namespace Mycelium.Forge.Services
 
                 if (tokenResult.IsError)
                 {
-                    this.logger.LogError("Failed to {Operation}: {Errors}", operationDescription, tokenResult.Errors.ToJoinedDescriptions());
+                    this.logger.LogError("Failed to {Operation}: {Errors}", sanitizedDescription, tokenResult.Errors.ToJoinedDescriptions());
                     return tokenResult.Errors;
                 }
 
-                return await operation(tokenResult.Value);
+                return await operation.Invoke(tokenResult.Value);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (Exception exception)
             {
-                this.logger.LogError(exception, "Failed to {Operation}", operationDescription);
+                this.logger.LogError(exception, "Failed to {Operation}", sanitizedDescription);
                 return Error.Failure(SyncFailedErrorCode, exception.Message);
             }
         }
@@ -323,27 +319,13 @@ namespace Mycelium.Forge.Services
         /// <param name="content">The optional HTTP request content.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The <see cref="HttpResponseMessage" /> returned by Keycloak.</returns>
-        private Task<HttpResponseMessage> SendAuthenticatedAsync(HttpMethod method, string requestUri, string accessToken, HttpContent content, CancellationToken cancellationToken)
+        private async Task<HttpResponseMessage> SendAuthenticatedAsync(HttpMethod method, string requestUri, string accessToken, HttpContent content, CancellationToken cancellationToken)
         {
-            var request = new HttpRequestMessage(method, requestUri);
+            using var request = new HttpRequestMessage(method, requestUri);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             request.Content = content;
 
-            return this.SendAndDisposeRequestAsync(request, cancellationToken);
-        }
-
-        /// <summary>
-        /// Sends and disposes an <see cref="HttpRequestMessage" />.
-        /// </summary>
-        /// <param name="request">The HTTP request message to send.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The <see cref="HttpResponseMessage" /> returned by the server.</returns>
-        private async Task<HttpResponseMessage> SendAndDisposeRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            using (request)
-            {
-                return await this.httpClient.SendAsync(request, cancellationToken);
-            }
+            return await this.httpClient.SendAsync(request, cancellationToken);
         }
 
         /// <summary>

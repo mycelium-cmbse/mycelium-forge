@@ -77,7 +77,7 @@ namespace Mycelium.Forge.Tests.Services
             var successResult = await this.client.AssignRealmRolesAsync(userId, ["Account"], CancellationToken.None);
             Assert.That(successResult.IsError, Is.False);
 
-            // Case 3: Role fetch failure returns Keycloak.SyncFailed error
+            // Case 2: Role fetch failure returns Keycloak.SyncFailed error
             this.httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get && req.RequestUri != null && req.RequestUri.ToString().Contains("/roles/")), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(() => new HttpResponseMessage { StatusCode = HttpStatusCode.NotFound });
 
             var errorResult = await this.client.AssignRealmRolesAsync(userId, ["MissingRole"], CancellationToken.None);
@@ -86,6 +86,23 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(errorResult.IsError, Is.True);
                 Assert.That(errorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+            }
+
+            // Case 3: Role mapping POST failure returns Keycloak.SyncFailed error
+            this.httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get && req.RequestUri != null && req.RequestUri.ToString().Contains("/roles/")), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(() => new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("{\"id\": \"role-id\", \"name\": \"Account\"}", Encoding.UTF8, "application/json")
+            });
+
+            this.httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post && req.RequestUri != null && req.RequestUri.ToString().Contains($"/users/{userId}/role-mappings/realm")), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(() => new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest });
+
+            var postErrorResult = await this.client.AssignRealmRolesAsync(userId, ["Account"], CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(postErrorResult.IsError, Is.True);
+                Assert.That(postErrorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
             }
         }
 
@@ -160,6 +177,19 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(root.GetProperty("users").GetArrayLength(), Is.EqualTo(1));
             }
 
+            // Case 2: Unconfigured BaseUrl returns Keycloak.SyncFailed error without HTTP calls
+            var unconfiguredHandlerMock = new Mock<HttpMessageHandler>();
+            var unconfiguredClient = new KeycloakAdminClient(new HttpClient(unconfiguredHandlerMock.Object), Options.Create(new KeycloakOptions { BaseUrl = string.Empty, Realm = "forge" }), this.loggerMock.Object);
+
+            var unconfiguredResult = await unconfiguredClient.PartialImportUsersAsync([new { username = "alex" }], CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(unconfiguredResult.IsError, Is.True);
+                Assert.That(unconfiguredResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                unconfiguredHandlerMock.Protected().Verify(SendAsync, Times.Never(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
+            }
+
             // Case 3: Non-success status returns Keycloak.SyncFailed error
             this.httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post && req.RequestUri != null && req.RequestUri.ToString().EndsWith("/partialImport")), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(() => new HttpResponseMessage { StatusCode = HttpStatusCode.BadRequest });
 
@@ -177,27 +207,32 @@ namespace Mycelium.Forge.Tests.Services
         {
             var userId = Guid.NewGuid();
 
-            // Case 1: Empty BaseUrl skips Keycloak call and returns Result.Success
-            var emptyBaseUrlOptions = Options.Create(new KeycloakOptions { BaseUrl = "   ", Realm = "forge" });
-            var noOpHandlerMock = new Mock<HttpMessageHandler>();
-            var noOpClient = new KeycloakAdminClient(new HttpClient(noOpHandlerMock.Object), emptyBaseUrlOptions, this.loggerMock.Object);
+            // Case 1: Empty BaseUrl returns Keycloak.SyncFailed error without HTTP calls
+            var emptyBaseUrlOptions = Options.Create(new KeycloakOptions { BaseUrl = "   ", Realm = "forge", AdminUsername = "admin", AdminPassword = "adminpassword" });
+            var unconfiguredHandlerMock = new Mock<HttpMessageHandler>();
+            var unconfiguredClient = new KeycloakAdminClient(new HttpClient(unconfiguredHandlerMock.Object), emptyBaseUrlOptions, this.loggerMock.Object);
 
-            var noOpResult = await noOpClient.UpdateUserAsync(userId, "alex@example.com", "Alex", "Rivera", CancellationToken.None);
+            var emptyUrlResult = await unconfiguredClient.UpdateUserAsync(userId, "alex@example.com", "Alex", "Rivera", CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(noOpResult.IsError, Is.False);
-                noOpHandlerMock.Protected().Verify(SendAsync, Times.Never(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
-                this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+                Assert.That(emptyUrlResult.IsError, Is.True);
+                Assert.That(emptyUrlResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                unconfiguredHandlerMock.Protected().Verify(SendAsync, Times.Never(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
+                this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
             }
 
-            // Case 2: Unconfigured BaseUrl on seeder operation returns Keycloak.SyncFailed error
-            var missingUrlResult = await noOpClient.DeleteAllUsersAsync(CancellationToken.None);
+            // Case 2: Missing admin credentials returns Keycloak.SyncFailed error without HTTP calls
+            var missingCredentialsOptions = Options.Create(new KeycloakOptions { BaseUrl = "http://localhost:8080/", Realm = "forge", AdminUsername = "admin", AdminPassword = " " });
+            var missingCredentialsClient = new KeycloakAdminClient(new HttpClient(unconfiguredHandlerMock.Object), missingCredentialsOptions, this.loggerMock.Object);
+
+            var missingCredentialsResult = await missingCredentialsClient.DeleteAllUsersAsync(CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(missingUrlResult.IsError, Is.True);
-                Assert.That(missingUrlResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(missingCredentialsResult.IsError, Is.True);
+                Assert.That(missingCredentialsResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                unconfiguredHandlerMock.Protected().Verify(SendAsync, Times.Never(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
             }
 
             // Case 3: Fetches existing user representation and sends PUT preserving createdTimestamp and username while updating { email, firstName, lastName }
@@ -286,6 +321,14 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(tokenErrorResult.IsError, Is.True);
                 Assert.That(tokenErrorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
             }
+
+            // Case 8: Caller cancellation propagates OperationCanceledException without swallowing it
+            using var cancellationTokenSource = new CancellationTokenSource();
+            await cancellationTokenSource.CancelAsync();
+
+            this.httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>()).ThrowsAsync(new OperationCanceledException(cancellationTokenSource.Token));
+
+            Assert.That(async () => await this.client.UpdateUserAsync(userId, "alex@example.com", "Alex", "Rivera", cancellationTokenSource.Token), Throws.InstanceOf<OperationCanceledException>());
         }
     }
 }
