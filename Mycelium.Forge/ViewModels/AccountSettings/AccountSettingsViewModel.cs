@@ -214,6 +214,9 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             }
 
             this.Profile = updatedAccount;
+
+            // Forces the scoped UserService to reload its cached account so other components in the circuit see the updated profile.
+            await this.userService.GetCurrentUser(true);
             this.notificationService.AddNotification("Profile updated successfully.", "Profile Updated", NotificationType.Success);
             return Result.Success;
         }

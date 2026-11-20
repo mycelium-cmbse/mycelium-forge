@@ -271,6 +271,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 Assert.That(this.viewModel.Profile.Name, Is.EqualTo("Alex Rivera"));
                 this.loggerMock.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
                 this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), It.IsAny<string?>(), NotificationType.Error), Times.Once);
+                this.userServiceMock.Verify(x => x.GetCurrentUser(true), Times.Never);
             }
 
             // Scenario 2: Success path
@@ -286,6 +287,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 Assert.That(this.viewModel.Profile.Name, Is.EqualTo("Alex Updated"));
                 Assert.That(capturedAccounts.Single().Name, Is.EqualTo("Alex Updated"));
                 this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), It.IsAny<string?>(), NotificationType.Success), Times.Once);
+                this.userServiceMock.Verify(x => x.GetCurrentUser(true), Times.Once);
             }
         }
     }
