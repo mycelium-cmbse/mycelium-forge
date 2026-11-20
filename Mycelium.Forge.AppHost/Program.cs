@@ -139,7 +139,7 @@ namespace Mycelium.Forge.AppHost
                 .WaitFor(keycloak)
                 .ExcludeFromManifest();
 
-            builder.AddProject<Mycelium_Forge>(AppHostConstants.Forge, "http")
+            var forge = builder.AddProject<Mycelium_Forge>(AppHostConstants.Forge, "http")
                 .WithDatabaseEnvironment(postgres, databaseUsername, databasePassword)
                 .WithEnvironment("ArtifactStore__ServiceUrl", garage.GetEndpoint("s3"))
                 .WithEnvironment("ArtifactStore__Region", "garage")
@@ -154,6 +154,11 @@ namespace Mycelium.Forge.AppHost
                 .WaitFor(garage)
                 .WaitFor(keycloak)
                 .WithForgeEnvironmentAndPublishConfiguration(builder, keycloakPublicUrlParameter, keycloakAdminPassword, migrator, seeder);
+
+            if (!builder.ExecutionContext.IsPublishMode)
+            {
+                keycloak.WithEnvironment("FORGE_SPI_BASE_URL", forge.GetEndpoint("http"));
+            }
 
             builder.Build().Run();
         }

@@ -8,7 +8,8 @@
   // The Aspire AppHost (Mycelium.Forge.AppHost) starts Postgres, Garage, Keycloak, the migrator, the
   // seeder and Forge itself. docker-in-docker (not docker-outside-of-docker) gives it a Docker daemon
   // inside this container, so the AppHost's bind-mount paths (/workspaces/...) resolve natively.
-  // Start it from inside the container with: dotnet run --project Mycelium.Forge.AppHost
+  // Because the default AppHost launch profile targets Podman, start it inside this container with the
+  // Docker profile: dotnet run --project Mycelium.Forge.AppHost --launch-profile "Mycelium.Forge.AppHost (Docker)"
   "features": {
     "ghcr.io/microsoft/aspire-devcontainer-feature/aspire:2": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
