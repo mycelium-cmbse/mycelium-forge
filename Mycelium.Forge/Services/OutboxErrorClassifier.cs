@@ -22,6 +22,15 @@ namespace Mycelium.Forge.Services
         public const string StatusCodeMetadataKey = "StatusCode";
 
         /// <summary>
+        /// HTTP 4xx status codes that represent transient failures and remain eligible for retry.
+        /// </summary>
+        private static readonly IReadOnlyList<int> TransientErrorCodes =
+        [
+            408, // Request Timeout
+            429 // Too Many Requests
+        ];
+
+        /// <summary>
         /// Determines whether the supplied errors indicate a permanent failure that must not be retried.
         /// </summary>
         /// <param name="errors">The collection of errors returned by an outbox handler.</param>
@@ -45,7 +54,7 @@ namespace Mycelium.Forge.Services
                     continue;
                 }
 
-                if (statusCode is >= 400 and < 500 and not 408 and not 429)
+                if (statusCode is >= 400 and < 500 && !TransientErrorCodes.Contains(statusCode))
                 {
                     return true;
                 }

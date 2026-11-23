@@ -22,6 +22,12 @@ namespace Mycelium.Forge.Services
     /// Hosted background service that polls the transactional outbox, dispatches claimed messages to matching
     /// <see cref="IOutboxEventHandler" /> implementations, and handles retry scheduling or failure marking.
     /// </summary>
+    /// <remarks>
+    /// Successfully delivered messages are deleted immediately. Messages that fail permanently (or exhaust
+    /// <see cref="OutboxOptions.MaxAttempts" />) log an error and remain in <c>forge.outbox_message</c> with
+    /// <see cref="OutboxMessageStatus.Failed" /> and <c>last_error</c> for manual SQL inspection or replay until
+    /// dedicated admin tooling or metrics are added.
+    /// </remarks>
     public class OutboxDispatcherHostedService : BackgroundService
     {
         /// <summary>

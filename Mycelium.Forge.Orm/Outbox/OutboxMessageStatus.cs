@@ -20,7 +20,8 @@ namespace Mycelium.Forge.Orm.Outbox
         Pending,
 
         /// <summary>
-        /// The outbox message has permanently failed delivery.
+        /// The outbox message has permanently failed delivery and remains in <c>forge.outbox_message</c> with
+        /// <c>last_error</c> for manual SQL inspection or replay until admin tooling or metrics are added.
         /// </summary>
         Failed
     }

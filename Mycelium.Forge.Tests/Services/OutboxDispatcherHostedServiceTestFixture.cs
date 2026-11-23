@@ -124,9 +124,7 @@ namespace Mycelium.Forge.Tests.Services
             IReadOnlyList<OutboxMessage> successBatch = [successMessage];
             IReadOnlyList<OutboxMessage> emptyBatch2 = [];
 
-            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(ErrorOrFactory.From(successBatch))
-                .ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
+            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(successBatch)).ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
 
             this.eventHandlerMock.Setup(x => x.HandleAsync(successMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
             this.outboxDaoMock.Setup(x => x.DeleteAsync(It.IsAny<NpgsqlTransaction>(), successMessage.Id, It.IsAny<CancellationToken>())).Callback(() => deleteCompleted.TrySetResult()).ReturnsAsync(Result.Deleted);
@@ -152,9 +150,7 @@ namespace Mycelium.Forge.Tests.Services
 
             IReadOnlyList<OutboxMessage> unknownBatch = [unknownMessage];
 
-            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(ErrorOrFactory.From(unknownBatch))
-                .ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
+            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(unknownBatch)).ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
 
             this.outboxDaoMock.Setup(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), unknownMessage.Id, It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback<NpgsqlTransaction, Guid, string, CancellationToken>((_, _, error, _) =>
             {
@@ -184,9 +180,7 @@ namespace Mycelium.Forge.Tests.Services
 
             IReadOnlyList<OutboxMessage> transientBatch = [transientMessage];
 
-            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(ErrorOrFactory.From(transientBatch))
-                .ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
+            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(transientBatch)).ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
 
             this.eventHandlerMock.Setup(x => x.HandleAsync(transientMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(KeycloakAdminClient.SyncFailedErrorCode, "Keycloak 503", new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, 503 } }));
 
@@ -220,9 +214,7 @@ namespace Mycelium.Forge.Tests.Services
 
             IReadOnlyList<OutboxMessage> permanentBatch = [permanentMessage];
 
-            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(ErrorOrFactory.From(permanentBatch))
-                .ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
+            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(permanentBatch)).ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
 
             this.eventHandlerMock.Setup(x => x.HandleAsync(permanentMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(KeycloakAdminClient.SyncFailedErrorCode, "Bad request", new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, 400 } }));
             this.outboxDaoMock.Setup(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), permanentMessage.Id, It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback(() => permanentCompleted.TrySetResult()).ReturnsAsync(Result.Updated);
@@ -245,9 +237,7 @@ namespace Mycelium.Forge.Tests.Services
 
             IReadOnlyList<OutboxMessage> exhaustedBatch = [exhaustedMessage];
 
-            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(ErrorOrFactory.From(exhaustedBatch))
-                .ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
+            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(exhaustedBatch)).ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
 
             this.eventHandlerMock.Setup(x => x.HandleAsync(exhaustedMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(KeycloakAdminClient.SyncFailedErrorCode, "Timeout"));
             this.outboxDaoMock.Setup(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), exhaustedMessage.Id, It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback(() => exhaustedCompleted.TrySetResult()).ReturnsAsync(Result.Updated);
@@ -270,9 +260,7 @@ namespace Mycelium.Forge.Tests.Services
 
             IReadOnlyList<OutboxMessage> throwingBatch = [throwingMessage];
 
-            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(ErrorOrFactory.From(throwingBatch))
-                .ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
+            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(throwingBatch)).ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
 
             this.eventHandlerMock.Setup(x => x.HandleAsync(throwingMessage, It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException("Handler crashed"));
             this.outboxDaoMock.Setup(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), throwingMessage.Id, It.IsAny<DateTimeOffset>(), It.Is<string>(error => error.Contains("Handler crashed")), It.IsAny<CancellationToken>())).Callback(() => handlerExceptionCompleted.TrySetResult()).ReturnsAsync(Result.Updated);

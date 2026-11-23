@@ -128,9 +128,7 @@ namespace Mycelium.Forge.Tests.Services
             this.keycloakAdminClientMock.Invocations.Clear();
             var transientError = Error.Failure(KeycloakAdminClient.SyncFailedErrorCode, "Service Unavailable", new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, 503 } });
 
-            this.keycloakAdminClientMock.SetupSequence(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>()))
-                .ReturnsAsync(transientError)
-                .ReturnsAsync(Result.Success);
+            this.keycloakAdminClientMock.SetupSequence(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>())).ReturnsAsync(transientError).ReturnsAsync(Result.Success);
 
             var transientRecoveredResult = await this.handler.HandleAsync(validMessage, CancellationToken.None);
 
@@ -143,10 +141,7 @@ namespace Mycelium.Forge.Tests.Services
             // Case 7: Transient HttpRequestException retries up to ImmediateRetryCount and succeeds on final retry
             this.keycloakAdminClientMock.Invocations.Clear();
 
-            this.keycloakAdminClientMock.SetupSequence(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new HttpRequestException("Temporary network error"))
-                .ThrowsAsync(new TimeoutException("Timed out"))
-                .ReturnsAsync(Result.Success);
+            this.keycloakAdminClientMock.SetupSequence(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>())).ThrowsAsync(new HttpRequestException("Temporary network error")).ThrowsAsync(new TimeoutException("Timed out")).ReturnsAsync(Result.Success);
 
             var exceptionRecoveredResult = await this.handler.HandleAsync(validMessage, CancellationToken.None);
 
