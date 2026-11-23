@@ -10,27 +10,27 @@
 namespace Mycelium.Forge.Tests.Data
 {
     using System;
-    using System.Net;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net.Http;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+
+    using ErrorOr;
 
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
     using Moq;
-    using Moq.Protected;
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Data;
+    using Mycelium.Forge.Services;
 
     [TestFixture]
     public class KeycloakUserSeederTestFixture
     {
-        private const string SendAsync = "SendAsync";
-
-        private Mock<HttpMessageHandler> httpMessageHandlerMock;
+        private Mock<IKeycloakAdminClient> keycloakAdminClientMock;
         private Mock<ILogger<KeycloakUserSeeder>> loggerMock;
         private IOptions<KeycloakOptions> options;
         private KeycloakUserSeeder seeder;
@@ -38,7 +38,7 @@ namespace Mycelium.Forge.Tests.Data
         [SetUp]
         public void SetUp()
         {
-            this.httpMessageHandlerMock = new Mock<HttpMessageHandler>();
+            this.keycloakAdminClientMock = new Mock<IKeycloakAdminClient>();
             this.loggerMock = new Mock<ILogger<KeycloakUserSeeder>>();
 
             this.options = Options.Create(new KeycloakOptions
@@ -50,67 +50,44 @@ namespace Mycelium.Forge.Tests.Data
                 SeedUserPassword = "userpassword"
             });
 
-            this.httpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.RequestUri != null && req.RequestUri.ToString().Contains("protocol/openid-connect/token")), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(() => new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"access_token\": \"mock_token\"}", Encoding.UTF8, "application/json")
-                });
+            this.keycloakAdminClientMock.Setup(x => x.DeleteAllUsersAsync(It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            this.keycloakAdminClientMock.Setup(x => x.PartialImportUsersAsync(It.IsAny<IEnumerable<object>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            this.keycloakAdminClientMock.Setup(x => x.AssignRealmRolesAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
 
-            this.httpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get && req.RequestUri != null && req.RequestUri.ToString().Contains("/users")), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(() => new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("[{\"id\": \"user-1\"}]", Encoding.UTF8, "application/json")
-                });
-
-            this.httpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Delete && req.RequestUri != null && req.RequestUri.ToString().Contains("/users/user-1")), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(() => new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
-
-            this.httpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.RequestUri != null && req.RequestUri.ToString().Contains("/partialImport")), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(() => new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
-
-            this.httpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Get && req.RequestUri != null && req.RequestUri.ToString().Contains("/roles/")), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(() => new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\"id\": \"role-id\", \"name\": \"Role\"}", Encoding.UTF8, "application/json")
-                });
-
-            this.httpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.RequestUri != null && req.RequestUri.ToString().Contains("/role-mappings/realm")), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(() => new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
-
-            var httpClient = new HttpClient(this.httpMessageHandlerMock.Object) { BaseAddress = new Uri(this.options.Value.BaseUrl) };
-            this.seeder = new KeycloakUserSeeder(httpClient, this.options, this.loggerMock.Object);
+            this.seeder = new KeycloakUserSeeder(this.keycloakAdminClientMock.Object, this.options, this.loggerMock.Object);
         }
 
         [Test]
         public async Task VerifySeedAsync()
         {
-            // Case 1: Keycloak successfully seeds admin token, cleans users, imports realm, and maps roles (success)
-            var seedSuccess = await this.seeder.SeedAsync();
-            Assert.That(seedSuccess, Is.True);
+            // Case 1: Keycloak successfully deletes users, imports realm, and assigns roles (success)
+            var seedSuccess = await this.seeder.SeedAsync(CancellationToken.None);
 
-            // Case 2: Network failure during token acquisition (fail)
-            this.httpMessageHandlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.RequestUri != null && req.RequestUri.ToString().Contains("protocol/openid-connect/token")), ItExpr.IsAny<CancellationToken>())
-                .ThrowsAsync(new HttpRequestException("Connection refused"));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(seedSuccess, Is.True);
+                this.keycloakAdminClientMock.Verify(x => x.DeleteAllUsersAsync(CancellationToken.None), Times.Once);
+                this.keycloakAdminClientMock.Verify(x => x.PartialImportUsersAsync(It.Is<IEnumerable<object>>(users => users.Count() == SeedData.Accounts.Count), CancellationToken.None), Times.Once);
+                this.keycloakAdminClientMock.Verify(x => x.AssignRealmRolesAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<string>>(), CancellationToken.None), Times.Exactly(SeedData.Accounts.Count));
+            }
 
-            var failure = await this.seeder.SeedAsync();
-            Assert.That(failure, Is.False);
+            // Case 2: Failure during DeleteAllUsersAsync (fail)
+            this.keycloakAdminClientMock.Setup(x => x.DeleteAllUsersAsync(It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Keycloak.SyncFailed", "Delete failed"));
+            Assert.That(await this.seeder.SeedAsync(CancellationToken.None), Is.False);
+
+            // Case 3: Failure during PartialImportUsersAsync (fail)
+            this.keycloakAdminClientMock.Setup(x => x.DeleteAllUsersAsync(It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            this.keycloakAdminClientMock.Setup(x => x.PartialImportUsersAsync(It.IsAny<IEnumerable<object>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Keycloak.SyncFailed", "Import failed"));
+            Assert.That(await this.seeder.SeedAsync(CancellationToken.None), Is.False);
+
+            // Case 4: Failure during AssignRealmRolesAsync (fail)
+            this.keycloakAdminClientMock.Setup(x => x.PartialImportUsersAsync(It.IsAny<IEnumerable<object>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            this.keycloakAdminClientMock.Setup(x => x.AssignRealmRolesAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Keycloak.SyncFailed", "Role assignment failed"));
+            Assert.That(await this.seeder.SeedAsync(CancellationToken.None), Is.False);
+
+            // Case 5: Exception thrown during seeding (fail)
+            this.keycloakAdminClientMock.Setup(x => x.DeleteAllUsersAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new HttpRequestException("Connection refused"));
+            Assert.That(await this.seeder.SeedAsync(CancellationToken.None), Is.False);
         }
     }
 }

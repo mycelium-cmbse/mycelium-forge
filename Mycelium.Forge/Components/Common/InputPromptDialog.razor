@@ -1,0 +1,56 @@
+@* ------------------------------------------------------------------------------------------------
+<copyright file="InputPromptDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        @if (this.HasDescription)
+        {
+            <p class="text-sm leading-xs font-normal text-muted-foreground">
+                @(this.Description)
+            </p>
+        }
+
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.InputValue)))">
+            @if (this.HasLabel)
+            {
+                <BbFieldLabel For="input-prompt-dialog-input"
+                              Class="form-field-label">
+                    @(this.Label)
+                </BbFieldLabel>
+            }
+            <BbFieldContent>
+                <BbInput Id="input-prompt-dialog-input"
+                         Value="@(this.InputValue)"
+                         ValueChanged="@(this.OnInputValueChanged)"
+                         Placeholder="@(this.Placeholder)"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.InputValue)])"/>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton id="input-prompt-dialog-cancel-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            @(this.CancelText)
+        </BbButton>
+
+        <BbButton id="input-prompt-dialog-confirm-button"
+                  Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnConfirmClicked)">
+            @(this.ConfirmText)
+        </BbButton>
+    </Footer>
+</DialogComponent>

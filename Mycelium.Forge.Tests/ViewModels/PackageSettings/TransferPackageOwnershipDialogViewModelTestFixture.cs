@@ -122,7 +122,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(foreignAccountResult.FirstError.Description, Is.EqualTo("Ownership can only be transferred to your own account or to an organization you administer."));
             }
 
-            // Case 8: Installation administrator may target an account that is not their own
+            // Case 7: Installation administrator may target an account that is not their own
             this.userContext.CurrentRoles = [RoleKind.Account, RoleKind.InstallationAdministrator];
             var installationAdministratorAccountResult = await this.viewModel.ValidateTargetAsync(this.package, "starion", "foreign-user", CancellationToken.None);
 
@@ -132,7 +132,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(installationAdministratorAccountResult.Value, Is.SameAs(foreignAccount));
             }
 
-            // Case 9: Own account is accepted
+            // Case 8: Own account is accepted
             this.userContext.CurrentRoles = [RoleKind.Account];
             var ownAccount = new Account { Id = this.userId, ShortName = "own-user" };
             this.SetupScope("own-user", ownAccount);
@@ -144,7 +144,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(ownAccountResult.Value, Is.SameAs(ownAccount));
             }
 
-            // Case 10: Administered organization is accepted
+            // Case 9: Administered organization is accepted
             var administeredOrganization = new Organization { Id = Guid.NewGuid(), ShortName = "administered-org", Administrator = [this.userId] };
             this.SetupScope("administered-org", administeredOrganization);
             var administeredOrganizationResult = await this.viewModel.ValidateTargetAsync(this.package, "starion", "administered-org", CancellationToken.None);
@@ -155,7 +155,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Assert.That(administeredOrganizationResult.Value, Is.SameAs(administeredOrganization));
             }
 
-            // Case 11: Coordinate already occupied in the target scope is a conflict (permissions bypassed)
+            // Case 10: Coordinate already occupied in the target scope is a conflict (permissions bypassed)
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(It.IsAny<IUserContext>(), "administered-org", this.package.ShortName, true, It.IsAny<CancellationToken>())).ReturnsAsync(new Package { Id = Guid.NewGuid(), ShortName = this.package.ShortName });
             var conflictResult = await this.viewModel.ValidateTargetAsync(this.package, "starion", "administered-org", CancellationToken.None);
 
@@ -166,7 +166,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 this.packageServiceMock.Verify(x => x.ReadByCoordinateAsync(this.userContext, "administered-org", this.package.ShortName, true, It.IsAny<CancellationToken>()), Times.Exactly(2));
             }
 
-            // Case 12: Coordinate lookup failure other than NotFound is a failure
+            // Case 11: Coordinate lookup failure other than NotFound is a failure
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(It.IsAny<IUserContext>(), "administered-org", this.package.ShortName, true, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Database unavailable."));
             var coordinateFailureResult = await this.viewModel.ValidateTargetAsync(this.package, "starion", "administered-org", CancellationToken.None);
 

@@ -110,7 +110,8 @@ namespace Mycelium.Forge
                         services.AddScoped<IDatabaseMigrator, DatabaseMigrator>();
                         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
                         services.Configure<KeycloakOptions>(context.Configuration.GetSection(KeycloakOptions.SectionName));
-                        services.AddHttpClient<IKeycloakUserSeeder, KeycloakUserSeeder>();
+                        services.AddHttpClient<IKeycloakAdminClient, KeycloakAdminClient>(client => client.Timeout = TimeSpan.FromSeconds(10));
+                        services.AddScoped<IKeycloakUserSeeder, KeycloakUserSeeder>();
                     });
 
                 using var host = hostBuilder.Build();

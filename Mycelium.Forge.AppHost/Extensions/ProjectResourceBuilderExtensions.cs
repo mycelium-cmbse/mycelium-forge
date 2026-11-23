@@ -57,6 +57,28 @@ namespace Mycelium.Forge.AppHost.Extensions
             }
 
             /// <summary>
+            /// Adds the <c>Keycloak</c> administration settings used by Forge and the seeder to reach Keycloak's Admin REST API.
+            /// </summary>
+            /// <param name="isPublish">
+            /// <see langword="true" /> when publishing the Docker Compose manifest (uses the internal container endpoint);
+            /// <see langword="false" /> for local run mode (uses <see cref="AppHostConstants.DevelopmentKeycloakPublicUrl" />).
+            /// </param>
+            /// <param name="keycloakAdminPassword">The Keycloak administrator password parameter.</param>
+            /// <returns>The configured <see cref="IResourceBuilder{ProjectResource}" /> instance.</returns>
+            public IResourceBuilder<ProjectResource> WithKeycloakAdminEnvironment(bool isPublish, IResourceBuilder<ParameterResource> keycloakAdminPassword)
+            {
+                var baseUrl = isPublish
+                    ? $"http://{AppHostConstants.Keycloak}:8080"
+                    : AppHostConstants.DevelopmentKeycloakPublicUrl;
+
+                return project
+                    .WithEnvironment("Keycloak__BaseUrl", baseUrl)
+                    .WithEnvironment("Keycloak__Realm", "forge")
+                    .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
+                    .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword);
+            }
+
+            /// <summary>
             /// Configures the Forge application service for run mode or Docker Compose publishing mode.
             /// </summary>
             /// <param name="builder">The distributed application builder.</param>
@@ -67,6 +89,8 @@ namespace Mycelium.Forge.AppHost.Extensions
             /// <returns>The configured <see cref="IResourceBuilder{ProjectResource}" /> instance.</returns>
             public IResourceBuilder<ProjectResource> WithForgeEnvironmentAndPublishConfiguration(IDistributedApplicationBuilder builder, IResourceBuilder<ParameterResource> keycloakPublicUrlParameter, IResourceBuilder<ParameterResource> keycloakAdminPassword, IResourceBuilder<ProjectResource> migrator, IResourceBuilder<ProjectResource> seeder)
             {
+                project.WithKeycloakAdminEnvironment(builder.ExecutionContext.IsPublishMode, keycloakAdminPassword);
+
                 if (builder.ExecutionContext.IsPublishMode)
                 {
                     project.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Production")
@@ -77,10 +101,6 @@ namespace Mycelium.Forge.AppHost.Extensions
                 else
                 {
                     project.WithEnvironment("Authentication__Authority", $"{AppHostConstants.DevelopmentKeycloakPublicUrl}/realms/forge")
-                        .WithEnvironment("Keycloak__BaseUrl", AppHostConstants.DevelopmentKeycloakPublicUrl)
-                        .WithEnvironment("Keycloak__Realm", "forge")
-                        .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
-                        .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword)
                         .WaitForCompletion(seeder);
                 }
 

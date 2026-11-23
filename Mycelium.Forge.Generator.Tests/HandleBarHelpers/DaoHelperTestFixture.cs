@@ -51,9 +51,9 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
-                Assert.That(packageResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version']);"));
-                Assert.That(countryResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['owner']);"));
-                Assert.That(thingResult, Does.Contain("VALUES (@id, @classKind, @data);"));
+                Assert.That(packageResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['createdAt', 'modifiedAt', 'owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version']);"));
+                Assert.That(countryResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['createdAt', 'modifiedAt', 'owner']);"));
+                Assert.That(thingResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['createdAt', 'modifiedAt']);"));
             }
         }
 
@@ -74,9 +74,9 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
-                Assert.That(packageResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version'] WHERE id = @id;"));
-                Assert.That(countryResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['owner'] WHERE id = @id;"));
-                Assert.That(thingResult, Does.Contain("UPDATE forge.thing SET data = @data WHERE id = @id;"));
+                Assert.That(packageResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['createdAt', 'modifiedAt', 'owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version'] WHERE id = @id;"));
+                Assert.That(countryResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['createdAt', 'modifiedAt', 'owner'] WHERE id = @id;"));
+                Assert.That(thingResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['createdAt', 'modifiedAt'] WHERE id = @id;"));
             }
         }
 

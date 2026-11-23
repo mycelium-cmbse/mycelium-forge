@@ -10,8 +10,8 @@
 namespace Mycelium.Forge.Common
 {
     /// <summary>
-    /// Settings used by the <c>seed</c> command to create the development users in Forge's Keycloak, bound from the
-    /// <see cref="SectionName" /> section of the application settings.
+    /// Represents the configuration settings for authenticating and communicating with the Keycloak Admin REST API,
+    /// bound from the <see cref="SectionName" /> section of the application settings.
     /// </summary>
     public class KeycloakOptions
     {
@@ -21,7 +21,7 @@ namespace Mycelium.Forge.Common
         public const string SectionName = "Keycloak";
 
         /// <summary>
-        /// Gets or sets the base URL of the Keycloak server, as reachable by the seeder.
+        /// Gets or sets the base URL of the Keycloak server.
         /// </summary>
         public string BaseUrl { get; set; } = string.Empty;
 

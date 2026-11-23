@@ -32,6 +32,26 @@ namespace Mycelium.Forge.Common.Tests.Extensions
         }
 
         [Test]
+        [TestCase(null, null, null)]
+        [TestCase("", null, null)]
+        [TestCase("   ", null, null)]
+        [TestCase("Alice", "Alice", null)]
+        [TestCase("  Alice  ", "Alice", null)]
+        [TestCase("Alice Smith", "Alice", "Smith")]
+        [TestCase("Jean Luc Picard", "Jean Luc", "Picard")]
+        [TestCase("  Mary   Jane  ", "Mary", "Jane")]
+        public void VerifySplitFullName(string? input, string? expectedFirstName, string? expectedLastName)
+        {
+            var (firstName, lastName) = input.SplitFullName();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(firstName, Is.EqualTo(expectedFirstName));
+                Assert.That(lastName, Is.EqualTo(expectedLastName));
+            }
+        }
+
+        [Test]
         [TestCase("Name", "name")]
         [TestCase("Email", "email")]
         [TestCase("A", "a")]

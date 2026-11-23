@@ -131,10 +131,7 @@ namespace Mycelium.Forge.AppHost
             var seeder = builder.AddProject<Mycelium_Forge>(AppHostConstants.Seeder, options => options.ExcludeLaunchProfile = true)
                 .WithArgs("seed")
                 .WithDatabaseEnvironment(postgres, databaseUsername, databasePassword)
-                .WithEnvironment("Keycloak__BaseUrl", AppHostConstants.DevelopmentKeycloakPublicUrl)
-                .WithEnvironment("Keycloak__Realm", "forge")
-                .WithEnvironment("Keycloak__AdminUsername", AppHostConstants.DefaultAdminUsername)
-                .WithEnvironment("Keycloak__AdminPassword", keycloakAdminPassword)
+                .WithKeycloakAdminEnvironment(builder.ExecutionContext.IsPublishMode, keycloakAdminPassword)
                 .WaitForCompletion(migrator)
                 .WaitFor(keycloak)
                 .ExcludeFromManifest();
