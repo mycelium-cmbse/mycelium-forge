@@ -10,7 +10,8 @@ If you just want to see the app running without opening an editor at all, skip t
 
 ## Prerequisites
 
-- **Docker Desktop**, running, before you do anything else below.
+- **Podman** (default — via **Podman Desktop** or the Podman CLI) **or Docker Desktop**, running before you do anything else below.
+  - **Windows (Podman):** use the **WSL 2** provider (Hyper-V is not required and is unavailable on Windows Home). Make sure WSL is up to date (`wsl --update`) so the Podman machine boots with cgroup v2. To use `podman compose` without Docker Desktop installed, enable the built-in Compose extension in Podman Desktop (**Settings → Resources → Compose → Setup**).
 - **JetBrains Rider**, a reasonably current version — Dev Containers support ships bundled; if you
   don't see the options described below, update Rider first.
 - Git, obviously, and an SSH agent running locally if you plan to open the project as a Dev Container
@@ -21,11 +22,13 @@ You do **not** need the .NET SDK installed locally for the Dev Container path �
 the container. You do need it if you choose [Option B](#option-b-run-the-apphost-on-your-machine)
 instead.
 
-## Option A: Dev Container in Rider (recommended)
+## Option A: Dev Container in Rider (Docker)
 
 This gets you a full .NET SDK plus a Docker daemon of its own, so the Aspire AppHost can start PostgreSQL,
 Garage (object storage), Keycloak (identity provider), the migrator and seeder, and Forge itself. The
 repository lives in a container volume (see [A2](#a2-from-the-welcome-screen-no-clone-needed)).
+
+> **Note:** The Dev Container uses `docker-in-docker` internally and does not include Podman. If you use Podman without Docker Desktop on your host, prefer [Option B](#option-b-run-the-apphost-on-your-machine). Inside the Dev Container, always use the **`Mycelium.Forge.AppHost (Docker)`** launch profile (since the default profile targets Podman).
 
 ### A1. From an already-cloned repo (not recommended)
 
@@ -67,10 +70,10 @@ every file.
 
 You're now working inside the `workspace` container, with the repository in a container volume at
 `/workspaces/mycelium-forge` and the .NET SDK already there. Start the Aspire AppHost from the terminal
-(`dotnet run --project Mycelium.Forge.AppHost`): Postgres, Garage, Keycloak, the migrator, the seeder and Forge
+using the Docker launch profile (`dotnet run --project Mycelium.Forge.AppHost --launch-profile "Mycelium.Forge.AppHost (Docker)"`): Postgres, Garage, Keycloak, the migrator, the seeder and Forge
 run as containers/processes inside this container.
 
-- **Run/debug the app**: open `Mycelium.Forge.sln`, make sure `Mycelium.Forge.AppHost` is the startup project,
+- **Run/debug the app**: open `Mycelium.Forge.sln`, select the **`Mycelium.Forge.AppHost (Docker)`** launch profile for `Mycelium.Forge.AppHost`,
   and Run or Debug as usual (▶ / 🐞 in the toolbar, or <kbd>Shift+F10</kbd> / <kbd>Shift+F9</kbd>). The
   database, storage and authentication settings are injected by the AppHost, so this just works -
   no local `appsettings.json` to create.
@@ -94,15 +97,23 @@ Login state persists across rebuilds (it lives in a named Docker volume), so you
 once. Skipping permission prompts is still a real trust decision, not just a root-vs-non-root technicality —
 only use it in a container you're comfortable giving broad, prompt-free access to.
 
-## Option B: run the AppHost on your machine
+## Option B: run the AppHost on your machine (Podman or Docker)
 
 If you'd rather work outside a Dev Container - plain Rider on your host, .NET SDK installed locally -
 the Aspire AppHost still gives you Postgres/Garage/Keycloak, the migrator and seeder, and Forge.
 
+`Mycelium.Forge.AppHost/Properties/launchSettings.json` ships two profiles:
+- **`Mycelium.Forge.AppHost`** (default): runs with **Podman** (`ASPIRE_CONTAINER_RUNTIME=podman`).
+- **`Mycelium.Forge.AppHost (Docker)`**: runs with **Docker** (`ASPIRE_CONTAINER_RUNTIME=docker`).
+
 1. Open `Mycelium.Forge.sln` in Rider normally (no Dev Container) and run or debug the
-   `Mycelium.Forge.AppHost` project, or from the repo root:
+   `Mycelium.Forge.AppHost` project with the matching profile, or from the repo root:
    ```
+   # Podman (default)
    dotnet run --project Mycelium.Forge.AppHost
+
+   # Docker (alternative)
+   dotnet run --project Mycelium.Forge.AppHost --launch-profile "Mycelium.Forge.AppHost (Docker)"
    ```
 2. Open the Aspire dashboard URL printed in the console (it carries a login token). Wait for the migrator and
    seeder to finish and for `forge` to be running.
@@ -117,7 +128,11 @@ variables.
 No editor, no interactive development — just see a working Forge instance:
 
 ```
+# Podman (default)
 dotnet run --project Mycelium.Forge.AppHost
+
+# Docker (alternative)
+dotnet run --project Mycelium.Forge.AppHost --launch-profile "Mycelium.Forge.AppHost (Docker)"
 ```
 
 This starts the Aspire AppHost, which brings up Postgres, Garage, Keycloak, the one-shot migrator,
@@ -129,18 +144,25 @@ starts immediately.
 
 ## Resetting local state
 
+Stop the AppHost (and any persistent containers) first, then remove the named volumes for your runtime:
+
 ```
+# Podman
+podman volume rm forge-postgres-data forge-keycloak-postgres-data forge-garage-meta forge-garage-data
+
+# Docker
 docker volume rm forge-postgres-data forge-keycloak-postgres-data forge-garage-meta forge-garage-data
 ```
 
-This removes Postgres data, Garage's buckets/keys and Keycloak's realm state. Stop the AppHost first. The next
+This removes Postgres data, Garage's buckets/keys and Keycloak's realm state. The next
 AppHost start begins from scratch. Use this if something's in a state you
 don't trust, or after pulling changes that touch the database schema.
 
 ## Troubleshooting
 
-- **"Cannot connect to the Docker daemon"** — Docker Desktop isn't running. Start it and wait for it to
-  fully initialize before retrying.
+- **"Cannot connect to Podman / Docker daemon"** — your Podman machine (`podman machine start` or Podman Desktop) or Docker Desktop isn't running. Start it and wait for it to fully initialize before retrying.
+- **Podman machine fails to start on Windows (WSL 2 / systemd)** — run `wsl --update` in an elevated terminal so WSL 2 runs a kernel with cgroup v2 enabled (required by Podman 6 / Fedora 44).
+- **Running both Docker Desktop and Podman on Windows** — start **Docker Desktop first**, then `podman machine start`. Starting Podman first binds `\\.\pipe\docker_engine` and causes Docker Desktop to fail on startup with `Access is denied`. Also stop persistent containers in one runtime before launching the AppHost in the other so fixed host ports don't collide.
 - **Port already in use** (5000, 5432, 5433, 8081, 3900, 3903) - something else on your machine is already
   using it. Stop that; these ports are fixed in `Mycelium.Forge.AppHost/Program.cs` and the Forge launch profile.
 - **A resource won't go "healthy"** - open it in the Aspire dashboard and read its console logs.

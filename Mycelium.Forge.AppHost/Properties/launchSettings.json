@@ -5,7 +5,16 @@
             "commandName": "Project",
             "dotnetRunMessages": true,
             "environmentVariables": {
-                "DOTNET_ENVIRONMENT": "Development"
+                "DOTNET_ENVIRONMENT": "Development",
+                "ASPIRE_CONTAINER_RUNTIME": "podman"
+            }
+        },
+        "Mycelium.Forge.AppHost (Docker)": {
+            "commandName": "Project",
+            "dotnetRunMessages": true,
+            "environmentVariables": {
+                "DOTNET_ENVIRONMENT": "Development",
+                "ASPIRE_CONTAINER_RUNTIME": "docker"
             }
         }
     }

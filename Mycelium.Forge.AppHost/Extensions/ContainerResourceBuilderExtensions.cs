@@ -31,11 +31,6 @@ namespace Mycelium.Forge.AppHost.Extensions
         /// </summary>
         private const string DevelopmentForgePublicUrl = "http://localhost:5000";
 
-        /// <summary>
-        /// The URL Keycloak uses, from inside its container, to reach Forge running as a host process in local development.
-        /// </summary>
-        private const string DevelopmentForgeUrlFromContainers = "http://host.docker.internal:5000";
-
         /// <param name="container">The <see cref="IResourceBuilder{ContainerResource}" /> to configure.</param>
         extension<T>(IResourceBuilder<T> container) where T : ContainerResource
         {
@@ -124,9 +119,7 @@ namespace Mycelium.Forge.AppHost.Extensions
                         .WithEnvironment("KC_HOSTNAME", AppHostConstants.DevelopmentKeycloakPublicUrl)
                         .WithEnvironment("FORGE_BASE_URL", DevelopmentForgePublicUrl)
                         .WithEnvironment("FORGE_KEYCLOAK_SSL_REQUIRED", "none")
-                        .WithEnvironment("FORGE_SPI_BASE_URL", DevelopmentForgeUrlFromContainers)
-                        .WithBindMount("../docker/keycloak/themes/forge", "/opt/keycloak/themes/forge", true)
-                        .WithContainerRuntimeArgs("--add-host", "host.docker.internal:host-gateway");
+                        .WithBindMount("../docker/keycloak/themes/forge", "/opt/keycloak/themes/forge", true);
                 }
 
                 return container.PublishAsDockerComposeService((_, service) =>
