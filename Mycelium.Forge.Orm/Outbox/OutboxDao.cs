@@ -118,6 +118,7 @@ namespace Mycelium.Forge.Orm.Outbox
                           SELECT 1
                           FROM forge.outbox_message older
                           WHERE older.aggregate_id = m.aggregate_id
+                            AND older.event_type = m.event_type
                             AND older.status = 'PENDING'
                             AND older.id < m.id
                       )

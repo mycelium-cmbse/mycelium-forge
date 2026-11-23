@@ -116,6 +116,54 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
                 await deleteSecondTransaction.CommitAsync();
             }
 
+            // Marking an older message as Failed also unblocks a newer Pending message for the same aggregate and event type,
+            // while a different event type for the same aggregate is never blocked.
+            var sharedAggregate = Guid.NewGuid();
+            var olderSharedMessage = new OutboxMessage { AggregateId = sharedAggregate, EventType = OutboxEventTypes.AccountKeycloakSync, Payload = "{\"seq\":1}" };
+            var newerSameEventMessage = new OutboxMessage { AggregateId = sharedAggregate, EventType = OutboxEventTypes.AccountKeycloakSync, Payload = "{\"seq\":2}" };
+            var differentEventMessage = new OutboxMessage { AggregateId = sharedAggregate, EventType = "Account.SearchIndex", Payload = "{\"seq\":3}" };
+
+            await this.Insert(transaction => this.outboxDao.EnqueueAsync(transaction, olderSharedMessage, CancellationToken.None));
+            await this.Insert(transaction => this.outboxDao.EnqueueAsync(transaction, newerSameEventMessage, CancellationToken.None));
+            await this.Insert(transaction => this.outboxDao.EnqueueAsync(transaction, differentEventMessage, CancellationToken.None));
+
+            await using (var multiEventClaimTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                var multiEventClaim = await this.outboxDao.ClaimBatchAsync(multiEventClaimTransaction, 10, TimeSpan.FromSeconds(30), CancellationToken.None);
+                await multiEventClaimTransaction.CommitAsync();
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(multiEventClaim.Value, Has.Count.EqualTo(2));
+                    Assert.That(multiEventClaim.Value.Select(m => m.Id), Is.EquivalentTo([olderSharedMessage.Id, differentEventMessage.Id]));
+                }
+            }
+
+            await using (var markOlderFailedTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.outboxDao.MarkFailedAsync(markOlderFailedTransaction, olderSharedMessage.Id, "Permanent 400", CancellationToken.None);
+                await this.outboxDao.DeleteAsync(markOlderFailedTransaction, differentEventMessage.Id, CancellationToken.None);
+                await markOlderFailedTransaction.CommitAsync();
+            }
+
+            await using (var unblockedByFailureTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                var unblockedByFailureClaim = await this.outboxDao.ClaimBatchAsync(unblockedByFailureTransaction, 10, TimeSpan.FromSeconds(30), CancellationToken.None);
+                await unblockedByFailureTransaction.CommitAsync();
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(unblockedByFailureClaim.Value, Has.Count.EqualTo(1));
+                    Assert.That(unblockedByFailureClaim.Value[0].Id, Is.EqualTo(newerSameEventMessage.Id));
+                }
+            }
+
+            await using (var deleteUnblockedTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.outboxDao.DeleteAsync(deleteUnblockedTransaction, newerSameEventMessage.Id, CancellationToken.None);
+                await deleteUnblockedTransaction.CommitAsync();
+            }
+
             // Case 3: Lease expiration allows reclaim with incremented attempts
             var leaseMessage = new OutboxMessage { AggregateId = Guid.NewGuid(), EventType = OutboxEventTypes.AccountKeycloakSync, Payload = "{\"lease\":true}" };
             await this.Insert(transaction => this.outboxDao.EnqueueAsync(transaction, leaseMessage, CancellationToken.None));

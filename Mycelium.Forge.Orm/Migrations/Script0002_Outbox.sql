@@ -29,5 +29,5 @@ CREATE INDEX idx_outbox_message_pending_next_attempt
     WHERE status = 'PENDING';
 
 CREATE INDEX idx_outbox_message_pending_aggregate
-    ON forge.outbox_message (aggregate_id, id)
+    ON forge.outbox_message (aggregate_id, event_type, id)
     WHERE status = 'PENDING';
