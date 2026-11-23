@@ -342,8 +342,10 @@ namespace Mycelium.Forge.Services
                 return Result.Success;
             }
 
-            this.logger.LogError("Keycloak admin request {Method} {Uri} failed with status code {StatusCode}", method, requestUri, (int)response.StatusCode);
-            return Error.Failure(SyncFailedErrorCode, $"Keycloak request {method} {requestUri} failed with status code {(int)response.StatusCode}.");
+            var statusCode = (int)response.StatusCode;
+            this.logger.LogError("Keycloak admin request {Method} {Uri} failed with status code {StatusCode}", method, requestUri, statusCode);
+            var metadata = new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, statusCode } };
+            return Error.Failure(SyncFailedErrorCode, $"Keycloak request {method} {requestUri} failed with status code {statusCode}.", metadata);
         }
     }
 }

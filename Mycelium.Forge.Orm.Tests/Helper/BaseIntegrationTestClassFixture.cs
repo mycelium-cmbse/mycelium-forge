@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="BaseIntegrationTestClassFixture.cs" company="Starion Group S.A.">
-//
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -73,14 +73,10 @@ namespace Mycelium.Forge.Orm.Tests.Helper
         [SetUp]
         public async Task CleanDataBase()
         {
-            await using var sqlRemoveCommand = new NpgsqlCommand("DROP SCHEMA IF EXISTS forge CASCADE;", this.Connection);
-            sqlRemoveCommand.ExecuteNonQuery();
+            var databaseMigrator = new DatabaseMigrator();
+            var resetSucceeded = await databaseMigrator.ResetDatabaseAsync(this.ConnectionString);
 
-            var path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Data", "Script0001_InitialSchema.sql");
-            var schemaSql = await File.ReadAllTextAsync(path);
-
-            await using var sqlCreateCommand = new NpgsqlCommand(schemaSql, this.Connection);
-            sqlCreateCommand.ExecuteNonQuery();
+            Assert.That(resetSucceeded, Is.True);
 
             await this.PostSetup();
         }

@@ -86,6 +86,8 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(errorResult.IsError, Is.True);
                 Assert.That(errorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(errorResult.FirstError.Metadata, Is.Not.Null);
+                Assert.That(errorResult.FirstError.Metadata![OutboxErrorClassifier.StatusCodeMetadataKey], Is.EqualTo(404));
             }
 
             // Case 3: Role mapping POST failure returns Keycloak.SyncFailed error
@@ -103,6 +105,8 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(postErrorResult.IsError, Is.True);
                 Assert.That(postErrorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(postErrorResult.FirstError.Metadata, Is.Not.Null);
+                Assert.That(postErrorResult.FirstError.Metadata![OutboxErrorClassifier.StatusCodeMetadataKey], Is.EqualTo(400));
             }
         }
 
@@ -150,6 +154,8 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(errorResult.IsError, Is.True);
                 Assert.That(errorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(errorResult.FirstError.Metadata, Is.Not.Null);
+                Assert.That(errorResult.FirstError.Metadata![OutboxErrorClassifier.StatusCodeMetadataKey], Is.EqualTo(500));
             }
         }
 
@@ -199,6 +205,8 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(errorResult.IsError, Is.True);
                 Assert.That(errorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(errorResult.FirstError.Metadata, Is.Not.Null);
+                Assert.That(errorResult.FirstError.Metadata![OutboxErrorClassifier.StatusCodeMetadataKey], Is.EqualTo(400));
             }
         }
 
@@ -280,6 +288,8 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(getErrorResult.IsError, Is.True);
                 Assert.That(getErrorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(getErrorResult.FirstError.Metadata, Is.Not.Null);
+                Assert.That(getErrorResult.FirstError.Metadata![OutboxErrorClassifier.StatusCodeMetadataKey], Is.EqualTo(404));
             }
 
             // Case 5: Non-success HTTP status on PUT returns Keycloak.SyncFailed error
@@ -297,6 +307,8 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(httpErrorResult.IsError, Is.True);
                 Assert.That(httpErrorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(httpErrorResult.FirstError.Metadata, Is.Not.Null);
+                Assert.That(httpErrorResult.FirstError.Metadata![OutboxErrorClassifier.StatusCodeMetadataKey], Is.EqualTo(400));
             }
 
             // Case 6: HttpRequestException returns Keycloak.SyncFailed error
@@ -320,6 +332,8 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(tokenErrorResult.IsError, Is.True);
                 Assert.That(tokenErrorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+                Assert.That(tokenErrorResult.FirstError.Metadata, Is.Not.Null);
+                Assert.That(tokenErrorResult.FirstError.Metadata![OutboxErrorClassifier.StatusCodeMetadataKey], Is.EqualTo(401));
             }
 
             // Case 8: Caller cancellation propagates OperationCanceledException without swallowing it
