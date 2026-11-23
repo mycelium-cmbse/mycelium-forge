@@ -637,13 +637,17 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
         /// <returns>The SQL expression for the <c>data</c> column.</returns>
         private static string BuildDataJsonbExpression(IClass @class)
         {
+            // The timestamps are owned by the thing timestamp triggers, so they are never written from the DTO.
             var referencePropertyNames = @class.QueryDtoClassProperties()
                 .Where(x => !x.IsDerived && !x.IsDerivedUnion && !x.Name.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase) && !x.TryQueryRedefinedByProperty(@class, out _) && !x.QueryIsDataType())
-                .Select(x => $"'{x.Name.LowerCaseFirstLetter()}'")
+                .Select(x => x.Name)
+                .Concat([PropertyNames.CreatedAt, PropertyNames.ModifiedAt])
+                .Select(x => $"'{x.LowerCaseFirstLetter()}'")
                 .Distinct()
+                .OrderBy(x => x, StringComparer.Ordinal)
                 .ToList();
 
-            return referencePropertyNames.Count == 0 ? "@data" : $"@data - ARRAY[{string.Join(", ", referencePropertyNames)}]";
+            return $"@data - ARRAY[{string.Join(", ", referencePropertyNames)}]";
         }
     }
 }

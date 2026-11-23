@@ -77,12 +77,17 @@ AS $$
         ts text := to_char(transaction_timestamp() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"');
     BEGIN
 
-        -- createdAt is immutable: always taken from the existing row (fallback: now)
+        -- The timestamps are never taken from the payload: both are restored from the existing row (fallback: now)
         NEW.data = COALESCE(NEW.data, '{}'::jsonb)
                 || jsonb_build_object(
                        'createdAt',  COALESCE(OLD.data ->> 'createdAt', ts),
-                       'modifiedAt', ts
+                       'modifiedAt', COALESCE(OLD.data ->> 'modifiedAt', ts)
                    );
+
+        -- modifiedAt is bumped only when the row actually changed (no-op updates keep it)
+        IF NEW IS DISTINCT FROM OLD THEN
+            NEW.data = NEW.data || jsonb_build_object('modifiedAt', ts);
+        END IF;
 
         RETURN NEW;
     END;
@@ -94,11 +99,9 @@ CREATE OR REPLACE TRIGGER trg_thing_timestamps_insert
     FOR EACH ROW
         EXECUTE FUNCTION forge.thing_timestamps_insert();
 
--- WHEN: skip the function entirely for no-op updates (modifiedAt is not bumped)
 CREATE OR REPLACE TRIGGER trg_thing_timestamps_update
     BEFORE UPDATE ON forge.thing
     FOR EACH ROW
-    WHEN (OLD.* IS DISTINCT FROM NEW.*)
         EXECUTE FUNCTION forge.thing_timestamps_update();
 
 CREATE OR REPLACE FUNCTION forge.thing_delete()
