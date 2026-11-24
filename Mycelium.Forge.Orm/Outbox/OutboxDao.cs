@@ -211,7 +211,7 @@ namespace Mycelium.Forge.Orm.Outbox
         /// <param name="lastError">The error description recorded from the failed attempt.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Updated}" /> indicating whether rescheduling succeeded.</returns>
-        public async Task<ErrorOr<Updated>> RescheduleAsync(NpgsqlTransaction transaction, Guid id, DateTimeOffset nextAttemptAt, string lastError, CancellationToken token)
+        public Task<ErrorOr<Updated>> RescheduleAsync(NpgsqlTransaction transaction, Guid id, DateTimeOffset nextAttemptAt, string lastError, CancellationToken token)
         {
             const string sql =
                 """
@@ -222,31 +222,14 @@ namespace Mycelium.Forge.Orm.Outbox
                   AND status = 'PENDING';
                 """;
 
-            try
-            {
-                await using var command = new NpgsqlCommand(sql, transaction.Connection, transaction);
-                command.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = id });
-                command.Parameters.Add(new NpgsqlParameter("@nextAttemptAt", NpgsqlDbType.TimestampTz) { Value = nextAttemptAt.ToUniversalTime() });
-                command.Parameters.Add(new NpgsqlParameter("@lastError", NpgsqlDbType.Text) { Value = (object)lastError ?? DBNull.Value });
+            NpgsqlParameter[] parameters =
+            [
+                new("@id", NpgsqlDbType.Uuid) { Value = id },
+                new("@nextAttemptAt", NpgsqlDbType.TimestampTz) { Value = nextAttemptAt.ToUniversalTime() },
+                new("@lastError", NpgsqlDbType.Text) { Value = (object)lastError ?? DBNull.Value }
+            ];
 
-                var affected = await command.ExecuteNonQueryAsync(token);
-
-                if (affected == 0)
-                {
-                    return Error.NotFound(description: $"Outbox message '{id}' was not found for rescheduling.");
-                }
-
-                return Result.Updated;
-            }
-            catch (OperationCanceledException) when (token.IsCancellationRequested)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                this.logger.LogError(exception, "Failed to reschedule outbox message {MessageId}", id.SanitizeForLog());
-                return Error.Failure(description: exception.Message);
-            }
+            return this.ExecuteUpdateAsync(transaction, sql, parameters, $"Outbox message '{id}' was not found for rescheduling.", "reschedule", id, token);
         }
 
         /// <summary>
@@ -257,7 +240,7 @@ namespace Mycelium.Forge.Orm.Outbox
         /// <param name="lastError">The error description recorded for the permanent failure.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Updated}" /> indicating whether updating the status succeeded.</returns>
-        public async Task<ErrorOr<Updated>> MarkFailedAsync(NpgsqlTransaction transaction, Guid id, string lastError, CancellationToken token)
+        public Task<ErrorOr<Updated>> MarkFailedAsync(NpgsqlTransaction transaction, Guid id, string lastError, CancellationToken token)
         {
             const string sql =
                 """
@@ -267,31 +250,14 @@ namespace Mycelium.Forge.Orm.Outbox
                 WHERE id = @id;
                 """;
 
-            try
-            {
-                await using var command = new NpgsqlCommand(sql, transaction.Connection, transaction);
-                command.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = id });
-                command.Parameters.Add(new NpgsqlParameter("@status", NpgsqlDbType.Text) { Value = ToDbStatus(OutboxMessageStatus.Failed) });
-                command.Parameters.Add(new NpgsqlParameter("@lastError", NpgsqlDbType.Text) { Value = (object)lastError ?? DBNull.Value });
+            NpgsqlParameter[] parameters =
+            [
+                new("@id", NpgsqlDbType.Uuid) { Value = id },
+                new("@status", NpgsqlDbType.Text) { Value = ToDbStatus(OutboxMessageStatus.Failed) },
+                new("@lastError", NpgsqlDbType.Text) { Value = (object)lastError ?? DBNull.Value }
+            ];
 
-                var affected = await command.ExecuteNonQueryAsync(token);
-
-                if (affected == 0)
-                {
-                    return Error.NotFound(description: $"Outbox message '{id}' was not found to mark as failed.");
-                }
-
-                return Result.Updated;
-            }
-            catch (OperationCanceledException) when (token.IsCancellationRequested)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                this.logger.LogError(exception, "Failed to mark outbox message {MessageId} as failed", id.SanitizeForLog());
-                return Error.Failure(description: exception.Message);
-            }
+            return this.ExecuteUpdateAsync(transaction, sql, parameters, $"Outbox message '{id}' was not found to mark as failed.", "mark as failed", id, token);
         }
 
         /// <summary>
@@ -343,6 +309,39 @@ namespace Mycelium.Forge.Orm.Outbox
                 FailedStatusValue => OutboxMessageStatus.Failed,
                 _ => throw new InvalidOperationException($"Unsupported outbox message status '{status}'.")
             };
+        }
+
+        /// <summary>
+        /// Executes an outbox row update command and returns <see cref="Result.Updated" /> or <see cref="Error.NotFound" />.
+        /// </summary>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
+        /// <param name="sql">The parameterized SQL <c>UPDATE</c> statement.</param>
+        /// <param name="parameters">The typed SQL parameters to bind to the command.</param>
+        /// <param name="notFoundDescription">The error description returned when no rows match.</param>
+        /// <param name="failureAction">The action verb logged if execution fails.</param>
+        /// <param name="id">The unique identifier of the target outbox message.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>An <see cref="ErrorOr{Updated}" /> indicating the outcome of the update.</returns>
+        private async Task<ErrorOr<Updated>> ExecuteUpdateAsync(NpgsqlTransaction transaction, string sql, NpgsqlParameter[] parameters, string notFoundDescription, string failureAction, Guid id, CancellationToken token)
+        {
+            try
+            {
+                await using var command = new NpgsqlCommand(sql, transaction.Connection, transaction);
+                command.Parameters.AddRange(parameters);
+
+                var affected = await command.ExecuteNonQueryAsync(token);
+
+                return affected == 0 ? Error.NotFound(description: notFoundDescription) : Result.Updated;
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                this.logger.LogError(exception, "Failed to {Action} outbox message {MessageId}", failureAction, id.SanitizeForLog());
+                return Error.Failure(description: exception.Message);
+            }
         }
     }
 }

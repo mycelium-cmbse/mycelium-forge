@@ -80,32 +80,32 @@ namespace Mycelium.Forge.Services
         public Task<ErrorOr<Success>> UpdateUserAsync(Guid userId, string email, string firstName, string lastName, CancellationToken cancellationToken = default)
         {
             return this.ExecuteAdminOperationAsync(async accessToken =>
+            {
+                var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}";
+                using var getResponse = await this.SendAuthenticatedAsync(HttpMethod.Get, requestUri, accessToken, null, cancellationToken);
+                var getStatusResult = this.EnsureSuccessStatus(getResponse, HttpMethod.Get, "users/{id}");
+
+                if (getStatusResult.IsError)
                 {
-                    var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}";
-                    using var getResponse = await this.SendAuthenticatedAsync(HttpMethod.Get, requestUri, accessToken, null, cancellationToken);
-                    var getStatusResult = this.EnsureSuccessStatus(getResponse, HttpMethod.Get, requestUri);
+                    return getStatusResult.Errors;
+                }
 
-                    if (getStatusResult.IsError)
-                    {
-                        return getStatusResult.Errors;
-                    }
+                var user = await getResponse.Content.ReadFromJsonAsync<JsonObject>(cancellationToken);
 
-                    var user = await getResponse.Content.ReadFromJsonAsync<JsonObject>(cancellationToken);
+                if (user == null)
+                {
+                    return Error.Failure(SyncFailedErrorCode, "Keycloak returned an empty user representation.");
+                }
 
-                    if (user == null)
-                    {
-                        return Error.Failure(SyncFailedErrorCode, $"Keycloak returned an empty user representation for {userId}.");
-                    }
+                user["email"] = email;
+                user["firstName"] = firstName;
+                user["lastName"] = lastName;
 
-                    user["email"] = email;
-                    user["firstName"] = firstName;
-                    user["lastName"] = lastName;
+                using var content = JsonContent.Create(user);
+                using var putResponse = await this.SendAuthenticatedAsync(HttpMethod.Put, requestUri, accessToken, content, cancellationToken);
 
-                    using var content = JsonContent.Create(user);
-                    using var putResponse = await this.SendAuthenticatedAsync(HttpMethod.Put, requestUri, accessToken, content, cancellationToken);
-
-                    return this.EnsureSuccessStatus(putResponse, HttpMethod.Put, requestUri);
-                }, $"update Keycloak user {userId}", cancellationToken);
+                return this.EnsureSuccessStatus(putResponse, HttpMethod.Put, "users/{id}");
+            }, "update Keycloak user", cancellationToken);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Mycelium.Forge.Services
             {
                 var requestUri = $"admin/realms/{this.options.Realm}/users";
                 using var response = await this.SendAuthenticatedAsync(HttpMethod.Get, requestUri, accessToken, null, cancellationToken);
-                var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Get, requestUri);
+                var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Get, "users");
 
                 if (statusResult.IsError)
                 {
@@ -160,7 +160,7 @@ namespace Mycelium.Forge.Services
                 var requestUri = $"admin/realms/{this.options.Realm}/partialImport";
                 using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
 
-                return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
+                return this.EnsureSuccessStatus(response, HttpMethod.Post, "partialImport");
             }, "import Keycloak users", cancellationToken);
         }
 
@@ -174,22 +174,22 @@ namespace Mycelium.Forge.Services
         public Task<ErrorOr<Success>> AssignRealmRolesAsync(Guid userId, IEnumerable<string> roleNames, CancellationToken cancellationToken = default)
         {
             return this.ExecuteAdminOperationAsync(async accessToken =>
+            {
+                var roleResults = await Task.WhenAll(roleNames.Select(roleName => this.GetRealmRoleAsync(roleName, accessToken, cancellationToken)));
+                var failedRole = Array.Find(roleResults, result => result.IsError);
+
+                if (failedRole.IsError)
                 {
-                    var roleResults = await Task.WhenAll(roleNames.Select(roleName => this.GetRealmRoleAsync(roleName, accessToken, cancellationToken)));
-                    var failedRole = Array.Find(roleResults, result => result.IsError);
+                    return failedRole.Errors;
+                }
 
-                    if (failedRole.IsError)
-                    {
-                        return failedRole.Errors;
-                    }
+                var roles = roleResults.Select(result => result.Value).ToArray();
+                using var content = JsonContent.Create(roles);
+                var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}/role-mappings/realm";
+                using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
 
-                    var roles = roleResults.Select(result => result.Value).ToArray();
-                    using var content = JsonContent.Create(roles);
-                    var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}/role-mappings/realm";
-                    using var response = await this.SendAuthenticatedAsync(HttpMethod.Post, requestUri, accessToken, content, cancellationToken);
-
-                    return this.EnsureSuccessStatus(response, HttpMethod.Post, requestUri);
-                }, $"assign Keycloak roles to user {userId}", cancellationToken);
+                return this.EnsureSuccessStatus(response, HttpMethod.Post, "users/{id}/role-mappings/realm");
+            }, "assign Keycloak roles", cancellationToken);
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace Mycelium.Forge.Services
             var requestUri = $"admin/realms/{this.options.Realm}/users/{userId}";
             using var response = await this.SendAuthenticatedAsync(HttpMethod.Delete, requestUri, accessToken, null, cancellationToken);
 
-            return this.EnsureSuccessStatus(response, HttpMethod.Delete, requestUri);
+            return this.EnsureSuccessStatus(response, HttpMethod.Delete, "users/{id}");
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace Mycelium.Forge.Services
         {
             var requestUri = $"admin/realms/{this.options.Realm}/roles/{roleName}";
             using var response = await this.SendAuthenticatedAsync(HttpMethod.Get, requestUri, accessToken, null, cancellationToken);
-            var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Get, requestUri);
+            var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Get, "roles/{roleName}");
 
             if (statusResult.IsError)
             {
@@ -291,7 +291,7 @@ namespace Mycelium.Forge.Services
 
             using var form = new FormUrlEncodedContent(parameters);
             using var response = await this.httpClient.PostAsync("realms/master/protocol/openid-connect/token", form, cancellationToken);
-            var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Post, "realms/master/protocol/openid-connect/token");
+            var statusResult = this.EnsureSuccessStatus(response, HttpMethod.Post, "protocol/openid-connect/token");
 
             if (statusResult.IsError)
             {
@@ -333,9 +333,9 @@ namespace Mycelium.Forge.Services
         /// </summary>
         /// <param name="response">The HTTP response received from Keycloak.</param>
         /// <param name="method">The HTTP method that was sent.</param>
-        /// <param name="requestUri">The request URI that was called.</param>
+        /// <param name="endpoint">The static endpoint name that was called.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> representing the HTTP response status.</returns>
-        private ErrorOr<Success> EnsureSuccessStatus(HttpResponseMessage response, HttpMethod method, string requestUri)
+        private ErrorOr<Success> EnsureSuccessStatus(HttpResponseMessage response, HttpMethod method, string endpoint)
         {
             if (response.IsSuccessStatusCode)
             {
@@ -343,9 +343,9 @@ namespace Mycelium.Forge.Services
             }
 
             var statusCode = (int)response.StatusCode;
-            this.logger.LogError("Keycloak admin request {Method} {Uri} failed with status code {StatusCode}", method, requestUri, statusCode);
+            this.logger.LogError("Keycloak admin request {Method} {Endpoint} failed with status code {StatusCode}", method, endpoint, statusCode);
             var metadata = new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, statusCode } };
-            return Error.Failure(SyncFailedErrorCode, $"Keycloak request {method} {requestUri} failed with status code {statusCode}.", metadata);
+            return Error.Failure(SyncFailedErrorCode, $"Keycloak request {method} {endpoint} failed with status code {statusCode}.", metadata);
         }
     }
 }

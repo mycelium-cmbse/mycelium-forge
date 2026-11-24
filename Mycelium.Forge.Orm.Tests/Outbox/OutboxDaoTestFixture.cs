@@ -270,6 +270,35 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
                 Assert.That(worker2Claim.Value, Has.Count.EqualTo(1));
                 Assert.That(worker1Claim.Value[0].Id, Is.Not.EqualTo(worker2Claim.Value[0].Id));
             }
+
+            // Case 6: Non-null LastError round-trips via MapToOutboxMessage when reclaiming a rescheduled message
+            await using (var rescheduleWithErrorTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.outboxDao.RescheduleAsync(rescheduleWithErrorTransaction, concurrentMessage1.Id, DateTimeOffset.UtcNow.AddSeconds(-1), "Transient 503", CancellationToken.None);
+                await rescheduleWithErrorTransaction.CommitAsync();
+            }
+
+            await using (var reclaimWithErrorTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                var reclaimWithError = await this.outboxDao.ClaimBatchAsync(reclaimWithErrorTransaction, 10, TimeSpan.FromSeconds(30), CancellationToken.None);
+                await reclaimWithErrorTransaction.CommitAsync();
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(reclaimWithError.IsError, Is.False);
+                    Assert.That(reclaimWithError.Value, Has.Count.EqualTo(1));
+                    Assert.That(reclaimWithError.Value[0].Id, Is.EqualTo(concurrentMessage1.Id));
+                    Assert.That(reclaimWithError.Value[0].LastError, Is.EqualTo("Transient 503"));
+                }
+            }
+
+            // Case 7: Negative batchSize returns Error.Failure and canceled token throws OperationCanceledException
+            await using var invalidBatchTransaction = await this.Connection.BeginTransactionAsync();
+            var negativeBatchResult = await this.outboxDao.ClaimBatchAsync(invalidBatchTransaction, -1, TimeSpan.FromSeconds(30), CancellationToken.None);
+            await invalidBatchTransaction.RollbackAsync();
+
+            Assert.That(negativeBatchResult.IsError, Is.True);
+            await this.AssertThrowsOperationCanceledAsync((transaction, token) => this.outboxDao.ClaimBatchAsync(transaction, 10, TimeSpan.FromSeconds(30), token));
         }
 
         [Test]
@@ -310,6 +339,8 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
                 Assert.That(deleteMissingResult.IsError, Is.False);
                 Assert.That(remainingCount, Is.EqualTo(0));
             }
+
+            await this.AssertThrowsOperationCanceledAsync((transaction, token) => this.outboxDao.DeleteAsync(transaction, message.Id, token));
         }
 
         [Test]
@@ -359,7 +390,25 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
             var invalidResult = await this.outboxDao.EnqueueAsync(failTransaction, invalidMessage, CancellationToken.None);
             await failTransaction.RollbackAsync();
 
-            Assert.That(invalidResult.IsError, Is.True);
+            var unsupportedStatusMessage = new OutboxMessage
+            {
+                AggregateId = aggregateId,
+                EventType = OutboxEventTypes.AccountKeycloakSync,
+                Payload = "{}",
+                Status = (OutboxMessageStatus)999
+            };
+
+            await using var unsupportedStatusTransaction = await this.Connection.BeginTransactionAsync();
+            var unsupportedStatusResult = await this.outboxDao.EnqueueAsync(unsupportedStatusTransaction, unsupportedStatusMessage, CancellationToken.None);
+            await unsupportedStatusTransaction.RollbackAsync();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(invalidResult.IsError, Is.True);
+                Assert.That(unsupportedStatusResult.IsError, Is.True);
+            }
+
+            await this.AssertThrowsOperationCanceledAsync((transaction, token) => this.outboxDao.EnqueueAsync(transaction, message, token));
         }
 
         [Test]
@@ -403,6 +452,16 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
             var claimAfterFailed = await this.outboxDao.ClaimBatchAsync(claimTransaction, 10, TimeSpan.FromSeconds(30), CancellationToken.None);
             await claimTransaction.CommitAsync();
 
+            await using (var nullErrorFailTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.outboxDao.MarkFailedAsync(nullErrorFailTransaction, message.Id, null, CancellationToken.None);
+                await nullErrorFailTransaction.CommitAsync();
+            }
+
+            await using var nullErrorReadCommand = new NpgsqlCommand("SELECT last_error FROM forge.outbox_message WHERE id = @id;", this.Connection);
+            nullErrorReadCommand.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = message.Id });
+            var clearedLastError = await nullErrorReadCommand.ExecuteScalarAsync();
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(markFailedResult.IsError, Is.False);
@@ -411,6 +470,7 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
                 Assert.That(claimAfterFailed.Value, Is.Empty);
                 Assert.That(notFoundResult.IsError, Is.True);
                 Assert.That(notFoundResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
+                Assert.That(clearedLastError, Is.EqualTo(DBNull.Value));
             }
         }
 
@@ -479,6 +539,16 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
             failedReadCommand.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = failedMessage.Id });
             var failedStatus = (string)(await failedReadCommand.ExecuteScalarAsync())!;
 
+            await using (var nullErrorRescheduleTransaction = await this.Connection.BeginTransactionAsync())
+            {
+                await this.outboxDao.RescheduleAsync(nullErrorRescheduleTransaction, message.Id, futureAttempt, null, CancellationToken.None);
+                await nullErrorRescheduleTransaction.CommitAsync();
+            }
+
+            await using var nullErrorReadCommand = new NpgsqlCommand("SELECT last_error FROM forge.outbox_message WHERE id = @id;", this.Connection);
+            nullErrorReadCommand.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = message.Id });
+            var clearedLastError = await nullErrorReadCommand.ExecuteScalarAsync();
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(rescheduleResult.IsError, Is.False);
@@ -491,13 +561,35 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
                 Assert.That(rescheduleFailedResult.IsError, Is.True);
                 Assert.That(rescheduleFailedResult.FirstError.Type, Is.EqualTo(ErrorType.NotFound));
                 Assert.That(failedStatus, Is.EqualTo("FAILED"));
+                Assert.That(clearedLastError, Is.EqualTo(DBNull.Value));
             }
+
+            await this.AssertThrowsOperationCanceledAsync((transaction, token) => this.outboxDao.RescheduleAsync(transaction, message.Id, futureAttempt, "Canceled", token));
         }
 
         protected override Task PostSetup()
         {
             this.outboxDao = new OutboxDao(this.TestLoggerFactory.CreateLogger<OutboxDao>());
             return Task.CompletedTask;
+        }
+
+        private async Task AssertThrowsOperationCanceledAsync(Func<NpgsqlTransaction, CancellationToken, Task> operation)
+        {
+            var canceledSource = new CancellationTokenSource();
+            await canceledSource.CancelAsync();
+            var token = canceledSource.Token;
+            var canceledTransaction = await this.Connection.BeginTransactionAsync(CancellationToken.None);
+
+            try
+            {
+                Assert.That(async () => await operation(canceledTransaction, token), Throws.InstanceOf<OperationCanceledException>());
+            }
+            finally
+            {
+                await canceledTransaction.RollbackAsync(CancellationToken.None);
+                await canceledTransaction.DisposeAsync();
+                canceledSource.Dispose();
+            }
         }
     }
 }
