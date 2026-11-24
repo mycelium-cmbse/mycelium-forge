@@ -102,6 +102,7 @@ namespace Mycelium.Forge.Extensions
                 builder.Services.AddTransient<ITransferPackageOwnershipDialogViewModel, TransferPackageOwnershipDialogViewModel>();
                 builder.Services.AddTransient<IAccountSettingsViewModel, AccountSettingsViewModel>();
                 builder.Services.AddTransient<IPendingRequestsManagerViewModel, PendingRequestsManagerViewModel>();
+                builder.Services.AddTransient<IAddressesManagerViewModel, AddressesManagerViewModel>();
                 builder.Services.AddTransient(typeof(IInvitationManagerViewModel<>), typeof(InvitationManagerViewModel<>));
                 builder.Services.AddTransient<IOrganizationSettingsViewModel, OrganizationSettingsViewModel>();
                 builder.Services.AddTransient<IAdminAccountsViewModel, AdminAccountsViewModel>();

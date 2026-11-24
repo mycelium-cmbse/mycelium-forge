@@ -32,11 +32,6 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         private readonly IAccountService accountService;
 
         /// <summary>
-        /// The (injected) <see cref="IAddressService" /> domain service.
-        /// </summary>
-        private readonly IAddressService addressService;
-
-        /// <summary>
         /// The (injected) <see cref="IForgeContext" /> application context.
         /// </summary>
         private readonly IForgeContext forgeContext;
@@ -77,23 +72,24 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <param name="logger">The (injected) <see cref="ILogger{AccountSettingsViewModel}" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
-        /// <param name="addressService">The (injected) <see cref="IAddressService" />.</param>
         /// <param name="organizationService">The (injected) <see cref="IOrganizationService" />.</param>
         /// <param name="pendingRequestsManagerViewModel">The (injected) <see cref="IPendingRequestsManagerViewModel" />.</param>
+        /// <param name="addressesManagerViewModel">The (injected) <see cref="IAddressesManagerViewModel" />.</param>
         /// <param name="forgeContext">The (injected) <see cref="IForgeContext" />.</param>
         /// <param name="notificationService">The (injected) <see cref="INotificationService" />.</param>
-        public AccountSettingsViewModel(ILogger<AccountSettingsViewModel> logger, IUserService userService, IAccountService accountService, IAddressService addressService, IOrganizationService organizationService, IPendingRequestsManagerViewModel pendingRequestsManagerViewModel, IForgeContext forgeContext, INotificationService notificationService)
+        public AccountSettingsViewModel(ILogger<AccountSettingsViewModel> logger, IUserService userService, IAccountService accountService, IOrganizationService organizationService, IPendingRequestsManagerViewModel pendingRequestsManagerViewModel, IAddressesManagerViewModel addressesManagerViewModel, IForgeContext forgeContext, INotificationService notificationService)
         {
             this.accountService = accountService;
-            this.addressService = addressService;
             this.organizationService = organizationService;
             this.PendingRequestsManagerViewModel = pendingRequestsManagerViewModel;
+            this.AddressesManagerViewModel = addressesManagerViewModel;
             this.forgeContext = forgeContext;
             this.notificationService = notificationService;
             this.userService = userService;
             this.logger = logger;
 
             this.PendingRequestsManagerViewModel.OnOrganizationAccepted = acceptedOrg => { this.Organizations.Edit(innerList => innerList.AddOrReplace(acceptedOrg)); };
+            this.AddressesManagerViewModel.OnPrimaryAddressChanging = this.UpdatePrimaryAddress;
         }
 
         /// <summary>
@@ -112,9 +108,9 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         public IPendingRequestsManagerViewModel PendingRequestsManagerViewModel { get; }
 
         /// <summary>
-        /// Gets or sets the primary address location string.
+        /// Gets the view model for managing the addresses.
         /// </summary>
-        public string Location { get; set; } = string.Empty;
+        public IAddressesManagerViewModel AddressesManagerViewModel { get; }
 
         /// <summary>
         /// Initializes the view model state and populates initial user profile and organization data asynchronously.
@@ -139,11 +135,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
                 return;
             }
 
-            if (this.Profile.PrimaryAddress.HasValue)
-            {
-                var address = await this.addressService.ReadOrNull(this.userContext, this.Profile.PrimaryAddress.Value);
-                this.Location = address != null ? address.Locality : "-";
-            }
+            await this.AddressesManagerViewModel.InitializeViewModel(this.Profile);
 
             var organizationsResult = await this.organizationService.ReadByAccountMembershipAsync(this.userContext, this.currentUserId, CancellationToken.None);
 
@@ -200,25 +192,9 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// </summary>
         /// <param name="updatedAccount">The updated <see cref="Account" /> DTO.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
-        public async Task<ErrorOr<Success>> UpdateProfile(Account updatedAccount)
+        public Task<ErrorOr<Success>> UpdateProfile(Account updatedAccount)
         {
-            const string errorMessage = "Failed to update profile.";
-
-            var updateResult = await this.accountService.UpdateAndSyncAsync(this.userContext, [updatedAccount], CancellationToken.None);
-
-            if (updateResult.IsError)
-            {
-                this.logger.LogError(errorMessage + " {AccountId} Errors: {Errors}", updatedAccount.Id.SanitizeForLog(), updateResult.Errors.ToJoinedDescriptions());
-                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
-                return updateResult.Errors;
-            }
-
-            this.Profile = updatedAccount;
-
-            // Forces the scoped UserService to reload its cached account so other components in the circuit see the updated profile.
-            await this.userService.GetCurrentUser(true);
-            this.notificationService.AddNotification("Profile updated successfully.", "Profile Updated", NotificationType.Success);
-            return Result.Success;
+            return this.PersistProfile(updatedAccount, true);
         }
 
         /// <summary>
@@ -237,6 +213,50 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         public Task DeleteAccount()
         {
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Persists a new primary address identifier on the user profile asynchronously.
+        /// </summary>
+        /// <param name="primaryAddressId">The identifier of the new primary address, or <see langword="null" /> to clear it.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
+        private Task<ErrorOr<Success>> UpdatePrimaryAddress(Guid? primaryAddressId)
+        {
+            var updated = this.Profile.Clone();
+            updated.PrimaryAddress = primaryAddressId;
+            return this.PersistProfile(updated, false);
+        }
+
+        /// <summary>
+        /// Persists the updated user profile account and synchronizes identity changes asynchronously.
+        /// </summary>
+        /// <param name="updatedAccount">The updated <see cref="Account" /> DTO.</param>
+        /// <param name="notifyOnSuccess">A value indicating whether to emit a success notification.</param>
+        /// <returns>An <see cref="ErrorOr{Success}" /> indicating the success or failure of the operation.</returns>
+        private async Task<ErrorOr<Success>> PersistProfile(Account updatedAccount, bool notifyOnSuccess)
+        {
+            const string errorMessage = "Failed to update profile.";
+
+            var updateResult = await this.accountService.UpdateAndSyncAsync(this.userContext, [updatedAccount], CancellationToken.None);
+
+            if (updateResult.IsError)
+            {
+                this.logger.LogError(errorMessage + " {AccountId} Errors: {Errors}", updatedAccount.Id.SanitizeForLog(), updateResult.Errors.ToJoinedDescriptions());
+                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
+                return updateResult.Errors;
+            }
+
+            this.Profile = updatedAccount;
+
+            // Forces the scoped UserService to reload its cached account so other components in the circuit see the updated profile.
+            await this.userService.GetCurrentUser(true);
+
+            if (notifyOnSuccess)
+            {
+                this.notificationService.AddNotification("Profile updated successfully.", "Profile Updated", NotificationType.Success);
+            }
+
+            return Result.Success;
         }
     }
 }

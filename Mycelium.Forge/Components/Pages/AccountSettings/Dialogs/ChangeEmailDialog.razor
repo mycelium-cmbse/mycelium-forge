@@ -1,0 +1,51 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="ChangeEmailDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        <ForgeAlert Variant="ForgeAlertVariant.Warning"
+                    Description="Changing your email address marks your account as unverified until the new address is confirmed. Unverified accounts cannot publish packages or hold package roles."
+                    IconName="triangle-alert"
+                    IconSize="15"/>
+
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.NewEmail)))">
+            <BbFieldLabel For="change-email-input"
+                          Class="form-field-label">
+                New email address
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="change-email-input"
+                         Value="@(this.NewEmail)"
+                         ValueChanged="@(this.OnNewEmailChanged)"
+                         Placeholder="e.g. name@example.com"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.NewEmail)])"/>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton id="change-email-cancel-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton id="change-email-submit-button"
+                  Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnConfirmClicked)">
+            Change email
+        </BbButton>
+    </Footer>
+</DialogComponent>

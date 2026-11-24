@@ -1,0 +1,47 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="AddressesManager.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@inherits DisposableComponent
+
+<ForgeCard Class="@(this.Class)">
+    <div class="flex items-center justify-between gap-2 w-full h-8">
+        <span class="section-label flex-1">
+            ADDRESSES
+        </span>
+        <BbButton id="account-settings-add-address-button"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnAddAddress)">
+            Add address
+        </BbButton>
+    </div>
+
+    @if (this.ViewModel.Addresses.Count == 0)
+    {
+        <span class="text-xs leading-2xs font-normal text-muted-foreground">
+            No addresses yet.
+        </span>
+    }
+    else
+    {
+        <div id="account-settings-addresses"
+             class="flex flex-col w-full divide-y divide-border">
+            @foreach (var address in this.ViewModel.Addresses.Items)
+            {
+                <AddressRow @key="address.Id"
+                            Address="@address"
+                            CountryName="@(this.GetCountryName(address.Country))"
+                            IsPrimary="@(this.IsPrimary(address))"
+                            OnSetPrimary="@(this.OnSetPrimaryAddress)"
+                            OnEdit="@(this.OnEditAddress)"
+                            OnDelete="@(this.OnDeleteAddress)"/>
+            }
+        </div>
+    }
+</ForgeCard>
