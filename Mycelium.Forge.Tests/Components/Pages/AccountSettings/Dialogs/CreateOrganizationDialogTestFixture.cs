@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
 {
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -28,6 +29,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
     using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Models.DialogResults;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.Tests.TestHelpers;
 
     [TestFixture]
     public class CreateOrganizationDialogTestFixture
@@ -117,17 +119,30 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
                 parameters.Add(x => x.OnResult, onResult);
             });
 
+            var nameInput = dialog.FindComponents<BbInput>().FirstOrDefault(x => x.Instance.HasId("create-org-name"));
+            var scopeInput = dialog.FindComponents<BbInput>().FirstOrDefault(x => x.Instance.HasId("create-org-scope"));
+            var billingEmailInput = dialog.FindComponents<BbInput>().FirstOrDefault(x => x.Instance.HasId("create-org-billing-email"));
+            var submitButton = dialog.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId("create-org-submit-button"));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(nameInput, Is.Not.Null);
+                Assert.That(scopeInput, Is.Not.Null);
+                Assert.That(billingEmailInput, Is.Not.Null);
+                Assert.That(submitButton, Is.Not.Null);
+            }
+
             // Empty fields -> validation fails
-            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
+            await dialog.InvokeAsync(() => submitButton!.Find("button").ClickAsync());
 
             Assert.That(capturedResult, Is.Null);
 
             // Invalid billing email -> validation fails
-            dialog.Instance.OnOrganizationNameChanged("Starion Group");
-            dialog.Instance.OnScopeChanged("starion");
-            dialog.Instance.OnBillingEmailChanged("invalid-billing-email");
+            await dialog.InvokeAsync(() => nameInput!.Instance.ValueChanged.InvokeAsync("Starion Group"));
+            await dialog.InvokeAsync(() => scopeInput!.Instance.ValueChanged.InvokeAsync("starion"));
+            await dialog.InvokeAsync(() => billingEmailInput!.Instance.ValueChanged.InvokeAsync("invalid-billing-email"));
 
-            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
+            await dialog.InvokeAsync(() => submitButton!.Find("button").ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
@@ -136,11 +151,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             }
 
             // Scope conflict -> validation fails
-            dialog.Instance.OnBillingEmailChanged("billing@starion.eu");
+            await dialog.InvokeAsync(() => billingEmailInput!.Instance.ValueChanged.InvokeAsync("billing@starion.eu"));
 
             this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IScope>(new Organization { ShortName = "starion" }));
 
-            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
+            await dialog.InvokeAsync(() => submitButton!.Find("button").ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {
@@ -149,10 +164,10 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
             }
 
             // All valid and unique -> success (billing email trimmed and lowercased)
-            dialog.Instance.OnBillingEmailChanged("  Billing@Starion.EU  ");
+            await dialog.InvokeAsync(() => billingEmailInput!.Instance.ValueChanged.InvokeAsync("  Billing@Starion.EU  "));
             this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList<IScope>.Empty);
 
-            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
+            await dialog.InvokeAsync(() => submitButton!.Find("button").ClickAsync());
 
             using (Assert.EnterMultipleScope())
             {

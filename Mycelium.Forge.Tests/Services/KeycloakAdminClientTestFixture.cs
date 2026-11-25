@@ -17,6 +17,8 @@ namespace Mycelium.Forge.Tests.Services
     using System.Threading;
     using System.Threading.Tasks;
 
+    using ErrorOr;
+
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
@@ -297,6 +299,18 @@ namespace Mycelium.Forge.Tests.Services
             {
                 Assert.That(httpErrorResult.IsError, Is.True);
                 Assert.That(httpErrorResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
+            }
+
+            // Case 5b: HTTP 409 Conflict on PUT returns Keycloak.Conflict error
+            this.httpMessageHandlerMock.Protected().Setup<Task<HttpResponseMessage>>(SendAsync, ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Put), ItExpr.IsAny<CancellationToken>()).ReturnsAsync(() => new HttpResponseMessage { StatusCode = HttpStatusCode.Conflict });
+
+            var conflictResult = await this.client.UpdateUserAsync(userId, "alex@example.com", "Alex", "Rivera", CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(conflictResult.IsError, Is.True);
+                Assert.That(conflictResult.FirstError.Type, Is.EqualTo(ErrorType.Conflict));
+                Assert.That(conflictResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.ConflictErrorCode));
             }
 
             // Case 6: HttpRequestException returns Keycloak.SyncFailed error

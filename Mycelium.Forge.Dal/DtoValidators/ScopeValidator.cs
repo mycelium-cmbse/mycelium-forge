@@ -35,7 +35,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// <returns><c>true</c> if the value is a valid absolute http or https URL; otherwise, <c>false</c>.</returns>
         public static bool IsValidWebsite(string website)
         {
-            return Uri.TryCreate(website, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+            return Uri.TryCreate(website, UriKind.Absolute, out var uri) && !string.IsNullOrWhiteSpace(uri.Host) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
         }
 
         /// <summary>
@@ -44,6 +44,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         partial void AddCustomValidation()
         {
             this.RuleFor(x => x.Email).Matches(EmailFormatRegex()).WithMessage("Email must be a valid email address.");
+            this.RuleFor(x => x.BillingEmail).Matches(EmailFormatRegex()).When(x => !string.IsNullOrEmpty(x.BillingEmail)).WithMessage("Billing email must be a valid email address.");
             this.RuleFor(x => x.Website).Must(IsValidWebsite).When(x => !string.IsNullOrEmpty(x.Website)).WithMessage("Website must be a valid absolute http or https URL.");
         }
     }

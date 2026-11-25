@@ -16,8 +16,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
     using System.Threading;
     using System.Threading.Tasks;
 
-    using DynamicData;
-
     using ErrorOr;
 
     using Microsoft.Extensions.Logging;
@@ -42,7 +40,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
         private Mock<IPendingRequestsManagerViewModel> pendingRequestsManagerViewModelMock;
         private Mock<IUserService> userServiceMock;
         private Mock<ILogger<AccountSettingsViewModel>> loggerMock;
-        private SourceList<Address> addressesSourceList;
         private AccountSettingsViewModel viewModel;
         private UserContext unauthenticatedContext;
         private UserContext authenticatedContext;
@@ -57,8 +54,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             this.accountServiceMock = new Mock<IAccountService>();
             this.addressesManagerViewModelMock = new Mock<IAddressesManagerViewModel>();
             this.addressesManagerViewModelMock.SetupProperty(x => x.OnPrimaryAddressChanging);
-            this.addressesSourceList = new SourceList<Address>();
-            this.addressesManagerViewModelMock.Setup(x => x.Addresses).Returns(this.addressesSourceList);
             this.forgeContextMock = new Mock<IForgeContext>();
             this.notificationServiceMock = new Mock<INotificationService>();
             this.organizationServiceMock = new Mock<IOrganizationService>();
@@ -121,7 +116,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
         [TearDown]
         public void TearDown()
         {
-            this.addressesSourceList.Dispose();
             this.viewModel.Dispose();
         }
 
@@ -300,6 +294,17 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 this.userServiceMock.Verify(x => x.GetCurrentUser(true), Times.Never);
             }
 
+            // Scenario 1b: Conflict path surfaces email conflict message
+            this.accountServiceMock.Setup(x => x.UpdateAndSyncAsync(this.authenticatedContext, It.IsAny<IEnumerable<IAccount>>(), CancellationToken.None)).ReturnsAsync(Error.Conflict("Keycloak.Conflict", "Keycloak request PUT conflicted (409)."));
+
+            var conflictResult = await this.viewModel.UpdateProfile(updatedProfile);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(conflictResult.IsError, Is.True);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Unable to use this email address. Please enter a different email address.", "Error", NotificationType.Error), Times.Once);
+            }
+
             // Scenario 2: Success path
             IEnumerable<IAccount> capturedAccounts = [];
             this.accountServiceMock.Setup(x => x.UpdateAndSyncAsync(this.authenticatedContext, It.IsAny<IEnumerable<IAccount>>(), CancellationToken.None)).Callback<IUserContext, IEnumerable<IAccount>, CancellationToken>((_, accounts, _) => capturedAccounts = accounts).ReturnsAsync(Result.Updated);
@@ -315,6 +320,20 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), It.IsAny<string?>(), NotificationType.Success), Times.Once);
                 this.userServiceMock.Verify(x => x.GetCurrentUser(true), Times.Once);
             }
+
+            // Scenario 3: Email change sets IsVerified to false and subsequent non-email update preserves it
+            var emailChangedProfile = this.viewModel.Profile.Clone();
+            emailChangedProfile.Email = "new@example.com";
+            emailChangedProfile.IsVerified = false;
+
+            await this.viewModel.UpdateProfile(emailChangedProfile);
+
+            var nonEmailUpdate = this.viewModel.Profile.Clone();
+            nonEmailUpdate.Website = "https://example.com";
+
+            await this.viewModel.UpdateProfile(nonEmailUpdate);
+
+            Assert.That(this.viewModel.Profile.IsVerified, Is.False);
         }
     }
 }

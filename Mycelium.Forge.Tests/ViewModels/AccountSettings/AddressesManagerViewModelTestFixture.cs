@@ -121,6 +121,12 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             this.viewModel = new AddressesManagerViewModel(this.loggerMock.Object, this.userServiceMock.Object, this.addressServiceMock.Object, this.countryServiceMock.Object, this.notificationServiceMock.Object);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            this.viewModel.Dispose();
+        }
+
         [Test]
         public async Task VerifyInitializeViewModel()
         {
@@ -351,7 +357,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             {
                 Assert.That(alreadyPrimaryResult.IsError, Is.False);
                 Assert.That(primaryCallbackIds, Is.Empty);
-                this.notificationServiceMock.Verify(x => x.AddNotification("Primary address updated.", "Primary Address Updated", NotificationType.Success), Times.Once);
+                this.notificationServiceMock.Verify(x => x.AddNotification("Primary address updated.", "Primary Address Updated", NotificationType.Success), Times.Never);
             }
 
             // Scenario 3: Promoting non-primary updates PrimaryAddressId and notifies without calling AddressService.UpdateAsync
@@ -369,7 +375,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 Assert.That(this.viewModel.PrimaryAddressId, Is.EqualTo(this.secondaryAddress.Id));
                 Assert.That(primaryCallbackIds, Is.EqualTo(expectedSecondaryId));
                 this.addressServiceMock.Verify(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IAddress>>(), It.IsAny<CancellationToken>()), Times.Never);
-                this.notificationServiceMock.Verify(x => x.AddNotification("Primary address updated.", "Primary Address Updated", NotificationType.Success), Times.Exactly(2));
+                this.notificationServiceMock.Verify(x => x.AddNotification("Primary address updated.", "Primary Address Updated", NotificationType.Success), Times.Once);
             }
         }
 
@@ -421,7 +427,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 this.notificationServiceMock.Verify(x => x.AddNotification("Failed to delete address.", "Error", NotificationType.Error), Times.Once);
             }
 
-            // Scenario 4: Deleting primary address fails in DeleteAsync -> restores PrimaryAddressId
+            // Scenario 3: Deleting primary address fails in DeleteAsync -> restores PrimaryAddressId
             primaryCallbackIds.Clear();
 
             var deletePrimaryErrorResult = await this.viewModel.DeleteAddress(this.primaryAddress.Id);
@@ -437,7 +443,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 this.notificationServiceMock.Verify(x => x.AddNotification("Failed to delete address.", "Error", NotificationType.Error), Times.Exactly(2));
             }
 
-            // Scenario 5: Deleting non-primary address succeeds without clearing primary
+            // Scenario 4: Deleting non-primary address succeeds without clearing primary
             primaryCallbackIds.Clear();
             this.addressServiceMock.Setup(x => x.DeleteAsync(this.authenticatedContext, It.IsAny<IEnumerable<Guid>>(), CancellationToken.None)).ReturnsAsync(Result.Deleted);
 
@@ -452,7 +458,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 this.notificationServiceMock.Verify(x => x.AddNotification("Address deleted successfully.", "Address Deleted", NotificationType.Success), Times.Once);
             }
 
-            // Scenario 6: Deleting primary address clears PrimaryAddressId and removes address
+            // Scenario 5: Deleting primary address clears PrimaryAddressId and removes address
             var deletePrimaryResult = await this.viewModel.DeleteAddress(this.primaryAddress.Id);
 
             using (Assert.EnterMultipleScope())

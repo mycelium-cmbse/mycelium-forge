@@ -127,15 +127,17 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             }
 
             this.currentUserId = this.userContext.AccountId.Value;
-            this.Profile = await this.accountService.ReadOrNull(this.userContext, this.currentUserId) as Account;
+            var profile = await this.accountService.ReadOrNull(this.userContext, this.currentUserId) as Account;
 
-            if (this.Profile == null)
+            if (profile == null)
             {
                 this.logger.LogWarning("Account profile for user {UserId} not found during settings initialization", this.currentUserId);
                 return;
             }
 
-            await this.AddressesManagerViewModel.InitializeViewModel(this.Profile);
+            await this.AddressesManagerViewModel.InitializeViewModel(profile);
+
+            this.Profile = profile;
 
             var organizationsResult = await this.organizationService.ReadByAccountMembershipAsync(this.userContext, this.currentUserId, CancellationToken.None);
 
@@ -237,12 +239,24 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         {
             const string errorMessage = "Failed to update profile.";
 
+            if (string.Equals(updatedAccount.Email, this.Profile.Email, StringComparison.Ordinal))
+            {
+                // Remove this line once ticket #221 persists IsVerified in the domain model and Account.Clone() copies it.
+                updatedAccount.IsVerified = this.Profile.IsVerified;
+            }
+
             var updateResult = await this.accountService.UpdateAndSyncAsync(this.userContext, [updatedAccount], CancellationToken.None);
 
             if (updateResult.IsError)
             {
                 this.logger.LogError(errorMessage + " {AccountId} Errors: {Errors}", updatedAccount.Id.SanitizeForLog(), updateResult.Errors.ToJoinedDescriptions());
-                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
+
+                // Remove this Conflict branch once ticket #221 delegates email change to Keycloak (kc_action=UPDATE_EMAIL).
+                var notificationMessage = updateResult.FirstError.Type == ErrorType.Conflict
+                    ? "Unable to use this email address. Please enter a different email address."
+                    : errorMessage;
+
+                this.notificationService.AddNotification(notificationMessage, "Error", NotificationType.Error);
                 return updateResult.Errors;
             }
 

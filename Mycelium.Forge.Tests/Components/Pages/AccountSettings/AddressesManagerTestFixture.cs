@@ -149,7 +149,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings
             this.addressesSourceList.AddRange([this.primaryAddress, this.secondaryAddress]);
             var manager = this.context.Render<AddressesManager>(parameters => parameters.Add(x => x.ViewModel, this.viewModelMock.Object));
 
-            // Case 1: Editing primary address passes isPrimary = true
+            // Case 1: Editing primary address
             var editPrimaryButton = manager.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasId($"address-edit-{this.primaryAddress.Id}"));
             Assert.That(editPrimaryButton, Is.Not.Null);
 

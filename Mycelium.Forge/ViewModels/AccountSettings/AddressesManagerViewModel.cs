@@ -23,7 +23,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
     /// <summary>
     /// Provides view model state and operations for managing the addresses of the user account.
     /// </summary>
-    public class AddressesManagerViewModel : IAddressesManagerViewModel
+    public class AddressesManagerViewModel : DisposableViewModel, IAddressesManagerViewModel
     {
         /// <summary>
         /// The (injected) <see cref="IAddressService" /> domain service.
@@ -75,6 +75,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
             this.addressService = addressService;
             this.countryService = countryService;
             this.notificationService = notificationService;
+            this.Disposables.Add(this.Addresses);
         }
 
         /// <summary>
@@ -181,6 +182,11 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <returns>A task indicating the success or failure of the operation.</returns>
         public async Task<ErrorOr<Success>> SetPrimaryAddress(Guid addressId)
         {
+            if (this.PrimaryAddressId == addressId)
+            {
+                return Result.Success;
+            }
+
             var primaryResult = await this.ApplyPrimaryAddress(addressId, true);
 
             if (primaryResult.IsError)

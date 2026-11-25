@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Services
 {
+    using System.Net;
     using System.Net.Http.Headers;
     using System.Text.Json;
     using System.Text.Json.Nodes;
@@ -25,6 +26,11 @@ namespace Mycelium.Forge.Services
     /// </summary>
     public class KeycloakAdminClient : IKeycloakAdminClient
     {
+        /// <summary>
+        /// The error code returned when Keycloak rejects a request due to a resource conflict.
+        /// </summary>
+        public const string ConflictErrorCode = "Keycloak.Conflict";
+
         /// <summary>
         /// The error code returned when a Keycloak administration request fails.
         /// </summary>
@@ -103,6 +109,13 @@ namespace Mycelium.Forge.Services
 
                     using var content = JsonContent.Create(user);
                     using var putResponse = await this.SendAuthenticatedAsync(HttpMethod.Put, requestUri, accessToken, content, cancellationToken);
+
+                    // Remove this 409 check once ticket #221 delegates email change to Keycloak (kc_action=UPDATE_EMAIL).
+                    if (putResponse.StatusCode == HttpStatusCode.Conflict)
+                    {
+                        this.logger.LogWarning("Keycloak admin request {Method} {Uri} returned conflict (409)", HttpMethod.Put, requestUri);
+                        return Error.Conflict(ConflictErrorCode, $"Keycloak request {HttpMethod.Put} {requestUri} conflicted (409).");
+                    }
 
                     return this.EnsureSuccessStatus(putResponse, HttpMethod.Put, requestUri);
                 }, $"update Keycloak user {userId}", cancellationToken);

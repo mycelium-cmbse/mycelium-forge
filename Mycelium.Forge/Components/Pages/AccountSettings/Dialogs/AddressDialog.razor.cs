@@ -99,7 +99,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         private void OnAddressLine1Changed(string value)
         {
             this.EditedAddress.AddressLine1 = value ?? string.Empty;
-            this.ValidationManager.ClearError(nameof(this.Address.AddressLine1));
+            this.ValidationManager.ClearError(nameof(this.EditedAddress.AddressLine1));
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         private void OnLocalityChanged(string value)
         {
             this.EditedAddress.Locality = value ?? string.Empty;
-            this.ValidationManager.ClearError(nameof(this.Address.Locality));
+            this.ValidationManager.ClearError(nameof(this.EditedAddress.Locality));
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         {
             this.SelectedCountry = country;
             this.EditedAddress.Country = country?.Id ?? Guid.Empty;
-            this.ValidationManager.ClearError(nameof(this.Address.Country));
+            this.ValidationManager.ClearError(nameof(this.EditedAddress.Country));
         }
 
         /// <summary>
@@ -171,9 +171,9 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         private async Task OnSaveClicked()
         {
             var isValid = this.ValidationManager
-                .Check(nameof(this.Address.AddressLine1), !string.IsNullOrWhiteSpace(this.EditedAddress.AddressLine1), "Address line 1 is required.")
-                .Check(nameof(this.Address.Locality), !string.IsNullOrWhiteSpace(this.EditedAddress.Locality), "City is required.")
-                .Check(nameof(this.Address.Country), this.EditedAddress.Country != Guid.Empty, "Country is required.")
+                .Check(nameof(this.EditedAddress.AddressLine1), !string.IsNullOrWhiteSpace(this.EditedAddress.AddressLine1), "Address line 1 is required.")
+                .Check(nameof(this.EditedAddress.Locality), !string.IsNullOrWhiteSpace(this.EditedAddress.Locality), "City is required.")
+                .Check(nameof(this.EditedAddress.Country), this.EditedAddress.Country != Guid.Empty, "Country is required.")
                 .IsValid;
 
             if (!isValid)

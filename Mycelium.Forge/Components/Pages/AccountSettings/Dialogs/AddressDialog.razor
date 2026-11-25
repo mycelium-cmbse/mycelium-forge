@@ -10,10 +10,10 @@
 <DialogComponent>
     <ChildContent>
         <BbField Class="w-full flex flex-col gap-1.5"
-                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.Address.AddressLine1)))">
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.EditedAddress.AddressLine1)))">
             <BbFieldLabel For="address-line-1"
                           Class="form-field-label">
-                Address line 1
+                Address line 1 <span class="text-primary">*</span>
             </BbFieldLabel>
             <BbFieldContent>
                 <BbInput Id="address-line-1"
@@ -23,7 +23,7 @@
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
             <BbFieldError Class="form-field-error"
-                          Errors="@(this.ValidationManager[nameof(this.Address.AddressLine1)])"/>
+                          Errors="@(this.ValidationManager[nameof(this.EditedAddress.AddressLine1)])"/>
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-1.5">
@@ -41,10 +41,10 @@
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-1.5"
-                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.Address.Locality)))">
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.EditedAddress.Locality)))">
             <BbFieldLabel For="address-locality"
                           Class="form-field-label">
-                City
+                City <span class="text-primary">*</span>
             </BbFieldLabel>
             <BbFieldContent>
                 <BbInput Id="address-locality"
@@ -54,7 +54,7 @@
                          Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
             </BbFieldContent>
             <BbFieldError Class="form-field-error"
-                          Errors="@(this.ValidationManager[nameof(this.Address.Locality)])"/>
+                          Errors="@(this.ValidationManager[nameof(this.EditedAddress.Locality)])"/>
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-1.5">
@@ -86,10 +86,10 @@
         </BbField>
 
         <BbField Class="w-full flex flex-col gap-1.5"
-                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.Address.Country)))">
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.EditedAddress.Country)))">
             <BbFieldLabel For="address-country"
                           Class="form-field-label">
-                Country
+                Country <span class="text-primary">*</span>
             </BbFieldLabel>
             <BbFieldContent>
                 <ForgeSelect TValue="ICountry"
@@ -101,7 +101,7 @@
                              ContentClass="max-h-60 overflow-y-auto"/>
             </BbFieldContent>
             <BbFieldError Class="form-field-error"
-                          Errors="@(this.ValidationManager[nameof(this.Address.Country)])"/>
+                          Errors="@(this.ValidationManager[nameof(this.EditedAddress.Country)])"/>
         </BbField>
     </ChildContent>
     <Footer>
