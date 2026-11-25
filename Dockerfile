@@ -12,6 +12,7 @@ COPY Mycelium.Forge.Common/Mycelium.Forge.Common.csproj ./Mycelium.Forge.Common/
 COPY Mycelium.Forge.Dal/Mycelium.Forge.Dal.csproj ./Mycelium.Forge.Dal/
 COPY Mycelium.Forge.Extractors/Mycelium.Forge.Extractors.csproj ./Mycelium.Forge.Extractors/
 COPY Mycelium.Forge.Orm/Mycelium.Forge.Orm.csproj ./Mycelium.Forge.Orm/
+COPY Mycelium.Forge.Outbox/Mycelium.Forge.Outbox.csproj ./Mycelium.Forge.Outbox/
 COPY Mycelium.Forge.Serializer.Json/Mycelium.Forge.Serializer.Json.csproj ./Mycelium.Forge.Serializer.Json/
 COPY Mycelium.Forge.Storage/Mycelium.Forge.Storage.csproj ./Mycelium.Forge.Storage/
 COPY Directory.Build.targets Nuget.Config ./
@@ -24,6 +25,7 @@ COPY Mycelium.Forge.Common/ ./Mycelium.Forge.Common/
 COPY Mycelium.Forge.Dal/ ./Mycelium.Forge.Dal/
 COPY Mycelium.Forge.Extractors/ ./Mycelium.Forge.Extractors/
 COPY Mycelium.Forge.Orm/ ./Mycelium.Forge.Orm/
+COPY Mycelium.Forge.Outbox/ ./Mycelium.Forge.Outbox/
 COPY Mycelium.Forge.Serializer.Json/ ./Mycelium.Forge.Serializer.Json/
 COPY Mycelium.Forge.Storage/ ./Mycelium.Forge.Storage/
 

@@ -24,6 +24,7 @@ namespace Mycelium.Forge
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Orm;
+    using Mycelium.Forge.Orm.Outbox;
     using Mycelium.Forge.Services;
 
     using OpenTelemetry.Resources;
@@ -107,6 +108,7 @@ namespace Mycelium.Forge
                     {
                         services.RegisterDatabase(context.Configuration);
                         services.AddForgeDal();
+                        services.AddSingleton<IOutboxDao, OutboxDao>();
                         services.AddScoped<IDatabaseMigrator, DatabaseMigrator>();
                         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
                         services.Configure<KeycloakOptions>(context.Configuration.GetSection(KeycloakOptions.SectionName));
