@@ -38,10 +38,4 @@
         <ProjectReference Include="..\Mycelium.Forge.Serializer.Json\Mycelium.Forge.Serializer.Json.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <None Include="..\Mycelium.Forge.Orm\Migrations\Script0001_InitialSchema.sql" Link="Data\Script0001_InitialSchema.sql">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
-
 </Project>
