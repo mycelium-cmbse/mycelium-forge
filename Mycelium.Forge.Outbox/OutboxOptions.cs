@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Common
+namespace Mycelium.Forge.Outbox
 {
     /// <summary>
     /// Represents configuration settings for the transactional outbox dispatcher and retry behavior,
@@ -54,10 +54,5 @@ namespace Mycelium.Forge.Common
         /// Gets or sets the maximum delay in seconds between durable retry attempts.
         /// </summary>
         public int MaxRetryDelaySeconds { get; set; } = 300;
-
-        /// <summary>
-        /// Gets or sets the number of immediate in-process Polly retries for transient errors before rescheduling.
-        /// </summary>
-        public int ImmediateRetryCount { get; set; } = 2;
     }
 }

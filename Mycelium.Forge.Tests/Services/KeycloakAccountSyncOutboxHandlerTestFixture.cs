@@ -10,9 +10,7 @@
 namespace Mycelium.Forge.Tests.Services
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Net.Http;
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
@@ -20,12 +18,10 @@ namespace Mycelium.Forge.Tests.Services
     using ErrorOr;
 
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
 
     using Moq;
 
-    using Mycelium.Forge.Common;
-    using Mycelium.Forge.Dal.Services;
+    using Mycelium.Forge.Dal.Events;
     using Mycelium.Forge.Orm.Outbox;
     using Mycelium.Forge.Services;
 
@@ -42,19 +38,17 @@ namespace Mycelium.Forge.Tests.Services
         {
             this.keycloakAdminClientMock = new Mock<IKeycloakAdminClient>();
             this.loggerMock = new Mock<ILogger<KeycloakAccountSyncOutboxHandler>>();
-
-            var options = Options.Create(new OutboxOptions { ImmediateRetryCount = 2 });
-            this.handler = new KeycloakAccountSyncOutboxHandler(this.keycloakAdminClientMock.Object, options, this.loggerMock.Object);
+            this.handler = new KeycloakAccountSyncOutboxHandler(this.keycloakAdminClientMock.Object, this.loggerMock.Object);
         }
 
         [Test]
         public async Task VerifyHandleAsync()
         {
-            Assert.That(this.handler.EventType, Is.EqualTo(OutboxEventTypes.AccountKeycloakSync));
+            Assert.That(this.handler.EventType, Is.EqualTo(AccountProfileChanged.EventType));
 
             var accountId = Guid.NewGuid();
-            var validPayload = JsonSerializer.Serialize(new KeycloakAccountSyncPayload(accountId, "alex@example.com", "Alex", "Rivera"));
-            var validMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = OutboxEventTypes.AccountKeycloakSync, Payload = validPayload };
+            var validPayload = JsonSerializer.Serialize(new AccountProfileChanged(accountId, "alex@example.com", "Alex", "Rivera"));
+            var validMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = AccountProfileChanged.EventType, Payload = validPayload };
 
             // Case 1: Valid payload dispatches to KeycloakAdminClient.UpdateUserAsync
             this.keycloakAdminClientMock.Setup(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", CancellationToken.None)).ReturnsAsync(Result.Success);
@@ -68,8 +62,8 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 2: Null firstName/lastName values pass through cleanly
-            var blankNamePayload = JsonSerializer.Serialize(new KeycloakAccountSyncPayload(accountId, "alex@example.com", null!, null!));
-            var blankNameMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = OutboxEventTypes.AccountKeycloakSync, Payload = blankNamePayload };
+            var blankNamePayload = JsonSerializer.Serialize(new AccountProfileChanged(accountId, "alex@example.com", null!, null!));
+            var blankNameMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = AccountProfileChanged.EventType, Payload = blankNamePayload };
             this.keycloakAdminClientMock.Setup(x => x.UpdateUserAsync(accountId, "alex@example.com", null!, null!, CancellationToken.None)).ReturnsAsync(Result.Success);
 
             var blankNameResult = await this.handler.HandleAsync(blankNameMessage, CancellationToken.None);
@@ -81,7 +75,7 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 3: Invalid JSON payload returns validation error without calling KeycloakAdminClient
-            var invalidJsonMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = OutboxEventTypes.AccountKeycloakSync, Payload = "{not-valid-json" };
+            var invalidJsonMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = AccountProfileChanged.EventType, Payload = "{not-valid-json" };
 
             var invalidJsonResult = await this.handler.HandleAsync(invalidJsonMessage, CancellationToken.None);
 
@@ -93,9 +87,9 @@ namespace Mycelium.Forge.Tests.Services
             }
 
             // Case 4: Null or empty AccountId payload returns validation error without calling KeycloakAdminClient
-            var nullPayloadMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = OutboxEventTypes.AccountKeycloakSync, Payload = "null" };
-            var emptyAccountPayload = JsonSerializer.Serialize(new KeycloakAccountSyncPayload(Guid.Empty, "alex@example.com", "Alex", "Rivera"));
-            var emptyAccountMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = OutboxEventTypes.AccountKeycloakSync, Payload = emptyAccountPayload };
+            var nullPayloadMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = AccountProfileChanged.EventType, Payload = "null" };
+            var emptyAccountPayload = JsonSerializer.Serialize(new AccountProfileChanged(Guid.Empty, "alex@example.com", "Alex", "Rivera"));
+            var emptyAccountMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = accountId, EventType = AccountProfileChanged.EventType, Payload = emptyAccountPayload };
 
             var nullPayloadResult = await this.handler.HandleAsync(nullPayloadMessage, CancellationToken.None);
             var emptyAccountResult = await this.handler.HandleAsync(emptyAccountMessage, CancellationToken.None);
@@ -110,69 +104,18 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(emptyAccountResult.FirstError.Code, Is.EqualTo("Outbox.InvalidPayload"));
             }
 
-            // Case 5: Permanent HTTP 4xx error is not retried by Polly
+            // Case 5: Downstream Keycloak errors propagate directly without in-process retries
             this.keycloakAdminClientMock.Invocations.Clear();
-            var permanentError = Error.Failure(KeycloakAdminClient.SyncFailedErrorCode, "Bad Request", new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, 400 } });
-            this.keycloakAdminClientMock.Setup(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>())).ReturnsAsync(permanentError);
+            var downstreamError = Error.Unauthorized(KeycloakAdminClient.SyncFailedErrorCode, "Unauthorized");
+            this.keycloakAdminClientMock.Setup(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>())).ReturnsAsync(downstreamError);
 
-            var permanentResult = await this.handler.HandleAsync(validMessage, CancellationToken.None);
+            var downstreamResult = await this.handler.HandleAsync(validMessage, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(permanentResult.IsError, Is.True);
-                Assert.That(permanentResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
-                this.keycloakAdminClientMock.Verify(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>()), Times.Once());
-            }
-
-            // Case 6: Transient error retries via Polly and succeeds when subsequent attempt succeeds
-            this.keycloakAdminClientMock.Invocations.Clear();
-            var transientError = Error.Failure(KeycloakAdminClient.SyncFailedErrorCode, "Service Unavailable", new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, 503 } });
-
-            this.keycloakAdminClientMock.SetupSequence(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>())).ReturnsAsync(transientError).ReturnsAsync(Result.Success);
-
-            var transientRecoveredResult = await this.handler.HandleAsync(validMessage, CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(transientRecoveredResult.IsError, Is.False);
-                this.keycloakAdminClientMock.Verify(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>()), Times.Exactly(2));
-            }
-
-            // Case 7: Transient HttpRequestException retries up to ImmediateRetryCount and succeeds on final retry
-            this.keycloakAdminClientMock.Invocations.Clear();
-
-            this.keycloakAdminClientMock.SetupSequence(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>())).ThrowsAsync(new HttpRequestException("Temporary network error")).ThrowsAsync(new TimeoutException("Timed out")).ReturnsAsync(Result.Success);
-
-            var exceptionRecoveredResult = await this.handler.HandleAsync(validMessage, CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(exceptionRecoveredResult.IsError, Is.False);
-                this.keycloakAdminClientMock.Verify(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>()), Times.Exactly(3));
-            }
-
-            // Case 8: Exhausted retries return the transient error after 1 + ImmediateRetryCount attempts
-            this.keycloakAdminClientMock.Invocations.Clear();
-            this.keycloakAdminClientMock.Setup(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>())).ReturnsAsync(transientError);
-
-            var exhaustedResult = await this.handler.HandleAsync(validMessage, CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(exhaustedResult.IsError, Is.True);
-                Assert.That(exhaustedResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
-                this.keycloakAdminClientMock.Verify(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>()), Times.Exactly(3));
-            }
-
-            // Case 9: Zero ImmediateRetryCount uses empty pipeline without retries
-            var noRetryHandler = new KeycloakAccountSyncOutboxHandler(this.keycloakAdminClientMock.Object, Options.Create(new OutboxOptions { ImmediateRetryCount = 0 }), this.loggerMock.Object);
-            this.keycloakAdminClientMock.Invocations.Clear();
-
-            var noRetryResult = await noRetryHandler.HandleAsync(validMessage, CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(noRetryResult.IsError, Is.True);
+                Assert.That(downstreamResult.IsError, Is.True);
+                Assert.That(downstreamResult.FirstError.Type, Is.EqualTo(ErrorType.Unauthorized));
+                Assert.That(downstreamResult.FirstError.Code, Is.EqualTo(KeycloakAdminClient.SyncFailedErrorCode));
                 this.keycloakAdminClientMock.Verify(x => x.UpdateUserAsync(accountId, "alex@example.com", "Alex", "Rivera", It.IsAny<CancellationToken>()), Times.Once());
             }
         }

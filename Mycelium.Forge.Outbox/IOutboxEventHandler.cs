@@ -7,7 +7,7 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Services
+namespace Mycelium.Forge.Outbox
 {
     using ErrorOr;
 

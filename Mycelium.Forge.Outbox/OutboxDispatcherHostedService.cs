@@ -7,13 +7,15 @@
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Services
+namespace Mycelium.Forge.Outbox
 {
     using ErrorOr;
 
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
-    using Mycelium.Forge.Common;
     using Mycelium.Forge.Common.Extensions;
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Orm.Outbox;
@@ -152,7 +154,7 @@ namespace Mycelium.Forge.Services
         {
             await using var scope = this.serviceScopeFactory.CreateAsyncScope();
             var outboxDao = scope.ServiceProvider.GetRequiredService<IOutboxDao>();
-            var handlers = scope.ServiceProvider.GetServices<IOutboxEventHandler>().ToDictionary(handler => handler.EventType, StringComparer.Ordinal);
+            var handlers = scope.ServiceProvider.GetServices<IOutboxEventHandler>().ToLookup(handler => handler.EventType, StringComparer.Ordinal);
 
             var batchSize = this.options.BatchSize;
             var leaseDuration = TimeSpan.FromSeconds(this.options.LeaseDurationSeconds);
@@ -177,55 +179,69 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
-        /// Dispatches a single claimed outbox message and updates or deletes its outbox record in a short transaction.
+        /// Dispatches a single claimed outbox message to all matching handlers and updates or deletes its outbox record in a
+        /// short transaction.
         /// </summary>
         /// <param name="outboxDao">The scoped <see cref="IOutboxDao" /> instance.</param>
         /// <param name="handlers">The registered <see cref="IOutboxEventHandler" /> lookup keyed by event type.</param>
         /// <param name="message">The claimed <see cref="OutboxMessage" /> to process.</param>
         /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous message processing.</returns>
-        private async Task ProcessMessageAsync(IOutboxDao outboxDao, Dictionary<string, IOutboxEventHandler> handlers, OutboxMessage message, CancellationToken stoppingToken)
+        private async Task ProcessMessageAsync(IOutboxDao outboxDao, ILookup<string, IOutboxEventHandler> handlers, OutboxMessage message, CancellationToken stoppingToken)
         {
-            if (!handlers.TryGetValue(message.EventType, out var handler))
+            var claimToken = message.ClaimToken ?? Guid.Empty;
+            var matchingHandlers = handlers[message.EventType].ToList();
+
+            if (matchingHandlers.Count == 0)
             {
                 var missingHandlerError = $"No outbox handler registered for event type '{message.EventType}'.";
                 this.logger.LogError("Outbox message {MessageId} permanently failed: {Error}", message.Id.SanitizeForLog(), missingHandlerError.SanitizeForLog());
-                await this.MarkFailedInTransactionAsync(outboxDao, message.Id, missingHandlerError, stoppingToken);
+                await this.MarkFailedInTransactionAsync(outboxDao, message.Id, claimToken, missingHandlerError, stoppingToken);
                 return;
             }
 
-            var handleResult = await ExecuteHandlerSafelyAsync(handler, message, stoppingToken);
+            List<Error> errors = [];
 
-            if (!handleResult.IsError)
+            foreach (var handler in matchingHandlers)
             {
-                var deleteResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.DeleteAsync(transaction, message.Id, stoppingToken), stoppingToken);
+                var handleResult = await ExecuteHandlerSafelyAsync(handler, message, stoppingToken);
+
+                if (handleResult.IsError)
+                {
+                    errors.AddRange(handleResult.Errors);
+                }
+            }
+
+            if (errors.Count == 0)
+            {
+                var deleteResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.DeleteAsync(transaction, message.Id, claimToken, stoppingToken), stoppingToken);
 
                 if (deleteResult.IsError)
                 {
-                    this.logger.LogWarning("Failed to delete processed outbox message {MessageId}: {Errors}", message.Id.SanitizeForLog(), deleteResult.Errors.ToJoinedDescriptions().SanitizeForLog());
+                    this.LogCompletionError("delete processed", message.Id, deleteResult.Errors);
                 }
 
                 return;
             }
 
-            var errorDescription = handleResult.Errors.ToJoinedDescriptions();
+            var errorDescription = errors.ToJoinedDescriptions();
             var maxAttempts = this.options.MaxAttempts;
 
-            if (OutboxErrorClassifier.IsPermanentError(handleResult.Errors) || message.Attempts >= maxAttempts)
+            if (OutboxErrorClassifier.IsPermanentError(errors) || message.Attempts >= maxAttempts)
             {
                 this.logger.LogError("Outbox message {MessageId} ({EventType}) permanently failed on attempt {Attempts}/{MaxAttempts}: {Error}", message.Id.SanitizeForLog(), message.EventType.SanitizeForLog(), message.Attempts, maxAttempts, errorDescription.SanitizeForLog());
-                await this.MarkFailedInTransactionAsync(outboxDao, message.Id, errorDescription, stoppingToken);
+                await this.MarkFailedInTransactionAsync(outboxDao, message.Id, claimToken, errorDescription, stoppingToken);
                 return;
             }
 
             var nextAttemptAt = DateTimeOffset.UtcNow.Add(this.CalculateRetryDelay(message.Attempts));
             this.logger.LogWarning("Outbox message {MessageId} ({EventType}) failed on attempt {Attempts}/{MaxAttempts}; rescheduling for {NextAttemptAt}: {Error}", message.Id.SanitizeForLog(), message.EventType.SanitizeForLog(), message.Attempts, maxAttempts, nextAttemptAt, errorDescription.SanitizeForLog());
 
-            var rescheduleResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.RescheduleAsync(transaction, message.Id, nextAttemptAt, errorDescription, stoppingToken), stoppingToken);
+            var rescheduleResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.RescheduleAsync(transaction, message.Id, claimToken, nextAttemptAt, errorDescription, stoppingToken), stoppingToken);
 
             if (rescheduleResult.IsError)
             {
-                this.logger.LogWarning("Failed to reschedule outbox message {MessageId}: {Errors}", message.Id.SanitizeForLog(), rescheduleResult.Errors.ToJoinedDescriptions().SanitizeForLog());
+                this.LogCompletionError("reschedule", message.Id, rescheduleResult.Errors);
             }
         }
 
@@ -234,17 +250,35 @@ namespace Mycelium.Forge.Services
         /// </summary>
         /// <param name="outboxDao">The scoped <see cref="IOutboxDao" /> instance.</param>
         /// <param name="messageId">The unique identifier of the outbox message.</param>
+        /// <param name="claimToken">The fencing token assigned when the message was claimed.</param>
         /// <param name="errorDescription">The error description to persist.</param>
         /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous update operation.</returns>
-        private async Task MarkFailedInTransactionAsync(IOutboxDao outboxDao, Guid messageId, string errorDescription, CancellationToken stoppingToken)
+        private async Task MarkFailedInTransactionAsync(IOutboxDao outboxDao, Guid messageId, Guid claimToken, string errorDescription, CancellationToken stoppingToken)
         {
-            var markFailedResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.MarkFailedAsync(transaction, messageId, errorDescription, stoppingToken), stoppingToken);
+            var markFailedResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.MarkFailedAsync(transaction, messageId, claimToken, errorDescription, stoppingToken), stoppingToken);
 
             if (markFailedResult.IsError)
             {
-                this.logger.LogWarning("Failed to mark outbox message {MessageId} as failed: {Errors}", messageId.SanitizeForLog(), markFailedResult.Errors.ToJoinedDescriptions().SanitizeForLog());
+                this.LogCompletionError("mark as failed", messageId, markFailedResult.Errors);
             }
+        }
+
+        /// <summary>
+        /// Logs an outbox completion failure, distinguishing lost lease ownership conflicts from unexpected errors.
+        /// </summary>
+        /// <param name="action">The completion action being attempted.</param>
+        /// <param name="messageId">The unique identifier of the outbox message.</param>
+        /// <param name="errors">The errors returned by the persistence operation.</param>
+        private void LogCompletionError(string action, Guid messageId, List<Error> errors)
+        {
+            if (errors.Exists(error => error.Type == ErrorType.Conflict))
+            {
+                this.logger.LogWarning("Lost lease ownership for outbox message {MessageId} before completing {Action}; skipping update", messageId.SanitizeForLog(), action);
+                return;
+            }
+
+            this.logger.LogWarning("Failed to {Action} outbox message {MessageId}: {Errors}", action, messageId.SanitizeForLog(), errors.ToJoinedDescriptions().SanitizeForLog());
         }
 
         /// <summary>

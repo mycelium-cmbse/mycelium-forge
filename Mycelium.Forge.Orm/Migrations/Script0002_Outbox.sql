@@ -16,7 +16,8 @@ CREATE TABLE forge.outbox_message (
     attempts integer NOT NULL DEFAULT 0 CHECK (attempts >= 0),
     next_attempt_at timestamptz NOT NULL DEFAULT now(),
     created_at timestamptz NOT NULL DEFAULT now(),
-    last_error text NULL
+    last_error text NULL,
+    claim_token uuid NULL
 );
 
 ALTER TABLE forge.outbox_message SET (autovacuum_vacuum_scale_factor = 0.0);
@@ -29,5 +30,5 @@ CREATE INDEX idx_outbox_message_pending_next_attempt
     WHERE status = 'PENDING';
 
 CREATE INDEX idx_outbox_message_pending_aggregate
-    ON forge.outbox_message (aggregate_id, event_type, id)
+    ON forge.outbox_message (aggregate_id, id)
     WHERE status = 'PENDING';

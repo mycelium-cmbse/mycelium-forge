@@ -9,6 +9,8 @@
 
 namespace Mycelium.Forge.Orm.Outbox
 {
+    using System.Text.Json;
+
     using ErrorOr;
 
     using Mycelium.Forge.Common.Extensions;
@@ -97,6 +99,26 @@ namespace Mycelium.Forge.Orm.Outbox
         }
 
         /// <summary>
+        /// Asynchronously serializes and enqueues a typed <see cref="IOutboxEvent" /> within the supplied database transaction.
+        /// </summary>
+        /// <typeparam name="TEvent">The type of outbox event to enqueue.</typeparam>
+        /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
+        /// <param name="outboxEvent">The typed outbox event instance to persist.</param>
+        /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>An <see cref="ErrorOr{Created}" /> indicating whether enqueueing succeeded.</returns>
+        public Task<ErrorOr<Created>> EnqueueAsync<TEvent>(NpgsqlTransaction transaction, TEvent outboxEvent, CancellationToken token) where TEvent : IOutboxEvent
+        {
+            var message = new OutboxMessage
+            {
+                AggregateId = outboxEvent.AggregateId,
+                EventType = TEvent.EventType,
+                Payload = JsonSerializer.Serialize(outboxEvent)
+            };
+
+            return this.EnqueueAsync(transaction, message, token);
+        }
+
+        /// <summary>
         /// Asynchronously claims up to <paramref name="batchSize" /> eligible outbox messages for processing with a lease
         /// duration.
         /// </summary>
@@ -118,7 +140,6 @@ namespace Mycelium.Forge.Orm.Outbox
                           SELECT 1
                           FROM forge.outbox_message older
                           WHERE older.aggregate_id = m.aggregate_id
-                            AND older.event_type = m.event_type
                             AND older.status = 'PENDING'
                             AND older.id < m.id
                       )
@@ -128,10 +149,11 @@ namespace Mycelium.Forge.Orm.Outbox
                 )
                 UPDATE forge.outbox_message target
                 SET attempts = target.attempts + 1,
-                    next_attempt_at = now() + @lease
+                    next_attempt_at = now() + @lease,
+                    claim_token = uuidv7()
                 FROM claimed
                 WHERE target.id = claimed.id
-                RETURNING target.id, target.aggregate_id, target.event_type, target.payload::text AS payload, target.status, target.attempts, target.next_attempt_at, target.created_at, target.last_error;
+                RETURNING target.id, target.aggregate_id, target.event_type, target.payload::text AS payload, target.status, target.attempts, target.next_attempt_at, target.created_at, target.last_error, target.claim_token;
                 """;
 
             try
@@ -163,33 +185,41 @@ namespace Mycelium.Forge.Orm.Outbox
         }
 
         /// <summary>
-        /// Asynchronously deletes a processed outbox message by identifier.
+        /// Asynchronously deletes a processed outbox message if the caller still holds the matching claim token.
         /// </summary>
         /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
         /// <param name="id">The unique identifier of the outbox message to delete.</param>
+        /// <param name="claimToken">The fencing token assigned when the message was claimed.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Deleted}" /> indicating whether deletion succeeded.</returns>
-        public async Task<ErrorOr<Deleted>> DeleteAsync(NpgsqlTransaction transaction, Guid id, CancellationToken token)
+        public async Task<ErrorOr<Deleted>> DeleteAsync(NpgsqlTransaction transaction, Guid id, Guid claimToken, CancellationToken token)
         {
             const string sql =
                 """
                 DELETE FROM forge.outbox_message
-                WHERE id = @id;
+                WHERE id = @id
+                  AND claim_token = @claimToken;
                 """;
 
             try
             {
                 await using var command = new NpgsqlCommand(sql, transaction.Connection, transaction);
                 command.Parameters.Add(new NpgsqlParameter("@id", NpgsqlDbType.Uuid) { Value = id });
+                command.Parameters.Add(new NpgsqlParameter("@claimToken", NpgsqlDbType.Uuid) { Value = claimToken });
 
                 var affected = await command.ExecuteNonQueryAsync(token);
 
-                if (affected == 0 && this.logger.IsEnabled(LogLevel.Warning))
+                if (affected != 0)
                 {
-                    this.logger.LogWarning("Outbox message {MessageId} was not found when deleting", id.SanitizeForLog());
+                    return Result.Deleted;
                 }
 
-                return Result.Deleted;
+                if (this.logger.IsEnabled(LogLevel.Warning))
+                {
+                    this.logger.LogWarning("Outbox message {MessageId} could not be deleted because lease ownership was lost or it was not found", id.SanitizeForLog());
+                }
+
+                return Error.Conflict(description: $"Outbox message '{id}' was not deleted because ownership was lost or it was not found.");
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
             {
@@ -203,61 +233,70 @@ namespace Mycelium.Forge.Orm.Outbox
         }
 
         /// <summary>
-        /// Asynchronously reschedules a pending outbox message for a future retry attempt.
+        /// Asynchronously reschedules a pending outbox message for a future retry attempt if the caller still holds the
+        /// matching claim token.
         /// </summary>
         /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
         /// <param name="id">The unique identifier of the outbox message to reschedule.</param>
+        /// <param name="claimToken">The fencing token assigned when the message was claimed.</param>
         /// <param name="nextAttemptAt">The timestamp when the message should next be attempted.</param>
         /// <param name="lastError">The error description recorded from the failed attempt.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Updated}" /> indicating whether rescheduling succeeded.</returns>
-        public Task<ErrorOr<Updated>> RescheduleAsync(NpgsqlTransaction transaction, Guid id, DateTimeOffset nextAttemptAt, string lastError, CancellationToken token)
+        public Task<ErrorOr<Updated>> RescheduleAsync(NpgsqlTransaction transaction, Guid id, Guid claimToken, DateTimeOffset nextAttemptAt, string lastError, CancellationToken token)
         {
             const string sql =
                 """
                 UPDATE forge.outbox_message
                 SET next_attempt_at = @nextAttemptAt,
-                    last_error = @lastError
+                    last_error = @lastError,
+                    claim_token = NULL
                 WHERE id = @id
+                  AND claim_token = @claimToken
                   AND status = 'PENDING';
                 """;
 
             NpgsqlParameter[] parameters =
             [
                 new("@id", NpgsqlDbType.Uuid) { Value = id },
+                new("@claimToken", NpgsqlDbType.Uuid) { Value = claimToken },
                 new("@nextAttemptAt", NpgsqlDbType.TimestampTz) { Value = nextAttemptAt.ToUniversalTime() },
                 new("@lastError", NpgsqlDbType.Text) { Value = (object)lastError ?? DBNull.Value }
             ];
 
-            return this.ExecuteUpdateAsync(transaction, sql, parameters, $"Outbox message '{id}' was not found for rescheduling.", "reschedule", id, token);
+            return this.ExecuteUpdateAsync(transaction, sql, parameters, $"Outbox message '{id}' was not rescheduled because ownership was lost or it was not found.", "reschedule", id, token);
         }
 
         /// <summary>
-        /// Asynchronously marks an outbox message as permanently failed.
+        /// Asynchronously marks an outbox message as permanently failed if the caller still holds the matching claim token.
         /// </summary>
         /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
         /// <param name="id">The unique identifier of the outbox message to mark as failed.</param>
+        /// <param name="claimToken">The fencing token assigned when the message was claimed.</param>
         /// <param name="lastError">The error description recorded for the permanent failure.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Updated}" /> indicating whether updating the status succeeded.</returns>
-        public Task<ErrorOr<Updated>> MarkFailedAsync(NpgsqlTransaction transaction, Guid id, string lastError, CancellationToken token)
+        public Task<ErrorOr<Updated>> MarkFailedAsync(NpgsqlTransaction transaction, Guid id, Guid claimToken, string lastError, CancellationToken token)
         {
             const string sql =
                 """
                 UPDATE forge.outbox_message
                 SET status = @status,
-                    last_error = @lastError
-                WHERE id = @id;
+                    last_error = @lastError,
+                    claim_token = NULL
+                WHERE id = @id
+                  AND claim_token = @claimToken;
                 """;
 
             NpgsqlParameter[] parameters =
             [
                 new("@id", NpgsqlDbType.Uuid) { Value = id },
+                new("@claimToken", NpgsqlDbType.Uuid) { Value = claimToken },
                 new("@status", NpgsqlDbType.Text) { Value = ToDbStatus(OutboxMessageStatus.Failed) },
                 new("@lastError", NpgsqlDbType.Text) { Value = (object)lastError ?? DBNull.Value }
             ];
 
-            return this.ExecuteUpdateAsync(transaction, sql, parameters, $"Outbox message '{id}' was not found to mark as failed.", "mark as failed", id, token);
+            return this.ExecuteUpdateAsync(transaction, sql, parameters, $"Outbox message '{id}' was not marked as failed because ownership was lost or it was not found.", "mark as failed", id, token);
         }
 
         /// <summary>
@@ -277,7 +316,8 @@ namespace Mycelium.Forge.Orm.Outbox
                 Attempts = (int)reader["attempts"],
                 NextAttemptAt = reader.GetFieldValue<DateTimeOffset>(reader.GetOrdinal("next_attempt_at")),
                 CreatedAt = reader.GetFieldValue<DateTimeOffset>(reader.GetOrdinal("created_at")),
-                LastError = reader["last_error"] is DBNull ? null : (string)reader["last_error"]
+                LastError = reader["last_error"] is DBNull ? null : (string)reader["last_error"],
+                ClaimToken = reader["claim_token"] is DBNull ? null : (Guid?)reader["claim_token"]
             };
         }
 
@@ -312,17 +352,17 @@ namespace Mycelium.Forge.Orm.Outbox
         }
 
         /// <summary>
-        /// Executes an outbox row update command and returns <see cref="Result.Updated" /> or <see cref="Error.NotFound" />.
+        /// Executes an outbox row update command and returns <see cref="Result.Updated" /> or <see cref="Error.Conflict" />.
         /// </summary>
         /// <param name="transaction">The active <see cref="NpgsqlTransaction" />.</param>
         /// <param name="sql">The parameterized SQL <c>UPDATE</c> statement.</param>
         /// <param name="parameters">The typed SQL parameters to bind to the command.</param>
-        /// <param name="notFoundDescription">The error description returned when no rows match.</param>
+        /// <param name="conflictDescription">The error description returned when no rows match.</param>
         /// <param name="failureAction">The action verb logged if execution fails.</param>
         /// <param name="id">The unique identifier of the target outbox message.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Updated}" /> indicating the outcome of the update.</returns>
-        private async Task<ErrorOr<Updated>> ExecuteUpdateAsync(NpgsqlTransaction transaction, string sql, NpgsqlParameter[] parameters, string notFoundDescription, string failureAction, Guid id, CancellationToken token)
+        private async Task<ErrorOr<Updated>> ExecuteUpdateAsync(NpgsqlTransaction transaction, string sql, NpgsqlParameter[] parameters, string conflictDescription, string failureAction, Guid id, CancellationToken token)
         {
             try
             {
@@ -331,7 +371,7 @@ namespace Mycelium.Forge.Orm.Outbox
 
                 var affected = await command.ExecuteNonQueryAsync(token);
 
-                return affected == 0 ? Error.NotFound(description: notFoundDescription) : Result.Updated;
+                return affected == 0 ? Error.Conflict(description: conflictDescription) : Result.Updated;
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
             {

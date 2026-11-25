@@ -58,5 +58,10 @@ namespace Mycelium.Forge.Orm.Outbox
         /// Gets or sets the error description from the most recent failed delivery attempt.
         /// </summary>
         public string LastError { get; set; }
+
+        /// <summary>
+        /// Gets or sets the per-claim fencing token used to verify lease ownership when updating or deleting the message.
+        /// </summary>
+        public Guid? ClaimToken { get; set; }
     }
 }

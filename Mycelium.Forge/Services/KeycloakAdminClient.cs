@@ -9,6 +9,7 @@
 
 namespace Mycelium.Forge.Services
 {
+    using System.Net;
     using System.Net.Http.Headers;
     using System.Text.Json;
     using System.Text.Json.Nodes;
@@ -207,7 +208,7 @@ namespace Mycelium.Forge.Services
             if (string.IsNullOrWhiteSpace(this.options.BaseUrl) || string.IsNullOrWhiteSpace(this.options.AdminUsername) || string.IsNullOrWhiteSpace(this.options.AdminPassword))
             {
                 this.logger.LogError("Keycloak admin client is not configured; cannot {Operation}", sanitizedDescription);
-                return Error.Failure(SyncFailedErrorCode, "Keycloak admin client is not configured.");
+                return Error.Validation(SyncFailedErrorCode, "Keycloak admin client is not configured.");
             }
 
             try
@@ -295,7 +296,9 @@ namespace Mycelium.Forge.Services
 
             if (statusResult.IsError)
             {
-                return statusResult.Errors;
+                return response.StatusCode == HttpStatusCode.BadRequest
+                    ? Error.Unauthorized(SyncFailedErrorCode, statusResult.FirstError.Description)
+                    : statusResult.Errors;
             }
 
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -344,8 +347,17 @@ namespace Mycelium.Forge.Services
 
             var statusCode = (int)response.StatusCode;
             this.logger.LogError("Keycloak admin request {Method} {Endpoint} failed with status code {StatusCode}", method, endpoint, statusCode);
-            var metadata = new Dictionary<string, object> { { OutboxErrorClassifier.StatusCodeMetadataKey, statusCode } };
-            return Error.Failure(SyncFailedErrorCode, $"Keycloak request {method} {endpoint} failed with status code {statusCode}.", metadata);
+            var description = $"Keycloak request {method} {endpoint} failed with status code {statusCode}.";
+
+            return response.StatusCode switch
+            {
+                HttpStatusCode.BadRequest or HttpStatusCode.UnprocessableEntity => Error.Validation(SyncFailedErrorCode, description),
+                HttpStatusCode.Unauthorized => Error.Unauthorized(SyncFailedErrorCode, description),
+                HttpStatusCode.Forbidden => Error.Forbidden(SyncFailedErrorCode, description),
+                HttpStatusCode.NotFound => Error.NotFound(SyncFailedErrorCode, description),
+                HttpStatusCode.Conflict => Error.Conflict(SyncFailedErrorCode, description),
+                _ => Error.Failure(SyncFailedErrorCode, description)
+            };
         }
     }
 }
