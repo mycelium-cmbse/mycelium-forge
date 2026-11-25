@@ -1,0 +1,56 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="AddressRow.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<div class="flex items-center gap-3 py-2.25 w-full">
+    <div class="flex-1 flex flex-col gap-0.5 min-w-0">
+        <span class="text-sm leading-xs font-medium text-foreground truncate">
+            @(this.GetStreetSummary())
+        </span>
+        <span class="text-xs leading-2xs font-normal text-muted-foreground truncate">
+            @(this.GetLocalitySummary())
+        </span>
+    </div>
+
+    @if (this.IsPrimary)
+    {
+        <BbBadge Variant="BadgeVariant.Secondary"
+                 Class="badge-role text-primary">
+            Primary
+        </BbBadge>
+    }
+    else
+    {
+        <BbButton id="@($"address-set-primary-{this.Address.Id}")"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnSetPrimaryClicked)"
+                  Class="button-sm">
+            Set as primary
+        </BbButton>
+    }
+
+    <BbButton id="@($"address-edit-{this.Address.Id}")"
+              Variant="ButtonVariant.Outline"
+              Size="ButtonSize.Small"
+              Type="ButtonType.Button"
+              OnClick="@(this.OnEditClicked)"
+              Class="button-sm">
+        Edit
+    </BbButton>
+
+    <BbButton id="@($"address-delete-{this.Address.Id}")"
+              Variant="ButtonVariant.Outline"
+              Size="ButtonSize.Small"
+              Type="ButtonType.Button"
+              OnClick="@(this.OnDeleteClicked)"
+              Class="btn-destructive-outline button-sm">
+        Delete
+    </BbButton>
+</div>

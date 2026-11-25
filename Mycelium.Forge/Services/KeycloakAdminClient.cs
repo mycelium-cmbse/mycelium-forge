@@ -27,6 +27,11 @@ namespace Mycelium.Forge.Services
     public class KeycloakAdminClient : IKeycloakAdminClient
     {
         /// <summary>
+        /// The error code returned when Keycloak rejects a request due to a resource conflict.
+        /// </summary>
+        public const string ConflictErrorCode = "Keycloak.Conflict";
+
+        /// <summary>
         /// The error code returned when a Keycloak administration request fails.
         /// </summary>
         public const string SyncFailedErrorCode = "Keycloak.SyncFailed";

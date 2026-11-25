@@ -19,6 +19,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
     using Mycelium.Forge.Common.Extensions;
     using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.AccountSettings.Dialogs;
+    using Mycelium.Forge.Dal.AutoGenDtoValidator;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Models.Common;
     using Mycelium.Forge.Models.DialogResults;
@@ -77,6 +78,38 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         }
 
         /// <summary>
+        /// Validates that the entered display name includes both a first and last name.
+        /// </summary>
+        /// <param name="displayName">The trimmed display name entered by the user.</param>
+        /// <returns>A <see cref="Task{TResult}" /> resolving to <see cref="Result.Success" /> or a validation error.</returns>
+        private static Task<ErrorOr<Success>> ValidateDisplayNameAsync(string displayName)
+        {
+            var (firstName, lastName) = displayName.SplitFullName();
+
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            {
+                return Task.FromResult<ErrorOr<Success>>(Error.Validation(description: "Please enter both your first and last name (at least two words)."));
+            }
+
+            return Task.FromResult<ErrorOr<Success>>(Result.Success);
+        }
+
+        /// <summary>
+        /// Validates that the entered website URL is either empty or a valid absolute http or https URL.
+        /// </summary>
+        /// <param name="website">The trimmed website URL entered by the user.</param>
+        /// <returns>A <see cref="Task{TResult}" /> resolving to <see cref="Result.Success" /> or a validation error.</returns>
+        private static Task<ErrorOr<Success>> ValidateWebsiteAsync(string website)
+        {
+            if (string.IsNullOrWhiteSpace(website) || AccountValidator.IsValidWebsite(website))
+            {
+                return Task.FromResult<ErrorOr<Success>>(Result.Success);
+            }
+
+            return Task.FromResult<ErrorOr<Success>>(Error.Validation(description: "Please enter a valid absolute http or https URL."));
+        }
+
+        /// <summary>
         /// Handles the action to delete the user account.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
@@ -118,34 +151,34 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         }
 
         /// <summary>
-        /// Handles the action to change the user's username.
-        /// </summary>
-        private static void OnChangeUsername()
-        {
-        }
-
-        /// <summary>
         /// Handles the action to change the user's primary email address.
         /// </summary>
-        private static void OnChangeEmail()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnChangeEmail()
         {
-        }
-
-        /// <summary>
-        /// Validates that the entered display name includes both a first and last name.
-        /// </summary>
-        /// <param name="displayName">The trimmed display name entered by the user.</param>
-        /// <returns>A <see cref="Task{TResult}" /> resolving to <see cref="Result.Success" /> or a validation error.</returns>
-        private static Task<ErrorOr<Success>> ValidateDisplayNameAsync(string displayName)
-        {
-            var (firstName, lastName) = displayName.SplitFullName();
-
-            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+            var onResult = new EventCallbackFactory().Create(this, async (string email) =>
             {
-                return Task.FromResult<ErrorOr<Success>>(Error.Validation(description: "Please enter both your first and last name (at least two words)."));
-            }
+                var updated = this.ViewModel.Profile.Clone();
+                updated.Email = email;
 
-            return Task.FromResult<ErrorOr<Success>>(Result.Success);
+                // To be done in ticket #221: Persist IsVerified and trigger Keycloak email verification on email change.
+                updated.IsVerified = false;
+
+                await this.ViewModel.UpdateProfile(updated);
+            });
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(ChangeEmailDialog.CurrentEmail), this.ViewModel.Profile.Email },
+                { nameof(ChangeEmailDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Change email"
+            };
+
+            await this.DialogService.OpenAsync<ChangeEmailDialog>(parameters, options);
         }
 
         /// <summary>
@@ -182,17 +215,35 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         }
 
         /// <summary>
-        /// Handles the action to edit the user's location.
-        /// </summary>
-        private static void OnEditLocation()
-        {
-        }
-
-        /// <summary>
         /// Handles the action to edit the user's website URL.
         /// </summary>
-        private static void OnEditWebsite()
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        private async Task OnEditWebsite()
         {
+            var onResult = new EventCallbackFactory().Create(this, async (string website) =>
+            {
+                var updated = this.ViewModel.Profile.Clone();
+                updated.Website = string.IsNullOrWhiteSpace(website) ? null : website;
+                await this.ViewModel.UpdateProfile(updated);
+            });
+
+            var validate = ValidateWebsiteAsync;
+
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(InputPromptDialog.Description), "Enter your website URL." },
+                { nameof(InputPromptDialog.Placeholder), "https://example.com" },
+                { nameof(InputPromptDialog.InitialValue), this.ViewModel.Profile.Website ?? string.Empty },
+                { nameof(InputPromptDialog.ValidateAsync), validate },
+                { nameof(InputPromptDialog.OnResult), onResult }
+            };
+
+            var options = new DialogOpenOptions
+            {
+                Title = "Edit website"
+            };
+
+            await this.DialogService.OpenAsync<InputPromptDialog>(parameters, options);
         }
 
         /// <summary>

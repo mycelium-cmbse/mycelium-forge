@@ -123,12 +123,14 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public async Task OnCreateOrganizationClicked()
         {
+            var billingEmail = this.BillingEmail.Trim().ToLowerInvariant();
             var isScopeValid = !string.IsNullOrWhiteSpace(this.Scope) && OrganizationValidator.ShortNameFormatRegex().IsMatch(this.Scope);
+            var isBillingEmailValid = !string.IsNullOrWhiteSpace(billingEmail) && OrganizationValidator.EmailFormatRegex().IsMatch(billingEmail);
 
             var isValid = this.ValidationManager
                 .Check(nameof(this.OrganizationName), !string.IsNullOrWhiteSpace(this.OrganizationName), "Organization name is required.")
                 .Check(nameof(this.Scope), isScopeValid, "Scope must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.")
-                .Check(nameof(this.BillingEmail), !string.IsNullOrWhiteSpace(this.BillingEmail), "Billing email is required.")
+                .Check(nameof(this.BillingEmail), isBillingEmailValid, "Billing email must be a valid email address.")
                 .IsValid;
 
             if (!isValid)
@@ -155,7 +157,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings.Dialogs
             {
                 OrganizationName = this.OrganizationName,
                 Scope = this.Scope,
-                BillingEmail = this.BillingEmail
+                BillingEmail = billingEmail
             };
 
             await this.OnResult.InvokeAsync(result);

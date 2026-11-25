@@ -1,0 +1,124 @@
+﻿@* ------------------------------------------------------------------------------------------------
+<copyright file="AddressDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+<DialogComponent>
+    <ChildContent>
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.EditedAddress.AddressLine1)))">
+            <BbFieldLabel For="address-line-1"
+                          Class="form-field-label">
+                Address line 1 <span class="text-primary">*</span>
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="address-line-1"
+                         Value="@(this.EditedAddress.AddressLine1)"
+                         ValueChanged="@(this.OnAddressLine1Changed)"
+                         Placeholder="e.g. 1 Main Street"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.EditedAddress.AddressLine1)])"/>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="address-line-2"
+                          Class="form-field-label">
+                Address line 2
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="address-line-2"
+                         Value="@(this.EditedAddress.AddressLine2)"
+                         ValueChanged="@(this.OnAddressLine2Changed)"
+                         Placeholder="e.g. Building B, floor 3"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.EditedAddress.Locality)))">
+            <BbFieldLabel For="address-locality"
+                          Class="form-field-label">
+                City <span class="text-primary">*</span>
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="address-locality"
+                         Value="@(this.EditedAddress.Locality)"
+                         ValueChanged="@(this.OnLocalityChanged)"
+                         Placeholder="e.g. Toulouse"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.EditedAddress.Locality)])"/>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="address-region"
+                          Class="form-field-label">
+                Region
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="address-region"
+                         Value="@(this.EditedAddress.Region)"
+                         ValueChanged="@(this.OnRegionChanged)"
+                         Placeholder="e.g. Occitanie"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5">
+            <BbFieldLabel For="address-postal-code"
+                          Class="form-field-label">
+                Postal code
+            </BbFieldLabel>
+            <BbFieldContent>
+                <BbInput Id="address-postal-code"
+                         Value="@(this.EditedAddress.PostalCode)"
+                         ValueChanged="@(this.OnPostalCodeChanged)"
+                         Placeholder="e.g. 31000"
+                         Class="h-10 w-full px-3 rounded-md bg-card border border-border text-sm leading-xs text-foreground focus:outline-none"/>
+            </BbFieldContent>
+        </BbField>
+
+        <BbField Class="w-full flex flex-col gap-1.5"
+                 IsInvalid="@(this.ValidationManager.HasError(nameof(this.EditedAddress.Country)))">
+            <BbFieldLabel For="address-country"
+                          Class="form-field-label">
+                Country <span class="text-primary">*</span>
+            </BbFieldLabel>
+            <BbFieldContent>
+                <ForgeSelect TValue="ICountry"
+                             Id="address-country"
+                             Value="@(this.SelectedCountry)"
+                             ValueChanged="@(this.OnCountryChanged)"
+                             Items="@(this.Countries)"
+                             DisplayTextSelector="@(GetCountryName)"
+                             ContentClass="max-h-60 overflow-y-auto"/>
+            </BbFieldContent>
+            <BbFieldError Class="form-field-error"
+                          Errors="@(this.ValidationManager[nameof(this.EditedAddress.Country)])"/>
+        </BbField>
+    </ChildContent>
+    <Footer>
+        <BbButton id="address-cancel-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCancelClicked)">
+            Cancel
+        </BbButton>
+
+        <BbButton id="address-submit-button"
+                  Variant="ButtonVariant.Default"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnSaveClicked)">
+            Save address
+        </BbButton>
+    </Footer>
+</DialogComponent>

@@ -13,6 +13,8 @@ namespace Mycelium.Forge.Data
 
     using Mycelium.Forge.Common;
 
+    using Nager.Country;
+
     /// <summary>
     /// Provides centralized development seed data entities for database persistence.
     /// </summary>
@@ -30,7 +32,7 @@ namespace Mycelium.Forge.Data
                 Name = "R. André",
                 ShortName = "r-andre",
                 Email = "regis.andre@starion.eu",
-                Website = "stariongroup.eu",
+                Website = "https://stariongroup.eu",
                 Origin = "Toulouse, France",
                 Status = ScopeStatusKind.ACTIVE
             };
@@ -116,42 +118,15 @@ namespace Mycelium.Forge.Data
 
             Countries =
             [
-                new Country
+                .. new CountryProvider().GetCountries().Select(country => new Country
                 {
                     Id = Guid.NewGuid(),
                     Owner = forgeId,
-                    Alpha2Code = "FR",
-                    Alpha3Code = "FRA",
-                    NumericCode = "250",
-                    Name = "France"
-                },
-                new Country
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = forgeId,
-                    Alpha2Code = "NL",
-                    Alpha3Code = "NLD",
-                    NumericCode = "528",
-                    Name = "Netherlands"
-                },
-                new Country
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = forgeId,
-                    Alpha2Code = "DE",
-                    Alpha3Code = "DEU",
-                    NumericCode = "276",
-                    Name = "Germany"
-                },
-                new Country
-                {
-                    Id = Guid.NewGuid(),
-                    Owner = forgeId,
-                    Alpha2Code = "US",
-                    Alpha3Code = "USA",
-                    NumericCode = "840",
-                    Name = "United States"
-                }
+                    Alpha2Code = country.Alpha2Code.ToString(),
+                    Alpha3Code = country.Alpha3Code.ToString(),
+                    NumericCode = country.NumericCode.ToString("D3"),
+                    Name = country.CommonName
+                }).Where(country => !string.IsNullOrWhiteSpace(country.Alpha2Code) && !string.IsNullOrWhiteSpace(country.Alpha3Code) && !string.IsNullOrWhiteSpace(country.NumericCode) && !string.IsNullOrWhiteSpace(country.Name))
             ];
 
             SysmlV2PackageType = new PackageType

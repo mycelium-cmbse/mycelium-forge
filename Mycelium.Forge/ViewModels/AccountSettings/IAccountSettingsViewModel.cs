@@ -37,9 +37,9 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         IPendingRequestsManagerViewModel PendingRequestsManagerViewModel { get; }
 
         /// <summary>
-        /// Gets or sets the primary address location string.
+        /// Gets the view model for managing the addresses.
         /// </summary>
-        string Location { get; set; }
+        IAddressesManagerViewModel AddressesManagerViewModel { get; }
 
         /// <summary>
         /// Initializes the view model state and populates initial user profile and organization data asynchronously.
