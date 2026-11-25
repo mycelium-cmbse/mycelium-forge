@@ -16,6 +16,8 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
     using System.Threading;
     using System.Threading.Tasks;
 
+    using DynamicData;
+
     using ErrorOr;
 
     using Microsoft.Extensions.Logging;
@@ -33,19 +35,19 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
     public class AccountSettingsViewModelTestFixture
     {
         private Mock<IAccountService> accountServiceMock;
-        private Mock<IAddressService> addressServiceMock;
+        private Mock<IAddressesManagerViewModel> addressesManagerViewModelMock;
         private Mock<IForgeContext> forgeContextMock;
         private Mock<INotificationService> notificationServiceMock;
         private Mock<IOrganizationService> organizationServiceMock;
         private Mock<IPendingRequestsManagerViewModel> pendingRequestsManagerViewModelMock;
         private Mock<IUserService> userServiceMock;
         private Mock<ILogger<AccountSettingsViewModel>> loggerMock;
+        private SourceList<Address> addressesSourceList;
         private AccountSettingsViewModel viewModel;
         private UserContext unauthenticatedContext;
         private UserContext authenticatedContext;
         private Account profileWithAddress;
         private Account profileNoAddress;
-        private Address address;
         private Organization adminOrg;
         private Organization memberOrg;
 
@@ -53,7 +55,10 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
         public void SetUp()
         {
             this.accountServiceMock = new Mock<IAccountService>();
-            this.addressServiceMock = new Mock<IAddressService>();
+            this.addressesManagerViewModelMock = new Mock<IAddressesManagerViewModel>();
+            this.addressesManagerViewModelMock.SetupProperty(x => x.OnPrimaryAddressChanging);
+            this.addressesSourceList = new SourceList<Address>();
+            this.addressesManagerViewModelMock.Setup(x => x.Addresses).Returns(this.addressesSourceList);
             this.forgeContextMock = new Mock<IForgeContext>();
             this.notificationServiceMock = new Mock<INotificationService>();
             this.organizationServiceMock = new Mock<IOrganizationService>();
@@ -89,12 +94,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
                 PrimaryAddress = null
             };
 
-            this.address = new Address
-            {
-                Id = addressId,
-                Locality = "Darmstadt"
-            };
-
             this.adminOrg = new Organization
             {
                 Id = Guid.NewGuid(),
@@ -114,15 +113,15 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             this.forgeContextMock.Setup(x => x.ForgeId).Returns(Guid.NewGuid());
             this.userServiceMock.Setup(x => x.GetUserContext(false)).ReturnsAsync(this.authenticatedContext);
             this.accountServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.profileWithAddress));
-            this.addressServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAddress>(this.address));
             this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.authenticatedContext, userId, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganization>());
 
-            this.viewModel = new AccountSettingsViewModel(this.loggerMock.Object, this.userServiceMock.Object, this.accountServiceMock.Object, this.addressServiceMock.Object, this.organizationServiceMock.Object, this.pendingRequestsManagerViewModelMock.Object, this.forgeContextMock.Object, this.notificationServiceMock.Object);
+            this.viewModel = new AccountSettingsViewModel(this.loggerMock.Object, this.userServiceMock.Object, this.accountServiceMock.Object, this.organizationServiceMock.Object, this.pendingRequestsManagerViewModelMock.Object, this.addressesManagerViewModelMock.Object, this.forgeContextMock.Object, this.notificationServiceMock.Object);
         }
 
         [TearDown]
         public void TearDown()
         {
+            this.addressesSourceList.Dispose();
             this.viewModel.Dispose();
         }
 
@@ -203,6 +202,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             {
                 Assert.That(this.viewModel.Profile, Is.Null);
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+                this.addressesManagerViewModelMock.Verify(x => x.InitializeViewModel(It.IsAny<Account>()), Times.Never);
             }
 
             // Scenario 2: Profile is null
@@ -215,6 +215,7 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             {
                 Assert.That(this.viewModel.Profile, Is.Null);
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(2));
+                this.addressesManagerViewModelMock.Verify(x => x.InitializeViewModel(It.IsAny<Account>()), Times.Never);
             }
 
             // Scenario 3: Organization read error and no primary address
@@ -227,13 +228,12 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Profile, Is.EqualTo(this.profileNoAddress));
-                Assert.That(this.viewModel.Location, Is.Empty);
                 Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(0));
+                this.addressesManagerViewModelMock.Verify(x => x.InitializeViewModel(this.profileNoAddress), Times.Once);
             }
 
             // Scenario 4: Happy path with address and organizations
             this.accountServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.profileWithAddress));
-            this.addressServiceMock.Setup(x => x.ReadAsync(this.authenticatedContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAddress>(this.address));
             this.organizationServiceMock.Setup(x => x.ReadByAccountMembershipAsync(this.authenticatedContext, userId, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IOrganization>(this.adminOrg, this.memberOrg));
 
             await this.viewModel.InitializeViewModel();
@@ -241,8 +241,8 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(this.viewModel.Profile, Is.EqualTo(this.profileWithAddress));
-                Assert.That(this.viewModel.Location, Is.EqualTo("Darmstadt"));
                 Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(2));
+                this.addressesManagerViewModelMock.Verify(x => x.InitializeViewModel(this.profileWithAddress), Times.Once);
                 this.pendingRequestsManagerViewModelMock.Verify(x => x.InitializeViewModel(), Times.Exactly(2));
             }
 
@@ -250,6 +250,32 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountSettings
             var newOrg = new Organization { Id = Guid.NewGuid(), Name = "Accepted Org" };
             this.pendingRequestsManagerViewModelMock.Object.OnOrganizationAccepted?.Invoke(newOrg);
             Assert.That(this.viewModel.Organizations, Has.Count.EqualTo(3));
+
+            // Verify OnPrimaryAddressChanging callback (failure then success without success notification)
+            var newPrimaryAddressId = Guid.NewGuid();
+            this.accountServiceMock.Setup(x => x.UpdateAndSyncAsync(this.authenticatedContext, It.IsAny<IEnumerable<IAccount>>(), CancellationToken.None)).ReturnsAsync(Error.Failure("Primary update failed"));
+
+            var primaryErrorResult = await this.addressesManagerViewModelMock.Object.OnPrimaryAddressChanging!(newPrimaryAddressId);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(primaryErrorResult.IsError, Is.True);
+                Assert.That(this.viewModel.Profile.PrimaryAddress, Is.EqualTo(this.profileWithAddress.PrimaryAddress));
+                this.notificationServiceMock.Verify(x => x.AddNotification("Failed to update profile.", "Error", NotificationType.Error), Times.Once);
+                this.userServiceMock.Verify(x => x.GetCurrentUser(true), Times.Never);
+            }
+
+            this.accountServiceMock.Setup(x => x.UpdateAndSyncAsync(this.authenticatedContext, It.IsAny<IEnumerable<IAccount>>(), CancellationToken.None)).ReturnsAsync(Result.Updated);
+
+            var primarySuccessResult = await this.addressesManagerViewModelMock.Object.OnPrimaryAddressChanging!(newPrimaryAddressId);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(primarySuccessResult.IsError, Is.False);
+                Assert.That(this.viewModel.Profile.PrimaryAddress, Is.EqualTo(newPrimaryAddressId));
+                this.userServiceMock.Verify(x => x.GetCurrentUser(true), Times.Once);
+                this.notificationServiceMock.Verify(x => x.AddNotification(It.IsAny<string>(), It.IsAny<string?>(), NotificationType.Success), Times.Never);
+            }
         }
 
         [Test]

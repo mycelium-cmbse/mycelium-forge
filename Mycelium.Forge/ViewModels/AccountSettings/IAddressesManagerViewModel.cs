@@ -55,13 +55,18 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         Task<ErrorOr<Success>> CreateAddress(Address address);
 
         /// <summary>
-        /// Updates an existing address of the user account asynchronously, and updates the primary address of the account when it
-        /// changed.
+        /// Updates an existing address of the user account asynchronously.
         /// </summary>
         /// <param name="address">The updated address.</param>
-        /// <param name="isPrimary">A value indicating whether the address is the primary address of the account.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
-        Task<ErrorOr<Success>> UpdateAddress(Address address, bool isPrimary);
+        Task<ErrorOr<Success>> UpdateAddress(Address address);
+
+        /// <summary>
+        /// Sets the specified address as the primary address of the user account asynchronously.
+        /// </summary>
+        /// <param name="addressId">The identifier of the address to mark as primary.</param>
+        /// <returns>A task indicating the success or failure of the operation.</returns>
+        Task<ErrorOr<Success>> SetPrimaryAddress(Guid addressId);
 
         /// <summary>
         /// Deletes an address of the user account asynchronously, clearing the primary address first when needed.

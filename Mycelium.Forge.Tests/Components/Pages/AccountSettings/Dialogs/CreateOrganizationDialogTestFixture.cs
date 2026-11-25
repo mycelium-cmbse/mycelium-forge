@@ -122,9 +122,20 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
 
             Assert.That(capturedResult, Is.Null);
 
-            // Scope conflict -> validation fails
+            // Invalid billing email -> validation fails
             dialog.Instance.OnOrganizationNameChanged("Starion Group");
             dialog.Instance.OnScopeChanged("starion");
+            dialog.Instance.OnBillingEmailChanged("invalid-billing-email");
+
+            await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(capturedResult, Is.Null);
+                Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.BillingEmail)), Is.True);
+            }
+
+            // Scope conflict -> validation fails
             dialog.Instance.OnBillingEmailChanged("billing@starion.eu");
 
             this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IScope>(new Organization { ShortName = "starion" }));
@@ -137,7 +148,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.AccountSettings.Dialogs
                 Assert.That(dialog.Instance.ValidationManager.HasError(nameof(dialog.Instance.Scope)), Is.True);
             }
 
-            // All valid and unique -> success
+            // All valid and unique -> success (billing email trimmed and lowercased)
+            dialog.Instance.OnBillingEmailChanged("  Billing@Starion.EU  ");
             this.scopeServiceMock.Setup(x => x.ReadByShortNameAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList<IScope>.Empty);
 
             await dialog.InvokeAsync(() => dialog.Instance.OnCreateOrganizationClicked());

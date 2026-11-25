@@ -101,8 +101,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task OnEditAddress(Address address)
         {
-            var isPrimary = this.IsPrimary(address);
-            var onResult = new EventCallbackFactory().Create(this, async (Address updatedAddress) => await this.ViewModel.UpdateAddress(updatedAddress, isPrimary));
+            var onResult = new EventCallbackFactory().Create(this, async (Address updatedAddress) => await this.ViewModel.UpdateAddress(updatedAddress));
 
             var parameters = new Dictionary<string, object>
             {
@@ -126,7 +125,7 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         private async Task OnSetPrimaryAddress(Address address)
         {
-            await this.ViewModel.UpdateAddress(address, true);
+            await this.ViewModel.SetPrimaryAddress(address.Id);
         }
 
         /// <summary>

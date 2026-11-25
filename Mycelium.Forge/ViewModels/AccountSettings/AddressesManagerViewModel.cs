@@ -156,13 +156,11 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         }
 
         /// <summary>
-        /// Updates an existing address of the user account asynchronously, and updates the primary address of the account when it
-        /// changed.
+        /// Updates an existing address of the user account asynchronously.
         /// </summary>
         /// <param name="address">The updated address.</param>
-        /// <param name="isPrimary">A value indicating whether the address is the primary address of the account.</param>
         /// <returns>A task indicating the success or failure of the operation.</returns>
-        public async Task<ErrorOr<Success>> UpdateAddress(Address address, bool isPrimary)
+        public async Task<ErrorOr<Success>> UpdateAddress(Address address)
         {
             var updateResult = await this.addressService.UpdateAsync(this.userContext, [address], CancellationToken.None);
 
@@ -171,15 +169,26 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
                 return this.HandleErrors("Failed to update address.", address.Id, updateResult.Errors);
             }
 
-            var primaryResult = await this.ApplyPrimaryAddress(address.Id, isPrimary);
             this.Addresses.Edit(innerList => innerList.Replace(innerList.Single(existing => existing.Id == address.Id), address));
+            this.notificationService.AddNotification("Address updated successfully.", "Address Updated", NotificationType.Success);
+            return Result.Success;
+        }
+
+        /// <summary>
+        /// Sets the specified address as the primary address of the user account asynchronously.
+        /// </summary>
+        /// <param name="addressId">The identifier of the address to mark as primary.</param>
+        /// <returns>A task indicating the success or failure of the operation.</returns>
+        public async Task<ErrorOr<Success>> SetPrimaryAddress(Guid addressId)
+        {
+            var primaryResult = await this.ApplyPrimaryAddress(addressId, true);
 
             if (primaryResult.IsError)
             {
                 return primaryResult;
             }
 
-            this.notificationService.AddNotification("Address updated successfully.", "Address Updated", NotificationType.Success);
+            this.notificationService.AddNotification("Primary address updated.", "Primary Address Updated", NotificationType.Success);
             return Result.Success;
         }
 
@@ -190,6 +199,7 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
         /// <returns>A task indicating the success or failure of the operation.</returns>
         public async Task<ErrorOr<Success>> DeleteAddress(Guid addressId)
         {
+            var wasPrimary = this.PrimaryAddressId == addressId;
             var clearResult = await this.ApplyPrimaryAddress(addressId, false);
 
             if (clearResult.IsError)
@@ -201,6 +211,11 @@ namespace Mycelium.Forge.ViewModels.AccountSettings
 
             if (deleteResult.IsError)
             {
+                if (wasPrimary)
+                {
+                    await this.ApplyPrimaryAddress(addressId, true);
+                }
+
                 return this.HandleErrors("Failed to delete address.", addressId, deleteResult.Errors);
             }
 

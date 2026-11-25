@@ -87,6 +87,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
             var validAdminOrg = new Organization { Administrator = [Guid.NewGuid()] };
             var invalidRegexOrg = new Organization { ShortName = "INVALID_SCOPE" };
             var validRegexOrg = new Organization { ShortName = "valid-scope-1" };
+            var nullBillingEmailOrg = new Organization { BillingEmail = null };
+            var emptyBillingEmailOrg = new Organization { BillingEmail = string.Empty };
+            var invalidBillingEmailOrg = new Organization { BillingEmail = "invalid-billing-email" };
+            var validBillingEmailOrg = new Organization { BillingEmail = "billing@starion.eu" };
 
             var emailResult = await this.validator.ValidateFields(organizationWithEmailOnly, x => x.Email);
             var nameResult = await this.validator.ValidateFields(organizationWithEmailOnly, x => x.Name);
@@ -98,6 +102,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
             var validAdminResult = await this.validator.ValidateFields(validAdminOrg, x => x.Administrator);
             var invalidRegexResult = await this.validator.ValidateFields(invalidRegexOrg, x => x.ShortName);
             var validRegexResult = await this.validator.ValidateFields(validRegexOrg, x => x.ShortName);
+            var nullBillingEmailResult = await this.validator.ValidateFields(nullBillingEmailOrg, x => x.BillingEmail);
+            var emptyBillingEmailResult = await this.validator.ValidateFields(emptyBillingEmailOrg, x => x.BillingEmail);
+            var invalidBillingEmailResult = await this.validator.ValidateFields(invalidBillingEmailOrg, x => x.BillingEmail);
+            var validBillingEmailResult = await this.validator.ValidateFields(validBillingEmailOrg, x => x.BillingEmail);
 
             using (Assert.EnterMultipleScope())
             {
@@ -111,6 +119,10 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
                 Assert.That(validAdminResult.IsError, Is.False);
                 Assert.That(invalidRegexResult.IsError, Is.True);
                 Assert.That(validRegexResult.IsError, Is.False);
+                Assert.That(nullBillingEmailResult.IsError, Is.False);
+                Assert.That(emptyBillingEmailResult.IsError, Is.False);
+                Assert.That(invalidBillingEmailResult.IsError, Is.True);
+                Assert.That(validBillingEmailResult.IsError, Is.False);
             }
         }
     }

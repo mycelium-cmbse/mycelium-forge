@@ -160,6 +160,8 @@ namespace Mycelium.Forge.Components.Pages.AccountSettings
             {
                 var updated = this.ViewModel.Profile.Clone();
                 updated.Email = email;
+
+                // To be done in ticket #221: Persist IsVerified and trigger Keycloak email verification on email change.
                 updated.IsVerified = false;
 
                 await this.ViewModel.UpdateProfile(updated);
