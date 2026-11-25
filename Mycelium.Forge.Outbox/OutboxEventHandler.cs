@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Outbox
     /// delegating to <see cref="HandleAsync(TEvent, CancellationToken)" />.
     /// </summary>
     /// <typeparam name="TEvent">The strongly typed <see cref="IOutboxEvent" /> handled by this instance.</typeparam>
-    public abstract class OutboxEventHandler<TEvent> : IOutboxEventHandler where TEvent : IOutboxEvent
+    public abstract class OutboxEventHandler<TEvent> : IOutboxEventHandler where TEvent : class, IOutboxEvent
     {
         /// <summary>
         /// The <see cref="ILogger" /> used to log deserialization and validation errors.

@@ -28,15 +28,7 @@ namespace Mycelium.Forge.Outbox
                 return false;
             }
 
-            foreach (var error in errors)
-            {
-                if (error.Type is ErrorType.Validation or ErrorType.NotFound or ErrorType.Conflict)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return errors.Any(error => error.Type is ErrorType.Validation or ErrorType.NotFound or ErrorType.Conflict);
         }
     }
 }

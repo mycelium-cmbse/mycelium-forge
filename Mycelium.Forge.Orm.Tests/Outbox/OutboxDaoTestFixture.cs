@@ -690,8 +690,12 @@ namespace Mycelium.Forge.Orm.Tests.Outbox
             var result = await this.outboxDao.ClaimBatchAsync(transaction, 1, TimeSpan.FromSeconds(30), CancellationToken.None);
             await transaction.CommitAsync();
 
-            Assert.That(result.IsError, Is.False);
-            Assert.That(result.Value, Has.Count.EqualTo(1));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.IsError, Is.False);
+                Assert.That(result.Value, Has.Count.EqualTo(1));
+            }
+
             return result.Value[0];
         }
 
