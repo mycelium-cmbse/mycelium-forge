@@ -23,6 +23,10 @@ namespace Mycelium.Forge.Outbox.Extensions
         /// Registers <see cref="OutboxOptions" /> with startup validation, <see cref="IOutboxDao" />, and the
         /// <see cref="OutboxDispatcherHostedService" /> background worker.
         /// </summary>
+        /// <remarks>
+        /// <see cref="IOutboxDao" /> is registered as a singleton as it does not have any state that needs to be managed
+        /// per request, and can be easily used in dispatcher logic.
+        /// </remarks>
         /// <param name="services">The <see cref="IServiceCollection" /> to configure.</param>
         /// <param name="configuration">The application configuration providing outbox settings.</param>
         /// <returns>The configured <see cref="IServiceCollection" /> instance.</returns>
@@ -31,8 +35,8 @@ namespace Mycelium.Forge.Outbox.Extensions
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(configuration);
 
-            services.AddOptions<OutboxOptions>().Bind(configuration.GetSection(OutboxOptions.SectionName)).Validate(IsValidOptions, "Outbox options must define positive intervals, batch size, max attempts, lease duration, and MaxRetryDelaySeconds >= BaseRetryDelaySeconds.").ValidateOnStart();
-            services.AddScoped<IOutboxDao, OutboxDao>();
+            services.AddOptions<OutboxOptions>().Bind(configuration.GetSection(OutboxOptions.SectionName)).Validate(IsValidOptions, "Outbox options must define positive intervals, batch size, max concurrency, max attempts, lease duration, and MaxRetryDelaySeconds >= BaseRetryDelaySeconds.").ValidateOnStart();
+            services.AddSingleton<IOutboxDao, OutboxDao>();
             services.AddHostedService<OutboxDispatcherHostedService>();
 
             return services;
@@ -47,6 +51,7 @@ namespace Mycelium.Forge.Outbox.Extensions
         {
             return options.PollingIntervalSeconds > 0
                    && options.BatchSize > 0
+                   && options.MaxConcurrency > 0
                    && options.MaxAttempts > 0
                    && options.LeaseDurationSeconds > 0
                    && options.BaseRetryDelaySeconds > 0

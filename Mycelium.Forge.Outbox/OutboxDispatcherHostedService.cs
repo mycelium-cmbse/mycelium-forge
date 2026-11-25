@@ -29,6 +29,11 @@ namespace Mycelium.Forge.Outbox
     /// <see cref="OutboxOptions.MaxAttempts" />) log an error and remain in <c>forge.outbox_message</c> with
     /// <see cref="OutboxMessageStatus.Failed" /> and <c>last_error</c> for manual SQL inspection or replay until
     /// dedicated admin tooling or metrics are added.
+    /// <para>
+    /// When multiple <see cref="IOutboxEventHandler" /> registrations share an event type, all matching handlers execute
+    /// per attempt and must be idempotent: a transient failure in any handler reschedules the message, re-runs all
+    /// matching handlers on retry, and holds per-aggregate ordering until every handler succeeds or fails permanently.
+    /// </para>
     /// </remarks>
     public class OutboxDispatcherHostedService : BackgroundService
     {
@@ -58,7 +63,12 @@ namespace Mycelium.Forge.Outbox
         private readonly OutboxOptions options;
 
         /// <summary>
-        /// The injected <see cref="IServiceScopeFactory" /> used to resolve scoped DAOs and handlers per polling cycle.
+        /// The injected <see cref="IOutboxDao" /> used to claim and update outbox messages.
+        /// </summary>
+        private readonly IOutboxDao outboxDao;
+
+        /// <summary>
+        /// The injected <see cref="IServiceScopeFactory" /> used to resolve scoped handlers per message.
         /// </summary>
         private readonly IServiceScopeFactory serviceScopeFactory;
 
@@ -66,12 +76,14 @@ namespace Mycelium.Forge.Outbox
         /// Initializes a new instance of the <see cref="OutboxDispatcherHostedService" /> class.
         /// </summary>
         /// <param name="databaseSource">The injected <see cref="IDatabaseSource" />.</param>
+        /// <param name="outboxDao">The injected <see cref="IOutboxDao" />.</param>
         /// <param name="serviceScopeFactory">The injected <see cref="IServiceScopeFactory" />.</param>
         /// <param name="options">The injected <see cref="OutboxOptions" />.</param>
         /// <param name="logger">The injected <see cref="ILogger{OutboxDispatcherHostedService}" />.</param>
-        public OutboxDispatcherHostedService(IDatabaseSource databaseSource, IServiceScopeFactory serviceScopeFactory, IOptions<OutboxOptions> options, ILogger<OutboxDispatcherHostedService> logger)
+        public OutboxDispatcherHostedService(IDatabaseSource databaseSource, IOutboxDao outboxDao, IServiceScopeFactory serviceScopeFactory, IOptions<OutboxOptions> options, ILogger<OutboxDispatcherHostedService> logger)
         {
             this.databaseSource = databaseSource;
+            this.outboxDao = outboxDao;
             this.serviceScopeFactory = serviceScopeFactory;
             this.options = options.Value;
             this.logger = logger;
@@ -146,20 +158,17 @@ namespace Mycelium.Forge.Outbox
         }
 
         /// <summary>
-        /// Claims the next batch of eligible outbox messages and dispatches each message outside the claim transaction.
+        /// Claims the next batch of eligible outbox messages and dispatches messages concurrently up to
+        /// <see cref="OutboxOptions.MaxConcurrency" /> with an isolated DI scope per message.
         /// </summary>
         /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous batch operation.</returns>
         private async Task ProcessNextBatchAsync(CancellationToken stoppingToken)
         {
-            await using var scope = this.serviceScopeFactory.CreateAsyncScope();
-            var outboxDao = scope.ServiceProvider.GetRequiredService<IOutboxDao>();
-            var handlers = scope.ServiceProvider.GetServices<IOutboxEventHandler>().ToLookup(handler => handler.EventType, StringComparer.Ordinal);
-
             var batchSize = this.options.BatchSize;
             var leaseDuration = TimeSpan.FromSeconds(this.options.LeaseDurationSeconds);
 
-            var claimResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.ClaimBatchAsync(transaction, batchSize, leaseDuration, stoppingToken), stoppingToken);
+            var claimResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.outboxDao.ClaimBatchAsync(transaction, batchSize, leaseDuration, stoppingToken), stoppingToken);
 
             if (claimResult.IsError)
             {
@@ -172,22 +181,38 @@ namespace Mycelium.Forge.Outbox
                 return;
             }
 
-            foreach (var message in claimResult.Value)
+            var parallelOptions = new ParallelOptions
             {
-                await this.ProcessMessageAsync(outboxDao, handlers, message, stoppingToken);
-            }
+                MaxDegreeOfParallelism = this.options.MaxConcurrency,
+                CancellationToken = stoppingToken
+            };
+
+            await Parallel.ForEachAsync(claimResult.Value, parallelOptions, this.ProcessMessageInScopeAsync);
+        }
+
+        /// <summary>
+        /// Creates a dedicated DI scope and processes a single claimed outbox message.
+        /// </summary>
+        /// <param name="message">The claimed <see cref="OutboxMessage" /> to process.</param>
+        /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>A <see cref="ValueTask" /> representing the asynchronous message processing.</returns>
+        private async ValueTask ProcessMessageInScopeAsync(OutboxMessage message, CancellationToken stoppingToken)
+        {
+            await using var scope = this.serviceScopeFactory.CreateAsyncScope();
+            var handlers = scope.ServiceProvider.GetServices<IOutboxEventHandler>().ToLookup(handler => handler.EventType, StringComparer.Ordinal);
+
+            await this.ProcessMessageAsync(handlers, message, stoppingToken);
         }
 
         /// <summary>
         /// Dispatches a single claimed outbox message to all matching handlers and updates or deletes its outbox record in a
         /// short transaction.
         /// </summary>
-        /// <param name="outboxDao">The scoped <see cref="IOutboxDao" /> instance.</param>
         /// <param name="handlers">The registered <see cref="IOutboxEventHandler" /> lookup keyed by event type.</param>
         /// <param name="message">The claimed <see cref="OutboxMessage" /> to process.</param>
         /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous message processing.</returns>
-        private async Task ProcessMessageAsync(IOutboxDao outboxDao, ILookup<string, IOutboxEventHandler> handlers, OutboxMessage message, CancellationToken stoppingToken)
+        private async Task ProcessMessageAsync(ILookup<string, IOutboxEventHandler> handlers, OutboxMessage message, CancellationToken stoppingToken)
         {
             var claimToken = message.ClaimToken ?? Guid.Empty;
             var matchingHandlers = handlers[message.EventType].ToList();
@@ -196,7 +221,7 @@ namespace Mycelium.Forge.Outbox
             {
                 var missingHandlerError = $"No outbox handler registered for event type '{message.EventType}'.";
                 this.logger.LogError("Outbox message {MessageId} permanently failed: {Error}", message.Id.SanitizeForLog(), missingHandlerError.SanitizeForLog());
-                await this.MarkFailedInTransactionAsync(outboxDao, message.Id, claimToken, missingHandlerError, stoppingToken);
+                await this.MarkFailedInTransactionAsync(message.Id, claimToken, missingHandlerError, stoppingToken);
                 return;
             }
 
@@ -214,7 +239,7 @@ namespace Mycelium.Forge.Outbox
 
             if (errors.Count == 0)
             {
-                var deleteResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.DeleteAsync(transaction, message.Id, claimToken, stoppingToken), stoppingToken);
+                var deleteResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.outboxDao.DeleteAsync(transaction, message.Id, claimToken, stoppingToken), stoppingToken);
 
                 if (deleteResult.IsError)
                 {
@@ -230,14 +255,14 @@ namespace Mycelium.Forge.Outbox
             if (OutboxErrorClassifier.IsPermanentError(errors) || message.Attempts >= maxAttempts)
             {
                 this.logger.LogError("Outbox message {MessageId} ({EventType}) permanently failed on attempt {Attempts}/{MaxAttempts}: {Error}", message.Id.SanitizeForLog(), message.EventType.SanitizeForLog(), message.Attempts, maxAttempts, errorDescription.SanitizeForLog());
-                await this.MarkFailedInTransactionAsync(outboxDao, message.Id, claimToken, errorDescription, stoppingToken);
+                await this.MarkFailedInTransactionAsync(message.Id, claimToken, errorDescription, stoppingToken);
                 return;
             }
 
             var nextAttemptAt = DateTimeOffset.UtcNow.Add(this.CalculateRetryDelay(message.Attempts));
             this.logger.LogWarning("Outbox message {MessageId} ({EventType}) failed on attempt {Attempts}/{MaxAttempts}; rescheduling for {NextAttemptAt}: {Error}", message.Id.SanitizeForLog(), message.EventType.SanitizeForLog(), message.Attempts, maxAttempts, nextAttemptAt, errorDescription.SanitizeForLog());
 
-            var rescheduleResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.RescheduleAsync(transaction, message.Id, claimToken, nextAttemptAt, errorDescription, stoppingToken), stoppingToken);
+            var rescheduleResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.outboxDao.RescheduleAsync(transaction, message.Id, claimToken, nextAttemptAt, errorDescription, stoppingToken), stoppingToken);
 
             if (rescheduleResult.IsError)
             {
@@ -248,15 +273,14 @@ namespace Mycelium.Forge.Outbox
         /// <summary>
         /// Marks an outbox message as permanently failed inside a short database transaction.
         /// </summary>
-        /// <param name="outboxDao">The scoped <see cref="IOutboxDao" /> instance.</param>
         /// <param name="messageId">The unique identifier of the outbox message.</param>
         /// <param name="claimToken">The fencing token assigned when the message was claimed.</param>
         /// <param name="errorDescription">The error description to persist.</param>
         /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous update operation.</returns>
-        private async Task MarkFailedInTransactionAsync(IOutboxDao outboxDao, Guid messageId, Guid claimToken, string errorDescription, CancellationToken stoppingToken)
+        private async Task MarkFailedInTransactionAsync(Guid messageId, Guid claimToken, string errorDescription, CancellationToken stoppingToken)
         {
-            var markFailedResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => outboxDao.MarkFailedAsync(transaction, messageId, claimToken, errorDescription, stoppingToken), stoppingToken);
+            var markFailedResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.outboxDao.MarkFailedAsync(transaction, messageId, claimToken, errorDescription, stoppingToken), stoppingToken);
 
             if (markFailedResult.IsError)
             {

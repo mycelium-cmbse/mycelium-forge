@@ -54,7 +54,6 @@ namespace Mycelium.Forge.Outbox.Tests
             this.secondaryHandlerMock.Setup(x => x.EventType).Returns("Secondary.Only");
 
             var services = new ServiceCollection();
-            services.AddScoped(_ => this.outboxDaoMock.Object);
             services.AddScoped(_ => this.eventHandlerMock.Object);
             services.AddScoped(_ => this.secondaryHandlerMock.Object);
             this.serviceProvider = services.BuildServiceProvider();
@@ -85,7 +84,7 @@ namespace Mycelium.Forge.Outbox.Tests
         public async Task VerifyStartAsync()
         {
             // Case 1: Disabled outbox exits immediately without claiming batches
-            using var disabledService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(new OutboxOptions { Enabled = false }), this.loggerMock.Object);
+            using var disabledService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(new OutboxOptions { Enabled = false }), this.loggerMock.Object);
             await disabledService.StartAsync(CancellationToken.None);
             await disabledService.ExecuteTask!;
 
@@ -96,7 +95,7 @@ namespace Mycelium.Forge.Outbox.Tests
             var emptyBatchCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             this.outboxDaoMock.Setup(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).Callback(() => emptyBatchCompleted.TrySetResult()).ReturnsAsync(ErrorOrFactory.From(emptyBatch));
 
-            using var emptyBatchService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var emptyBatchService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await emptyBatchService.StartAsync(CancellationToken.None);
             await emptyBatchCompleted.Task;
             await emptyBatchService.StopAsync(CancellationToken.None);
@@ -111,7 +110,7 @@ namespace Mycelium.Forge.Outbox.Tests
             var claimErrorCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             this.outboxDaoMock.Setup(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).Callback(() => claimErrorCompleted.TrySetResult()).ReturnsAsync(Error.Failure("Outbox.ClaimError", "Claim failed"));
 
-            using var claimErrorService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var claimErrorService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await claimErrorService.StartAsync(CancellationToken.None);
             await claimErrorCompleted.Task;
             await claimErrorService.StopAsync(CancellationToken.None);
@@ -132,7 +131,7 @@ namespace Mycelium.Forge.Outbox.Tests
             this.eventHandlerMock.Setup(x => x.HandleAsync(successMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
             this.outboxDaoMock.Setup(x => x.DeleteAsync(It.IsAny<NpgsqlTransaction>(), successMessage.Id, successClaimToken, It.IsAny<CancellationToken>())).Callback(() => deleteCompleted.TrySetResult()).ReturnsAsync(Result.Deleted);
 
-            using var successService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var successService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await successService.StartAsync(CancellationToken.None);
             await deleteCompleted.Task;
             await successService.StopAsync(CancellationToken.None);
@@ -159,7 +158,7 @@ namespace Mycelium.Forge.Outbox.Tests
             this.secondaryHandlerMock.Setup(x => x.HandleAsync(fanOutMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Unauthorized("Keycloak.SyncFailed", "Unauthorized"));
             this.outboxDaoMock.Setup(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), fanOutMessage.Id, fanOutToken, It.IsAny<DateTimeOffset>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback(() => fanOutCompleted.TrySetResult()).ReturnsAsync(Result.Updated);
 
-            using var fanOutService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var fanOutService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await fanOutService.StartAsync(CancellationToken.None);
             await fanOutCompleted.Task;
             await fanOutService.StopAsync(CancellationToken.None);
@@ -189,7 +188,7 @@ namespace Mycelium.Forge.Outbox.Tests
                 unknownFailedCompleted.TrySetResult();
             }).ReturnsAsync(Result.Updated);
 
-            using var unknownEventService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var unknownEventService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await unknownEventService.StartAsync(CancellationToken.None);
             await unknownFailedCompleted.Task;
             await unknownEventService.StopAsync(CancellationToken.None);
@@ -223,7 +222,7 @@ namespace Mycelium.Forge.Outbox.Tests
                 rescheduleCompleted.TrySetResult();
             }).ReturnsAsync(Result.Updated);
 
-            using var rescheduleService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var rescheduleService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await rescheduleService.StartAsync(CancellationToken.None);
             await rescheduleCompleted.Task;
             await rescheduleService.StopAsync(CancellationToken.None);
@@ -252,7 +251,7 @@ namespace Mycelium.Forge.Outbox.Tests
             this.eventHandlerMock.Setup(x => x.HandleAsync(permanentMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Validation("Keycloak.SyncFailed", "Bad request"));
             this.outboxDaoMock.Setup(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), permanentMessage.Id, permanentClaimToken, It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback(() => permanentCompleted.TrySetResult()).ReturnsAsync(Result.Updated);
 
-            using var permanentService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var permanentService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await permanentService.StartAsync(CancellationToken.None);
             await permanentCompleted.Task;
             await permanentService.StopAsync(CancellationToken.None);
@@ -276,7 +275,7 @@ namespace Mycelium.Forge.Outbox.Tests
             this.eventHandlerMock.Setup(x => x.HandleAsync(exhaustedMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Keycloak.SyncFailed", "Timeout"));
             this.outboxDaoMock.Setup(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), exhaustedMessage.Id, exhaustedClaimToken, It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback(() => exhaustedCompleted.TrySetResult()).ReturnsAsync(Result.Updated);
 
-            using var exhaustedService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var exhaustedService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await exhaustedService.StartAsync(CancellationToken.None);
             await exhaustedCompleted.Task;
             await exhaustedService.StopAsync(CancellationToken.None);
@@ -300,7 +299,7 @@ namespace Mycelium.Forge.Outbox.Tests
             this.eventHandlerMock.Setup(x => x.HandleAsync(throwingMessage, It.IsAny<CancellationToken>())).ThrowsAsync(new InvalidOperationException("Handler crashed"));
             this.outboxDaoMock.Setup(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), throwingMessage.Id, throwingClaimToken, It.IsAny<DateTimeOffset>(), It.Is<string>(error => error.Contains("Handler crashed")), It.IsAny<CancellationToken>())).Callback(() => handlerExceptionCompleted.TrySetResult()).ReturnsAsync(Result.Updated);
 
-            using var throwingHandlerService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var throwingHandlerService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await throwingHandlerService.StartAsync(CancellationToken.None);
             await handlerExceptionCompleted.Task;
             await throwingHandlerService.StopAsync(CancellationToken.None);
@@ -319,7 +318,7 @@ namespace Mycelium.Forge.Outbox.Tests
             this.eventHandlerMock.Setup(x => x.HandleAsync(conflictMessage, It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
             this.outboxDaoMock.Setup(x => x.DeleteAsync(It.IsAny<NpgsqlTransaction>(), conflictMessage.Id, conflictClaimToken, It.IsAny<CancellationToken>())).Callback(() => conflictCompleted.TrySetResult()).ReturnsAsync(Error.Conflict("Outbox.Conflict", "Ownership lost"));
 
-            using var conflictService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var conflictService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await conflictService.StartAsync(CancellationToken.None);
             await conflictCompleted.Task;
             await conflictService.StopAsync(CancellationToken.None);
@@ -332,7 +331,7 @@ namespace Mycelium.Forge.Outbox.Tests
 
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<IReadOnlyList<OutboxMessage>>>>>(), It.IsAny<CancellationToken>())).Callback(() => pollExceptionCompleted.TrySetResult()).ThrowsAsync(new InvalidOperationException("Database temporarily unavailable"));
 
-            using var resilientService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            using var resilientService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
             await resilientService.StartAsync(CancellationToken.None);
             await pollExceptionCompleted.Task;
             await resilientService.StopAsync(CancellationToken.None);

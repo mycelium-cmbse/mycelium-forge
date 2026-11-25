@@ -108,7 +108,7 @@ namespace Mycelium.Forge
                     {
                         services.RegisterDatabase(context.Configuration);
                         services.AddForgeDal();
-                        services.AddScoped<IOutboxDao, OutboxDao>();
+                        services.AddSingleton<IOutboxDao, OutboxDao>();
                         services.AddScoped<IDatabaseMigrator, DatabaseMigrator>();
                         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
                         services.Configure<KeycloakOptions>(context.Configuration.GetSection(KeycloakOptions.SectionName));

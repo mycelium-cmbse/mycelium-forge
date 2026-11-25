@@ -13,6 +13,12 @@ namespace Mycelium.Forge.Outbox
     /// Represents configuration settings for the transactional outbox dispatcher and retry behavior,
     /// bound from the <see cref="SectionName" /> section of the application settings.
     /// </summary>
+    /// <remarks>
+    /// Messages within a claimed batch belong to distinct aggregates and are dispatched in parallel up to
+    /// <see cref="MaxConcurrency" />, while handlers for a single message execute sequentially. Operators should size
+    /// <see cref="BatchSize" />, <see cref="MaxConcurrency" />, and <see cref="LeaseDurationSeconds" /> together so a
+    /// batch completes comfortably within the lease window and queued messages are not reclaimed before completion.
+    /// </remarks>
     public class OutboxOptions
     {
         /// <summary>
@@ -34,6 +40,11 @@ namespace Mycelium.Forge.Outbox
         /// Gets or sets the maximum number of outbox messages claimed per polling batch.
         /// </summary>
         public int BatchSize { get; set; } = 20;
+
+        /// <summary>
+        /// Gets or sets the maximum number of claimed outbox messages processed concurrently within a batch.
+        /// </summary>
+        public int MaxConcurrency { get; set; } = 5;
 
         /// <summary>
         /// Gets or sets the maximum number of durable delivery attempts before marking a message as failed.
