@@ -48,6 +48,12 @@ namespace Mycelium.Forge.Outbox
         private const double JitterRange = 0.4;
 
         /// <summary>
+        /// The fraction of the lease usable by handlers. The remainder is a safety margin so handlers are cancelled and the
+        /// outcome is persisted before the message can be reclaimed by another instance.
+        /// </summary>
+        private const double LeaseUsableRatio = 0.9;
+
+        /// <summary>
         /// The injected <see cref="IDatabaseSource" /> used to manage short outbox transactions.
         /// </summary>
         private readonly IDatabaseSource databaseSource;
@@ -139,15 +145,15 @@ namespace Mycelium.Forge.Outbox
         /// </summary>
         /// <param name="handler">The handler matching the outbox message event type.</param>
         /// <param name="message">The claimed <see cref="OutboxMessage" /> to process.</param>
-        /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken" /> cancelled on shutdown or when the message lease expires.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> representing the handler execution outcome.</returns>
-        private static async Task<ErrorOr<Success>> ExecuteHandlerSafelyAsync(IOutboxEventHandler handler, OutboxMessage message, CancellationToken stoppingToken)
+        private static async Task<ErrorOr<Success>> ExecuteHandlerSafelyAsync(IOutboxEventHandler handler, OutboxMessage message, CancellationToken cancellationToken)
         {
             try
             {
-                return await handler.HandleAsync(message, stoppingToken);
+                return await handler.HandleAsync(message, cancellationToken);
             }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 throw;
             }
@@ -168,6 +174,9 @@ namespace Mycelium.Forge.Outbox
             var batchSize = this.options.BatchSize;
             var leaseDuration = TimeSpan.FromSeconds(this.options.LeaseDurationSeconds);
 
+            using var leaseTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+            leaseTokenSource.CancelAfter(leaseDuration * LeaseUsableRatio);
+
             var claimResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.outboxDao.ClaimBatchAsync(transaction, batchSize, leaseDuration, stoppingToken), stoppingToken);
 
             if (claimResult.IsError)
@@ -187,21 +196,39 @@ namespace Mycelium.Forge.Outbox
                 CancellationToken = stoppingToken
             };
 
-            await Parallel.ForEachAsync(claimResult.Value, parallelOptions, this.ProcessMessageInScopeAsync);
+            await Parallel.ForEachAsync(claimResult.Value, parallelOptions, (message, token) => this.ProcessMessageInScopeAsync(message, leaseTokenSource.Token, token));
         }
 
         /// <summary>
-        /// Creates a dedicated DI scope and processes a single claimed outbox message.
+        /// Creates a dedicated DI scope and processes a single claimed outbox message, cancelling its handlers when the
+        /// batch lease expires. Messages whose lease already expired before processing started are skipped so they can be
+        /// reclaimed.
         /// </summary>
         /// <param name="message">The claimed <see cref="OutboxMessage" /> to process.</param>
+        /// <param name="leaseToken">The <see cref="CancellationToken" /> cancelled on shutdown or when the batch lease expires.</param>
         /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="ValueTask" /> representing the asynchronous message processing.</returns>
-        private async ValueTask ProcessMessageInScopeAsync(OutboxMessage message, CancellationToken stoppingToken)
+        private async ValueTask ProcessMessageInScopeAsync(OutboxMessage message, CancellationToken leaseToken, CancellationToken stoppingToken)
         {
-            await using var scope = this.serviceScopeFactory.CreateAsyncScope();
-            var handlers = scope.ServiceProvider.GetServices<IOutboxEventHandler>().ToLookup(handler => handler.EventType, StringComparer.Ordinal);
+            stoppingToken.ThrowIfCancellationRequested();
 
-            await this.ProcessMessageAsync(handlers, message, stoppingToken);
+            if (leaseToken.IsCancellationRequested)
+            {
+                this.logger.LogWarning("Lease for outbox message {MessageId} expired before processing started; skipping so it can be reclaimed", message.Id.SanitizeForLog());
+                return;
+            }
+
+            try
+            {
+                await using var scope = this.serviceScopeFactory.CreateAsyncScope();
+                var handlers = scope.ServiceProvider.GetServices<IOutboxEventHandler>().ToLookup(handler => handler.EventType, StringComparer.Ordinal);
+
+                await this.ProcessMessageAsync(handlers, message, leaseToken, stoppingToken);
+            }
+            catch (OperationCanceledException) when (leaseToken.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
+            {
+                await this.HandleFailureAsync(message, message.ClaimToken ?? Guid.Empty, [Error.Failure("Outbox.LeaseExpired", "Lease expired while processing; handlers were cancelled.")], stoppingToken);
+            }
         }
 
         /// <summary>
@@ -210,9 +237,10 @@ namespace Mycelium.Forge.Outbox
         /// </summary>
         /// <param name="handlers">The registered <see cref="IOutboxEventHandler" /> lookup keyed by event type.</param>
         /// <param name="message">The claimed <see cref="OutboxMessage" /> to process.</param>
+        /// <param name="leaseToken">The <see cref="CancellationToken" /> passed to handlers, cancelled on shutdown or when the message lease expires.</param>
         /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous message processing.</returns>
-        private async Task ProcessMessageAsync(ILookup<string, IOutboxEventHandler> handlers, OutboxMessage message, CancellationToken stoppingToken)
+        private async Task ProcessMessageAsync(ILookup<string, IOutboxEventHandler> handlers, OutboxMessage message, CancellationToken leaseToken, CancellationToken stoppingToken)
         {
             var claimToken = message.ClaimToken ?? Guid.Empty;
             var matchingHandlers = handlers[message.EventType].ToList();
@@ -229,7 +257,7 @@ namespace Mycelium.Forge.Outbox
 
             foreach (var handler in matchingHandlers)
             {
-                var handleResult = await ExecuteHandlerSafelyAsync(handler, message, stoppingToken);
+                var handleResult = await ExecuteHandlerSafelyAsync(handler, message, leaseToken);
 
                 if (handleResult.IsError)
                 {
@@ -249,6 +277,20 @@ namespace Mycelium.Forge.Outbox
                 return;
             }
 
+            await this.HandleFailureAsync(message, claimToken, errors, stoppingToken);
+        }
+
+        /// <summary>
+        /// Marks a failed outbox message as permanently failed or reschedules it with exponential backoff, depending on the
+        /// error classification and the number of attempts performed.
+        /// </summary>
+        /// <param name="message">The claimed <see cref="OutboxMessage" /> that failed.</param>
+        /// <param name="claimToken">The fencing token assigned when the message was claimed.</param>
+        /// <param name="errors">The errors that caused the failure.</param>
+        /// <param name="stoppingToken">The <see cref="CancellationToken" /> used to cancel the operation.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous failure handling.</returns>
+        private async Task HandleFailureAsync(OutboxMessage message, Guid claimToken, List<Error> errors, CancellationToken stoppingToken)
+        {
             var errorDescription = errors.ToJoinedDescriptions();
             var maxAttempts = this.options.MaxAttempts;
 

@@ -15,9 +15,13 @@ namespace Mycelium.Forge.Outbox
     /// </summary>
     /// <remarks>
     /// Messages within a claimed batch belong to distinct aggregates and are dispatched in parallel up to
-    /// <see cref="MaxConcurrency" />, while handlers for a single message execute sequentially. Operators should size
-    /// <see cref="BatchSize" />, <see cref="MaxConcurrency" />, and <see cref="LeaseDurationSeconds" /> together so a
-    /// batch completes comfortably within the lease window and queued messages are not reclaimed before completion.
+    /// <see cref="MaxConcurrency" />, while handlers for a single message execute sequentially. The lease of every message
+    /// starts when the batch is claimed: handlers are cancelled when 90% of their message lease has elapsed, the message is
+    /// then retried with backoff like any other transient failure, and messages whose lease expired while queued are
+    /// skipped, so they are never processed after another instance may have reclaimed them. Operators should still size
+    /// <see cref="BatchSize" />, <see cref="MaxConcurrency" />, and <see cref="LeaseDurationSeconds" /> together so
+    /// batches complete within the lease window, otherwise messages are repeatedly cancelled or skipped and consume
+    /// delivery attempts.
     /// </remarks>
     public class OutboxOptions
     {
@@ -52,9 +56,10 @@ namespace Mycelium.Forge.Outbox
         public int MaxAttempts { get; set; } = 10;
 
         /// <summary>
-        /// Gets or sets the lease duration in seconds for claimed outbox messages before they become reclaimable.
+        /// Gets or sets the lease duration in seconds for claimed outbox messages before they become reclaimable. It must
+        /// exceed the worst-case duration of a single message across all its handlers plus a 10% safety margin.
         /// </summary>
-        public int LeaseDurationSeconds { get; set; } = 30;
+        public int LeaseDurationSeconds { get; set; } = 60;
 
         /// <summary>
         /// Gets or sets the base delay in seconds for exponential backoff between durable retry attempts.

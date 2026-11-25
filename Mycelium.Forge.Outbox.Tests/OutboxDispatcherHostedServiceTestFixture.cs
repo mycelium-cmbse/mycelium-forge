@@ -80,7 +80,7 @@ namespace Mycelium.Forge.Outbox.Tests
         }
 
         [Test]
-        [CancelAfter(10000)]
+        [CancelAfter(30000)]
         public async Task VerifyStartAsync()
         {
             // Case 1: Disabled outbox exits immediately without claiming batches
@@ -337,6 +337,114 @@ namespace Mycelium.Forge.Outbox.Tests
             await resilientService.StopAsync(CancellationToken.None);
 
             this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.AtLeastOnce());
+
+            // Case 13: Lease expires while a handler runs -> handler token is cancelled, message is rescheduled and queued messages with an expired lease are skipped
+            this.ResetMocks();
+            var leaseOptions = new OutboxOptions { Enabled = true, PollingIntervalSeconds = 1, BatchSize = 20, MaxConcurrency = 1, MaxAttempts = 5, LeaseDurationSeconds = 2, BaseRetryDelaySeconds = 10, MaxRetryDelaySeconds = 300 };
+            var leaseClaimToken = Guid.NewGuid();
+            var leaseMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = Guid.NewGuid(), EventType = TestEventType, Payload = "{}", Attempts = 1, ClaimToken = leaseClaimToken };
+            var skippedMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = Guid.NewGuid(), EventType = TestEventType, Payload = "{}", Attempts = 1, ClaimToken = Guid.NewGuid() };
+            var leaseBatchProcessed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var capturedHandlerToken = CancellationToken.None;
+            var capturedLeaseError = string.Empty;
+            var leaseClaimCalls = 0;
+
+            IReadOnlyList<OutboxMessage> leaseBatch = [leaseMessage, skippedMessage];
+
+            this.outboxDaoMock.Setup(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(2), It.IsAny<CancellationToken>())).Returns(() =>
+            {
+                leaseClaimCalls++;
+
+                if (leaseClaimCalls == 1)
+                {
+                    return Task.FromResult(ErrorOrFactory.From(leaseBatch));
+                }
+
+                leaseBatchProcessed.TrySetResult();
+                return Task.FromResult(ErrorOrFactory.From(emptyBatch2));
+            });
+
+            this.eventHandlerMock.Setup(x => x.HandleAsync(leaseMessage, It.IsAny<CancellationToken>())).Returns<OutboxMessage, CancellationToken>(async (_, token) =>
+            {
+                capturedHandlerToken = token;
+                await Task.Delay(Timeout.Infinite, token);
+                return ErrorOrFactory.From(Result.Success);
+            });
+
+            this.outboxDaoMock.Setup(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), leaseMessage.Id, leaseClaimToken, It.IsAny<DateTimeOffset>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback<NpgsqlTransaction, Guid, Guid, DateTimeOffset, string, CancellationToken>((_, _, _, _, error, _) => capturedLeaseError = error).ReturnsAsync(Result.Updated);
+
+            using var leaseService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(leaseOptions), this.loggerMock.Object);
+            await leaseService.StartAsync(CancellationToken.None);
+            await leaseBatchProcessed.Task;
+            await leaseService.StopAsync(CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(capturedHandlerToken.IsCancellationRequested, Is.True);
+                Assert.That(capturedLeaseError, Does.Contain("Lease expired"));
+                this.outboxDaoMock.Verify(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), leaseMessage.Id, leaseClaimToken, It.IsAny<DateTimeOffset>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once());
+                this.eventHandlerMock.Verify(x => x.HandleAsync(skippedMessage, It.IsAny<CancellationToken>()), Times.Never());
+                this.outboxDaoMock.Verify(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), skippedMessage.Id, It.IsAny<Guid>(), It.IsAny<DateTimeOffset>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+                this.outboxDaoMock.Verify(x => x.DeleteAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never());
+                this.outboxDaoMock.Verify(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            }
+
+            // Case 14: Lease expires on the last allowed attempt -> marks failed instead of rescheduling
+            this.ResetMocks();
+            var exhaustedLeaseClaimToken = Guid.NewGuid();
+            var exhaustedLeaseMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = Guid.NewGuid(), EventType = TestEventType, Payload = "{}", Attempts = 5, ClaimToken = exhaustedLeaseClaimToken };
+            var exhaustedLeaseCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            IReadOnlyList<OutboxMessage> exhaustedLeaseBatch = [exhaustedLeaseMessage];
+
+            this.outboxDaoMock.SetupSequence(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(2), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(exhaustedLeaseBatch)).ReturnsAsync(ErrorOrFactory.From(emptyBatch2));
+
+            this.eventHandlerMock.Setup(x => x.HandleAsync(exhaustedLeaseMessage, It.IsAny<CancellationToken>())).Returns<OutboxMessage, CancellationToken>(async (_, token) =>
+            {
+                await Task.Delay(Timeout.Infinite, token);
+                return ErrorOrFactory.From(Result.Success);
+            });
+
+            this.outboxDaoMock.Setup(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), exhaustedLeaseMessage.Id, exhaustedLeaseClaimToken, It.IsAny<string>(), It.IsAny<CancellationToken>())).Callback(() => exhaustedLeaseCompleted.TrySetResult()).ReturnsAsync(Result.Updated);
+
+            using var exhaustedLeaseService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(leaseOptions), this.loggerMock.Object);
+            await exhaustedLeaseService.StartAsync(CancellationToken.None);
+            await exhaustedLeaseCompleted.Task;
+            await exhaustedLeaseService.StopAsync(CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                this.outboxDaoMock.Verify(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), exhaustedLeaseMessage.Id, exhaustedLeaseClaimToken, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once());
+                this.outboxDaoMock.Verify(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<DateTimeOffset>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            }
+
+            // Case 15: Shutdown while a handler runs -> handler is cancelled and the outbox row is left untouched
+            this.ResetMocks();
+            var shutdownMessage = new OutboxMessage { Id = Guid.NewGuid(), AggregateId = Guid.NewGuid(), EventType = TestEventType, Payload = "{}", Attempts = 1, ClaimToken = Guid.NewGuid() };
+            var handlerStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            IReadOnlyList<OutboxMessage> shutdownBatch = [shutdownMessage];
+
+            this.outboxDaoMock.Setup(x => x.ClaimBatchAsync(It.IsAny<NpgsqlTransaction>(), 20, TimeSpan.FromSeconds(30), It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From(shutdownBatch));
+
+            this.eventHandlerMock.Setup(x => x.HandleAsync(shutdownMessage, It.IsAny<CancellationToken>())).Returns<OutboxMessage, CancellationToken>(async (_, token) =>
+            {
+                handlerStarted.TrySetResult();
+                await Task.Delay(Timeout.Infinite, token);
+                return ErrorOrFactory.From(Result.Success);
+            });
+
+            using var shutdownService = new OutboxDispatcherHostedService(this.databaseSourceMock.Object, this.outboxDaoMock.Object, this.serviceScopeFactory, Options.Create(this.options), this.loggerMock.Object);
+            await shutdownService.StartAsync(CancellationToken.None);
+            await handlerStarted.Task;
+            await shutdownService.StopAsync(CancellationToken.None);
+
+            using (Assert.EnterMultipleScope())
+            {
+                this.outboxDaoMock.Verify(x => x.DeleteAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never());
+                this.outboxDaoMock.Verify(x => x.RescheduleAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<DateTimeOffset>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+                this.outboxDaoMock.Verify(x => x.MarkFailedAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
+            }
         }
 
         private void ConfigureTransactionPassThrough()
