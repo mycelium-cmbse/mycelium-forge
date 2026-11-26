@@ -252,16 +252,11 @@ namespace Mycelium.Forge.Serializer.Json
                     ownedPackageInvitationSeen = true;
                     reader.Read();
 
-                    if (reader.TokenType == JsonTokenType.Null)
-                    {
-                        dtoInstance.OwnedPackageInvitation = Guid.Empty;
-                        logger.LogDebug($"the Account.OwnedPackageInvitation property was not found in the Json. The value is set to Guid.Empty");
-                    }
-                    else
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
                     {
                         if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownedPackageInvitationRefId))
                         {
-                            dtoInstance.OwnedPackageInvitation = ownedPackageInvitationRefId;
+                            dtoInstance.OwnedPackageInvitation.Add(ownedPackageInvitationRefId);
                         }
                     }
 

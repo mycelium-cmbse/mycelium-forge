@@ -83,6 +83,17 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteEndArray();
             writer.WritePropertyName("createdAt"u8);
             writer.WriteStringValue(iForge.CreatedAt);
+            writer.WriteStartArray("curatedTags"u8);
+
+            foreach (var item in iForge.CuratedTags)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("@id"u8);
+                writer.WriteStringValue(item);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
             writer.WritePropertyName("description"u8);
             writer.WriteStringValue(iForge.Description);
             writer.WritePropertyName("modifiedAt"u8);

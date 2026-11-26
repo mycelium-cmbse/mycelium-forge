@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageMetaDataDeSerializer.cs" company="Starion Group S.A.">
+// <copyright file="LicenseDeSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -22,33 +22,35 @@ namespace Mycelium.Forge.Serializer.Json
     using Mycelium.Forge.Common;
 
     /// <summary>
-    /// The purpose of the <see cref="PackageMetaDataDeSerializer"/> is to provide deserialization capabilities
-    /// for the <see cref="IPackageMetaData"/> interface
+    /// The purpose of the <see cref="LicenseDeSerializer"/> is to provide deserialization capabilities
+    /// for the <see cref="ILicense"/> interface
     /// </summary>
-    internal static class PackageMetaDataDeSerializer
+    internal static class LicenseDeSerializer
     {
         /// <summary>
-        /// Deserializes an instance of <see cref="IPackageMetaData"/> from the provided <see cref="Utf8JsonReader"/>
+        /// Deserializes an instance of <see cref="ILicense"/> from the provided <see cref="Utf8JsonReader"/>
         /// </summary>
         /// <param name="reader">
-        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="IPackageMetaData"/> json object's <see cref="JsonTokenType.StartObject"/> token
+        /// The <see cref="Utf8JsonReader"/>, positioned at the <see cref="ILicense"/> json object's <see cref="JsonTokenType.StartObject"/> token
         /// </param>
         /// <param name="loggerFactory">
         /// The <see cref="ILoggerFactory"/> used to setup logging
         /// </param>
         /// <returns>
-        /// an instance of <see cref="IPackageMetaData"/>
+        /// an instance of <see cref="ILicense"/>
         /// </returns>
-        internal static IPackageMetaData DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
+        internal static ILicense DeSerialize(ref Utf8JsonReader reader, ILoggerFactory loggerFactory = null)
         {
-            var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("PackageMetaDataDeSerializer");
+            var logger = loggerFactory == null ? NullLogger.Instance : loggerFactory.CreateLogger("LicenseDeSerializer");
 
-            var dtoInstance = new Mycelium.Forge.Common.PackageMetaData();
+            var dtoInstance = new Mycelium.Forge.Common.License();
 
             var typeSeen = false;
             var createdAtSeen = false;
+            var licenseTextSeen = false;
             var modifiedAtSeen = false;
-            var ownerSeen = false;
+            var nameSeen = false;
+            var spdxIdentifierSeen = false;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -63,9 +65,9 @@ namespace Mycelium.Forge.Serializer.Json
                     typeSeen = true;
                     var typeValue = reader.GetString();
 
-                    if (typeValue != "PackageMetaData")
+                    if (typeValue != "License")
                     {
-                        throw new InvalidOperationException($"The PackageMetaDataDeSerializer can only be used to deserialize objects of type IPackageMetaData, a {typeValue} was provided");
+                        throw new InvalidOperationException($"The LicenseDeSerializer can only be used to deserialize objects of type ILicense, a {typeValue} was provided");
                     }
 
                     continue;
@@ -77,7 +79,7 @@ namespace Mycelium.Forge.Serializer.Json
 
                     if (reader.TokenType == JsonTokenType.Null)
                     {
-                        throw new JsonException("The @id property is not present, the PackageMetaData cannot be deserialized");
+                        throw new JsonException("The @id property is not present, the License cannot be deserialized");
                     }
 
                     dtoInstance.Id = Utf8JsonReaderHelper.ReadGuid(ref reader);
@@ -93,6 +95,20 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("licenseText"u8))
+                {
+                    licenseTextSeen = true;
+                    reader.Read();
+
+                    var licenseTextScalarValue = reader.GetString();
+
+                    if (licenseTextScalarValue != null)
+                    {
+                        dtoInstance.LicenseText = licenseTextScalarValue;
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("modifiedAt"u8))
                 {
                     modifiedAtSeen = true;
@@ -102,22 +118,30 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
-                if (reader.ValueTextEquals("owner"u8))
+                if (reader.ValueTextEquals("name"u8))
                 {
-                    ownerSeen = true;
+                    nameSeen = true;
                     reader.Read();
 
-                    if (reader.TokenType == JsonTokenType.Null)
+                    var nameScalarValue = reader.GetString();
+
+                    if (nameScalarValue != null)
                     {
-                        dtoInstance.Owner = Guid.Empty;
-                        logger.LogDebug($"the PackageMetaData.Owner property was not found in the Json. The value is set to Guid.Empty");
+                        dtoInstance.Name = nameScalarValue;
                     }
-                    else
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("spdxIdentifier"u8))
+                {
+                    spdxIdentifierSeen = true;
+                    reader.Read();
+
+                    var spdxIdentifierScalarValue = reader.GetString();
+
+                    if (spdxIdentifierScalarValue != null)
                     {
-                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var ownerRefId))
-                        {
-                            dtoInstance.Owner = ownerRefId;
-                        }
+                        dtoInstance.SpdxIdentifier = spdxIdentifierScalarValue;
                     }
 
                     continue;
@@ -128,20 +152,28 @@ namespace Mycelium.Forge.Serializer.Json
 
             if (!typeSeen)
             {
-                throw new InvalidOperationException("The @type property is not available, the PackageMetaDataDeSerializer cannot be used to deserialize this JsonElement");
+                throw new InvalidOperationException("The @type property is not available, the LicenseDeSerializer cannot be used to deserialize this JsonElement");
             }
 
             if (!createdAtSeen)
             {
-                logger.LogDebug("the createdAt Json property was not found in the PackageMetaData: {Id}", dtoInstance.Id);
+                logger.LogDebug("the createdAt Json property was not found in the License: {Id}", dtoInstance.Id);
+            }
+            if (!licenseTextSeen)
+            {
+                logger.LogDebug("the licenseText Json property was not found in the License: {Id}", dtoInstance.Id);
             }
             if (!modifiedAtSeen)
             {
-                logger.LogDebug("the modifiedAt Json property was not found in the PackageMetaData: {Id}", dtoInstance.Id);
+                logger.LogDebug("the modifiedAt Json property was not found in the License: {Id}", dtoInstance.Id);
             }
-            if (!ownerSeen)
+            if (!nameSeen)
             {
-                logger.LogDebug("the owner Json property was not found in the PackageMetaData: {Id}", dtoInstance.Id);
+                logger.LogDebug("the name Json property was not found in the License: {Id}", dtoInstance.Id);
+            }
+            if (!spdxIdentifierSeen)
+            {
+                logger.LogDebug("the spdxIdentifier Json property was not found in the License: {Id}", dtoInstance.Id);
             }
 
             return dtoInstance;

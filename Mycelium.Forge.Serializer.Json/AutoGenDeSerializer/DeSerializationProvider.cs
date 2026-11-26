@@ -35,15 +35,16 @@ namespace Mycelium.Forge.Serializer.Json
             { "APIKey", APIKeyDeSerializer.DeSerialize },
             { "Country", CountryDeSerializer.DeSerialize },
             { "Forge", ForgeDeSerializer.DeSerialize },
+            { "License", LicenseDeSerializer.DeSerialize },
             { "Organization", OrganizationDeSerializer.DeSerialize },
             { "OrganizationInvitation", OrganizationInvitationDeSerializer.DeSerialize },
             { "Package", PackageDeSerializer.DeSerialize },
             { "PackageInvitation", PackageInvitationDeSerializer.DeSerialize },
-            { "PackageMetaData", PackageMetaDataDeSerializer.DeSerialize },
             { "PackageType", PackageTypeDeSerializer.DeSerialize },
             { "PackageVersion", PackageVersionDeSerializer.DeSerialize },
             { "ProfileLink", ProfileLinkDeSerializer.DeSerialize },
             { "ProfileType", ProfileTypeDeSerializer.DeSerialize },
+            { "Tag", TagDeSerializer.DeSerialize },
         };
 
         /// <summary>

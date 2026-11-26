@@ -19,7 +19,7 @@ namespace Mycelium.Forge.Common
     /// <summary>
     /// Static mapping of <see cref="RoleKind"/> to their granted <see cref="PermissionKind"/> sets.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public static class RolePermissionMap
     {
         /// <summary>

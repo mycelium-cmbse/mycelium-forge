@@ -94,6 +94,16 @@ ALTER TABLE forge.invitation SET (autovacuum_vacuum_threshold = 2500);
 ALTER TABLE forge.invitation SET (autovacuum_analyze_scale_factor = 0.0);
 ALTER TABLE forge.invitation SET (autovacuum_analyze_threshold = 2500);
 
+CREATE TABLE forge.license (
+    id uuid NOT NULL,
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE forge.license SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE forge.license SET (autovacuum_vacuum_threshold = 2500);
+ALTER TABLE forge.license SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE forge.license SET (autovacuum_analyze_threshold = 2500);
+
 CREATE TABLE forge.namespace (
     id uuid NOT NULL,
     PRIMARY KEY (id)
@@ -153,17 +163,6 @@ ALTER TABLE forge.package_invitation SET (autovacuum_vacuum_threshold = 2500);
 ALTER TABLE forge.package_invitation SET (autovacuum_analyze_scale_factor = 0.0);
 ALTER TABLE forge.package_invitation SET (autovacuum_analyze_threshold = 2500);
 
-CREATE TABLE forge.package_meta_data (
-    id uuid NOT NULL,
-    owner uuid NOT NULL,
-    PRIMARY KEY (id)
-);
-
-ALTER TABLE forge.package_meta_data SET (autovacuum_vacuum_scale_factor = 0.0);
-ALTER TABLE forge.package_meta_data SET (autovacuum_vacuum_threshold = 2500);
-ALTER TABLE forge.package_meta_data SET (autovacuum_analyze_scale_factor = 0.0);
-ALTER TABLE forge.package_meta_data SET (autovacuum_analyze_threshold = 2500);
-
 CREATE TABLE forge.package_type (
     id uuid NOT NULL,
     owner uuid NOT NULL,
@@ -220,6 +219,17 @@ ALTER TABLE forge.scope SET (autovacuum_vacuum_threshold = 2500);
 ALTER TABLE forge.scope SET (autovacuum_analyze_scale_factor = 0.0);
 ALTER TABLE forge.scope SET (autovacuum_analyze_threshold = 2500);
 
+CREATE TABLE forge.tag (
+    id uuid NOT NULL,
+    owner uuid NOT NULL,
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE forge.tag SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE forge.tag SET (autovacuum_vacuum_threshold = 2500);
+ALTER TABLE forge.tag SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE forge.tag SET (autovacuum_analyze_threshold = 2500);
+
 
 -- Thing foreign key constraints
 ALTER TABLE forge.account ADD CONSTRAINT account_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
@@ -228,17 +238,18 @@ ALTER TABLE forge.api_key ADD CONSTRAINT api_key_thing_fk_source FOREIGN KEY (id
 ALTER TABLE forge.country ADD CONSTRAINT country_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.forge ADD CONSTRAINT forge_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.invitation ADD CONSTRAINT invitation_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE forge.license ADD CONSTRAINT license_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.namespace ADD CONSTRAINT namespace_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.organization ADD CONSTRAINT organization_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.organization_invitation ADD CONSTRAINT organization_invitation_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.package ADD CONSTRAINT package_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.package_invitation ADD CONSTRAINT package_invitation_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-ALTER TABLE forge.package_meta_data ADD CONSTRAINT package_meta_data_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.package_type ADD CONSTRAINT package_type_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.package_version ADD CONSTRAINT package_version_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.profile_link ADD CONSTRAINT profile_link_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.profile_type ADD CONSTRAINT profile_type_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 ALTER TABLE forge.scope ADD CONSTRAINT scope_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+ALTER TABLE forge.tag ADD CONSTRAINT tag_thing_fk_source FOREIGN KEY (id) REFERENCES forge.thing (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 
 -- Many to Many link tables including Foreign Key Constraints
 CREATE TABLE forge.forge_administrator__account (
@@ -256,6 +267,22 @@ ALTER TABLE forge.forge_administrator__account ADD CONSTRAINT forge_fk_source FO
 CREATE INDEX idx_forge_administrator_source_forge ON forge.forge_administrator__account (source_forge);
 ALTER TABLE forge.forge_administrator__account ADD CONSTRAINT account_fk_target FOREIGN KEY (target_account) REFERENCES forge.account (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 CREATE INDEX idx_forge_administrator_target_account ON forge.forge_administrator__account (target_account);
+
+CREATE TABLE forge.forge_curated_tags__tag (
+    source_forge uuid NOT NULL,
+    target_tag uuid NOT NULL,
+    PRIMARY KEY (source_forge, target_tag)
+);
+
+ALTER TABLE forge.forge_curated_tags__tag SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE forge.forge_curated_tags__tag SET (autovacuum_vacuum_threshold = 2500);
+ALTER TABLE forge.forge_curated_tags__tag SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE forge.forge_curated_tags__tag SET (autovacuum_analyze_threshold = 2500);
+
+ALTER TABLE forge.forge_curated_tags__tag ADD CONSTRAINT forge_fk_source FOREIGN KEY (source_forge) REFERENCES forge.forge (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX idx_forge_curated_tags_source_forge ON forge.forge_curated_tags__tag (source_forge);
+ALTER TABLE forge.forge_curated_tags__tag ADD CONSTRAINT tag_fk_target FOREIGN KEY (target_tag) REFERENCES forge.tag (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX idx_forge_curated_tags_target_tag ON forge.forge_curated_tags__tag (target_tag);
 
 CREATE TABLE forge.organization_administrator__account (
     source_organization uuid NOT NULL,
@@ -351,8 +378,6 @@ ALTER TABLE forge.package_invitation ADD CONSTRAINT package_invitation_package_f
 CREATE INDEX idx_package_invitation_package ON forge.package_invitation (package);
 ALTER TABLE forge.package_invitation ADD CONSTRAINT package_invitation_target_fk_source FOREIGN KEY (target) REFERENCES forge.account (id) ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX idx_package_invitation_target ON forge.package_invitation (target);
-ALTER TABLE forge.package_meta_data ADD CONSTRAINT package_meta_data_owner_fk_source FOREIGN KEY (owner) REFERENCES forge.package_version (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
-CREATE INDEX idx_package_meta_data_owner ON forge.package_meta_data (owner);
 ALTER TABLE forge.package_type ADD CONSTRAINT package_type_owner_fk_source FOREIGN KEY (owner) REFERENCES forge.forge (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX idx_package_type_owner ON forge.package_type (owner);
 ALTER TABLE forge.package_version ADD CONSTRAINT package_version_owner_fk_source FOREIGN KEY (owner) REFERENCES forge.package (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
@@ -365,19 +390,22 @@ ALTER TABLE forge.profile_type ADD CONSTRAINT profile_type_owner_fk_source FOREI
 CREATE INDEX idx_profile_type_owner ON forge.profile_type (owner);
 ALTER TABLE forge.scope ADD CONSTRAINT scope_primary_address_fk_source FOREIGN KEY (primary_address) REFERENCES forge.address (id) ON UPDATE CASCADE DEFERRABLE;
 CREATE INDEX idx_scope_primary_address ON forge.scope (primary_address);
+ALTER TABLE forge.tag ADD CONSTRAINT tag_owner_fk_source FOREIGN KEY (owner) REFERENCES forge.forge (id) ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+CREATE INDEX idx_tag_owner ON forge.tag (owner);
 
 -- Indexable Value Properties
 CREATE INDEX idx_api_key_expires_at ON forge.thing ((data ->> 'expiresAt')) WHERE class_kind = 'APIKey';
 CREATE INDEX idx_api_key_last_used_at ON forge.thing ((data ->> 'lastUsedAt')) WHERE class_kind = 'APIKey';
 CREATE INDEX idx_api_key_name ON forge.thing ((data ->> 'name')) WHERE class_kind = 'APIKey';
 CREATE INDEX idx_country_name ON forge.thing ((data ->> 'name')) WHERE class_kind = 'Country';
-CREATE INDEX idx_namespace_name ON forge.thing ((data ->> 'name')) WHERE class_kind IN ('Account', 'Forge', 'Organization', 'Package');
-CREATE INDEX idx_namespace_short_name ON forge.thing ((data ->> 'shortName')) WHERE class_kind IN ('Account', 'Forge', 'Organization', 'Package');
+CREATE INDEX idx_namespace_name ON forge.thing ((data ->> 'name')) WHERE class_kind IN ('Account', 'Forge', 'License', 'Organization', 'Package');
+CREATE INDEX idx_namespace_short_name ON forge.thing ((data ->> 'shortName')) WHERE class_kind IN ('Account', 'Forge', 'License', 'Organization', 'Package');
 CREATE INDEX idx_package_description ON forge.thing ((data ->> 'description')) WHERE class_kind = 'Package';
 CREATE INDEX idx_package_type_name ON forge.thing ((data ->> 'name')) WHERE class_kind = 'PackageType';
 CREATE INDEX idx_scope_email ON forge.thing ((data ->> 'email')) WHERE class_kind IN ('Account', 'Organization');
 CREATE INDEX idx_scope_origin ON forge.thing ((data ->> 'origin')) WHERE class_kind IN ('Account', 'Organization');
 CREATE INDEX idx_scope_status ON forge.thing ((data ->> 'status')) WHERE class_kind IN ('Account', 'Organization');
+CREATE INDEX idx_tag_name ON forge.thing ((data ->> 'name')) WHERE class_kind = 'Tag';
 
 -- Timestamp Trigger Functions for Thing Table
 CREATE OR REPLACE FUNCTION forge.thing_timestamps_insert()
@@ -506,6 +534,11 @@ CREATE OR REPLACE TRIGGER trg_thing_delete
         EXECUTE FUNCTION forge.thing_delete();
 
 CREATE OR REPLACE TRIGGER trg_thing_delete
+    AFTER DELETE ON forge.license
+    FOR EACH ROW
+        EXECUTE FUNCTION forge.thing_delete();
+
+CREATE OR REPLACE TRIGGER trg_thing_delete
     AFTER DELETE ON forge.namespace
     FOR EACH ROW
         EXECUTE FUNCTION forge.thing_delete();
@@ -527,11 +560,6 @@ CREATE OR REPLACE TRIGGER trg_thing_delete
 
 CREATE OR REPLACE TRIGGER trg_thing_delete
     AFTER DELETE ON forge.package_invitation
-    FOR EACH ROW
-        EXECUTE FUNCTION forge.thing_delete();
-
-CREATE OR REPLACE TRIGGER trg_thing_delete
-    AFTER DELETE ON forge.package_meta_data
     FOR EACH ROW
         EXECUTE FUNCTION forge.thing_delete();
 
@@ -560,6 +588,11 @@ CREATE OR REPLACE TRIGGER trg_thing_delete
     FOR EACH ROW
         EXECUTE FUNCTION forge.thing_delete();
 
+CREATE OR REPLACE TRIGGER trg_thing_delete
+    AFTER DELETE ON forge.tag
+    FOR EACH ROW
+        EXECUTE FUNCTION forge.thing_delete();
+
 
 -- Delete Triggers to the Base Table Table
 CREATE OR REPLACE TRIGGER trg_scope_on_account_delete
@@ -569,6 +602,11 @@ CREATE OR REPLACE TRIGGER trg_scope_on_account_delete
 
 CREATE OR REPLACE TRIGGER trg_namespace_on_forge_delete
     AFTER DELETE ON forge.forge
+    FOR EACH ROW
+        EXECUTE FUNCTION forge.namespace_delete();
+
+CREATE OR REPLACE TRIGGER trg_namespace_on_license_delete
+    AFTER DELETE ON forge.license
     FOR EACH ROW
         EXECUTE FUNCTION forge.namespace_delete();
 
@@ -602,7 +640,7 @@ CREATE OR REPLACE TRIGGER trg_namespace_on_scope_delete
 CREATE OR REPLACE FUNCTION forge.query_model_version()
 RETURNS text AS $$
 BEGIN
-    RETURN '0.5.0';
+    RETURN '0.6.0';
 END;
 $$ LANGUAGE plpgsql;
 

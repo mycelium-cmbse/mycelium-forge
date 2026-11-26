@@ -53,7 +53,14 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("expiresAt"u8);
             writer.WriteStringValue(iAPIKey.ExpiresAt);
             writer.WritePropertyName("lastUsedAt"u8);
-            writer.WriteStringValue(iAPIKey.LastUsedAt);
+            if (iAPIKey.LastUsedAt.HasValue)
+            {
+                writer.WriteStringValue(iAPIKey.LastUsedAt.Value);
+            }
+            else
+            {
+                writer.WriteNullValue();
+            }
             writer.WritePropertyName("modifiedAt"u8);
             writer.WriteStringValue(iAPIKey.ModifiedAt);
             writer.WritePropertyName("name"u8);
@@ -72,7 +79,14 @@ namespace Mycelium.Forge.Serializer.Json
 
             writer.WriteEndArray();
             writer.WritePropertyName("revokedAt"u8);
-            writer.WriteStringValue(iAPIKey.RevokedAt);
+            if (iAPIKey.RevokedAt.HasValue)
+            {
+                writer.WriteStringValue(iAPIKey.RevokedAt.Value);
+            }
+            else
+            {
+                writer.WriteNullValue();
+            }
             writer.WriteStartArray("secretHash"u8);
 
             foreach (var item in iAPIKey.SecretHash)

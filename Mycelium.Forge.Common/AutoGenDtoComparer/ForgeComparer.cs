@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IForge"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class ForgeComparer : IDtoComparer<IForge>
     {
         /// <summary>
@@ -71,6 +71,14 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
             if (oldDto.CreatedAt != newDto.CreatedAt)
             {
                 changes.Add(new PropertyChange(nameof(IForge.CreatedAt), oldDto.CreatedAt, newDto.CreatedAt));
+            }
+
+            var oldCuratedTags = oldDto.CuratedTags ?? [];
+            var newCuratedTags = newDto.CuratedTags ?? [];
+
+            if (!oldCuratedTags.SequenceEqual(newCuratedTags))
+            {
+                changes.Add(new PropertyChange(nameof(IForge.CuratedTags), oldDto.CuratedTags, newDto.CuratedTags));
             }
 
             if (oldDto.Description != newDto.Description)

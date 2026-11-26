@@ -52,6 +52,14 @@ namespace Mycelium.Forge.Generator.Generators
         } = string.Empty;
 
         /// <summary>
+        /// Registers C# type mappings for custom primitive DataTypes from the Forge and CommonPrimitives models.
+        /// </summary>
+        protected static void RegisterCustomCSharpTypeMappings()
+        {
+            TypedElementExtensions.AddOrOverwriteCSharpTypeMappings(("UUID", "Guid"), ("URI", "string"), ("SemVer", "string"), ("Date", "DateOnly"), ("Markdown", "string"));
+        }
+
+        /// <summary>
         /// Generates code specific to the concrete implementation
         /// </summary>
         /// <param name="xmiReaderResult">

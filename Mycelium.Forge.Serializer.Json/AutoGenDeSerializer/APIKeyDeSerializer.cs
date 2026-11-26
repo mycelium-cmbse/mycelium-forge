@@ -113,7 +113,7 @@ namespace Mycelium.Forge.Serializer.Json
                     lastUsedAtSeen = true;
                     reader.Read();
 
-                    dtoInstance.LastUsedAt = reader.GetDateTime();
+                    dtoInstance.LastUsedAt = reader.TokenType == JsonTokenType.Null ? null : reader.GetDateTime();
 
                     continue;
                 }
@@ -182,7 +182,7 @@ namespace Mycelium.Forge.Serializer.Json
                     revokedAtSeen = true;
                     reader.Read();
 
-                    dtoInstance.RevokedAt = reader.GetDateTime();
+                    dtoInstance.RevokedAt = reader.TokenType == JsonTokenType.Null ? null : reader.GetDateTime();
 
                     continue;
                 }

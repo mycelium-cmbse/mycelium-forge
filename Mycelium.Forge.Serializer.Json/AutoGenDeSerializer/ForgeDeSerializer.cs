@@ -50,6 +50,7 @@ namespace Mycelium.Forge.Serializer.Json
             var administratorSeen = false;
             var countrySeen = false;
             var createdAtSeen = false;
+            var curatedTagsSeen = false;
             var descriptionSeen = false;
             var modifiedAtSeen = false;
             var nameSeen = false;
@@ -144,6 +145,21 @@ namespace Mycelium.Forge.Serializer.Json
                     reader.Read();
 
                     dtoInstance.CreatedAt = reader.GetDateTime();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("curatedTags"u8))
+                {
+                    curatedTagsSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var curatedTagsRefId))
+                        {
+                            dtoInstance.CuratedTags.Add(curatedTagsRefId);
+                        }
+                    }
 
                     continue;
                 }
@@ -282,6 +298,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the Forge: {Id}", dtoInstance.Id);
+            }
+            if (!curatedTagsSeen)
+            {
+                logger.LogDebug("the curatedTags Json property was not found in the Forge: {Id}", dtoInstance.Id);
             }
             if (!descriptionSeen)
             {

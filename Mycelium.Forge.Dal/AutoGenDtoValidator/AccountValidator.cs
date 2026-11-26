@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// <summary>
     /// DTO validator class for the <see cref="Account"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class AccountValidator : ScopeValidator<IAccount>
     {
         /// <summary>
@@ -33,7 +33,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         {
             this.RuleForEach(x => x.ApiKey).NotEmpty();
             this.RuleForEach(x => x.OwnedOrganizationInvitation).NotEmpty();
-            this.RuleFor(x => x.OwnedPackageInvitation).NotEmpty();
+            this.RuleForEach(x => x.OwnedPackageInvitation).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
             this.AddCustomValidation();
         }

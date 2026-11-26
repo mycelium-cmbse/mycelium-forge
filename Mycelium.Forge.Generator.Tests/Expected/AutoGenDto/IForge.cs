@@ -47,6 +47,15 @@ namespace Mycelium.Forge.Common
         List<Guid> Country { get; set; }
 
         /// <summary>
+        /// The Tags that Forge administrators have selected as recommended labels. They are suggested to users
+        /// when tagging a Package and highlighted in search facets. Each curated Tag is also one of the Tags
+        /// contained by the Forge.
+        /// </summary>
+        [Property(xmiId: "EAID_dstBAC129_B9B2_4163_B8AC_4DB9B7430E0C", aggregation: AggregationKind.None, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [SubsettedProperty(propertyName: "EAID_dst13B896_A2F7_494b_8A14_ABD1D4CD5362")]
+        List<Guid> CuratedTags { get; set; }
+
+        /// <summary>
         /// A human readable description of this instance of Forge
         /// </summary>
         [Property(xmiId: "EAID_1E50A5E2_E9BC_49f3_87D5_C4D92C84B0FE", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
@@ -71,6 +80,7 @@ namespace Mycelium.Forge.Common
         List<Guid> ProfileType { get; set; }
 
         /// <summary>
+        /// The collection of existing tags
         /// </summary>
         [Property(xmiId: "EAID_dst13B896_A2F7_494b_8A14_ABD1D4CD5362", aggregation: AggregationKind.Composite, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         List<Guid> Tag { get; set; }

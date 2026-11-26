@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="APIKeyComparer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IAPIKey"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class APIKeyComparer : IDtoComparer<IAPIKey>
     {
         /// <summary>

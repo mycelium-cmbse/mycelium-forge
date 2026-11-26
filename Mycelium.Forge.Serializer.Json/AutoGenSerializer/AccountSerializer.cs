@@ -108,11 +108,17 @@ namespace Mycelium.Forge.Serializer.Json
             }
 
             writer.WriteEndArray();
-            writer.WritePropertyName("ownedPackageInvitation"u8);
-            writer.WriteStartObject();
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iAccount.OwnedPackageInvitation);
-            writer.WriteEndObject();
+            writer.WriteStartArray("ownedPackageInvitation"u8);
+
+            foreach (var item in iAccount.OwnedPackageInvitation)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("@id"u8);
+                writer.WriteStringValue(item);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
             writer.WritePropertyName("owner"u8);
             writer.WriteStartObject();
             writer.WritePropertyName("@id"u8);

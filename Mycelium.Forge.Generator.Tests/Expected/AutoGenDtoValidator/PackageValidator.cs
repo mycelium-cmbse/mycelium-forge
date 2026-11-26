@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// <summary>
     /// DTO validator class for the <see cref="Package"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class PackageValidator : NamespaceValidator<IPackage>
     {
         /// <summary>
@@ -31,6 +31,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         public PackageValidator()
         {
+            this.RuleForEach(x => x.AppliedTags).NotEmpty();
             this.RuleFor(x => x.Description).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Listed).NotNull();
             this.RuleFor(x => x.Owner).NotEmpty();

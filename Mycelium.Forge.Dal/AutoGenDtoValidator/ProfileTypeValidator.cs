@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// <summary>
     /// DTO validator class for the <see cref="ProfileType"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class ProfileTypeValidator : ThingValidator<IProfileType>
     {
         /// <summary>
@@ -31,7 +31,6 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         public ProfileTypeValidator()
         {
-            this.RuleFor(x => x.LogoBlobReference).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Name).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Owner).NotEmpty();
             this.AddCustomValidation();

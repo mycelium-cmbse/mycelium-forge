@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// DTO validator class for the <see cref="INamespace"/> class.
     /// </summary>
     /// <typeparam name="T">The <see cref="INamespace"/> type to validate.</typeparam>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public abstract partial class NamespaceValidator<T> : ThingValidator<T> where T : class, INamespace
     {
         /// <summary>

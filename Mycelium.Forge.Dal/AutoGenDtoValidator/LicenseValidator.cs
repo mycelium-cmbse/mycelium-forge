@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageInvitationValidator.cs" company="Starion Group S.A.">
+// <copyright file="LicenseValidator.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -21,25 +21,23 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     using Mycelium.Forge.Dal.DtoValidator;
 
     /// <summary>
-    /// DTO validator class for the <see cref="PackageInvitation"/> class.
+    /// DTO validator class for the <see cref="License"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public partial class PackageInvitationValidator : InvitationValidator<IPackageInvitation>
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
+    public partial class LicenseValidator : NamespaceValidator<ILicense>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PackageInvitationValidator"/> class.
+        /// Initializes a new instance of the <see cref="LicenseValidator"/> class.
         /// </summary>
-        public PackageInvitationValidator()
+        public LicenseValidator()
         {
-            this.RuleFor(x => x.Owner).NotEmpty();
-            this.RuleFor(x => x.Package).NotEmpty();
-            this.RuleFor(x => x.PackageInvitationKind).NotNull();
-            this.RuleFor(x => x.Target).NotEmpty();
+            this.RuleFor(x => x.LicenseText).Must(value => !string.IsNullOrWhiteSpace(value));
+            this.RuleFor(x => x.SpdxIdentifier).Must(value => !string.IsNullOrWhiteSpace(value));
             this.AddCustomValidation();
         }
 
         /// <summary>
-        /// Adds possibilities for custom validation rules for the <see cref="PackageInvitation"/> entity.
+        /// Adds possibilities for custom validation rules for the <see cref="License"/> entity.
         /// </summary>
         partial void AddCustomValidation();
     }

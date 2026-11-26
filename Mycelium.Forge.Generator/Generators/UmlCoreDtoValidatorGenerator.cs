@@ -35,11 +35,7 @@ namespace Mycelium.Forge.Generator.Generators
         /// </summary>
         static UmlCoreDtoValidatorGenerator()
         {
-            TypedElementExtensions.AddOrOverwriteCSharpTypeMappings(
-                ("UUID", "Guid"),
-                ("URI", "string"),
-                ("SemVer", "string"),
-                ("Date", "DateOnly"));
+            RegisterCustomCSharpTypeMappings();
         }
 
         /// <summary>

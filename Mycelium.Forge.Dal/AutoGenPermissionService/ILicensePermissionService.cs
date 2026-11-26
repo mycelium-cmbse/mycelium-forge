@@ -1,9 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageMetaDataValidator.cs" company="Starion Group S.A.">
-//
+// <copyright file="ILicensePermissionService.cs" company="Starion Group S.A.">
+// 
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
-//
+// 
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -11,34 +11,19 @@
 // --------THIS IS AN AUTOMATICALLY GENERATED FILE. ANY MANUAL CHANGES WILL BE OVERWRITTEN!--------
 // ------------------------------------------------------------------------------------------------
 
-namespace Mycelium.Forge.Dal.AutoGenDtoValidator
+namespace Mycelium.Forge.Dal.AutoGenPermissionService
 {
     using System.CodeDom.Compiler;
 
-    using FluentValidation;
-
     using Mycelium.Forge.Common;
-    using Mycelium.Forge.Dal.DtoValidator;
+    using Mycelium.Forge.Dal.PermissionService;
 
     /// <summary>
-    /// DTO validator class for the <see cref="PackageMetaData"/> class.
+    /// Defines permission validation operations for <see cref="ILicense"/> instances.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public partial class PackageMetaDataValidator : ThingValidator<IPackageMetaData>
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
+    public partial interface ILicensePermissionService : IPermissionService<ILicense>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PackageMetaDataValidator"/> class.
-        /// </summary>
-        public PackageMetaDataValidator()
-        {
-            this.RuleFor(x => x.Owner).NotEmpty();
-            this.AddCustomValidation();
-        }
-
-        /// <summary>
-        /// Adds possibilities for custom validation rules for the <see cref="PackageMetaData"/> entity.
-        /// </summary>
-        partial void AddCustomValidation();
     }
 }
 

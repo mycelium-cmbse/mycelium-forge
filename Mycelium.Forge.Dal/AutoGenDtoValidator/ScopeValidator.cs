@@ -24,7 +24,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// DTO validator class for the <see cref="IScope"/> class.
     /// </summary>
     /// <typeparam name="T">The <see cref="IScope"/> type to validate.</typeparam>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public abstract partial class ScopeValidator<T> : NamespaceValidator<T> where T : class, IScope
     {
         /// <summary>
