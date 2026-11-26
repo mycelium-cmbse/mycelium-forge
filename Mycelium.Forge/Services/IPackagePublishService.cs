@@ -31,14 +31,13 @@ namespace Mycelium.Forge.Services
         /// <param name="formatName">The format name of the artifact.</param>
         /// <param name="package">The package entity to populate.</param>
         /// <param name="packageVersion">The package version entity to populate.</param>
-        /// <param name="packageMetaData">The package metadata entity to populate.</param>
         /// <param name="isExistingPackage">A value indicating whether an existing package is being published.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{IArtifactManifest}" /> containing the extracted manifest or errors.</returns>
-        Task<ErrorOr<IArtifactManifest>> ExtractManifestAsync(IUserContext userContext, Stream archiveStream, ArtifactKind kind, string formatName, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token = default);
+        Task<ErrorOr<IArtifactManifest>> ExtractManifestAsync(IUserContext userContext, Stream archiveStream, ArtifactKind kind, string formatName, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, CancellationToken token = default);
 
         /// <summary>
-        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, semver progression, and license).
+        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, and semver progression).
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="selectedScope">The owning scope of the package.</param>
@@ -55,19 +54,18 @@ namespace Mycelium.Forge.Services
         Task<IReadOnlyList<ValidationCheckModel>> ValidateReleaseAsync(IUserContext userContext, IScope selectedScope, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, IReadOnlyList<string> existingVersions, IReadOnlyList<Error> beforeValidationErrors = null, CancellationToken token = default);
 
         /// <summary>
-        /// Stores the artifact stream into object storage and atomically persists the package, version, and metadata
+        /// Stores the artifact stream into object storage and atomically persists the package and version
         /// in the database within a transaction with deferred constraints. Rolls back object storage on failure.
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="artifactStream">The stream of the artifact package file.</param>
         /// <param name="package">The package being created or updated.</param>
         /// <param name="packageVersion">The package version to create.</param>
-        /// <param name="packageMetaData">The package metadata to create.</param>
         /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
         /// <param name="selectedScope">The owning scope of the package.</param>
         /// <param name="existingVersions">The optional collection of previously published version strings.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or failure of the publication.</returns>
-        Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, IScope selectedScope, IReadOnlyList<string> existingVersions = null, CancellationToken token = default);
+        Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, IScope selectedScope, IReadOnlyList<string> existingVersions = null, CancellationToken token = default);
     }
 }

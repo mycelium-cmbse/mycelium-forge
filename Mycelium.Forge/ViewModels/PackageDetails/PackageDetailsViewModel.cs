@@ -46,11 +46,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         private readonly IMemoryCache memoryCache;
 
         /// <summary>
-        /// The (injected) <see cref="IPackageMetaDataService" /> used to retrieve package metadata.
-        /// </summary>
-        private readonly IPackageMetaDataService packageMetaDataService;
-
-        /// <summary>
         /// The (injected) <see cref="IPackagePermissionService" /> used to validate package permissions.
         /// </summary>
         private readonly IPackagePermissionService packagePermissionService;
@@ -87,20 +82,18 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <param name="packageService">The (injected) <see cref="IPackageService" />.</param>
         /// <param name="scopeService">The (injected) <see cref="IScopeService" />.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" />.</param>
-        /// <param name="packageMetaDataService">The (injected) <see cref="IPackageMetaDataService" />.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" />.</param>
         /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="memoryCache">The (injected) <see cref="IMemoryCache" />.</param>
         /// <param name="packagePermissionService">The (injected) <see cref="IPackagePermissionService" />.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackageDetailsViewModel}" />.</param>
-        public PackageDetailsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService, IAccountService accountService, IUserService userService, IMemoryCache memoryCache, IPackagePermissionService packagePermissionService, ILogger<PackageDetailsViewModel> logger)
+        public PackageDetailsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, IAccountService accountService, IUserService userService, IMemoryCache memoryCache, IPackagePermissionService packagePermissionService, ILogger<PackageDetailsViewModel> logger)
         {
             this.databaseSource = databaseSource;
             this.packageService = packageService;
             this.scopeService = scopeService;
             this.packageVersionService = packageVersionService;
-            this.packageMetaDataService = packageMetaDataService;
             this.packageTypeService = packageTypeService;
             this.accountService = accountService;
             this.userService = userService;
@@ -135,6 +128,22 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public int DownloadCount => this.Package.ComputeDownloadCount(this.Versions);
 
         /// <summary>
+        /// Gets the SPDX license identifier for display on the package details page.
+        /// </summary>
+        /// <remarks>
+        /// Currently populated with mock data. It will be removed in a future version or computed from real model data.
+        /// </remarks>
+        public string License => "Apache-2.0";
+
+        /// <summary>
+        /// Gets the collection of tag names associated with the package for display.
+        /// </summary>
+        /// <remarks>
+        /// Currently populated with mock data. It will be removed in a future version or computed from real model data.
+        /// </remarks>
+        public IReadOnlyList<string> Tags { get; } = ["sysml-v2", "spacecraft", "power-system", "small-sat", "electrical"];
+
+        /// <summary>
         /// Gets or sets the collection of maintainer account DTOs.
         /// </summary>
         public IReadOnlyList<IAccount> Maintainers { get; set; } = [];
@@ -145,24 +154,31 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public IPackageVersion CurrentVersion { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of package metadata DTOs corresponding to package versions.
-        /// </summary>
-        public IReadOnlyList<IPackageMetaData> MetaDatas { get; set; } = [];
-
-        /// <summary>
-        /// Gets the package metadata DTO for the currently selected package version.
-        /// </summary>
-        public IPackageMetaData CurrentMetaData => this.MetaDatas.FirstOrDefault(m => m.Id == this.CurrentVersion.MetaData || m.Owner == this.CurrentVersion.Id);
-
-        /// <summary>
         /// Gets the collection of model elements contained within the package release.
         /// </summary>
-        public IReadOnlyList<(string Name, string Kind, string Category, string AttributeSummary)> Elements => this.CurrentMetaData?.Elements ?? [];
+        /// <remarks>
+        /// Currently populated with mock data. It will be removed in a future version or computed from real model data.
+        /// </remarks>
+        public IReadOnlyList<(string Name, string Kind, string Category, string AttributeSummary)> Elements { get; } =
+        [
+            ("PowerBus", "«part def»", "Parts", "8 attributes"),
+            ("Battery", "«part def»", "Parts", "12 attributes"),
+            ("SolarArray", "«part def»", "Parts", "6 attributes"),
+            ("PowerConditioningUnit", "«part def»", "Parts", "9 attributes"),
+            ("powerOut", "«port def»", "Parts", "2 attributes"),
+            ("BusVoltage", "«attribute def»", "Attributes", "typed by Voltage")
+        ];
 
         /// <summary>
         /// Gets the collection of direct package dependencies resolved from the usage projection.
         /// </summary>
-        public IReadOnlyList<(string Name, string Summary, bool IsVerified)> Dependencies => this.CurrentMetaData?.Dependencies ?? [];
+        /// <remarks>
+        /// Currently populated with mock data. It will be removed in a future version or computed from real model data.
+        /// </remarks>
+        public IReadOnlyList<(string Name, string Summary, bool IsVerified)> Dependencies { get; } =
+        [
+            ("@mycelium/ISQ-quantities-units", "^2.4 → 2.5.0 · MIT", true)
+        ];
 
         /// <summary>
         /// Gets the collection of packages and projects depending on this package.
@@ -172,7 +188,17 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <summary>
         /// Gets the collection of quality evaluation checks.
         /// </summary>
-        public IReadOnlyList<(string Title, string Detail, bool Passed)> QualityChecks => this.CurrentMetaData?.QualityChecks ?? [];
+        /// <remarks>
+        /// Currently populated with mock data. It will be removed in a future version or computed from real model data.
+        /// </remarks>
+        public IReadOnlyList<(string Title, string Detail, bool Passed)> QualityChecks { get; } =
+        [
+            ("Loads in a fresh workspace", "Parsed elements cleanly in 1.2s · 0 errors, 0 warnings", true),
+            ("Dependencies resolved", "1 dependency: @mycelium/ISQ-quantities-units ^2.4 → 2.5.0", true),
+            ("Metamodel conformance", "SysML v2 (2025-02) · packaged as KerML clause 10.3 kpar", true),
+            ("Documentation provided", "README.md present (2.1 KB)", true),
+            ("License present", "Apache-2.0 (SPDX)", true)
+        ];
 
         /// <summary>
         /// Gets or sets a value indicating whether the current user is an administrator of the package.
@@ -216,26 +242,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             this.Versions = cachedData.Versions;
             this.CurrentVersion = cachedData.SelectedVersion;
             this.Maintainers = cachedData.Maintainers;
-            this.MetaDatas = cachedData.MetaDatas;
 
             var updatePermissionResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Package);
             this.IsUserAdmin = updatePermissionResult.IsSuccess;
             this.CanManageVersions = this.Package.CanManageVersions(userContext, this.Owner);
             this.CanManagePackageTeam = this.Package.CanManageTeam(userContext, this.Owner);
-
-            var isVersionsTab = string.Equals(tab, PackageTabConstants.Versions, StringComparison.OrdinalIgnoreCase);
-
-            if (isVersionsTab)
-            {
-                var metaDataIds = this.Versions.Select(v => v.MetaData).ToList();
-                var hasAllMetaDatas = metaDataIds.Count > 0 && metaDataIds.All(id => cachedData.MetaDatas.Any(m => m.Id == id));
-
-                if (!hasAllMetaDatas)
-                {
-                    this.MetaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, metaDataIds)).ToList();
-                    cachedData.MetaDatas = this.MetaDatas;
-                }
-            }
         }
 
         /// <summary>
@@ -290,8 +301,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             var selectedVersion = versions[0];
             List<IAccount> maintainers = [.. maintainersTask.Result.DistinctBy(account => account.Id)];
 
-            var metaDatas = (await this.packageMetaDataService.ReadOrEmpty(userContext, [selectedVersion.MetaData])).ToList();
-
             var result = new PackageDetailsCacheModel
             {
                 Package = package,
@@ -299,8 +308,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 PackageType = packageType,
                 Versions = versions,
                 SelectedVersion = selectedVersion,
-                Maintainers = maintainers,
-                MetaDatas = metaDatas
+                Maintainers = maintainers
             };
 
             var cacheEntryOptions = new MemoryCacheEntryOptions

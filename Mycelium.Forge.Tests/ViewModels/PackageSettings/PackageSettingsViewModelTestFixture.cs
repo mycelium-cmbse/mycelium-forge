@@ -129,7 +129,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 Owner = packageId,
                 Version = "1.0.0",
                 Listed = true,
-                IsDeprecated = false,
                 PublicationDate = DateTime.UtcNow
             };
 
@@ -250,36 +249,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
         }
 
         [Test]
-        public async Task VerifyDeprecateVersion()
-        {
-            this.viewModel.Versions = [this.version];
-
-            // Scenario 1: Failure
-            this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure("Failed"));
-
-            await this.viewModel.DeprecateVersion(this.version, CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(this.version.IsDeprecated, Is.False);
-                this.notificationServiceMock.Verify(x => x.AddNotification("Failed to deprecate version.", "Error", NotificationType.Error), Times.Once);
-            }
-
-            // Scenario 2: Success
-            this.packageVersionServiceMock.Setup(x => x.UpdateAsync(It.IsAny<IUserContext>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Updated);
-
-            await this.viewModel.DeprecateVersion(this.version, CancellationToken.None);
-
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(this.viewModel.Versions[0], Is.Not.SameAs(this.version));
-                Assert.That(this.viewModel.Versions[0].IsDeprecated, Is.True);
-                Assert.That(this.version.IsDeprecated, Is.False);
-                this.notificationServiceMock.Verify(x => x.AddNotification("Version 1.0.0 has been deprecated.", "Version Deprecated", NotificationType.Success), Times.Once);
-            }
-        }
-
-        [Test]
         public async Task VerifyInitializeViewModel()
         {
             // Scenario 1: Package not found
@@ -363,7 +332,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 this.invitationManagerMock.Verify(x => x.InitializeViewModel(nonOwnerAdminContext, this.nonOwnerPackage.Id, true, It.IsAny<CancellationToken>()), Times.Once);
             }
 
-            // Scenario 5: Owning organization administrator (not in PackageOwner/Maintainer) gets full owner capabilities and duplicate account DTOs are deduplicated
+            // Scenario 5: Owning organization administrator (not in PackageOwner/Maintainer) gets full owner capabilities
             var orgAdminId = Guid.NewGuid();
             this.ownerScope.Administrator = [orgAdminId];
            
@@ -373,9 +342,8 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageSettings
                 CurrentRoles = [RoleKind.Account]
             };
 
-            var duplicateUserAccount = new Account { Id = this.userAccount.Id, Name = this.userAccount.Name };
             this.SetupPackageReadServices(orgAdminContext, this.nonOwnerPackage);
-            this.accountServiceMock.Setup(x => x.ReadAsync(orgAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount, duplicateUserAccount));
+            this.accountServiceMock.Setup(x => x.ReadAsync(orgAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IAccount>(this.userAccount));
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).Returns<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>, CancellationToken>((func, _) => func(null!));
 
             await this.viewModel.InitializeViewModel("ecss-mm-pwr", "starion");

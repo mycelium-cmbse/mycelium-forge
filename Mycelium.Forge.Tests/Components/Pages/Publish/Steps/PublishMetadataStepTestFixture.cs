@@ -57,6 +57,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             this.viewModelMock.Setup(x => x.Package).Returns(this.package);
             this.viewModelMock.Setup(x => x.PackageVersion).Returns(this.packageVersion);
             this.viewModelMock.SetupProperty(x => x.SelectedScope, this.organizationScope);
+            this.viewModelMock.SetupProperty(x => x.License, string.Empty);
+            this.viewModelMock.SetupProperty(x => x.Tags, []);
             this.viewModelMock.Setup(x => x.StagedArtefact).Returns(this.stagedArtefact);
             this.viewModelMock.Setup(x => x.ScopeOptions).Returns([this.organizationScope, this.accountScope]);
         }
@@ -80,7 +82,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             {
                 Assert.That(this.viewModelMock.Object.SelectedScope, Is.EqualTo(this.accountScope));
                 Assert.That(this.package.Visibility, Is.EqualTo(VisibilityKind.PRIVATE));
-                Assert.That(this.package.IsVerified, Is.False);
             }
 
             // Case 2: Changing metadata fields updates underlying models
@@ -100,9 +101,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
                 Assert.That(this.packageVersion.Version, Is.EqualTo("2.3.4"));
                 Assert.That(this.packageVersion.ReleaseNotes, Is.EqualTo("Notes"));
                 Assert.That(this.package.Description, Is.EqualTo("New Description"));
-                Assert.That(this.package.License, Is.EqualTo("MIT"));
+                Assert.That(this.viewModelMock.Object.License, Is.EqualTo("MIT"));
                 Assert.That(this.package.Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
-                Assert.That(this.package.Tags, Has.Count.EqualTo(2));
+                Assert.That(this.viewModelMock.Object.Tags, Has.Count.EqualTo(2));
             }
         }
 

@@ -65,11 +65,6 @@ namespace Mycelium.Forge.ViewModels.Rows
         int DependentsCount { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the publisher is verified.
-        /// </summary>
-        bool IsVerified { get; }
-
-        /// <summary>
         /// Gets the relative elapsed time since publication.
         /// </summary>
         string LastPublished { get; }

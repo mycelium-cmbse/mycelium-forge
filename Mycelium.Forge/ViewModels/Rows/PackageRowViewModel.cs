@@ -88,11 +88,6 @@ namespace Mycelium.Forge.ViewModels.Rows
         public int DependentsCount { get; private init; }
 
         /// <summary>
-        /// Gets a value indicating whether the publisher is verified.
-        /// </summary>
-        public bool IsVerified { get; private init; }
-
-        /// <summary>
         /// Gets the relative elapsed time since the package was created, formatted as a human-readable string.
         /// Gets the relative elapsed time since the latest listed package version was published, formatted as a human-readable
         /// string.
@@ -117,9 +112,8 @@ namespace Mycelium.Forge.ViewModels.Rows
         /// The collection of related <see cref="IThing" /> instances containing scopes (organizations or accounts), package
         /// versions, and package types.
         /// </param>
-        /// <param name="isVerified">A value indicating whether the packages should be marked as verified.</param>
         /// <returns>A read-only list of <see cref="PackageRowViewModel" /> instances.</returns>
-        public static IReadOnlyList<PackageRowViewModel> GenerateRows(IEnumerable<IPackage> packages, IEnumerable<IThing> things, bool isVerified = true)
+        public static IReadOnlyList<PackageRowViewModel> GenerateRows(IEnumerable<IPackage> packages, IEnumerable<IThing> things)
         {
             var thingsList = things?.ToList() ?? [];
             var scopes = thingsList.OfType<IScope>().ToList();
@@ -154,7 +148,6 @@ namespace Mycelium.Forge.ViewModels.Rows
                     Tags = ResolveTagsForPackage(package),
                     DownloadCount = package.ComputeDownloadCount(packageVersions),
                     DependentsCount = ResolveDependentsCountForPackage(package),
-                    IsVerified = isVerified,
                     CreatedAt = package.CreatedAt,
                     LatestPublicationDate = latestPublicationDate,
                     LastPublished = latestPublicationDate.ToTimeAgo()

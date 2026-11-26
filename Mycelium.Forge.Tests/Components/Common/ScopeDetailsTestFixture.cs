@@ -87,7 +87,7 @@ namespace Mycelium.Forge.Tests.Components.Common
                 Name = "SysML v2"
             };
 
-            this.packages = PackageRowViewModel.GenerateRows([package], [this.organization, packageType], false);
+            this.packages = PackageRowViewModel.GenerateRows([package], [this.organization, packageType]);
         }
 
         [TearDown]

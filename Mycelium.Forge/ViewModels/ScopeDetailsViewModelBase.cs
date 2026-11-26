@@ -82,7 +82,7 @@ namespace Mycelium.Forge.ViewModels
             var packageVersions = versionsTask.Result;
             var packageTypes = packageTypesTask.Result;
 
-            this.Packages = PackageRowViewModel.GenerateRows(packages, [scope, .. packageVersions, .. packageTypes], false);
+            this.Packages = PackageRowViewModel.GenerateRows(packages, [scope, .. packageVersions, .. packageTypes]);
         }
     }
 }

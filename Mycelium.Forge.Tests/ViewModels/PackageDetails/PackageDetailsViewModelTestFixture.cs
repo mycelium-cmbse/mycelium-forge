@@ -38,7 +38,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
         private Mock<IPackageService> packageServiceMock;
         private Mock<IScopeService> scopeServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
-        private Mock<IPackageMetaDataService> packageMetaDataServiceMock;
         private Mock<IPackageTypeService> packageTypeServiceMock;
         private Mock<IAccountService> accountServiceMock;
         private Mock<IUserService> userServiceMock;
@@ -52,7 +51,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
         private Organization org;
         private PackageType packageType;
         private Account maintainer;
-        private PackageMetaData metaData;
 
         [SetUp]
         public void SetUp()
@@ -61,7 +59,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.packageServiceMock = new Mock<IPackageService>();
             this.scopeServiceMock = new Mock<IScopeService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
-            this.packageMetaDataServiceMock = new Mock<IPackageMetaDataService>();
             this.packageTypeServiceMock = new Mock<IPackageTypeService>();
             this.accountServiceMock = new Mock<IAccountService>();
             this.userServiceMock = new Mock<IUserService>();
@@ -77,14 +74,12 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
 
             var orgId = Guid.NewGuid();
             var typeId = Guid.NewGuid();
-            var metaDataId = Guid.NewGuid();
             var maintainerId = Guid.NewGuid();
 
             this.version = new PackageVersion
             {
                 Id = Guid.NewGuid(),
                 Version = "1.3.0",
-                MetaData = metaDataId,
                 PublicationDate = DateTime.UtcNow.AddDays(-2)
             };
 
@@ -115,25 +110,14 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.maintainer = new Account
             {
                 Id = maintainerId,
-                Name = "Alex Rivera",
-                IsVerified = true
-            };
-
-            this.metaData = new PackageMetaData
-            {
-                Id = metaDataId,
-                Owner = this.version.Id,
-                MetadataSource = MetadataSource.DeclaredByArtefact,
-                Elements = [("PowerSubsystem", "«part def»", "Parts", "3 parts")],
-                Dependencies = [("@esa/CoreTypes", "Core types", true)],
-                QualityChecks = [("Schema check", "Passed", true)]
+                Name = "Alex Rivera"
             };
 
             this.SetupPackageReadServices(this.userContext);
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Error.Unauthorized());
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Unauthorized());
 
-            this.viewModel = new PackageDetailsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.packageMetaDataServiceMock.Object, this.packageTypeServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.memoryCache, this.packagePermissionServiceMock.Object, this.loggerMock.Object);
+            this.viewModel = new PackageDetailsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.memoryCache, this.packagePermissionServiceMock.Object, this.loggerMock.Object);
         }
 
         [TearDown]
@@ -157,12 +141,10 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.Versions, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.CurrentVersion, Is.EqualTo(this.version));
                 Assert.That(this.viewModel.Maintainers, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.MetaDatas, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.CurrentMetaData, Is.EqualTo(this.metaData));
-                Assert.That(this.viewModel.Elements, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.Dependencies, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.Elements, Has.Count.GreaterThan(0));
+                Assert.That(this.viewModel.Dependencies, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.Dependents, Has.Count.EqualTo(0));
-                Assert.That(this.viewModel.QualityChecks, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.QualityChecks, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.IsUserAdmin, Is.False);
                 Assert.That(this.viewModel.CanManageVersions, Is.False);
                 Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
@@ -224,7 +206,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 CurrentRoles = [RoleKind.Account]
             };
 
-            var duplicateMaintainer = new Account { Id = this.maintainer.Id, Name = this.maintainer.Name, IsVerified = true };
+            var duplicateMaintainer = new Account { Id = this.maintainer.Id, Name = this.maintainer.Name };
             this.SetupPackageReadServices(orgAdminContext);
             this.accountServiceMock.Setup(x => x.ReadAsync(orgAdminContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IAccount>(this.maintainer, duplicateMaintainer)));
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(orgAdminContext, this.package, this.package, It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
@@ -262,7 +244,6 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageType>(this.packageType)));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageVersion>(this.version)));
             this.accountServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IAccount>(this.maintainer)));
-            this.packageMetaDataServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageMetaData>(this.metaData)));
         }
     }
 }

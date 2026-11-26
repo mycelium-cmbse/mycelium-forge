@@ -198,9 +198,8 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             await Task.WhenAll(maintainersTask, ownersTask, versionsTask, canUpdatePackageTask, canDeletePackageTask, invitationsTask);
 
-            // Deduplicate until Account.OwnedPackageInvitation is updated to UML multiplicity 0..* (#138) and AccountDao.ReadAsync stops returning duplicate rows.
-            this.Maintainers = [.. maintainersTask.Result.DistinctBy(account => account.Id)];
-            this.Owners = [.. ownersTask.Result.DistinctBy(account => account.Id)];
+            this.Maintainers = [.. maintainersTask.Result];
+            this.Owners = [.. ownersTask.Result];
             this.Versions = [.. versionsTask.Result.Cast<PackageVersion>().OrderByDescending(v => v.PublicationDate)];
             this.CanManagePackage = canUpdatePackageTask.Result.IsSuccess;
             this.CanManageVersions = this.Package.CanManageVersions(this.UserContext, this.Owner);
@@ -380,31 +379,6 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
 
             this.Versions.Replace(version, versionClone);
             this.notificationService.AddNotification($"Version {version.Version} has been relisted.", "Version Relisted", NotificationType.Success);
-        }
-
-        /// <summary>
-        /// Marks the specified package version as deprecated asynchronously.
-        /// </summary>
-        /// <param name="version">The package version to deprecate.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task DeprecateVersion(PackageVersion version, CancellationToken token = default)
-        {
-            var versionClone = version.Clone();
-            versionClone.IsDeprecated = true;
-            var result = await this.packageVersionService.UpdateAsync(this.UserContext, [versionClone], token);
-
-            if (result.IsError)
-            {
-                const string errorMessage = "Failed to deprecate version.";
-
-                this.logger.LogError(errorMessage + " Errors: {Errors}", result.Errors.ToJoinedDescriptions());
-                this.notificationService.AddNotification(errorMessage, "Error", NotificationType.Error);
-                return;
-            }
-
-            this.Versions.Replace(version, versionClone);
-            this.notificationService.AddNotification($"Version {version.Version} has been deprecated.", "Version Deprecated", NotificationType.Success);
         }
 
         /// <summary>

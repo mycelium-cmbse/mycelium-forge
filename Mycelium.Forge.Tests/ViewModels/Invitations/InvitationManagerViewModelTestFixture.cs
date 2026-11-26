@@ -111,10 +111,9 @@ namespace Mycelium.Forge.Tests.ViewModels.Invitations
                 Assert.That(this.orgViewModel.GetTargetName(matchingOrgInvite), Is.EqualTo("Unknown"));
             }
 
-            // Scenario 3: Package invitations load scoped by ReadByPackageAsync (including duplicate account DTOs), and canManage=false clears state without querying
-            var duplicatePkgTarget = new Account { Id = pkgTarget.Id, ShortName = "pkg-target" };
+            // Scenario 3: Package invitations load scoped by ReadByPackageAsync, and canManage=false clears state without querying
             this.packageInvitationServiceMock.Setup(x => x.ReadByPackageAsync(this.userContext, packageId, It.IsAny<CancellationToken>())).ReturnsAsync(ImmutableList.Create<IPackageInvitation>(matchingPkgInvite, revokedPkgInvite));
-            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == pkgTarget.Id))).ReturnsAsync(ImmutableList.Create<IAccount>(pkgTarget, duplicatePkgTarget));
+            this.accountServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == pkgTarget.Id))).ReturnsAsync(ImmutableList.Create<IAccount>(pkgTarget));
 
             await this.packageViewModel.InitializeViewModel(this.userContext, packageId, true, CancellationToken.None);
 

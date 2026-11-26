@@ -37,7 +37,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
         private Mock<IPublishViewModel> viewModelMock;
         private Package package;
         private PackageVersion packageVersion;
-        private PackageMetaData packageMetaData;
         private Organization scope;
         private List<ValidationCheckModel> validationChecks;
         private PublishArtefactModel stagedArtefact;
@@ -50,9 +49,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             this.context.Services.AddBlazorBlueprintComponents();
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            this.package = new Package { Name = "test-pkg", ShortName = "test-pkg", Description = "A test package", License = "MIT", Tags = ["tag1", "tag2"] };
+            this.package = new Package { Name = "test-pkg", ShortName = "test-pkg", Description = "A test package" };
             this.packageVersion = new PackageVersion { Version = "1.0.0" };
-            this.packageMetaData = new PackageMetaData { Dependencies = [("dep1", ">=1.0.0", true)] };
             this.scope = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
             this.validationChecks = [];
             this.stagedArtefact = new PublishArtefactModel { FileName = "pkg.kpar", Format = "SysML v2", SizeInBytes = 1024 };
@@ -60,7 +58,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             this.viewModelMock = new Mock<IPublishViewModel>();
             this.viewModelMock.Setup(x => x.Package).Returns(this.package);
             this.viewModelMock.Setup(x => x.PackageVersion).Returns(this.packageVersion);
-            this.viewModelMock.Setup(x => x.PackageMetaData).Returns(this.packageMetaData);
+            this.viewModelMock.Setup(x => x.License).Returns("MIT");
+            this.viewModelMock.Setup(x => x.Tags).Returns(["tag1", "tag2"]);
+            this.viewModelMock.Setup(x => x.Dependencies).Returns([("dep1", ">=1.0.0", true)]);
             this.viewModelMock.Setup(x => x.SelectedScope).Returns(this.scope);
             this.viewModelMock.Setup(x => x.ValidationChecks).Returns(this.validationChecks);
             this.viewModelMock.Setup(x => x.StagedArtefact).Returns(this.stagedArtefact);
@@ -89,9 +89,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             }
 
             // Case 2: Empty metadata fields fall back to None
-            this.package.License = string.Empty;
-            this.package.Tags = [];
-            this.packageMetaData.Dependencies = [];
+            this.viewModelMock.Setup(x => x.License).Returns(string.Empty);
+            this.viewModelMock.Setup(x => x.Tags).Returns([]);
+            this.viewModelMock.Setup(x => x.Dependencies).Returns([]);
 
             using (Assert.EnterMultipleScope())
             {

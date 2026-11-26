@@ -341,16 +341,6 @@ namespace Mycelium.Forge.Components.Pages.PackageSettings
         }
 
         /// <summary>
-        /// Deprecates the specified package version asynchronously.
-        /// </summary>
-        /// <param name="version">The package version to deprecate.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        private async Task OnDeprecateVersion(PackageVersion version)
-        {
-            await this.ViewModel.DeprecateVersion(version);
-        }
-
-        /// <summary>
         /// Opens the confirmation dialog to transfer package ownership.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>

@@ -23,13 +23,6 @@
             <span class="text-sm leading-xs font-semibold text-foreground truncate group-hover:text-primary transition-colors flex-1">
                 @(this.PackageRowViewModel.Name)
             </span>
-            @if (this.PackageRowViewModel.IsVerified)
-            {
-                <LucideIcon Name="badge-check"
-                            Size="16"
-                            Class="text-primary shrink-0"
-                            aria-hidden="true"/>
-            }
             <BbBadge Variant="BadgeVariant.Outline"
                      Class="badge-format">
                 @(this.PackageRowViewModel.Format)

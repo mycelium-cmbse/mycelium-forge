@@ -184,7 +184,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
             if (!this.ViewModel.IsExistingPackage && scope != null)
             {
                 this.ViewModel.Package.Visibility = scope.DefaultPackageVisibility;
-                this.ViewModel.Package.IsVerified = scope.IsVerified();
             }
         }
 
@@ -245,7 +244,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <param name="license">The selected license identifier.</param>
         public void OnLicenseChanged(string license)
         {
-            this.ViewModel.Package.License = license;
+            this.ViewModel.License = license;
         }
 
         /// <summary>
@@ -263,7 +262,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <param name="tags">The updated list of tags.</param>
         public void OnTagsChanged(IReadOnlyList<string> tags)
         {
-            this.ViewModel.Package.Tags = [.. tags ?? []];
+            this.ViewModel.Tags = [.. tags ?? []];
         }
 
         /// <summary>

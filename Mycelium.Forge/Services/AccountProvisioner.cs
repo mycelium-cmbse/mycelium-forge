@@ -206,8 +206,7 @@ namespace Mycelium.Forge.Services
                 Owner = this.forgeContext.ForgeId,
                 Name = displayName,
                 ShortName = username,
-                Email = email,
-                OwnedPackageInvitation = Guid.NewGuid() // Remove once Account.OwnedPackageInvitation is updated to UML multiplicity 0..* (non-mandatory) (#138) so AccountDao.ReadAsync stops returning duplicate rows.
+                Email = email
             };
 
             var created = await this.accountService.CreateAsync(systemContext, [account], cancellationToken);
