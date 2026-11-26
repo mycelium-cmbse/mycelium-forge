@@ -77,10 +77,7 @@ namespace Mycelium.Forge.Common
         string INamespace.ShortName
         {
             get => this.SpdxIdentifier;
-            set
-            {
-                this.SpdxIdentifier = value;
-            }
+            set => this.SpdxIdentifier = value;
         }
 
         /// <summary>

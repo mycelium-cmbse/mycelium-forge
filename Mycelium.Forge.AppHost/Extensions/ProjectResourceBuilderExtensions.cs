@@ -42,6 +42,24 @@ namespace Mycelium.Forge.AppHost.Extensions
             }
 
             /// <summary>
+            /// Adds the <c>ArtifactStore</c> settings Forge and the seeder use to reach the Garage S3-compatible store.
+            /// </summary>
+            /// <param name="garage">The Garage container resource.</param>
+            /// <param name="storageAccessKey">The Garage S3 access key parameter.</param>
+            /// <param name="storageSecretKey">The Garage S3 secret key parameter.</param>
+            /// <returns>The configured <see cref="IResourceBuilder{ProjectResource}" /> instance.</returns>
+            public IResourceBuilder<ProjectResource> WithArtifactStoreEnvironment(IResourceBuilder<ContainerResource> garage, IResourceBuilder<ParameterResource> storageAccessKey, IResourceBuilder<ParameterResource> storageSecretKey)
+            {
+                return project
+                    .WithEnvironment("ArtifactStore__ServiceUrl", garage.GetEndpoint("s3"))
+                    .WithEnvironment("ArtifactStore__Region", "garage")
+                    .WithEnvironment("ArtifactStore__BucketName", "forge-artefacts")
+                    .WithEnvironment("ArtifactStore__AccessKey", storageAccessKey)
+                    .WithEnvironment("ArtifactStore__SecretKey", storageSecretKey)
+                    .WithEnvironment("ArtifactStore__ForcePathStyle", "true");
+            }
+
+            /// <summary>
             /// Configures the migrator service for Docker Compose publishing.
             /// </summary>
             /// <param name="builder">The distributed application builder.</param>

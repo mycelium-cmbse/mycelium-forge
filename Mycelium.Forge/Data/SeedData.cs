@@ -359,6 +359,9 @@ namespace Mycelium.Forge.Data
 
             var baseDate = DateTime.UtcNow;
 
+            const string seedChecksum = "65846a5822634106bc07d4fc81798f0d2895e5277a7ec706921253741d02cb2f";
+            const int seedSizeInBytes = 3636;
+
             PackageVersions =
             [
                 new PackageVersion
@@ -368,7 +371,10 @@ namespace Mycelium.Forge.Data
                     Owner = SysmlIsqQuantitiesPackage.Id,
                     Version = "2025.2.0",
                     DownloadCount = 1400,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -377,7 +383,10 @@ namespace Mycelium.Forge.Data
                     PublicationDate = baseDate.AddDays(-30),
                     Version = "2025.2.0",
                     DownloadCount = 2100,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -386,7 +395,10 @@ namespace Mycelium.Forge.Data
                     Version = "1.0.0",
                     PublicationDate = baseDate.AddDays(-60),
                     DownloadCount = 860,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -395,7 +407,10 @@ namespace Mycelium.Forge.Data
                     Version = "1.2.0",
                     DownloadCount = 210,
                     PublicationDate = baseDate.AddDays(-14),
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -404,7 +419,10 @@ namespace Mycelium.Forge.Data
                     Version = "0.8.2",
                     Listed = true,
                     DownloadCount = 145,
-                    PublicationDate = baseDate.AddDays(-21)
+                    PublicationDate = baseDate.AddDays(-21),
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -413,7 +431,10 @@ namespace Mycelium.Forge.Data
                     PublicationDate = baseDate.AddDays(-60),
                     Version = "0.3.0",
                     DownloadCount = 190,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -422,7 +443,10 @@ namespace Mycelium.Forge.Data
                     Version = "10.25.1",
                     PublicationDate = baseDate.AddDays(-30),
                     DownloadCount = 320,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "zip",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -431,7 +455,10 @@ namespace Mycelium.Forge.Data
                     Version = "6.1.0",
                     DownloadCount = 185,
                     PublicationDate = baseDate.AddDays(-90),
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "zip",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -440,7 +467,10 @@ namespace Mycelium.Forge.Data
                     Owner = EcssMechanicalPackage.Id,
                     Version = "1.0.0",
                     DownloadCount = 165,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -449,7 +479,10 @@ namespace Mycelium.Forge.Data
                     Version = "2025.1.0",
                     PublicationDate = baseDate.AddDays(-120),
                     DownloadCount = 980,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -458,7 +491,10 @@ namespace Mycelium.Forge.Data
                     PublicationDate = baseDate.AddDays(-120),
                     Version = "2025.1.0",
                     DownloadCount = 1450,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -467,7 +503,10 @@ namespace Mycelium.Forge.Data
                     Version = "0.9.0",
                     Listed = true,
                     DownloadCount = 320,
-                    PublicationDate = baseDate.AddDays(-150)
+                    PublicationDate = baseDate.AddDays(-150),
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -476,7 +515,10 @@ namespace Mycelium.Forge.Data
                     Version = "1.1.0",
                     PublicationDate = baseDate.AddDays(-104),
                     DownloadCount = 180,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -485,7 +527,10 @@ namespace Mycelium.Forge.Data
                     Version = "1.0.0",
                     DownloadCount = 95,
                     PublicationDate = baseDate.AddDays(-194),
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "kpar",
+                    SizeInBytes = seedSizeInBytes
                 },
                 new PackageVersion
                 {
@@ -494,11 +539,12 @@ namespace Mycelium.Forge.Data
                     Version = "10.25.0",
                     PublicationDate = baseDate.AddDays(-120),
                     DownloadCount = 185,
-                    Listed = true
+                    Listed = true,
+                    CheckSum = seedChecksum,
+                    FileExtension = "zip",
+                    SizeInBytes = seedSizeInBytes
                 }
             ];
-
-            PackageMetaDatas = PackageVersions.Select(CreatePackageMetaData).ToList();
 
             Packages =
             [
@@ -560,7 +606,7 @@ namespace Mycelium.Forge.Data
                     Name = "ci-publish",
                     ExpiresAt = new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-3),
-                    RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    RevokedAt = null,
                     SecretHash = [1, 2, 3],
                     Permissions = ["read", "write"]
                 },
@@ -571,7 +617,7 @@ namespace Mycelium.Forge.Data
                     Name = "release-bot",
                     ExpiresAt = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-14),
-                    RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    RevokedAt = null,
                     SecretHash = [1, 2, 3],
                     Permissions = ["read", "write"]
                 },
@@ -582,7 +628,7 @@ namespace Mycelium.Forge.Data
                     Name = "local-dev",
                     ExpiresAt = new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc),
                     LastUsedAt = DateTime.UtcNow.AddDays(-30),
-                    RevokedAt = new DateTime(2099, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    RevokedAt = null,
                     SecretHash = [1, 2, 3],
                     Permissions = ["read", "write"]
                 }
@@ -730,11 +776,6 @@ namespace Mycelium.Forge.Data
         public static IReadOnlyList<PackageVersion> PackageVersions { get; }
 
         /// <summary>
-        /// Gets the master list of seeded package metadata entities.
-        /// </summary>
-        public static IReadOnlyList<PackageMetaData> PackageMetaDatas { get; }
-
-        /// <summary>
         /// Gets the master list of seeded package invitations.
         /// </summary>
         public static IReadOnlyList<PackageInvitation> PackageInvitations { get; }
@@ -748,24 +789,6 @@ namespace Mycelium.Forge.Data
         /// Gets the master list of API keys.
         /// </summary>
         public static IReadOnlyList<APIKey> ApiKeys { get; }
-
-        /// <summary>
-        /// Creates a <see cref="PackageMetaData" /> instance linked to the specified <see cref="PackageVersion" /> using only
-        /// codegenerated properties.
-        /// </summary>
-        /// <param name="packageVersion">The owning package version.</param>
-        /// <returns>A configured <see cref="PackageMetaData" /> entity.</returns>
-        private static PackageMetaData CreatePackageMetaData(PackageVersion packageVersion)
-        {
-            var metaData = new PackageMetaData
-            {
-                Id = Guid.NewGuid(),
-                Owner = packageVersion.Id
-            };
-
-            packageVersion.MetaData = metaData.Id;
-            return metaData;
-        }
 
         /// <summary>
         /// Creates a <see cref="PackageInvitation" /> instance linked to the specified owning <see cref="Account" />, target
@@ -789,7 +812,7 @@ namespace Mycelium.Forge.Data
                 ExperiesAt = DateTime.UtcNow.AddDays(14)
             };
 
-            owner.OwnedPackageInvitation = invitation.Id;
+            owner.OwnedPackageInvitation.Add(invitation.Id);
             return invitation;
         }
     }

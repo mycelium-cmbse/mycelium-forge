@@ -218,6 +218,10 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers
                         {
                             sb.AppendLine("\tset { }");
                         }
+                        else if (!setterImplementation.Contains('\n', StringComparison.Ordinal))
+                        {
+                            sb.AppendLine($"\tset => {setterImplementation}");
+                        }
                         else
                         {
                             sb.AppendLine("\tset ");

@@ -44,7 +44,7 @@ namespace Mycelium.Forge.Generator.Tests
     {
         private static readonly string[] ConcreteInterestingClasses =
         [
-            "APIKey", "Forge", "Organization", "Package", "PackageInvitation", "PackageVersion", "ProfileLink"
+            "APIKey", "Forge", "License", "Organization", "Package", "PackageVersion", "ProfileLink"
         ];
 
         private static readonly string[] AbstractInterestingClasses = ["Invitation", "Scope", "Thing"];

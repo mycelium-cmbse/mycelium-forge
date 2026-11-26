@@ -25,10 +25,13 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
     public class PropertyExtensionTestFixture
     {
         private IProperty administratorProperty;
+        private IProperty avatarBlobReferenceProperty;
+        private IProperty emailProperty;
         private IProperty packageTypeProperty;
         private IProperty billingEmailProperty;
         private IProperty downloadCountProperty;
         private IProperty idProperty;
+        private IProperty readmeProperty;
         private IProperty scopePrimaryAddressProperty;
         private IProperty scopeAddressProperty;
         private IProperty orgInvitationTargetProperty;
@@ -37,13 +40,29 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
         public void SetUp()
         {
             this.administratorProperty = GetOwnedProperty("Organization", "administrator");
+            this.avatarBlobReferenceProperty = GetOwnedProperty("Account", "avatarBlobReference");
+            this.emailProperty = GetOwnedProperty("Scope", "email");
             this.packageTypeProperty = GetOwnedProperty("Package", "packageType");
             this.billingEmailProperty = GetOwnedProperty("Scope", "billingEmail");
             this.downloadCountProperty = GetOwnedProperty("Package", "downloadCount");
             this.idProperty = GetOwnedProperty("Thing", "id");
+            this.readmeProperty = GetOwnedProperty("PackageVersion", "readme");
             this.scopePrimaryAddressProperty = GetOwnedProperty("Scope", "primaryAddress");
             this.scopeAddressProperty = GetOwnedProperty("Scope", "address");
             this.orgInvitationTargetProperty = GetOwnedProperty("OrganizationInvitation", "target");
+        }
+
+        [Test]
+        public void VerifyQueryIsIndexable()
+        {
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => GeneratorPropertyExtension.QueryIsIndexable(null!), Throws.TypeOf<ArgumentNullException>());
+                Assert.That(GeneratorPropertyExtension.QueryIsIndexable(this.emailProperty), Is.True);
+                Assert.That(GeneratorPropertyExtension.QueryIsIndexable(this.idProperty), Is.False);
+                Assert.That(GeneratorPropertyExtension.QueryIsIndexable(this.billingEmailProperty), Is.False);
+                Assert.That(GeneratorPropertyExtension.QueryIsIndexable(this.avatarBlobReferenceProperty), Is.False);
+            }
         }
 
         [Test]
@@ -315,6 +334,8 @@ namespace Mycelium.Forge.Generator.Tests.Extensions
                 }
 
                 Assert.That(GeneratorPropertyExtension.QuerySqlTypeName(unknownProp), Is.EqualTo("text"));
+                Assert.That(GeneratorPropertyExtension.QuerySqlTypeName(this.readmeProperty), Is.EqualTo("text"));
+                Assert.That(this.readmeProperty.QueryCSharpTypeName(), Is.EqualTo("string"));
                 Assert.That(GeneratorPropertyExtension.QuerySqlTypeName(enumerableRef), Is.EqualTo("[uuid]"));
                 Assert.That(GeneratorPropertyExtension.QuerySqlTypeName(unTypedProp), Is.EqualTo(string.Empty));
             }

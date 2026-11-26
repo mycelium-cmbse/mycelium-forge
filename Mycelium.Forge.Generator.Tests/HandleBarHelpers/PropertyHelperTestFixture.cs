@@ -32,6 +32,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
     {
         private IHandlebars handlebars;
         private IClass accountClass;
+        private IClass licenseClass;
         private IClass thingClass;
         private IProperty accountOwnerProperty;
         private IProperty thingIdProperty;
@@ -49,6 +50,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             PropertyHelper.RegisterPropertyHelper(this.handlebars);
 
             this.accountClass = GetClass("Account");
+            this.licenseClass = GetClass("License");
             this.thingClass = GetClass("Thing");
             this.accountOwnerProperty = this.accountClass.QueryDtoInterfaceProperties().Single(x => x.Name == "owner");
             this.thingIdProperty = this.thingClass.OwnedAttribute.Single(x => x.Name == "id");
@@ -69,6 +71,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             var classPropertiesResult = classPropertiesTemplate(this.accountClass);
             var writeInterfacePropertyResult = writeInterfacePropertyTemplate(this.accountOwnerProperty);
             var writeClassPropertyResult = writeClassPropertyTemplate(this.accountClass);
+            var writeLicenseClassPropertyResult = writeClassPropertyTemplate(this.licenseClass);
             var writeOwnerDocumentationResult = writeDocumentationTemplate(this.accountOwnerProperty);
 
             using (Assert.EnterMultipleScope())
@@ -78,6 +81,9 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(classPropertiesResult, Does.Contain("owner"));
                 Assert.That(writeInterfacePropertyResult, Does.Contain("Guid Owner { get; set; }"));
                 Assert.That(writeClassPropertyResult, Does.Contain("public Guid Owner { get; set; }"));
+                Assert.That(writeLicenseClassPropertyResult, Does.Contain("string INamespace.ShortName"));
+                Assert.That(writeLicenseClassPropertyResult, Does.Contain("get => this.SpdxIdentifier;"));
+                Assert.That(writeLicenseClassPropertyResult, Does.Contain("set => this.SpdxIdentifier = value;"));
                 Assert.That(writeOwnerDocumentationResult, Does.Contain("The unique identifier of the owning Forge."));
                 Assert.That(() => interfacePropertiesTemplate("not-a-class"), Throws.TypeOf<HandlebarsException>());
                 Assert.That(() => classPropertiesTemplate("not-a-class"), Throws.TypeOf<HandlebarsException>());

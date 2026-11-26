@@ -25,6 +25,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
     {
         private IHandlebars handlebars;
         private IClass countryClass;
+        private IClass licenseClass;
         private IClass packageClass;
         private IClass thingClass;
 
@@ -36,6 +37,7 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
             this.handlebars.RegisterDaoHelper();
 
             this.countryClass = GetClass("Country");
+            this.licenseClass = GetClass("License");
             this.packageClass = GetClass("Package");
             this.thingClass = GetClass("Thing");
         }
@@ -54,6 +56,21 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(packageResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['appliedTags', 'createdAt', 'modifiedAt', 'owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version']);"));
                 Assert.That(countryResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['createdAt', 'modifiedAt', 'owner']);"));
                 Assert.That(thingResult, Does.Contain("VALUES (@id, @classKind, @data - ARRAY['createdAt', 'modifiedAt']);"));
+            }
+        }
+
+        [Test]
+        public void VerifyReadAsyncWriteReadSql()
+        {
+            var template = this.handlebars.Compile("{{#Dao.ReadAsyncWriteReadSQL this}}");
+            var licenseResult = template(this.licenseClass);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
+                Assert.That(licenseResult, Does.Contain("(thing.data->>'spdxIdentifier') AS spdx_identifier"));
+                Assert.That(licenseResult, Does.Not.Contain("shortName"));
+                Assert.That(licenseResult, Does.Not.Contain("short_name"));
             }
         }
 
@@ -77,6 +94,21 @@ namespace Mycelium.Forge.Generator.Tests.HandleBarHelpers
                 Assert.That(packageResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['appliedTags', 'createdAt', 'modifiedAt', 'owner', 'packageMaintainer', 'packageOwner', 'packageType', 'version'] WHERE id = @id;"));
                 Assert.That(countryResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['createdAt', 'modifiedAt', 'owner'] WHERE id = @id;"));
                 Assert.That(thingResult, Does.Contain("UPDATE forge.thing SET data = @data - ARRAY['createdAt', 'modifiedAt'] WHERE id = @id;"));
+            }
+        }
+
+        [Test]
+        public void VerifyWriteMapToDto()
+        {
+            var template = this.handlebars.Compile("{{#Dao.WriteMapToDto this}}");
+            var licenseResult = template(this.licenseClass);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(() => template("not-a-class"), Throws.TypeOf<HandlebarsException>());
+                Assert.That(licenseResult, Does.Contain("SpdxIdentifier = (string)reader[\"spdx_identifier\"]"));
+                Assert.That(licenseResult, Does.Not.Contain("ShortName"));
+                Assert.That(licenseResult, Does.Not.Contain("short_name"));
             }
         }
 

@@ -35,13 +35,15 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenDtoValidator
             var packageVersion = new PackageVersion
             {
                 Id = Guid.NewGuid(),
+                CheckSum = new string('a', 64),
                 CreatedAt = DateTime.UtcNow,
                 ModifiedAt = DateTime.UtcNow,
                 DownloadCount = 0,
+                FileExtension = "kpar",
                 Listed = true,
-                MetaData = Guid.NewGuid(),
                 Owner = Guid.NewGuid(),
                 PublicationDate = DateTime.UtcNow,
+                SizeInBytes = 1024,
                 Version = version
             };
 
