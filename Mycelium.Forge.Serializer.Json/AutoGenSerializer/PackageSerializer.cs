@@ -48,10 +48,25 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackage.Id);
 
+            writer.WriteStartArray("appliedTags"u8);
+
+            foreach (var item in iPackage.AppliedTags)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("@id"u8);
+                writer.WriteStringValue(item);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
             writer.WritePropertyName("createdAt"u8);
             writer.WriteStringValue(iPackage.CreatedAt);
             writer.WritePropertyName("description"u8);
             writer.WriteStringValue(iPackage.Description);
+            writer.WritePropertyName("documentationUrl"u8);
+            writer.WriteStringValue(iPackage.DocumentationUrl);
+            writer.WritePropertyName("homepageUrl"u8);
+            writer.WriteStringValue(iPackage.HomepageUrl);
             writer.WritePropertyName("listed"u8);
             writer.WriteBooleanValue(iPackage.Listed);
             writer.WritePropertyName("modifiedAt"u8);
@@ -90,6 +105,8 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackage.PackageType);
             writer.WriteEndObject();
+            writer.WritePropertyName("repositoryUrl"u8);
+            writer.WriteStringValue(iPackage.RepositoryUrl);
             writer.WritePropertyName("shortName"u8);
             writer.WriteStringValue(iPackage.ShortName);
             writer.WriteStartArray("version"u8);

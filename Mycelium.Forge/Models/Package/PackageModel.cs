@@ -113,11 +113,6 @@ namespace Mycelium.Forge.Models.Package
         public int DependentsCount { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the publisher is verified.
-        /// </summary>
-        public bool IsVerified { get; set; }
-
-        /// <summary>
         /// Gets or sets the visibility of the package from the underlying package DTO.
         /// </summary>
         public VisibilityKind Visibility => this.Package?.Visibility ?? VisibilityKind.PUBLIC;
@@ -184,10 +179,7 @@ namespace Mycelium.Forge.Models.Package
                 format,
                 tags,
                 downloadCount,
-                dependentsCount)
-            {
-                IsVerified = true
-            };
+                dependentsCount);
         }
     }
 }

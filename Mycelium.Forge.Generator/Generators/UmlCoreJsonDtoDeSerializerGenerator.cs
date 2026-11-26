@@ -41,11 +41,7 @@ namespace Mycelium.Forge.Generator.Generators
         /// </summary>
         static UmlCoreJsonDtoDeSerializerGenerator()
         {
-            TypedElementExtensions.AddOrOverwriteCSharpTypeMappings(
-                ("UUID", "Guid"),
-                ("URI", "string"),
-                ("SemVer", "string"),
-                ("Date", "DateOnly"));
+            RegisterCustomCSharpTypeMappings();
         }
 
         /// <summary>

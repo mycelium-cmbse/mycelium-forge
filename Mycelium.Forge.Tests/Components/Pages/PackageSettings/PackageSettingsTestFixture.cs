@@ -84,7 +84,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 Version = "1.3.0",
                 Owner = packageId,
                 Listed = true,
-                IsDeprecated = false,
                 PublicationDate = DateTime.UtcNow.AddDays(-1)
             };
 
@@ -94,7 +93,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 Version = "1.0.0",
                 Owner = packageId,
                 Listed = false,
-                IsDeprecated = false,
                 PublicationDate = DateTime.UtcNow.AddMonths(-1)
             };
 
@@ -122,8 +120,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
             {
                 Id = ownerAccountId,
                 Name = "Alex Rivera",
-                ShortName = "alex.rivera",
-                IsVerified = true
+                ShortName = "alex.rivera"
             };
 
             this.maintainerAccount = new Account
@@ -205,18 +202,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageSettings
                 Assert.That(collaboratorRows[0].Instance.Account.Id, Is.EqualTo(this.ownerAccount.Id));
                 Assert.That(collaboratorRows[1].Instance.Account.Id, Is.EqualTo(this.maintainerAccount.Id));
             }
-        }
-
-        [Test]
-        public async Task VerifyDeprecateVersion()
-        {
-            var packageSettingsPage = this.context.Render<PackageSettings>();
-            var deprecateButton = packageSettingsPage.FindComponents<BbButton>().FirstOrDefault(x => x.Instance.HasClass("package-deprecate-version-button"));
-            Assert.That(deprecateButton, Is.Not.Null);
-
-            await packageSettingsPage.InvokeAsync(() => deprecateButton!.Find("button").ClickAsync());
-
-            this.viewModelMock.Verify(x => x.DeprecateVersion(this.activeVersion, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]

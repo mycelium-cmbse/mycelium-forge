@@ -56,9 +56,11 @@
         "@id": "00000000-0000-0000-0000-000000000007"
       }
     ],
-    "ownedPackageInvitation": {
-      "@id": "00000000-0000-0000-0000-000000000008"
-    },
+    "ownedPackageInvitation": [
+      {
+        "@id": "00000000-0000-0000-0000-000000000008"
+      }
+    ],
     "owner": {
       "@id": "00000000-0000-0000-0000-000000000000"
     },
@@ -123,6 +125,11 @@
       }
     ],
     "createdAt": "2026-01-01T00:00:00Z",
+    "curatedTags": [
+      {
+        "@id": "00000000-0000-0000-0000-000000000018"
+      }
+    ],
     "description": "The Mycelium Forge instance",
     "modifiedAt": "2026-01-01T00:00:00Z",
     "name": "mycelium-forge",
@@ -142,7 +149,20 @@
       }
     ],
     "shortName": "mycelium-forge",
-    "tag": []
+    "tag": [
+      {
+        "@id": "00000000-0000-0000-0000-000000000018"
+      }
+    ]
+  },
+  {
+    "@type": "License",
+    "@id": "00000000-0000-0000-0000-000000000019",
+    "createdAt": "2026-01-01T00:00:00Z",
+    "licenseText": "Apache License, Version 2.0",
+    "modifiedAt": "2026-01-01T00:00:00Z",
+    "name": "Apache License 2.0",
+    "spdxIdentifier": "Apache-2.0"
   },
   {
     "@type": "Organization",
@@ -229,8 +249,15 @@
   {
     "@type": "Package",
     "@id": "00000000-0000-0000-0000-000000000007",
+    "appliedTags": [
+      {
+        "@id": "00000000-0000-0000-0000-000000000018"
+      }
+    ],
     "createdAt": "2026-01-01T00:00:00Z",
-    "description": null,
+    "description": "The Mycelium Forge client package",
+    "documentationUrl": "https://docs.example.com/mycelium-forge-client",
+    "homepageUrl": "https://example.com/mycelium-forge-client",
     "listed": true,
     "modifiedAt": "2026-01-01T00:00:00Z",
     "name": "mycelium-forge-client",
@@ -250,6 +277,7 @@
     "packageType": {
       "@id": "00000000-0000-0000-0000-000000000013"
     },
+    "repositoryUrl": "https://github.com/example/mycelium-forge-client",
     "shortName": "mycelium-forge-client",
     "version": [
       {
@@ -295,15 +323,6 @@
     }
   },
   {
-    "@type": "PackageMetaData",
-    "@id": "00000000-0000-0000-0000-000000000018",
-    "createdAt": "2026-01-01T00:00:00Z",
-    "modifiedAt": "2026-01-01T00:00:00Z",
-    "owner": {
-      "@id": "00000000-0000-0000-0000-000000000000"
-    }
-  },
-  {
     "@type": "PackageType",
     "@id": "00000000-0000-0000-0000-000000000013",
     "createdAt": "2026-01-01T00:00:00Z",
@@ -317,17 +336,24 @@
   {
     "@type": "PackageVersion",
     "@id": "00000000-0000-0000-0000-000000000016",
+    "applicableLicenses": [
+      {
+        "@id": "00000000-0000-0000-0000-000000000019"
+      }
+    ],
+    "checkSum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "createdAt": "2026-01-01T00:00:00Z",
     "downloadCount": 42,
+    "fileExtension": "kpar",
     "listed": true,
-    "metaData": {
-      "@id": "00000000-0000-0000-0000-000000000018"
-    },
     "modifiedAt": "2026-01-01T00:00:00Z",
     "owner": {
       "@id": "00000000-0000-0000-0000-000000000000"
     },
     "publicationDate": "2026-01-02T00:00:00Z",
+    "readme": "# Mycelium Forge Client",
+    "releaseNotes": "Initial release.",
+    "sizeInBytes": 2048,
     "version": "1.0.0"
   },
   {
@@ -352,6 +378,16 @@
     "name": "GitHub",
     "owner": {
       "@id": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+  {
+    "@type": "Tag",
+    "@id": "00000000-0000-0000-0000-000000000018",
+    "createdAt": "2026-01-01T00:00:00Z",
+    "modifiedAt": "2026-01-01T00:00:00Z",
+    "name": "sysml-v2",
+    "owner": {
+      "@id": "00000000-0000-0000-0000-000000000011"
     }
   }
 ]

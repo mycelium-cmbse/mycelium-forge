@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Generator.Extensions
     using uml4net.Classification;
     using uml4net.CommonStructure;
     using uml4net.Extensions;
+    using uml4net.Profiling;
     using uml4net.SimpleClassifiers;
     using uml4net.Values;
 
@@ -35,7 +36,8 @@ namespace Mycelium.Forge.Generator.Extensions
             { "UUID", "uuid" },
             { "Uuid", "uuid" },
             { "URI", "text" },
-            { "SemVer", "text" }
+            { "SemVer", "text" },
+            { "Markdown", "text" }
         };
 
         /// <param name="property">The <see cref="IProperty" /> to assert.</param>
@@ -125,6 +127,14 @@ namespace Mycelium.Forge.Generator.Extensions
                 ArgumentNullException.ThrowIfNull(property);
 
                 if (property.QueryIsMemberOfManyToMany())
+                {
+                    return true;
+                }
+
+                // Workaround (To be fixed in model by #226): a unidirectional non-composite association to many whose opposite end
+                // is missing or unowned (e.g. Package.appliedTags -> Tag, PackageVersion.applicableLicenses -> License in
+                // model 0.6.0) cannot be mapped as a foreign key column and is mapped as a junction table instead.
+                if (property.QueryIsEnumerable() && property.Type != null && !property.QueryIsDataType() && !property.IsComposite && (property.Opposite == null || property.Opposite.Class == null))
                 {
                     return true;
                 }
@@ -350,28 +360,61 @@ namespace Mycelium.Forge.Generator.Extensions
             }
 
             /// <summary>
-            /// Queries whether the <see cref="IProperty" /> represents a primary key based on UML metadata
-            /// where both <see cref="IProperty.IsID" /> and <see cref="IMultiplicityElement.IsUnique" /> are true.
+            /// Queries whether the <see cref="IProperty" /> is indexable based on the Mycelium profile <c>&lt;&lt;index&gt;&gt;</c> stereotype.
             /// </summary>
-            /// <returns>True if the property is a primary key, false otherwise.</returns>
-            public bool QueryIsPrimaryKey()
-            {
-                ArgumentNullException.ThrowIfNull(property);
-
-                return property.IsID && property.IsUnique;
-            }
-
-            /// <summary>
-            /// Queries whether the <see cref="IProperty" /> is indexable based on UML metadata
-            /// where <see cref="IProperty.IsID" /> is true and <see cref="IMultiplicityElement.IsUnique" /> is false.
-            /// </summary>
-            /// <returns>True if the property is indexable, false otherwise.</returns>
+            /// <returns>True if the property has the <c>Mycelium:index</c> stereotype, false otherwise.</returns>
             public bool QueryIsIndexable()
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                return property.IsID && !property.IsUnique;
+                // Model 0.6 replaced the UML isID=true / isUnique=false convention with the <<index>> stereotype from the
+                // Mycelium profile.
+                return property.QueryStereoTypeApplication("index") != null;
             }
+
+            /*
+             * To be done in #227 (Mycelium profile <<managed>> & onAction follow-up):
+             *
+             * Forge model 0.6 introduces the <<managed>> stereotype (ProfileName: "Mycelium", StereoTypeName: "managed")
+             * and an accompanying Enterprise Architect tagged value `onAction` to mark system/server-managed properties
+             * that clients must not freely supply or overwrite.
+             *
+             * 1. How uml4net exposes them at generation time:
+             *    - <<managed>> is exposed directly on IProperty via `property.QueryStereoTypeApplications()`
+             *      (uml4net.Profiling.StereoTypeApplicationExtensions), where ProfileName == "Mycelium" and
+             *      StereoTypeName == "managed". Note: this works for both OwnedAttribute properties AND reverse
+             *      composite `owner` association ends (e.g. APIKey.owner, OrganizationInvitation.owner,
+             *      PackageInvitation.owner).
+             *    - `onAction` is NOT currently populated on `StereoTypeApplication.TaggedValues` by uml4net 9.1.0;
+             *      instead it lives in the EA XMI extension (`xmiReaderResult.XmiRoot.Extensions`) on:
+             *        * `Element.Attributes[].Tags` (for class-owned attributes), matched by `ea_guid` / XMI id
+             *        * `Connector.SourceEnd.Tags` (for association ends like `owner`)
+             *      Values observed in 0.6.0:
+             *        * `onAction="OnCreate"` (11 properties):
+             *            Thing.createdAt, APIKey.secretHash, APIKey.owner, Invitation.experiesAt,
+             *            OrganizationInvitation.owner, PackageInvitation.owner, PackageVersion.checkSum,
+             *            PackageVersion.fileExtension, PackageVersion.publicationDate, PackageVersion.sizeInBytes,
+             *            Scope.origin
+             *        * `onAction="OnCreate,OnUpdate"` (1 property):
+             *            Thing.modifiedAt
+             *        * No `onAction` tag (7 <<managed>> properties mutated by dedicated workflows/endpoints):
+             *            Account.avatarBlobReference, APIKey.lastUsedAt, APIKey.revokedAt,
+             *            Invitation.status, Organization.LogoBlobReference, PackageVersion.downloadCount,
+             *            ProfileType.LogoBlobReference
+             *
+             * 2. Potential codegen / runtime touchpoints to evaluate:
+             *    - DtoValidatorHelper: currently hardcodes skipping `CreatedAt` and `ModifiedAt` (ShouldSkipProperty).
+             *      We could skip validation for `<<managed>>` properties populated server-side (especially `OnCreate`
+             *      when creating DTOs before persistence, or conditionally based on `onAction`), while checking
+             *      existing rules like `SecretHash`, `CheckSum`, `DownloadCount`, etc.
+             *    - DTOs (`Property.WriteForDTOClass` / `Property.WriteForDTOInterface`): decide whether `<<managed>>`
+             *      properties should remain `{ get; set; }` (needed when services/mappers/seeders construct or
+             *      clone DTOs, e.g. `AcceptInvitationAsync` mutating `Status` or DB-read mapping) or use restricted
+             *      setters / separate server-mutation helpers.
+             *    - PermissionService / ServiceBase (`BeforeCreate` / `BeforeUpdate`): enforce immutability or reject
+             *      client-supplied changes on `<<managed>>` properties (e.g. preventing callers from modifying
+             *      `OnCreate`-only properties during `UpdateAsync`, or restoring server-managed fields from `existing`).
+             */
         }
     }
 }

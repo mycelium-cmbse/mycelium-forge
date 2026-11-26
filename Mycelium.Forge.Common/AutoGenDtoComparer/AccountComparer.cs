@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IAccount"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class AccountComparer : IDtoComparer<IAccount>
     {
         /// <summary>
@@ -116,7 +116,10 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(IAccount.OwnedPackage), oldDto.OwnedPackage, newDto.OwnedPackage));
             }
 
-            if (oldDto.OwnedPackageInvitation != newDto.OwnedPackageInvitation)
+            var oldOwnedPackageInvitation = oldDto.OwnedPackageInvitation ?? [];
+            var newOwnedPackageInvitation = newDto.OwnedPackageInvitation ?? [];
+
+            if (!oldOwnedPackageInvitation.SequenceEqual(newOwnedPackageInvitation))
             {
                 changes.Add(new PropertyChange(nameof(IAccount.OwnedPackageInvitation), oldDto.OwnedPackageInvitation, newDto.OwnedPackageInvitation));
             }

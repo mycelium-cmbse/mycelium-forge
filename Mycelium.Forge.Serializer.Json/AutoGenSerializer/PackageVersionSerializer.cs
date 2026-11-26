@@ -48,17 +48,27 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WritePropertyName("@id"u8);
             writer.WriteStringValue(iPackageVersion.Id);
 
+            writer.WriteStartArray("applicableLicenses"u8);
+
+            foreach (var item in iPackageVersion.ApplicableLicenses)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("@id"u8);
+                writer.WriteStringValue(item);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+            writer.WritePropertyName("checkSum"u8);
+            writer.WriteStringValue(iPackageVersion.CheckSum);
             writer.WritePropertyName("createdAt"u8);
             writer.WriteStringValue(iPackageVersion.CreatedAt);
             writer.WritePropertyName("downloadCount"u8);
             writer.WriteNumberValue(iPackageVersion.DownloadCount);
+            writer.WritePropertyName("fileExtension"u8);
+            writer.WriteStringValue(iPackageVersion.FileExtension);
             writer.WritePropertyName("listed"u8);
             writer.WriteBooleanValue(iPackageVersion.Listed);
-            writer.WritePropertyName("metaData"u8);
-            writer.WriteStartObject();
-            writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iPackageVersion.MetaData);
-            writer.WriteEndObject();
             writer.WritePropertyName("modifiedAt"u8);
             writer.WriteStringValue(iPackageVersion.ModifiedAt);
             writer.WritePropertyName("owner"u8);
@@ -68,6 +78,12 @@ namespace Mycelium.Forge.Serializer.Json
             writer.WriteEndObject();
             writer.WritePropertyName("publicationDate"u8);
             writer.WriteStringValue(iPackageVersion.PublicationDate);
+            writer.WritePropertyName("readme"u8);
+            writer.WriteStringValue(iPackageVersion.Readme);
+            writer.WritePropertyName("releaseNotes"u8);
+            writer.WriteStringValue(iPackageVersion.ReleaseNotes);
+            writer.WritePropertyName("sizeInBytes"u8);
+            writer.WriteNumberValue(iPackageVersion.SizeInBytes);
             writer.WritePropertyName("version"u8);
             writer.WriteStringValue(iPackageVersion.Version);
 

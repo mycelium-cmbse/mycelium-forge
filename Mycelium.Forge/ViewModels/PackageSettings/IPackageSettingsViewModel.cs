@@ -138,14 +138,6 @@ namespace Mycelium.Forge.ViewModels.PackageSettings
         Task RelistVersion(PackageVersion version, CancellationToken token = default);
 
         /// <summary>
-        /// Marks the specified package version as deprecated asynchronously.
-        /// </summary>
-        /// <param name="version">The package version to deprecate.</param>
-        /// <param name="token">The cancellation token.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        Task DeprecateVersion(PackageVersion version, CancellationToken token = default);
-
-        /// <summary>
         /// Transfers package ownership to the specified recipient scope asynchronously.
         /// </summary>
         /// <param name="targetScope">The recipient target scope.</param>

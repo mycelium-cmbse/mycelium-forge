@@ -20,6 +20,7 @@ namespace Mycelium.Forge.Services
     using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Extractors.Extractors;
     using Mycelium.Forge.Extractors.Models;
+    using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.Storage.Stores;
 
@@ -52,11 +53,6 @@ namespace Mycelium.Forge.Services
         private readonly IEnumerable<IArtifactManifestExtractor> manifestExtractors;
 
         /// <summary>
-        /// The (injected) <see cref="IPackageMetaDataService" /> domain service.
-        /// </summary>
-        private readonly IPackageMetaDataService packageMetaDataService;
-
-        /// <summary>
         /// The (injected) <see cref="IPackageService" /> domain service.
         /// </summary>
         private readonly IPackageService packageService;
@@ -79,17 +75,15 @@ namespace Mycelium.Forge.Services
         /// <param name="manifestExtractors">The (injected) collection of <see cref="IArtifactManifestExtractor" /> instances.</param>
         /// <param name="packageService">The (injected) <see cref="IPackageService" /> domain service.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" /> domain service.</param>
-        /// <param name="packageMetaDataService">The (injected) <see cref="IPackageMetaDataService" /> domain service.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" /> domain service.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackagePublishService}" /> logger.</param>
-        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors, IPackageService packageService, IPackageVersionService packageVersionService, IPackageMetaDataService packageMetaDataService, IPackageTypeService packageTypeService, ILogger<PackagePublishService> logger)
+        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors, IPackageService packageService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, ILogger<PackagePublishService> logger)
         {
             this.artifactStore = artifactStore;
             this.databaseSource = databaseSource;
             this.manifestExtractors = manifestExtractors;
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
-            this.packageMetaDataService = packageMetaDataService;
             this.packageTypeService = packageTypeService;
             this.logger = logger;
         }
@@ -103,11 +97,10 @@ namespace Mycelium.Forge.Services
         /// <param name="formatName">The format name of the artifact.</param>
         /// <param name="package">The package entity to populate.</param>
         /// <param name="packageVersion">The package version entity to populate.</param>
-        /// <param name="packageMetaData">The package metadata entity to populate.</param>
         /// <param name="isExistingPackage">A value indicating whether an existing package is being published.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{IArtifactManifest}" /> containing the extracted manifest or errors.</returns>
-        public async Task<ErrorOr<IArtifactManifest>> ExtractManifestAsync(IUserContext userContext, Stream archiveStream, ArtifactKind kind, string formatName, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, CancellationToken token = default)
+        public async Task<ErrorOr<IArtifactManifest>> ExtractManifestAsync(IUserContext userContext, Stream archiveStream, ArtifactKind kind, string formatName, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, CancellationToken token = default)
         {
             if (!isExistingPackage)
             {
@@ -128,7 +121,8 @@ namespace Mycelium.Forge.Services
                 return Error.Validation(ValidationTypes.SchemaValidation, $"No extractor configured for artifact kind '{kind}'.");
             }
 
-            packageVersion.SizeInBytes = archiveStream.Length;
+            packageVersion.SizeInBytes = (int)archiveStream.Length;
+            packageVersion.FileExtension = SupportedPackageFormat.All.FirstOrDefault(x => x.Kind == kind)?.Extension.TrimStart('.') ?? "zip";
 
             var extractResult = extractor.Extract(archiveStream);
 
@@ -137,12 +131,12 @@ namespace Mycelium.Forge.Services
                 return extractResult.Errors;
             }
 
-            extractResult.Value.ApplyTo(package, packageVersion, packageMetaData, isExistingPackage);
+            extractResult.Value.ApplyTo(package, packageVersion, isExistingPackage);
             return extractResult;
         }
 
         /// <summary>
-        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, semver progression, and license).
+        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, and semver progression).
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="selectedScope">The owning scope of the package.</param>
@@ -176,26 +170,23 @@ namespace Mycelium.Forge.Services
             var versionSuccessDetail = !isExistingPackage ? "Initial version is valid for publication." : "Version is unique and strictly greater than prior releases.";
             checks.Add(new ValidationCheckModel(ValidationTypes.PackageVersion, versionResult, versionSuccessDetail));
 
-            checks.Add(ValidateLicense(package));
-
             return checks;
         }
 
         /// <summary>
-        /// Stores the artifact stream into object storage and atomically persists the package, version, and metadata
+        /// Stores the artifact stream into object storage and atomically persists the package and version
         /// in the database within a transaction with deferred constraints. Rolls back object storage on failure.
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="artifactStream">The stream of the artifact package file.</param>
         /// <param name="package">The package being created or updated.</param>
         /// <param name="packageVersion">The package version to create.</param>
-        /// <param name="packageMetaData">The package metadata to create.</param>
         /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
         /// <param name="selectedScope">The owning scope of the package.</param>
         /// <param name="existingVersions">The optional collection of previously published version strings.</param>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or failure of the publication.</returns>
-        public async Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, IScope selectedScope, IReadOnlyList<string> existingVersions = null, CancellationToken token = default)
+        public async Task<ErrorOr<Success>> PublishReleaseAsync(IUserContext userContext, Stream artifactStream, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, IScope selectedScope, IReadOnlyList<string> existingVersions = null, CancellationToken token = default)
         {
             var resolvedVersions = existingVersions?.ToList() ?? [];
 
@@ -226,10 +217,10 @@ namespace Mycelium.Forge.Services
                 }
 
                 (storedHash, wasArtifactNew) = artifactResult.Value;
-                packageVersion.Checksum = storedHash;
+                packageVersion.CheckSum = storedHash;
                 packageVersion.PublicationDate = DateTime.UtcNow;
 
-                var dbResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.PersistReleaseEntitiesAsync(userContext, transaction, package, packageVersion, packageMetaData, isExistingPackage, selectedScope, token), token);
+                var dbResult = await this.databaseSource.ExecuteInTransactionAsync(transaction => this.PersistReleaseEntitiesAsync(userContext, transaction, package, packageVersion, isExistingPackage, selectedScope, token), token);
 
                 if (!dbResult.IsError)
                 {
@@ -257,18 +248,17 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
-        /// Persists the package, package version, and metadata entities in the database during publication.
+        /// Persists the package and package version entities in the database during publication.
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="transaction">The database transaction.</param>
         /// <param name="package">The package being created or updated.</param>
         /// <param name="packageVersion">The package version to create.</param>
-        /// <param name="packageMetaData">The package metadata to create.</param>
         /// <param name="isExistingPackage">A value indicating whether the package record already exists.</param>
         /// <param name="selectedScope">The owning scope of the package.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>An <see cref="ErrorOr{Success}" /> indicating success or database errors.</returns>
-        private async Task<ErrorOr<Success>> PersistReleaseEntitiesAsync(IUserContext userContext, NpgsqlTransaction transaction, IPackage package, IPackageVersion packageVersion, IPackageMetaData packageMetaData, bool isExistingPackage, IScope selectedScope, CancellationToken token)
+        private async Task<ErrorOr<Success>> PersistReleaseEntitiesAsync(IUserContext userContext, NpgsqlTransaction transaction, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, IScope selectedScope, CancellationToken token)
         {
             var coordinate = $"{selectedScope.ShortName}:{package.ShortName.Trim().ToLowerInvariant()}";
 
@@ -299,13 +289,6 @@ namespace Mycelium.Forge.Services
             if (versionResult.IsError)
             {
                 return versionResult.Errors;
-            }
-
-            var metaDataResult = await this.packageMetaDataService.CreateAsync(userContext, transaction, [packageMetaData], token);
-
-            if (metaDataResult.IsError)
-            {
-                return metaDataResult.Errors;
             }
 
             if (isExistingPackage)
@@ -406,18 +389,6 @@ namespace Mycelium.Forge.Services
             }
 
             return Result.Success;
-        }
-
-        /// <summary>
-        /// Validates that a license is specified for the package.
-        /// </summary>
-        /// <param name="package">The package entity being published.</param>
-        /// <returns>A <see cref="ValidationCheckModel" /> representing the license validation check.</returns>
-        private static ValidationCheckModel ValidateLicense(IPackage package)
-        {
-            return string.IsNullOrWhiteSpace(package.License)
-                ? new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Warning, "No license specified for this package. Consider selecting one.")
-                : new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Pass, $"License '{package.License}' declared.");
         }
 
         /// <summary>

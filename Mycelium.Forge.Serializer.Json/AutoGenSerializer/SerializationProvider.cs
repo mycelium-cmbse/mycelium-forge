@@ -33,15 +33,16 @@ namespace Mycelium.Forge.Serializer.Json
             { typeof(Mycelium.Forge.Common.APIKey), APIKeySerializer.Serialize },
             { typeof(Mycelium.Forge.Common.Country), CountrySerializer.Serialize },
             { typeof(Mycelium.Forge.Common.Forge), ForgeSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.License), LicenseSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.Organization), OrganizationSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.OrganizationInvitation), OrganizationInvitationSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.Package), PackageSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.PackageInvitation), PackageInvitationSerializer.Serialize },
-            { typeof(Mycelium.Forge.Common.PackageMetaData), PackageMetaDataSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.PackageType), PackageTypeSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.PackageVersion), PackageVersionSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.ProfileLink), ProfileLinkSerializer.Serialize },
             { typeof(Mycelium.Forge.Common.ProfileType), ProfileTypeSerializer.Serialize },
+            { typeof(Mycelium.Forge.Common.Tag), TagSerializer.Serialize },
         };
 
         /// <summary>

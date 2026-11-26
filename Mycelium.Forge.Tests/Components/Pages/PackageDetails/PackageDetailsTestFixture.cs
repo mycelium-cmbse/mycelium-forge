@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDetailsTestFixture.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -38,7 +38,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         private Package package;
         private Organization organization;
         private PackageVersion packageVersion;
-        private PackageMetaData packageMetaData;
         private PackageType packageType;
 
         [SetUp]
@@ -66,16 +65,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Name = "ECSS-MM-PWR",
                 ShortName = "ecss-mm-pwr",
                 Description = "Power subsystem metamodel",
-                License = "Apache-2.0",
                 Owner = this.organization.Id,
                 CreatedAt = DateTime.UtcNow.AddDays(-30)
-            };
-
-            this.packageMetaData = new PackageMetaData
-            {
-                Id = Guid.NewGuid(),
-                Owner = Guid.NewGuid(),
-                MetadataSource = MetadataSource.DeclaredByArtefact
             };
 
             this.packageVersion = new PackageVersion
@@ -84,11 +75,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Owner = this.package.Id,
                 Version = "1.3.0",
                 PublicationDate = DateTime.UtcNow.AddDays(-5),
-                Listed = true,
-                MetaData = this.packageMetaData.Id
+                Listed = true
             };
-
-            this.packageMetaData.Owner = this.packageVersion.Id;
 
             this.packageType = new PackageType
             {
@@ -101,9 +89,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             this.viewModelMock.SetupGet(x => x.PackageType).Returns(this.packageType);
             this.viewModelMock.SetupGet(x => x.CurrentVersion).Returns(this.packageVersion);
             this.viewModelMock.SetupGet(x => x.Versions).Returns([this.packageVersion]);
+            this.viewModelMock.SetupGet(x => x.License).Returns("Apache-2.0");
+            this.viewModelMock.SetupGet(x => x.Tags).Returns([]);
             this.viewModelMock.SetupGet(x => x.Maintainers).Returns([]);
-            this.viewModelMock.SetupGet(x => x.MetaDatas).Returns([this.packageMetaData]);
-            this.viewModelMock.SetupGet(x => x.CurrentMetaData).Returns(this.packageMetaData);
             this.viewModelMock.SetupGet(x => x.Elements).Returns([]);
             this.viewModelMock.SetupGet(x => x.Dependencies).Returns([]);
             this.viewModelMock.SetupGet(x => x.Dependents).Returns([]);
@@ -188,7 +176,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             var packageDetailsPage = this.context.Render<PackageDetails>();
             var status = packageDetailsPage.Instance.GetReleaseStatus();
 
-            this.packageVersion.IsDeprecated = true;
+            this.packageVersion.Listed = false;
             var deprecatedStatus = packageDetailsPage.Instance.GetReleaseStatus();
 
             using (Assert.EnterMultipleScope())
@@ -231,7 +219,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             Assert.That(nullPackageDetailsPage.Markup.Trim(), Has.Length.LessThan(5));
 
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
-            var maintainer = new Account { Id = Guid.NewGuid(), Name = "R. Andre", ShortName = "r-andre", IsVerified = true };
+            var maintainer = new Account { Id = Guid.NewGuid(), Name = "R. Andre", ShortName = "r-andre" };
             this.viewModelMock.SetupGet(x => x.Maintainers).Returns([maintainer]);
             this.SetupAccessFlags(true, false);
             var activePackageDetailsPage = this.context.Render<PackageDetails>();

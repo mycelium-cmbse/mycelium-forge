@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageDeSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -46,8 +46,11 @@ namespace Mycelium.Forge.Serializer.Json
             var dtoInstance = new Mycelium.Forge.Common.Package();
 
             var typeSeen = false;
+            var appliedTagsSeen = false;
             var createdAtSeen = false;
             var descriptionSeen = false;
+            var documentationUrlSeen = false;
+            var homepageUrlSeen = false;
             var listedSeen = false;
             var modifiedAtSeen = false;
             var nameSeen = false;
@@ -55,6 +58,7 @@ namespace Mycelium.Forge.Serializer.Json
             var packageMaintainerSeen = false;
             var packageOwnerSeen = false;
             var packageTypeSeen = false;
+            var repositoryUrlSeen = false;
             var shortNameSeen = false;
             var versionSeen = false;
             var visibilitySeen = false;
@@ -93,6 +97,21 @@ namespace Mycelium.Forge.Serializer.Json
                     continue;
                 }
 
+                if (reader.ValueTextEquals("appliedTags"u8))
+                {
+                    appliedTagsSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var appliedTagsRefId))
+                        {
+                            dtoInstance.AppliedTags.Add(appliedTagsRefId);
+                        }
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("createdAt"u8))
                 {
                     createdAtSeen = true;
@@ -113,6 +132,24 @@ namespace Mycelium.Forge.Serializer.Json
                     {
                         dtoInstance.Description = descriptionScalarValue;
                     }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("documentationUrl"u8))
+                {
+                    documentationUrlSeen = true;
+                    reader.Read();
+
+                    dtoInstance.DocumentationUrl = reader.GetString();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("homepageUrl"u8))
+                {
+                    homepageUrlSeen = true;
+                    reader.Read();
+
+                    dtoInstance.HomepageUrl = reader.GetString();
 
                     continue;
                 }
@@ -221,6 +258,15 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("repositoryUrl"u8))
+                {
+                    repositoryUrlSeen = true;
+                    reader.Read();
+
+                    dtoInstance.RepositoryUrl = reader.GetString();
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("shortName"u8))
                 {
                     shortNameSeen = true;
@@ -268,6 +314,10 @@ namespace Mycelium.Forge.Serializer.Json
                 throw new InvalidOperationException("The @type property is not available, the PackageDeSerializer cannot be used to deserialize this JsonElement");
             }
 
+            if (!appliedTagsSeen)
+            {
+                logger.LogDebug("the appliedTags Json property was not found in the Package: {Id}", dtoInstance.Id);
+            }
             if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the Package: {Id}", dtoInstance.Id);
@@ -275,6 +325,14 @@ namespace Mycelium.Forge.Serializer.Json
             if (!descriptionSeen)
             {
                 logger.LogDebug("the description Json property was not found in the Package: {Id}", dtoInstance.Id);
+            }
+            if (!documentationUrlSeen)
+            {
+                logger.LogDebug("the documentationUrl Json property was not found in the Package: {Id}", dtoInstance.Id);
+            }
+            if (!homepageUrlSeen)
+            {
+                logger.LogDebug("the homepageUrl Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
             if (!listedSeen)
             {
@@ -303,6 +361,10 @@ namespace Mycelium.Forge.Serializer.Json
             if (!packageTypeSeen)
             {
                 logger.LogDebug("the packageType Json property was not found in the Package: {Id}", dtoInstance.Id);
+            }
+            if (!repositoryUrlSeen)
+            {
+                logger.LogDebug("the repositoryUrl Json property was not found in the Package: {Id}", dtoInstance.Id);
             }
             if (!shortNameSeen)
             {

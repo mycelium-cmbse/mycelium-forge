@@ -129,7 +129,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>The license display string.</returns>
         public string GetLicenseText()
         {
-            return string.IsNullOrWhiteSpace(this.ViewModel.Package.License) ? "None" : this.ViewModel.Package.License;
+            return string.IsNullOrWhiteSpace(this.ViewModel.License) ? "None" : this.ViewModel.License;
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>The tags display string.</returns>
         public string GetTagsText()
         {
-            return this.ViewModel.Package.Tags is { Count: > 0 } ? string.Join(", ", this.ViewModel.Package.Tags) : "None";
+            return this.ViewModel.Tags is { Count: > 0 } ? string.Join(", ", this.ViewModel.Tags) : "None";
         }
 
         /// <summary>
@@ -147,12 +147,12 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>The dependencies display string.</returns>
         public string GetDependenciesText()
         {
-            if (this.ViewModel.PackageMetaData.Dependencies is not { Count: > 0 })
+            if (this.ViewModel.Dependencies is not { Count: > 0 })
             {
                 return "None";
             }
 
-            return string.Join(", ", this.ViewModel.PackageMetaData.Dependencies.Select(d => string.IsNullOrWhiteSpace(d.Summary) ? d.Name : $"{d.Name} {d.Summary}"));
+            return string.Join(", ", this.ViewModel.Dependencies.Select(d => string.IsNullOrWhiteSpace(d.Summary) ? d.Name : $"{d.Name} {d.Summary}"));
         }
 
         /// <summary>

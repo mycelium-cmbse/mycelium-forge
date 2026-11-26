@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageMetaDataSerializer.cs" company="Starion Group S.A.">
+// <copyright file="TagSerializer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -19,43 +19,45 @@ namespace Mycelium.Forge.Serializer.Json
     using Mycelium.Forge.Common;
 
     /// <summary>
-    /// The purpose of the <see cref="PackageMetaDataSerializer"/> is to provide serialization capabilities
-    /// capabilities for the <see cref="IPackageMetaData"/> interface
+    /// The purpose of the <see cref="TagSerializer"/> is to provide serialization capabilities
+    /// capabilities for the <see cref="ITag"/> interface
     /// </summary>
-    internal static class PackageMetaDataSerializer
+    internal static class TagSerializer
     {
         /// <summary>
-        /// Serializes an instance of <see cref="IPackageMetaData"/> using an <see cref="Utf8JsonWriter"/>
+        /// Serializes an instance of <see cref="ITag"/> using an <see cref="Utf8JsonWriter"/>
         /// </summary>
         /// <param name="obj">
-        /// The <see cref="IPackageMetaData"/> to serialize
+        /// The <see cref="ITag"/> to serialize
         /// </param>
         /// <param name="writer">
         /// The target <see cref="Utf8JsonWriter"/>
         /// </param>
         internal static void Serialize(object obj, Utf8JsonWriter writer)
         {
-            if (obj is not IPackageMetaData iPackageMetaData)
+            if (obj is not ITag iTag)
             {
-                throw new ArgumentException("The object shall be an IPackageMetaData", nameof(obj));
+                throw new ArgumentException("The object shall be an ITag", nameof(obj));
             }
 
             writer.WriteStartObject();
 
             writer.WritePropertyName("@type"u8);
-            writer.WriteStringValue("PackageMetaData"u8);
+            writer.WriteStringValue("Tag"u8);
 
             writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iPackageMetaData.Id);
+            writer.WriteStringValue(iTag.Id);
 
             writer.WritePropertyName("createdAt"u8);
-            writer.WriteStringValue(iPackageMetaData.CreatedAt);
+            writer.WriteStringValue(iTag.CreatedAt);
             writer.WritePropertyName("modifiedAt"u8);
-            writer.WriteStringValue(iPackageMetaData.ModifiedAt);
+            writer.WriteStringValue(iTag.ModifiedAt);
+            writer.WritePropertyName("name"u8);
+            writer.WriteStringValue(iTag.Name);
             writer.WritePropertyName("owner"u8);
             writer.WriteStartObject();
             writer.WritePropertyName("@id"u8);
-            writer.WriteStringValue(iPackageMetaData.Owner);
+            writer.WriteStringValue(iTag.Owner);
             writer.WriteEndObject();
 
             writer.WriteEndObject();

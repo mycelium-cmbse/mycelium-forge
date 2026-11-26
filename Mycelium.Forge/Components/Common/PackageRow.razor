@@ -19,12 +19,6 @@
                 <span class="text-md leading-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                     @(this.Model.Name)
                 </span>
-                @if (this.Model.IsVerified)
-                {
-                    <LucideIcon Name="badge-check"
-                                Size="16"
-                                Class="text-primary shrink-0"/>
-                }
                 <BbBadge Variant="BadgeVariant.Outline"
                          Class="badge-format">
                     @(this.Model.Format)

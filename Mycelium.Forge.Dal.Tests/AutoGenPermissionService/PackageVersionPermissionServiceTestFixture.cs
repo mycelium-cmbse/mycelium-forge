@@ -277,7 +277,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Id = Guid.NewGuid(),
                 Owner = this.packageId,
                 Version = "1.0.0",
-                Listed = true
+                Listed = true,
+                ApplicableLicenses = [Guid.NewGuid()]
             };
 
             var unlistedVersion = new PackageVersion
@@ -285,7 +286,8 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Id = existingVersion.Id,
                 Owner = this.packageId,
                 Version = "1.0.0",
-                Listed = false
+                Listed = false,
+                ApplicableLicenses = [.. existingVersion.ApplicableLicenses]
             };
 
             var immutableBreachVersion = new PackageVersion
@@ -293,7 +295,17 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 Id = existingVersion.Id,
                 Owner = this.packageId,
                 Version = "1.0.1",
-                Listed = true
+                Listed = true,
+                ApplicableLicenses = [.. existingVersion.ApplicableLicenses]
+            };
+
+            var immutableLicensesBreachVersion = new PackageVersion
+            {
+                Id = existingVersion.Id,
+                Owner = this.packageId,
+                Version = "1.0.0",
+                Listed = false,
+                ApplicableLicenses = [Guid.NewGuid()]
             };
 
             var package = new Package
@@ -311,6 +323,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
                 .ReturnsAsync(ImmutableList.Create<IPackage>(package));
 
             var immutableResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingVersion, immutableBreachVersion, this.transaction);
+            var immutableLicensesResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingVersion, immutableLicensesBreachVersion, this.transaction);
             var unlistResult = await this.permissionService.IsAllowedToUpdate(this.ownerUserContext, existingVersion, unlistedVersion, this.transaction);
             var otherResult = await this.permissionService.IsAllowedToUpdate(this.otherUserContext, existingVersion, unlistedVersion, this.transaction);
 
@@ -334,6 +347,7 @@ namespace Mycelium.Forge.Dal.Tests.AutoGenPermissionService
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(immutableResult.IsError, Is.True);
+                Assert.That(immutableLicensesResult.IsError, Is.True);
                 Assert.That(unlistResult.IsError, Is.False);
                 Assert.That(otherResult.IsError, Is.True);
                 Assert.That(orgAdminUnlistResult.IsError, Is.False);

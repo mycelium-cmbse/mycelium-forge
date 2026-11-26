@@ -32,11 +32,7 @@ namespace Mycelium.Forge.Generator.Generators
         /// </summary>
         static UmlCoreDtoGenerator()
         {
-            TypedElementExtensions.AddOrOverwriteCSharpTypeMappings(
-                ("UUID", "Guid"),
-                ("URI", "string"),
-                ("SemVer", "string"),
-                ("Date", "DateOnly"));
+            RegisterCustomCSharpTypeMappings();
         }
 
         /// <summary>

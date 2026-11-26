@@ -90,6 +90,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
                 Id = Guid.NewGuid(),
                 Version = "1.3.0",
                 Listed = true,
+                SizeInBytes = 2048,
                 PublicationDate = DateTime.UtcNow.AddDays(-1)
             };
 
@@ -98,34 +99,17 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
                 Id = Guid.NewGuid(),
                 Version = "1.2.0",
                 Listed = false,
+                SizeInBytes = 1024,
                 PublicationDate = DateTime.UtcNow.AddDays(-10)
             };
 
-            var versionDeprecated = new PackageVersion
-            {
-                Id = Guid.NewGuid(),
-                Version = "1.1.0",
-                Listed = true,
-                IsDeprecated = true,
-                PublicationDate = DateTime.UtcNow.AddDays(-20)
-            };
-
-            var metaData = new PackageMetaData
-            {
-                Id = Guid.NewGuid(),
-                Owner = versionLatest.Id,
-                QualityChecks = [("Check 1", "Detail", true)]
-            };
-
-            versionLatest.MetaData = metaData.Id;
-
-            var versions = new List<IPackageVersion> { versionLatest, versionUnlisted, versionDeprecated };
-            var metaDatas = new List<IPackageMetaData> { metaData };
+            var versions = new List<IPackageVersion> { versionLatest, versionUnlisted };
+            var qualityChecks = new List<(string Title, string Detail, bool Passed)> { ("Check 1", "Detail", true) };
 
             var populatedTab = this.context.Render<PackageVersionsTab>(parameters =>
             {
                 parameters.Add(x => x.Versions, versions);
-                parameters.Add(x => x.MetaDatas, metaDatas);
+                parameters.Add(x => x.QualityChecks, qualityChecks);
                 parameters.Add(x => x.Owner, this.organization);
                 parameters.Add(x => x.Package, this.package);
             });
@@ -133,7 +117,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
             var isLatest = populatedTab.Instance.IsLatestVersion(versionLatest);
             var isNotLatest = populatedTab.Instance.IsLatestVersion(versionUnlisted);
             var isValidated = populatedTab.Instance.IsValidated(versionLatest);
-            var isNotValidated = populatedTab.Instance.IsValidated(versionUnlisted);
+            var isNotValidated = emptyTab.Instance.IsValidated(versionUnlisted);
             var downloadUrl = populatedTab.Instance.GetDownloadUrl(versionLatest);
             var markup = populatedTab.Markup;
 
@@ -147,7 +131,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
                 Assert.That(downloadUrl, Does.Contain("/api/packages/starion/ecss-mm-pwr/1.3.0/download"));
                 Assert.That(markup, Does.Contain("Latest"));
                 Assert.That(markup, Does.Contain("Unlisted"));
-                Assert.That(markup, Does.Contain("Deprecated"));
                 Assert.That(markup, Does.Contain("Validated"));
             }
         }

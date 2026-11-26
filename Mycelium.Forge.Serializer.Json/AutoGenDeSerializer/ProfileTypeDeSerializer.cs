@@ -100,12 +100,7 @@ namespace Mycelium.Forge.Serializer.Json
                     logoBlobReferenceSeen = true;
                     reader.Read();
 
-                    var logoBlobReferenceScalarValue = reader.GetString();
-
-                    if (logoBlobReferenceScalarValue != null)
-                    {
-                        dtoInstance.LogoBlobReference = logoBlobReferenceScalarValue;
-                    }
+                    dtoInstance.LogoBlobReference = reader.GetString();
 
                     continue;
                 }

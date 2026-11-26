@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // <copyright file="PackageComparer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
@@ -22,7 +22,7 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     /// <summary>
     /// Compares two instances of <see cref="IPackage"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class PackageComparer : IDtoComparer<IPackage>
     {
         /// <summary>
@@ -44,6 +44,14 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 return changes;
             }
 
+            var oldAppliedTags = oldDto.AppliedTags ?? [];
+            var newAppliedTags = newDto.AppliedTags ?? [];
+
+            if (!oldAppliedTags.SequenceEqual(newAppliedTags))
+            {
+                changes.Add(new PropertyChange(nameof(IPackage.AppliedTags), oldDto.AppliedTags, newDto.AppliedTags));
+            }
+
             if (oldDto.CreatedAt != newDto.CreatedAt)
             {
                 changes.Add(new PropertyChange(nameof(IPackage.CreatedAt), oldDto.CreatedAt, newDto.CreatedAt));
@@ -54,9 +62,19 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
                 changes.Add(new PropertyChange(nameof(IPackage.Description), oldDto.Description, newDto.Description));
             }
 
+            if (oldDto.DocumentationUrl != newDto.DocumentationUrl)
+            {
+                changes.Add(new PropertyChange(nameof(IPackage.DocumentationUrl), oldDto.DocumentationUrl, newDto.DocumentationUrl));
+            }
+
             if (oldDto.downloadCount != newDto.downloadCount)
             {
                 changes.Add(new PropertyChange(nameof(IPackage.downloadCount), oldDto.downloadCount, newDto.downloadCount));
+            }
+
+            if (oldDto.HomepageUrl != newDto.HomepageUrl)
+            {
+                changes.Add(new PropertyChange(nameof(IPackage.HomepageUrl), oldDto.HomepageUrl, newDto.HomepageUrl));
             }
 
             if (oldDto.Listed != newDto.Listed)
@@ -98,6 +116,11 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
             if (oldDto.PackageType != newDto.PackageType)
             {
                 changes.Add(new PropertyChange(nameof(IPackage.PackageType), oldDto.PackageType, newDto.PackageType));
+            }
+
+            if (oldDto.RepositoryUrl != newDto.RepositoryUrl)
+            {
+                changes.Add(new PropertyChange(nameof(IPackage.RepositoryUrl), oldDto.RepositoryUrl, newDto.RepositoryUrl));
             }
 
             if (oldDto.ShortName != newDto.ShortName)

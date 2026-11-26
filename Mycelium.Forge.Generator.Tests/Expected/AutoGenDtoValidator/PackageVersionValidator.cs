@@ -23,7 +23,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
     /// <summary>
     /// DTO validator class for the <see cref="PackageVersion"/> class.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class PackageVersionValidator : ThingValidator<IPackageVersion>
     {
         /// <summary>
@@ -31,11 +31,14 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         public PackageVersionValidator()
         {
+            this.RuleForEach(x => x.ApplicableLicenses).NotEmpty();
+            this.RuleFor(x => x.CheckSum).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.DownloadCount).NotNull();
+            this.RuleFor(x => x.FileExtension).Must(value => !string.IsNullOrWhiteSpace(value));
             this.RuleFor(x => x.Listed).NotNull();
-            this.RuleFor(x => x.MetaData).NotEmpty();
             this.RuleFor(x => x.Owner).NotEmpty();
             this.RuleFor(x => x.PublicationDate).NotEmpty();
+            this.RuleFor(x => x.SizeInBytes).NotNull();
             this.RuleFor(x => x.Version).Must(value => !string.IsNullOrWhiteSpace(value));
             this.AddCustomValidation();
         }

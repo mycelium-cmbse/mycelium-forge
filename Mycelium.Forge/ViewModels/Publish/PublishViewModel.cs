@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // <copyright file="PublishViewModel.cs" company="Starion Group S.A.">
 // 
 //   Copyright 2026 Starion Group S.A.
@@ -18,8 +18,10 @@ namespace Mycelium.Forge.ViewModels.Publish
     using Mycelium.Forge.Dal.AutoGenPermissionService;
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Dal.Services;
-    using Mycelium.Forge.Enums;
     using Mycelium.Forge.Extensions;
+    using Mycelium.Forge.Extractors.Models;
+    using Mycelium.Forge.Extractors.Models.EcssC3;
+    using Mycelium.Forge.Extractors.Models.Kpar;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
     using Mycelium.Forge.Services;
@@ -129,9 +131,9 @@ namespace Mycelium.Forge.ViewModels.Publish
         public IPackageVersion PackageVersion { get; private set; }
 
         /// <summary>
-        /// Gets the metadata of the package version being published.
+        /// Gets the collection of extracted package dependencies for display during review.
         /// </summary>
-        public IPackageMetaData PackageMetaData { get; private set; }
+        public IReadOnlyList<(string Name, string Summary, bool IsVerified)> Dependencies { get; private set; } = [];
 
         /// <summary>
         /// Gets or sets the scope that owns the package.
@@ -180,6 +182,16 @@ namespace Mycelium.Forge.ViewModels.Publish
         public bool IsPublishing { get; set; }
 
         /// <summary>
+        /// Gets or sets the temporary SPDX license identifier for the package being published.
+        /// </summary>
+        public string License { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the temporary collection of tags associated with the package being published.
+        /// </summary>
+        public List<string> Tags { get; set; } = [];
+
+        /// <summary>
         /// Initializes the view model state and loads the scopes of the current account for creating a new package.
         /// </summary>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
@@ -202,12 +214,9 @@ namespace Mycelium.Forge.ViewModels.Publish
                 Listed = true,
                 PackageOwner = [this.currentUserId],
                 Version = [this.PackageVersion.Id],
-                License = string.Empty,
                 RepositoryUrl = string.Empty,
                 HomepageUrl = string.Empty,
-                DocumentationUrl = string.Empty,
-                Tags = [],
-                IsVerified = this.SelectedScope?.IsVerified() ?? false
+                DocumentationUrl = string.Empty
             };
         }
 
@@ -268,17 +277,52 @@ namespace Mycelium.Forge.ViewModels.Publish
             this.StagedArtefact = artefact;
 
             await using var stream = this.fileUploadStagingService.OpenStagedFile(artefact.StagingToken);
-            var extractResult = await this.packagePublishService.ExtractManifestAsync(this.userContext, stream, artefact.Kind, artefact.Format, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage);
+            var extractResult = await this.packagePublishService.ExtractManifestAsync(this.userContext, stream, artefact.Kind, artefact.Format, this.Package, this.PackageVersion, this.IsExistingPackage);
 
             artefact.IsManifestValid = !extractResult.IsError;
 
             if (extractResult.IsError)
             {
+                this.Dependencies = [];
+                this.License = string.Empty;
+                this.Tags = [];
                 await this.Validate(extractResult.Errors);
                 return false;
             }
 
+            this.Dependencies = extractResult.Value.GetDependencies();
+
+            if (!this.IsExistingPackage)
+            {
+                this.ApplyManifestMetadata(extractResult.Value);
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// Maps the license and tags declared by the extracted manifest onto the package being published.
+        /// </summary>
+        /// <param name="manifest">The extracted artefact manifest.</param>
+        private void ApplyManifestMetadata(IArtifactManifest manifest)
+        {
+            switch (manifest)
+            {
+                case KparManifest kpar:
+                    this.License = kpar.License;
+                    this.Tags = kpar.Topics ?? [];
+                    break;
+
+                case EcssC3Manifest ecss:
+                    this.License = ecss.Copyright;
+                    this.Tags = [];
+                    break;
+
+                default:
+                    this.License = string.Empty;
+                    this.Tags = [];
+                    break;
+            }
         }
 
         /// <summary>
@@ -296,11 +340,10 @@ namespace Mycelium.Forge.ViewModels.Publish
             var checks = await this.packagePublishService.ValidateReleaseAsync(this.userContext, this.SelectedScope, this.Package, this.PackageVersion, this.IsExistingPackage, this.ExistingVersions, beforeValidationErrors);
 
             this.ValidationChecks.AddRange(checks);
-            this.PackageMetaData.QualityChecks = [.. this.ValidationChecks.Select(check => (check.Title, check.Detail, check.Status == ValidationStatus.Pass))];
         }
 
         /// <summary>
-        /// Publishes the staged artefact and persists the package, its version, and its metadata.
+        /// Publishes the staged artefact and persists the package and its version.
         /// </summary>
         /// <param name="token">The <see cref="CancellationToken" /> used to cancel the operation.</param>
         /// <returns>A <see cref="ErrorOr{Success}" /> indicating success or failure of the publish operation.</returns>
@@ -316,7 +359,7 @@ namespace Mycelium.Forge.ViewModels.Publish
                 }
 
                 await using var stagedStream = this.fileUploadStagingService.OpenStagedFile(this.StagedArtefact.StagingToken);
-                var result = await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.Package, this.PackageVersion, this.PackageMetaData, this.IsExistingPackage, this.SelectedScope, this.ExistingVersions, token);
+                var result = await this.packagePublishService.PublishReleaseAsync(this.userContext, stagedStream, this.Package, this.PackageVersion, this.IsExistingPackage, this.SelectedScope, this.ExistingVersions, token);
 
                 if (!result.IsError)
                 {
@@ -363,14 +406,8 @@ namespace Mycelium.Forge.ViewModels.Publish
         }
 
         /// <summary>
-        /// Initializes the user context and new version and metadata instances shared by both initialization paths.
+        /// Initializes the user context and new version instance shared by both initialization paths.
         /// </summary>
-        /// <remarks>
-        /// Explicitly initializes partial DTO properties (e.g. Readme, SizeInBytes, Dependencies, Elements) to clean, empty
-        /// values to prevent mock defaults defined in prototype partial classes (such as <see cref="PackageVersion" /> and
-        /// <see cref="PackageMetaData" />) from persisting into the database. These settings shall be removed in future model
-        /// changes.
-        /// </remarks>
         /// <returns>A <see cref="Task" /> representing the asynchronous initialization.</returns>
         private async Task InitializeBase()
         {
@@ -378,27 +415,21 @@ namespace Mycelium.Forge.ViewModels.Publish
             this.currentUserId = this.userContext.AccountId.Value;
 
             var versionId = Guid.NewGuid();
-            var metaDataId = Guid.NewGuid();
 
             this.PackageVersion = new PackageVersion
             {
                 Id = versionId,
-                MetaData = metaDataId,
                 Listed = true,
                 Readme = string.Empty,
                 ReleaseNotes = string.Empty,
-                Checksum = string.Empty,
+                CheckSum = string.Empty,
+                FileExtension = string.Empty,
                 SizeInBytes = 0
             };
 
-            this.PackageMetaData = new PackageMetaData
-            {
-                Id = metaDataId,
-                Owner = versionId,
-                Dependencies = [],
-                Elements = [],
-                QualityChecks = []
-            };
+            this.Dependencies = [];
+            this.License = string.Empty;
+            this.Tags = [];
         }
 
         /// <summary>
@@ -420,7 +451,7 @@ namespace Mycelium.Forge.ViewModels.Publish
             {
                 IAccount account => account.Id == accountId && canPublish,
                 IOrganization organization => PermissionGuard.HasPermission(this.userContext, PermissionKind.ManageOrganizations)
-                    || (canPublish && (organization.Member.Contains(accountId) || organization.Administrator.Contains(accountId))),
+                                              || (canPublish && (organization.Member.Contains(accountId) || organization.Administrator.Contains(accountId))),
                 _ => false
             };
         }

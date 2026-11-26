@@ -101,7 +101,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             await this.viewModel.InitializeViewModel();
             var artefact = new PublishArtefactModel { StagingToken = "token-discard", Kind = ArtifactKind.Kpar, Format = PackageFormatConstants.SysMlV2, FileName = "test.kpar" };
             this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile("token-discard")).Returns(new MemoryStream([.. "content"u8]));
-            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(new KparManifest { Name = "test", Version = "1.0.0" });
+            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<CancellationToken>())).ReturnsAsync(new KparManifest { Name = "test", Version = "1.0.0" });
 
             await this.viewModel.ExtractManifest(artefact);
             this.viewModel.DiscardStagedFile();
@@ -126,7 +126,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile(token)).Returns(stream);
 
             var manifest = new KparManifest { Name = "kpar-package", Version = "1.0.0", Description = "Kpar package description" };
-            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, stream, ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(manifest);
+            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, stream, ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<CancellationToken>())).ReturnsAsync(manifest);
 
             var success = await this.viewModel.ExtractManifest(artefact);
 
@@ -140,7 +140,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             // Case 2: Package extraction failure marks manifest invalid and returns false
             var invalidArtefact = new PublishArtefactModel { StagingToken = "token-fail", Kind = ArtifactKind.Kpar, Format = "UnknownType", FileName = "test.kpar" };
             this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile("token-fail")).Returns(new MemoryStream([.. "corrupt"u8]));
-            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, "UnknownType", this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Validation(ValidationTypes.SchemaValidation, "Package type unknown"));
+            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, "UnknownType", this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Validation(ValidationTypes.SchemaValidation, "Package type unknown"));
 
             this.packagePublishServiceMock.Setup(x => x.ValidateReleaseAsync(this.userContext, this.activeScope, this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<IReadOnlyList<string>>(), It.IsAny<IReadOnlyList<Error>>(), It.IsAny<CancellationToken>())).ReturnsAsync([new ValidationCheckModel(ValidationTypes.SchemaValidation, ValidationStatus.Fail, "Package type unknown")]);
 
@@ -166,9 +166,9 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
                 Assert.That(this.viewModel.SelectedScope, Is.EqualTo(this.activeScope));
                 Assert.That(this.viewModel.Package, Is.Not.Null);
                 Assert.That(this.viewModel.PackageVersion, Is.Not.Null);
-                Assert.That(this.viewModel.PackageMetaData, Is.Not.Null);
                 Assert.That(this.viewModel.PackageVersion.Owner, Is.EqualTo(this.viewModel.Package.Id));
-                Assert.That(this.viewModel.PackageMetaData.Owner, Is.EqualTo(this.viewModel.PackageVersion.Id));
+                Assert.That(this.viewModel.License, Is.Empty);
+                Assert.That(this.viewModel.Tags, Is.Empty);
             }
 
             // Case 2: Existing package initialization loads metadata and permissions
@@ -257,11 +257,11 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile(It.IsAny<string>())).Returns(() => new MemoryStream([.. "content"u8]));
 
             var manifest = new KparManifest { Name = "pub-pkg", Version = "1.0.0" };
-            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<CancellationToken>())).ReturnsAsync(manifest);
+            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<CancellationToken>())).ReturnsAsync(manifest);
 
             await this.viewModel.ExtractManifest(artefact);
 
-            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<IScope>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
+            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<IScope>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success);
 
             var expectedCacheKey = this.memoryCacheMock.Object.BuildPackageDetailsCacheKey(this.userContext, this.activeScope.ShortName, this.viewModel.Package.ShortName);
             var successResult = await this.viewModel.Publish(CancellationToken.None);
@@ -277,7 +277,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
             // Case 2: Publication error returns failure
             await this.viewModel.ExtractManifest(artefact);
-            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, this.viewModel.PackageMetaData, false, It.IsAny<IScope>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Upload failed"));
+            this.packagePublishServiceMock.Setup(x => x.PublishReleaseAsync(this.userContext, It.IsAny<Stream>(), this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<IScope>(), It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Upload failed"));
 
             var artifactFailResult = await this.viewModel.Publish(CancellationToken.None);
 
@@ -296,7 +296,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             await this.viewModel.InitializeViewModel();
             this.viewModel.Package.Name = "test-pkg";
             this.viewModel.Package.ShortName = "test-pkg";
-            this.viewModel.Package.License = "MIT";
+            this.viewModel.License = "MIT";
             this.viewModel.PackageVersion.Version = "1.0.0";
 
             var passChecks = new List<ValidationCheckModel>
@@ -315,7 +315,6 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             {
                 Assert.That(this.viewModel.ValidationChecks, Has.Count.EqualTo(4));
                 Assert.That(this.viewModel.ValidationChecks.TrueForAll(x => x.Status == ValidationStatus.Pass), Is.True);
-                Assert.That(this.viewModel.PackageMetaData.QualityChecks, Has.Count.EqualTo(4));
             }
 
             // Case 2: External errors surface as validation check failure

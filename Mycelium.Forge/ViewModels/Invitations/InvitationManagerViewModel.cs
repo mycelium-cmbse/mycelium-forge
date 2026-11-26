@@ -123,9 +123,8 @@ namespace Mycelium.Forge.ViewModels.Invitations
             });
 
             var pendingTargetIds = pending.Select(GetTargetId).Where(id => id != Guid.Empty).Distinct().ToList();
-            
-            // Deduplicate until Account.OwnedPackageInvitation is updated to UML multiplicity 0..* (#138) and AccountDao.ReadAsync stops returning duplicate rows.
-            this.invitedAccounts = [.. (await this.accountService.ReadOrEmpty(userContext, pendingTargetIds, true, token)).DistinctBy(account => account.Id)];
+
+            this.invitedAccounts = [.. await this.accountService.ReadOrEmpty(userContext, pendingTargetIds, true, token)];
         }
 
         /// <summary>

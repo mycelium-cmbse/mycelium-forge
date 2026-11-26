@@ -26,6 +26,7 @@ namespace Mycelium.Forge
     using Mycelium.Forge.Orm;
     using Mycelium.Forge.Orm.Outbox;
     using Mycelium.Forge.Services;
+    using Mycelium.Forge.Storage.Extensions;
 
     using OpenTelemetry.Resources;
     using OpenTelemetry.Trace;
@@ -108,6 +109,7 @@ namespace Mycelium.Forge
                     {
                         services.RegisterDatabase(context.Configuration);
                         services.AddForgeDal();
+                        services.RegisterArtifactStore(context.Configuration);
                         services.AddSingleton<IOutboxDao, OutboxDao>();
                         services.AddScoped<IDatabaseMigrator, DatabaseMigrator>();
                         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();

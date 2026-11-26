@@ -203,8 +203,7 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
             var config = this.GetConfiguration(definition, behavior);
 
             var immutableProperties = @class.QueryDtoClassProperties()
-                .Select(p => p.Name.CapitalizeFirstLetter())
-                .Where(p => !p.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase) && !p.Equals(PropertyNames.CreatedAt, StringComparison.OrdinalIgnoreCase) && !p.Equals(PropertyNames.ModifiedAt, StringComparison.OrdinalIgnoreCase) && (string.IsNullOrWhiteSpace(config.StateProperty) || !p.Equals(config.StateProperty, StringComparison.OrdinalIgnoreCase)))
+                .Where(p => !p.Name.Equals(PropertyNames.Id, StringComparison.OrdinalIgnoreCase) && !p.Name.Equals(PropertyNames.CreatedAt, StringComparison.OrdinalIgnoreCase) && !p.Name.Equals(PropertyNames.ModifiedAt, StringComparison.OrdinalIgnoreCase) && (string.IsNullOrWhiteSpace(config.StateProperty) || !p.Name.Equals(config.StateProperty, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
             stringBuilder.Append($$"""
@@ -216,7 +215,11 @@ namespace Mycelium.Forge.Generator.HandleBarHelpers.BehaviorTypeHelpers
 
             if (immutableProperties.Count > 0 && !string.IsNullOrWhiteSpace(config.StateProperty))
             {
-                var diffChecks = immutableProperties.Select(p => $"existingThing.{p} != updatedThing.{p}");
+                var diffChecks = immutableProperties.Select(p =>
+                {
+                    var name = p.Name.CapitalizeFirstLetter();
+                    return p.QueryIsEnumerable() ? $"!existingThing.{name}.SequenceEqual(updatedThing.{name})" : $"existingThing.{name} != updatedThing.{name}";
+                });
 
                 stringBuilder.Append(ModelConstants.DoubleNewLine);
 

@@ -19,25 +19,18 @@ namespace Mycelium.Forge.Common
     using Mycelium.Forge.Common.Decorators;
 
     /// <summary>
-    /// a short, free-text label a user can attach to a project to describe what it relates to, used for
+    /// A short, free-text label a user can attach to a Package to describe what it relates to, used for
     /// search, filtering, and facet counts. It's normalised (lowercased, spaces→hyphens) and deduplicated
-    /// on write, but not curated or restricted to a fixed list
+    /// on write.
     /// </summary>
     [Class(xmiId: "EAID_B267D33A_7D03_4de8_BC66_066A0EC0DF2D", isAbstract: false, isFinalSpecialization: false, isActive: false)]
-    public partial interface ITag
+    public partial interface ITag : IThing
     {
-        /// <summary>
-        /// Indicates whether the tag is part of the Forge's curated global tag set rather than an ad-hoc,
-        /// user-created label.
-        /// </summary>
-        [Property(xmiId: "EAID_99DCF2DF_5692_4f89_88DD_F3CEB21DA1D5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
-        int IsCurated { get; set; }
-
         /// <summary>
         /// the tag's text value, stored as a String. Unique after normalisation; what's displayed and matched
         /// against in search/autocomplete
         /// </summary>
-        [Property(xmiId: "EAID_969CFA62_079A_4551_A43D_88F5EA5FF592", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
+        [Property(xmiId: "EAID_969CFA62_079A_4551_A43D_88F5EA5FF592", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string Name { get; set; }
 
         /// <summary>

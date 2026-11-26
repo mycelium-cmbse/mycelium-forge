@@ -29,23 +29,38 @@ namespace Mycelium.Forge.Common
     public partial interface IPackageVersion : IThing
     {
         /// <summary>
+        /// The Licenses that apply to this PackageVersion; each one applies in full. It is empty when no
+        /// license has been declared.
+        /// </summary>
+        [Property(xmiId: "EAID_dst9A3C0C_3C75_42af_B423_BB1C28CD8A1F", aggregation: AggregationKind.None, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        List<Guid> ApplicableLicenses { get; set; }
+
+        /// <summary>
+        /// The SHA-256 hash of the published package file, encoded as a 64-character lowercase hexadecimal
+        /// string. Clients use it to check that a downloaded file is intact and unaltered.
+        /// </summary>
+        [Property(xmiId: "EAID_4F19C56F_8722_4544_9FE0_FE3BF3F362AD", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        string CheckSum { get; set; }
+
+        /// <summary>
         /// The amount of times the version has been downloaded since its creation
         /// </summary>
         [Property(xmiId: "EAID_133F00F0_42F5_4d22_AAF4_0BC7A44A6C0F", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         int DownloadCount { get; set; }
 
         /// <summary>
+        /// The file extension of the published package file (e.g. "zip", "kpar"), without the leading dot. It
+        /// is set by the packaging format of the Package's PackageType.
+        /// </summary>
+        [Property(xmiId: "EAID_89A0E661_9A0E_4ac6_8E82_B0E642DC6D5C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        string FileExtension { get; set; }
+
+        /// <summary>
         /// Whether this specific version appears in search/browse results. Lets you hide one problematic
         /// release from discovery without touching any other version.
         /// </summary>
-        [Property(xmiId: "EAID_BFB9588E_A91A_4546_978A_0B8A6F67EEE5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Property(xmiId: "EAID_BFB9588E_A91A_4546_978A_0B8A6F67EEE5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: "true", isOwnerEnd: false)]
         bool Listed { get; set; }
-
-        /// <summary>
-        /// the owned MetaDataDefinition
-        /// </summary>
-        [Property(xmiId: "EAID_dst94AFDF_F62B_4600_9B44_6076F54197E6", aggregation: AggregationKind.Composite, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
-        Guid MetaData { get; set; }
 
         /// <summary>
         /// The unique identifier of the owning Package.
@@ -60,6 +75,28 @@ namespace Mycelium.Forge.Common
         DateTime PublicationDate { get; set; }
 
         /// <summary>
+        /// An optional Markdown document, provided at publication time, that describes what this PackageVersion
+        /// is and how to install and use it. It is displayed on the version's page in the Forge.
+        /// </summary>
+        [Property(xmiId: "EAID_AB62B06F_47B1_47ef_B653_2865DA5CCA74", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        string Readme { get; set; }
+
+        /// <summary>
+        /// An optional Markdown document describing what changed in this PackageVersion compared with earlier
+        /// versions, such as new features, fixes and breaking changes.
+        /// </summary>
+        [Property(xmiId: "EAID_6E02912D_7674_4962_A055_CFED51B4CDB5", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        string ReleaseNotes { get; set; }
+
+        /// <summary>
+        /// The size of the published package file, in bytes.
+        /// </summary>
+        [Property(xmiId: "EAID_41A3B121_3829_4b60_80FB_C3B8E7769AA6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        int SizeInBytes { get; set; }
+
+        /// <summary>
+        /// The Semantic Version number that identifies this PackageVersion within its owning Package. It is
+        /// unique among the versions of a Package and cannot be changed once published.
         /// </summary>
         [Property(xmiId: "EAID_5E3DB552_5872_48f8_BDA3_4CB2ECE6BC69", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string Version { get; set; }

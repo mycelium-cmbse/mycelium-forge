@@ -11,6 +11,7 @@ namespace Mycelium.Forge.Tests.Data
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace Mycelium.Forge.Tests.Data
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Data;
     using Mycelium.Forge.Orm;
+    using Mycelium.Forge.Storage.Stores;
 
     using Npgsql;
 
@@ -39,9 +41,9 @@ namespace Mycelium.Forge.Tests.Data
         private Mock<IOrganizationInvitationService> organizationInvitationServiceMock;
         private Mock<IPackageService> packageServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
-        private Mock<IPackageMetaDataService> packageMetaDataServiceMock;
         private Mock<IPackageInvitationService> packageInvitationServiceMock;
         private Mock<IAPIKeyService> apiKeyServiceMock;
+        private Mock<IArtifactStore> artifactStoreMock;
         private Mock<IDatabaseMigrator> databaseMigratorMock;
         private Mock<IDatabaseSource> databaseSourceMock;
         private Mock<ILogger<DatabaseSeeder>> loggerMock;
@@ -59,9 +61,9 @@ namespace Mycelium.Forge.Tests.Data
             this.organizationInvitationServiceMock = new Mock<IOrganizationInvitationService>();
             this.packageServiceMock = new Mock<IPackageService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
-            this.packageMetaDataServiceMock = new Mock<IPackageMetaDataService>();
             this.packageInvitationServiceMock = new Mock<IPackageInvitationService>();
             this.apiKeyServiceMock = new Mock<IAPIKeyService>();
+            this.artifactStoreMock = new Mock<IArtifactStore>();
             this.databaseMigratorMock = new Mock<IDatabaseMigrator>();
             this.databaseSourceMock = new Mock<IDatabaseSource>();
             this.loggerMock = new Mock<ILogger<DatabaseSeeder>>();
@@ -119,10 +121,6 @@ namespace Mycelium.Forge.Tests.Data
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
 
-            this.packageMetaDataServiceMock
-                .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageMetaData>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Result.Created);
-
             this.packageInvitationServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
@@ -130,6 +128,10 @@ namespace Mycelium.Forge.Tests.Data
             this.apiKeyServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IAPIKey>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
+
+            this.artifactStoreMock
+                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(("65846a5822634106bc07d4fc81798f0d2895e5277a7ec706921253741d02cb2f", true));
 
             this.databaseSeeder = new DatabaseSeeder(
                 this.forgeServiceMock.Object,
@@ -140,13 +142,13 @@ namespace Mycelium.Forge.Tests.Data
                 this.organizationInvitationServiceMock.Object,
                 this.packageServiceMock.Object,
                 this.packageVersionServiceMock.Object,
-                this.packageMetaDataServiceMock.Object,
                 this.packageInvitationServiceMock.Object,
                 this.apiKeyServiceMock.Object,
                 this.databaseConfig,
                 this.loggerMock.Object,
                 this.databaseMigratorMock.Object,
-                this.databaseSourceMock.Object);
+                this.databaseSourceMock.Object,
+                this.artifactStoreMock.Object);
         }
 
         [Test]
@@ -158,6 +160,7 @@ namespace Mycelium.Forge.Tests.Data
             {
                 Assert.That(successResult, Is.True);
                 this.databaseMigratorMock.Verify(x => x.ResetDatabaseAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+                this.artifactStoreMock.Verify(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.databaseSourceMock.Verify(x => x.DeferConstraintsAsync(It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.forgeServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IForge>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.countryServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<ICountry>>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -167,7 +170,6 @@ namespace Mycelium.Forge.Tests.Data
                 this.organizationInvitationServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageVersionServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>()), Times.Once);
-                this.packageMetaDataServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageMetaData>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageInvitationServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageInvitation>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.apiKeyServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IAPIKey>>(), It.IsAny<CancellationToken>()), Times.Once);
             }
@@ -211,6 +213,17 @@ namespace Mycelium.Forge.Tests.Data
             this.databaseMigratorMock
                 .Setup(x => x.ResetDatabaseAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
+
+            this.artifactStoreMock
+                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Error.Failure(description: "Failed to upload seed artifact"));
+
+            var artifactFailureResult = await this.databaseSeeder.SeedAsync(CancellationToken.None);
+            Assert.That(artifactFailureResult, Is.False);
+
+            this.artifactStoreMock
+                .Setup(x => x.StoreArtifactAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(("65846a5822634106bc07d4fc81798f0d2895e5277a7ec706921253741d02cb2f", false));
 
             this.packageServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>()))

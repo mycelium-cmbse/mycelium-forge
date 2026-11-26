@@ -14,6 +14,7 @@ namespace Mycelium.Forge.Data
     using Mycelium.Forge.Dal.DatabaseSource;
     using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Orm;
+    using Mycelium.Forge.Storage.Stores;
 
     using Npgsql;
 
@@ -31,6 +32,11 @@ namespace Mycelium.Forge.Data
         /// The domain service for <see cref="IAPIKey" /> entities.
         /// </summary>
         private readonly IAPIKeyService apiKeyService;
+
+        /// <summary>
+        /// The artifact storage service for seed archive blobs.
+        /// </summary>
+        private readonly IArtifactStore artifactStore;
 
         /// <summary>
         /// The domain service for <see cref="ICountry" /> entities.
@@ -78,11 +84,6 @@ namespace Mycelium.Forge.Data
         private readonly IPackageInvitationService packageInvitationService;
 
         /// <summary>
-        /// The domain service for <see cref="IPackageMetaData" /> entities.
-        /// </summary>
-        private readonly IPackageMetaDataService packageMetaDataService;
-
-        /// <summary>
         /// The domain service for <see cref="IPackage" /> entities.
         /// </summary>
         private readonly IPackageService packageService;
@@ -108,29 +109,14 @@ namespace Mycelium.Forge.Data
         /// <param name="organizationInvitationService">The domain service for <see cref="IOrganizationInvitation" /> entities.</param>
         /// <param name="packageService">The domain service for <see cref="IPackage" /> entities.</param>
         /// <param name="packageVersionService">The domain service for <see cref="IPackageVersion" /> entities.</param>
-        /// <param name="packageMetaDataService">The domain service for <see cref="IPackageMetaData" /> entities.</param>
         /// <param name="packageInvitationService">The domain service for <see cref="IPackageInvitation" /> entities.</param>
         /// <param name="apiKeyService">The domain service for <see cref="IAPIKey" /> entities.</param>
         /// <param name="databaseConfig">The database configuration options.</param>
         /// <param name="logger">The logger for diagnostic messages.</param>
         /// <param name="databaseMigrator">The database migration service.</param>
         /// <param name="databaseSource">The database connection provider.</param>
-        public DatabaseSeeder(
-            IForgeService forgeService,
-            ICountryService countryService,
-            IPackageTypeService packageTypeService,
-            IAccountService accountService,
-            IOrganizationService organizationService,
-            IOrganizationInvitationService organizationInvitationService,
-            IPackageService packageService,
-            IPackageVersionService packageVersionService,
-            IPackageMetaDataService packageMetaDataService,
-            IPackageInvitationService packageInvitationService,
-            IAPIKeyService apiKeyService,
-            DatabaseConfig databaseConfig,
-            ILogger<DatabaseSeeder> logger,
-            IDatabaseMigrator databaseMigrator,
-            IDatabaseSource databaseSource)
+        /// <param name="artifactStore">The artifact storage service for seed archive blobs.</param>
+        public DatabaseSeeder(IForgeService forgeService, ICountryService countryService, IPackageTypeService packageTypeService, IAccountService accountService, IOrganizationService organizationService, IOrganizationInvitationService organizationInvitationService, IPackageService packageService, IPackageVersionService packageVersionService, IPackageInvitationService packageInvitationService, IAPIKeyService apiKeyService, DatabaseConfig databaseConfig, ILogger<DatabaseSeeder> logger, IDatabaseMigrator databaseMigrator, IDatabaseSource databaseSource, IArtifactStore artifactStore)
         {
             ArgumentNullException.ThrowIfNull(forgeService);
             ArgumentNullException.ThrowIfNull(countryService);
@@ -140,13 +126,13 @@ namespace Mycelium.Forge.Data
             ArgumentNullException.ThrowIfNull(organizationInvitationService);
             ArgumentNullException.ThrowIfNull(packageService);
             ArgumentNullException.ThrowIfNull(packageVersionService);
-            ArgumentNullException.ThrowIfNull(packageMetaDataService);
             ArgumentNullException.ThrowIfNull(packageInvitationService);
             ArgumentNullException.ThrowIfNull(apiKeyService);
             ArgumentNullException.ThrowIfNull(databaseConfig);
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(databaseMigrator);
             ArgumentNullException.ThrowIfNull(databaseSource);
+            ArgumentNullException.ThrowIfNull(artifactStore);
 
             this.forgeService = forgeService;
             this.countryService = countryService;
@@ -156,13 +142,13 @@ namespace Mycelium.Forge.Data
             this.organizationInvitationService = organizationInvitationService;
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
-            this.packageMetaDataService = packageMetaDataService;
             this.packageInvitationService = packageInvitationService;
             this.apiKeyService = apiKeyService;
             this.databaseConfig = databaseConfig;
             this.logger = logger;
             this.databaseMigrator = databaseMigrator;
             this.databaseSource = databaseSource;
+            this.artifactStore = artifactStore;
         }
 
         /// <summary>
@@ -179,6 +165,11 @@ namespace Mycelium.Forge.Data
             try
             {
                 if (!await this.ResetDatabaseAsync(cancellationToken))
+                {
+                    return false;
+                }
+
+                if (!await this.SeedArtifactAsync(cancellationToken))
                 {
                     return false;
                 }
@@ -204,7 +195,6 @@ namespace Mycelium.Forge.Data
                                       await this.SeedThing(seederUserContext, transaction, this.organizationInvitationService, SeedData.OrganizationInvitations, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.packageService, SeedData.Packages, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.packageVersionService, SeedData.PackageVersions, cancellationToken) &&
-                                      await this.SeedThing(seederUserContext, transaction, this.packageMetaDataService, SeedData.PackageMetaDatas, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.packageInvitationService, SeedData.PackageInvitations, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.apiKeyService, SeedData.ApiKeys, cancellationToken);
 
@@ -225,6 +215,38 @@ namespace Mycelium.Forge.Data
                 this.logger.LogError(exception, "Database seeding failed unexpectedly.");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Uploads the embedded seed archive to object storage when not already present.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A task resolving to <see langword="true" /> if the seed artifact was stored successfully; otherwise <see langword="false" />.</returns>
+        private async Task<bool> SeedArtifactAsync(CancellationToken cancellationToken)
+        {
+            const string seedResourceName = "Mycelium.Forge.Data.Resources.seed_model.kpar";
+            await using var artifactStream = typeof(DatabaseSeeder).Assembly.GetManifestResourceStream(seedResourceName);
+
+            if (artifactStream == null)
+            {
+                this.logger.LogError("Embedded seed artifact resource '{ResourceName}' was not found.", seedResourceName);
+                return false;
+            }
+
+            var result = await this.artifactStore.StoreArtifactAsync(artifactStream, "application/zip", cancellationToken);
+
+            if (result.IsError)
+            {
+                this.logger.LogError("Failed to upload seed artifact '{ResourceName}': {Errors}", seedResourceName, string.Join(", ", result.Errors));
+                return false;
+            }
+
+            if (this.logger.IsEnabled(LogLevel.Information))
+            {
+                this.logger.LogInformation("Seed artifact stored with hash {ContentHash} (newlyUploaded: {WasNewlyUploaded}).", result.Value.ContentHash, result.Value.WasNewlyUploaded);
+            }
+
+            return true;
         }
 
         /// <summary>

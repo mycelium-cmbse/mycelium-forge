@@ -69,11 +69,6 @@
                                 <ForgeBadge Text="Unlisted"
                                             Class="badge-lifecycle-archived"/>
                             }
-                            else if (ver.IsDeprecated)
-                            {
-                                <ForgeBadge Text="Deprecated"
-                                            Class="badge-lifecycle-archived"/>
-                            }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-36 shrink-0 text-muted-foreground p-0">
                             @(ver.PublicationDate.ToTimeAgo())
@@ -91,7 +86,7 @@
                             }
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-24 shrink-0 text-muted-foreground p-0">
-                            @(ver.SizeInBytes.FormatFileSize())
+                            @(((long)ver.SizeInBytes).FormatFileSize())
                         </BlazorBlueprint.Primitives.Table.BbTableCell>
                         <div class="flex-1"></div>
                         <BlazorBlueprint.Primitives.Table.BbTableCell class="w-13 shrink-0 text-right p-0">

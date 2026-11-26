@@ -26,10 +26,23 @@ namespace Mycelium.Forge.Common
     public partial interface IPackage : IThing, INamespace
     {
         /// <summary>
+        /// The Tags attached to the Package to describe what it relates to, used for search, filtering and
+        /// facet counts.
+        /// </summary>
+        [Property(xmiId: "EAID_dstD430BA_78D2_40fb_BDA1_CA46BFB7B95E", aggregation: AggregationKind.None, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        List<Guid> AppliedTags { get; set; }
+
+        /// <summary>
         /// A human readable description for the Package.
         /// </summary>
-        [Property(xmiId: "EAID_03CDEFB7_67B8_4310_A5D7_E3FA99CBDD57", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
+        [Property(xmiId: "EAID_03CDEFB7_67B8_4310_A5D7_E3FA99CBDD57", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         string Description { get; set; }
+
+        /// <summary>
+        /// An optional URI of the Package's user or API documentation.
+        /// </summary>
+        [Property(xmiId: "EAID_0A37F903_2AB9_4ac1_AF03_87CE576A03D1", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        string DocumentationUrl { get; set; }
 
         /// <summary>
         /// Total downloads across the Package, computed as the sum of downloadCount over all its
@@ -39,10 +52,17 @@ namespace Mycelium.Forge.Common
         int downloadCount { get; }
 
         /// <summary>
+        /// An optional URI of the Package's project home page, where general information about the Package can
+        /// be found.
+        /// </summary>
+        [Property(xmiId: "EAID_CEF20E41_31A6_494d_91FC_93C7B189A0A2", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        string HomepageUrl { get; set; }
+
+        /// <summary>
         /// Whether the Package appears in search results and browsable listings. When false, it's still
         /// reachable directly (e.g. by exact name or link) but hidden from discovery.
         /// </summary>
-        [Property(xmiId: "EAID_4F8A692D_12D7_4a0e_BF07_B7BD116E7E01", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Property(xmiId: "EAID_4F8A692D_12D7_4a0e_BF07_B7BD116E7E01", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: "true", isOwnerEnd: false)]
         bool Listed { get; set; }
 
         /// <summary>
@@ -68,6 +88,13 @@ namespace Mycelium.Forge.Common
         /// </summary>
         [Property(xmiId: "EAID_dst22907F_7B04_491a_9894_18D7F240B0C8", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         Guid PackageType { get; set; }
+
+        /// <summary>
+        /// An optional URI of the source code repository the Package is developed in, e.g. a Git repository on
+        /// a code-hosting platform.
+        /// </summary>
+        [Property(xmiId: "EAID_FB450279_922A_415e_B7BE_665F3D70C9E1", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        string RepositoryUrl { get; set; }
 
         /// <summary>
         /// The PackageVersions that are owned by the Package

@@ -151,7 +151,6 @@ namespace Mycelium.Forge.Tests.ViewModels.AccountDetails
                 Assert.That(this.viewModel.Account.ShortName, Is.EqualTo("r-andre"));
                 Assert.That(this.viewModel.IsCurrentUser, Is.True);
                 Assert.That(this.viewModel.Packages, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.Packages[0].IsVerified, Is.False);
             }
 
             // Scenario 5: Viewing another user's profile

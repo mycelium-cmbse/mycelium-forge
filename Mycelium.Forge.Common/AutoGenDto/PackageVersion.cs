@@ -29,9 +29,25 @@ namespace Mycelium.Forge.Common
     public partial class PackageVersion : IPackageVersion, ICloneable<PackageVersion>
     {
         /// <summary>
+        /// The Licenses that apply to this PackageVersion; each one applies in full. It is empty when no
+        /// license has been declared.
+        /// </summary>
+        [Property(xmiId: "EAID_dst9A3C0C_3C75_42af_B423_BB1C28CD8A1F", aggregation: AggregationKind.None, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Implements(implementation: "IPackageVersion.ApplicableLicenses")]
+        public List<Guid> ApplicableLicenses { get; set; } = [];
+
+        /// <summary>
+        /// The SHA-256 hash of the published package file, encoded as a 64-character lowercase hexadecimal
+        /// string. Clients use it to check that a downloaded file is intact and unaltered.
+        /// </summary>
+        [Property(xmiId: "EAID_4F19C56F_8722_4544_9FE0_FE3BF3F362AD", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Implements(implementation: "IPackageVersion.CheckSum")]
+        public string CheckSum { get; set; }
+
+        /// <summary>
         /// The DateTime at which the Thing has been created.
         /// </summary>
-        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
+        [Property(xmiId: "EAID_C608D12F_75CD_46ed_9AEC_1E65CD83951B", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.CreatedAt")]
         public DateTime CreatedAt { get; set; }
 
@@ -41,6 +57,14 @@ namespace Mycelium.Forge.Common
         [Property(xmiId: "EAID_133F00F0_42F5_4d22_AAF4_0BC7A44A6C0F", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackageVersion.DownloadCount")]
         public int DownloadCount { get; set; }
+
+        /// <summary>
+        /// The file extension of the published package file (e.g. "zip", "kpar"), without the leading dot. It
+        /// is set by the packaging format of the Package's PackageType.
+        /// </summary>
+        [Property(xmiId: "EAID_89A0E661_9A0E_4ac6_8E82_B0E642DC6D5C", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Implements(implementation: "IPackageVersion.FileExtension")]
+        public string FileExtension { get; set; }
 
         /// <summary>
         /// Universally Unique Identifier (UUID) that uniquely identifies an instance of Thing.
@@ -53,21 +77,14 @@ namespace Mycelium.Forge.Common
         /// Whether this specific version appears in search/browse results. Lets you hide one problematic
         /// release from discovery without touching any other version.
         /// </summary>
-        [Property(xmiId: "EAID_BFB9588E_A91A_4546_978A_0B8A6F67EEE5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Property(xmiId: "EAID_BFB9588E_A91A_4546_978A_0B8A6F67EEE5", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: "true", isOwnerEnd: false)]
         [Implements(implementation: "IPackageVersion.Listed")]
-        public bool Listed { get; set; }
-
-        /// <summary>
-        /// the owned MetaDataDefinition
-        /// </summary>
-        [Property(xmiId: "EAID_dst94AFDF_F62B_4600_9B44_6076F54197E6", aggregation: AggregationKind.Composite, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
-        [Implements(implementation: "IPackageVersion.MetaData")]
-        public Guid MetaData { get; set; }
+        public bool Listed { get; set; } = true;
 
         /// <summary>
         /// The DateTime at which the Thing was last modified.
         /// </summary>
-        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: false, defaultValue: null, isOwnerEnd: false)]
+        [Property(xmiId: "EAID_048B19C9_AA4A_4e41_A4BD_B28426AEC937", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IThing.ModifiedAt")]
         public DateTime ModifiedAt { get; set; }
 
@@ -86,6 +103,31 @@ namespace Mycelium.Forge.Common
         public DateTime PublicationDate { get; set; }
 
         /// <summary>
+        /// An optional Markdown document, provided at publication time, that describes what this PackageVersion
+        /// is and how to install and use it. It is displayed on the version's page in the Forge.
+        /// </summary>
+        [Property(xmiId: "EAID_AB62B06F_47B1_47ef_B653_2865DA5CCA74", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Implements(implementation: "IPackageVersion.Readme")]
+        public string Readme { get; set; }
+
+        /// <summary>
+        /// An optional Markdown document describing what changed in this PackageVersion compared with earlier
+        /// versions, such as new features, fixes and breaking changes.
+        /// </summary>
+        [Property(xmiId: "EAID_6E02912D_7674_4962_A055_CFED51B4CDB5", aggregation: AggregationKind.None, lowerValue: 0, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Implements(implementation: "IPackageVersion.ReleaseNotes")]
+        public string ReleaseNotes { get; set; }
+
+        /// <summary>
+        /// The size of the published package file, in bytes.
+        /// </summary>
+        [Property(xmiId: "EAID_41A3B121_3829_4b60_80FB_C3B8E7769AA6", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        [Implements(implementation: "IPackageVersion.SizeInBytes")]
+        public int SizeInBytes { get; set; }
+
+        /// <summary>
+        /// The Semantic Version number that identifies this PackageVersion within its owning Package. It is
+        /// unique among the versions of a Package and cannot be changed once published.
         /// </summary>
         [Property(xmiId: "EAID_5E3DB552_5872_48f8_BDA3_4CB2ECE6BC69", aggregation: AggregationKind.None, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
         [Implements(implementation: "IPackageVersion.Version")]
@@ -99,14 +141,19 @@ namespace Mycelium.Forge.Common
         {
             return new PackageVersion
             {
+                ApplicableLicenses = [.. this.ApplicableLicenses],
+                CheckSum = this.CheckSum,
                 CreatedAt = this.CreatedAt,
                 DownloadCount = this.DownloadCount,
+                FileExtension = this.FileExtension,
                 Id = this.Id,
                 Listed = this.Listed,
-                MetaData = this.MetaData,
                 ModifiedAt = this.ModifiedAt,
                 Owner = this.Owner,
                 PublicationDate = this.PublicationDate,
+                Readme = this.Readme,
+                ReleaseNotes = this.ReleaseNotes,
+                SizeInBytes = this.SizeInBytes,
                 Version = this.Version
             };
         }

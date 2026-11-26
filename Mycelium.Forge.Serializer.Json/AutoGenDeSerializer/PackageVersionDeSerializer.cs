@@ -46,13 +46,18 @@ namespace Mycelium.Forge.Serializer.Json
             var dtoInstance = new Mycelium.Forge.Common.PackageVersion();
 
             var typeSeen = false;
+            var applicableLicensesSeen = false;
+            var checkSumSeen = false;
             var createdAtSeen = false;
             var downloadCountSeen = false;
+            var fileExtensionSeen = false;
             var listedSeen = false;
-            var metaDataSeen = false;
             var modifiedAtSeen = false;
             var ownerSeen = false;
             var publicationDateSeen = false;
+            var readmeSeen = false;
+            var releaseNotesSeen = false;
+            var sizeInBytesSeen = false;
             var versionSeen = false;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
@@ -89,6 +94,35 @@ namespace Mycelium.Forge.Serializer.Json
                     continue;
                 }
 
+                if (reader.ValueTextEquals("applicableLicenses"u8))
+                {
+                    applicableLicensesSeen = true;
+                    reader.Read();
+
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                    {
+                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var applicableLicensesRefId))
+                        {
+                            dtoInstance.ApplicableLicenses.Add(applicableLicensesRefId);
+                        }
+                    }
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("checkSum"u8))
+                {
+                    checkSumSeen = true;
+                    reader.Read();
+
+                    var checkSumScalarValue = reader.GetString();
+
+                    if (checkSumScalarValue != null)
+                    {
+                        dtoInstance.CheckSum = checkSumScalarValue;
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("createdAt"u8))
                 {
                     createdAtSeen = true;
@@ -107,6 +141,20 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("fileExtension"u8))
+                {
+                    fileExtensionSeen = true;
+                    reader.Read();
+
+                    var fileExtensionScalarValue = reader.GetString();
+
+                    if (fileExtensionScalarValue != null)
+                    {
+                        dtoInstance.FileExtension = fileExtensionScalarValue;
+                    }
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("listed"u8))
                 {
                     listedSeen = true;
@@ -115,26 +163,6 @@ namespace Mycelium.Forge.Serializer.Json
                     if (reader.TokenType != JsonTokenType.Null)
                     {
                         dtoInstance.Listed = reader.GetBoolean();
-                    }
-
-                    continue;
-                }
-                if (reader.ValueTextEquals("metaData"u8))
-                {
-                    metaDataSeen = true;
-                    reader.Read();
-
-                    if (reader.TokenType == JsonTokenType.Null)
-                    {
-                        dtoInstance.MetaData = Guid.Empty;
-                        logger.LogDebug($"the PackageVersion.MetaData property was not found in the Json. The value is set to Guid.Empty");
-                    }
-                    else
-                    {
-                        if (Utf8JsonReaderHelper.TryReadReferenceId(ref reader, out var metaDataRefId))
-                        {
-                            dtoInstance.MetaData = metaDataRefId;
-                        }
                     }
 
                     continue;
@@ -177,6 +205,33 @@ namespace Mycelium.Forge.Serializer.Json
 
                     continue;
                 }
+                if (reader.ValueTextEquals("readme"u8))
+                {
+                    readmeSeen = true;
+                    reader.Read();
+
+                    dtoInstance.Readme = reader.GetString();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("releaseNotes"u8))
+                {
+                    releaseNotesSeen = true;
+                    reader.Read();
+
+                    dtoInstance.ReleaseNotes = reader.GetString();
+
+                    continue;
+                }
+                if (reader.ValueTextEquals("sizeInBytes"u8))
+                {
+                    sizeInBytesSeen = true;
+                    reader.Read();
+
+                    dtoInstance.SizeInBytes = reader.GetInt32();
+
+                    continue;
+                }
                 if (reader.ValueTextEquals("version"u8))
                 {
                     versionSeen = true;
@@ -200,6 +255,14 @@ namespace Mycelium.Forge.Serializer.Json
                 throw new InvalidOperationException("The @type property is not available, the PackageVersionDeSerializer cannot be used to deserialize this JsonElement");
             }
 
+            if (!applicableLicensesSeen)
+            {
+                logger.LogDebug("the applicableLicenses Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
+            }
+            if (!checkSumSeen)
+            {
+                logger.LogDebug("the checkSum Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
+            }
             if (!createdAtSeen)
             {
                 logger.LogDebug("the createdAt Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
@@ -208,13 +271,13 @@ namespace Mycelium.Forge.Serializer.Json
             {
                 logger.LogDebug("the downloadCount Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
+            if (!fileExtensionSeen)
+            {
+                logger.LogDebug("the fileExtension Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
+            }
             if (!listedSeen)
             {
                 logger.LogDebug("the listed Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
-            }
-            if (!metaDataSeen)
-            {
-                logger.LogDebug("the metaData Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
             if (!modifiedAtSeen)
             {
@@ -227,6 +290,18 @@ namespace Mycelium.Forge.Serializer.Json
             if (!publicationDateSeen)
             {
                 logger.LogDebug("the publicationDate Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
+            }
+            if (!readmeSeen)
+            {
+                logger.LogDebug("the readme Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
+            }
+            if (!releaseNotesSeen)
+            {
+                logger.LogDebug("the releaseNotes Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
+            }
+            if (!sizeInBytesSeen)
+            {
+                logger.LogDebug("the sizeInBytes Json property was not found in the PackageVersion: {Id}", dtoInstance.Id);
             }
             if (!versionSeen)
             {

@@ -26,7 +26,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
     /// <summary>
     /// Default permission service for <see cref="IAPIKey"/>.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class APIKeyPermissionService : PermissionServiceBase<IAPIKey>, IAPIKeyPermissionService
     {
         /// <summary>

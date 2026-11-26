@@ -38,10 +38,10 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         public IPackage Package { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of package metadata DTOs corresponding to package versions.
+        /// Gets or sets the collection of quality validation check tuples (Title, Detail, Passed).
         /// </summary>
         [Parameter]
-        public IReadOnlyList<IPackageMetaData> MetaDatas { get; set; } = [];
+        public IReadOnlyList<(string Title, string Detail, bool Passed)> QualityChecks { get; set; } = [];
 
         /// <summary>
         /// Determines whether the specified package version is the latest release.
@@ -60,8 +60,7 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails.Tabs
         /// <returns><see langword="true" /> if the version has passed all quality checks; otherwise, <see langword="false" />.</returns>
         public bool IsValidated(IPackageVersion version)
         {
-            var metaData = this.MetaDatas.FirstOrDefault(m => m.Id == version.MetaData || m.Owner == version.Id);
-            return metaData != null && metaData.QualityChecks.Count > 0 && metaData.QualityChecks.All(check => check.Passed);
+            return this.QualityChecks.Count > 0 && this.QualityChecks.All(check => check.Passed);
         }
 
         /// <summary>

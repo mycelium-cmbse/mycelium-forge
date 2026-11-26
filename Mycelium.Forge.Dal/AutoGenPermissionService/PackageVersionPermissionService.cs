@@ -26,7 +26,7 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
     /// <summary>
     /// Default permission service for <see cref="IPackageVersion"/>.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
     public partial class PackageVersionPermissionService : PermissionServiceBase<IPackageVersion>, IPackageVersionPermissionService
     {
         /// <summary>
@@ -149,10 +149,15 @@ namespace Mycelium.Forge.Dal.AutoGenPermissionService
                 return Error.Unauthorized(description: "Unauthenticated user cannot update packageversion.");
             }
 
-            if (existingThing.DownloadCount != updatedThing.DownloadCount ||
-                    existingThing.MetaData != updatedThing.MetaData ||
+            if (!existingThing.ApplicableLicenses.SequenceEqual(updatedThing.ApplicableLicenses) ||
+                    existingThing.CheckSum != updatedThing.CheckSum ||
+                    existingThing.DownloadCount != updatedThing.DownloadCount ||
+                    existingThing.FileExtension != updatedThing.FileExtension ||
                     existingThing.Owner != updatedThing.Owner ||
                     existingThing.PublicationDate != updatedThing.PublicationDate ||
+                    existingThing.Readme != updatedThing.Readme ||
+                    existingThing.ReleaseNotes != updatedThing.ReleaseNotes ||
+                    existingThing.SizeInBytes != updatedThing.SizeInBytes ||
                     existingThing.Version != updatedThing.Version)
             {
                 return Error.Forbidden(description: "PackageVersions are immutable; only the listed status may be modified.");

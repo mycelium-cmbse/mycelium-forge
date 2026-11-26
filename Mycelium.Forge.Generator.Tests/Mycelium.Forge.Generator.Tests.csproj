@@ -65,8 +65,8 @@
              property values themselves flow into this project fine via those packages'
              buildTransitive props, since Mycelium.Forge.Generator may be referenced via ProjectReference. -->
 
-        <PackageReference Include="Mycelium.Model.CommonPrimitives" Version="0.4.0" />
-        <PackageReference Include="Mycelium.Model.Forge" Version="0.5.0" />
+        <PackageReference Include="Mycelium.Model.CommonPrimitives" Version="0.5.0" />
+        <PackageReference Include="Mycelium.Model.Forge" Version="0.6.0" />
 
         <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
             <_Parameter1>MyceliumModelForgeXmiPath</_Parameter1>

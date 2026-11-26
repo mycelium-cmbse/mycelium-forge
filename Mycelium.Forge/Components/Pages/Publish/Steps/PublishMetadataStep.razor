@@ -206,7 +206,7 @@ else
         </BbFieldLabel>
         <BbFieldContent>
             <ForgeSelect TValue="string"
-                         Value="@(this.ViewModel.Package.License)"
+                         Value="@(this.ViewModel.License)"
                          ValueChanged="@(this.OnLicenseChanged)"
                          Items="@(LicenseOptions)"
                          Id="publish-license"/>
@@ -244,7 +244,7 @@ else
             TAGS
         </BbFieldLabel>
         <BbFieldContent>
-            <BbTagInput Tags="@(this.ViewModel.Package.Tags)"
+            <BbTagInput Tags="@(this.ViewModel.Tags)"
                         TagsChanged="@(this.OnTagsChanged)"
                         id="publish-tags"
                         Placeholder="Add tag..."

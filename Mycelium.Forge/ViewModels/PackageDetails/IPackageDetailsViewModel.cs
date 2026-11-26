@@ -42,6 +42,16 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         int DownloadCount { get; }
 
         /// <summary>
+        /// Gets the SPDX license identifier for display on the package details page.
+        /// </summary>
+        string License { get; }
+
+        /// <summary>
+        /// Gets the collection of tag names associated with the package for display.
+        /// </summary>
+        IReadOnlyList<string> Tags { get; }
+
+        /// <summary>
         /// Gets or sets the collection of maintainer account DTOs.
         /// </summary>
         IReadOnlyList<IAccount> Maintainers { get; set; }
@@ -50,16 +60,6 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// Gets or sets the selected or latest package version DTO.
         /// </summary>
         IPackageVersion CurrentVersion { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of package metadata DTOs corresponding to package versions.
-        /// </summary>
-        IReadOnlyList<IPackageMetaData> MetaDatas { get; set; }
-
-        /// <summary>
-        /// Gets the package metadata DTO for the currently selected package version.
-        /// </summary>
-        IPackageMetaData CurrentMetaData { get; }
 
         /// <summary>
         /// Gets the collection of model elements contained within the package release.

@@ -60,7 +60,6 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish
             this.viewModelMock.Setup(x => x.SelectedScope).Returns(new Organization { ShortName = "starion" });
             this.viewModelMock.Setup(x => x.Package).Returns(new Package { ShortName = "my-pkg" });
             this.viewModelMock.Setup(x => x.PackageVersion).Returns(new PackageVersion { Version = "1.0.0" });
-            this.viewModelMock.Setup(x => x.PackageMetaData).Returns(new PackageMetaData());
             this.viewModelMock.Setup(x => x.StagedArtefact).Returns(this.stagedArtefact);
             this.viewModelMock.Setup(x => x.ValidationChecks).Returns([]);
 

@@ -165,7 +165,6 @@ namespace Mycelium.Forge.Tests.ViewModels.OrganizationDetails
                 Assert.That(this.viewModel.Organization.ShortName, Is.EqualTo("starion"));
                 Assert.That(this.viewModel.IsUserAdmin, Is.True);
                 Assert.That(this.viewModel.Packages, Has.Count.EqualTo(1));
-                Assert.That(this.viewModel.Packages[0].IsVerified, Is.False);
             }
 
             // Scenario 4: User is admin by permission (InstallationAdministrator)

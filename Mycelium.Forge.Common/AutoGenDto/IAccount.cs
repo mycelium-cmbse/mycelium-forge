@@ -48,8 +48,8 @@ namespace Mycelium.Forge.Common
         /// <summary>
         /// The PackageInvitation sent by this account
         /// </summary>
-        [Property(xmiId: "EAID_dstF552D7_FD16_4883_8758_17E13BC36BCC", aggregation: AggregationKind.Composite, lowerValue: 1, upperValue: 1, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
-        Guid OwnedPackageInvitation { get; set; }
+        [Property(xmiId: "EAID_dstF552D7_FD16_4883_8758_17E13BC36BCC", aggregation: AggregationKind.Composite, lowerValue: 0, upperValue: int.MaxValue, isOrdered: false, isReadOnly: false, isDerived: false, isDerivedUnion: false, isUnique: true, defaultValue: null, isOwnerEnd: false)]
+        List<Guid> OwnedPackageInvitation { get; set; }
 
         /// <summary>
         /// The unique identifier of the owning Forge.

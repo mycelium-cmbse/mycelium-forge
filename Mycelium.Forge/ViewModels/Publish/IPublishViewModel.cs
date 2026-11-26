@@ -31,9 +31,9 @@ namespace Mycelium.Forge.ViewModels.Publish
         IPackageVersion PackageVersion { get; }
 
         /// <summary>
-        /// Gets the metadata of the package version being published.
+        /// Gets the collection of extracted package dependencies for display during review.
         /// </summary>
-        IPackageMetaData PackageMetaData { get; }
+        IReadOnlyList<(string Name, string Summary, bool IsVerified)> Dependencies { get; }
 
         /// <summary>
         /// Gets or sets the scope that owns the package.
@@ -80,6 +80,16 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// Gets or sets a value indicating whether a package publish operation is currently in progress.
         /// </summary>
         bool IsPublishing { get; set; }
+
+        /// <summary>
+        /// Gets or sets the temporary SPDX license identifier for the package being published.
+        /// </summary>
+        string License { get; set; }
+
+        /// <summary>
+        /// Gets or sets the temporary collection of tags associated with the package being published.
+        /// </summary>
+        List<string> Tags { get; set; }
 
         /// <summary>
         /// Discards the currently staged upload file and frees associated resources.

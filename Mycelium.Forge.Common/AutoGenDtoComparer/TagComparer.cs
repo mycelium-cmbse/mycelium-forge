@@ -1,5 +1,5 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="PackageMetaDataComparer.cs" company="Starion Group S.A.">
+// <copyright file="TagComparer.cs" company="Starion Group S.A.">
 //
 //   Copyright 2026 Starion Group S.A.
 //   SPDX-License-Identifier: Apache-2.0
@@ -20,22 +20,22 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
     using Mycelium.Forge.Common.Comparers;
 
     /// <summary>
-    /// Compares two instances of <see cref="IPackageMetaData"/> and returns the property changes between them.
+    /// Compares two instances of <see cref="ITag"/> and returns the property changes between them.
     /// </summary>
-    [GeneratedCode("Mycelium.Forge.Generator", "0.5.0")]
-    public partial class PackageMetaDataComparer : IDtoComparer<IPackageMetaData>
+    [GeneratedCode("Mycelium.Forge.Generator", "0.6.0")]
+    public partial class TagComparer : IDtoComparer<ITag>
     {
         /// <summary>
         /// Compares the specified <paramref name="oldDto" /> with <paramref name="newDto" /> and returns the collection of
         /// property differences.
         /// </summary>
-        /// <param name="oldDto">The original <see cref="IPackageMetaData" /> instance.</param>
-        /// <param name="newDto">The updated <see cref="IPackageMetaData" /> instance.</param>
+        /// <param name="oldDto">The original <see cref="ITag" /> instance.</param>
+        /// <param name="newDto">The updated <see cref="ITag" /> instance.</param>
         /// <returns>
         /// An <see cref="IEnumerable{PropertyChange}" /> representing the property differences between
         /// <paramref name="oldDto" /> and <paramref name="newDto" />.
         /// </returns>
-        public IEnumerable<PropertyChange> Compare(IPackageMetaData oldDto, IPackageMetaData newDto)
+        public IEnumerable<PropertyChange> Compare(ITag oldDto, ITag newDto)
         {
             var changes = new List<PropertyChange>();
 
@@ -46,17 +46,22 @@ namespace Mycelium.Forge.Common.AutoGenDtoComparer
 
             if (oldDto.CreatedAt != newDto.CreatedAt)
             {
-                changes.Add(new PropertyChange(nameof(IPackageMetaData.CreatedAt), oldDto.CreatedAt, newDto.CreatedAt));
+                changes.Add(new PropertyChange(nameof(ITag.CreatedAt), oldDto.CreatedAt, newDto.CreatedAt));
             }
 
             if (oldDto.ModifiedAt != newDto.ModifiedAt)
             {
-                changes.Add(new PropertyChange(nameof(IPackageMetaData.ModifiedAt), oldDto.ModifiedAt, newDto.ModifiedAt));
+                changes.Add(new PropertyChange(nameof(ITag.ModifiedAt), oldDto.ModifiedAt, newDto.ModifiedAt));
+            }
+
+            if (oldDto.Name != newDto.Name)
+            {
+                changes.Add(new PropertyChange(nameof(ITag.Name), oldDto.Name, newDto.Name));
             }
 
             if (oldDto.Owner != newDto.Owner)
             {
-                changes.Add(new PropertyChange(nameof(IPackageMetaData.Owner), oldDto.Owner, newDto.Owner));
+                changes.Add(new PropertyChange(nameof(ITag.Owner), oldDto.Owner, newDto.Owner));
             }
 
             return changes;

@@ -165,13 +165,6 @@
                                 Unlisted
                             </BbBadge>
                         }
-                        else if (version.IsDeprecated)
-                        {
-                            <BbBadge Variant="BadgeVariant.Secondary"
-                                     Class="badge-version-state text-muted-foreground">
-                                Deprecated
-                            </BbBadge>
-                        }
 
                         <div class="flex-1"></div>
 
@@ -193,12 +186,6 @@
                                       OnClick="() => this.OnUnlistVersion(version)"
                                       Class="package-unlist-version-button text-foreground-muted hover:text-foreground">
                                 Unlist
-                            </BbButton>
-
-                            <BbButton Variant="ButtonVariant.Link"
-                                      OnClick="() => this.OnDeprecateVersion(version)"
-                                      Class="package-deprecate-version-button text-foreground-muted hover:text-foreground">
-                                Deprecate
                             </BbButton>
                         }
                     </div>
