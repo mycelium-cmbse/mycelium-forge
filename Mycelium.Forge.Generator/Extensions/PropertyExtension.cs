@@ -131,6 +131,14 @@ namespace Mycelium.Forge.Generator.Extensions
                     return true;
                 }
 
+                // Workaround (To be fixed in model by #226): a unidirectional non-composite association to many whose opposite end
+                // is missing or unowned (e.g. Package.appliedTags -> Tag, PackageVersion.applicableLicenses -> License in
+                // model 0.6.0) cannot be mapped as a foreign key column and is mapped as a junction table instead.
+                if (property.QueryIsEnumerable() && property.Type != null && !property.QueryIsDataType() && !property.IsComposite && (property.Opposite == null || property.Opposite.Class == null))
+                {
+                    return true;
+                }
+
                 return property.QueryIsEnumerable() && property.Type != null && !property.QueryIsDataType() && !property.IsComposite && property.SubsettedProperty.Count > 0;
             }
 
@@ -352,18 +360,6 @@ namespace Mycelium.Forge.Generator.Extensions
             }
 
             /// <summary>
-            /// Queries whether the <see cref="IProperty" /> represents a primary key based on UML metadata
-            /// where both <see cref="IProperty.IsID" /> and <see cref="IMultiplicityElement.IsUnique" /> are true.
-            /// </summary>
-            /// <returns>True if the property is a primary key, false otherwise.</returns>
-            public bool QueryIsPrimaryKey()
-            {
-                ArgumentNullException.ThrowIfNull(property);
-
-                return property.IsID && property.IsUnique;
-            }
-
-            /// <summary>
             /// Queries whether the <see cref="IProperty" /> is indexable based on the Mycelium profile <c>&lt;&lt;index&gt;&gt;</c> stereotype.
             /// </summary>
             /// <returns>True if the property has the <c>Mycelium:index</c> stereotype, false otherwise.</returns>
@@ -371,12 +367,13 @@ namespace Mycelium.Forge.Generator.Extensions
             {
                 ArgumentNullException.ThrowIfNull(property);
 
-                // Model 0.6 replaced the UML isID=true / isUnique=false convention with the <<index>> stereotype from the Mycelium profile.
+                // Model 0.6 replaced the UML isID=true / isUnique=false convention with the <<index>> stereotype from the
+                // Mycelium profile.
                 return property.QueryStereoTypeApplication("index") != null;
             }
 
             /*
-             * TODO (Mycelium profile <<managed>> & onAction follow-up):
+             * To be done in #227 (Mycelium profile <<managed>> & onAction follow-up):
              *
              * Forge model 0.6 introduces the <<managed>> stereotype (ProfileName: "Mycelium", StereoTypeName: "managed")
              * and an accompanying Enterprise Architect tagged value `onAction` to mark system/server-managed properties

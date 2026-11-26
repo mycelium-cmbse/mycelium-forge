@@ -316,6 +316,22 @@ CREATE INDEX idx_organization_member_source_organization ON forge.organization_m
 ALTER TABLE forge.organization_member__account ADD CONSTRAINT account_fk_target FOREIGN KEY (target_account) REFERENCES forge.account (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 CREATE INDEX idx_organization_member_target_account ON forge.organization_member__account (target_account);
 
+CREATE TABLE forge.package_applied_tags__tag (
+    source_package uuid NOT NULL,
+    target_tag uuid NOT NULL,
+    PRIMARY KEY (source_package, target_tag)
+);
+
+ALTER TABLE forge.package_applied_tags__tag SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE forge.package_applied_tags__tag SET (autovacuum_vacuum_threshold = 2500);
+ALTER TABLE forge.package_applied_tags__tag SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE forge.package_applied_tags__tag SET (autovacuum_analyze_threshold = 2500);
+
+ALTER TABLE forge.package_applied_tags__tag ADD CONSTRAINT package_fk_source FOREIGN KEY (source_package) REFERENCES forge.package (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX idx_package_applied_tags_source_package ON forge.package_applied_tags__tag (source_package);
+ALTER TABLE forge.package_applied_tags__tag ADD CONSTRAINT tag_fk_target FOREIGN KEY (target_tag) REFERENCES forge.tag (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX idx_package_applied_tags_target_tag ON forge.package_applied_tags__tag (target_tag);
+
 CREATE TABLE forge.package_package_maintainer__account (
     source_package uuid NOT NULL,
     target_account uuid NOT NULL,
@@ -347,6 +363,22 @@ ALTER TABLE forge.package_package_owner__account ADD CONSTRAINT package_fk_sourc
 CREATE INDEX idx_package_package_owner_source_package ON forge.package_package_owner__account (source_package);
 ALTER TABLE forge.package_package_owner__account ADD CONSTRAINT account_fk_target FOREIGN KEY (target_account) REFERENCES forge.account (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 CREATE INDEX idx_package_package_owner_target_account ON forge.package_package_owner__account (target_account);
+
+CREATE TABLE forge.package_version_applicable_licenses__license (
+    source_package_version uuid NOT NULL,
+    target_license uuid NOT NULL,
+    PRIMARY KEY (source_package_version, target_license)
+);
+
+ALTER TABLE forge.package_version_applicable_licenses__license SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE forge.package_version_applicable_licenses__license SET (autovacuum_vacuum_threshold = 2500);
+ALTER TABLE forge.package_version_applicable_licenses__license SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE forge.package_version_applicable_licenses__license SET (autovacuum_analyze_threshold = 2500);
+
+ALTER TABLE forge.package_version_applicable_licenses__license ADD CONSTRAINT package_version_fk_source FOREIGN KEY (source_package_version) REFERENCES forge.package_version (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX idx_package_version_applicable_licenses_source_package_version ON forge.package_version_applicable_licenses__license (source_package_version);
+ALTER TABLE forge.package_version_applicable_licenses__license ADD CONSTRAINT license_fk_target FOREIGN KEY (target_license) REFERENCES forge.license (id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+CREATE INDEX idx_package_version_applicable_licenses_target_license ON forge.package_version_applicable_licenses__license (target_license);
 
 
 -- Reference Properties that are not Many-to-Many
