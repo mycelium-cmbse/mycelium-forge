@@ -84,6 +84,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails.Tabs
                 Assert.That(multipleLicensesTab.Markup, Does.Contain("Apache License 2.0"));
                 Assert.That(multipleLicensesTab.Markup, Does.Contain("MIT License"));
                 Assert.That(multipleLicensesTab.Markup, Does.Contain("MIT License full text"));
+                Assert.That(multipleLicensesTab.FindAll("[id='Apache-2.0']"), Has.Count.EqualTo(1));
+                Assert.That(multipleLicensesTab.FindAll("[id='MIT']"), Has.Count.EqualTo(1));
                 Assert.That(multipleBadges, Has.Count.EqualTo(2));
                 Assert.That(multipleLicensesTab.FindAll("pre").Select(pre => pre.TextContent), Is.EquivalentTo((string[])["Apache License 2.0 full text", "MIT License full text"]));
             }

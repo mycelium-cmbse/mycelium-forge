@@ -270,14 +270,17 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
 
             var maintainerLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']");
             var licenseLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetPackageRoute("starion", "ecss-mm-pwr", PackageTabConstants.Licenses)}']");
+            var licenseBadgeLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetPackageRoute("starion", "ecss-mm-pwr", PackageTabConstants.Licenses, "Apache-2.0")}']");
 
             this.viewModelMock.SetupGet(x => x.ApplicableLicenses).Returns([]);
+
             var noLicenseDetailsPage = this.context.Render<PackageDetails>(parameters =>
             {
                 parameters.Add(p => p.Scope, "starion");
                 parameters.Add(p => p.PackageShortname, "ecss-mm-pwr");
                 parameters.Add(p => p.Tab, PackageTabConstants.Licenses);
             });
+
             this.viewModelMock.SetupGet(x => x.ApplicableLicenses).Returns([this.apacheLicense]);
 
             var licensesTab = noLicenseDetailsPage.FindComponents<PackageLicensesTab>();
@@ -291,7 +294,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("QUALITY"));
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("LATEST"));
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("PUBLISHED"));
-                Assert.That(licenseLinks, Has.Count.GreaterThanOrEqualTo(2));
+                Assert.That(licenseLinks, Has.Count.EqualTo(1));
+                Assert.That(licenseBadgeLinks, Has.Count.EqualTo(1));
                 Assert.That(noLicenseDetailsPage.Markup, Does.Contain("No license"));
                 Assert.That(noLicenseDetailsPage.Markup, Does.Contain("None"));
                 Assert.That(licensesTab, Has.Count.EqualTo(1));

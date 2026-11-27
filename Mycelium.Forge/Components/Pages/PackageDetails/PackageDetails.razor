@@ -187,7 +187,7 @@
                             @foreach (var license in this.ViewModel.ApplicableLicenses)
                             {
                                 <a @key="license.Id"
-                                   href="@(PageRoutes.GetPackageRoute(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, PackageTabConstants.Licenses))"
+                                   href="@(PageRoutes.GetPackageRoute(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, PackageTabConstants.Licenses, license.SpdxIdentifier))"
                                    title="@($"View {license.SpdxIdentifier} license text")">
                                     <BbBadge Variant="BadgeVariant.Outline"
                                              Class="badge-format hover:border-primary hover:text-primary transition-colors">

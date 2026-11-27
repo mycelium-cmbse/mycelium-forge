@@ -124,22 +124,24 @@ namespace Mycelium.Forge.Common
         }
 
         /// <summary>
-        /// Generates the relative URL for the package details page, optionally with a specified tab.
+        /// Generates the relative URL for the package details page, optionally with a specified tab and anchor fragment.
         /// </summary>
         /// <param name="scope">The owning scope or publisher name.</param>
         /// <param name="packageShortname">The package short name.</param>
         /// <param name="tab">The optional content tab identifier.</param>
+        /// <param name="fragment">The optional anchor fragment identifier without a leading hash.</param>
         /// <returns>The formatted package route path.</returns>
-        public static string GetPackageRoute(string scope, string packageShortname, string tab = null)
+        public static string GetPackageRoute(string scope, string packageShortname, string tab = null, string fragment = null)
         {
             var cleanScope = scope.CleanScope();
 
-            if (string.IsNullOrWhiteSpace(tab))
-            {
-                return $"/packages/{cleanScope}/{packageShortname}";
-            }
+            var route = string.IsNullOrWhiteSpace(tab)
+                ? $"/packages/{cleanScope}/{packageShortname}"
+                : $"/packages/{cleanScope}/{packageShortname}/{tab.ToLowerInvariant()}";
 
-            return $"/packages/{cleanScope}/{packageShortname}/{tab.ToLowerInvariant()}";
+            return string.IsNullOrWhiteSpace(fragment)
+                ? route
+                : $"{route}#{fragment.TrimStart('#')}";
         }
 
         /// <summary>

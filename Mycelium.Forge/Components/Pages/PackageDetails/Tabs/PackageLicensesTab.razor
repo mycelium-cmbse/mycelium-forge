@@ -35,7 +35,8 @@
         @foreach (var license in this.Licenses)
         {
             <div @key="license.Id"
-                 class="w-full rounded-lg bg-background border border-border p-4 flex flex-col gap-3">
+                 id="@(license.SpdxIdentifier)"
+                 class="w-full rounded-lg bg-background border border-border p-4 flex flex-col gap-3 scroll-mt-6">
                 <div class="flex items-center justify-between gap-2">
                     <span class="text-sm leading-xs font-semibold text-foreground">
                         @(license.Name)
