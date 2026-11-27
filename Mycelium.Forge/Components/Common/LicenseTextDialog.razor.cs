@@ -16,7 +16,7 @@ namespace Mycelium.Forge.Components.Common
     using Mycelium.Forge.Common;
 
     /// <summary>
-    /// Represents a modal dialog displaying the full legal text of a supported <see cref="License" />.
+    /// Represents a modal dialog displaying the full legal text of a supported <see cref="ILicense" />.
     /// </summary>
     public partial class LicenseTextDialog : ComponentBase
     {
@@ -27,10 +27,10 @@ namespace Mycelium.Forge.Components.Common
         public IDialogReference DialogReference { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="License" /> whose details and full text are displayed.
+        /// Gets or sets the <see cref="ILicense" /> whose details and full text are displayed.
         /// </summary>
         [Parameter]
-        public License License { get; set; }
+        public ILicense License { get; set; }
 
         /// <summary>
         /// Closes the license text dialog.

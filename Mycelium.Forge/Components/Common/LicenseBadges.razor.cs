@@ -30,7 +30,7 @@ namespace Mycelium.Forge.Components.Common
         /// Gets or sets the collection of applicable licenses to display.
         /// </summary>
         [Parameter]
-        public IReadOnlyList<License> Licenses { get; set; } = [];
+        public IReadOnlyList<ILicense> Licenses { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the fallback text displayed when no licenses are present.
@@ -45,11 +45,11 @@ namespace Mycelium.Forge.Components.Common
         public string ContainerClass { get; set; } = "flex flex-wrap items-center justify-end gap-1.5";
 
         /// <summary>
-        /// Opens the <see cref="LicenseTextDialog" /> showing the full legal text for the selected <see cref="License" />.
+        /// Opens the <see cref="LicenseTextDialog" /> showing the full legal text for the selected <see cref="ILicense" />.
         /// </summary>
-        /// <param name="license">The <see cref="License" /> to display.</param>
+        /// <param name="license">The <see cref="ILicense" /> to display.</param>
         /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public async Task OpenLicenseTextDialog(License license)
+        public async Task OpenLicenseTextDialog(ILicense license)
         {
             if (license == null)
             {

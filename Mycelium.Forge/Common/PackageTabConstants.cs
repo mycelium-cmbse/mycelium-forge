@@ -43,5 +43,10 @@ namespace Mycelium.Forge.Common
         /// The validation content tab identifier.
         /// </summary>
         public const string Validation = "validation";
+
+        /// <summary>
+        /// The licenses content tab identifier.
+        /// </summary>
+        public const string Licenses = "licenses";
     }
 }

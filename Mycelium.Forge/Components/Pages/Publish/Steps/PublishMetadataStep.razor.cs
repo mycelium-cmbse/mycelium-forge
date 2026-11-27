@@ -231,16 +231,15 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         }
 
         /// <summary>
-        /// Resolves the selected <see cref="License" /> entities matching the current package version's applicable license identifiers.
+        /// Resolves the selected <see cref="ILicense" /> entities matching the current package version's applicable license identifiers.
         /// </summary>
-        /// <returns>A read-only list of selected <see cref="License" /> entities.</returns>
-        public IReadOnlyList<License> GetSelectedLicenses()
+        /// <returns>A read-only list of selected <see cref="ILicense" /> entities.</returns>
+        public IReadOnlyList<ILicense> GetSelectedLicenses()
         {
             return
             [
                 .. this.ViewModel.AvailableLicenses
                     .Where(license => this.ViewModel.PackageVersion.ApplicableLicenses.Contains(license.Id))
-                    .OfType<License>()
             ];
         }
 

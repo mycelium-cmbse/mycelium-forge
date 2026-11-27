@@ -61,7 +61,8 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             PackageTabConstants.Dependencies,
             PackageTabConstants.Dependents,
             PackageTabConstants.Versions,
-            PackageTabConstants.Validation
+            PackageTabConstants.Validation,
+            PackageTabConstants.Licenses
         ];
 
         /// <summary>

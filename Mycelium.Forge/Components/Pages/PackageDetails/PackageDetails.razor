@@ -153,6 +153,10 @@
                 <PackageValidationTab Checks="@(this.ViewModel.QualityChecks)"
                                       Version="@(this.ViewModel.CurrentVersion)"/>
             }
+            else if (this.SelectedContentTab == PackageTabConstants.Licenses)
+            {
+                <PackageLicensesTab Licenses="@(this.ViewModel.ApplicableLicenses)"/>
+            }
         </div>
 
         <aside class="w-full lg:w-[340px] shrink-0 flex flex-col gap-4">
@@ -173,7 +177,26 @@
 
                 <div class="flex items-start justify-between gap-2 text-xs leading-2xs">
                     <span class="text-muted-foreground shrink-0 pt-0.5">License</span>
-                    <LicenseBadges Licenses="@([.. this.ViewModel.ApplicableLicenses.OfType<License>()])" />
+                    @if (this.ViewModel.ApplicableLicenses.Count == 0)
+                    {
+                        <span class="text-muted-foreground font-medium">None</span>
+                    }
+                    else
+                    {
+                        <div class="flex flex-wrap items-center justify-end gap-1.5">
+                            @foreach (var license in this.ViewModel.ApplicableLicenses)
+                            {
+                                <a @key="license.Id"
+                                   href="@(PageRoutes.GetPackageRoute(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, PackageTabConstants.Licenses))"
+                                   title="@($"View {license.SpdxIdentifier} license text")">
+                                    <BbBadge Variant="BadgeVariant.Outline"
+                                             Class="badge-format hover:border-primary hover:text-primary transition-colors">
+                                        @(license.SpdxIdentifier)
+                                    </BbBadge>
+                                </a>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">

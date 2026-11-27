@@ -252,9 +252,9 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(step.HasSelectedLicenses, Is.True);
-                Assert.That(step.GetSelectedLicenses(), Is.EqualTo((License[])[this.mitLicense]));
+                Assert.That(step.GetSelectedLicenses(), Is.EqualTo((ILicense[])[this.mitLicense]));
                 Assert.That(licenseBadges, Has.Count.EqualTo(1));
-                Assert.That(licenseBadges[0].Instance.Licenses, Is.EqualTo((License[])[this.mitLicense]));
+                Assert.That(licenseBadges[0].Instance.Licenses, Is.EqualTo((ILicense[])[this.mitLicense]));
                 Assert.That(renderedStep.Markup, Does.Contain("Click a badge to view the full license text."));
             }
         }
