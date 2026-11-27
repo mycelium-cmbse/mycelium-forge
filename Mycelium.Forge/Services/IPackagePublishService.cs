@@ -37,7 +37,8 @@ namespace Mycelium.Forge.Services
         Task<ErrorOr<IArtifactManifest>> ExtractManifestAsync(IUserContext userContext, Stream archiveStream, ArtifactKind kind, string formatName, IPackage package, IPackageVersion packageVersion, bool isExistingPackage, CancellationToken token = default);
 
         /// <summary>
-        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, and semver progression).
+        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, semver progression, and
+        /// license).
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="selectedScope">The owning scope of the package.</param>

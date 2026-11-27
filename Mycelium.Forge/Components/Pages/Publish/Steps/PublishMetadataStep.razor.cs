@@ -25,19 +25,6 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
     public partial class PublishMetadataStep : ComponentBase
     {
         /// <summary>
-        /// The available SPDX license identifier options.
-        /// </summary>
-        private static readonly IReadOnlyList<string> LicenseOptions =
-        [
-            "Apache-2.0",
-            "MIT",
-            "BSD-3-Clause",
-            "GPL-3.0",
-            "EPL-2.0",
-            "Proprietary"
-        ];
-
-        /// <summary>
         /// The available package visibility options.
         /// </summary>
         private static readonly IReadOnlyList<VisibilityKind> VisibilityOptions = Enum.GetValues<VisibilityKind>();
@@ -109,6 +96,11 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// Gets a value indicating whether the selected scope is an organization.
         /// </summary>
         public bool IsScopeOrganization => this.ViewModel.SelectedScope is IOrganization;
+
+        /// <summary>
+        /// Gets a value indicating whether at least one applicable license has been selected.
+        /// </summary>
+        public bool HasSelectedLicenses => this.ViewModel.PackageVersion.ApplicableLicenses.Count > 0;
 
         /// <summary>
         /// Gets the formatted `@scope/packageName` coordinate string for display.
@@ -239,12 +231,25 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         }
 
         /// <summary>
-        /// Handles changes to the package license selection.
+        /// Resolves the selected <see cref="ILicense" /> entities matching the current package version's applicable license identifiers.
         /// </summary>
-        /// <param name="license">The selected license identifier.</param>
-        public void OnLicenseChanged(string license)
+        /// <returns>A read-only list of selected <see cref="ILicense" /> entities.</returns>
+        public IReadOnlyList<ILicense> GetSelectedLicenses()
         {
-            this.ViewModel.License = license;
+            return
+            [
+                .. this.ViewModel.AvailableLicenses
+                    .Where(license => this.ViewModel.PackageVersion.ApplicableLicenses.Contains(license.Id))
+            ];
+        }
+
+        /// <summary>
+        /// Handles changes to the selected package license identifiers.
+        /// </summary>
+        /// <param name="licenseIds">The updated collection of selected license identifiers.</param>
+        public void OnLicensesChanged(IEnumerable<Guid> licenseIds)
+        {
+            this.ViewModel.PackageVersion.ApplicableLicenses = [.. licenseIds ?? []];
         }
 
         /// <summary>

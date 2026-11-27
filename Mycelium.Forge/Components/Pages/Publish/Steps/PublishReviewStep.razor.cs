@@ -129,7 +129,14 @@ namespace Mycelium.Forge.Components.Pages.Publish.Steps
         /// <returns>The license display string.</returns>
         public string GetLicenseText()
         {
-            return string.IsNullOrWhiteSpace(this.ViewModel.License) ? "None" : this.ViewModel.License;
+            List<string> identifiers =
+            [
+                .. this.ViewModel.AvailableLicenses
+                    .Where(license => this.ViewModel.PackageVersion.ApplicableLicenses.Contains(license.Id))
+                    .Select(license => license.SpdxIdentifier)
+            ];
+
+            return identifiers.Count > 0 ? string.Join(", ", identifiers) : "None";
         }
 
         /// <summary>

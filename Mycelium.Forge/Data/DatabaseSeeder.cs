@@ -64,6 +64,11 @@ namespace Mycelium.Forge.Data
         private readonly IForgeService forgeService;
 
         /// <summary>
+        /// The domain service for <see cref="ILicense" /> entities.
+        /// </summary>
+        private readonly ILicenseService licenseService;
+
+        /// <summary>
         /// The logger for diagnostic messages.
         /// </summary>
         private readonly ILogger<DatabaseSeeder> logger;
@@ -104,6 +109,7 @@ namespace Mycelium.Forge.Data
         /// <param name="forgeService">The domain service for <see cref="IForge" /> entities.</param>
         /// <param name="countryService">The domain service for <see cref="ICountry" /> entities.</param>
         /// <param name="packageTypeService">The domain service for <see cref="IPackageType" /> entities.</param>
+        /// <param name="licenseService">The domain service for <see cref="ILicense" /> entities.</param>
         /// <param name="accountService">The domain service for <see cref="IAccount" /> entities.</param>
         /// <param name="organizationService">The domain service for <see cref="IOrganization" /> entities.</param>
         /// <param name="organizationInvitationService">The domain service for <see cref="IOrganizationInvitation" /> entities.</param>
@@ -116,11 +122,12 @@ namespace Mycelium.Forge.Data
         /// <param name="databaseMigrator">The database migration service.</param>
         /// <param name="databaseSource">The database connection provider.</param>
         /// <param name="artifactStore">The artifact storage service for seed archive blobs.</param>
-        public DatabaseSeeder(IForgeService forgeService, ICountryService countryService, IPackageTypeService packageTypeService, IAccountService accountService, IOrganizationService organizationService, IOrganizationInvitationService organizationInvitationService, IPackageService packageService, IPackageVersionService packageVersionService, IPackageInvitationService packageInvitationService, IAPIKeyService apiKeyService, DatabaseConfig databaseConfig, ILogger<DatabaseSeeder> logger, IDatabaseMigrator databaseMigrator, IDatabaseSource databaseSource, IArtifactStore artifactStore)
+        public DatabaseSeeder(IForgeService forgeService, ICountryService countryService, IPackageTypeService packageTypeService, ILicenseService licenseService, IAccountService accountService, IOrganizationService organizationService, IOrganizationInvitationService organizationInvitationService, IPackageService packageService, IPackageVersionService packageVersionService, IPackageInvitationService packageInvitationService, IAPIKeyService apiKeyService, DatabaseConfig databaseConfig, ILogger<DatabaseSeeder> logger, IDatabaseMigrator databaseMigrator, IDatabaseSource databaseSource, IArtifactStore artifactStore)
         {
             ArgumentNullException.ThrowIfNull(forgeService);
             ArgumentNullException.ThrowIfNull(countryService);
             ArgumentNullException.ThrowIfNull(packageTypeService);
+            ArgumentNullException.ThrowIfNull(licenseService);
             ArgumentNullException.ThrowIfNull(accountService);
             ArgumentNullException.ThrowIfNull(organizationService);
             ArgumentNullException.ThrowIfNull(organizationInvitationService);
@@ -137,6 +144,7 @@ namespace Mycelium.Forge.Data
             this.forgeService = forgeService;
             this.countryService = countryService;
             this.packageTypeService = packageTypeService;
+            this.licenseService = licenseService;
             this.accountService = accountService;
             this.organizationService = organizationService;
             this.organizationInvitationService = organizationInvitationService;
@@ -190,6 +198,7 @@ namespace Mycelium.Forge.Data
                         var success = await this.SeedThing(seederUserContext, transaction, this.forgeService, [SeedData.Forge], cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.countryService, SeedData.Countries, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.packageTypeService, SeedData.PackageTypes, cancellationToken) &&
+                                      await this.SeedThing(seederUserContext, transaction, this.licenseService, SeedData.Licenses, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.accountService, SeedData.Accounts, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.organizationService, SeedData.Organizations, cancellationToken) &&
                                       await this.SeedThing(seederUserContext, transaction, this.organizationInvitationService, SeedData.OrganizationInvitations, cancellationToken) &&

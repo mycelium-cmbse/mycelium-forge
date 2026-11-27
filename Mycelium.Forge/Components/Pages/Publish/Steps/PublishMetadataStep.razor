@@ -181,6 +181,34 @@ else
                   Errors="@(this.ValidationManager[nameof(IPackageVersion.ReleaseNotes)])"/>
 </BbField>
 
+<BbField Class="w-full flex flex-col gap-1.5">
+    <BbFieldLabel For="publish-license"
+                  Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+        LICENSE
+    </BbFieldLabel>
+    <BbFieldContent>
+        <BbMultiSelect id="publish-license"
+                       TValue="Guid"
+                       Options="@(this.ViewModel.AvailableLicenses.Select(license => new SelectOption<Guid>(license.Id, license.Name)))"
+                       Values="@(this.ViewModel.PackageVersion.ApplicableLicenses)"
+                       ValuesChanged="@(this.OnLicensesChanged)"
+                       Placeholder="Select applicable licenses..."
+                       SearchPlaceholder="Search SPDX licenses..."
+                       EmptyMessage="No matching licenses."
+                       MatchTriggerWidth="true"
+                       ShowSelectAll="false"
+                       Class="w-full"/>
+    </BbFieldContent>
+    @if (this.HasSelectedLicenses)
+    {
+        <LicenseBadges Licenses="@(this.GetSelectedLicenses())"
+                       ContainerClass="flex flex-wrap items-center gap-1.5 pt-1"/>
+        <BbFieldDescription Class="text-2xs leading-3xs font-normal text-muted-foreground">
+            Click a badge to view the full license text.
+        </BbFieldDescription>
+    }
+</BbField>
+
 @if (!this.ViewModel.IsExistingPackage)
 {
     <BbField Class="w-full flex flex-col gap-1.5"
@@ -197,20 +225,6 @@ else
         </BbFieldContent>
         <BbFieldError Class="form-field-error"
                       Errors="@(this.ValidationManager[nameof(IPackage.Description)])"/>
-    </BbField>
-
-    <BbField Class="w-full flex flex-col gap-1.5">
-        <BbFieldLabel For="publish-license"
-                      Class="text-2xs leading-3xs font-semibold uppercase tracking-wider text-muted-foreground">
-            LICENSE
-        </BbFieldLabel>
-        <BbFieldContent>
-            <ForgeSelect TValue="string"
-                         Value="@(this.ViewModel.License)"
-                         ValueChanged="@(this.OnLicenseChanged)"
-                         Items="@(LicenseOptions)"
-                         Id="publish-license"/>
-        </BbFieldContent>
     </BbField>
 
     <BbField Class="w-full flex flex-col gap-1.5">

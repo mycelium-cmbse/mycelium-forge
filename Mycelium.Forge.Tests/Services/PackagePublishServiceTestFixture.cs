@@ -45,6 +45,7 @@ namespace Mycelium.Forge.Tests.Services
         private Mock<IPackageService> packageServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
         private Mock<IPackageTypeService> packageTypeServiceMock;
+        private Mock<ILicenseService> licenseServiceMock;
         private Mock<ILogger<PackagePublishService>> loggerMock;
         private PackagePublishService service;
         private IUserContext userContext;
@@ -59,6 +60,7 @@ namespace Mycelium.Forge.Tests.Services
             this.packageServiceMock = new Mock<IPackageService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
             this.packageTypeServiceMock = new Mock<IPackageTypeService>();
+            this.licenseServiceMock = new Mock<ILicenseService>();
             this.loggerMock = new Mock<ILogger<PackagePublishService>>();
             this.loggerMock.Setup(x => x.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
@@ -73,8 +75,9 @@ namespace Mycelium.Forge.Tests.Services
             this.packageServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync((IUserContext _, NpgsqlTransaction _, CancellationToken _, Guid[] ids) => ImmutableList.Create<IPackage>(new Package { Id = ids?.FirstOrDefault() ?? Guid.NewGuid(), ShortName = "existing", Version = [] }));
             this.packageServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackage>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
             this.packageVersionServiceMock.Setup(x => x.CreateAsync(this.userContext, It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageVersion>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Created);
+            this.licenseServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList<ILicense>.Empty);
 
-            this.service = new PackagePublishService(this.artifactStoreMock.Object, this.databaseSourceMock.Object, this.manifestExtractors, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.loggerMock.Object);
+            this.service = new PackagePublishService(this.artifactStoreMock.Object, this.databaseSourceMock.Object, this.manifestExtractors, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.licenseServiceMock.Object, this.loggerMock.Object);
         }
 
         [Test]
@@ -427,10 +430,16 @@ namespace Mycelium.Forge.Tests.Services
                 Assert.That(majorNoNotesResult.First(x => x.Title == ValidationTypes.PackageVersion).Detail, Does.Contain("major-version update requires release notes"));
             }
 
-            // Case 5: Major bump with release notes passes
+            // Case 5: Major bump with release notes and supported license passes
+            var apacheLicense = new License { Id = Guid.NewGuid(), Name = "Apache License 2.0", SpdxIdentifier = "Apache-2.0", LicenseText = "Apache text" };
+            var mitLicense = new License { Id = Guid.NewGuid(), Name = "MIT License", SpdxIdentifier = "MIT", LicenseText = "MIT text" };
+            this.licenseServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == apacheLicense.Id))).ReturnsAsync(ImmutableList.Create<ILicense>(apacheLicense));
+
             packageVersion.ReleaseNotes = "Breaking changes included.";
+            packageVersion.ApplicableLicenses = [apacheLicense.Id];
             var majorWithNotesResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, true, ["1.0.0"]);
             Assert.That(majorWithNotesResult.All(x => x.Status == ValidationStatus.Pass), Is.True);
+            packageVersion.ApplicableLicenses = [];
 
             // Case 6: New package with coordinate collision returns namespace fail
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", true, It.IsAny<CancellationToken>())).ReturnsAsync(new Package { Id = Guid.NewGuid() });
@@ -454,6 +463,45 @@ namespace Mycelium.Forge.Tests.Services
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", true, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Failure(description: "Database connection failed"));
             var dbErrorResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, []);
             Assert.That(dbErrorResult.Any(x => x.Title == ValidationTypes.NamespaceUniqueness && x.Status == ValidationStatus.Fail), Is.True);
+
+            // Case 10: Empty ApplicableLicenses returns License Warning
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "sysml-core", true, It.IsAny<CancellationToken>())).ReturnsAsync(Error.NotFound());
+            packageVersion.ApplicableLicenses = [];
+            var noLicenseResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, []);
+            var noLicenseCheck = noLicenseResult.First(x => x.Title == ValidationTypes.License);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(noLicenseCheck.Status, Is.EqualTo(ValidationStatus.Warning));
+                Assert.That(noLicenseCheck.Detail, Does.Contain("No license selected"));
+            }
+
+            // Case 11: Supported ApplicableLicenses resolves SPDX identifiers and returns License Pass
+            packageVersion.ApplicableLicenses = [apacheLicense.Id, mitLicense.Id];
+            this.licenseServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 2))).ReturnsAsync(ImmutableList.Create<ILicense>(apacheLicense, mitLicense));
+
+            var validLicensesResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, []);
+            var validLicensesCheck = validLicensesResult.First(x => x.Title == ValidationTypes.License);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(validLicensesCheck.Status, Is.EqualTo(ValidationStatus.Pass));
+                Assert.That(validLicensesCheck.Detail, Does.Contain("Apache-2.0, MIT"));
+            }
+
+            // Case 12: Missing or unsupported license identifier returns License Fail
+            var missingLicenseId = Guid.NewGuid();
+            packageVersion.ApplicableLicenses = [apacheLicense.Id, missingLicenseId];
+            this.licenseServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 2))).ReturnsAsync(ImmutableList.Create<ILicense>(apacheLicense));
+
+            var invalidLicenseResult = await this.service.ValidateReleaseAsync(this.userContext, scope, package, packageVersion, false, []);
+            var invalidLicenseCheck = invalidLicenseResult.First(x => x.Title == ValidationTypes.License);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(invalidLicenseCheck.Status, Is.EqualTo(ValidationStatus.Fail));
+                Assert.That(invalidLicenseCheck.Detail, Does.Contain("not supported by the registry"));
+            }
         }
     }
 }

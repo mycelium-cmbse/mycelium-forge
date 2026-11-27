@@ -20,7 +20,6 @@ namespace Mycelium.Forge.ViewModels.Publish
     using Mycelium.Forge.Dal.Services;
     using Mycelium.Forge.Extensions;
     using Mycelium.Forge.Extractors.Models;
-    using Mycelium.Forge.Extractors.Models.EcssC3;
     using Mycelium.Forge.Extractors.Models.Kpar;
     using Mycelium.Forge.Models.Publish;
     using Mycelium.Forge.Models.Validation;
@@ -40,6 +39,11 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// The (injected) <see cref="IFileUploadStagingService" /> upload staging service.
         /// </summary>
         private readonly IFileUploadStagingService fileUploadStagingService;
+
+        /// <summary>
+        /// The (injected) <see cref="ILicenseService" /> domain service.
+        /// </summary>
+        private readonly ILicenseService licenseService;
 
         /// <summary>
         /// The (injected) <see cref="IMemoryCache" /> cache instance used for invalidating cached package details.
@@ -99,20 +103,20 @@ namespace Mycelium.Forge.ViewModels.Publish
         /// <param name="packageService">The (injected) <see cref="IPackageService" />.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" />.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" />.</param>
+        /// <param name="licenseService">The (injected) <see cref="ILicenseService" />.</param>
         /// <param name="databaseSource">The (injected) <see cref="IDatabaseSource" />.</param>
         /// <param name="fileUploadStagingService">The (injected) <see cref="IFileUploadStagingService" />.</param>
         /// <param name="packagePublishService">The (injected) <see cref="IPackagePublishService" />.</param>
         /// <param name="packageVersionPermissionService">The (injected) <see cref="IPackageVersionPermissionService" />.</param>
         /// <param name="memoryCache">The (injected) <see cref="IMemoryCache" />.</param>
-        public PublishViewModel(IUserService userService, IScopeService scopeService, IPackageService packageService, IPackageVersionService packageVersionService,
-            IPackageTypeService packageTypeService, IDatabaseSource databaseSource, IFileUploadStagingService fileUploadStagingService, IPackagePublishService packagePublishService,
-            IPackageVersionPermissionService packageVersionPermissionService, IMemoryCache memoryCache)
+        public PublishViewModel(IUserService userService, IScopeService scopeService, IPackageService packageService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, ILicenseService licenseService, IDatabaseSource databaseSource, IFileUploadStagingService fileUploadStagingService, IPackagePublishService packagePublishService, IPackageVersionPermissionService packageVersionPermissionService, IMemoryCache memoryCache)
         {
             this.userService = userService;
             this.scopeService = scopeService;
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
             this.packageTypeService = packageTypeService;
+            this.licenseService = licenseService;
             this.databaseSource = databaseSource;
             this.fileUploadStagingService = fileUploadStagingService;
             this.packagePublishService = packagePublishService;
@@ -182,9 +186,9 @@ namespace Mycelium.Forge.ViewModels.Publish
         public bool IsPublishing { get; set; }
 
         /// <summary>
-        /// Gets or sets the temporary SPDX license identifier for the package being published.
+        /// Gets the closed set of supported licenses available for selection.
         /// </summary>
-        public string License { get; set; } = string.Empty;
+        public IReadOnlyList<ILicense> AvailableLicenses { get; private set; } = [];
 
         /// <summary>
         /// Gets or sets the temporary collection of tags associated with the package being published.
@@ -255,6 +259,9 @@ namespace Mycelium.Forge.ViewModels.Publish
             var packageVersions = await this.packageVersionService.ReadOrEmpty(this.userContext, this.Package.Version);
             this.ExistingVersions = [.. packageVersions.Select(x => x.Version).OrderDescending(SemanticVersionComparer.Instance)];
 
+            var latestVersion = packageVersions.OrderByDescending(x => x.Version, SemanticVersionComparer.Instance).First();
+            this.PackageVersion.ApplicableLicenses = [.. latestVersion.ApplicableLicenses];
+
             this.SelectedScope = await this.scopeService.ReadOrNull(this.userContext, this.Package.Owner);
 
             var permissionResult = await this.packageVersionPermissionService.IsAllowedToCreate(this.databaseSource, this.userContext, this.PackageVersion);
@@ -284,7 +291,6 @@ namespace Mycelium.Forge.ViewModels.Publish
             if (extractResult.IsError)
             {
                 this.Dependencies = [];
-                this.License = string.Empty;
                 this.Tags = [];
                 await this.Validate(extractResult.Errors);
                 return false;
@@ -298,31 +304,6 @@ namespace Mycelium.Forge.ViewModels.Publish
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Maps the license and tags declared by the extracted manifest onto the package being published.
-        /// </summary>
-        /// <param name="manifest">The extracted artefact manifest.</param>
-        private void ApplyManifestMetadata(IArtifactManifest manifest)
-        {
-            switch (manifest)
-            {
-                case KparManifest kpar:
-                    this.License = kpar.License;
-                    this.Tags = kpar.Topics ?? [];
-                    break;
-
-                case EcssC3Manifest ecss:
-                    this.License = ecss.Copyright;
-                    this.Tags = [];
-                    break;
-
-                default:
-                    this.License = string.Empty;
-                    this.Tags = [];
-                    break;
-            }
         }
 
         /// <summary>
@@ -427,8 +408,9 @@ namespace Mycelium.Forge.ViewModels.Publish
                 SizeInBytes = 0
             };
 
+            var licenses = await this.licenseService.ReadOrEmpty(this.userContext, emptyWhenNoIds: false);
+            this.AvailableLicenses = [.. licenses.OrderBy(x => x.SpdxIdentifier, StringComparer.OrdinalIgnoreCase)];
             this.Dependencies = [];
-            this.License = string.Empty;
             this.Tags = [];
         }
 
@@ -454,6 +436,45 @@ namespace Mycelium.Forge.ViewModels.Publish
                                               || (canPublish && (organization.Member.Contains(accountId) || organization.Administrator.Contains(accountId))),
                 _ => false
             };
+        }
+
+        /// <summary>
+        /// Maps the license and tags declared by the extracted manifest onto the package and version being published.
+        /// </summary>
+        /// <param name="manifest">The extracted artefact manifest.</param>
+        private void ApplyManifestMetadata(IArtifactManifest manifest)
+        {
+            switch (manifest)
+            {
+                case KparManifest kpar:
+                    this.ApplyDeclaredManifestLicense(kpar.License);
+                    this.Tags = kpar.Topics ?? [];
+                    break;
+
+                default:
+                    this.Tags = [];
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Resolves a license string declared in a manifest against the supported Forge licenses.
+        /// </summary>
+        /// <param name="declaredLicense">The raw license identifier declared by the manifest.</param>
+        private void ApplyDeclaredManifestLicense(string declaredLicense)
+        {
+            if (string.IsNullOrWhiteSpace(declaredLicense))
+            {
+                return;
+            }
+
+            var trimmed = declaredLicense.Trim();
+            var matched = this.AvailableLicenses.FirstOrDefault(license => license.SpdxIdentifier.Equals(trimmed, StringComparison.OrdinalIgnoreCase));
+
+            if (matched != null)
+            {
+                this.PackageVersion.ApplicableLicenses = [matched.Id];
+            }
         }
     }
 }

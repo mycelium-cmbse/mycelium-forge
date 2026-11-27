@@ -63,6 +63,7 @@
         <!-- DD-18: migrations are numbered, forward-only SQL scripts embedded in the assembly and
              journalled by DbUp - see Orm/Migrator.cs. -->
         <EmbeddedResource Include="Orm\Migrations\*.sql" />
+        <EmbeddedResource Include="Data\Resources\licenses.json" />
         <EmbeddedResource Include="Data\Resources\seed_model.kpar" />
     </ItemGroup>
 

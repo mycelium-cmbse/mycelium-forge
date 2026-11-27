@@ -65,7 +65,7 @@
         </p>
 
         <p class="text-xs leading-2xs text-muted-foreground">
-            Published recently by <a href="@(PageRoutes.GetScopeRoute(this.ViewModel.Owner))" class="hover:text-foreground hover:underline transition-colors">@@@(this.ViewModel.Owner.ShortName)</a> · @(this.ViewModel.License) · @(this.ViewModel.DownloadCount.ToCompactMetric()) downloads
+            Published recently by <a href="@(PageRoutes.GetScopeRoute(this.ViewModel.Owner))" class="hover:text-foreground hover:underline transition-colors">@@@(this.ViewModel.Owner.ShortName)</a> · @(this.GetLicenseSummary()) · @(this.ViewModel.DownloadCount.ToCompactMetric()) downloads
         </p>
 
         <PackageDetailsActions Package="@(this.ViewModel.Package)"
@@ -73,7 +73,7 @@
                                SelectedVersion="@(this.ViewModel.CurrentVersion)"
                                IsUserAdmin="@(this.ViewModel.IsUserAdmin)"/>
 
-        <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-border">
+        <div class="w-full rounded-lg bg-card border border-border grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border">
             <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
                 <span class="section-label">
                     DOWNLOADS
@@ -104,14 +104,6 @@
                 </span>
                 <span class="text-xl leading-lg font-semibold text-foreground">
                     @(this.GetPublishedAgo())
-                </span>
-            </div>
-            <div class="p-3.5 px-5 flex flex-col items-start gap-0.5">
-                <span class="section-label">
-                    LICENSE
-                </span>
-                <span class="text-xl leading-lg font-semibold text-foreground">
-                    @(this.ViewModel.License)
                 </span>
             </div>
         </div>
@@ -161,6 +153,10 @@
                 <PackageValidationTab Checks="@(this.ViewModel.QualityChecks)"
                                       Version="@(this.ViewModel.CurrentVersion)"/>
             }
+            else if (this.SelectedContentTab == PackageTabConstants.Licenses)
+            {
+                <PackageLicensesTab Licenses="@(this.ViewModel.ApplicableLicenses)"/>
+            }
         </div>
 
         <aside class="w-full lg:w-[340px] shrink-0 flex flex-col gap-4">
@@ -179,12 +175,28 @@
                     <span class="font-medium text-foreground text-right">@(this.GetPublishedAgo())</span>
                 </div>
 
-                <div class="flex items-center justify-between gap-2 text-xs leading-2xs">
-                    <span class="text-muted-foreground">License</span>
-                    <BbBadge Variant="BadgeVariant.Outline"
-                             Class="badge-format">
-                        @(this.ViewModel.License)
-                    </BbBadge>
+                <div class="flex items-start justify-between gap-2 text-xs leading-2xs">
+                    <span class="text-muted-foreground shrink-0 pt-0.5">License</span>
+                    @if (this.ViewModel.ApplicableLicenses.Count == 0)
+                    {
+                        <span class="text-muted-foreground font-medium">None</span>
+                    }
+                    else
+                    {
+                        <div class="flex flex-wrap items-center justify-end gap-1.5">
+                            @foreach (var license in this.ViewModel.ApplicableLicenses)
+                            {
+                                <a @key="license.Id"
+                                   href="@(PageRoutes.GetPackageRoute(this.ViewModel.Owner.ShortName, this.ViewModel.Package.ShortName, PackageTabConstants.Licenses, license.SpdxIdentifier))"
+                                   title="@($"View {license.SpdxIdentifier} license text")">
+                                    <BbBadge Variant="BadgeVariant.Outline"
+                                             Class="badge-format hover:border-primary hover:text-primary transition-colors">
+                                        @(license.SpdxIdentifier)
+                                    </BbBadge>
+                                </a>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <div class="flex items-center justify-between gap-2 text-xs leading-2xs">

@@ -36,6 +36,11 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         private readonly IDatabaseSource databaseSource;
 
         /// <summary>
+        /// The (injected) <see cref="ILicenseService" /> used to retrieve license data.
+        /// </summary>
+        private readonly ILicenseService licenseService;
+
+        /// <summary>
         /// The (injected) <see cref="ILogger{PackageDetailsViewModel}" /> used for diagnostic logging.
         /// </summary>
         private readonly ILogger<PackageDetailsViewModel> logger;
@@ -83,18 +88,20 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// <param name="scopeService">The (injected) <see cref="IScopeService" />.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" />.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" />.</param>
+        /// <param name="licenseService">The (injected) <see cref="ILicenseService" />.</param>
         /// <param name="accountService">The (injected) <see cref="IAccountService" />.</param>
         /// <param name="userService">The (injected) <see cref="IUserService" />.</param>
         /// <param name="memoryCache">The (injected) <see cref="IMemoryCache" />.</param>
         /// <param name="packagePermissionService">The (injected) <see cref="IPackagePermissionService" />.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackageDetailsViewModel}" />.</param>
-        public PackageDetailsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, IAccountService accountService, IUserService userService, IMemoryCache memoryCache, IPackagePermissionService packagePermissionService, ILogger<PackageDetailsViewModel> logger)
+        public PackageDetailsViewModel(IDatabaseSource databaseSource, IPackageService packageService, IScopeService scopeService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, ILicenseService licenseService, IAccountService accountService, IUserService userService, IMemoryCache memoryCache, IPackagePermissionService packagePermissionService, ILogger<PackageDetailsViewModel> logger)
         {
             this.databaseSource = databaseSource;
             this.packageService = packageService;
             this.scopeService = scopeService;
             this.packageVersionService = packageVersionService;
             this.packageTypeService = packageTypeService;
+            this.licenseService = licenseService;
             this.accountService = accountService;
             this.userService = userService;
             this.memoryCache = memoryCache;
@@ -128,12 +135,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         public int DownloadCount => this.Package.ComputeDownloadCount(this.Versions);
 
         /// <summary>
-        /// Gets the SPDX license identifier for display on the package details page.
+        /// Gets or sets the collection of applicable license DTOs for the current package version.
         /// </summary>
-        /// <remarks>
-        /// Currently populated with mock data. It will be removed in a future version or computed from real model data.
-        /// </remarks>
-        public string License => "Apache-2.0";
+        public IReadOnlyList<ILicense> ApplicableLicenses { get; set; } = [];
 
         /// <summary>
         /// Gets the collection of tag names associated with the package for display.
@@ -242,6 +246,7 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             this.Versions = cachedData.Versions;
             this.CurrentVersion = cachedData.SelectedVersion;
             this.Maintainers = cachedData.Maintainers;
+            this.ApplicableLicenses = cachedData.ApplicableLicenses;
 
             var updatePermissionResult = await this.packagePermissionService.IsAllowedToUpdate(this.databaseSource, userContext, this.Package);
             this.IsUserAdmin = updatePermissionResult.IsSuccess;
@@ -301,6 +306,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
             var selectedVersion = versions[0];
             List<IAccount> maintainers = [.. maintainersTask.Result.DistinctBy(account => account.Id)];
 
+            var applicableLicenses = await this.licenseService.ReadOrEmpty(userContext, selectedVersion.ApplicableLicenses);
+
             var result = new PackageDetailsCacheModel
             {
                 Package = package,
@@ -308,7 +315,8 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
                 PackageType = packageType,
                 Versions = versions,
                 SelectedVersion = selectedVersion,
-                Maintainers = maintainers
+                Maintainers = maintainers,
+                ApplicableLicenses = applicableLicenses
             };
 
             var cacheEntryOptions = new MemoryCacheEntryOptions

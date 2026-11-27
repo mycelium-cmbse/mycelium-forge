@@ -1,0 +1,28 @@
+@* ------------------------------------------------------------------------------------------------
+<copyright file="LicenseTextDialog.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@if (this.License == null)
+{
+    return;
+}
+
+<DialogComponent Class="flex flex-col gap-3 px-6 py-4">
+    <ChildContent>
+        <pre class="max-h-96 w-full overflow-y-auto whitespace-pre-wrap rounded-md bg-background border border-border p-3.5 font-mono text-xs leading-normal text-foreground-muted select-text">@(this.License.LicenseText)</pre>
+    </ChildContent>
+    <Footer>
+        <BbButton id="license-text-dialog-close-button"
+                  Variant="ButtonVariant.Outline"
+                  Size="ButtonSize.Small"
+                  Type="ButtonType.Button"
+                  OnClick="@(this.OnCloseClicked)">
+            Close
+        </BbButton>
+    </Footer>
+</DialogComponent>

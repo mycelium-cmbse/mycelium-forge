@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Data
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Text.Json;
 
     using Mycelium.Forge.Common;
 
@@ -19,6 +20,11 @@ namespace Mycelium.Forge.Data
     [ExcludeFromCodeCoverage]
     public static class SeedData
     {
+        /// <summary>
+        /// The JSON serializer options used when parsing the embedded SPDX license seed resource.
+        /// </summary>
+        private static readonly JsonSerializerOptions LicenseJsonOptions = new() { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip };
+
         static SeedData()
         {
             var forgeId = Guid.NewGuid();
@@ -184,6 +190,15 @@ namespace Mycelium.Forge.Data
                 Cdp4CometPackageType,
                 CapellaPackageType
             ];
+
+            Licenses = LoadLicenses();
+
+            var apache2LicenseId = FindLicenseId("Apache-2.0");
+            var mitLicenseId = FindLicenseId("MIT");
+            var bsd3LicenseId = FindLicenseId("BSD-3-Clause");
+            var lgpl3LicenseId = FindLicenseId("LGPL-3.0-only");
+            var epl2LicenseId = FindLicenseId("EPL-2.0");
+            var eupl12LicenseId = FindLicenseId("EUPL-1.2");
 
             StarionOrganization = new Organization
             {
@@ -374,7 +389,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -386,7 +402,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -398,7 +415,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [eupl12LicenseId]
                 },
                 new PackageVersion
                 {
@@ -410,7 +428,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -422,7 +441,8 @@ namespace Mycelium.Forge.Data
                     PublicationDate = baseDate.AddDays(-21),
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId, mitLicenseId]
                 },
                 new PackageVersion
                 {
@@ -434,7 +454,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [bsd3LicenseId]
                 },
                 new PackageVersion
                 {
@@ -446,7 +467,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "zip",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [lgpl3LicenseId]
                 },
                 new PackageVersion
                 {
@@ -458,7 +480,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "zip",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [epl2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -482,7 +505,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -494,7 +518,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -506,7 +531,8 @@ namespace Mycelium.Forge.Data
                     PublicationDate = baseDate.AddDays(-150),
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [eupl12LicenseId]
                 },
                 new PackageVersion
                 {
@@ -518,7 +544,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -530,7 +557,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "kpar",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [apache2LicenseId]
                 },
                 new PackageVersion
                 {
@@ -542,7 +570,8 @@ namespace Mycelium.Forge.Data
                     Listed = true,
                     CheckSum = seedChecksum,
                     FileExtension = "zip",
-                    SizeInBytes = seedSizeInBytes
+                    SizeInBytes = seedSizeInBytes,
+                    ApplicableLicenses = [lgpl3LicenseId]
                 }
             ];
 
@@ -664,6 +693,11 @@ namespace Mycelium.Forge.Data
         /// Gets the list of initial package types.
         /// </summary>
         public static IReadOnlyList<PackageType> PackageTypes { get; }
+
+        /// <summary>
+        /// Gets the list of supported SPDX and proprietary licenses.
+        /// </summary>
+        public static IReadOnlyList<License> Licenses { get; }
 
         /// <summary>
         /// Gets the primary user account for Regis André.
@@ -814,6 +848,39 @@ namespace Mycelium.Forge.Data
 
             owner.OwnedPackageInvitation.Add(invitation.Id);
             return invitation;
+        }
+
+        /// <summary>
+        /// Loads the curated SPDX license definitions from the embedded <c>licenses.json</c> resource.
+        /// </summary>
+        /// <returns>A read-only list of <see cref="License" /> entities.</returns>
+        private static IReadOnlyList<License> LoadLicenses()
+        {
+            const string resourceName = "Mycelium.Forge.Data.Resources.licenses.json";
+            using var stream = typeof(SeedData).Assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded license resource '{resourceName}' was not found.");
+
+            var records = JsonSerializer.Deserialize<List<JsonElement>>(stream, LicenseJsonOptions) ?? [];
+
+            return
+            [
+                .. records.Select(record => new License
+                {
+                    Id = Guid.NewGuid(),
+                    Name = record.GetProperty("name").GetString(),
+                    SpdxIdentifier = record.GetProperty("spdxIdentifier").GetString(),
+                    LicenseText = record.GetProperty("licenseText").GetString()
+                })
+            ];
+        }
+
+        /// <summary>
+        /// Resolves the unique identifier of the seeded license matching the specified SPDX identifier.
+        /// </summary>
+        /// <param name="spdxIdentifier">The SPDX short-form identifier to resolve.</param>
+        /// <returns>The <see cref="Guid" /> of the matching seeded <see cref="License" />.</returns>
+        private static Guid FindLicenseId(string spdxIdentifier)
+        {
+            return Licenses.First(license => license.SpdxIdentifier.Equals(spdxIdentifier, StringComparison.OrdinalIgnoreCase)).Id;
         }
     }
 }

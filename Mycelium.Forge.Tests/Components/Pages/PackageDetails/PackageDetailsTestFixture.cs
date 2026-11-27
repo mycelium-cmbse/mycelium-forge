@@ -25,6 +25,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
 
     using Mycelium.Forge.Common;
     using Mycelium.Forge.Components.Pages.PackageDetails;
+    using Mycelium.Forge.Components.Pages.PackageDetails.Tabs;
     using Mycelium.Forge.Services;
     using Mycelium.Forge.Tests.TestHelpers;
     using Mycelium.Forge.ViewModels.PackageDetails;
@@ -39,6 +40,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
         private Organization organization;
         private PackageVersion packageVersion;
         private PackageType packageType;
+        private License apacheLicense;
+        private License mitLicense;
 
         [SetUp]
         public void SetUp()
@@ -84,12 +87,28 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Name = "SysML v2"
             };
 
+            this.apacheLicense = new License
+            {
+                Id = Guid.NewGuid(),
+                Name = "Apache License 2.0",
+                SpdxIdentifier = "Apache-2.0",
+                LicenseText = "Apache License 2.0 text"
+            };
+
+            this.mitLicense = new License
+            {
+                Id = Guid.NewGuid(),
+                Name = "MIT License",
+                SpdxIdentifier = "MIT",
+                LicenseText = "MIT License text"
+            };
+
             this.viewModelMock.SetupGet(x => x.Package).Returns(this.package);
             this.viewModelMock.SetupGet(x => x.Owner).Returns(this.organization);
             this.viewModelMock.SetupGet(x => x.PackageType).Returns(this.packageType);
             this.viewModelMock.SetupGet(x => x.CurrentVersion).Returns(this.packageVersion);
             this.viewModelMock.SetupGet(x => x.Versions).Returns([this.packageVersion]);
-            this.viewModelMock.SetupGet(x => x.License).Returns("Apache-2.0");
+            this.viewModelMock.SetupGet(x => x.ApplicableLicenses).Returns([this.apacheLicense]);
             this.viewModelMock.SetupGet(x => x.Tags).Returns([]);
             this.viewModelMock.SetupGet(x => x.Maintainers).Returns([]);
             this.viewModelMock.SetupGet(x => x.Elements).Returns([]);
@@ -129,6 +148,26 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
                 Assert.That(activeClass, Does.Contain("bg-primary/10"));
                 Assert.That(activeClass, Does.Contain("text-primary font-semibold"));
                 Assert.That(inactiveClass, Does.Contain("text-muted-foreground"));
+            }
+        }
+
+        [Test]
+        public void VerifyGetLicenseSummary()
+        {
+            var packageDetailsPage = this.context.Render<PackageDetails>();
+            var singleLicenseSummary = packageDetailsPage.Instance.GetLicenseSummary();
+
+            this.viewModelMock.SetupGet(x => x.ApplicableLicenses).Returns([this.apacheLicense, this.mitLicense]);
+            var multipleLicensesSummary = packageDetailsPage.Instance.GetLicenseSummary();
+
+            this.viewModelMock.SetupGet(x => x.ApplicableLicenses).Returns([]);
+            var emptyLicenseSummary = packageDetailsPage.Instance.GetLicenseSummary();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(singleLicenseSummary, Is.EqualTo("Apache-2.0"));
+                Assert.That(multipleLicensesSummary, Is.EqualTo("Apache-2.0, MIT"));
+                Assert.That(emptyLicenseSummary, Is.EqualTo("No license"));
             }
         }
 
@@ -230,11 +269,36 @@ namespace Mycelium.Forge.Tests.Components.Pages.PackageDetails
             this.viewModelMock.SetupGet(x => x.Owner).Returns(this.organization);
 
             var maintainerLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetAccountRoute("r-andre")}']");
+            var licenseLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetPackageRoute("starion", "ecss-mm-pwr", PackageTabConstants.Licenses)}']");
+            var licenseBadgeLinks = activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetPackageRoute("starion", "ecss-mm-pwr", PackageTabConstants.Licenses, "Apache-2.0")}']");
+
+            this.viewModelMock.SetupGet(x => x.ApplicableLicenses).Returns([]);
+
+            var noLicenseDetailsPage = this.context.Render<PackageDetails>(parameters =>
+            {
+                parameters.Add(p => p.Scope, "starion");
+                parameters.Add(p => p.PackageShortname, "ecss-mm-pwr");
+                parameters.Add(p => p.Tab, PackageTabConstants.Licenses);
+            });
+
+            this.viewModelMock.SetupGet(x => x.ApplicableLicenses).Returns([this.apacheLicense]);
+
+            var licensesTab = noLicenseDetailsPage.FindComponents<PackageLicensesTab>();
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("ECSS-MM-PWR"));
                 Assert.That(activePackageDetailsPage.Markup, Does.Contain("Power subsystem metamodel"));
+                Assert.That(activePackageDetailsPage.Markup, Does.Contain("Apache-2.0"));
+                Assert.That(activePackageDetailsPage.Markup, Does.Contain("DOWNLOADS"));
+                Assert.That(activePackageDetailsPage.Markup, Does.Contain("QUALITY"));
+                Assert.That(activePackageDetailsPage.Markup, Does.Contain("LATEST"));
+                Assert.That(activePackageDetailsPage.Markup, Does.Contain("PUBLISHED"));
+                Assert.That(licenseLinks, Has.Count.EqualTo(1));
+                Assert.That(licenseBadgeLinks, Has.Count.EqualTo(1));
+                Assert.That(noLicenseDetailsPage.Markup, Does.Contain("No license"));
+                Assert.That(noLicenseDetailsPage.Markup, Does.Contain("None"));
+                Assert.That(licensesTab, Has.Count.EqualTo(1));
                 Assert.That(activePackageDetailsPage.FindAll($"a[href='{PageRoutes.GetOrganizationRoute("starion")}']"), Has.Count.GreaterThan(0));
                 Assert.That(maintainerLinks, Has.Count.EqualTo(1));
                 Assert.That(maintainerLinks[0].TextContent.Trim(), Is.EqualTo("R. Andre"));

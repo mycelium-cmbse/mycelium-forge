@@ -33,7 +33,7 @@ namespace Mycelium.Forge.Dal.AutoGenDtoValidator
         /// </summary>
         partial void AddCustomValidation()
         {
-            this.RuleFor(x => x.ShortName).Matches(ShortNameFormatRegex()).WithMessage("Short name must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.");
+            this.RuleFor(x => x.ShortName).Matches(ShortNameFormatRegex()).When(x => x is not ILicense).WithMessage("Short name must start and end with an alphanumeric character and contain only lowercase alphanumeric characters and hyphens.");
         }
     }
 }

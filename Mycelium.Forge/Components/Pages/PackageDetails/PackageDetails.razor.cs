@@ -61,7 +61,8 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             PackageTabConstants.Dependencies,
             PackageTabConstants.Dependents,
             PackageTabConstants.Versions,
-            PackageTabConstants.Validation
+            PackageTabConstants.Validation,
+            PackageTabConstants.Licenses
         ];
 
         /// <summary>
@@ -97,6 +98,17 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
             return string.Equals(this.SelectedContentTab, tab, StringComparison.OrdinalIgnoreCase)
                 ? $"{baseClass} bg-primary/10 text-primary font-semibold"
                 : $"{baseClass} text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium";
+        }
+
+        /// <summary>
+        /// Computes the formatted summary of applicable SPDX license identifiers for the current release.
+        /// </summary>
+        /// <returns>The joined SPDX identifiers, or "No license" when none are declared.</returns>
+        public string GetLicenseSummary()
+        {
+            return this.ViewModel.ApplicableLicenses.Count > 0
+                ? string.Join(", ", this.ViewModel.ApplicableLicenses.Select(license => license.SpdxIdentifier))
+                : "No license";
         }
 
         /// <summary>

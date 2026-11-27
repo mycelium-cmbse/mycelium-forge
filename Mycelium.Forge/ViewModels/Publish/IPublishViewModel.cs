@@ -82,9 +82,9 @@ namespace Mycelium.Forge.ViewModels.Publish
         bool IsPublishing { get; set; }
 
         /// <summary>
-        /// Gets or sets the temporary SPDX license identifier for the package being published.
+        /// Gets the closed set of supported licenses available for selection.
         /// </summary>
-        string License { get; set; }
+        IReadOnlyList<ILicense> AvailableLicenses { get; }
 
         /// <summary>
         /// Gets or sets the temporary collection of tags associated with the package being published.

@@ -1,0 +1,32 @@
+@* ------------------------------------------------------------------------------------------------
+<copyright file="LicenseBadges.razor" company="Starion Group S.A.">
+
+  Copyright 2026 Starion Group S.A.
+  SPDX-License-Identifier: Apache-2.0
+
+</copyright>
+------------------------------------------------------------------------------------------------ *@
+
+@if (this.Licenses == null || this.Licenses.Count == 0)
+{
+    <span class="text-muted-foreground font-medium">@(this.EmptyText)</span>
+}
+else
+{
+    <div class="@(this.ContainerClass)">
+        @foreach (var license in this.Licenses)
+        {
+            <BbButton @key="license.Id"
+                      Variant="ButtonVariant.Ghost"
+                      Type="ButtonType.Button"
+                      OnClick="@(() => this.OpenLicenseTextDialog(license))"
+                      title="@($"View {license.SpdxIdentifier} license text")"
+                      Class="p-0 h-auto min-h-0 hover:bg-transparent">
+                <BbBadge Variant="BadgeVariant.Outline"
+                         Class="badge-format hover:border-primary hover:text-primary transition-colors cursor-pointer">
+                    @(license.SpdxIdentifier)
+                </BbBadge>
+            </BbButton>
+        }
+    </div>
+}

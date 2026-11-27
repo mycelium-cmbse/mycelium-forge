@@ -42,9 +42,9 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         int DownloadCount { get; }
 
         /// <summary>
-        /// Gets the SPDX license identifier for display on the package details page.
+        /// Gets or sets the collection of applicable license DTOs for the current package version.
         /// </summary>
-        string License { get; }
+        IReadOnlyList<ILicense> ApplicableLicenses { get; set; }
 
         /// <summary>
         /// Gets the collection of tag names associated with the package for display.
