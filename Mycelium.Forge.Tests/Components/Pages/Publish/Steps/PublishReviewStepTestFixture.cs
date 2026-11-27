@@ -40,6 +40,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
         private Organization scope;
         private List<ValidationCheckModel> validationChecks;
         private PublishArtefactModel stagedArtefact;
+        private License apacheLicense;
+        private License mitLicense;
 
         [SetUp]
         public void SetUp()
@@ -49,8 +51,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             this.context.Services.AddBlazorBlueprintComponents();
             this.context.JSInterop.Mode = JSRuntimeMode.Loose;
 
+            this.apacheLicense = new License { Id = Guid.NewGuid(), Name = "Apache License 2.0", SpdxIdentifier = "Apache-2.0", LicenseText = "Apache text" };
+            this.mitLicense = new License { Id = Guid.NewGuid(), Name = "MIT License", SpdxIdentifier = "MIT", LicenseText = "MIT text" };
+
             this.package = new Package { Name = "test-pkg", ShortName = "test-pkg", Description = "A test package" };
-            this.packageVersion = new PackageVersion { Version = "1.0.0" };
+            this.packageVersion = new PackageVersion { Version = "1.0.0", ApplicableLicenses = [this.mitLicense.Id] };
             this.scope = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org" };
             this.validationChecks = [];
             this.stagedArtefact = new PublishArtefactModel { FileName = "pkg.kpar", Format = "SysML v2", SizeInBytes = 1024 };
@@ -58,7 +63,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             this.viewModelMock = new Mock<IPublishViewModel>();
             this.viewModelMock.Setup(x => x.Package).Returns(this.package);
             this.viewModelMock.Setup(x => x.PackageVersion).Returns(this.packageVersion);
-            this.viewModelMock.Setup(x => x.License).Returns("MIT");
+            this.viewModelMock.Setup(x => x.AvailableLicenses).Returns([this.apacheLicense, this.mitLicense]);
             this.viewModelMock.Setup(x => x.Tags).Returns(["tag1", "tag2"]);
             this.viewModelMock.Setup(x => x.Dependencies).Returns([("dep1", ">=1.0.0", true)]);
             this.viewModelMock.Setup(x => x.SelectedScope).Returns(this.scope);
@@ -88,8 +93,12 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
                 Assert.That(step.GetValidationStatusText(), Is.EqualTo("Passed all validation checks"));
             }
 
-            // Case 2: Empty metadata fields fall back to None
-            this.viewModelMock.Setup(x => x.License).Returns(string.Empty);
+            // Case 2: Multiple applicable licenses are joined with comma separator
+            this.packageVersion.ApplicableLicenses = [this.apacheLicense.Id, this.mitLicense.Id];
+            Assert.That(step.GetLicenseText(), Is.EqualTo("Apache-2.0, MIT"));
+
+            // Case 3: Empty metadata fields fall back to None
+            this.packageVersion.ApplicableLicenses = [];
             this.viewModelMock.Setup(x => x.Tags).Returns([]);
             this.viewModelMock.Setup(x => x.Dependencies).Returns([]);
 
@@ -100,7 +109,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
                 Assert.That(step.GetDependenciesText(), Is.EqualTo("None"));
             }
 
-            // Case 3: Validation warnings and errors affect review status text
+            // Case 4: Validation warnings and errors affect review status text
             this.validationChecks.Add(new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Warning, "License warning"));
             Assert.That(step.GetValidationStatusText(), Does.Contain("Passed with 1 warning"));
 

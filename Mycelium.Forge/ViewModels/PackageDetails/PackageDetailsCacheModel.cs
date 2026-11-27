@@ -45,5 +45,10 @@ namespace Mycelium.Forge.ViewModels.PackageDetails
         /// Gets or sets the collection of maintainer account DTOs.
         /// </summary>
         public IReadOnlyList<IAccount> Maintainers { get; set; } = [];
+
+        /// <summary>
+        /// Gets or sets the collection of applicable license DTOs for the selected package version.
+        /// </summary>
+        public IReadOnlyList<ILicense> ApplicableLicenses { get; set; } = [];
     }
 }

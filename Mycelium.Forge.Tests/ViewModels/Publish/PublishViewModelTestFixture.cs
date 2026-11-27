@@ -46,6 +46,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
         private Mock<IPackageService> packageServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
         private Mock<IPackageTypeService> packageTypeServiceMock;
+        private Mock<ILicenseService> licenseServiceMock;
         private Mock<IDatabaseSource> databaseSourceMock;
         private Mock<IFileUploadStagingService> fileUploadStagingServiceMock;
         private Mock<IPackagePublishService> packagePublishServiceMock;
@@ -54,6 +55,8 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
         private UserContext userContext;
         private Organization activeScope;
         private PackageType packageType;
+        private License apacheLicense;
+        private License mitLicense;
         private PublishViewModel viewModel;
 
         [SetUp]
@@ -64,6 +67,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             this.packageServiceMock = new Mock<IPackageService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
             this.packageTypeServiceMock = new Mock<IPackageTypeService>();
+            this.licenseServiceMock = new Mock<ILicenseService>();
             this.databaseSourceMock = new Mock<IDatabaseSource>();
             this.fileUploadStagingServiceMock = new Mock<IFileUploadStagingService>();
             this.packagePublishServiceMock = new Mock<IPackagePublishService>();
@@ -74,14 +78,17 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             this.userContext = new UserContext { AccountId = accountId, Username = "testPublisher", CurrentRoles = [RoleKind.Account] };
             this.activeScope = new Organization { Id = Guid.NewGuid(), Name = "Starion", ShortName = "starion", Status = ScopeStatusKind.ACTIVE, DefaultPackageVisibility = VisibilityKind.PUBLIC, Member = [accountId] };
             this.packageType = new PackageType { Id = Guid.NewGuid(), Name = PackageFormatConstants.SysMlV2 };
+            this.apacheLicense = new License { Id = Guid.NewGuid(), Name = "Apache License 2.0", SpdxIdentifier = "Apache-2.0", LicenseText = "Apache text" };
+            this.mitLicense = new License { Id = Guid.NewGuid(), Name = "MIT License", SpdxIdentifier = "MIT", LicenseText = "MIT text" };
 
             this.userServiceMock.Setup(x => x.GetUserContext()).ReturnsAsync(this.userContext);
             this.scopeServiceMock.Setup(x => x.ReadActiveByAccountAsync(this.userContext, accountId, It.IsAny<CancellationToken>())).ReturnsAsync([this.activeScope]);
             this.scopeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length > 0 && ids[0] == this.activeScope.Id))).ReturnsAsync(ImmutableList.Create<IScope>(this.activeScope));
             this.packageTypeServiceMock.Setup(x => x.ReadByNameAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<string[]>())).ReturnsAsync(ImmutableList.Create<IPackageType>(this.packageType));
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length > 0 && ids[0] == this.packageType.Id))).ReturnsAsync(ImmutableList.Create<IPackageType>(this.packageType));
+            this.licenseServiceMock.Setup(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<ILicense>(this.mitLicense, this.apacheLicense));
 
-            this.viewModel = new PublishViewModel(this.userServiceMock.Object, this.scopeServiceMock.Object, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.databaseSourceMock.Object, this.fileUploadStagingServiceMock.Object, this.packagePublishServiceMock.Object, this.packageVersionPermissionServiceMock.Object, this.memoryCacheMock.Object);
+            this.viewModel = new PublishViewModel(this.userServiceMock.Object, this.scopeServiceMock.Object, this.packageServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.licenseServiceMock.Object, this.databaseSourceMock.Object, this.fileUploadStagingServiceMock.Object, this.packagePublishServiceMock.Object, this.packageVersionPermissionServiceMock.Object, this.memoryCacheMock.Object);
         }
 
         [TearDown]
@@ -125,7 +132,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
 
             this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile(token)).Returns(stream);
 
-            var manifest = new KparManifest { Name = "kpar-package", Version = "1.0.0", Description = "Kpar package description" };
+            var manifest = new KparManifest { Name = "kpar-package", Version = "1.0.0", Description = "Kpar package description", License = "  mit  ", Topics = ["sysml"] };
             this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, stream, ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<CancellationToken>())).ReturnsAsync(manifest);
 
             var success = await this.viewModel.ExtractManifest(artefact);
@@ -135,9 +142,25 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
                 Assert.That(success, Is.True);
                 Assert.That(artefact.IsManifestValid, Is.True);
                 Assert.That(this.viewModel.StagedArtefact, Is.EqualTo(artefact));
+                Assert.That(this.viewModel.PackageVersion.ApplicableLicenses, Is.EqualTo((Guid[])[this.mitLicense.Id]));
+                Assert.That(this.viewModel.Tags, Is.EqualTo((string[])["sysml"]));
             }
 
-            // Case 2: Package extraction failure marks manifest invalid and returns false
+            // Case 2: Unmatched declared license preserves existing ApplicableLicenses
+            var unmatchedArtefact = new PublishArtefactModel { StagingToken = "token-unmatched", Kind = ArtifactKind.Kpar, Format = PackageFormatConstants.SysMlV2, FileName = "unmatched.kpar" };
+            this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile("token-unmatched")).Returns(new MemoryStream([.. "unmatched"u8]));
+            var unmatchedManifest = new KparManifest { Name = "kpar-package", Version = "1.0.0", License = "Unknown-License-1.0" };
+            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<CancellationToken>())).ReturnsAsync(unmatchedManifest);
+
+            var unmatchedSuccess = await this.viewModel.ExtractManifest(unmatchedArtefact);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(unmatchedSuccess, Is.True);
+                Assert.That(this.viewModel.PackageVersion.ApplicableLicenses, Is.EqualTo((Guid[])[this.mitLicense.Id]));
+            }
+
+            // Case 3: Package extraction failure marks manifest invalid, preserves ApplicableLicenses, and returns false
             var invalidArtefact = new PublishArtefactModel { StagingToken = "token-fail", Kind = ArtifactKind.Kpar, Format = "UnknownType", FileName = "test.kpar" };
             this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile("token-fail")).Returns(new MemoryStream([.. "corrupt"u8]));
             this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, "UnknownType", this.viewModel.Package, this.viewModel.PackageVersion, false, It.IsAny<CancellationToken>())).ReturnsAsync(Error.Validation(ValidationTypes.SchemaValidation, "Package type unknown"));
@@ -150,6 +173,32 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             {
                 Assert.That(failResult, Is.False);
                 Assert.That(invalidArtefact.IsManifestValid, Is.False);
+                Assert.That(this.viewModel.PackageVersion.ApplicableLicenses, Is.EqualTo((Guid[])[this.mitLicense.Id]));
+                Assert.That(this.viewModel.Tags, Is.Empty);
+            }
+
+            // Case 4: Existing package ignores declared KparManifest.License and preserves pre-filled ApplicableLicenses
+            var existingPackage = new Package { Id = Guid.NewGuid(), Name = "Existing", ShortName = "existing", Owner = this.activeScope.Id, PackageType = this.packageType.Id, Version = [Guid.NewGuid()] };
+            var existingVersion = new PackageVersion { Id = existingPackage.Version[0], Version = "1.0.0", Owner = existingPackage.Id, ApplicableLicenses = [this.apacheLicense.Id] };
+
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "existing", false, It.IsAny<CancellationToken>())).ReturnsAsync(existingPackage);
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(existingVersion));
+            this.packageVersionPermissionServiceMock.Setup(x => x.IsAllowedToCreate(this.userContext, It.IsAny<PackageVersion>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
+
+            await this.viewModel.InitializeViewModel("starion", "existing");
+
+            var existingArtefact = new PublishArtefactModel { StagingToken = "token-existing", Kind = ArtifactKind.Kpar, Format = PackageFormatConstants.SysMlV2, FileName = "existing.kpar" };
+            this.fileUploadStagingServiceMock.Setup(x => x.OpenStagedFile("token-existing")).Returns(new MemoryStream([.. "existing"u8]));
+            var existingManifest = new KparManifest { Name = "existing", Version = "1.1.0", License = "MIT", Topics = ["ignored"] };
+            this.packagePublishServiceMock.Setup(x => x.ExtractManifestAsync(this.userContext, It.IsAny<Stream>(), ArtifactKind.Kpar, PackageFormatConstants.SysMlV2, this.viewModel.Package, this.viewModel.PackageVersion, true, It.IsAny<CancellationToken>())).ReturnsAsync(existingManifest);
+
+            var existingSuccess = await this.viewModel.ExtractManifest(existingArtefact);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(existingSuccess, Is.True);
+                Assert.That(this.viewModel.PackageVersion.ApplicableLicenses, Is.EqualTo((Guid[])[this.apacheLicense.Id]));
+                Assert.That(this.viewModel.Tags, Is.Empty);
             }
         }
 
@@ -167,16 +216,22 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
                 Assert.That(this.viewModel.Package, Is.Not.Null);
                 Assert.That(this.viewModel.PackageVersion, Is.Not.Null);
                 Assert.That(this.viewModel.PackageVersion.Owner, Is.EqualTo(this.viewModel.Package.Id));
-                Assert.That(this.viewModel.License, Is.Empty);
+                Assert.That(this.viewModel.PackageVersion.ApplicableLicenses, Is.Empty);
+                Assert.That(this.viewModel.AvailableLicenses, Has.Count.EqualTo(2));
+                Assert.That(this.viewModel.AvailableLicenses[0].SpdxIdentifier, Is.EqualTo("Apache-2.0"));
+                Assert.That(this.viewModel.AvailableLicenses[1].SpdxIdentifier, Is.EqualTo("MIT"));
                 Assert.That(this.viewModel.Tags, Is.Empty);
             }
 
-            // Case 2: Existing package initialization loads metadata and permissions
-            var existingPackage = new Package { Id = Guid.NewGuid(), Name = "Existing", ShortName = "existing", Owner = this.activeScope.Id, PackageType = this.packageType.Id, Version = [Guid.NewGuid()] };
-            var existingVersion = new PackageVersion { Id = existingPackage.Version[0], Version = "1.0.0", Owner = existingPackage.Id };
+            // Case 2: Existing package initialization loads metadata, permissions, and pre-fills ApplicableLicenses from highest SemVer version
+            var olderVersionId = Guid.NewGuid();
+            var latestVersionId = Guid.NewGuid();
+            var existingPackage = new Package { Id = Guid.NewGuid(), Name = "Existing", ShortName = "existing", Owner = this.activeScope.Id, PackageType = this.packageType.Id, Version = [olderVersionId, latestVersionId] };
+            var olderVersion = new PackageVersion { Id = olderVersionId, Version = "1.0.0", Owner = existingPackage.Id, ApplicableLicenses = [this.mitLicense.Id] };
+            var latestVersion = new PackageVersion { Id = latestVersionId, Version = "2.0.0", Owner = existingPackage.Id, ApplicableLicenses = [this.apacheLicense.Id] };
 
             this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "existing", false, It.IsAny<CancellationToken>())).ReturnsAsync(existingPackage);
-            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(existingVersion));
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ImmutableList.Create<IPackageVersion>(olderVersion, latestVersion));
             this.packageVersionPermissionServiceMock.Setup(x => x.IsAllowedToCreate(this.userContext, It.IsAny<PackageVersion>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Result.Success);
 
             await this.viewModel.InitializeViewModel("starion", "existing");
@@ -188,7 +243,8 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
                 Assert.That(this.viewModel.Package, Is.EqualTo(existingPackage));
                 Assert.That(this.viewModel.ExpectedFormat, Is.Not.Null);
                 Assert.That(this.viewModel.ExpectedFormat.Name, Is.EqualTo(PackageFormatConstants.SysMlV2));
-                Assert.That(this.viewModel.ExistingVersions, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.ExistingVersions, Is.EqualTo((string[])["2.0.0", "1.0.0"]));
+                Assert.That(this.viewModel.PackageVersion.ApplicableLicenses, Is.EqualTo((Guid[])[this.apacheLicense.Id]));
                 Assert.That(this.viewModel.CanUserReleaseExistingPackageVersion, Is.True);
             }
 
@@ -296,7 +352,7 @@ namespace Mycelium.Forge.Tests.ViewModels.Publish
             await this.viewModel.InitializeViewModel();
             this.viewModel.Package.Name = "test-pkg";
             this.viewModel.Package.ShortName = "test-pkg";
-            this.viewModel.License = "MIT";
+            this.viewModel.PackageVersion.ApplicableLicenses = [this.mitLicense.Id];
             this.viewModel.PackageVersion.Version = "1.0.0";
 
             var passChecks = new List<ValidationCheckModel>

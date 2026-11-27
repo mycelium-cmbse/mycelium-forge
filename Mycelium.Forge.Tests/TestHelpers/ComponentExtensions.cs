@@ -45,6 +45,7 @@ namespace Mycelium.Forge.Tests.TestHelpers
                 BbButton { AdditionalAttributes: not null } button => button.AdditionalAttributes,
                 BbBadge { AdditionalAttributes: not null } badge => badge.AdditionalAttributes,
                 BbDropdownMenuItem { AdditionalAttributes: not null } menuItem => menuItem.AdditionalAttributes,
+                BbMultiSelect<Guid> { AdditionalAttributes: not null } multiSelect => multiSelect.AdditionalAttributes,
                 _ => ImmutableDictionary<string, object>.Empty
             };
         }

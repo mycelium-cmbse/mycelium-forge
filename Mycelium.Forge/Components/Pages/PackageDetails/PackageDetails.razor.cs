@@ -100,6 +100,17 @@ namespace Mycelium.Forge.Components.Pages.PackageDetails
         }
 
         /// <summary>
+        /// Computes the formatted summary of applicable SPDX license identifiers for the current release.
+        /// </summary>
+        /// <returns>The joined SPDX identifiers, or "No license" when none are declared.</returns>
+        public string GetLicenseSummary()
+        {
+            return this.ViewModel.ApplicableLicenses.Count > 0
+                ? string.Join(", ", this.ViewModel.ApplicableLicenses.Select(license => license.SpdxIdentifier))
+                : "No license";
+        }
+
+        /// <summary>
         /// Computes the formatted quality score summary string from the quality checks (e.g., "5/5 checks").
         /// </summary>
         /// <returns>The formatted quality score string.</returns>

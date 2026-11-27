@@ -10,6 +10,7 @@
 namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using BlazorBlueprint.Components;
@@ -23,9 +24,11 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
     using Moq;
 
     using Mycelium.Forge.Common;
+    using Mycelium.Forge.Components.Common;
     using Mycelium.Forge.Components.Pages.Publish.Steps;
     using Mycelium.Forge.Extractors.Enums;
     using Mycelium.Forge.Models.Publish;
+    using Mycelium.Forge.Tests.TestHelpers;
     using Mycelium.Forge.ViewModels.Publish;
 
     [TestFixture]
@@ -38,6 +41,8 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
         private Organization organizationScope;
         private Account accountScope;
         private PublishArtefactModel stagedArtefact;
+        private License apacheLicense;
+        private License mitLicense;
 
         [SetUp]
         public void SetUp()
@@ -52,13 +57,15 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             this.organizationScope = new Organization { Id = Guid.NewGuid(), Name = "Org", ShortName = "org", DefaultPackageVisibility = VisibilityKind.INTERNAL };
             this.accountScope = new Account { Id = Guid.NewGuid(), Name = "User", ShortName = "user", IsVerified = false, DefaultPackageVisibility = VisibilityKind.PRIVATE };
             this.stagedArtefact = new PublishArtefactModel { Kind = ArtifactKind.Kpar, StagingToken = "token-kpar" };
+            this.apacheLicense = new License { Id = Guid.NewGuid(), Name = "Apache License 2.0", SpdxIdentifier = "Apache-2.0", LicenseText = "Apache text" };
+            this.mitLicense = new License { Id = Guid.NewGuid(), Name = "MIT License", SpdxIdentifier = "MIT", LicenseText = "MIT text" };
 
             this.viewModelMock = new Mock<IPublishViewModel>();
             this.viewModelMock.Setup(x => x.Package).Returns(this.package);
             this.viewModelMock.Setup(x => x.PackageVersion).Returns(this.packageVersion);
             this.viewModelMock.SetupProperty(x => x.SelectedScope, this.organizationScope);
-            this.viewModelMock.SetupProperty(x => x.License, string.Empty);
             this.viewModelMock.SetupProperty(x => x.Tags, []);
+            this.viewModelMock.Setup(x => x.AvailableLicenses).Returns([this.apacheLicense, this.mitLicense]);
             this.viewModelMock.Setup(x => x.StagedArtefact).Returns(this.stagedArtefact);
             this.viewModelMock.Setup(x => x.ScopeOptions).Returns([this.organizationScope, this.accountScope]);
         }
@@ -70,7 +77,7 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
         }
 
         [Test]
-        public void VerifyChangeHandlers()
+        public async Task VerifyChangeHandlers()
         {
             var renderedStep = this.context.Render<PublishMetadataStep>(p => p.Add(x => x.ViewModel, this.viewModelMock.Object));
             var step = renderedStep.Instance;
@@ -90,9 +97,13 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
             step.OnVersionChanged("2.3.4");
             step.OnReleaseNotesChanged("Notes");
             step.OnDescriptionChanged("New Description");
-            step.OnLicenseChanged("MIT");
             step.OnVisibilityChanged(VisibilityKind.PUBLIC);
             step.OnTagsChanged(["tag1", "tag2"]);
+
+            var licenseSelector = renderedStep.FindComponents<BbMultiSelect<Guid>>().FirstOrDefault(x => x.Instance.HasId("publish-license"));
+            Assert.That(licenseSelector, Is.Not.Null);
+            Assert.That(licenseSelector!.Instance.Options!.Select(x => x.Text), Is.EqualTo((string[])["Apache License 2.0", "MIT License"]));
+            await renderedStep.InvokeAsync(() => licenseSelector.Instance.ValuesChanged.InvokeAsync([this.mitLicense.Id, this.apacheLicense.Id]));
 
             using (Assert.EnterMultipleScope())
             {
@@ -101,10 +112,14 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
                 Assert.That(this.packageVersion.Version, Is.EqualTo("2.3.4"));
                 Assert.That(this.packageVersion.ReleaseNotes, Is.EqualTo("Notes"));
                 Assert.That(this.package.Description, Is.EqualTo("New Description"));
-                Assert.That(this.viewModelMock.Object.License, Is.EqualTo("MIT"));
+                Assert.That(this.packageVersion.ApplicableLicenses, Is.EqualTo((Guid[])[this.mitLicense.Id, this.apacheLicense.Id]));
                 Assert.That(this.package.Visibility, Is.EqualTo(VisibilityKind.PUBLIC));
                 Assert.That(this.viewModelMock.Object.Tags, Has.Count.EqualTo(2));
             }
+
+            // Case 3: Passing null license selection clears ApplicableLicenses
+            step.OnLicensesChanged(null);
+            Assert.That(this.packageVersion.ApplicableLicenses, Is.Empty);
         }
 
         [Test]
@@ -223,6 +238,24 @@ namespace Mycelium.Forge.Tests.Components.Pages.Publish.Steps
                 Assert.That(step.IsScopeOrganization, Is.False);
                 Assert.That(step.IsVisibilityItemDisabled(VisibilityKind.INTERNAL), Is.True);
                 Assert.That(step.IsVisibilityItemDisabled(VisibilityKind.PUBLIC), Is.False);
+                Assert.That(step.HasSelectedLicenses, Is.False);
+                Assert.That(step.GetSelectedLicenses(), Is.Empty);
+                Assert.That(renderedStep.FindComponents<LicenseBadges>(), Is.Empty);
+            }
+
+            // Case 3: Selecting applicable licenses exposes HasSelectedLicenses, GetSelectedLicenses, and LicenseBadges
+            this.packageVersion.ApplicableLicenses = [this.mitLicense.Id];
+            renderedStep.Render();
+
+            var licenseBadges = renderedStep.FindComponents<LicenseBadges>();
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(step.HasSelectedLicenses, Is.True);
+                Assert.That(step.GetSelectedLicenses(), Is.EqualTo((License[])[this.mitLicense]));
+                Assert.That(licenseBadges, Has.Count.EqualTo(1));
+                Assert.That(licenseBadges[0].Instance.Licenses, Is.EqualTo((License[])[this.mitLicense]));
+                Assert.That(renderedStep.Markup, Does.Contain("Click a badge to view the full license text."));
             }
         }
     }

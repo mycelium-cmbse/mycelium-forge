@@ -43,6 +43,11 @@ namespace Mycelium.Forge.Services
         private readonly IDatabaseSource databaseSource;
 
         /// <summary>
+        /// The (injected) <see cref="ILicenseService" /> domain service.
+        /// </summary>
+        private readonly ILicenseService licenseService;
+
+        /// <summary>
         /// The (injected) <see cref="ILogger{PackagePublishService}" /> logger.
         /// </summary>
         private readonly ILogger<PackagePublishService> logger;
@@ -76,8 +81,9 @@ namespace Mycelium.Forge.Services
         /// <param name="packageService">The (injected) <see cref="IPackageService" /> domain service.</param>
         /// <param name="packageVersionService">The (injected) <see cref="IPackageVersionService" /> domain service.</param>
         /// <param name="packageTypeService">The (injected) <see cref="IPackageTypeService" /> domain service.</param>
+        /// <param name="licenseService">The (injected) <see cref="ILicenseService" /> domain service.</param>
         /// <param name="logger">The (injected) <see cref="ILogger{PackagePublishService}" /> logger.</param>
-        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors, IPackageService packageService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, ILogger<PackagePublishService> logger)
+        public PackagePublishService(IArtifactStore artifactStore, IDatabaseSource databaseSource, IEnumerable<IArtifactManifestExtractor> manifestExtractors, IPackageService packageService, IPackageVersionService packageVersionService, IPackageTypeService packageTypeService, ILicenseService licenseService, ILogger<PackagePublishService> logger)
         {
             this.artifactStore = artifactStore;
             this.databaseSource = databaseSource;
@@ -85,6 +91,7 @@ namespace Mycelium.Forge.Services
             this.packageService = packageService;
             this.packageVersionService = packageVersionService;
             this.packageTypeService = packageTypeService;
+            this.licenseService = licenseService;
             this.logger = logger;
         }
 
@@ -136,7 +143,8 @@ namespace Mycelium.Forge.Services
         }
 
         /// <summary>
-        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, and semver progression).
+        /// Evaluates the pre-publishing domain validation checks (schema, namespace uniqueness, semver progression, and
+        /// license).
         /// </summary>
         /// <param name="userContext">The contextual user information.</param>
         /// <param name="selectedScope">The owning scope of the package.</param>
@@ -169,6 +177,9 @@ namespace Mycelium.Forge.Services
             var versionResult = ValidateVersion(packageVersion, isExistingPackage, existingVersions);
             var versionSuccessDetail = !isExistingPackage ? "Initial version is valid for publication." : "Version is unique and strictly greater than prior releases.";
             checks.Add(new ValidationCheckModel(ValidationTypes.PackageVersion, versionResult, versionSuccessDetail));
+
+            var licenseCheck = await this.ValidateLicensesAsync(userContext, packageVersion, token);
+            checks.Add(licenseCheck);
 
             return checks;
         }
@@ -334,7 +345,7 @@ namespace Mycelium.Forge.Services
         /// <returns>An <see cref="ErrorOr{Success}" /> representing the namespace uniqueness check.</returns>
         private async Task<ErrorOr<Success>> ValidateNamespaceAsync(IUserContext userContext, IScope selectedScope, IPackage package, CancellationToken token)
         {
-            var existingResult = await this.packageService.ReadByCoordinateAsync(userContext, selectedScope?.ShortName ?? string.Empty, package.ShortName, true, token);
+            var existingResult = await this.packageService.ReadByCoordinateAsync(userContext, selectedScope.ShortName, package.ShortName, true, token);
 
             if (existingResult.IsError && existingResult.FirstError.Type != ErrorType.NotFound)
             {
@@ -343,7 +354,7 @@ namespace Mycelium.Forge.Services
 
             if (!existingResult.IsError)
             {
-                return Error.Conflict(ValidationTypes.NamespaceUniqueness, $"Package '{package.ShortName}' already exists in scope '@{selectedScope?.ShortName}'.");
+                return Error.Conflict(ValidationTypes.NamespaceUniqueness, $"Package '{package.ShortName}' already exists in scope '@{selectedScope.ShortName}'.");
             }
 
             return Result.Success;
@@ -363,7 +374,7 @@ namespace Mycelium.Forge.Services
                 return Result.Success;
             }
 
-            var conflictingVersion = existingVersions?.FirstOrDefault(x => SemanticVersionComparer.Instance.Compare(packageVersion.Version, x) <= 0);
+            var conflictingVersion = existingVersions.FirstOrDefault(x => SemanticVersionComparer.Instance.Compare(packageVersion.Version, x) <= 0);
 
             if (conflictingVersion != null)
             {
@@ -380,7 +391,7 @@ namespace Mycelium.Forge.Services
                 return Error.Conflict(ValidationTypes.PackageVersion, detail, new Dictionary<string, object> { { ValidationCheckModel.RecommendationMetadataKey, recommendation } });
             }
 
-            var latestVersion = existingVersions?.OrderByDescending(x => x, SemanticVersionComparer.Instance).FirstOrDefault();
+            var latestVersion = existingVersions.OrderByDescending(x => x, SemanticVersionComparer.Instance).FirstOrDefault();
             var isMajorBump = latestVersion != null && SemanticVersionComparer.IsMajorBump(packageVersion.Version, latestVersion);
 
             if (isMajorBump && string.IsNullOrWhiteSpace(packageVersion.ReleaseNotes))
@@ -389,6 +400,31 @@ namespace Mycelium.Forge.Services
             }
 
             return Result.Success;
+        }
+
+        /// <summary>
+        /// Validates the applicable licenses referenced by the package version against the supported licenses in the registry.
+        /// </summary>
+        /// <param name="userContext">The contextual user information.</param>
+        /// <param name="packageVersion">The package version being published.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A <see cref="ValidationCheckModel" /> representing the license validation outcome.</returns>
+        private async Task<ValidationCheckModel> ValidateLicensesAsync(IUserContext userContext, IPackageVersion packageVersion, CancellationToken token)
+        {
+            if (packageVersion.ApplicableLicenses.Count == 0)
+            {
+                return new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Warning, "No license selected for this package version.", "Select an applicable license so consumers know the usage terms.");
+            }
+
+            var matchedLicenses = await this.licenseService.ReadOrEmpty(userContext, packageVersion.ApplicableLicenses, token: token);
+
+            if (matchedLicenses.Count != packageVersion.ApplicableLicenses.Count)
+            {
+                return new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Fail, "One or more selected licenses are not supported by the registry.", "Select valid licenses from the supported SPDX list.");
+            }
+
+            var resolvedIdentifiers = string.Join(", ", matchedLicenses.Select(license => license.SpdxIdentifier));
+            return new ValidationCheckModel(ValidationTypes.License, ValidationStatus.Pass, $"Applicable license(s) verified: {resolvedIdentifiers}.");
         }
 
         /// <summary>

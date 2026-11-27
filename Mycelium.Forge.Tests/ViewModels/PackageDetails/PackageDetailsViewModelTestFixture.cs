@@ -39,6 +39,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
         private Mock<IScopeService> scopeServiceMock;
         private Mock<IPackageVersionService> packageVersionServiceMock;
         private Mock<IPackageTypeService> packageTypeServiceMock;
+        private Mock<ILicenseService> licenseServiceMock;
         private Mock<IAccountService> accountServiceMock;
         private Mock<IUserService> userServiceMock;
         private Mock<IPackagePermissionService> packagePermissionServiceMock;
@@ -50,6 +51,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
         private Package package;
         private Organization org;
         private PackageType packageType;
+        private License license;
         private Account maintainer;
 
         [SetUp]
@@ -60,6 +62,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.scopeServiceMock = new Mock<IScopeService>();
             this.packageVersionServiceMock = new Mock<IPackageVersionService>();
             this.packageTypeServiceMock = new Mock<IPackageTypeService>();
+            this.licenseServiceMock = new Mock<ILicenseService>();
             this.accountServiceMock = new Mock<IAccountService>();
             this.userServiceMock = new Mock<IUserService>();
             this.packagePermissionServiceMock = new Mock<IPackagePermissionService>();
@@ -76,11 +79,20 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             var typeId = Guid.NewGuid();
             var maintainerId = Guid.NewGuid();
 
+            this.license = new License
+            {
+                Id = Guid.NewGuid(),
+                Name = "Apache License 2.0",
+                SpdxIdentifier = "Apache-2.0",
+                LicenseText = "Apache License 2.0 full text"
+            };
+
             this.version = new PackageVersion
             {
                 Id = Guid.NewGuid(),
                 Version = "1.3.0",
-                PublicationDate = DateTime.UtcNow.AddDays(-2)
+                PublicationDate = DateTime.UtcNow.AddDays(-2),
+                ApplicableLicenses = [this.license.Id]
             };
 
             this.package = new Package
@@ -117,7 +129,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.packagePermissionServiceMock.Setup(x => x.IsAllowedToUpdate(It.IsAny<IUserContext>(), It.IsAny<IPackage>(), It.IsAny<IPackage>(), It.IsAny<NpgsqlTransaction>())).ReturnsAsync(Error.Unauthorized());
             this.databaseSourceMock.Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<NpgsqlTransaction, Task<ErrorOr<Success>>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(Error.Unauthorized());
 
-            this.viewModel = new PackageDetailsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.memoryCache, this.packagePermissionServiceMock.Object, this.loggerMock.Object);
+            this.viewModel = new PackageDetailsViewModel(this.databaseSourceMock.Object, this.packageServiceMock.Object, this.scopeServiceMock.Object, this.packageVersionServiceMock.Object, this.packageTypeServiceMock.Object, this.licenseServiceMock.Object, this.accountServiceMock.Object, this.userServiceMock.Object, this.memoryCache, this.packagePermissionServiceMock.Object, this.loggerMock.Object);
         }
 
         [TearDown]
@@ -140,11 +152,14 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.PackageType, Is.EqualTo(this.packageType));
                 Assert.That(this.viewModel.Versions, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.CurrentVersion, Is.EqualTo(this.version));
+                Assert.That(this.viewModel.ApplicableLicenses, Has.Count.EqualTo(1));
+                Assert.That(this.viewModel.ApplicableLicenses[0], Is.EqualTo(this.license));
                 Assert.That(this.viewModel.Maintainers, Has.Count.EqualTo(1));
                 Assert.That(this.viewModel.Elements, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.Dependencies, Has.Count.GreaterThan(0));
                 Assert.That(this.viewModel.Dependents, Has.Count.EqualTo(0));
                 Assert.That(this.viewModel.QualityChecks, Has.Count.GreaterThan(0));
+                Assert.That(this.viewModel.QualityChecks, Does.Contain(("License present", "Apache-2.0 (SPDX)", true)));
                 Assert.That(this.viewModel.IsUserAdmin, Is.False);
                 Assert.That(this.viewModel.CanManageVersions, Is.False);
                 Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
@@ -234,6 +249,22 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
                 Assert.That(this.viewModel.CanManagePackageTeam, Is.False);
                 this.loggerMock.Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(), It.Is<It.IsAnyType>((v, t) => true), It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Exactly(2));
             }
+
+            // Package version with no applicable licenses loads empty ApplicableLicenses without querying licenseService
+            this.licenseServiceMock.Invocations.Clear();
+            var unlicensedVersion = new PackageVersion { Id = Guid.NewGuid(), Version = "1.0.0", PublicationDate = DateTime.UtcNow, ApplicableLicenses = [] };
+            var unlicensedPackage = new Package { Id = Guid.NewGuid(), Name = "Unlicensed", ShortName = "unlicensed", Owner = this.org.Id, PackageType = this.packageType.Id, Version = [unlicensedVersion.Id], PackageMaintainer = [this.maintainer.Id] };
+
+            this.packageServiceMock.Setup(x => x.ReadByCoordinateAsync(this.userContext, "starion", "unlicensed", false, It.IsAny<CancellationToken>())).ReturnsAsync(ErrorOrFactory.From<IPackage>(unlicensedPackage));
+            this.packageVersionServiceMock.Setup(x => x.ReadAsync(this.userContext, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == unlicensedVersion.Id))).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageVersion>(unlicensedVersion)));
+
+            await this.viewModel.InitializeViewModel("unlicensed", "starion");
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(this.viewModel.ApplicableLicenses, Is.Empty);
+                this.licenseServiceMock.Verify(x => x.ReadAsync(It.IsAny<IUserContext>(), It.IsAny<CancellationToken>(), It.IsAny<Guid[]>()), Times.Never);
+            }
         }
 
         private void SetupPackageReadServices(UserContext context)
@@ -243,6 +274,7 @@ namespace Mycelium.Forge.Tests.ViewModels.PackageDetails
             this.scopeServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IScope>(this.org)));
             this.packageTypeServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageType>(this.packageType)));
             this.packageVersionServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IPackageVersion>(this.version)));
+            this.licenseServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == this.license.Id))).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<ILicense>(this.license)));
             this.accountServiceMock.Setup(x => x.ReadAsync(context, It.IsAny<CancellationToken>(), It.IsAny<Guid[]>())).ReturnsAsync(ErrorOrFactory.From(ImmutableList.Create<IAccount>(this.maintainer)));
         }
     }

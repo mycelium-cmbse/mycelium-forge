@@ -12,6 +12,7 @@ namespace Mycelium.Forge.Tests.Data
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -36,6 +37,7 @@ namespace Mycelium.Forge.Tests.Data
         private Mock<IForgeService> forgeServiceMock;
         private Mock<ICountryService> countryServiceMock;
         private Mock<IPackageTypeService> packageTypeServiceMock;
+        private Mock<ILicenseService> licenseServiceMock;
         private Mock<IAccountService> accountServiceMock;
         private Mock<IOrganizationService> organizationServiceMock;
         private Mock<IOrganizationInvitationService> organizationInvitationServiceMock;
@@ -56,6 +58,7 @@ namespace Mycelium.Forge.Tests.Data
             this.forgeServiceMock = new Mock<IForgeService>();
             this.countryServiceMock = new Mock<ICountryService>();
             this.packageTypeServiceMock = new Mock<IPackageTypeService>();
+            this.licenseServiceMock = new Mock<ILicenseService>();
             this.accountServiceMock = new Mock<IAccountService>();
             this.organizationServiceMock = new Mock<IOrganizationService>();
             this.organizationInvitationServiceMock = new Mock<IOrganizationInvitationService>();
@@ -101,6 +104,10 @@ namespace Mycelium.Forge.Tests.Data
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageType>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
 
+            this.licenseServiceMock
+                .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<ILicense>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result.Created);
+
             this.accountServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IAccount>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
@@ -137,6 +144,7 @@ namespace Mycelium.Forge.Tests.Data
                 this.forgeServiceMock.Object,
                 this.countryServiceMock.Object,
                 this.packageTypeServiceMock.Object,
+                this.licenseServiceMock.Object,
                 this.accountServiceMock.Object,
                 this.organizationServiceMock.Object,
                 this.organizationInvitationServiceMock.Object,
@@ -165,6 +173,7 @@ namespace Mycelium.Forge.Tests.Data
                 this.forgeServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IForge>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.countryServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<ICountry>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.packageTypeServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IPackageType>>(), It.IsAny<CancellationToken>()), Times.Once);
+                this.licenseServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.Is<IEnumerable<ILicense>>(licenses => licenses.Count() == SeedData.Licenses.Count), It.IsAny<CancellationToken>()), Times.Once);
                 this.accountServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IAccount>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.organizationServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IOrganization>>(), It.IsAny<CancellationToken>()), Times.Once);
                 this.organizationInvitationServiceMock.Verify(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IOrganizationInvitation>>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -183,6 +192,17 @@ namespace Mycelium.Forge.Tests.Data
 
             this.forgeServiceMock
                 .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<IForge>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result.Created);
+
+            this.licenseServiceMock
+                .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<ILicense>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Error.Failure(description: "Failed to create licenses"));
+
+            var licenseFailureResult = await this.databaseSeeder.SeedAsync(CancellationToken.None);
+            Assert.That(licenseFailureResult, Is.False);
+
+            this.licenseServiceMock
+                .Setup(x => x.CreateAsync(It.IsAny<IUserContext>(), It.IsAny<NpgsqlTransaction>(), It.IsAny<IEnumerable<ILicense>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result.Created);
 
             this.accountServiceMock
